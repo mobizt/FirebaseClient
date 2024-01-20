@@ -100,11 +100,11 @@ public:
     const char *c_str() { return buf.c_str(); }
 };
 
-class Value
+class ValueConverter
 {
 public:
-    Value() {}
-    ~Value() {}
+    ValueConverter() {}
+    ~ValueConverter() {}
 
     template <typename T>
     struct is_string

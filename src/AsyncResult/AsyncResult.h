@@ -77,7 +77,7 @@ public:
         template <typename T>
         T to()
         {
-            return value.to<T>(data().c_str());
+            return vcon.to<T>(data().c_str());
         }
         bool isStream() { return sse; }
         String name() { return node_name; }
@@ -101,11 +101,11 @@ public:
 
         database_data_type type()
         {
-            return value.getType(data().c_str());
+            return vcon.getType(data().c_str());
         }
 
     private:
-        Value value;
+        ValueConverter vcon;
         String *ref_payload = nullptr;
         bool null_etag = false;
         bool sse = false;

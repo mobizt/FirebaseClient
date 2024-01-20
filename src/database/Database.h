@@ -132,13 +132,22 @@ public:
     }
 
     template <typename T = const char *>
-    void set(AsyncClient &aClient, const String &path, T value)
+    bool set(AsyncClient &aClient, const String &path, T value)
     {
-        Value v;
-        String payload;
-        v.getVal<T>(payload, value);
-        AsyncClient::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClient::slot_options_t(), nullptr, nullptr, nullptr, NULL);
-        asyncRequest(aReq, payload.c_str());
+        AsyncResult result;
+        return storeAsync(aClient, path, value, async_request_handler_t::http_put, false, &result, NULL);
+    }
+
+    template <typename T = const char *>
+    void set(AsyncClient &aClient, const String &path, T value, AsyncResultCallback cb)
+    {
+        storeAsync(aClient, path, value, async_request_handler_t::http_put, true, nullptr, cb);
+    }
+
+    template <typename T = const char *>
+    void set(AsyncClient &aClient, const String &path, T value, AsyncResult &aResult)
+    {
+        storeAsync(aClient, path, value, async_request_handler_t::http_put, true, &aResult, NULL);
     }
 
     void set(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb)
@@ -156,13 +165,90 @@ public:
     template <typename T = const char *>
     String push(AsyncClient &aClient, const String &path, T value)
     {
-        Value v;
+        ValueConverter vcon;
         AsyncResult result;
         String payload;
-        v.getVal<T>(payload, value);
+        vcon.getVal<T>(payload, value);
         AsyncClient::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(), nullptr, nullptr, &result, NULL);
         asyncRequest(aReq, payload.c_str());
         return result.database.name();
+    }
+
+    void push(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb)
+    {
+        AsyncClient::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, &file, nullptr, cb);
+        asyncRequest(aReq);
+    }
+
+    void push(AsyncClient &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+    {
+        AsyncClient::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, &file, &aResult, nullptr);
+        asyncRequest(aReq);
+    }
+
+    template <typename T = object_t>
+    bool update(AsyncClient &aClient, const String &path, const T &value)
+    {
+        AsyncResult result;
+        return storeAsync(aClient, path, value, async_request_handler_t::http_patch, false, &result, NULL);
+    }
+
+    template <typename T = object_t>
+    void update(AsyncClient &aClient, const String &path, const T &value, AsyncResultCallback cb)
+    {
+        storeAsync(aClient, path, value, async_request_handler_t::http_patch, true, nullptr, cb);
+    }
+
+    template <typename T = object_t>
+    void update(AsyncClient &aClient, const String &path, const T &value, AsyncResult &aResult)
+    {
+        storeAsync(aClient, path, value, async_request_handler_t::http_patch, true, &aResult, NULL);
+    }
+
+    bool remove(AsyncClient &aClient, const String &path)
+    {
+        AsyncResult result;
+        AsyncClient::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(), nullptr, nullptr, &result, nullptr);
+        asyncRequest(aReq);
+        return result.database.null_etag && result.database.data().indexOf("null") > -1;
+    }
+
+    void url(const String &url)
+    {
+        this->dbUrl = url;
+    }
+
+    void loop()
+    {
+        for (size_t clientSlot = 0; clientSlot < clientList.size(); clientSlot++)
+        {
+            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(clientList[clientSlot]);
+            if (aClient)
+            {
+                for (size_t slot = 0; slot < aClient->slotCount(); slot++)
+                    aClient->process(clientList, true);
+            }
+        }
+    }
+
+private:
+    String dbUrl;
+    vector<uint32_t> clientList;
+
+    template <typename T = object_t>
+    bool storeAsync(AsyncClient &aClient, const String &path, const T &value, async_request_handler_t::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb)
+    {
+        ValueConverter vcon;
+        String payload;
+        vcon.getVal<object_t>(payload, value);
+        DataOptions options;
+        if (!async)
+            options.silent = true;
+        AsyncClient::async_request_data_t aReq(&aClient, path, mode, AsyncClient::slot_options_t(false, false, async, false, false), &options, nullptr, aResult, cb);
+        asyncRequest(aReq, payload.c_str());
+        if (!async)
+            return aResult->lastError.code() == 0;
+        return true;
     }
 
     void asyncRequest(AsyncClient::async_request_data_t &request, const char *payload = "")
@@ -195,28 +281,6 @@ public:
 
         request.aClient->process(clientList, sData->async);
     }
-
-    void url(const String &url)
-    {
-        this->dbUrl = url;
-    }
-
-    void loop()
-    {
-        for (size_t clientSlot = 0; clientSlot < clientList.size(); clientSlot++)
-        {
-            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(clientList[clientSlot]);
-            if (aClient)
-            {
-                for (size_t slot = 0; slot < aClient->slotCount(); slot++)
-                    aClient->process(clientList, true);
-            }
-        }
-    }
-
-private:
-    String dbUrl;
-    vector<uint32_t> clientList;
 
     void addParams(bool hasQueryParams, String &extras, async_request_handler_t::http_request_method method, DataOptions *options, bool isFile)
     {

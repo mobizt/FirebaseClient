@@ -584,6 +584,7 @@ private:
                         if (sData->aResult.download_data.total > 0)
                             sData->aResult.data_available = false;
 #if defined(ENABLE_DATABASE)
+
                         if (sData->request.method == async_request_handler_t::http_post)
                             sData->aResult.database.parseNodeName();
 
@@ -650,7 +651,6 @@ private:
             if ((read == 1 && sData->response.header[sData->response.header.length() - 1] == '\r') ||
                 (read == 2 && sData->response.header[sData->response.header.length() - 2] == '\r' && sData->response.header[sData->response.header.length() - 1] == '\n'))
             {
-
                 clear(sData->response.location);
                 clear(sData->response.etag);
 
