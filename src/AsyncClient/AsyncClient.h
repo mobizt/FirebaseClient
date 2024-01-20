@@ -460,8 +460,9 @@ private:
     void removeSlot(std::vector<uint32_t> &clientList, uint8_t slot)
     {
         async_data_item_t *sData = getData(slot);
-
+#if defined(ENABLE_DATABASE)
         sData->aResult.database.clearSSE();
+#endif
 
         closeFile(sData);
 
@@ -582,7 +583,7 @@ private:
 
                         if (sData->aResult.download_data.total > 0)
                             sData->aResult.data_available = false;
-
+#if defined(ENABLE_DATABASE)
                         if (sData->request.method == async_request_handler_t::http_post)
                             sData->aResult.database.parseNodeName();
 
@@ -600,6 +601,7 @@ private:
                                 returnResult(sData, true);
                             }
                         }
+#endif
                     }
                 }
             }
@@ -655,7 +657,9 @@ private:
                 String cl, con, te, ct;
                 parseRespHeader(sData, sData->response.header, sData->response.location, "Location");
                 parseRespHeader(sData, sData->response.header, sData->response.etag, "ETag");
+#if defined(ENABLE_DATABASE)
                 sData->aResult.database.null_etag = sData->response.etag.indexOf("null_etag") > -1;
+#endif
 
                 parseRespHeader(sData, sData->response.header, cl, "Content-Length");
 
@@ -1014,7 +1018,7 @@ private:
 
         if (strlen(uri) > 0)
         {
-#if defined(ENABLE_DATABASE) || defined(FIREBASE_ENABLE_DATABASE)
+#if defined(ENABLE_DATABASE)
             p2 = String(uri).indexOf("auth=", 0);
             if (p2 != -1)
                 x = sscanf(uri + p2 + 5, "%[^&]", auth);
@@ -1647,7 +1651,9 @@ private:
 
                 if (sData->async && !client->available())
                 {
+#if defined(ENABLE_DATABASE)
                     handleEventTimeout(sData);
+#endif
                     inProcess = false;
                     return;
                 }
@@ -1681,16 +1687,16 @@ private:
             }
 
             handleProcessFailure(sData);
-
+#if defined(ENABLE_DATABASE)
             handleEventTimeout(sData);
-
+#endif
             if (sData->cancel || (!sData->sse && (sData->return_type == function_return_type_complete || sData->return_type == function_return_type_failure)))
                 removeSlot(clientList, slot);
         }
 
         inProcess = false;
     }
-
+#if defined(ENABLE_DATABASE)
     void handleEventTimeout(async_data_item_t *sData)
     {
         if ((!sData->cancel && sData->sse && !sData->aResult.database.sse_request && sData->sse && sData->aResult.database.eventTimeout()))
@@ -1700,12 +1706,14 @@ private:
             reset(sData, true);
         }
     }
-
+#endif
     void handleProcessFailure(async_data_item_t *sData)
     {
         if (sData->return_type == function_return_type_failure)
         {
+#if defined(ENABLE_DATABASE)
             sData->aResult.database.sse_request = false;
+#endif
             if (sData->async)
                 returnResult(sData, false);
             reset(sData, false);
@@ -1761,7 +1769,7 @@ public:
         this->client = client;
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
-         for (size_t i = 0; i < aDataList.size(); i++)
+        for (size_t i = 0; i < aDataList.size(); i++)
             reset(getData(i), true);
     }
 
