@@ -33,8 +33,9 @@ class Database
 {
 
 public:
-    Database(const String &location = ""){
-
+    Database(const String &url = "")
+    {
+        this->dbUrl = url;
     };
 
     Database &operator=(Database &rhs)
@@ -47,25 +48,11 @@ public:
     {
     }
 
-    // Syncronouse Get functions (14)
-
     /**
      * Get value at the node path.
      * @param path The node path to get value.
-     * @param net Optional. The network data (network_config_data) obtained from
-     * network class object e.g. GenericNetwork,
-     * GSMNetwork, EthernetNetwork and DefaultNetwork.
+     * @param aClient The async client.
      * @return value that casts from response payload.
-     *
-     * Example:
-     *
-     * GenericNetwork network;
-     *
-     * int int_value = database.get<int>("/path/to/data", getNetwork(network));
-     * String string_value = database.get<String>("/path/to/data");
-     * bool bool_value = database.get<bool>("/path/to/data");
-     * double double_value = database.get<double>("/path/to/data");
-     * FirebaseJson json_obj = database.get<FirebaseJson>("/path/to/data");
      */
 
     template <typename T1 = int>
@@ -162,8 +149,20 @@ public:
 
     void set(AsyncClient &aClient, const String &path, file_config_data file, AsyncResult &aResult)
     {
-         AsyncClient::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, &file, &aResult, nullptr);
+        AsyncClient::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
+    }
+
+    template <typename T = const char *>
+    String push(AsyncClient &aClient, const String &path, T value)
+    {
+        Value v;
+        AsyncResult result;
+        String payload;
+        v.getVal<T>(payload, value);
+        AsyncClient::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(), nullptr, nullptr, &result, NULL);
+        asyncRequest(aReq, payload.c_str());
+        return result.database.name();
     }
 
     void asyncRequest(AsyncClient::async_request_data_t &request, const char *payload = "")

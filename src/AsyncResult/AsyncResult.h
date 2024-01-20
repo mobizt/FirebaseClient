@@ -34,7 +34,7 @@ class AsyncResult
 
     struct upload_data_t
     {
-        public:
+    public:
         String targetPath;
         size_t total = 0;
         size_t uploaded = 0;
@@ -126,6 +126,17 @@ public:
             data_p1 = 0;
             data_p2 = 0;
             sse = false;
+        }
+
+        void parseNodeName()
+        {
+            StringHelper sh;
+            int p1 = 0, p2 = 0;
+            sh.parse(*ref_payload, "\"name\"", "}", p1, p2);
+            if (p1 > -1 && p2 > -1)
+            {
+                node_name = ref_payload->substring(p1 + 1, p2 - 1);
+            }
         }
 
         void parseSSE()

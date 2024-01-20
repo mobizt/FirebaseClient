@@ -472,7 +472,7 @@ private:
             returnResult(sData, true);
         }
 
-        reset(sData);
+        reset(sData, false);
 
         delete sData;
         sData = nullptr;
@@ -579,8 +579,12 @@ private:
                     {
                         // if (!sData->response.flags.sse)
                         sData->aResult.setPayload(sData->response.payload);
+
                         if (sData->aResult.download_data.total > 0)
                             sData->aResult.data_available = false;
+
+                        if (sData->request.method == async_request_handler_t::http_post)
+                            sData->aResult.database.parseNodeName();
 
                         // data available from sse event
                         if (sData->response.flags.sse && sData->response.payload.length())
@@ -970,9 +974,10 @@ private:
         sData->response.chunkInfo.phase = async_response_handler_t::READ_CHUNK_SIZE;
     }
 
-    void reset(async_data_item_t *sData)
+    void reset(async_data_item_t *sData, bool disconnect)
     {
-        stop();
+        if (disconnect)
+            stop();
         sData->response.httpCode = 0;
         sData->error.code = 0;
         sData->aResult.lastError.clearError();
@@ -1594,7 +1599,7 @@ private:
                 if (sData->sse)
                 {
                     returnResult(sData, false);
-                    reset(sData);
+                    reset(sData, true);
                 }
 
                 inProcess = false;
@@ -1692,7 +1697,7 @@ private:
         {
             setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEDOUT);
             returnResult(sData, false);
-            reset(sData);
+            reset(sData, true);
         }
     }
 
@@ -1700,11 +1705,10 @@ private:
     {
         if (sData->return_type == function_return_type_failure)
         {
-            client->stop();
             sData->aResult.database.sse_request = false;
             if (sData->async)
                 returnResult(sData, false);
-            reset(sData);
+            reset(sData, false);
         }
     }
 
@@ -1754,12 +1758,11 @@ public:
 
     AsyncClient(network_config_data &net, Client *client)
     {
-        for (size_t i = 0; i < aDataList.size(); i++)
-            reset(getData(i));
-
         this->client = client;
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
+         for (size_t i = 0; i < aDataList.size(); i++)
+            reset(getData(i), true);
     }
 
     bool networkStatus() { return netStatus(); }
