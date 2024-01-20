@@ -2,6 +2,7 @@
 #define FIREBASE_CLIENT_H
 #include <Arduino.h>
 #include "core/AuthConfig.h"
+#include "core/FirebaseApp.h"
 #include "database/Database.h"
 
 class FirebaseClient
@@ -12,7 +13,7 @@ public:
     FirebaseClient(){};
     ~FirebaseClient(){};
 
-    void initializeApp(AsyncClient &aClient, user_auth_data &auth){}
+    void initializeApp(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth){}
 
 
 
