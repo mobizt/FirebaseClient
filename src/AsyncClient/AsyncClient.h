@@ -95,6 +95,7 @@ private:
     network_config_data net;
     uint32_t addr = 0;
     bool inProcess = false;
+    // should be removed
     String token;
 
     void closeFile(async_data_item_t *sData)
@@ -1732,7 +1733,8 @@ private:
         parse(sData->request.url, url_info);
         return url_info.host;
     }
-
+    
+    // should be removed
     String getToken()
     {
         return token;

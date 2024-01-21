@@ -1038,4 +1038,11 @@ private:
     user_auth_data data;
 };
 
+struct auth_token_data_t
+{
+    user_auth_data user_auth;
+    String token;
+    uint32_t expire = 0;
+};
+
 #endif

@@ -72,11 +72,10 @@
  */
 #define ENABLE_FS
 
-/**📍 For enabling Keep Alive connection mode
- * ⛔ Use following build flag to disable.
- * -D DISABLE_KEEPALIVE
- */
-#define ENABLE_KEEPALIVE
+
+#define ENABLE_JWT
+
+
 
 #include "core/Options.h"
 

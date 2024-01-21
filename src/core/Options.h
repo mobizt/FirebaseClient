@@ -56,7 +56,6 @@
 #undef ENABLE_ERROR_STRING
 #undef ENABLE_OTA
 #undef ENABLE_FS
-#undef ENABLE_KEEPALIVE
 #undef DEFAULT_DEBUG_PORT
 
 #endif
@@ -106,26 +105,11 @@
 #undef ENABLE_FS
 #endif
 
-#if defined(DISABLE_KEEPALIVE)
-#undef ENABLE_KEEPALIVE
-#endif
-
 #if defined(DISABLE_DEBUG)
 #undef DEFAULT_DEBUG_PORT
 #endif
 
 
-#if !defined(FIREBASE_RTDB_STREAM_TASK_STACK_SIZE)
-#define FIREBASE_RTDB_STREAM_TASK_STACK_SIZE 8192
-#endif
-
-#if !defined(FIREBASE_MAX_BLOB_PAYLOAD_SIZE)
-#define FIREBASE_MAX_BLOB_PAYLOAD_SIZE 1024
-#endif
-
-#if !defined(FIREBASE_MAX_ASYNC_QUEUE)
-#define FIREBASE_MAX_ASYNC_QUEUE 20
-#endif
 
 #if defined(ENABLE_PSRAM)
 #define FIREBASE_USE_PSRAM
@@ -169,6 +153,12 @@ public:
 #if ESP_ARDUINO_VERSION > ESP_ARDUINO_VERSION_VAL(2, 0, 1)
 #define ESP32_GT_2_0_1_FS_MEMORY_FIX
 #endif
+#endif
+#endif
+
+#if defined(ENABLE_JWT)
+#if !__has_include(<ESP_SSLClient.h>)
+#include "core/SSLClient/ESP_SSLClient.h"
 #endif
 #endif
 

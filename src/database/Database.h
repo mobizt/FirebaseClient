@@ -31,6 +31,7 @@ using namespace std;
 
 class Database
 {
+    friend class FirebaseClient;
 
 public:
     Database(const String &url = "")
@@ -46,6 +47,16 @@ public:
 
     ~Database()
     {
+    }
+
+    bool isInitialized()
+    {
+        return auth_token.user_auth.initialized;
+    }
+
+    bool ready()
+    {
+        return auth_token.user_auth.authenticated;
     }
 
     /**
@@ -233,6 +244,7 @@ public:
 
 private:
     String dbUrl;
+    auth_token_data_t auth_token;
     vector<uint32_t> clientList;
 
     template <typename T = object_t>
@@ -253,7 +265,7 @@ private:
 
     void asyncRequest(AsyncClient::async_request_data_t &request, const char *payload = "")
     {
-        String extras = ".json?auth=" + request.aClient->getToken();
+        String extras = ".json?auth=" + request.aClient->getToken(); // request.aClient->getToken() should be replace with app token
         addParams(true, extras, request.method, request.options, request.file);
         AsyncClient::async_data_item_t *sData = request.aClient->newSlot(clientList, dbUrl, request.path, extras, request.method, request.opt);
         if (request.file)
