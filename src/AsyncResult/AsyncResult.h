@@ -9,6 +9,7 @@
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
 #define FIREBASE_SSE_TIMEOUT 40 * 1000;
 
+
 class AsyncResult
 {
     friend class AsyncClient;

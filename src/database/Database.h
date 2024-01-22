@@ -26,12 +26,14 @@
 #ifndef ASYNC_DATABASE_H
 #define ASYNC_DATABASE_H
 #include <Arduino.h>
-#include "AsyncClient/AsyncClient.h"
+#include "core/FirebaseApp.h"
 using namespace std;
+
+using namespace firebase;
 
 class Database
 {
-    friend class FirebaseClient;
+    friend class FirebaseApp;
 
 public:
     Database(const String &url = "")
@@ -49,14 +51,9 @@ public:
     {
     }
 
-    bool isInitialized()
+    void setAppToken(app_token_t *app_token)
     {
-        return auth_token.user_auth.initialized;
-    }
-
-    bool ready()
-    {
-        return auth_token.user_auth.authenticated;
+        this->app_token = app_token;
     }
 
     /**
@@ -231,21 +228,20 @@ public:
 
     void loop()
     {
-        for (size_t clientSlot = 0; clientSlot < clientList.size(); clientSlot++)
+        for (size_t clientSlot = 0; clientSlot < firebase_client_list.size(); clientSlot++)
         {
-            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(clientList[clientSlot]);
+            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(firebase_client_list[clientSlot]);
             if (aClient)
             {
                 for (size_t slot = 0; slot < aClient->slotCount(); slot++)
-                    aClient->process(clientList, true);
+                    aClient->process(firebase_client_list, true);
             }
         }
     }
 
 private:
     String dbUrl;
-    auth_token_data_t auth_token;
-    vector<uint32_t> clientList;
+    app_token_t *app_token = nullptr;
 
     template <typename T = object_t>
     bool storeAsync(AsyncClient &aClient, const String &path, const T &value, async_request_handler_t::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb)
@@ -267,7 +263,7 @@ private:
     {
         String extras = ".json?auth=" + request.aClient->getToken(); // request.aClient->getToken() should be replace with app token
         addParams(true, extras, request.method, request.options, request.file);
-        AsyncClient::async_data_item_t *sData = request.aClient->newSlot(clientList, dbUrl, request.path, extras, request.method, request.opt);
+        AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt);
         if (request.file)
         {
             sData->request.file_data.copy(*request.file);
@@ -291,7 +287,7 @@ private:
         if (request.aResult)
             sData->refResult = request.aResult;
 
-        request.aClient->process(clientList, sData->async);
+        request.aClient->process(firebase_client_list, sData->async);
     }
 
     void addParams(bool hasQueryParams, String &extras, async_request_handler_t::http_request_method method, DataOptions *options, bool isFile)

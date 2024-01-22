@@ -57,6 +57,14 @@
 #undef ENABLE_OTA
 #undef ENABLE_FS
 #undef DEFAULT_DEBUG_PORT
+#undef ENABLE_SERVICE_AUTH
+#undef ENABLE_CUSTOM_AUTH
+#undef ENABLE_USER_AUTH
+#undef ENABLE_ACCESS_TOKEN
+#undef ENABLE_CUSTOM_TOKEN
+#undef ENABLE_ID_TOKEN
+#undef ENABLE_LEGACY_TOKEN
+#undef ENABLE_JWT
 
 #endif
 
@@ -109,6 +117,33 @@
 #undef DEFAULT_DEBUG_PORT
 #endif
 
+#if defined(DISABLE_SERVICE_AUTH)
+#undef ENABLE_SERVICE_AUTH
+#endif
+
+#if defined(DISABLE_CUSTOM_AUTH)
+#undef ENABLE_CUSTOM_AUTH
+#endif
+
+#if defined(DISABLE_USER_AUTH)
+#undef ENABLE_USER_AUTH
+#endif
+
+#if defined(DISABLE_ACCESS_TOKEN)
+#undef ENABLE_ACCESS_TOKEN
+#endif
+
+#if defined(DISABLE_CUSTOM_TOKEN)
+#undef ENABLE_CUSTOM_TOKEN
+#endif
+
+#if defined(DISABLE_ID_TOKEN)
+#undef ENABLE_ID_TOKEN
+#endif
+
+#if defined(DISABLE_LEGACY_TOKEN)
+#undef ENABLE_LEGACY_TOKEN
+#endif
 
 
 #if defined(ENABLE_PSRAM)
@@ -154,6 +189,10 @@ public:
 #define ESP32_GT_2_0_1_FS_MEMORY_FIX
 #endif
 #endif
+#endif
+
+#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
+#define ENABLE_JWT
 #endif
 
 #if defined(ENABLE_JWT)

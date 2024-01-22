@@ -1,36 +1,30 @@
 #ifndef FIREBASE_CLIENT_H
 #define FIREBASE_CLIENT_H
 #include <Arduino.h>
-#include "core/AuthConfig.h"
-#include "AsyncClient/AsyncClient.h"
+#include "core/FirebaseApp.h"
 #include "database/Database.h"
 
-class FirebaseClient
+using namespace firebase;
+
+namespace firebase
 {
-private:
-    vector<uint32_t> appList;
-
-    void addApp(uint32_t addr)
+    class FirebaseClient
     {
-        for (size_t i = 0; i < appList.size(); i++)
+    private:
+      
+
+    public:
+        FirebaseClient(){};
+        ~FirebaseClient(){};
+
+        void initializeApp(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
         {
-            if (appList[i] == addr)
-                return;
+            app.aClient = &aClient;
+            app.auth_data.user_auth.copy(auth);
         }
+    };
 
-        appList.push_back(addr);
-    }
-
-public:
-    FirebaseClient(){};
-    ~FirebaseClient(){};
-
-    // template <typename T= Database>
-    void initializeApp(AsyncClient &aClient, Database &app, user_auth_data &auth)
-    {
-        addApp(reinterpret_cast<uint32_t>(&app.auth_token));
-    }
-};
+}
 
 FirebaseClient Firebase;
 

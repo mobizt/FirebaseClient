@@ -11,9 +11,13 @@
 #include "./core/OTA.h"
 #include "./AsyncResult/AsyncResult.h"
 #include "./core/AuthConfig.h"
+#include "core/List.h"
+
+using namespace firebase;
 
 class AsyncClient
 {
+    friend class AuthRequest;
     friend class Database;
 
 private:
@@ -45,19 +49,20 @@ private:
         bool ota = false;
         const char *etag = "";
         slot_options_t() {}
-        slot_options_t(bool v1, bool v2, bool v3, bool v4, bool v5, const char *v6 = "")
+        slot_options_t(bool auth_use, bool sse, bool async, bool sv, bool ota, const char *etag = "")
         {
-            auth_use = v1;
-            sse = v2;
-            async = v3;
-            sv = v4;
-            ota = v5;
-            etag = v6;
+            this->auth_use = auth_use;
+            this->sse = sse;
+            this->async = async;
+            this->sv = sv;
+            this->ota = ota;
+            this->etag = etag;
         }
     };
 
     struct async_data_item_t
     {
+
     public:
         struct async_error_t
         {
@@ -252,8 +257,8 @@ private:
         {
             uint16_t toSend = len - sData->request.dataIndex > FIREBASE_CHUNK_SIZE ? FIREBASE_CHUNK_SIZE : len - sData->request.dataIndex;
             size_t sent = this->client->write(data + sData->request.dataIndex, toSend);
-
-            idle();
+            async_request_handler_t req;
+            req.idle();
 
             if (sent == toSend)
             {
@@ -312,7 +317,7 @@ private:
         {
             if (!client->connected())
             {
-                ret = connect(sData, getHost(sData).c_str(), sData->request.port);
+                ret = connect(sData, getHost(sData, true).c_str(), sData->request.port);
                 if (ret != function_return_type_complete)
                     return connErrorHandler(sData, sData->state);
             }
@@ -351,9 +356,7 @@ private:
 
         if (sData->response.location.length())
         {
-            async_request_handler_t::url_info_t url_info;
-            parse(sData->response.location, url_info);
-            if (connect(sData, url_info.host.c_str(), sData->request.port) > function_return_type_failure)
+            if (connect(sData, getHost(sData, false).c_str(), sData->request.port) > function_return_type_failure)
                 return function_return_type_continue;
 
             return connErrorHandler(sData, sData->state);
@@ -385,15 +388,6 @@ private:
             sData->error.code = code;
 
         setLastError(sData);
-    }
-
-    void idle()
-    {
-#if defined(ARDUINO_ESP8266_MAJOR) && defined(ARDUINO_ESP8266_MINOR) && defined(ARDUINO_ESP8266_REVISION) && ((ARDUINO_ESP8266_MAJOR == 3 && ARDUINO_ESP8266_MINOR >= 1) || ARDUINO_ESP8266_MAJOR > 3)
-        esp_yield();
-#else
-        delay(0);
-#endif
     }
 
     async_data_item_t *getData(uint8_t slot)
@@ -432,7 +426,8 @@ private:
         if (sData->cb && (setData || error_notify_timeout))
             sData->cb(sData->aResult);
 
-        idle();
+        async_request_handler_t req;
+        req.idle();
     }
 
     void setLastError(async_data_item_t *sData)
@@ -492,15 +487,6 @@ private:
                 }
             }
         }
-    }
-
-    void addList(vector<uint32_t> &clientList)
-    {
-        for (size_t i = 0; i < clientList.size(); i++)
-            if (clientList[i] == addr)
-                return;
-
-        clientList.push_back(addr);
     }
 
     int readLine(Client *client, String &buf)
@@ -652,6 +638,7 @@ private:
             if ((read == 1 && sData->response.header[sData->response.header.length() - 1] == '\r') ||
                 (read == 2 && sData->response.header[sData->response.header.length() - 2] == '\r' && sData->response.header[sData->response.header.length() - 1] == '\n'))
             {
+
                 clear(sData->response.location);
                 clear(sData->response.etag);
 
@@ -737,10 +724,12 @@ private:
         {
             if (sData->response.chunkInfo.chunkSize > -1)
             {
+                sData->response.payloadLen += sData->response.chunkInfo.chunkSize;
                 int read = readLine(client, *out);
                 if (read)
                 {
                     sData->response.chunkInfo.dataLen += read;
+                    sData->response.payloadRead += read;
                     // chunk may contain trailing
                     if (sData->response.chunkInfo.dataLen - 2 >= sData->response.chunkInfo.chunkSize)
                     {
@@ -995,151 +984,6 @@ private:
         sData->aResult.download_data.reset();
         sData->aResult.upload_data.reset();
         clear(sData);
-    }
-
-    void parse(const String &url, struct async_request_handler_t::url_info_t &info)
-    {
-
-        char *host = reinterpret_cast<char *>(mem.alloc(url.length()));
-        char *uri = reinterpret_cast<char *>(mem.alloc(url.length()));
-        char *auth = reinterpret_cast<char *>(mem.alloc(url.length()));
-
-        int p1 = 0;
-        int x = sscanf(url.c_str(), "https://%[^/]/%s", host, uri);
-        x ? p1 = 8 : x = sscanf(url.c_str(), "http://%[^/]/%s", host, uri);
-        x ? p1 = 7 : x = sscanf(url.c_str(), "%[^/]/%s", host, uri);
-
-        int p2 = 0;
-        if (x > 0)
-        {
-            p2 = String(host).indexOf("?", 0);
-            if (p2 != -1)
-                x = sscanf(url.c_str() + p1, "%[^?]?%s", host, uri);
-        }
-
-        if (strlen(uri) > 0)
-        {
-#if defined(ENABLE_DATABASE)
-            p2 = String(uri).indexOf("auth=", 0);
-            if (p2 != -1)
-                x = sscanf(uri + p2 + 5, "%[^&]", auth);
-#endif
-        }
-
-        info.uri = uri;
-        info.host = host;
-        info.auth = auth;
-        mem.release(&host);
-        mem.release(&uri);
-        mem.release(&auth);
-    }
-
-    void addNewLine(String &header)
-    {
-        header += "\r\n";
-    }
-
-    void addGAPIsHost(String &str, PGM_P sub)
-    {
-        str += sub;
-        if (str[str.length() - 1] != '.')
-            str += ".";
-        str += FPSTR("googleapis.com");
-    }
-
-    void addGAPIsHostHeader(String &header, PGM_P sub)
-    {
-        header += FPSTR("Host: ");
-        addGAPIsHost(header, sub);
-        addNewLine(header);
-    }
-
-    void addHostHeader(String &header, PGM_P host)
-    {
-        header += FPSTR("Host: ");
-        header += host;
-        addNewLine(header);
-    }
-
-    void addContentTypeHeader(String &header, PGM_P v)
-    {
-        header += FPSTR("Content-Type: ");
-        header += v;
-        addNewLine(header);
-    }
-
-    void addContentLengthHeader(String &header, size_t len)
-    {
-        header += FPSTR("Content-Length: ");
-        header += len;
-        addNewLine(header);
-    }
-
-    void addUAHeader(String &header)
-    {
-        header += FPSTR("User-Agent: ESP");
-        addNewLine(header);
-    }
-
-    void addConnectionHeader(String &header, bool keepAlive)
-    {
-        header += keepAlive ? FPSTR("Connection: keep-alive") : FPSTR("Connection: close");
-        addNewLine(header);
-    }
-
-    /* Append the string with first request line (HTTP method) */
-    bool addRequestHeaderFirst(String &header, async_request_handler_t::http_request_method method)
-    {
-        bool post = false;
-        switch (method)
-        {
-        case async_request_handler_t::http_get:
-            header += FPSTR("GET");
-            break;
-        case async_request_handler_t::http_post:
-            header += FPSTR("POST");
-            post = true;
-            break;
-
-        case async_request_handler_t::http_patch:
-            header += FPSTR("PATCH");
-            post = true;
-            break;
-
-        case async_request_handler_t::http_delete:
-            header += FPSTR("DELETE");
-            break;
-
-        case async_request_handler_t::http_put:
-            header += FPSTR("PUT");
-            break;
-
-        default:
-            break;
-        }
-
-        if (method == async_request_handler_t::http_get || method == async_request_handler_t::http_post || method == async_request_handler_t::http_patch || method == async_request_handler_t::http_delete || method == async_request_handler_t::http_put)
-            header += FPSTR(" ");
-
-        return post;
-    }
-
-    /* Append the string with last request line (HTTP version) */
-    void addRequestHeaderLast(String &header)
-    {
-        header += FPSTR(" HTTP/1.1\r\n");
-    }
-
-    /* Append the string with first part of Authorization header */
-    void addAuthHeaderFirst(String &header, auth_token_type type)
-    {
-        header += FPSTR("Authorization: ");
-        if (type == auth_access_token || type == auth_sa_access_token)
-            header += FPSTR("Bearer ");
-        else if (type == auth_id_token || type == auth_user_id_token || type == auth_sa_custom_token)
-            header += FPSTR("Firebase ");
-        else
-            header += FPSTR("key=");
     }
 
     function_return_type connect(async_data_item_t *sData, const char *host, uint16_t port)
@@ -1504,50 +1348,50 @@ private:
 
     async_data_item_t *newSlot(std::vector<uint32_t> &clientList, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t options)
     {
-        addList(clientList);
+        async_request_handler_t req;
         async_data_item_t *sData = addSlot();
         sData->async = options.async;
         sData->request.url = url;
         sData->request.path = path;
         sData->request.method = method;
         sData->sse = options.sse;
-        addRequestHeaderFirst(sData->request.header, method);
+        req.addRequestHeaderFirst(sData->request.header, method);
         if (path.length() == 0)
             sData->request.header += '/';
         else if (path.length() && path[0] != '/')
             sData->request.header += '/';
         sData->request.header += path;
         sData->request.header += extras;
-        addRequestHeaderLast(sData->request.header);
-        addHostHeader(sData->request.header, getHost(sData).c_str());
+        req.addRequestHeaderLast(sData->request.header);
+        req.addHostHeader(sData->request.header, getHost(sData, true).c_str());
 
         if (!options.auth_use)
         {
             sData->request.header += FPSTR("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
-            addNewLine(sData->request.header);
-            addConnectionHeader(sData->request.header, true);
+            req.addNewLine(sData->request.header);
+            req.addConnectionHeader(sData->request.header, true);
             if (!options.sv && method != async_request_handler_t::http_patch && extras.indexOf("orderBy") == -1)
             {
                 sData->request.header += FPSTR("X-Firebase-ETag: true");
-                addNewLine(sData->request.header);
+                req.addNewLine(sData->request.header);
             }
 
             if (strlen(options.etag) > 0 && (method == async_request_handler_t::http_put || method == async_request_handler_t::http_delete))
             {
                 sData->request.header += FPSTR("if-match: ");
                 sData->request.header += options.etag;
-                addNewLine(sData->request.header);
+                req.addNewLine(sData->request.header);
             }
 
             if (options.sse)
             {
                 sData->request.header += FPSTR("Accept: text/event-stream");
-                addNewLine(sData->request.header);
+                req.addNewLine(sData->request.header);
             }
         }
 
         if (method == async_request_handler_t::http_get || method == async_request_handler_t::http_delete)
-            addNewLine(sData->request.header);
+            req.addNewLine(sData->request.header);
         return sData;
     }
 
@@ -1555,8 +1399,9 @@ private:
     {
         if (sData->request.method == async_request_handler_t::http_post || sData->request.method == async_request_handler_t::http_put || sData->request.method == async_request_handler_t::http_patch)
         {
-            addContentLengthHeader(sData->request.header, len);
-            addNewLine(sData->request.header);
+            async_request_handler_t req;
+            req.addContentLengthHeader(sData->request.header, len);
+            req.addNewLine(sData->request.header);
         }
     }
 
@@ -1660,9 +1505,10 @@ private:
                 }
                 else if (!sData->async) // wait for non async
                 {
+                    async_request_handler_t req;
                     while (!client->available() && netConnect())
                     {
-                        idle();
+                        req.idle();
                     }
                 }
             }
@@ -1688,6 +1534,7 @@ private:
             }
 
             handleProcessFailure(sData);
+
 #if defined(ENABLE_DATABASE)
             handleEventTimeout(sData);
 #endif
@@ -1727,13 +1574,14 @@ private:
             client->stop();
     }
 
-    String getHost(async_data_item_t *sData)
+    String getHost(async_data_item_t *sData, bool fromReq)
     {
         async_request_handler_t::url_info_t url_info;
-        parse(sData->request.url, url_info);
+        async_request_handler_t req;
+        req.parse(mem, fromReq ? sData->request.url : sData->response.location, url_info);
         return url_info.host;
     }
-    
+
     // should be removed
     String getToken()
     {
@@ -1766,13 +1614,20 @@ public:
         }
     };
 
-    AsyncClient(network_config_data &net, Client *client)
+    AsyncClient(Client &client, network_config_data &net) : client(&client)
     {
-        this->client = client;
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
+        List list;
+        list.addRemoveList(firebase_client_list, addr, true);
+    }
+
+    ~AsyncClient()
+    {
         for (size_t i = 0; i < aDataList.size(); i++)
             reset(getData(i), true);
+        List list;
+        list.addRemoveList(firebase_client_list, addr, false);
     }
 
     bool networkStatus() { return netStatus(); }
