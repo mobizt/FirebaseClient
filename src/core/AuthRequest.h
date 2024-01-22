@@ -32,6 +32,13 @@ public:
 
         aClient->process(firebase_client_list, sData->async);
     }
+
+    void setLastError(AsyncResult &aResult, int code, const String &message)
+    {
+        aResult.lastError.err.message = message;
+        if (code != 0)
+            aResult.lastError.err.code = code;
+    }
 };
 
 #endif

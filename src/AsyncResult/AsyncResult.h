@@ -13,6 +13,7 @@
 class AsyncResult
 {
     friend class AsyncClient;
+    friend class AuthRequest;
     friend class Database;
 
     struct download_data_t

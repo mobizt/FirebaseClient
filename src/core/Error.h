@@ -98,6 +98,7 @@
 class FirebaseError
 {
     friend class AsyncClient;
+    friend class AuthRequest;
 
 private:
     struct firebase_error_info_t

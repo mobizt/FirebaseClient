@@ -69,12 +69,6 @@ namespace firebase
         user_auth_data_no_token
     };
 
-    struct firebase_auth_error_t
-    {
-        String string;
-        int code = 0;
-    };
-
     struct auth_status
     {
         friend class user_auth_data;
@@ -82,7 +76,6 @@ namespace firebase
 
     private:
         firebase_auth_event_type _event = auth_event_uninitialized;
-        firebase_auth_error_t _err;
 
         String authEventString(firebase_auth_event_type ev)
         {
@@ -136,7 +129,6 @@ namespace firebase
 
     public:
         firebase_auth_event_type event() { return _event; }
-        const char *string() { return _err.code == 0 ? authEventString(_event).c_str() : _err.string.c_str(); }
     };
 
     typedef void (*TimeStatusCallback)(uint32_t &ts);
@@ -1265,10 +1257,21 @@ namespace firebase
 
     struct app_token_t
     {
+    public:
         String token_type;
         String token;
+        String refresh;
         String uid;
         uint32_t expire = 0;
+        uint32_t expire_ts = 0;
+        void clear()
+        {
+            token_type = "";
+            token = "";
+            refresh = "";
+            uid = "";
+            expire = 0;
+        }
     };
 
     struct auth_data_t
