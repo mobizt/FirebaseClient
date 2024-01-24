@@ -1451,9 +1451,8 @@ private:
 
             if (!netConnect())
             {
-
                 setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED);
-                if (sData->sse)
+                if (sData->sse || sData->async)
                 {
                     returnResult(sData, false);
                     reset(sData, true);
@@ -1473,6 +1472,7 @@ private:
 
             if (sData->state == async_state_undefined || sData->state == async_state_send_header || sData->state == async_state_send_payload)
             {
+
                 sData->request.last_request_ms = millis();
                 sending = true;
                 sData->return_type = send(sData);

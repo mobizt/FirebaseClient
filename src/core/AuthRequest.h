@@ -33,9 +33,15 @@ public:
             aResult.lastError.err.code = code;
     }
 
-    void process(AsyncClient *aClient)
+    void process(AsyncClient *aClient, AsyncResult &aResult, AsyncResultCallback resultCb)
     {
         aClient->process(firebase_client_list, true);
+
+        if (aResult.lastError.code() != 0 && aResult.error_available)
+        {
+            if (resultCb)
+                resultCb(aResult);
+        }
     }
 
     void stop(AsyncClient *aClient)

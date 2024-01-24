@@ -28,9 +28,8 @@ namespace firebase
         auth_event_authenticating = 7,
         auth_event_auth_request_sent = 8,
         auth_event_auth_response_received = 9,
-        auth_event_re_authenticating = 10,
-        auth_event_ready = 11,
-        auth_event_error = 12
+        auth_event_ready = 10,
+        auth_event_error = 11
     };
 
     enum jwt_step
@@ -109,16 +108,12 @@ namespace firebase
             case auth_event_auth_response_received:
                 evstr = FPSTR("auth response received");
                 break;
-            case auth_event_re_authenticating:
-                evstr = FPSTR("re-authenticating");
-                break;
             case auth_event_ready:
                 evstr = FPSTR("ready");
                 break;
             case auth_event_error:
                 evstr = FPSTR("error");
                 break;
-
             default:
                 evstr = FPSTR("undefined");
                 break;

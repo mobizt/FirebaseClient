@@ -197,7 +197,7 @@ namespace firebase
 
         bool processAuth()
         {
-            authReq.process(aClient);
+            authReq.process(aClient, aResult, resultCb);
 
             if (!isExpired())
                 return true;
@@ -215,6 +215,8 @@ namespace firebase
                     setEvent(auth_event_uninitialized);
                 }
             }
+
+           
 
             if (auth_data.user_auth.auth_type == auth_access_token ||
                 auth_data.user_auth.auth_type == auth_sa_access_token ||

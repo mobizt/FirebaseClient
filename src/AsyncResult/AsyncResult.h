@@ -19,9 +19,10 @@ class AsyncResult
     struct app_event_t
     {
         friend class AuthRequest;
+
     private:
         String ev_msg;
-        int ev_code;
+        int ev_code = 0;
 
     public:
         String message() { return ev_msg; }
