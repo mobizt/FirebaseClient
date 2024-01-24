@@ -68,7 +68,6 @@
 
 #endif
 
-
 #if defined(DISABLE_DATABASE)
 #undef ENABLE_DATABASE
 #endif
@@ -145,12 +144,10 @@
 #undef ENABLE_LEGACY_TOKEN
 #endif
 
-
 #if defined(ENABLE_PSRAM)
 #define FIREBASE_USE_PSRAM
 #define MB_STRING_USE_PSRAM
 #endif
-
 
 #if defined(ENABLE_FS)
 #include <FS.h>
@@ -196,6 +193,15 @@ public:
 #endif
 
 #if defined(ENABLE_JWT)
+
+#if !defined(ENABLE_SERVICE_AUTH)
+#define ENABLE_SERVICE_AUTH
+#endif
+
+#if !defined(ENABLE_CUSTOM_AUTH)
+#define ENABLE_CUSTOM_AUTH
+#endif
+
 #if !__has_include(<ESP_SSLClient.h>)
 #include "core/SSLClient/ESP_SSLClient.h"
 #endif

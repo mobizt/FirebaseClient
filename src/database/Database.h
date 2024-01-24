@@ -51,9 +51,16 @@ public:
     {
     }
 
-    void setAppToken(app_token_t *app_token)
+    void setApp(uint32_t app_addr, app_token_t *app_token)
     {
+        this->app_addr = app_addr;
         this->app_token = app_token;
+    }
+
+    app_token_t *appToken()
+    {
+        List list;
+        return list.existed(firebase_app_list, app_addr) ? app_token : nullptr;
     }
 
     /**
@@ -241,6 +248,7 @@ public:
 
 private:
     String dbUrl;
+    uint32_t app_addr = 0;
     app_token_t *app_token = nullptr;
 
     template <typename T = object_t>

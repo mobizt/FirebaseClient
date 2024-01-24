@@ -6,9 +6,10 @@
 #include "AsyncClient/AsyncClient.h"
 #include "core/List.h"
 #if defined(ENABLE_JWT)
-#include "core/JWT.h";
+#include "core/JWT.h"
 #endif
 #include "AuthRequest.h"
+#include "core/Timer.h"
 
 #define FIREBASE_DEFAULT_TS 1618971013
 
@@ -24,14 +25,18 @@ namespace firebase
         auth_data_t auth_data;
         AsyncClient *aClient = nullptr;
         uint32_t addr = 0;
-        uint32_t ts = 0;
-        JWT jwt;
+        uint32_t ref_ts = 0;
+        AsyncResultCallback resultCb = NULL;
         AsyncResult aResult;
         AuthRequest authReq;
+        Timer timer;
         unsigned long last_error_ms = 0;
+        unsigned long last_auth_ms = 0;
+        bool processing = false;
+        uint32_t expire = 3600;
 
 #if defined(ENABLE_JWT)
-
+        JWT jwt;
         JWT::jwt_token_data *jwt_data = nullptr;
         bool createJwt(user_auth_data &auth_data)
         {
@@ -41,9 +46,9 @@ namespace firebase
             Memory mem;
 
             if (auth_data.timestatus_cb)
-                auth_data.timestatus_cb(ts);
+                auth_data.timestatus_cb(ref_ts);
 
-            if (!jwt.create(mem, jwt_data, auth_data, ts))
+            if (!jwt.create(mem, jwt_data, auth_data, ref_ts))
             {
                 authReq.setLastError(aResult, jwt_data->err_code, jwt_data->msg);
                 clearJWT();
@@ -69,6 +74,8 @@ namespace firebase
             jwt_data = nullptr;
         }
 
+#endif
+
         bool parseItem(StringHelper &sh, const String &src, String &dest, const String &name, const String &delim, int &p1, int &p2)
         {
             sh.parse(aResult.payload(), name, delim, p1, p2);
@@ -89,6 +96,10 @@ namespace firebase
             sh.parse(aResult.payload(), name, delim, p1, p2);
             if (p1 > -1 && p2 > -1)
             {
+                if (aResult.payload()[p1] == '"')
+                    p1++;
+                if (aResult.payload()[p2] == '"')
+                    p2--;
                 dest = atoi(aResult.payload().substring(p1, p2).c_str());
                 p1 = p2;
                 return true;
@@ -104,66 +115,47 @@ namespace firebase
             int p1 = 0, p2 = 0;
             auth_data.app_token.clear();
 
-            if (auth_data.user_auth.auth_type == auth_sa_custom_token ||
-                auth_data.user_auth.auth_type == auth_sa_access_token ||
-                auth_data.user_auth.auth_type == auth_access_token ||
-                auth_data.user_auth.auth_type == auth_user_id_token ||
-                auth_data.user_auth.auth_type == auth_custom_token)
+            if (aResult.payload().indexOf("\"error\"") > -1)
             {
                 String str;
-                if (parseItem(sh, aResult.payload(), str, "\"error\"", "}", p1, p2))
+                if (parseItem(sh, aResult.payload(), str, "\"error\"", auth_data.user_auth.auth_type == auth_user_id_token || auth_data.user_auth.auth_type == auth_sa_custom_token ? "}" : ",", p1, p2))
                 {
                     int code = 0;
                     str = "";
+                    p1 = 0;
+                    p2 = 0;
                     parseItem(sh, aResult.payload(), code, "\"code\"", ",", p1, p2);
-                    parseItem(sh, aResult.payload(), str, "\"message\"", "}", p1, p2);
+                    parseItem(sh, aResult.payload(), str, "\"message\"", ",", p1, p2);
                     parseItem(sh, aResult.payload(), str, "\"error_description\"", "}", p1, p2);
+                    if (str[str.length() - 1] == '"')
+                        str[str.length() - 1] = '\0';
                     authReq.setLastError(aResult, code, str);
-                    return false;
                 }
             }
-
-            if (auth_data.user_auth.auth_type == auth_sa_custom_token || auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token)
+            else if (aResult.payload().indexOf("\"idToken\"") > -1)
             {
-                if (auth_data.user_auth.auth_type == auth_sa_custom_token)
+                parseItem(sh, aResult.payload(), auth_data.app_token.uid, "\"localId\"", ",", p1, p2);
+
+                if (parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"idToken\"", ",", p1, p2))
                 {
-                    if (parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"idToken\"", ",", p1, p2))
-                    {
-                        parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refreshToken\"", ",", p1, p2);
-                        parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expiresIn\"", "}", p1, p2);
-                    }
-                }
-                else if (auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token)
-                {
-                    if (parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"access_token\"", ",", p1, p2))
-                    {
-                        parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
-                        parseItem(sh, aResult.payload(), auth_data.app_token.token_type, "\"token_type\"", "}", p1, p2);
-                    }
+                    parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refreshToken\"", ",", p1, p2);
+                    parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expiresIn\"", "}", p1, p2);
                 }
             }
-            else if (auth_data.user_auth.auth_type == auth_user_id_token || auth_data.user_auth.auth_type == auth_custom_token)
+            else if (aResult.payload().indexOf("\"id_token\"") > -1)
             {
-
-                if (auth_data.user_auth.auth_type == firebase_core_auth_task_type_delete_user || auth_data.user_auth.auth_type == firebase_core_auth_task_type_send_verify_email || auth_data.user_auth.auth_type == firebase_core_auth_task_type_reset_password)
-                    return false;
-
-                if (auth_data.user_auth.task_type == firebase_core_auth_task_type_signup)
-                    auth_data.user_auth.anonymous = auth_data.user_auth.user.email.length() == 0 && auth_data.user_auth.user.password.length() == 0;
-
-                if (auth_data.user_auth.auth_type == auth_custom_token)
+                parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
+                parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refresh_token\"", ",", p1, p2);
+                parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"id_token\"", ",", p1, p2);
+                parseItem(sh, aResult.payload(), auth_data.app_token.uid, "\"user_id\"", ",", p1, p2);
+            }
+            else if (aResult.payload().indexOf("\"access_token\"") > -1)
+            {
+                if (parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"access_token\"", ",", p1, p2))
                 {
-                    if (parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"access_token\"", ",", p1, p2))
-                        parseItem(sh, aResult.payload(), auth_data.app_token.token_type, "\"token_type\"", "}", p1, p2);
+                    parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
+                    parseItem(sh, aResult.payload(), auth_data.app_token.token_type, "\"token_type\"", "}", p1, p2);
                 }
-                else
-                {
-                    parseItem(sh, aResult.payload(), auth_data.app_token.token, auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? "\"id_token\"" : "\"idToken\"", ",", p1, p2);
-                }
-
-                parseItem(sh, aResult.payload(), auth_data.app_token.refresh, auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? "\"refresh_token\"" : "\"refreshToken\"", ",", p1, p2);
-                parseItem(sh, aResult.payload(), auth_data.app_token.expire, auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? "\"expires_in\"" : "\"expiresIn\"", ",", p1, p2);
-                parseItem(sh, aResult.payload(), auth_data.app_token.uid, auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? "\"user_id\"" : "\"localId\"", "}", p1, p2);
             }
 
             return auth_data.app_token.token.length() > 0;
@@ -171,27 +163,78 @@ namespace firebase
 
         void setEvent(firebase_auth_event_type event)
         {
-            if (auth_data.user_auth.status._event != event && event != auth_event_uninitialized)
-                auth_data.user_auth.status._event = event;
+            auth_data.user_auth.status._event = event;
+
+            if (event == auth_event_initializing || event == auth_event_authenticating)
+                processing = true;
 
             if (event == auth_event_error)
+            {
                 last_error_ms = millis();
+                timer.stop();
+            }
+
+            if (event == auth_event_ready)
+                last_auth_ms = millis();
+
+            if (event == auth_event_error || event == auth_event_ready)
+            {
+                processing = false;
+                authReq.stop(aClient);
+            }
+
+            authReq.setEventResult(aResult, auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
+
+            if (resultCb)
+                resultCb(aResult);
+        }
+
+        void getTime()
+        {
+            if (auth_data.user_auth.timestatus_cb)
+                auth_data.user_auth.timestatus_cb(ref_ts);
         }
 
         bool processAuth()
         {
-            if (auth_data.user_auth.status._event == auth_event_uninitialized)
-                auth_data.user_auth.status._event = auth_event_initializing;
+            authReq.process(aClient);
 
-            if (auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_sa_custom_token)
+            if (!isExpired())
+                return true;
+
+            if (!processing)
+            {
+                if ((auth_data.user_auth.auth_type == auth_access_token || auth_data.user_auth.auth_type == auth_custom_token) && isExpired())
+                {
+                    processing = true;
+                    auth_data.user_auth.task_type = firebase_core_auth_task_type_refresh_token;
+                }
+                else if ((auth_data.user_auth.status._event == auth_event_error || auth_data.user_auth.status._event == auth_event_ready) && (auth_data.app_token.expire == 0 || (auth_data.app_token.expire > 0 && isExpired())))
+                {
+                    processing = true;
+                    setEvent(auth_event_uninitialized);
+                }
+            }
+
+            if (auth_data.user_auth.auth_type == auth_access_token ||
+                auth_data.user_auth.auth_type == auth_sa_access_token ||
+                (auth_data.user_auth.auth_type == auth_sa_custom_token &&
+                 auth_data.app_token.refresh.length() == 0))
             {
 
-                if (auth_data.user_auth.status._event == auth_event_re_authenticating || auth_data.user_auth.status._event == auth_event_initializing)
+                if (auth_data.user_auth.status._event == auth_event_uninitialized)
+                {
+                    if (auth_data.user_auth.auth_type == auth_custom_token || (auth_data.user_auth.auth_type == auth_access_token && auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token))
+                        setEvent(auth_event_authenticating);
+                    else
+                        setEvent(auth_event_initializing);
+                }
+
+                if (auth_data.user_auth.status._event == auth_event_initializing)
                 {
 
-                    if (auth_data.user_auth.timestatus_cb)
-                        auth_data.user_auth.timestatus_cb(ts);
-
+                    getTime();
+#if defined(ENABLE_JWT)
                     if (auth_data.user_auth.sa.step == jwt_step_begin)
                     {
                         auth_data.user_auth.sa.step = jwt_step_encode_header_payload;
@@ -202,97 +245,192 @@ namespace firebase
                         }
                         setEvent(auth_event_token_signing);
                     }
+#endif
                 }
                 else if (auth_data.user_auth.status._event == auth_event_token_signing)
                 {
+#if defined(ENABLE_JWT)
                     if (auth_data.user_auth.sa.step == jwt_step_sign)
                     {
-                        if (!createJwt(auth_data.user_auth))
-                            return false;
-
-                        if (auth_data.user_auth.sa.step == jwt_step_ready)
+                        if (createJwt(auth_data.user_auth) && auth_data.user_auth.sa.step == jwt_step_ready)
                             setEvent(auth_event_authenticating);
+
+                        auth_data.user_auth.sa.step = jwt_step_begin;
                     }
+#endif
                 }
                 else if (auth_data.user_auth.status._event == auth_event_authenticating)
                 {
-                    authReq.asyncRequest(aClient, aResult, jwt);
-                    setEvent(auth_event_auth_request_sent);
-                }
-                else if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
-                {
-                    if (aResult.available())
+                    String payload;
+                    String extras;
+                    JSON json;
+                    String subdomain = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? "oauth2" : "identitytoolkit";
+
+                    if (auth_data.user_auth.auth_type == auth_sa_access_token)
                     {
-                        setEvent(auth_event_auth_response_received);
-                        if (parseToken())
-                        {
-                            auth_data.app_token.expire_ts = (ts > 0 ? ts : millis() / 1000) + auth_data.app_token.expire;
-                            auth_data.user_auth.authenticated = true;
-                            setEvent(auth_event_ready);
-                        }
+#if defined(ENABLE_SERVICE_AUTH)
+                        json.addObject(payload, json.toString("grant_type"), json.toString("urn:ietf:params:oauth:grant-type:jwt-bearer"));
+                        json.addObject(payload, json.toString("assertion"), json.toString(jwt.token()), true);
+#endif
                     }
+                    else if (auth_data.user_auth.auth_type == auth_sa_custom_token || auth_data.user_auth.auth_type == auth_custom_token)
+                    {
+#if defined(ENABLE_CUSTOM_AUTH)
+                        if (auth_data.user_auth.auth_type == auth_sa_custom_token)
+                            json.addObject(payload, json.toString("token"), json.toString(jwt.token()));
+#endif
+#if defined(ENABLE_CUSTOM_TOKEN)
+                        if (auth_data.user_auth.auth_type == auth_custom_token)
+                            json.addObject(payload, json.toString("token"), json.toString(auth_data.user_auth.custom_token.token));
+#endif
+
+                        json.addObject(payload, json.toString("returnSecureToken"), "true", true);
+                    }
+                    else if (auth_data.user_auth.auth_type == auth_access_token && auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
+                    {
+#if defined(ENABLE_ACCESS_TOKEN)
+                        json.addObject(payload, json.toString("client_id"), json.toString(auth_data.user_auth.access_token.client_id));
+                        json.addObject(payload, json.toString("client_secret"), json.toString(auth_data.user_auth.access_token.client_secret));
+                        json.addObject(payload, json.toString("grant_type"), json.toString("refresh_token"));
+                        json.addObject(payload, json.toString("refresh_token"), json.toString(auth_data.user_auth.access_token.refresh), true);
+#endif
+                    }
+
+                    String api_key;
+
+                    if (auth_data.user_auth.auth_type == auth_sa_custom_token)
+                    {
+#if defined(ENABLE_CUSTOM_AUTH)
+                        api_key = auth_data.user_auth.cust.api_key;
+#endif
+                    }
+                    else
+                        api_key = auth_data.user_auth.user.api_key;
+
+                    extras = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? "/token" : "/v1/accounts:signInWithCustomToken?key=" + api_key;
+
+                    authReq.asyncRequest(aClient, subdomain, extras, payload, aResult);
+                    setEvent(auth_event_auth_request_sent);
                 }
             }
             else
             {
                 // user/pass auth
 
+                if (auth_data.user_auth.status._event == auth_event_uninitialized)
+                    setEvent(auth_event_authenticating);
+
+                if ((auth_data.user_auth.task_type == firebase_core_auth_task_type_undefined || auth_data.user_auth.auth_type == auth_sa_custom_token) && auth_data.app_token.refresh.length())
+                    auth_data.user_auth.task_type = firebase_core_auth_task_type_refresh_token;
+
                 String payload;
                 String extras;
                 JSON json;
                 String subdomain = auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? "securetoken" : "identitytoolkit";
 
-                if (auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password || auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email)
+                if (auth_data.user_auth.status._event == auth_event_authenticating)
                 {
-
-                    if (auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email)
+                    if (auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password || auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email)
                     {
-                        // {"requestType":"VERIFY_EMAIL","idToken":"<id token>"}
-                        json.addObject(payload, json.toString("requestType"), json.toString("VERIFY_EMAIL"));
-                        json.addObject(payload, json.toString("idToken"), json.toString(auth_data.user_auth.user.id_token.length() > 0 ? auth_data.user_auth.user.id_token : auth_data.app_token.token), true);
+                        if (auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email)
+                        {
+
+                            // {"requestType":"VERIFY_EMAIL","idToken":"<id token>"}
+                            json.addObject(payload, json.toString("requestType"), json.toString("VERIFY_EMAIL"));
+                            json.addObject(payload, json.toString("idToken"), json.toString(auth_data.user_auth.user.id_token.length() > 0 ? auth_data.user_auth.user.id_token : auth_data.app_token.token), true);
+                        }
+                        else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
+                        {
+
+                            // {"requestType":"PASSWORD_RESET","email":"<email>"}
+                            json.addObject(payload, json.toString("requestType"), json.toString("PASSWORD_RESET"));
+                            json.addObject(payload, json.toString("email"), json.toString(auth_data.user_auth.user.email), true);
+                        }
+
+                        extras = "/v1/accounts:sendOobCode?key=";
                     }
-                    else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
+                    else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user)
                     {
-                        // {"requestType":"PASSWORD_RESET","email":"<email>"}
-                        json.addObject(payload, json.toString("requestType"), json.toString("PASSWORD_RESET"));
-                        json.addObject(payload, json.toString("email"), json.toString(auth_data.user_auth.user.email), true);
+
+                        json.addObject(payload, json.toString("idToken"), json.toString(auth_data.user_auth.user.id_token.length() ? auth_data.user_auth.user.id_token : auth_data.app_token.token), true);
+                        extras = "/v1/accounts:delete?key=" + auth_data.user_auth.user.api_key;
+                    }
+                    else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
+                    {
+                        // {"grantType":"refresh_token","refreshToken":"<refresh token>"}
+                        json.addObject(payload, json.toString("grantType"), json.toString("refresh_token"));
+                        if (auth_data.user_auth.auth_type == auth_custom_token)
+                        {
+#if defined(ENABLE_CUSTOM_TOKEN)
+
+                            json.addObject(payload, json.toString("refreshToken"), json.toString(auth_data.user_auth.custom_token.refresh), true);
+#endif
+                        }
+                        else
+                            json.addObject(payload, json.toString("refreshToken"), json.toString(auth_data.app_token.refresh), true);
+
+                        extras = "/v1/token?key=";
+                    }
+                    else
+                    {
+                        // auth_data.user_auth.task_type = firebase_core_auth_task_type_authenticate or auth_data.user_auth.task_type = firebase_core_auth_task_type_signup
+                        // {"email":"<email>","password":"<password>","returnSecureToken":true}
+
+                        if (auth_data.user_auth.user.email.length() && auth_data.user_auth.user.password.length())
+                        {
+                            json.addObject(payload, json.toString("email"), json.toString(auth_data.user_auth.user.email));
+                            json.addObject(payload, json.toString("password"), json.toString(auth_data.user_auth.user.password));
+                            json.addObject(payload, json.toString("returnSecureToken"), "true", true);
+                        }
+                        extras = auth_data.user_auth.task_type == firebase_core_auth_task_type_signup ? "/v1/accounts:signUp?key=" : "/v1/accounts:signInWithPassword?key=";
                     }
 
-                    extras = "/v1/accounts:sendOobCode?key=";
-                }
-                else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user)
-                {
-                    json.addObject(payload, json.toString("idToken"), json.toString(auth_data.user_auth.user.id_token.length() ? auth_data.user_auth.user.id_token : auth_data.app_token.token),true);
-                    extras = "/v1/accounts:delete?key=" + auth_data.user_auth.user.api_key;
-                }
-                else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
-                {
-                    // {"grantType":"refresh_token","refreshToken":"<refresh token>"}
-                    json.addObject(payload, json.toString("grantType"), json.toString("refresh_token"));
-                    json.addObject(payload, json.toString("refreshToken"), json.toString(auth_data.app_token.refresh), true);
-                    extras = "/v1/token?Key=";
-                }
-                else
-                {
-                    // auth_data.user_auth.task_type = firebase_core_auth_task_type_authenticate or auth_data.user_auth.task_type = firebase_core_auth_task_type_signup
-                    // {"email":"<email>","password":"<password>","returnSecureToken":true}
-                    if (auth_data.user_auth.user.email.length() && auth_data.user_auth.user.password.length())
+                    if (auth_data.user_auth.auth_type == auth_sa_custom_token)
                     {
-                        json.addObject(payload, json.toString("email"), json.toString(auth_data.user_auth.user.email));
-                        json.addObject(payload, json.toString("passworf"), json.toString(auth_data.user_auth.user.password));
-                        json.addObject(payload, json.toString("returnSecureToken"), "true", true);
+#if defined(ENABLE_CUSTOM_AUTH)
+                        extras += auth_data.user_auth.cust.api_key;
+#endif
                     }
-                    extras = auth_data.user_auth.task_type == firebase_core_auth_task_type_signup ? "/v1/accounts:signUp?key=" : "/v1/accounts:signInWithPassword?key=";
-                }
+                    else
+                        extras += auth_data.user_auth.user.api_key;
 
-                extras += auth_data.user_auth.user.api_key;
-                authReq.asyncRequest(aClient, subdomain, extras, payload, aResult);
-                setEvent(auth_event_auth_request_sent);
+                    authReq.asyncRequest(aClient, subdomain, extras, payload, aResult);
+                    setEvent(auth_event_auth_request_sent);
+                    return true;
+                }
+            }
+
+            if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
+            {
+                if (aResult.available())
+                {
+                    setEvent(auth_event_auth_response_received);
+
+                    if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user || auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email || auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
+                        return false;
+
+                    if (auth_data.user_auth.task_type == firebase_core_auth_task_type_signup)
+                        auth_data.user_auth.anonymous = auth_data.user_auth.user.email.length() == 0 && auth_data.user_auth.user.password.length() == 0;
+
+                    if (parseToken())
+                    {
+                        if (expire)
+                            timer.setInterval(expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
+                        timer.start();
+                        auth_data.app_token.authenticated = true;
+                        last_auth_ms = millis();
+                        setEvent(auth_event_ready);
+                    }
+                    else
+                    {
+                        setEvent(auth_event_error);
+                    }
+                }
             }
 
             return true;
         }
-#endif
+
     public:
         FirebaseApp()
         {
@@ -313,13 +451,13 @@ namespace firebase
 
         bool ready()
         {
-            return processAuth() && auth_data.user_auth.authenticated;
+            return processAuth() && auth_data.app_token.authenticated;
         }
 
         template <typename T>
         void getApp(T &app)
         {
-            app.setAppToken(&auth_data.app_token);
+            app.setApp(addr, &auth_data.app_token);
         }
 
         String getToken()
@@ -327,21 +465,46 @@ namespace firebase
             return auth_data.app_token.token;
         }
 
+        String getRefreshToken()
+        {
+            return auth_data.app_token.refresh;
+        }
+
+        String getUid()
+        {
+            return auth_data.app_token.uid;
+        }
+
         bool isAuthenticated()
         {
-            return auth_data.user_auth.authenticated;
+            return auth_data.app_token.authenticated;
         }
 
         bool isExpired()
         {
+            return timer.remaining() == 0;
+        }
 
-            if (auth_data.user_auth.timestatus_cb)
-                auth_data.user_auth.timestatus_cb(ts);
+        unsigned long ttl()
+        {
+            return timer.remaining();
+        }
 
-            return ts < auth_data.app_token.expire_ts ? auth_data.app_token.expire_ts - ts : 0;
+        void setCallback(AsyncResultCallback cb)
+        {
+            this->resultCb = cb;
+        }
+
+        void setExpire(uint16_t seconds)
+        {
+            expire = seconds;
+        }
+
+        AsyncResult getResult()
+        {
+            return aResult;
         }
     };
-
 };
 
 #endif

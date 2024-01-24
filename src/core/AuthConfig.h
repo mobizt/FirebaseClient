@@ -150,6 +150,7 @@ namespace firebase
         friend class LegacyToken;
         friend class NoAuth;
         friend class UserAccount;
+        friend class FirebaseClient;
 
 #if defined(ENABLE_SERVICE_AUTH)
 
@@ -229,7 +230,6 @@ namespace firebase
         };
 #endif
 
-#if defined(ENABLE_USER_AUTH)
         struct user_data
         {
             String email;
@@ -255,7 +255,6 @@ namespace firebase
                 api_key.clear();
             }
         };
-#endif
 
 #if defined(ENABLE_ID_TOKEN)
         struct id_token_data
@@ -375,9 +374,7 @@ namespace firebase
             this->cust.copy(rhs.cust);
 #endif
 
-#if defined(ENABLE_USER_AUTH)
             this->user.copy(rhs.user);
-#endif
 
 #if defined(ENABLE_ID_TOKEN)
             this->id_token.copy(rhs.id_token);
@@ -396,8 +393,6 @@ namespace firebase
 #endif
             this->auth_type = rhs.auth_type;
             this->auth_data_type = rhs.auth_data_type;
-
-            this->authenticated = rhs.authenticated;
             this->anonymous = rhs.anonymous;
             this->initialized = rhs.initialized;
             this->timestatus_cb = rhs.timestatus_cb;
@@ -413,9 +408,7 @@ namespace firebase
             cust.clear();
 #endif
 
-#if defined(ENABLE_USER_AUTH)
             user.clear();
-#endif
 
 #if defined(ENABLE_ID_TOKEN)
             id_token.clear();
@@ -434,7 +427,6 @@ namespace firebase
 #endif
 
             timestatus_cb = NULL;
-            authenticated = false;
             anonymous = false;
             initialized = false;
         }
@@ -446,9 +438,8 @@ namespace firebase
 #if defined(ENABLE_CUSTOM_AUTH)
         custom_data cust;
 #endif
-#if defined(ENABLE_USER_AUTH)
         user_data user;
-#endif
+
 #if defined(ENABLE_ID_TOKEN)
         id_token_data id_token;
 #endif
@@ -463,7 +454,6 @@ namespace firebase
         legacy_token_data legacy_token;
 #endif
 
-        bool authenticated = false;
         bool anonymous = false;
         bool initialized = false;
         auth_token_type auth_type = auth_unknown_token;
@@ -570,30 +560,38 @@ namespace firebase
                 }
                 else if (type == token_type_access_token && tokenSize == 5)
                 {
+#if defined(ENABLE_ACCESS_TOKEN)
                     auth_data.access_token.token = tokens[0];
                     auth_data.access_token.refresh = tokens[1];
                     auth_data.access_token.client_id = tokens[2];
                     auth_data.access_token.client_secret = tokens[3];
                     auth_data.access_token.expire = atoi(tokens[4].c_str());
+#endif
                     return true;
                 }
                 else if (type == token_type_id_token && tokenSize == 4)
                 {
+#if defined(ENABLE_ID_TOKEN)
                     auth_data.user.api_key = tokens[0];
                     auth_data.id_token.token = tokens[1];
                     auth_data.id_token.refresh = tokens[2];
                     auth_data.id_token.expire = atoi(tokens[3].c_str());
+#endif
                 }
                 else if (type == token_type_custom_token && tokenSize == 4)
                 {
                     auth_data.user.api_key = tokens[0];
+#if defined(ENABLE_CUSTOM_TOKEN)
                     auth_data.custom_token.token = tokens[1];
                     auth_data.custom_token.refresh = tokens[2];
                     auth_data.custom_token.expire = atoi(tokens[3].c_str());
+#endif
                 }
                 else if (type == token_type_legacy_token && tokenSize == 1)
                 {
+#if defined(ENABLE_LEGACY_TOKEN)
                     auth_data.legacy_token.token = tokens[0];
+#endif
                 }
             }
 
@@ -617,6 +615,7 @@ namespace firebase
                 }
                 else if (type == token_type_access_token)
                 {
+#if defined(ENABLE_ACCESS_TOKEN)
                     userfile.print(auth_data.access_token.token.c_str());
                     userfile.print(",");
                     userfile.print(auth_data.access_token.refresh.c_str());
@@ -626,34 +625,40 @@ namespace firebase
                     userfile.print(auth_data.access_token.client_secret.c_str());
                     userfile.print(",");
                     userfile.print(String(auth_data.access_token.expire).c_str());
+#endif
                     return true;
                 }
                 else if (type == token_type_id_token)
                 {
                     userfile.print(auth_data.user.api_key.c_str());
                     userfile.print(",");
+#if defined(ENABLE_ID_TOKEN)
                     userfile.print(auth_data.id_token.token.c_str());
                     userfile.print(",");
                     userfile.print(auth_data.id_token.refresh.c_str());
                     userfile.print(",");
                     userfile.print(String(auth_data.id_token.expire).c_str());
+#endif
                     return true;
                 }
                 else if (type == token_type_custom_token)
                 {
-
                     userfile.print(auth_data.user.api_key.c_str());
                     userfile.print(",");
+#if defined(ENABLE_CUSTOM_TOKEN)
                     userfile.print(auth_data.custom_token.token.c_str());
                     userfile.print(",");
                     userfile.print(auth_data.custom_token.refresh.c_str());
                     userfile.print(",");
                     userfile.print(auth_data.custom_token.expire);
+#endif
                     return true;
                 }
                 else if (type == token_type_legacy_token)
                 {
+#if defined(ENABLE_LEGACY_TOKEN)
                     userfile.print(auth_data.legacy_token.token.c_str());
+#endif
                     return true;
                 }
             }
@@ -663,7 +668,7 @@ namespace firebase
 
 #endif
 
-#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
+#if defined(ENABLE_SERVICE_AUTH) && defined(ENABLE_CUSTOM_AUTH)
     class SAParser
     {
     public:
@@ -726,7 +731,6 @@ namespace firebase
 #endif
 
 #if defined(ENABLE_USER_AUTH)
-
     class UserAuth
     {
         friend class Firebase;
@@ -794,7 +798,6 @@ namespace firebase
 #endif
 
 #if defined(ENABLE_SERVICE_AUTH)
-
     class ServiceAuth
     {
         friend class Firebase;
@@ -842,7 +845,6 @@ namespace firebase
 #endif
 
 #if defined(ENABLE_CUSTOM_AUTH)
-
     class CustomAuth
     {
         friend class Firebase;
@@ -866,8 +868,7 @@ namespace firebase
             data.timestatus_cb = cb;
         };
 
-        template <typename T = const char *>
-        CustomAuth(TimeStatusCallback cb, file_config_data &safile, T uid)
+        CustomAuth(TimeStatusCallback cb, file_config_data &safile, const String &uid)
         {
             data.clear();
             if (safile.initialized)
@@ -877,7 +878,7 @@ namespace firebase
                 {
                     if (SAParser::parseSAFile(safile.file, data))
                     {
-                        data.cust.uid = toStringPtr(uid);
+                        data.cust.uid = uid;
                         data.auth_type = auth_sa_custom_token;
                         data.auth_data_type = user_auth_data_custom_data;
                     }
@@ -910,38 +911,34 @@ namespace firebase
         friend class AsyncFirebaseClient;
 
     public:
-        template <typename T = const char *>
-        UserAccount(T apiKey)
+        UserAccount(const String &apiKey)
         {
-            data.user.api_key = toStringPtr(apiKey);
+            data.user.api_key = apiKey;
             data.auth_type = auth_user_id_token;
             data.auth_data_type = user_auth_data_user_data;
             data.initialized = true;
         }
-        template <typename T = const char *>
-        UserAccount &email(T email)
+        UserAccount &email(const String &email)
         {
-            data.user.email = toStringPtr(email);
+            data.user.email = email;
             data.auth_type = auth_user_id_token;
             data.auth_data_type = user_auth_data_user_data;
             data.initialized = true;
             return *this;
         };
 
-        template <typename T = const char *>
-        UserAccount &password(T password)
+        UserAccount &password(const String &password)
         {
-            data.user.password = toStringPtr(password);
+            data.user.password = password;
             data.auth_type = auth_user_id_token;
             data.auth_data_type = user_auth_data_user_data;
             data.initialized = true;
             return *this;
         };
 
-        template <typename T = const char *>
-        UserAccount &idToken(T idToken)
+        UserAccount &idToken(const String &idToken)
         {
-            data.user.id_token = toStringPtr(idToken);
+            data.user.id_token = idToken;
             data.auth_type = auth_user_id_token;
             data.auth_data_type = user_auth_data_user_data;
             data.initialized = true;
@@ -971,13 +968,12 @@ namespace firebase
         friend class AsyncFirebaseClient;
 
     public:
-        template <typename T1 = const char *, typename T2 = const char *, typename T3 = const char *>
-        IDToken(T1 api_key, T2 token, size_t expire = 3600, T3 refresh = "")
+        IDToken(const String &api_key, const String &token, size_t expire = 3600, const String &refresh = "")
         {
             this->data.clear();
-            this->data.user.api_key = toStringPtr(api_key);
-            this->data.id_token.token = toStringPtr(token);
-            this->data.id_token.refresh = toStringPtr(refresh);
+            this->data.user.api_key = api_key;
+            this->data.id_token.token = token;
+            this->data.id_token.refresh = refresh;
             this->data.id_token.expire = expire;
             this->data.initialized = true;
             this->data.auth_type = auth_user_id_token;
@@ -1040,19 +1036,17 @@ namespace firebase
         friend class AsyncFirebaseClient;
 
     public:
-        template <typename T1 = const char *, typename T2 = const char *, typename T3 = const char *, typename T4 = const char *>
-        AccessToken(TimeStatusCallback cb, T1 token, size_t expire = 3600, T2 refresh = "", T3 client_id = "", T4 client_secret = "")
+        AccessToken(const String &token, size_t expire = 3600, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
         {
             this->data.clear();
-            this->data.access_token.token = toStringPtr(token);
-            this->data.access_token.refresh = toStringPtr(refresh);
-            this->data.access_token.client_id = toStringPtr(client_id);
-            this->data.access_token.client_secret = toStringPtr(client_secret);
+            this->data.access_token.token = token;
+            this->data.access_token.refresh = refresh;
+            this->data.access_token.client_id = client_id;
+            this->data.access_token.client_secret = client_secret;
             this->data.access_token.expire = expire;
             this->data.initialized = true;
             this->data.auth_type = auth_access_token;
             this->data.auth_data_type = user_auth_data_access_token;
-            this->data.timestatus_cb = cb;
         }
 
         AccessToken(file_config_data &tokenFile)
@@ -1111,7 +1105,7 @@ namespace firebase
         friend class AsyncFirebaseClient;
 
     public:
-        CustomToken(TimeStatusCallback cb, const String &api_key, const String &token, size_t expire = 3600, const String &refresh = "")
+        CustomToken(const String &api_key, const String &token, size_t expire = 3600, const String &refresh = "")
         {
             this->data.clear();
             this->data.custom_token.token = token;
@@ -1121,7 +1115,6 @@ namespace firebase
             this->data.initialized = data.custom_token.token.length() > 0 && data.user.api_key.length() > 0;
             this->data.auth_type = auth_custom_token;
             this->data.auth_data_type = user_auth_data_custom_token;
-            this->data.timestatus_cb = cb;
         }
 
         CustomToken(TimeStatusCallback cb, file_config_data &tokenFile)
@@ -1263,7 +1256,7 @@ namespace firebase
         String refresh;
         String uid;
         uint32_t expire = 0;
-        uint32_t expire_ts = 0;
+        bool authenticated = false;
         void clear()
         {
             token_type = "";
@@ -1271,6 +1264,7 @@ namespace firebase
             refresh = "";
             uid = "";
             expire = 0;
+            authenticated = false;
         }
     };
 

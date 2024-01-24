@@ -9,12 +9,24 @@
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
 #define FIREBASE_SSE_TIMEOUT 40 * 1000;
 
-
 class AsyncResult
 {
     friend class AsyncClient;
+    friend class FirebaseApp;
     friend class AuthRequest;
     friend class Database;
+
+    struct app_event_t
+    {
+        friend class AuthRequest;
+    private:
+        String ev_msg;
+        int ev_code;
+
+    public:
+        String message() { return ev_msg; }
+        int code() { return ev_code; }
+    };
 
     struct download_data_t
     {
@@ -60,6 +72,7 @@ private:
     bool error_available = false;
     download_data_t download_data;
     upload_data_t upload_data;
+    app_event_t app_event;
 
     void setPayload(const String &data)
     {
@@ -197,6 +210,11 @@ public:
         bool ret = data_available;
         data_available = false;
         return ret;
+    }
+
+    app_event_t appEvent()
+    {
+        return app_event;
     }
 
     bool uploadProgress()

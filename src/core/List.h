@@ -32,6 +32,16 @@ namespace firebase
             if (add)
                 list.push_back(addr);
         }
+
+        bool existed(vector<uint32_t> &list, uint32_t addr)
+        {
+            for (size_t i = 0; i < list.size(); i++)
+            {
+                if (list[i] == addr)
+                    return true;
+            }
+            return false;
+        }
     };
 };
 

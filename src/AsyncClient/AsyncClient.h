@@ -638,7 +638,6 @@ private:
             if ((read == 1 && sData->response.header[sData->response.header.length() - 1] == '\r') ||
                 (read == 2 && sData->response.header[sData->response.header.length() - 2] == '\r' && sData->response.header[sData->response.header.length() - 1] == '\n'))
             {
-
                 clear(sData->response.location);
                 clear(sData->response.etag);
 
@@ -693,7 +692,6 @@ private:
     {
         String line;
         readLine(client, line);
-
         int p = line.indexOf(";");
         if (p == -1)
             p = line.indexOf("\r\n");
@@ -717,6 +715,7 @@ private:
             sData->response.chunkInfo.chunkSize = -1;
             sData->response.chunkInfo.dataLen = 0;
             res = getChunkSize(sData, client);
+            sData->response.payloadLen += res > -1 ? res : 0;
         }
         // read chunk-data and CRLF
         // append chunk-data to entity-body
@@ -724,7 +723,6 @@ private:
         {
             if (sData->response.chunkInfo.chunkSize > -1)
             {
-                sData->response.payloadLen += sData->response.chunkInfo.chunkSize;
                 int read = readLine(client, *out);
                 if (read)
                 {
@@ -908,6 +906,15 @@ private:
 
         if (sData->response.payloadLen > 0 && sData->response.payloadRead >= sData->response.payloadLen)
         {
+            if (sData->response.flags.chunks && client->available() <= 2)
+            {
+                while (client->available())
+                {
+                    client->read();
+                }
+                client->stop();
+            }
+
             if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK && (sData->request.ota || (sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size)))
             {
                 sData->aResult.download_data.total = sData->response.payloadLen;
@@ -1568,12 +1575,6 @@ private:
         }
     }
 
-    void stop()
-    {
-        if (client)
-            client->stop();
-    }
-
     String getHost(async_data_item_t *sData, bool fromReq)
     {
         async_request_handler_t::url_info_t url_info;
@@ -1652,6 +1653,12 @@ public:
                 }
             }
         }
+    }
+
+    void stop()
+    {
+        if (client)
+            client->stop();
     }
 
     void setAuth(const String &auth)
