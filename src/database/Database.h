@@ -269,8 +269,20 @@ private:
 
     void asyncRequest(AsyncClient::async_request_data_t &request, const char *payload = "")
     {
-        String extras = ".json?auth=" + request.aClient->getToken(); // request.aClient->getToken() should be replace with app token
-        addParams(true, extras, request.method, request.options, request.file);
+        app_token_t *app_token = appToken();
+
+        if (!app_token)
+        {
+            if (request.aResult)
+                request.aResult->lastError.setClientError(FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
+            return;
+        }
+
+        request.opt.app_token = app_token;
+        bool auth_param = app_token->auth_data_type != user_auth_data_no_token && app_token->auth_type != auth_access_token && app_token->auth_type != auth_sa_access_token;
+        String extras = auth_param ? ".json?auth=" + app_token->token : ".json";
+
+        addParams(auth_param, extras, request.method, request.options, request.file);
         AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt);
         if (request.file)
         {
@@ -293,7 +305,10 @@ private:
         if (request.cb)
             sData->cb = request.cb;
         if (request.aResult)
+        {
             sData->refResult = request.aResult;
+            sData->ref_result_addr = request.aResult->addr;
+        }
 
         request.aClient->process(firebase_client_list, sData->async);
     }

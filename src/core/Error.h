@@ -88,7 +88,8 @@
 #define FIREBASE_ERROR_FW_UPDATE_WRITE_FAILED -113
 #define FIREBASE_ERROR_FW_UPDATE_END_FAILED -114
 #define FIREBASE_ERROR_STREAM_TIMEDOUT -115
-#define FIREBASE_ERROR_RESPONSE_AUTH_REVOKED -116
+#define FIREBASE_ERROR_STREAM_AUTH_REVOKED -116
+#define FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED -117
 
 
 #if !defined(FPSTR)
@@ -99,6 +100,7 @@ class FirebaseError
 {
     friend class AsyncClient;
     friend class AuthRequest;
+    friend class Database;
 
 private:
     struct firebase_error_info_t
@@ -191,10 +193,12 @@ private:
             case FIREBASE_ERROR_STREAM_TIMEDOUT:
                 err.message = FPSTR("stream timed out");
                 break;
-            case FIREBASE_ERROR_RESPONSE_AUTH_REVOKED:
+            case FIREBASE_ERROR_STREAM_AUTH_REVOKED:
                 err.message = FPSTR("auth revoked");
                 break;
-
+            case FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED:
+            err.message = FPSTR("app was not assigned");
+                break;
             default:
                 err.message = FPSTR("undefined");
                 break;

@@ -8,6 +8,8 @@
 class AuthRequest
 {
 private:
+    AsyncClient::async_data_item_t *sData = nullptr;
+
 public:
     AuthRequest(){};
     ~AuthRequest(){};
@@ -18,19 +20,26 @@ public:
         async_request_handler_t req;
         req.addGAPIsHost(host, subdomain.c_str());
 
-        AsyncClient::async_data_item_t *sData = aClient->newSlot(firebase_client_list, host, extras, "", async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, false));
+        sData = aClient->newSlot(firebase_client_list, host, extras, "", async_request_handler_t::http_post, AsyncClient::slot_options_t(true, false, true, false, false));
         req.addContentTypeHeader(sData->request.header, "application/json");
         sData->request.payload = payload;
         aClient->setContentLength(sData, sData->request.payload.length());
         sData->refResult = &aResult;
+        sData->ref_result_addr = aResult.addr;
+
         aClient->process(firebase_client_list, sData->async);
     }
 
     void setLastError(AsyncResult &aResult, int code, const String &message)
     {
         aResult.lastError.err.message = message;
-        if (code != 0)
-            aResult.lastError.err.code = code;
+        aResult.lastError.err.code = code;
+    }
+
+    void clearLastError(AsyncResult &aResult)
+    {
+        aResult.lastError.err.message = "";
+        aResult.lastError.err.code = 0;
     }
 
     void process(AsyncClient *aClient, AsyncResult &aResult, AsyncResultCallback resultCb)
@@ -38,7 +47,10 @@ public:
         aClient->process(firebase_client_list, true);
 
         if (resultCb && aResult.lastError.code() != 0 && aResult.error_available)
+        {
+            aResult.data_available = false;
             resultCb(aResult);
+        }
     }
 
     void stop(AsyncClient *aClient)

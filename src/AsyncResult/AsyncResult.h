@@ -2,12 +2,14 @@
 #ifndef ASYNC_RESULT_H
 #define ASYNC_RESULT_H
 #include "Value.h"
-#include "./core/CRC16.h"
 #include "./core/Error.h"
+#include "./core/List.h"
 
 #define FIREBASE_CHUNK_SIZE 2048
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
 #define FIREBASE_SSE_TIMEOUT 40 * 1000;
+
+using namespace firebase;
 
 class AsyncResult
 {
@@ -66,6 +68,7 @@ class AsyncResult
     };
 
 private:
+    uint32_t addr = 0;
     FirebaseError lastError;
     String data_path;
     String data_payload;
@@ -202,8 +205,19 @@ public:
         }
     };
 
-    AsyncResult() { database.ref_payload = &data_payload; };
-    ~AsyncResult(){};
+    AsyncResult()
+    {
+        database.ref_payload = &data_payload;
+        addr = reinterpret_cast<uint32_t>(this);
+        List list;
+        list.addRemoveList(firebase_result_list, addr, true);
+    };
+    ~AsyncResult()
+    {
+        List list;
+        list.addRemoveList(firebase_result_list, addr, false);
+    };
+
     String payload() { return data_payload; }
     String path() { return data_path; }
     bool available()

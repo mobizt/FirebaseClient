@@ -10,6 +10,8 @@
 typedef void (*NetworkStatus)(bool &status);
 typedef void (*NetworkReconnect)(void);
 
+using namespace firebase;
+
 struct async_request_handler_t
 {
 public:
@@ -141,6 +143,18 @@ public:
     void addRequestHeaderLast(String &header)
     {
         header += FPSTR(" HTTP/1.1\r\n");
+    }
+
+    /* Append the string with first part of Authorization header */
+    void addAuthHeaderFirst(String &header, auth_token_type type)
+    {
+        header += "Authorization: ";
+        if (type == auth_access_token || type == auth_sa_access_token)
+            header += "Bearer ";
+        //  else if (type == auth_id_token || type == auth_user_id_token || type == auth_sa_custom_token)
+        //    header +=  "Firebase ";
+        // else
+        //   header +=  "key=";
     }
 
     void parse(Memory &mem, const String &url, struct async_request_handler_t::url_info_t &info)

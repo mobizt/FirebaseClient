@@ -24,12 +24,14 @@ namespace firebase
     private:
         auth_data_t auth_data;
         AsyncClient *aClient = nullptr;
-        uint32_t addr = 0;
+        uint32_t aclient_addr = 0;
+        uint32_t app_addr = 0;
         uint32_t ref_ts = 0;
         AsyncResultCallback resultCb = NULL;
         AsyncResult aResult;
         AuthRequest authReq;
         Timer timer;
+        List list;
         unsigned long last_error_ms = 0;
         unsigned long last_auth_ms = 0;
         bool processing = false;
@@ -177,16 +179,18 @@ namespace firebase
             if (event == auth_event_ready)
                 last_auth_ms = millis();
 
-            if (event == auth_event_error || event == auth_event_ready)
-            {
-                processing = false;
-                authReq.stop(aClient);
-            }
-
             authReq.setEventResult(aResult, auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
 
             if (resultCb)
                 resultCb(aResult);
+
+            if (event == auth_event_error || event == auth_event_ready)
+            {
+                processing = false;
+                authReq.stop(aClient);
+                event = auth_event_uninitialized;
+                authReq.clearLastError(aResult);
+            }
         }
 
         void getTime()
@@ -197,6 +201,7 @@ namespace firebase
 
         bool processAuth()
         {
+
             authReq.process(aClient, aResult, resultCb);
 
             if (!isExpired())
@@ -208,6 +213,7 @@ namespace firebase
                 {
                     processing = true;
                     auth_data.user_auth.task_type = firebase_core_auth_task_type_refresh_token;
+                    setEvent(auth_event_uninitialized);
                 }
                 else if ((auth_data.user_auth.status._event == auth_event_error || auth_data.user_auth.status._event == auth_event_ready) && (auth_data.app_token.expire == 0 || (auth_data.app_token.expire > 0 && isExpired())))
                 {
@@ -216,11 +222,12 @@ namespace firebase
                 }
             }
 
-           
+            if (auth_data.user_auth.status._event == auth_event_uninitialized && millis() - last_error_ms < 2000)
+                return false;
 
             if (auth_data.user_auth.auth_type == auth_access_token ||
                 auth_data.user_auth.auth_type == auth_sa_access_token ||
-                (auth_data.user_auth.auth_type == auth_sa_custom_token &&
+                ((auth_data.user_auth.auth_type == auth_custom_token || auth_data.user_auth.auth_type == auth_sa_custom_token) &&
                  auth_data.app_token.refresh.length() == 0))
             {
 
@@ -336,14 +343,12 @@ namespace firebase
                     {
                         if (auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email)
                         {
-
                             // {"requestType":"VERIFY_EMAIL","idToken":"<id token>"}
                             json.addObject(payload, json.toString("requestType"), json.toString("VERIFY_EMAIL"));
                             json.addObject(payload, json.toString("idToken"), json.toString(auth_data.user_auth.user.id_token.length() > 0 ? auth_data.user_auth.user.id_token : auth_data.app_token.token), true);
                         }
                         else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
                         {
-
                             // {"requestType":"PASSWORD_RESET","email":"<email>"}
                             json.addObject(payload, json.toString("requestType"), json.toString("PASSWORD_RESET"));
                             json.addObject(payload, json.toString("email"), json.toString(auth_data.user_auth.user.email), true);
@@ -361,16 +366,7 @@ namespace firebase
                     {
                         // {"grantType":"refresh_token","refreshToken":"<refresh token>"}
                         json.addObject(payload, json.toString("grantType"), json.toString("refresh_token"));
-                        if (auth_data.user_auth.auth_type == auth_custom_token)
-                        {
-#if defined(ENABLE_CUSTOM_TOKEN)
-
-                            json.addObject(payload, json.toString("refreshToken"), json.toString(auth_data.user_auth.custom_token.refresh), true);
-#endif
-                        }
-                        else
-                            json.addObject(payload, json.toString("refreshToken"), json.toString(auth_data.app_token.refresh), true);
-
+                        json.addObject(payload, json.toString("refreshToken"), json.toString(auth_data.app_token.refresh), true);
                         extras = "/v1/token?key=";
                     }
                     else
@@ -404,8 +400,15 @@ namespace firebase
 
             if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
             {
+                if (aResult.error().code() > 0)
+                {
+                    setEvent(auth_event_error);
+                    return false;
+                }
+
                 if (aResult.available())
                 {
+
                     setEvent(auth_event_auth_response_received);
 
                     if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user || auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email || auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
@@ -420,6 +423,8 @@ namespace firebase
                             timer.setInterval(expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         timer.start();
                         auth_data.app_token.authenticated = true;
+                        auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
+                        auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
                         last_auth_ms = millis();
                         setEvent(auth_event_ready);
                     }
@@ -436,14 +441,12 @@ namespace firebase
     public:
         FirebaseApp()
         {
-            addr = reinterpret_cast<uint32_t>(this);
-            List list;
-            list.addRemoveList(firebase_app_list, addr, true);
+            app_addr = reinterpret_cast<uint32_t>(this);
+            list.addRemoveList(firebase_app_list, app_addr, true);
         };
         ~FirebaseApp()
         {
-            List list;
-            list.addRemoveList(firebase_app_list, addr, false);
+            list.addRemoveList(firebase_app_list, app_addr, false);
         };
 
         bool isInitialized()
@@ -459,7 +462,7 @@ namespace firebase
         template <typename T>
         void getApp(T &app)
         {
-            app.setApp(addr, &auth_data.app_token);
+            app.setApp(app_addr, &auth_data.app_token);
         }
 
         String getToken()
@@ -495,11 +498,6 @@ namespace firebase
         void setCallback(AsyncResultCallback cb)
         {
             this->resultCb = cb;
-        }
-
-        void setExpire(uint16_t seconds)
-        {
-            expire = seconds;
         }
 
         AsyncResult getResult()

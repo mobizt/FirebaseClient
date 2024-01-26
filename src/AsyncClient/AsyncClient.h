@@ -48,8 +48,9 @@ private:
         bool sv = false;
         bool ota = false;
         const char *etag = "";
+        app_token_t *app_token = nullptr;
         slot_options_t() {}
-        slot_options_t(bool auth_use, bool sse, bool async, bool sv, bool ota, const char *etag = "")
+        slot_options_t(bool auth_use, bool sse, bool async, bool sv, bool ota, const char *etag = "", app_token_t *app_token = nullptr)
         {
             this->auth_use = auth_use;
             this->sse = sse;
@@ -57,6 +58,7 @@ private:
             this->sv = sv;
             this->ota = ota;
             this->etag = etag;
+            app_token = nullptr;
         }
     };
 
@@ -83,6 +85,7 @@ private:
         uint32_t addr = 0;
         AsyncResult aResult;
         AsyncResult *refResult = nullptr;
+        uint32_t ref_result_addr = 0;
         AsyncResultCallback cb = NULL;
         unsigned long last_error_notify_ms = 0;
         async_data_item_t()
@@ -413,6 +416,8 @@ private:
             error_notify_timeout = true;
         }
 
+        List list;
+
         if (sData->refResult)
         {
             if (setData || error_notify_timeout)
@@ -425,9 +430,6 @@ private:
 
         if (sData->cb && (setData || error_notify_timeout))
             sData->cb(sData->aResult);
-
-        async_request_handler_t req;
-        req.idle();
     }
 
     void setLastError(async_data_item_t *sData)
@@ -455,6 +457,7 @@ private:
 
     void removeSlot(std::vector<uint32_t> &clientList, uint8_t slot)
     {
+
         async_data_item_t *sData = getData(slot);
 #if defined(ENABLE_DATABASE)
         sData->aResult.database.clearSSE();
@@ -475,18 +478,6 @@ private:
         sData = nullptr;
 
         aDataList.erase(aDataList.begin() + slot);
-
-        if (aDataList.size() == 0)
-        {
-            for (size_t clientSlot = 0; clientSlot < clientList.size(); clientSlot++)
-            {
-                if (clientList[clientSlot] == addr)
-                {
-                    clientList.erase(clientList.begin() + clientSlot);
-                    break;
-                }
-            }
-        }
     }
 
     int readLine(Client *client, String &buf)
@@ -1357,6 +1348,7 @@ private:
     {
         async_request_handler_t req;
         async_data_item_t *sData = addSlot();
+
         sData->async = options.async;
         sData->request.url = url;
         sData->request.path = path;
@@ -1374,6 +1366,13 @@ private:
 
         if (!options.auth_use)
         {
+            if (options.app_token && (options.app_token->auth_type == auth_access_token || options.app_token->auth_type == auth_sa_access_token))
+            {
+                req.addAuthHeaderFirst(sData->request.header, options.app_token->auth_type);
+                sData->request.header += options.app_token->token;
+                req.addNewLine(sData->request.header);
+            }
+
             sData->request.header += FPSTR("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
             req.addNewLine(sData->request.header);
             req.addConnectionHeader(sData->request.header, true);

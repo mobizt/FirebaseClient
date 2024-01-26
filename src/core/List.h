@@ -6,9 +6,9 @@ using namespace std;
 
 namespace firebase
 {
-
     static vector<uint32_t> firebase_app_list;
     static vector<uint32_t> firebase_client_list;
+    static vector<uint32_t> firebase_result_list;
 
     class List
     {

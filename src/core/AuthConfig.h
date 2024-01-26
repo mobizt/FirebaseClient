@@ -314,7 +314,6 @@ namespace firebase
         struct custom_token_data
         {
             String token;
-            String refresh;
             size_t expire = 3600;
             TimeStatusCallback timestatus_cb = NULL;
 
@@ -324,14 +323,12 @@ namespace firebase
             void copy(custom_token_data &rhs)
             {
                 this->token = rhs.token;
-                this->refresh = rhs.refresh;
                 this->expire = rhs.expire;
                 this->timestatus_cb = rhs.timestatus_cb;
             }
             void clear()
             {
                 token.clear();
-                refresh.clear();
                 expire = 3600;
                 timestatus_cb = NULL;
             }
@@ -573,13 +570,12 @@ namespace firebase
                     auth_data.id_token.expire = atoi(tokens[3].c_str());
 #endif
                 }
-                else if (type == token_type_custom_token && tokenSize == 4)
+                else if (type == token_type_custom_token && tokenSize == 3)
                 {
                     auth_data.user.api_key = tokens[0];
 #if defined(ENABLE_CUSTOM_TOKEN)
                     auth_data.custom_token.token = tokens[1];
-                    auth_data.custom_token.refresh = tokens[2];
-                    auth_data.custom_token.expire = atoi(tokens[3].c_str());
+                    auth_data.custom_token.expire = atoi(tokens[2].c_str());
 #endif
                 }
                 else if (type == token_type_legacy_token && tokenSize == 1)
@@ -642,8 +638,6 @@ namespace firebase
                     userfile.print(",");
 #if defined(ENABLE_CUSTOM_TOKEN)
                     userfile.print(auth_data.custom_token.token.c_str());
-                    userfile.print(",");
-                    userfile.print(auth_data.custom_token.refresh.c_str());
                     userfile.print(",");
                     userfile.print(auth_data.custom_token.expire);
 #endif
@@ -1100,12 +1094,11 @@ namespace firebase
         friend class AsyncFirebaseClient;
 
     public:
-        CustomToken(const String &api_key, const String &token, size_t expire = 3600, const String &refresh = "")
+        CustomToken(const String &api_key, const String &token, size_t expire = 3600)
         {
             this->data.clear();
             this->data.custom_token.token = token;
             this->data.user.api_key = api_key;
-            this->data.custom_token.refresh = refresh;
             this->data.custom_token.expire = expire;
             this->data.initialized = data.custom_token.token.length() > 0 && data.user.api_key.length() > 0;
             this->data.auth_type = auth_custom_token;
@@ -1235,7 +1228,7 @@ namespace firebase
             this->data.clear();
             this->data.initialized = true;
             this->data.auth_type = auth_unknown_token;
-            this->data.auth_data_type = user_auth_data_no_token;
+            this->data.auth_data_type = user_auth_data_undefined;
         }
         user_auth_data &get() { return data; }
 
@@ -1252,6 +1245,8 @@ namespace firebase
         String uid;
         uint32_t expire = 0;
         bool authenticated = false;
+        auth_token_type auth_type = auth_unknown_token;
+        user_auth_data_type auth_data_type = user_auth_data_undefined;
         void clear()
         {
             token_type = "";
@@ -1260,6 +1255,8 @@ namespace firebase
             uid = "";
             expire = 0;
             authenticated = false;
+            auth_type = auth_unknown_token;
+            auth_data_type = user_auth_data_undefined;
         }
     };
 
