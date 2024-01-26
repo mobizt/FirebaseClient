@@ -25,10 +25,6 @@ namespace firebase
             app.auth_data.app_token.auth_type = app.auth_data.user_auth.auth_type;
             app.auth_data.app_token.auth_data_type = app.auth_data.user_auth.auth_data_type;
 
-            Serial.println("=======================");
-            Serial.println(app.auth_data.app_token.auth_type);
-            Serial.println(app.auth_data.app_token.auth_data_type);
-
             if (app.auth_data.user_auth.auth_data_type == user_auth_data_legacy_token || app.auth_data.user_auth.auth_data_type == user_auth_data_no_token)
             {
                 app.timer.stop();
