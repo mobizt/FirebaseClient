@@ -74,14 +74,14 @@ namespace firebase
                     app.expire = app.auth_data.user_auth.custom_token.expire;
                     app.auth_data.app_token.expire = app.expire;
 
-                    int dot = 0;
-                    for (int i = 0; i < app.auth_data.user_auth.custom_token.token.length(); i++)
+                    int token_part = 0;
+                    for (size_t i = 0; i < app.auth_data.user_auth.custom_token.token.length(); i++)
                         if (app.auth_data.user_auth.custom_token.token[i] == '.')
-                            dot++;
+                            token_part++;
 
-                    if (dot == 3)
+                    if (token_part == 3)
                         app.auth_data.app_token.token = app.auth_data.user_auth.custom_token.token;
-                    else // not a OAuth custom token, treat as a refresh token
+                    else // not a valid custom token, treat as a refresh token
                         app.auth_data.app_token.refresh = app.auth_data.user_auth.custom_token.token;
 
                     app.auth_data.app_token.authenticated = false;
