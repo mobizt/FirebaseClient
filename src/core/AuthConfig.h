@@ -157,6 +157,7 @@ namespace firebase
             friend class ServiceAuth;
             friend class FirebaseApp;
             friend class JWT;
+            friend class FirebaseClient;
 
         public:
             service_account() {}
@@ -169,6 +170,7 @@ namespace firebase
                 this->private_key_id = rhs.private_key_id;
                 this->client_id = rhs.client_id;
                 this->timestatus_cb = rhs.timestatus_cb;
+                this->expire = rhs.expire;
             }
 
             void clear()
@@ -179,6 +181,7 @@ namespace firebase
                 private_key_id.clear();
                 client_id.clear();
                 timestatus_cb = NULL;
+                expire= 3600;
             }
 
         protected:
@@ -189,6 +192,7 @@ namespace firebase
             String client_id;
             jwt_step step = jwt_step_begin;
             TimeStatusCallback timestatus_cb = NULL;
+            size_t expire = 3600;
         };
 #endif
 
@@ -232,6 +236,7 @@ namespace firebase
             String api_key;
             // used with apiKey for current user verification and delete
             String id_token;
+            size_t expire = 3600;
 
         public:
             user_data() {}
@@ -242,6 +247,7 @@ namespace firebase
                 this->password = rhs.password;
                 this->api_key = rhs.api_key;
                 this->id_token = rhs.id_token;
+                this->expire = rhs.expire;
             }
             void clear()
             {
@@ -727,7 +733,7 @@ namespace firebase
         friend class AsyncFirebaseClient;
 
     public:
-        UserAuth(const String &api_key, const String &email, const String &password)
+        UserAuth(const String &api_key, const String &email, const String &password, size_t expire = 3600)
         {
             data.clear();
             data.user.api_key = api_key;
@@ -735,6 +741,7 @@ namespace firebase
             data.user.password = password;
             data.auth_type = auth_user_id_token;
             data.auth_data_type = user_auth_data_user_data;
+            data.user.expire = expire;
             data.initialized = true;
         };
 
@@ -794,12 +801,13 @@ namespace firebase
         friend class AsyncFirebaseClient;
 
     public:
-        ServiceAuth(TimeStatusCallback cb, const String &clientEmail, const String &projectId, const String &privateKey)
+        ServiceAuth(TimeStatusCallback cb, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = 3600)
         {
             data.clear();
             data.sa.client_email = clientEmail;
             data.sa.project_id = projectId;
             data.sa.private_key = privateKey;
+            data.sa.expire = expire;
             data.initialized = isInitialized();
             data.auth_type = auth_sa_access_token;
             data.auth_data_type = user_auth_data_service_account;
@@ -841,12 +849,13 @@ namespace firebase
         friend class AsyncFirebaseClient;
 
     public:
-        CustomAuth(TimeStatusCallback cb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "")
+        CustomAuth(TimeStatusCallback cb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = 3600)
         {
             data.clear();
             data.sa.client_email = clientEmail;
             data.sa.project_id = projectId;
             data.sa.private_key = privateKey;
+            data.sa.expire = expire;
             data.cust.api_key = apiKey;
             data.cust.uid = uid;
             data.cust.scope = scope;

@@ -20,10 +20,14 @@ namespace firebase
             app.aClient = &aClient;
             app.aclient_addr = reinterpret_cast<uint32_t>(&aClient);
             app.auth_data.user_auth.copy(auth);
-            
+
             app.auth_data.app_token.clear();
             app.auth_data.app_token.auth_type = app.auth_data.user_auth.auth_type;
             app.auth_data.app_token.auth_data_type = app.auth_data.user_auth.auth_data_type;
+
+            Serial.println("=======================");
+            Serial.println(app.auth_data.app_token.auth_type);
+            Serial.println(app.auth_data.app_token.auth_data_type);
 
             if (app.auth_data.user_auth.auth_data_type == user_auth_data_legacy_token || app.auth_data.user_auth.auth_data_type == user_auth_data_no_token)
             {
@@ -40,6 +44,7 @@ namespace firebase
             else if (app.auth_data.user_auth.auth_data_type == user_auth_data_id_token)
             {
 #if defined(ENABLE_ID_TOKEN)
+
                 app.timer.stop();
                 app.expire = app.auth_data.user_auth.id_token.expire;
                 app.auth_data.app_token.expire = app.expire;
@@ -91,7 +96,8 @@ namespace firebase
             else if (app.auth_data.user_auth.auth_type == auth_sa_access_token || app.auth_data.user_auth.auth_type == auth_sa_custom_token || app.auth_data.user_auth.auth_type == auth_user_id_token)
             {
                 app.auth_data.app_token.authenticated = false;
-                app.expire = 3600;
+                app.expire = app.auth_data.user_auth.auth_type == auth_user_id_token ? app.auth_data.user_auth.user.expire : app.auth_data.user_auth.sa.expire;
+
                 app.timer.stop();
                 app.timer.setInterval(0);
                 app.timer.start();
