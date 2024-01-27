@@ -190,6 +190,7 @@ namespace firebase
                 authReq.stop(aClient);
                 event = auth_event_uninitialized;
                 authReq.clearLastError(aResult);
+                authReq.remove(aClient);
             }
         }
 

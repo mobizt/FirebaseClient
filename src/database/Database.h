@@ -244,7 +244,7 @@ public:
                 {
                     aClient->process(true);
                 }
-                 aClient->handleRemove();
+                aClient->handleRemove();
             }
         }
     }
@@ -276,8 +276,27 @@ private:
 
         if (!app_token)
         {
+             request.aResult->error_available = true;
             if (request.aResult)
                 request.aResult->lastError.setClientError(FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
+
+             if (request.cb)
+                request.cb(*request.aResult);
+            return;
+        }
+
+        FirebaseApp *app = reinterpret_cast<FirebaseApp *>(app_addr);
+
+        if (app && app->isExpired())
+        {
+
+            request.aResult->error_available = true;
+
+            if (request.aResult)
+                request.aResult->lastError.setClientError(FIREBASE_ERROR_UNAUTHENTICATE);
+
+            if (request.cb)
+                request.cb(*request.aResult);
             return;
         }
 

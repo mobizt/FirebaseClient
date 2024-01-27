@@ -55,6 +55,11 @@ public:
         }
     }
 
+    void remove(AsyncClient *aClient)
+    {
+        aClient->handleRemove();
+    }
+
     void stop(AsyncClient *aClient)
     {
         aClient->stop();
