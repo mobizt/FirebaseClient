@@ -27,7 +27,8 @@ public:
         sData->refResult = &aResult;
         sData->ref_result_addr = aResult.addr;
 
-        aClient->process(firebase_client_list, sData->async);
+        aClient->process(sData->async);
+        aClient->handleRemove();
     }
 
     void setLastError(AsyncResult &aResult, int code, const String &message)
@@ -44,7 +45,8 @@ public:
 
     void process(AsyncClient *aClient, AsyncResult &aResult, AsyncResultCallback resultCb)
     {
-        aClient->process(firebase_client_list, true);
+        aClient->process(true);
+        aClient->handleRemove();
 
         if (resultCb && aResult.lastError.code() != 0 && aResult.error_available)
         {

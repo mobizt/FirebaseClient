@@ -10,6 +10,9 @@ namespace firebase
     static vector<uint32_t> firebase_client_list;
     static vector<uint32_t> firebase_result_list;
 
+    static int sd_add = 0;
+    static int sd_remove = 0;
+
     class List
     {
     private:

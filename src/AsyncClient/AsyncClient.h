@@ -77,6 +77,7 @@ private:
         async_request_handler_t request;
         async_response_handler_t response;
         async_error_t error;
+        bool to_remove = false;
         bool complete = false;
         bool async = false;
         bool cancel = false;
@@ -148,7 +149,7 @@ private:
                 closeFile(sData);
                 if (!openFile(sData, file_mode_open_read))
                 {
-                    setAsyncError(sData, state, FIREBASE_ERROR_OPEN_FILE);
+                    setAsyncError(sData, state, FIREBASE_ERROR_OPEN_FILE, !sData->sse, true);
                     return function_return_type_failure;
                 }
             }
@@ -189,7 +190,7 @@ private:
                     toSend = sData->request.file_data.file.read(buf, toSend);
                     if (toSend == 0)
                     {
-                        setAsyncError(sData, state, FIREBASE_ERROR_FILE_READ);
+                        setAsyncError(sData, state, FIREBASE_ERROR_FILE_READ, !sData->sse, true);
                         ret = function_return_type_failure;
                         goto exit;
                     }
@@ -217,7 +218,7 @@ private:
                     toSend = sData->request.file_data.file.read(buf, toSend);
                 if (toSend == 0)
                 {
-                    setAsyncError(sData, state, FIREBASE_ERROR_FILE_READ);
+                    setAsyncError(sData, state, FIREBASE_ERROR_FILE_READ, !sData->sse, true);
                     ret = function_return_type_failure;
                     goto exit;
                 }
@@ -289,7 +290,7 @@ private:
         sData->return_type = sData->request.payloadIndex == size && size > 0 ? function_return_type_complete : function_return_type_failure;
 
         if (sData->return_type == function_return_type_failure)
-            setAsyncError(sData, state, FIREBASE_ERROR_TCP_SEND);
+            setAsyncError(sData, state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
 
         sData->request.payloadIndex = 0;
         sData->request.dataIndex = 0;
@@ -310,7 +311,7 @@ private:
     {
         if (!sData || !netConnect())
         {
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED);
+            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
             return function_return_type_failure;
         }
 
@@ -344,13 +345,13 @@ private:
     {
         if (!sData || !netConnect())
         {
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED);
+            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
             return function_return_type_failure;
         }
 
         if (!readResponse(sData))
         {
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT);
+            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
             return function_return_type_failure;
         }
 
@@ -380,15 +381,21 @@ private:
         if (sData->async && asyncCon)
             return function_return_type_continue;
 
-        setAsyncError(sData, state, FIREBASE_ERROR_TCP_CONNECTION);
+        setAsyncError(sData, state, FIREBASE_ERROR_TCP_CONNECTION, !sData->sse, false);
         return function_return_type_failure;
     }
 
-    void setAsyncError(async_data_item_t *sData, async_state state, int code)
+    void setAsyncError(async_data_item_t *sData, async_state state, int code, bool toRemove, bool toCloseFile)
     {
         sData->error.state = state;
         if (sData->error.code == 0)
             sData->error.code = code;
+
+        if (toRemove)
+            sData->to_remove = toRemove;
+
+        if (toCloseFile)
+            closeFile(sData);
 
         setLastError(sData);
     }
@@ -455,8 +462,10 @@ private:
         }
     }
 
-    void removeSlot(std::vector<uint32_t> &clientList, uint8_t slot)
+    void removeSlot(uint8_t slot)
     {
+
+        sd_remove++;
 
         async_data_item_t *sData = getData(slot);
 #if defined(ENABLE_DATABASE)
@@ -767,7 +776,7 @@ private:
                                     oh.prepareDownloadOTA(sData->response.payloadLen, sData->request.base64, sData->request.ota_error);
                                     if (sData->request.ota_error != 0)
                                     {
-                                        setAsyncError(sData, async_state_read_response, sData->request.ota_error);
+                                        setAsyncError(sData, async_state_read_response, sData->request.ota_error, !sData->sse, false);
                                         return false;
                                     }
                                 }
@@ -776,7 +785,7 @@ private:
                                     closeFile(sData);
                                     if (!openFile(sData, file_mode_open_write))
                                     {
-                                        setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_OPEN_FILE);
+                                        setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_OPEN_FILE, !sData->sse, true);
                                         return false;
                                     }
                                 }
@@ -820,7 +829,7 @@ private:
                                         oh.decodeBase64OTA(mem, &bh, (const char *)buf, read - ofs, sData->request.ota_error);
                                         if (sData->request.ota_error != 0)
                                         {
-                                            setAsyncError(sData, async_state_read_response, sData->request.ota_error);
+                                            setAsyncError(sData, async_state_read_response, sData->request.ota_error, !sData->sse, false);
                                             goto exit;
                                         }
 
@@ -829,7 +838,7 @@ private:
                                             oh.endDownloadOTA(sData->request.b64Pad, sData->request.ota_error);
                                             if (sData->request.ota_error != 0)
                                             {
-                                                setAsyncError(sData, async_state_read_response, sData->request.ota_error);
+                                                setAsyncError(sData, async_state_read_response, sData->request.ota_error, !sData->sse, false);
                                                 goto exit;
                                             }
                                         }
@@ -838,7 +847,7 @@ private:
                                     {
                                         if (!bh.decodeToFile(mem, sData->request.file_data.file, (const char *)buf + ofs))
                                         {
-                                            setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_FILE_WRITE);
+                                            setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_FILE_WRITE, !sData->sse, true);
                                             goto exit;
                                         }
                                     }
@@ -858,7 +867,7 @@ private:
                                             oh.endDownloadOTA(0, sData->request.ota_error);
                                             if (sData->request.ota_error != 0)
                                             {
-                                                setAsyncError(sData, async_state_read_response, sData->request.ota_error);
+                                                setAsyncError(sData, async_state_read_response, sData->request.ota_error, !sData->sse, false);
                                                 goto exit;
                                             }
                                         }
@@ -868,7 +877,7 @@ private:
                                         int write = sData->request.file_data.file.write(buf, read);
                                         if (write < read)
                                         {
-                                            setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_FILE_WRITE);
+                                            setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_FILE_WRITE, !sData->sse, true);
                                             goto exit;
                                         }
                                     }
@@ -1349,6 +1358,8 @@ private:
         async_request_handler_t req;
         async_data_item_t *sData = addSlot();
 
+        sd_add++;
+
         sData->async = options.async;
         sData->request.url = url;
         sData->request.path = path;
@@ -1436,12 +1447,28 @@ private:
         return aDataList.size();
     }
 
-    void process(std::vector<uint32_t> &clientList, bool async)
+    bool processLocked()
     {
         if (inProcess)
-            return;
+            return true;
 
         inProcess = true;
+        return false;
+    }
+    void handleRemove()
+    {
+        for (size_t slot = 0; slot < slotCount(); slot++)
+        {
+           async_data_item_t *sData = getData(slot);
+            if (sData->cancel || sData->to_remove)
+                removeSlot(slot);
+        }
+    }
+
+    void process(bool async)
+    {
+        if (processLocked())
+            return;
 
         if (slotCount())
         {
@@ -1450,13 +1477,12 @@ private:
 
             if (!netConnect())
             {
-                setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED);
-                if (sData->sse || sData->async)
+                setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
+                if (sData->async)
                 {
                     returnResult(sData, false);
                     reset(sData, true);
                 }
-
                 inProcess = false;
                 return;
             }
@@ -1481,7 +1507,7 @@ private:
                     sData->return_type = send(sData);
                     if (millis() - sData->request.last_request_ms > sData->request.request_tmo)
                     {
-                        setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_SEND);
+                        setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
                         sData->return_type = function_return_type_failure;
                     }
                     if (sData->cancel || sData->async || sData->return_type == function_return_type_failure)
@@ -1530,7 +1556,7 @@ private:
 
                     if (millis() - sData->response.last_response_ms > sData->response.response_tmo)
                     {
-                        setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT);
+                        setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
                         sData->return_type = function_return_type_failure;
                     }
                     bool allRead = sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_OK && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining;
@@ -1544,8 +1570,11 @@ private:
 #if defined(ENABLE_DATABASE)
             handleEventTimeout(sData);
 #endif
-            if (sData->cancel || (!sData->sse && (sData->return_type == function_return_type_complete || sData->return_type == function_return_type_failure)))
-                removeSlot(clientList, slot);
+
+            setAsyncError(sData, sData->state, 0, !sData->sse && sData->return_type == function_return_type_complete, false);
+
+            if (sData->cancel || sData->to_remove)
+                removeSlot(slot);
         }
 
         inProcess = false;
@@ -1555,7 +1584,7 @@ private:
     {
         if ((!sData->cancel && sData->sse && !sData->aResult.database.sse_request && sData->sse && sData->aResult.database.eventTimeout()))
         {
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEDOUT);
+            setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEDOUT, false, false);
             returnResult(sData, false);
             reset(sData, true);
         }

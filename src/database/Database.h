@@ -241,7 +241,10 @@ public:
             if (aClient)
             {
                 for (size_t slot = 0; slot < aClient->slotCount(); slot++)
-                    aClient->process(firebase_client_list, true);
+                {
+                    aClient->process(true);
+                }
+                 aClient->handleRemove();
             }
         }
     }
@@ -310,7 +313,8 @@ private:
             sData->ref_result_addr = request.aResult->addr;
         }
 
-        request.aClient->process(firebase_client_list, sData->async);
+        request.aClient->process(sData->async);
+        request.aClient->handleRemove();
     }
 
     void addParams(bool hasQueryParams, String &extras, async_request_handler_t::http_request_method method, DataOptions *options, bool isFile)
