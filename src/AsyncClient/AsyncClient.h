@@ -469,8 +469,6 @@ private:
     void removeSlot(uint8_t slot)
     {
 
-        sd_remove++;
-
         async_data_item_t *sData = getData(slot);
 #if defined(ENABLE_DATABASE)
         sData->aResult.database.clearSSE();
@@ -1361,8 +1359,6 @@ private:
     {
         async_request_handler_t req;
         async_data_item_t *sData = addSlot();
-
-        sd_add++;
 
         sData->async = options.async;
         sData->request.url = url;
