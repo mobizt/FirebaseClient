@@ -19,14 +19,12 @@ public:
         String host;
         async_request_handler_t req;
         req.addGAPIsHost(host, subdomain.c_str());
-
         sData = aClient->newSlot(firebase_client_list, host, extras, "", async_request_handler_t::http_post, AsyncClient::slot_options_t(true, false, true, false, false));
         req.addContentTypeHeader(sData->request.header, "application/json");
         sData->request.payload = payload;
         aClient->setContentLength(sData, sData->request.payload.length());
         sData->refResult = &aResult;
         sData->ref_result_addr = aResult.addr;
-
         aClient->process(sData->async);
         aClient->handleRemove();
     }

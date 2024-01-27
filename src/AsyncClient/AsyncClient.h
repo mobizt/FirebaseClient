@@ -42,7 +42,7 @@ private:
     struct slot_options_t
     {
     public:
-        bool auth_use = false;
+        bool auth_used = false;
         bool sse = false;
         bool async = false;
         bool sv = false;
@@ -50,9 +50,9 @@ private:
         const char *etag = "";
         app_token_t *app_token = nullptr;
         slot_options_t() {}
-        slot_options_t(bool auth_use, bool sse, bool async, bool sv, bool ota, const char *etag = "", app_token_t *app_token = nullptr)
+        slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, const char *etag = "", app_token_t *app_token = nullptr)
         {
-            this->auth_use = auth_use;
+            this->auth_used = auth_used;
             this->sse = sse;
             this->async = async;
             this->sv = sv;
@@ -78,6 +78,7 @@ private:
         async_response_handler_t response;
         async_error_t error;
         bool to_remove = false;
+        bool auth_used = false;
         bool complete = false;
         bool async = false;
         bool cancel = false;
@@ -319,6 +320,9 @@ private:
 
         if (sData->state == async_state_undefined || sData->state == async_state_send_header)
         {
+            if (sData->auth_used && sData->state == async_state_undefined)
+                stop();
+
             if (!client->connected())
             {
                 ret = connect(sData, getHost(sData, true).c_str(), sData->request.port);
@@ -481,7 +485,7 @@ private:
             returnResult(sData, true);
         }
 
-        reset(sData, false);
+        reset(sData, sData->auth_used);
 
         delete sData;
         sData = nullptr;
@@ -1375,8 +1379,9 @@ private:
         req.addRequestHeaderLast(sData->request.header);
         req.addHostHeader(sData->request.header, getHost(sData, true).c_str());
 
-        if (!options.auth_use)
+        if (!options.auth_used)
         {
+            sData->auth_used = true;
             if (options.app_token && (options.app_token->auth_type == auth_access_token || options.app_token->auth_type == auth_sa_access_token))
             {
                 req.addAuthHeaderFirst(sData->request.header, options.app_token->auth_type);
@@ -1459,7 +1464,7 @@ private:
     {
         for (size_t slot = 0; slot < slotCount(); slot++)
         {
-           async_data_item_t *sData = getData(slot);
+            async_data_item_t *sData = getData(slot);
             if (sData->cancel || sData->to_remove)
                 removeSlot(slot);
         }
@@ -1521,6 +1526,9 @@ private:
                 return;
             }
 
+            async_request_handler_t req;
+            req.idle();
+
             if (sData->state == async_state_read_response)
             {
                 // it can be complete response from payload sending
@@ -1532,6 +1540,7 @@ private:
 #if defined(ENABLE_DATABASE)
                     handleEventTimeout(sData);
 #endif
+
                     inProcess = false;
                     return;
                 }
