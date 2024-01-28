@@ -242,11 +242,12 @@ namespace firebase
 
                 if (auth_data.user_auth.status._event == auth_event_initializing)
                 {
-
+                    authReq.stop(aClient);
                     getTime();
 #if defined(ENABLE_JWT)
                     if (auth_data.user_auth.sa.step == jwt_step_begin)
                     {
+                        clearJWT();
                         auth_data.user_auth.sa.step = jwt_step_encode_header_payload;
                         if (!createJwt(auth_data.user_auth))
                         {
@@ -281,13 +282,17 @@ namespace firebase
 #if defined(ENABLE_SERVICE_AUTH)
                         json.addObject(payload, json.toString("grant_type"), json.toString("urn:ietf:params:oauth:grant-type:jwt-bearer"));
                         json.addObject(payload, json.toString("assertion"), json.toString(jwt.token()), true);
+                        clearJWT();
 #endif
                     }
                     else if (auth_data.user_auth.auth_type == auth_sa_custom_token || auth_data.user_auth.auth_type == auth_custom_token)
                     {
 #if defined(ENABLE_CUSTOM_AUTH)
                         if (auth_data.user_auth.auth_type == auth_sa_custom_token)
+                        {
                             json.addObject(payload, json.toString("token"), json.toString(jwt.token()));
+                            clearJWT();
+                        }
 #endif
 #if defined(ENABLE_CUSTOM_TOKEN)
                         if (auth_data.user_auth.auth_type == auth_custom_token)
@@ -320,6 +325,7 @@ namespace firebase
                     extras = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? "/token" : "/v1/accounts:signInWithCustomToken?key=" + api_key;
 
                     authReq.asyncRequest(aClient, subdomain, extras, payload, aResult);
+                    payload.remove(0, payload.length());
                     setEvent(auth_event_auth_request_sent);
                 }
             }
@@ -394,6 +400,7 @@ namespace firebase
                         extras += auth_data.user_auth.user.api_key;
 
                     authReq.asyncRequest(aClient, subdomain, extras, payload, aResult);
+                    payload.remove(0, payload.length());
                     setEvent(auth_event_auth_request_sent);
                     return true;
                 }

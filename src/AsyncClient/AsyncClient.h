@@ -420,6 +420,7 @@ private:
 
     void returnResult(async_data_item_t *sData, bool setData)
     {
+
         bool error_notify_timeout = false;
         if (sData->last_error_notify_ms == 0 || millis() - sData->last_error_notify_ms > 5000)
         {
@@ -440,7 +441,10 @@ private:
         }
 
         if (sData->cb && (setData || error_notify_timeout))
-            sData->cb(sData->aResult);
+        {
+            if (!sData->auth_used)
+                sData->cb(sData->aResult);
+        }
     }
 
     void setLastError(async_data_item_t *sData)
@@ -1375,9 +1379,10 @@ private:
         req.addRequestHeaderLast(sData->request.header);
         req.addHostHeader(sData->request.header, getHost(sData, true).c_str());
 
+        sData->auth_used = options.auth_used;
+
         if (!options.auth_used)
         {
-            sData->auth_used = true;
             if (options.app_token && (options.app_token->auth_type == auth_access_token || options.app_token->auth_type == auth_sa_access_token))
             {
                 req.addAuthHeaderFirst(sData->request.header, options.app_token->auth_type);
@@ -1506,6 +1511,7 @@ private:
                 while (sData->state == async_state_send_header || sData->state == async_state_send_payload)
                 {
                     sData->return_type = send(sData);
+                    sData->response.last_response_ms = millis();
                     if (millis() - sData->request.last_request_ms > sData->request.request_tmo)
                     {
                         setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
@@ -1537,6 +1543,12 @@ private:
                     handleEventTimeout(sData);
 #endif
 
+                    if (sData->response.last_response_ms > 0 && millis() - sData->response.last_response_ms > sData->response.response_tmo)
+                    {
+                        setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
+                        sData->return_type = function_return_type_failure;
+                    }
+
                     inProcess = false;
                     return;
                 }
@@ -1559,7 +1571,7 @@ private:
                     sData->response.last_response_ms = millis();
                     sData->return_type = receive(sData);
 
-                    if (millis() - sData->response.last_response_ms > sData->response.response_tmo)
+                    if (sData->response.last_response_ms > 0 && millis() - sData->response.last_response_ms > sData->response.response_tmo)
                     {
                         setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
                         sData->return_type = function_return_type_failure;
