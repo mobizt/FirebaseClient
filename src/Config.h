@@ -6,18 +6,6 @@
  * -D FIREBASE_DISABLE_ALL_OPTIONS
  */
 
-/**📍 For enabling the device or library time setup from NTP server
- * ⛔ Use following build flag to disable.
- * -D DISABLE_NTP_TIME
- */
-#define ENABLE_NTP_TIME
-
-/**📍 For enabling the error string from error reason
- * ⛔ Use following build flag to disable.
- * -D DISABLE_ERROR_STRING
- */
-#define ENABLE_ERROR_STRING
-
 /**📍 For RTDB class compilation
  * ⛔ Use following build flag to disable.
  * -D DISABLE_DATABASE
@@ -72,16 +60,23 @@
  */
 #define ENABLE_FS
 
- #define ENABLE_SERVICE_AUTH
- #define ENABLE_CUSTOM_AUTH
- #define ENABLE_USER_AUTH
- #define ENABLE_ACCESS_TOKEN
- #define ENABLE_CUSTOM_TOKEN
-  #define ENABLE_ID_TOKEN
+/**📍 For enabling authentication and token
+ * ⛔ Use following build flag to disable.
+ * -D DISABLE_SERVICE_AUTH
+ * -D DISABLE_CUSTOM_AUTH
+ * -D DISABLE_USER_AUTH
+ * -D DISABLE_ACCESS_TOKEN
+ * -D DISABLE_CUSTOM_TOKEN
+ * -D DISABLE_ID_TOKEN
+ * -D DISABLE_LEGACY_TOKEN
+ */
+#define ENABLE_SERVICE_AUTH
+#define ENABLE_CUSTOM_AUTH
+#define ENABLE_USER_AUTH
+#define ENABLE_ACCESS_TOKEN
+#define ENABLE_CUSTOM_TOKEN
+#define ENABLE_ID_TOKEN
 #define ENABLE_LEGACY_TOKEN
-
-
-
 
 #include "core/Options.h"
 

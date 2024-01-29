@@ -22,73 +22,62 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef CORE_TIMER_H
-#define CORE_TIMER_H
+#ifndef DATABASE_DATAOPTIONS_H
+#define DATABASE_DATAOPTIONS_H
 
 #include <Arduino.h>
 #include "./Config.h"
+#include "./database/Filter.h"
 
-class Timer
+
+#if defined(ENABLE_DATABASE)
+
+
+class DataOptions
 {
-private:
-    unsigned long ts = 0;
-    unsigned long end = 0;
-    unsigned long period = 0;
-    unsigned long now = 0;
-    unsigned long ms = 0;
-    bool enable = false;
+    friend class Database;
 
 public:
-    Timer(unsigned long sec = 60) { setInterval(sec); }
-    ~Timer(){};
+    uint32_t readTimeout = 0;
+    String writeSizeLimit;
+    bool shallow = false;
+    bool silent = false;
+    bool classicRequest = false;
+    String customHeaders;
+    String ETAG;
+    Filter filter;
 
-    void reset()
+    void copy(DataOptions &rhs)
     {
-        end = ts + period;
+        this->readTimeout = rhs.readTimeout;
+        this->writeSizeLimit = rhs.writeSizeLimit;
+        this->shallow = rhs.shallow;
+        this->silent = rhs.silent;
+        this->classicRequest = rhs.classicRequest;
+        this->customHeaders = rhs.customHeaders;
+        this->ETAG = rhs.ETAG;
+        this->filter.copy(rhs.filter);
+        this->ota = rhs.ota;
+        this->base64 = rhs.base64;
     }
 
-    void start()
+    void clear()
     {
-        enable = true;
-        loop();
-        reset();
+        readTimeout = 0;
+        writeSizeLimit.clear();
+        shallow = false;
+        silent = false;
+        classicRequest = false;
+        customHeaders.clear();
+        ETAG.clear();
+        filter.clear();
     }
 
-    void stop() { enable = false; }
-
-    void setInterval(unsigned long sec)
-    {
-        loop();
-        period = sec;
-        reset();
-    }
-
-    void loop()
-    {
-        if (enable && (unsigned long)(millis() - now) > 100)
-        {
-            now = millis();
-
-            if (now / 1000 >= ts)
-            {
-                ts = now / 1000;
-                ms = now;
-            }
-            else // millis overflow handling
-                ts += (unsigned long)(now - ms) / 1000;
-        }
-    }
-
-    unsigned long remaining()
-    {
-        return ready() ? 0 : end - ts;
-    }
-
-    bool ready()
-    {
-        loop();
-        return ts >= end;
-    }
+private:
+    bool base64 = false;
+    bool ota = false;
 };
+
+#endif
 
 #endif

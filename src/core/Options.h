@@ -1,8 +1,8 @@
 /**
- * Created November 8, 2023
+ * Created January 29, 2024
  *
  * The MIT License (MIT)
- * Copyright (c) 2023 K. Suwatchai (Mobizt)
+ * Copyright (c) 2024 K. Suwatchai (Mobizt)
  *
  *
  * Permission is hereby granted, free of charge, to any person returning a copy of
@@ -52,8 +52,6 @@
 #undef ENABLE_CLOUD_STORAGE
 #undef ENABLE_FUNCTIONS
 #undef ENABLE_PSRAM
-#undef ENABLE_NTP_TIME
-#undef ENABLE_ERROR_STRING
 #undef ENABLE_OTA
 #undef ENABLE_FS
 #undef DEFAULT_DEBUG_PORT
@@ -94,14 +92,6 @@
 
 #if defined(DISABLE_PSRAM)
 #undef ENABLE_PSRAM
-#endif
-
-#if defined(DISABLE_NPT_TIME)
-#undef ENABLE_NTP_TIME
-#endif
-
-#if defined(DISABLE_ERROR_STRING)
-#undef ENABLE_ERROR_STRING
 #endif
 
 #if defined(DISABLE_OTA)
@@ -203,7 +193,7 @@ public:
 #endif
 
 #if !__has_include(<ESP_SSLClient.h>)
-#include "core/SSLClient/ESP_SSLClient.h"
+#include "./core/SSLClient/ESP_SSLClient.h"
 #endif
 #endif
 

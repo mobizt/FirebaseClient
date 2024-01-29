@@ -1,6 +1,5 @@
-
 /**
- * Created January 11, 2024
+ * Created January 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -85,6 +84,8 @@ public:
         p1 = -1;
         p2 = -1;
     }
+
+    void addSp(String &buf) { buf += ' '; }
 };
 
 #endif

@@ -1,6 +1,5 @@
-
 /**
- * Created January 11, 2024
+ * Created January 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -29,8 +28,8 @@
 #include <Arduino.h>
 #include <Client.h>
 #include "./Config.h"
-#include "StringHelper.h"
-#include "Memory.h"
+#include "./core/StringHelper.h"
+#include "./core/Memory.h"
 
 class URLHelper
 {
@@ -95,10 +94,10 @@ public:
         if (path.length() > 0)
         {
             if (path[0] != '/')
-                url += "/";
+                url += '/';
         }
         else
-            url += "/";
+            url += '/';
 
         url += path;
     }
@@ -106,10 +105,10 @@ public:
     /* Append the string with google storage URL */
     void addGStorageURL(String &uri, const String &bucketID, const String &storagePath)
     {
-        uri += "gs://";
+        uri += FPSTR("gs://");
         uri += bucketID;
         if (storagePath[0] != '/')
-            uri += "/";
+            uri += '/';
         uri += storagePath;
     }
 
@@ -119,14 +118,14 @@ public:
     {
 #if defined(ENABLE_FUNCTIONS)
         if (url)
-            uri = "https://";
+            uri = FPSTR("https://");
         uri += locationId;
-        uri += "-";
+        uri += '-';
         uri += projectId;
-        uri += ".cloudfunctions.net";
+        uri += FPSTR(".cloudfunctions.net");
         if (path.length() > 0)
         {
-            uri += "/";
+            uri += '/';
             uri += path;
         }
 #endif
@@ -134,17 +133,17 @@ public:
 
     void addGAPIv1Path(String &uri)
     {
-        uri += "/v1/projects/";
+        uri += FPSTR("/v1/projects/");
     }
 
     void addGAPIv1beta1Path(String &uri)
     {
-        uri += "/v1beta1/projects/";
+        uri += FPSTR("/v1beta1/projects/");
     }
 
     void host2Url(String &url, String &host)
     {
-        url = "https://";
+        url = FPSTR("https://");
         url += host;
     }
 

@@ -1,8 +1,8 @@
 /**
- * Created November 9, 2023
+ * Created January 29, 2024
  *
  * The MIT License (MIT)
- * Copyright (c) 2023 K. Suwatchai (Mobizt)
+ * Copyright (c) 2024 K. Suwatchai (Mobizt)
  *
  *
  * Permission is hereby granted, free of charge, to any person returning a copy of
@@ -28,7 +28,7 @@
 #include <Arduino.h>
 #include "./Config.h"
 #include "./core/Network.h"
-#include "Memory.h"
+#include "./core/Memory.h"
 
 struct network_config_data
 {

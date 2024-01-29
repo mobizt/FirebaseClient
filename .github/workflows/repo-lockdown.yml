@@ -17,3 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: dessant/repo-lockdown@v4
+        with:
+          exclude-pr-labels: 'pinned'
+          lock-pr: false
+          process-only: 'prs'

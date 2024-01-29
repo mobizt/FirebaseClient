@@ -1,8 +1,8 @@
 /**
- * Created November 8, 2023
+ * Created January 29, 2024
  *
  * The MIT License (MIT)
- * Copyright (c) 2023 K. Suwatchai (Mobizt)
+ * Copyright (c) 2024 K. Suwatchai (Mobizt)
  *
  *
  * Permission is hereby granted, free of charge, to any person returning a copy of
@@ -27,13 +27,13 @@
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "core/Memory.h"
-#include "core/AuthConfig.h"
-#include "core/Base64.h"
-#include "core/URL.h"
-#include "core/JSON.h"
-#include "AsyncClient/RequestHandler.h"
-#include "core/Error.h"
+#include "./core/Memory.h"
+#include "./core/AuthConfig.h"
+#include "./core/Base64.h"
+#include "./core/URL.h"
+#include "./core/JSON.h"
+#include "./core/AsyncClient/RequestHandler.h"
+#include "./core/Error.h"
 
 #if defined(ENABLE_JWT)
 
@@ -46,6 +46,9 @@ namespace firebase
 
     private:
         String jwt;
+        StringHelper sh;
+        Base64Helper bh;
+        URLHelper uh;
 
     public:
         struct jwt_token_data
@@ -75,16 +78,13 @@ namespace firebase
 
             if (auth_data.sa.step == jwt_step_encode_header_payload)
             {
-                Base64Helper bh;
-                URLHelper uh;
-                StringHelper sh;
 
                 jwt_data->token.clear();
 
                 // header
                 // {"alg":"RS256","typ":"JWT"}
 
-                String header = "{\"alg\":\"RS256\",\"typ\":\"JWT\"}";
+                String header = FPSTR("{\"alg\":\"RS256\",\"typ\":\"JWT\"}");
 
                 size_t len = bh.encodedLength(header.length());
                 char *buf = reinterpret_cast<char *>(mem.alloc(len));
@@ -104,17 +104,16 @@ namespace firebase
                 json.addObject(payload, json.toString("iss"), json.toString(auth_data.sa.client_email));
                 json.addObject(payload, json.toString("sub"), json.toString(auth_data.sa.client_email));
 
-                String t = "https://";
+                String t = FPSTR("https://");
                 if (auth_data.auth_type == auth_sa_custom_token)
                 {
                     req.addGAPIsHost(t, "identitytoolkit");
-                    t += "/google.identity.identitytoolkit.v1.IdentityToolkit";
+                    t += FPSTR("/google.identity.identitytoolkit.v1.IdentityToolkit");
                 }
                 else if (auth_data.auth_type == auth_sa_access_token)
                 {
                     req.addGAPIsHost(t, "oauth2");
-                    t += "/";
-                    t += "token";
+                    t += FPSTR("/token");
                 }
 
                 json.addObject(payload, json.toString("aud"), json.toString(t));
@@ -127,36 +126,28 @@ namespace firebase
                     String host;
                     req.addGAPIsHost(host, "www");
                     uh.host2Url(buri, host);
-                    buri += "/";
-                    buri += "auth";
-                    buri += "/";
+                    buri += FPSTR("/auth/");
 
                     String s = buri; // https://www.googleapis.com/auth/
-                    s += "devstorage.full_control";
-
-                    s += " ";
+                    s += FPSTR("devstorage.full_control");
+                    sh.addSp(s);
                     s += buri; // https://www.googleapis.com/auth/
-                    s += "datastore";
-
-                    s += " ";
+                    s += FPSTR("datastore");
+                    sh.addSp(s);
                     s += buri; // https://www.googleapis.com/auth/
-                    s += "userinfo.email";
-
-                    s += " ";
+                    s += FPSTR("userinfo.email");
+                    sh.addSp(s);
                     s += buri; // https://www.googleapis.com/auth/
-                    s += "firebase.database";
-
-                    s += " ";
+                    s += FPSTR("firebase.database");
+                    sh.addSp(s);
                     s += buri; // https://www.googleapis.com/auth/
-                    s += "cloud-platform";
-
-                    s += " ";
+                    s += FPSTR("cloud-platform");
+                    sh.addSp(s);
                     s += buri; // https://www.googleapis.com/auth/
-                    s += "iam";
+                    s += FPSTR("iam");
 
                     if (auth_data.cust.scope.length() > 0)
                     {
-                        StringHelper sh;
 
                         char *p = reinterpret_cast<char *>(mem.alloc(auth_data.cust.scope.length()));
                         strcpy(p, auth_data.cust.scope.c_str());
@@ -170,7 +161,7 @@ namespace firebase
                             if (strlen(pp) > 0)
                             {
                                 tmp = pp;
-                                s += " ";
+                                sh.addSp(s);
                                 s += tmp;
                                 i++;
                             }
@@ -198,7 +189,7 @@ namespace firebase
                 jwt_data->encPayload = buf;
                 mem.release(&buf);
 
-                jwt_data->encHeadPayload += ".";
+                jwt_data->encHeadPayload += '.';
                 jwt_data->encHeadPayload += jwt_data->encPayload;
 
                 jwt_data->encHeader.clear();
@@ -213,15 +204,13 @@ namespace firebase
                 br_sha256_out(&mc, jwt_data->hash);
 
                 jwt_data->token = jwt_data->encHeadPayload;
-                jwt_data->token += ".";
+                jwt_data->token += '.';
                 jwt_data->encHeadPayload.clear();
 
                 auth_data.sa.step = jwt_step_sign;
             }
             else if (auth_data.sa.step == jwt_step_sign)
             {
-
-                Base64Helper bh;
 
                 // RSA private key
                 PrivateKey *pk = nullptr;

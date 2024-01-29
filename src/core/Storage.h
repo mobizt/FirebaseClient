@@ -1,5 +1,5 @@
 /**
- * Created January 11, 2024
+ * Created January 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,7 +27,7 @@
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "Memory.h"
+#include "./core/Memory.h"
 
 #if defined(ENABLE_FS)
 #include <FS.h>
