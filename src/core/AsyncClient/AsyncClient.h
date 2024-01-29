@@ -129,8 +129,6 @@ private:
     network_config_data net;
     uint32_t addr = 0;
     bool inProcess = false;
-    // should be removed
-    String token;
 
     void closeFile(async_data_item_t *sData)
     {
@@ -459,6 +457,7 @@ private:
             if (setData || error_notify_timeout)
             {
                 *sData->refResult = sData->aResult;
+
                 if (setData)
                     sData->refResult->setPayload(sData->aResult.data_payload);
             }
@@ -595,6 +594,7 @@ private:
 
                     if (sData->response.flags.sse || !sData->response.flags.payload_remaining)
                     {
+                        
                         sData->aResult.setPayload(sData->response.payload);
 
                         if (sData->aResult.download_data.total > 0)
@@ -1651,12 +1651,6 @@ private:
         return url_info.host;
     }
 
-    // should be removed
-    String getToken()
-    {
-        return token;
-    }
-
 public:
     AsyncClient(Client &client, network_config_data &net) : client(&client)
     {
@@ -1702,11 +1696,6 @@ public:
     {
         if (client)
             client->stop();
-    }
-
-    void setAuth(const String &auth)
-    {
-        this->token = auth;
     }
 
     FirebaseError lastError() { return lastErr; }

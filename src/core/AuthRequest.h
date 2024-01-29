@@ -33,10 +33,13 @@ class AuthRequest
 {
 private:
     AsyncClient::async_data_item_t *sData = nullptr;
+    
 
 public:
     AuthRequest(){};
     ~AuthRequest(){};
+
+    unsigned long request_sent_ms = 0;
 
     void asyncRequest(AsyncClient *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult)
     {
@@ -49,6 +52,7 @@ public:
         aClient->setContentLength(sData, sData->request.payload.length());
         sData->refResult = &aResult;
         sData->ref_result_addr = aResult.addr;
+        request_sent_ms = millis();
         aClient->process(sData->async);
         aClient->handleRemove();
     }

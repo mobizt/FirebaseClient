@@ -27,7 +27,7 @@
 #include <Arduino.h>
 #include <Client.h>
 
-#define FIREBASE_TCP_READ_TIMEOUT 60 * 1000;
+#define FIREBASE_TCP_READ_TIMEOUT 30 * 1000
 
 struct async_response_handler_t
 {
