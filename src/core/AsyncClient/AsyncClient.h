@@ -1400,7 +1400,7 @@ private:
         return net.network_status;
     }
 
-    int sIndex(slot_options_t options)
+    int sIndex(slot_options_t &options)
     {
         int slot = -1;
         if (options.auth_used)
