@@ -121,6 +121,7 @@ private:
     };
 
     FirebaseError lastErr;
+    String resETag;
     int netErrState = 0;
     Client *client = nullptr;
     bool asyncCon = false;
@@ -460,6 +461,9 @@ private:
 
                 if (setData)
                     sData->refResult->setPayload(sData->aResult.data_payload);
+
+                sData->refResult->setETag(sData->aResult.res_etag);
+                sData->refResult->setPath(sData->aResult.data_path);
             }
         }
 
@@ -673,6 +677,9 @@ private:
                 String cl, con, te, ct;
                 parseRespHeader(sData, sData->response.header, sData->response.location, "Location");
                 parseRespHeader(sData, sData->response.header, sData->response.etag, "ETag");
+                resETag = sData->response.etag;
+                sData->aResult.res_etag = sData->response.etag;
+                sData->aResult.data_path = sData->request.path;
 #if defined(ENABLE_DATABASE)
                 sData->aResult.database.null_etag = sData->response.etag.indexOf("null_etag") > -1;
 #endif
@@ -1304,7 +1311,7 @@ private:
     {
         if (!netStatus())
         {
-            if (millis() - net.net_reconnect_ms > net.net_reconnect_timeout || net.net_reconnect_ms == 0)
+            if (net.reconnect && (millis() - net.net_reconnect_ms > net.net_reconnect_timeout || net.net_reconnect_ms == 0))
             {
                 net.net_reconnect_ms = millis();
 
@@ -1699,6 +1706,8 @@ public:
     }
 
     FirebaseError lastError() { return lastErr; }
+
+    String etag(){ return resETag;}
 };
 
 #endif

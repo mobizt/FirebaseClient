@@ -65,7 +65,7 @@ public:
 
     void clearLastError(AsyncResult &aResult)
     {
-        aResult.lastError.err.message = "";
+        aResult.lastError.err.message.remove(0, aResult.lastError.err.message.length());
         aResult.lastError.err.code = 0;
     }
 

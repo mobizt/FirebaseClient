@@ -33,37 +33,37 @@
 class JSON
 {
 private:
-
 public:
     JSON(){};
     ~JSON(){};
     void addObject(String &buf, const String &name, const String &value, bool last = false)
     {
         if (buf.length() == 0)
-            buf += "{";
+            buf += '{';
         else
-            buf += ",";
+            buf += ',';
         buf += name;
-        buf += ":";
+        buf += ':';
         buf += value;
         if (last)
-            buf += "}";
+            buf += '}';
     }
     void addArray(String &buf, const String &value, bool last = false)
     {
         if (buf.length() == 0)
-            buf += "[";
+            buf += '[';
         else
-            buf += ",";
+            buf += ',';
         buf += value;
         if (last)
-            buf += "]";
+            buf += ']';
     }
     String toString(const String &value)
     {
-        String buf = "\"";
+        String buf;
+        buf += '"';
         buf += value;
-        buf += "\"";
+        buf += '"';
         return buf;
     }
 };

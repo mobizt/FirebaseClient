@@ -95,6 +95,7 @@ private:
     FirebaseError lastError;
     String data_path;
     String data_payload;
+    String res_etag;
     bool data_available = false;
     bool error_available = false;
     download_data_t download_data;
@@ -109,6 +110,16 @@ private:
             data_payload = data;
         }
         database.ref_payload = &data_payload;
+    }
+
+    void setETag(const String &etag)
+    {
+        res_etag = etag;
+    }
+
+    void setPath(const String &path)
+    {
+        data_path = path;
     }
 
 public:
@@ -246,11 +257,12 @@ public:
 
     String payload() { return data_payload; }
     String path() { return data_path; }
-    bool available()
+    String etag() { return res_etag; }
+    int available()
     {
         bool ret = data_available;
         data_available = false;
-        return ret;
+        return ret ? data_payload.length() : 0;
     }
 
     app_event_t appEvent()

@@ -299,7 +299,7 @@ namespace firebase
                     String payload;
                     String extras;
                     JSON json;
-                    String subdomain = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? "oauth2" : "identitytoolkit";
+                    String subdomain = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? FPSTR("oauth2") : FPSTR("identitytoolkit");
 
                     if (auth_data.user_auth.auth_type == auth_sa_access_token)
                     {
@@ -346,7 +346,7 @@ namespace firebase
                     else
                         api_key = auth_data.user_auth.user.api_key;
 
-                    extras = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? "/token" : "/v1/accounts:signInWithCustomToken?key=" + api_key;
+                    extras = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? FPSTR("/token") : FPSTR("/v1/accounts:signInWithCustomToken?key=") + api_key;
 
                     authReq.asyncRequest(aClient, subdomain, extras, payload, aResult);
                     payload.remove(0, payload.length());
@@ -366,7 +366,7 @@ namespace firebase
                 String payload;
                 String extras;
                 JSON json;
-                String subdomain = auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? "securetoken" : "identitytoolkit";
+                String subdomain = auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? FPSTR("securetoken") : FPSTR("identitytoolkit");
 
                 if (auth_data.user_auth.status._event == auth_event_authenticating)
                 {
@@ -385,20 +385,20 @@ namespace firebase
                             json.addObject(payload, json.toString("email"), json.toString(auth_data.user_auth.user.email), true);
                         }
 
-                        extras = "/v1/accounts:sendOobCode?key=";
+                        extras = FPSTR("/v1/accounts:sendOobCode?key=");
                     }
                     else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user)
                     {
 
                         json.addObject(payload, json.toString("idToken"), json.toString(auth_data.user_auth.user.id_token.length() ? auth_data.user_auth.user.id_token : auth_data.app_token.token), true);
-                        extras = "/v1/accounts:delete?key=" + auth_data.user_auth.user.api_key;
+                        extras = FPSTR("/v1/accounts:delete?key=") + auth_data.user_auth.user.api_key;
                     }
                     else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
                     {
                         // {"grantType":"refresh_token","refreshToken":"<refresh token>"}
                         json.addObject(payload, json.toString("grantType"), json.toString("refresh_token"));
                         json.addObject(payload, json.toString("refreshToken"), json.toString(auth_data.app_token.refresh), true);
-                        extras = "/v1/token?key=";
+                        extras = FPSTR("/v1/token?key=");
                     }
                     else
                     {
@@ -411,7 +411,7 @@ namespace firebase
                             json.addObject(payload, json.toString("password"), json.toString(auth_data.user_auth.user.password));
                             json.addObject(payload, json.toString("returnSecureToken"), "true", true);
                         }
-                        extras = auth_data.user_auth.task_type == firebase_core_auth_task_type_signup ? "/v1/accounts:signUp?key=" : "/v1/accounts:signInWithPassword?key=";
+                        extras = auth_data.user_auth.task_type == firebase_core_auth_task_type_signup ? FPSTR("/v1/accounts:signUp?key=") : FPSTR("/v1/accounts:signInWithPassword?key=");
                     }
 
                     if (auth_data.user_auth.auth_type == auth_sa_custom_token)
@@ -485,6 +485,11 @@ namespace firebase
         bool isInitialized()
         {
             return auth_data.user_auth.initialized;
+        }
+
+        void loop()
+        {
+            processAuth();
         }
 
         bool ready()

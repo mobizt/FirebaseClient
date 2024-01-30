@@ -114,10 +114,12 @@ private:
     ethernet_data ethernet;
     bool initialized = false;
     bool network_status = false;
+    bool reconnect = true;
     firebase_wifi *wifi = nullptr;
     SPI_ETH_Module *eth = NULL;
     unsigned long net_reconnect_ms =0;
     unsigned long net_reconnect_timeout = 10000;
+
 
 public:
     ~network_config_data() { clear(); }
@@ -131,6 +133,7 @@ public:
     {
         this->network_data_type = rhs.network_data_type;
         this->initialized = rhs.initialized;
+        this->reconnect = rhs.reconnect;
         generic.copy(rhs.generic);
         gsm.copy(rhs.gsm);
         ethernet.copy(rhs.ethernet);
@@ -144,6 +147,7 @@ public:
         network_data_type = firebase_network_data_undefined;
         initialized = false;
         network_status = false;
+        reconnect = true;
     }
 };
 
@@ -151,10 +155,11 @@ class DefaultNetwork
 {
 
 public:
-    DefaultNetwork()
+    DefaultNetwork(bool reconnect = true)
     {
         init();
         network_data.network_data_type = firebase_network_data_default_network;
+        network_data.reconnect = reconnect;
     }
     ~DefaultNetwork() { clear(); }
     void clear()

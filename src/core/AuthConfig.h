@@ -158,7 +158,6 @@ namespace firebase
         friend class UserAuth;
         friend class ServiceAuth;
         friend class CustomAuth;
-        friend class AppCore;
         friend class IDToken;
         friend class AccessToken;
         friend class CustomToken;
@@ -752,9 +751,7 @@ namespace firebase
 #if defined(ENABLE_USER_AUTH)
     class UserAuth
     {
-        friend class Firebase;
         friend class FirebaseApp;
-        friend class AsyncFirebaseClient;
 
     public:
         UserAuth(const String &api_key, const String &email, const String &password, size_t expire = 3600)
@@ -820,9 +817,7 @@ namespace firebase
 #if defined(ENABLE_SERVICE_AUTH)
     class ServiceAuth
     {
-        friend class Firebase;
         friend class FirebaseApp;
-        friend class AsyncFirebaseClient;
 
     public:
         ServiceAuth(TimeStatusCallback cb, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = 3600)
@@ -838,7 +833,7 @@ namespace firebase
             data.timestatus_cb = cb;
         };
 
-        ServiceAuth(file_config_data &safile, TimeStatusCallback cb)
+        ServiceAuth(TimeStatusCallback cb, file_config_data &safile)
         {
             data.clear();
             if (safile.initialized)
@@ -868,9 +863,7 @@ namespace firebase
 #if defined(ENABLE_CUSTOM_AUTH)
     class CustomAuth
     {
-        friend class Firebase;
         friend class FirebaseApp;
-        friend class AsyncFirebaseClient;
 
     public:
         CustomAuth(TimeStatusCallback cb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = 3600)
@@ -928,9 +921,7 @@ namespace firebase
 #if defined(ENABLE_USER_AUTH) || defined(ENABLE_ID_TOKEN)
     class UserAccount
     {
-        friend class Firebase;
         friend class FirebaseApp;
-        friend class AsyncFirebaseClient;
 
     public:
         UserAccount(const String &apiKey)
@@ -985,9 +976,7 @@ namespace firebase
 #if defined(ENABLE_ID_TOKEN)
     class IDToken
     {
-        friend class Firebase;
         friend class FirebaseApp;
-        friend class AsyncFirebaseClient;
 
     public:
         IDToken(const String &api_key, const String &token, size_t expire = 3600, const String &refresh = "")
@@ -1053,9 +1042,7 @@ namespace firebase
 
     class AccessToken
     {
-        friend class Firebase;
         friend class FirebaseApp;
-        friend class AsyncFirebaseClient;
 
     public:
         AccessToken(const String &token, size_t expire = 3600, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
@@ -1122,9 +1109,7 @@ namespace firebase
 
     class CustomToken
     {
-        friend class Firebase;
         friend class FirebaseApp;
-        friend class AsyncFirebaseClient;
 
     public:
         CustomToken(const String &api_key, const String &token, size_t expire = 3600)
@@ -1188,9 +1173,7 @@ namespace firebase
 #if defined(ENABLE_LEGACY_TOKEN)
     class LegacyToken
     {
-        friend class Firebase;
         friend class FirebaseApp;
-        friend class AsyncFirebaseClient;
 
     public:
         LegacyToken(const String &token)
@@ -1251,9 +1234,7 @@ namespace firebase
 
     class NoAuth
     {
-        friend class Firebase;
         friend class FirebaseApp;
-        friend class AsyncFirebaseClient;
 
     public:
         NoAuth()

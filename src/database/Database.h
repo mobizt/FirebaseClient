@@ -532,7 +532,7 @@ public:
      * @param aClient The async client.
      * @param path The node path to set the value.
      * @param value The value to set.
-     * @return boolean value indicates the operating status.
+     * @return String name of new node that created.
      *
      * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
      *
@@ -543,7 +543,7 @@ public:
      *
      * Example:
      *
-     * bool status = database.push<number_t>(aClient, "/path/to/data", number_t(123.456789, 3));
+     * String name = database.push<number_t>(aClient, "/path/to/data", number_t(123.456789, 3));
      */
     template <typename T = const char *>
     String push(AsyncClient &aClient, const String &path, T value)
@@ -555,6 +555,62 @@ public:
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(), nullptr, nullptr, &result, NULL);
         asyncRequest(aReq, payload.c_str());
         return result.database.name();
+    }
+
+    /**
+     * Push value to database.
+     * @param aClient The async client.
+     * @param path The node path to set the value.
+     * @param value The value to set.
+     * @param aResult The async result (AsyncResult).
+     *
+     * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
+     *
+     * The string_t is for string placeholder e.g. string_t("hello there").
+     * The number_t is for number (integer, float, double) placeholder with decimal places e.g. number_t(123.45678, 2).
+     * The boolean_t is for boolean placeholder e.g. boolean_t(true).
+     * The object_t is for JSON and JSON Array objects placeholder e.g. object_t("{\"name\":\"Jack\"}") or object_t("[123,true,\"hello\"]").
+     *
+     * Example:
+     *
+     * database.push<number_t>(aClient, "/path/to/data", number_t(123.456789, 3), aResult);
+     */
+    template <typename T = const char *>
+    void push(AsyncClient &aClient, const String &path, T value, AsyncResult &aResult)
+    {
+        ValueConverter vcon;
+        String payload;
+        vcon.getVal<T>(payload, value);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, nullptr, &aResult, NULL);
+        asyncRequest(aReq, payload.c_str());
+    }
+
+    /**
+     * Push value to database.
+     * @param aClient The async client.
+     * @param path The node path to set the value.
+     * @param value The value to set.
+     * @param cb The async result callback (AsyncResultCallback).
+     *
+     * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
+     *
+     * The string_t is for string placeholder e.g. string_t("hello there").
+     * The number_t is for number (integer, float, double) placeholder with decimal places e.g. number_t(123.45678, 2).
+     * The boolean_t is for boolean placeholder e.g. boolean_t(true).
+     * The object_t is for JSON and JSON Array objects placeholder e.g. object_t("{\"name\":\"Jack\"}") or object_t("[123,true,\"hello\"]").
+     *
+     * Example:
+     *
+     * database.push<number_t>(aClient, "/path/to/data", number_t(123.456789, 3), cb);
+     */
+    template <typename T = const char *>
+    void push(AsyncClient &aClient, const String &path, T value, AsyncResultCallback cb)
+    {
+        ValueConverter vcon;
+        String payload;
+        vcon.getVal<T>(payload, value);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, nullptr, nullptr, cb);
+        asyncRequest(aReq, payload.c_str());
     }
 
     /**
@@ -674,7 +730,7 @@ public:
      * @param aClient The async client.
      * @param path The node path to update.
      * @param value The JSON object (object_t) to update.
-     * @param aResult The async result (AsyncResult)
+     * @param aResult The async result (AsyncResult).
      *
      * Example:
      *
@@ -691,7 +747,7 @@ public:
      * @param aClient The async client.
      * @param path The node path to update.
      * @param value The JSON object (object_t) to update.
-     * @param cb The async result callback (AsyncResultCallback)
+     * @param cb The async result callback (AsyncResultCallback).
      *
      * Example:
      *
@@ -719,6 +775,38 @@ public:
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(), nullptr, nullptr, &result, nullptr);
         asyncRequest(aReq);
         return result.database.null_etag && result.database.data().indexOf("null") > -1;
+    }
+
+    /**
+     * Remove node from database
+     * @param aClient The async client.
+     * @param path The node path to remove.
+     * @param aResult The async result (AsyncResult).
+     *
+     * Example:
+     *
+     * database.remove(aClient, "/path/to/data", aResult);
+     */
+    bool remove(AsyncClient &aClient, const String &path, AsyncResult &aResult)
+    {
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false), nullptr, nullptr, &aResult, nullptr);
+        asyncRequest(aReq);
+    }
+
+    /**
+     * Remove node from database
+     * @param aClient The async client.
+     * @param path The node path to remove.
+     * @param cb The async result callback (AsyncResultCallback).
+     *
+     * Example:
+     *
+     * database.remove(aClient, "/path/to/data", aResult);
+     */
+    bool remove(AsyncClient &aClient, const String &path, AsyncResultCallback cb)
+    {
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false), nullptr, nullptr, nullptr, cb);
+        asyncRequest(aReq);
     }
 
     /**

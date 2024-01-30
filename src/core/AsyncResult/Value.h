@@ -48,7 +48,7 @@ private:
 
 public:
     object_t() {}
-    object_t(const char *o) { buf = o; }
+    object_t(const String &o) { buf = o; }
     const char *c_str() { return buf.c_str(); }
 };
 

@@ -4,6 +4,12 @@
 #include "core/FirebaseApp.h"
 #include "database/Database.h"
 
+#if defined(FIREBASE_CLIENT_VERSION)
+#undef FIREBASE_CLIENT_VERSION
+#endif
+
+#define FIREBASE_CLIENT_VERSION "1.0.0"
+
 using namespace firebase;
 
 namespace firebase
@@ -47,7 +53,7 @@ namespace firebase
                 app.auth_data.user_auth.user.api_key = app.auth_data.user_auth.user.api_key;
                 app.auth_data.app_token.token = app.auth_data.user_auth.id_token.token;
                 app.auth_data.app_token.refresh = app.auth_data.user_auth.id_token.refresh;
-                app.auth_data.app_token.authenticated = app.auth_data.user_auth.initialized;
+                app.auth_data.app_token.authenticated = app.auth_data.user_auth.id_token.token.length() ? app.auth_data.user_auth.initialized : false;
                 app.timer.setInterval(app.expire);
                 app.timer.start();
 #endif
@@ -60,9 +66,19 @@ namespace firebase
                     app.timer.stop();
                     app.expire = app.auth_data.user_auth.access_token.expire;
                     app.auth_data.app_token.expire = app.expire;
-                    app.auth_data.app_token.token = app.auth_data.user_auth.access_token.token;
-                    app.auth_data.app_token.refresh = app.auth_data.user_auth.access_token.refresh;
-                    app.auth_data.app_token.authenticated = app.auth_data.user_auth.initialized;
+
+                    if (app.auth_data.user_auth.access_token.token.length())
+                    {
+                        app.auth_data.app_token.token = app.auth_data.user_auth.access_token.token;
+                        app.auth_data.app_token.refresh = app.auth_data.user_auth.access_token.refresh;
+                        app.auth_data.app_token.authenticated = app.auth_data.user_auth.initialized;
+                    }
+                    else
+                    {
+                        app.auth_data.app_token.refresh = app.auth_data.user_auth.access_token.refresh;
+                        app.auth_data.app_token.authenticated = false;
+                    }
+
                     app.timer.setInterval(app.expire);
                     app.timer.start();
 #endif
@@ -99,6 +115,22 @@ namespace firebase
                 app.timer.start();
             }
         }
+
+        void signup(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        {
+        }
+
+        void resetPassword(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        {
+        }
+
+        void verify(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        {
+        }
+
+        void deleteUser(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        {
+        }
     };
 
 }
@@ -107,5 +139,14 @@ FirebaseClient Firebase;
 
 template <typename T>
 static user_auth_data &getAuth(T &auth) { return auth.get(); }
+static void initializeApp(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.initializeApp(aClient, app, auth); }
+template <typename T = const char *>
+static void signup(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.signup(aClient, app, auth); }
+template <typename T = const char *>
+static void resetPassword(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.resetPassword(aClient, app, auth); }
+template <typename T = const char *>
+static void verify(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.verify(aClient, app, auth); }
+template <typename T = const char *>
+static void deleteUser(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.deleteUser(aClient, app, auth); }
 
 #endif
