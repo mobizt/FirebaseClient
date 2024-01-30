@@ -39,6 +39,7 @@ public:
     ~AuthRequest(){};
 
     unsigned long request_sent_ms = 0;
+    uint16_t slot = 0;
 
     void asyncRequest(AsyncClient *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult)
     {
@@ -52,6 +53,7 @@ public:
         sData->refResult = &aResult;
         sData->ref_result_addr = aResult.addr;
         request_sent_ms = millis();
+        slot = aClient->aDataList.size() - 1;
         aClient->process(sData->async);
         aClient->handleRemove();
     }
@@ -101,6 +103,18 @@ public:
     {
         aResult.app_event.ev_code = code;
         aResult.app_event.ev_msg = msg;
+    }
+
+    void handleExpire(AsyncClient &aClient)
+    {
+        // if auth slot is not at the first index, move it to first index.
+        if (slot > 0)
+        {
+            uint32_t addr = aClient.aDataList[slot];
+            aClient.aDataList.erase(aClient.aDataList.begin() + slot);
+            aClient.aDataList.insert(aClient.aDataList.begin(), addr);
+            slot = 0;
+        }
     }
 };
 

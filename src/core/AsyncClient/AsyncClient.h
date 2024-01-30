@@ -1500,6 +1500,7 @@ private:
         inProcess = true;
         return false;
     }
+
     void handleRemove()
     {
         for (size_t slot = 0; slot < slotCount(); slot++)
