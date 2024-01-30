@@ -88,7 +88,7 @@ DefaultNetwork network; // initilize with boolean parameter to enable/disable ne
 
 LegacyToken legacy_token(DATABASE_SECRET);
 // or
-// ServiceAuth sa_auth(FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY);
+// ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY);
 
 FirebaseApp app;
 

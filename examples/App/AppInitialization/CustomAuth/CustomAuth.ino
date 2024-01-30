@@ -104,7 +104,7 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
-void timestatus(uint32_t &ts);
+void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
 
@@ -112,11 +112,11 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-CustomAuth custom_auth(timestatus, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "myId");
+CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "myId");
 
 FileConfig sa_file("/sa_file.json", fileCallback);
 
-CustomAuth sa_file_auth(timestatus, getFile(sa_file), "myId");
+CustomAuth sa_file_auth(timeStatusCB, getFile(sa_file), "myId");
 
 FirebaseApp app;
 
@@ -166,7 +166,7 @@ void loop()
     app.loop();
 }
 
-void timestatus(uint32_t &ts)
+void timeStatusCB(uint32_t &ts)
 {
     if (time(nullptr) < FIREBASE_DEFAULT_TS)
     {
