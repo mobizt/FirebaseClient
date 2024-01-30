@@ -44,7 +44,6 @@ public:
     bool silent = false;
     bool classicRequest = false;
     String customHeaders;
-    String ETAG;
     Filter filter;
 
     void copy(DataOptions &rhs)
@@ -55,7 +54,6 @@ public:
         this->silent = rhs.silent;
         this->classicRequest = rhs.classicRequest;
         this->customHeaders = rhs.customHeaders;
-        this->ETAG = rhs.ETAG;
         this->filter.copy(rhs.filter);
         this->ota = rhs.ota;
         this->base64 = rhs.base64;
@@ -64,12 +62,11 @@ public:
     void clear()
     {
         readTimeout = 0;
-        writeSizeLimit.clear();
+        writeSizeLimit.remove(0, writeSizeLimit.length());
         shallow = false;
         silent = false;
         classicRequest = false;
-        customHeaders.clear();
-        ETAG.clear();
+        customHeaders.remove(0, customHeaders.length());
         filter.clear();
     }
 

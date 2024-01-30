@@ -920,6 +920,13 @@ private:
 
         addParams(auth_param, extras, request.method, request.options, request.file);
         AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt);
+
+        if (request.options && request.options->customHeaders.length() && sData->request.header.indexOf("X-Firebase-") == -1 && sData->request.header.indexOf("-ETag") == -1)
+        {
+            sData->request.header += request.options->customHeaders;
+            sData->request.header += "\r\n";
+        }
+
         if (request.file)
         {
             sData->request.file_data.copy(*request.file);
