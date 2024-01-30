@@ -183,7 +183,10 @@ void asyncCB(AsyncResult &aResult)
         Serial.println("**************");
         Serial.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
         if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
+        {
             Serial.println("Download completed!");
+            restart();
+        }
     }
 
     if (aResult.uploadProgress())
