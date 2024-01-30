@@ -1,4 +1,4 @@
-# AsyncFirebaseClient
+# FirebaseClient
 Async Firebase Client library for Arduino
 
 This library is the new Firebase Client that supports the asynchronouse operations.
