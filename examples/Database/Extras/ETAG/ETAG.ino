@@ -139,7 +139,7 @@ void setup()
 
     bool result = database.set<int>(aClient, "test/etag", 1234);
 
-    if (aClient.lastError().code() == 0)
+    if (result)
         Serial.printf("Set int is ok, ETag: %s\n", aClient.etag().c_str());
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
@@ -148,6 +148,11 @@ void setup()
 
     aClient.setETag("wrong_etag");
     result = database.set<int>(aClient, "test/etag", 5678);
+
+    if (result)
+        Serial.println("Set int with wrong ETag is ok");
+    else
+        printError(aClient.lastError().code(), aClient.lastError().message());
 }
 
 void loop()
