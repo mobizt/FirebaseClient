@@ -58,18 +58,23 @@ void setup()
 
     UserAccount user(API_KEY);
 
-    Serial.println("[+] Send verifying email...");
-
     // The id token obtained from app.token() when initialize app with UserAuth
     const char *idtoken = "id token";
 
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
+
     app.setCallback(asyncCB);
+
+    Serial.println("[+] Send verifying email...");
 
     verify(aClient, app, getAuth(user.email("user@gmail.com").idToken(idtoken)));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    unsigned long ms = millis();
+    ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
 }

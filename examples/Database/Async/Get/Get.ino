@@ -114,7 +114,7 @@
  * The function aResult.payload() returns server serponse payload.
  *
  * The function aResult.available() returns the size of data that is ready to read.
- * 
+ *
  * The function aResult.path() returns the resource path that the request was sent.
  *
  * The function aResult.etag() returns the ETag from server response header.
@@ -195,13 +195,18 @@ void setup()
 
     Serial.println("Initializing app...");
 
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
+
     app.setCallback(asyncCB);
 
     initializeApp(aClient, app, getAuth(user_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    unsigned long ms = millis();
+    ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
 

@@ -61,16 +61,21 @@ void setup()
 
     UserAccount user(API_KEY);
 
-    Serial.println("[+] Anonymous signing up...");
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
 
     app.setCallback(asyncCB);
+
+    Serial.println("[+] Anonymous signing up...");
 
     // For anonymous sign up (not recommend).
     signup(aClient, app, getAuth(user));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    unsigned long ms = millis();
+    ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
 }

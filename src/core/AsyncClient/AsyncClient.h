@@ -413,8 +413,7 @@ private:
     void setAsyncError(async_data_item_t *sData, async_state state, int code, bool toRemove, bool toCloseFile)
     {
         sData->error.state = state;
-        if (sData->error.code == 0)
-            sData->error.code = code;
+        sData->error.code = code;
 
         if (toRemove)
             sData->to_remove = toRemove;
@@ -480,6 +479,12 @@ private:
             lastErr.setClientError(sData->error.code);
             sData->aResult.error_available = true;
             sData->aResult.data_available = false;
+            if (sData->refResult)
+            {
+                sData->refResult->lastError.setClientError(sData->error.code);
+                sData->refResult->error_available = true;
+                sData->refResult->data_available = false;
+            }
         }
         else if (sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
         {
@@ -487,11 +492,12 @@ private:
             lastErr.setResponseError(sData->response.payload, sData->response.httpCode);
             sData->aResult.error_available = true;
             sData->aResult.data_available = false;
-        }
-        else
-        {
-            sData->aResult.lastError.clearError();
-            lastErr.clearError();
+            if (sData->refResult)
+            {
+                sData->refResult->lastError.setResponseError(sData->response.payload, sData->response.httpCode);
+                sData->refResult->error_available = true;
+                sData->refResult->data_available = false;
+            }
         }
     }
 
@@ -1015,8 +1021,6 @@ private:
             stop();
         sData->response.httpCode = 0;
         sData->error.code = 0;
-        sData->aResult.lastError.clearError();
-        lastErr.clearError();
         sData->response.flags.reset();
         sData->state = async_state_undefined;
         sData->return_type = function_return_type_undefined;
@@ -1029,6 +1033,8 @@ private:
 
     function_return_type connect(async_data_item_t *sData, const char *host, uint16_t port)
     {
+        sData->aResult.lastError.clearError();
+        lastErr.clearError();
         sData->return_type = client && client->connect(host, port) > 0 ? function_return_type_complete : function_return_type_failure;
         return sData->return_type;
     }

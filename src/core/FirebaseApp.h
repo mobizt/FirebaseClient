@@ -226,6 +226,8 @@ namespace firebase
 
         bool processAuth()
         {
+            async_request_handler_t req;
+            req.idle();
 
             authReq.process(aClient, aResult, resultCb);
 
@@ -433,7 +435,7 @@ namespace firebase
             if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
             {
 
-                if (aResult.error().code() > 0 || millis() - authReq.request_sent_ms > FIREBASE_TCP_READ_TIMEOUT)
+                if (aResult.error().code() != 0 || millis() - authReq.request_sent_ms > FIREBASE_TCP_READ_TIMEOUT)
                 {
                     setEvent(auth_event_error);
                     return false;

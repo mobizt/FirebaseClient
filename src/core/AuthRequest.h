@@ -33,7 +33,6 @@ class AuthRequest
 {
 private:
     AsyncClient::async_data_item_t *sData = nullptr;
-    
 
 public:
     AuthRequest(){};
@@ -79,6 +78,13 @@ public:
             aResult.data_available = false;
             resultCb(aResult);
         }
+    }
+
+    FirebaseError err()
+    {
+        if (sData)
+            return sData->refResult->error();
+        return FirebaseError();
     }
 
     void remove(AsyncClient *aClient)

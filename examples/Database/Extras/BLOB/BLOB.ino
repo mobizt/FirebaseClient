@@ -65,7 +65,7 @@
  *
  * <data> - The BLOB data (uint8_t array).
  * <size> - The size of data.
- * 
+ *
  * The data can be a source (input) and target (output) data that used in upload and download.
  */
 
@@ -138,13 +138,18 @@ void setup()
 
   Serial.println("Initializing app...");
 
+  ssl_client.setInsecure();
+#if defined(ESP8266)
+  ssl_client.setBufferSizes(4096, 1024);
+#endif
+
   app.setCallback(asyncCB);
 
   initializeApp(aClient, app, getAuth(user_auth));
 
   // Waits for app to be authenticated.
   // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-  unsigned long ms = millis();
+  ms = millis();
   while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     ;
 
@@ -202,17 +207,16 @@ void asyncCB(AsyncResult &aResult)
   }
 }
 
-
 void printBlob(uint8_t *blob, size_t size)
 {
-    for (size_t i = 0; i < size; i++)
-    {
-      if (i > 0 && i % 16 == 0)
-        Serial.println();
-      if (blob[i] < 16)
-        Serial.print((const char *)FPSTR("0"));
-      Serial.print(blob[i], HEX);
-      Serial.print((const char *)FPSTR(" "));
-    }
-    Serial.println();
+  for (size_t i = 0; i < size; i++)
+  {
+    if (i > 0 && i % 16 == 0)
+      Serial.println();
+    if (blob[i] < 16)
+      Serial.print((const char *)FPSTR("0"));
+    Serial.print(blob[i], HEX);
+    Serial.print((const char *)FPSTR(" "));
+  }
+  Serial.println();
 }

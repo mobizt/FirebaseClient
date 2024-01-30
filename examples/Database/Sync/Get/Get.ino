@@ -75,8 +75,8 @@
  *
  * In case of error, the operation error information can be obtain from AsyncClient via aClient.lastError().message() and
  * aClient.lastError().code().
- * 
- * Note that the objects used as placeholder (input) that introduced to use in Push, Update and Set i.e. 
+ *
+ * Note that the objects used as placeholder (input) that introduced to use in Push, Update and Set i.e.
  * bool_t, number_t, string_t and object_t cannot be used to keep the output value.
  */
 
@@ -144,13 +144,18 @@ void setup()
 
     Serial.println("Initializing app...");
 
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
+
     app.setCallback(asyncCB);
 
     initializeApp(aClient, app, getAuth(user_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    unsigned long ms = millis();
+    ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
 

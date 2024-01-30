@@ -146,13 +146,18 @@ void setup()
 
     Serial.println("Initializing app...");
 
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
+
     app.setCallback(asyncCB);
 
     initializeApp(aClient, app, getAuth(user_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    unsigned long ms = millis();
+    ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
 
@@ -183,36 +188,36 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
-  if (aResult.appEvent().code() > 0)
-  {
-    Serial.println("**************");
-    Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-  }
-
-  if (aResult.isError())
-  {
-    Serial.println("**************");
-    Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
-  }
-
-  if (aResult.downloadProgress())
-  {
-    Serial.println("**************");
-    Serial.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
-    if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
+    if (aResult.appEvent().code() > 0)
     {
-      Serial.println("Download completed!");
-      printFile();
+        Serial.println("**************");
+        Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
-  }
 
-  if (aResult.uploadProgress())
-  {
-    Serial.println("**************");
-    Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
-    if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
-      Serial.println("Upload completed!");
-  }
+    if (aResult.isError())
+    {
+        Serial.println("**************");
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.downloadProgress())
+    {
+        Serial.println("**************");
+        Serial.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
+        {
+            Serial.println("Download completed!");
+            printFile();
+        }
+    }
+
+    if (aResult.uploadProgress())
+    {
+        Serial.println("**************");
+        Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
+            Serial.println("Upload completed!");
+    }
 }
 
 void fileCallback(File &file, const char *filename, file_operating_mode mode)

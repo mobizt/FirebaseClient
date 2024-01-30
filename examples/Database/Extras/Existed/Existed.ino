@@ -136,13 +136,18 @@ void setup()
 
     Serial.println("Initializing app...");
 
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
+
     app.setCallback(asyncCB);
 
     initializeApp(aClient, app, getAuth(user_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    unsigned long ms = millis();
+    ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
 
@@ -153,9 +158,9 @@ void setup()
     Serial.println("[+] Synchronous Existed... ");
     Serial.print("Check the path in database... ");
     bool status = database.existed(aClient, "/test/update/json");
-   
+
     if (aClient.lastError().code() == 0)
-         Serial.println(status ? "existed" : "not exist");
+        Serial.println(status ? "existed" : "not exist");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 }

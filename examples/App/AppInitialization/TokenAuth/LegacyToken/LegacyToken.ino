@@ -107,8 +107,12 @@ void setup()
 
     Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
 
-    initializeApp(aClient, app, getAuth(legacy_token));
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
 
+    initializeApp(aClient, app, getAuth(legacy_token));
 }
 
 void loop()

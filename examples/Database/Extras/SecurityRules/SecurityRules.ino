@@ -118,6 +118,11 @@ void setup()
 
     Serial.println("Initializing app...");
 
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
+
     initializeApp(aClient, app, getAuth(legacy_token));
 
     /** If access token or ServiceAuth used
