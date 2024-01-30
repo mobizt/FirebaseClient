@@ -873,7 +873,7 @@ private:
     {
         ValueConverter vcon;
         String payload;
-        vcon.getVal<object_t>(payload, value);
+        vcon.getVal<T>(payload, value);
         DataOptions options;
         if (!async)
             options.silent = true;

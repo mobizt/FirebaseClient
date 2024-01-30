@@ -122,6 +122,7 @@ private:
     String reqEtag, resETag;
     int netErrState = 0;
     Client *client = nullptr;
+    bool sse = false;
     bool asyncCon = false;
     std::vector<uint32_t> aDataList;
     Memory mem;
@@ -341,7 +342,7 @@ private:
 
         if (sData->state == async_state_undefined || sData->state == async_state_send_header)
         {
-            if (sData->auth_used && sData->state == async_state_undefined)
+            if ((sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined))
                 stop();
 
             if (!client->connected())
@@ -349,6 +350,7 @@ private:
                 ret = connect(sData, getHost(sData, true).c_str(), sData->request.port);
                 if (ret != function_return_type_complete)
                     return connErrorHandler(sData, sData->state);
+                sse = sData->sse;
             }
             return sendHeader(sData, sData->request.header.c_str());
         }
