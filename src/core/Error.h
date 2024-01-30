@@ -90,7 +90,6 @@
 #define FIREBASE_ERROR_STREAM_AUTH_REVOKED -116
 #define FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED -117
 
-
 #if !defined(FPSTR)
 #define FPSTR
 #endif
@@ -118,7 +117,10 @@ private:
 
     void setResponseError(const String &message, int code)
     {
-        err.message = message;
+        if (code == FIREBASE_ERROR_HTTP_CODE_PRECONDITION_FAILED)
+            err.message = FPSTR("precondition failed (ETag does not match)");
+        else
+            err.message = message;
         err.code = code;
     }
 
@@ -196,7 +198,7 @@ private:
                 err.message = FPSTR("auth revoked");
                 break;
             case FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED:
-            err.message = FPSTR("app was not assigned");
+                err.message = FPSTR("app was not assigned");
                 break;
             default:
                 err.message = FPSTR("undefined");

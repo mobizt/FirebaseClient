@@ -146,7 +146,7 @@ void setup()
 
     options.shallow = true;
 
-    String result = database.get<String>(aClient, "test");
+    String result = database.get<String>(aClient, "test", options);
 
     if (aClient.lastError().code() == 0)
         Serial.println(result);

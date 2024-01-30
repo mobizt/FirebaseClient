@@ -71,15 +71,17 @@ private:
         bool async = false;
         bool sv = false;
         bool ota = false;
+        bool no_etag = false;
         app_token_t *app_token = nullptr;
         slot_options_t() {}
-        slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, app_token_t *app_token = nullptr)
+        slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, bool no_etag, app_token_t *app_token = nullptr)
         {
             this->auth_used = auth_used;
             this->sse = sse;
             this->async = async;
             this->sv = sv;
             this->ota = ota;
+            this->no_etag = no_etag;
             app_token = nullptr;
         }
     };
@@ -1463,7 +1465,7 @@ private:
             sData->request.header += FPSTR("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
             req.addNewLine(sData->request.header);
             req.addConnectionHeader(sData->request.header, true);
-            if (!options.sv && method != async_request_handler_t::http_patch && extras.indexOf("orderBy") == -1)
+            if (!options.sv && !options.no_etag && method != async_request_handler_t::http_patch && extras.indexOf("orderBy") == -1)
             {
                 sData->request.header += FPSTR("X-Firebase-ETag: true");
                 req.addNewLine(sData->request.header);
@@ -1613,12 +1615,7 @@ private:
 #if defined(ENABLE_DATABASE)
                     handleEventTimeout(sData);
 #endif
-
-                    if (sData->response.last_response_ms > 0 && millis() - sData->response.last_response_ms > sData->response.response_tmo)
-                    {
-                        setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
-                        sData->return_type = function_return_type_failure;
-                    }
+                    handleReadTimeout(sData);
 
                     inProcess = false;
                     return;
@@ -1628,7 +1625,10 @@ private:
                     async_request_handler_t req;
                     while (!client->available() && netConnect())
                     {
+                        delay(1);
                         req.idle();
+                        if (handleReadTimeout(sData))
+                            break;
                     }
                 }
             }
@@ -1678,6 +1678,18 @@ private:
         }
     }
 #endif
+
+    bool handleReadTimeout(async_data_item_t *sData)
+    {
+        if (sData->response.last_response_ms > 0 && millis() - sData->response.last_response_ms > sData->response.response_tmo)
+        {
+            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
+            sData->return_type = function_return_type_failure;
+            return true;
+        }
+        return false;
+    }
+
     void handleProcessFailure(async_data_item_t *sData)
     {
         if (sData->return_type == function_return_type_failure)

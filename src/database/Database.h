@@ -123,7 +123,7 @@ public:
     auto get(AsyncClient &aClient, const String &path, DataOptions &options) -> typename enable_if<!is_same<T1, void>::value && !is_same<T1, AsyncResult>::value, T1>::type
     {
         AsyncResult result;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(), &options, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, false, false, false, options.shallow), &options, nullptr, &result, NULL);
         asyncRequest(aReq);
         return result.database.to<T1>();
     }
@@ -141,7 +141,7 @@ public:
      */
     void get(AsyncClient &aClient, const String &path, AsyncResult &aResult, bool sse = false)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, sse, true, false, false), nullptr, nullptr, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -158,7 +158,7 @@ public:
      */
     void get(AsyncClient &aClient, const String &path, AsyncResultCallback cb, bool sse = false)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, sse, true, false, false), nullptr, nullptr, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, nullptr, cb);
         asyncRequest(aReq);
     }
 
@@ -182,7 +182,7 @@ public:
      */
     void get(AsyncClient &aClient, const String &path, DataOptions &options, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, true, false, false), &options, nullptr, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, true, false, false, false), &options, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -206,7 +206,7 @@ public:
      */
     void get(AsyncClient &aClient, const String &path, DataOptions &options, AsyncResultCallback cb)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, true, false, false), &options, nullptr, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb);
         asyncRequest(aReq);
     }
 
@@ -338,7 +338,7 @@ public:
      */
     void ota(AsyncClient &aClient, const String &path, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, false, false, true), nullptr, nullptr, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, false, false, true, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -356,7 +356,7 @@ public:
      */
     void ota(AsyncClient &aClient, const String &path, AsyncResultCallback cb)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, false, false, true), nullptr, nullptr, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, false, false, true, false), nullptr, nullptr, nullptr, cb);
         asyncRequest(aReq);
     }
 
@@ -476,7 +476,7 @@ public:
      */
     void set(AsyncClient &aClient, const String &path, file_config_data file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, &file, &aResult, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -523,7 +523,7 @@ public:
      */
     void set(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, &file, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb);
         asyncRequest(aReq);
     }
 
@@ -656,7 +656,7 @@ public:
      */
     void push(AsyncClient &aClient, const String &path, file_config_data file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, &file, &aResult, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -703,7 +703,7 @@ public:
      */
     void push(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, &file, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb);
         asyncRequest(aReq);
     }
 
@@ -789,7 +789,7 @@ public:
      */
     void remove(AsyncClient &aClient, const String &path, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false), nullptr, nullptr, &aResult, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -805,7 +805,7 @@ public:
      */
     void remove(AsyncClient &aClient, const String &path, AsyncResultCallback cb)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false), nullptr, nullptr, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb);
         asyncRequest(aReq);
     }
 
@@ -875,9 +875,9 @@ private:
         String payload;
         vcon.getVal<T>(payload, value);
         DataOptions options;
-        if (!async)
+        if (!async && aClient.reqEtag.length() == 0)
             options.silent = true;
-        async_request_data_t aReq(&aClient, path, mode, AsyncClient::slot_options_t(false, false, async, false, false), &options, nullptr, aResult, cb);
+        async_request_data_t aReq(&aClient, path, mode, AsyncClient::slot_options_t(false, false, async, false, false, false), &options, nullptr, aResult, cb);
         asyncRequest(aReq, payload.c_str());
         if (!async)
             return aResult->lastError.code() == 0;
@@ -918,7 +918,6 @@ private:
         bool auth_param = app_token->auth_data_type != user_auth_data_no_token && app_token->auth_type != auth_access_token && app_token->auth_type != auth_sa_access_token;
         String extras = auth_param ? ".json?auth=" + app_token->token : ".json";
 
-        // TO DO: if the first slot data index is SSE and new slot is not SSE, insert new slot at the first index
         addParams(auth_param, extras, request.method, request.options, request.file);
         AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt);
 

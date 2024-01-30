@@ -156,13 +156,6 @@ void setup()
 
     Serial.println("[+] Set timestamp and data (async)... ");
     database.set<object_t>(aClient, "/test/timestamp", object_t(ts_data_json), asyncCB);
-
-    Serial.println("[+] Set timestamp and data (sync)... ");
-    status = database.set(aClient, "/test/timestamp", object_t(ts_data_json));
-    if (status)
-        Serial.println(String("ok"));
-    else
-        printError(aClient.lastError().code(), aClient.lastError().message());
 }
 
 void loop()

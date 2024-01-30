@@ -142,19 +142,21 @@ void setup()
 
     database.url(DATABASE_URL);
 
+    Serial.println();
+
     Serial.println("[+] Set data with priority (sync)... ");
 
     for (int i = 0; i < 15; i++)
     {
         // Set priority to object or node that contains children.
         float priority = 15 - i;
-        String key = "item_" + String(i + 1);
-        String val = "value_" + String(i + 1);
+        String key = "\"item_" + String(i + 1) + "\"";
+        String val = "\"value_" + String(i + 1) + "\"";
 
         String json;
 
         addJson(json, key, val);
-        addJson(json, ".priority", String(priority), true);
+        addJson(json, "\".priority\"", String(priority), true);
         String path = "/test/items/priority_" + String(15 - i);
 
         bool status = database.set<object_t>(aClient, path, object_t(json));
@@ -165,19 +167,21 @@ void setup()
     }
 
     // Change priority
+    Serial.println();
     Serial.println("[+] Set value with priority (sync)... ");
 
     String json;
 
-    addJson(json, ".value", "item_15");
+    addJson(json, "\".value\"", "\"item_15\"");
     // Set priority to primitive value.
-    addJson(json, ".priority", "6.0", true);
+    addJson(json, "\".priority\"", "6.0", true);
     bool status = database.set<object_t>(aClient, "/test/items/priority_1", object_t(json));
     if (status)
         Serial.println(String("ok"));
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
+    Serial.println();
     Serial.println("[+] Get priority (sync)... ");
     double v = database.get<double>(aClient, "/test/items/priority_1/.priority");
 
@@ -186,6 +190,7 @@ void setup()
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
+    Serial.println();
     Serial.println("[+] Filtering data with priority (sync)... ");
     DataOptions options;
     // Now the node priority_1 which its priority changed to 6.0 should include in the filtering result.
@@ -225,7 +230,7 @@ void printError(int code, const String &msg)
     Serial.printf("Error, msg: %s, code: %d\n", msg.c_str(), code);
 }
 
-void addJson(String &buf, const String &name, const String &value, bool last = false)
+void addJson(String &buf, const String &name, const String &value, bool last)
 {
     if (buf.length() == 0)
         buf += '{';
