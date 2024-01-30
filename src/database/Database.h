@@ -787,7 +787,7 @@ public:
      *
      * database.remove(aClient, "/path/to/data", aResult);
      */
-    bool remove(AsyncClient &aClient, const String &path, AsyncResult &aResult)
+    void remove(AsyncClient &aClient, const String &path, AsyncResult &aResult)
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false), nullptr, nullptr, &aResult, nullptr);
         asyncRequest(aReq);
@@ -803,7 +803,7 @@ public:
      *
      * database.remove(aClient, "/path/to/data", aResult);
      */
-    bool remove(AsyncClient &aClient, const String &path, AsyncResultCallback cb)
+    void remove(AsyncClient &aClient, const String &path, AsyncResultCallback cb)
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false), nullptr, nullptr, nullptr, cb);
         asyncRequest(aReq);

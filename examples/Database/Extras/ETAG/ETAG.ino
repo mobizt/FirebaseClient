@@ -146,10 +146,7 @@ void setup()
 
     Serial.println("[+] Set with wrong ETAG (sync)... ");
 
-    DataOptions options;
-
-    options.ETAG = "wrong_etag";
-
+    aClient.setETag("wrong_etag");
     result = database.set<int>(aClient, "test/etag", 5678);
 }
 

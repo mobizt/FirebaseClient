@@ -71,17 +71,15 @@ private:
         bool async = false;
         bool sv = false;
         bool ota = false;
-        const char *etag = "";
         app_token_t *app_token = nullptr;
         slot_options_t() {}
-        slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, const char *etag = "", app_token_t *app_token = nullptr)
+        slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, app_token_t *app_token = nullptr)
         {
             this->auth_used = auth_used;
             this->sse = sse;
             this->async = async;
             this->sv = sv;
             this->ota = ota;
-            this->etag = etag;
             app_token = nullptr;
         }
     };
@@ -121,7 +119,7 @@ private:
     };
 
     FirebaseError lastErr;
-    String resETag;
+    String reqEtag, resETag;
     int netErrState = 0;
     Client *client = nullptr;
     bool asyncCon = false;
@@ -598,7 +596,7 @@ private:
 
                     if (sData->response.flags.sse || !sData->response.flags.payload_remaining)
                     {
-                        
+
                         sData->aResult.setPayload(sData->response.payload);
 
                         if (sData->aResult.download_data.total > 0)
@@ -1399,6 +1397,8 @@ private:
         sData->request.path = path;
         sData->request.method = method;
         sData->sse = options.sse;
+        sData->request.etag = reqEtag;
+        clear(reqEtag);
         req.addRequestHeaderFirst(sData->request.header, method);
         if (path.length() == 0)
             sData->request.header += '/';
@@ -1429,10 +1429,10 @@ private:
                 req.addNewLine(sData->request.header);
             }
 
-            if (strlen(options.etag) > 0 && (method == async_request_handler_t::http_put || method == async_request_handler_t::http_delete))
+            if (sData->request.etag.length() > 0 && (method == async_request_handler_t::http_put || method == async_request_handler_t::http_delete))
             {
                 sData->request.header += FPSTR("if-match: ");
-                sData->request.header += options.etag;
+                sData->request.header += sData->request.etag;
                 req.addNewLine(sData->request.header);
             }
 
@@ -1707,7 +1707,9 @@ public:
 
     FirebaseError lastError() { return lastErr; }
 
-    String etag(){ return resETag;}
+    String etag() { return resETag; }
+
+    void setETag(const String &etag) { reqEtag = etag; }
 };
 
 #endif

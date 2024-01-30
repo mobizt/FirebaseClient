@@ -70,6 +70,7 @@ public:
     int b64Pad = 0;
     int ota_error = 0;
     http_request_method method = http_undefined;
+    String etag;
     unsigned long last_request_ms = 0;
     unsigned long request_tmo = FIREBASE_TCP_WRITE_TIMEOUT;
 

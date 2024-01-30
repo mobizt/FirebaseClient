@@ -118,18 +118,22 @@ namespace firebase
 
         void signup(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
         {
+            // TO DO
         }
 
         void resetPassword(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
         {
+            // TO DO
         }
 
         void verify(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
         {
+            // TO DO
         }
 
         void deleteUser(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
         {
+            // TO DO
         }
     };
 
