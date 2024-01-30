@@ -354,14 +354,17 @@ private:
         }
         else if (sData->state == async_state_send_payload)
         {
-            if (sData->request.payload.length())
-                ret = send(sData, sData->request.payload.c_str());
-            else if (sData->request.data && sData->request.dataLen)
-                ret = send(sData, sData->request.data, sData->request.dataLen, sData->request.dataLen);
-            else if (sData->request.file_data.file_size && ((sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size)))
-                ret = sendBuff(sData);
-            else
+            if (sData->request.method == async_request_handler_t::http_get || sData->request.method == async_request_handler_t::http_delete)
                 sData->state = async_state_read_response;
+            else
+            {
+                if (sData->request.payload.length())
+                    ret = send(sData, sData->request.payload.c_str());
+                else if (sData->request.data && sData->request.dataLen)
+                    ret = send(sData, sData->request.data, sData->request.dataLen, sData->request.dataLen);
+                else if (sData->request.file_data.file_size && ((sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size)))
+                    ret = sendBuff(sData);
+            }
         }
         return ret;
     }
