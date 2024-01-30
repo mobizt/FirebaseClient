@@ -918,6 +918,7 @@ private:
         bool auth_param = app_token->auth_data_type != user_auth_data_no_token && app_token->auth_type != auth_access_token && app_token->auth_type != auth_sa_access_token;
         String extras = auth_param ? ".json?auth=" + app_token->token : ".json";
 
+        // TO DO: if the first slot data index is SSE and new slot is not SSE, insert new slot at the first index
         addParams(auth_param, extras, request.method, request.options, request.file);
         AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt);
 

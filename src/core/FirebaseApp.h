@@ -233,8 +233,6 @@ namespace firebase
 
             if (!isExpired())
                 return true;
-            else
-                authReq.handleExpire(*aClient);
 
             if (!processing)
             {
@@ -270,7 +268,6 @@ namespace firebase
 
                 if (auth_data.user_auth.status._event == auth_event_initializing)
                 {
-                    authReq.stop(aClient);
                     getTime();
 #if defined(ENABLE_JWT)
                     if (auth_data.user_auth.sa.step == jwt_step_begin)

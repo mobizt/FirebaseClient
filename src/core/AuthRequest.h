@@ -104,18 +104,6 @@ public:
         aResult.app_event.ev_code = code;
         aResult.app_event.ev_msg = msg;
     }
-
-    void handleExpire(AsyncClient &aClient)
-    {
-        // if auth slot is not at the first index, move it to first index.
-        if (slot > 0)
-        {
-            uint32_t addr = aClient.aDataList[slot];
-            aClient.aDataList.erase(aClient.aDataList.begin() + slot);
-            aClient.aDataList.insert(aClient.aDataList.begin(), addr);
-            slot = 0;
-        }
-    }
 };
 
 #endif

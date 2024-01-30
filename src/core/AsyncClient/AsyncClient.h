@@ -434,10 +434,14 @@ private:
         return nullptr;
     }
 
-    async_data_item_t *addSlot()
+    async_data_item_t *addSlot(int index = -1)
     {
         async_data_item_t *sData = new async_data_item_t();
-        aDataList.push_back(sData->addr);
+        if (index > -1)
+            aDataList.insert(aDataList.begin() + index, sData->addr);
+        else
+            aDataList.push_back(sData->addr);
+
         return sData;
     }
 
@@ -1396,10 +1400,35 @@ private:
         return net.network_status;
     }
 
+    int sIndex(slot_options_t options)
+    {
+        int slot = -1;
+        if (options.auth_used)
+            slot = 0;
+        else
+        {
+            int sse_index = -1, auth_index = -1;
+            for (size_t i = 0; i < aDataList.size(); i++)
+            {
+                if (getData(i)->auth_used)
+                    auth_index = i;
+                else if (getData(i)->sse)
+                    sse_index = i;
+            }
+
+            if (auth_index > -1)
+                slot = auth_index + 1;
+            else if (sse_index > -1)
+                slot = sse_index;
+        }
+
+        return slot;
+    }
+
     async_data_item_t *newSlot(std::vector<uint32_t> &clientList, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t options)
     {
         async_request_handler_t req;
-        async_data_item_t *sData = addSlot();
+        async_data_item_t *sData = addSlot(sIndex(options));
 
         sData->async = options.async;
         sData->request.url = url;
