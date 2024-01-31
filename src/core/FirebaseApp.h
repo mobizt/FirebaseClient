@@ -138,7 +138,7 @@ namespace firebase
             p2 = 0;
             return false;
         }
-
+        
         bool parseToken()
         {
             StringHelper sh;
@@ -167,16 +167,12 @@ namespace firebase
                 parseItem(sh, aResult.payload(), auth_data.app_token.uid, "\"localId\"", ",", p1, p2);
                 p1 = 0;
                 p2 = 0;
+                sh.trim(auth_data.app_token.uid);
                 if (parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"idToken\"", ",", p1, p2))
                 {
-                    if (auth_data.app_token.token.length() && auth_data.app_token.token[auth_data.app_token.token.length() - 1] == '"')
-                        auth_data.app_token.token.remove(auth_data.app_token.token.length() - 1, 1);
-
+                    sh.trim(auth_data.app_token.token);
                     parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refreshToken\"", ",", p1, p2);
-
-                    if (auth_data.app_token.refresh.length() && auth_data.app_token.refresh[auth_data.app_token.refresh.length() - 1] == '"')
-                        auth_data.app_token.refresh.remove(auth_data.app_token.refresh.length() - 1, 1);
-
+                    sh.trim(auth_data.app_token.refresh);
                     parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expiresIn\"", "}", p1, p2);
                 }
             }

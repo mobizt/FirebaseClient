@@ -86,6 +86,16 @@ public:
         p2 = -1;
     }
 
+    void trim(String &str)
+    {
+        size_t i = str.length() - 1;
+        while (i >= 0 && (str[i] == ' ' || str[i] == '}' || str[i] == '\r' || str[i] == '\n'))
+        {
+            i--;
+        }
+        str.remove(i);
+    }
+
     void addSp(String &buf) { buf += ' '; }
 };
 

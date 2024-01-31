@@ -33,7 +33,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.0.2"
+#define FIREBASE_CLIENT_VERSION "0.0.3"
 
 using namespace firebase;
 
