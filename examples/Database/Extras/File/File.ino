@@ -108,7 +108,6 @@
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
 
-
 void asyncCB(AsyncResult &aResult);
 
 void fileCallback(File &file, const char *filename, file_operating_mode mode);
@@ -192,7 +191,11 @@ void setup()
 
 void loop()
 {
+    // This function is required for handling async operations and maintaining the authentication tasks.
     app.loop();
+
+    // This required when different AsyncClients than used in FirebaseApp assigned to the database functions.
+    database.loop();
 }
 
 void asyncCB(AsyncResult &aResult)

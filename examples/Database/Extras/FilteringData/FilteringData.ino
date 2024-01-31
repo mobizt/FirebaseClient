@@ -87,7 +87,6 @@
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
 
-
 void asyncCB(AsyncResult &aResult);
 
 void printError(int code, const String &msg);
@@ -188,6 +187,9 @@ void loop()
 {
     // This function is required for handling async operations and maintaining the authentication tasks.
     app.loop();
+
+    // This required when different AsyncClients than used in FirebaseApp assigned to the database functions.
+    database.loop();
 }
 
 void asyncCB(AsyncResult &aResult)

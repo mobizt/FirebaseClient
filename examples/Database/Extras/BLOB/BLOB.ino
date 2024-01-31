@@ -174,7 +174,11 @@ void setup()
 
 void loop()
 {
-  app.loop();
+    // This function is required for handling async operations and maintaining the authentication tasks.
+    app.loop();
+
+    // This required when different AsyncClients than used in FirebaseApp assigned to the database functions.
+    database.loop();
 }
 
 void asyncCB(AsyncResult &aResult)
