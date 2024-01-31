@@ -82,7 +82,6 @@
 #define DATABASE_SECRET "DATABASE_SECRET"
 #define DATABASE_URL "URL"
 
-
 void asyncCB(AsyncResult &aResult);
 
 void printError(int code, const String &msg);
@@ -152,6 +151,7 @@ void setup()
 
     if (aClient.lastError().code() == 0)
     {
+        Serial.println("Ok");
 
         // For indexing data doc. please see https://firebase.google.com/docs/database/security/indexing-data
 
@@ -162,13 +162,15 @@ void setup()
         insertJson(json_rules, new_indexon_rules);
 
         Serial.print("[+] Set security rules... ");
-        bool status = database.set(aClient, ".settings/rules", json_rules);
+        bool status = database.set<object_t>(aClient, ".settings/rules", object_t(json_rules));
 
         if (status)
             Serial.println("Ok");
         else
             printError(aClient.lastError().code(), aClient.lastError().message());
     }
+    else
+        printError(aClient.lastError().code(), aClient.lastError().message());
 }
 
 void loop()
@@ -213,10 +215,8 @@ void insertJson(String &json, const String &value)
         if (p2 == -1)
             p2 = json.indexOf("}", p1);
 
-        p2--;
-
         String part1 = json.substring(0, p2);
-        String part2 = json.substring(p2 + 1);
+        String part2 = json.substring(p2);
 
         json = part1 + "," + value + part2;
     }
