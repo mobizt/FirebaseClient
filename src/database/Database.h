@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created January 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -889,30 +889,12 @@ private:
         app_token_t *app_token = appToken();
 
         if (!app_token)
-        {
-            request.aResult->error_available = true;
-            if (request.aResult)
-                request.aResult->lastError.setClientError(FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
-
-            if (request.cb)
-                request.cb(*request.aResult);
-            return;
-        }
+        return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         FirebaseApp *app = reinterpret_cast<FirebaseApp *>(app_addr);
 
         if (app && app->isExpired())
-        {
-
-            request.aResult->error_available = true;
-
-            if (request.aResult)
-                request.aResult->lastError.setClientError(FIREBASE_ERROR_UNAUTHENTICATE);
-
-            if (request.cb)
-                request.cb(*request.aResult);
-            return;
-        }
+            return setClientError(request, FIREBASE_ERROR_UNAUTHENTICATE);
 
         request.opt.app_token = app_token;
         bool auth_param = app_token->auth_data_type != user_auth_data_no_token && app_token->auth_type != auth_access_token && app_token->auth_type != auth_sa_access_token;
@@ -920,6 +902,9 @@ private:
 
         addParams(auth_param, extras, request.method, request.options, request.file);
         AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt);
+
+        if (!sData)
+            return setClientError(request, FIREBASE_ERROR_OPERATION_NOT_PERMITTED);
 
         if (request.options && request.options->customHeaders.length() && sData->request.header.indexOf("X-Firebase-") == -1 && sData->request.header.indexOf("-ETag") == -1)
         {
@@ -977,6 +962,17 @@ private:
 
         if (options && options->filter.complete)
             extras += options->filter.uri;
+    }
+
+    void setClientError(async_request_data_t &request, int code)
+    {
+        request.aResult->error_available = true;
+
+        if (request.aResult)
+            request.aResult->lastError.setClientError(code);
+
+        if (request.cb)
+            request.cb(*request.aResult);
     }
 };
 

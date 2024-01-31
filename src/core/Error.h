@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created January 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -89,6 +89,7 @@
 #define FIREBASE_ERROR_STREAM_TIMEDOUT -115
 #define FIREBASE_ERROR_STREAM_AUTH_REVOKED -116
 #define FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED -117
+#define FIREBASE_ERROR_OPERATION_NOT_PERMITTED -118
 
 #if !defined(FPSTR)
 #define FPSTR
@@ -199,6 +200,9 @@ private:
                 break;
             case FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED:
                 err.message = FPSTR("app was not assigned");
+                break;
+            case FIREBASE_ERROR_OPERATION_NOT_PERMITTED:
+                err.message = FPSTR("operation not permitted");
                 break;
             default:
                 err.message = FPSTR("undefined");

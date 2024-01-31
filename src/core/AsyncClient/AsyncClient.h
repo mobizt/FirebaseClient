@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created January 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -1424,6 +1424,13 @@ private:
                 slot = auth_index + 1;
             else if (sse_index > -1)
                 slot = sse_index;
+            
+            // Multiple SSE modes
+            if (sse_index > -1 && options.sse)
+                slot = -2;
+
+            if (slot >= (int)aDataList.size())
+                slot = -1;
         }
 
         return slot;
@@ -1431,8 +1438,14 @@ private:
 
     async_data_item_t *newSlot(std::vector<uint32_t> &clientList, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t options)
     {
+        int slot_index = sIndex(options);
+
+        // Only one SSE mode is allowed
+        if (slot_index == -2)
+            return nullptr;
+
         async_request_handler_t req;
-        async_data_item_t *sData = addSlot(sIndex(options));
+        async_data_item_t *sData = addSlot(slot_index);
 
         sData->async = options.async;
         sData->request.url = url;
