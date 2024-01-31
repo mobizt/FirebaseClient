@@ -17,11 +17,7 @@ namespace firebase
     class FirebaseClient
     {
     private:
-    public:
-        FirebaseClient(){};
-        ~FirebaseClient(){};
-
-        void initializeApp(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        void configApp(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth, firebase_core_auth_task_type task_type = firebase_core_auth_task_type_undefined)
         {
             app.aClient = &aClient;
             app.aclient_addr = reinterpret_cast<uint32_t>(&aClient);
@@ -31,31 +27,47 @@ namespace firebase
             app.auth_data.app_token.auth_type = app.auth_data.user_auth.auth_type;
             app.auth_data.app_token.auth_data_type = app.auth_data.user_auth.auth_data_type;
 
+            app.auth_data.app_token.authenticated = false;
+            app.auth_data.user_auth.task_type = task_type;
+        }
+
+        void resetTimer(FirebaseApp &app, bool start, int interval = 0, int exp = -1)
+        {
+            app.timer.stop();
+            app.timer.setInterval(interval);
+            app.expire = exp == -1 ? interval : exp;
+            if (start)
+                app.timer.start();
+        }
+
+    public:
+        FirebaseClient(){};
+        ~FirebaseClient(){};
+
+        void initializeApp(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        {
+            configApp(aClient, app, auth);
+
             if (app.auth_data.user_auth.auth_data_type == user_auth_data_legacy_token || app.auth_data.user_auth.auth_data_type == user_auth_data_no_token)
             {
-                app.timer.stop();
-                app.expire = 3600;
 #if defined(ENABLE_LEGACY_TOKEN)
                 if (app.auth_data.user_auth.auth_data_type == user_auth_data_legacy_token)
                     app.auth_data.app_token.token = app.auth_data.user_auth.legacy_token.token;
 #endif
                 app.auth_data.app_token.authenticated = true;
 
-                app.timer.setInterval(3600);
+                resetTimer(app, false, 3600);
             }
             else if (app.auth_data.user_auth.auth_data_type == user_auth_data_id_token)
             {
 #if defined(ENABLE_ID_TOKEN)
 
-                app.timer.stop();
-                app.expire = app.auth_data.user_auth.id_token.expire;
                 app.auth_data.app_token.expire = app.expire;
                 app.auth_data.user_auth.user.api_key = app.auth_data.user_auth.user.api_key;
                 app.auth_data.app_token.token = app.auth_data.user_auth.id_token.token;
                 app.auth_data.app_token.refresh = app.auth_data.user_auth.id_token.refresh;
                 app.auth_data.app_token.authenticated = app.auth_data.user_auth.id_token.token.length() ? app.auth_data.user_auth.initialized : false;
-                app.timer.setInterval(app.expire);
-                app.timer.start();
+                resetTimer(app, true, app.auth_data.user_auth.id_token.expire);
 #endif
             }
             else if (app.auth_data.user_auth.auth_type == auth_access_token || app.auth_data.user_auth.auth_type == auth_custom_token)
@@ -63,9 +75,8 @@ namespace firebase
                 if (app.auth_data.user_auth.auth_type == auth_access_token)
                 {
 #if defined(ENABLE_ACCESS_TOKEN)
-                    app.timer.stop();
-                    app.expire = app.auth_data.user_auth.access_token.expire;
-                    app.auth_data.app_token.expire = app.expire;
+
+                    app.auth_data.app_token.expire = app.auth_data.user_auth.access_token.expire;
 
                     if (app.auth_data.user_auth.access_token.token.length())
                     {
@@ -79,16 +90,14 @@ namespace firebase
                         app.auth_data.app_token.authenticated = false;
                     }
 
-                    app.timer.setInterval(app.expire);
-                    app.timer.start();
+                    resetTimer(app, true, app.auth_data.user_auth.access_token.expire);
+
 #endif
                 }
                 else if (app.auth_data.user_auth.auth_type == auth_custom_token)
                 {
 #if defined(ENABLE_CUSTOM_TOKEN)
-                    app.timer.stop();
-                    app.expire = app.auth_data.user_auth.custom_token.expire;
-                    app.auth_data.app_token.expire = app.expire;
+                    app.auth_data.app_token.expire = app.auth_data.user_auth.custom_token.expire;
 
                     int token_part = 0;
                     for (size_t i = 0; i < app.auth_data.user_auth.custom_token.token.length(); i++)
@@ -101,7 +110,8 @@ namespace firebase
                         app.auth_data.app_token.refresh = app.auth_data.user_auth.custom_token.token;
 
                     app.auth_data.app_token.authenticated = false;
-                    app.timer.setInterval(0);
+
+                    resetTimer(app, true, 0, app.auth_data.user_auth.custom_token.expire);
 #endif
                 }
             }
@@ -109,31 +119,32 @@ namespace firebase
             {
                 app.auth_data.app_token.authenticated = false;
                 app.expire = app.auth_data.user_auth.auth_type == auth_user_id_token ? app.auth_data.user_auth.user.expire : app.auth_data.user_auth.sa.expire;
-
-                app.timer.stop();
-                app.timer.setInterval(0);
-                app.timer.start();
+                resetTimer(app, true, 0);
             }
         }
 
         void signup(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
         {
-            // TO DO
+            configApp(aClient, app, auth, firebase_core_auth_task_type_signup);
+            resetTimer(app, true, 0);
         }
 
         void resetPassword(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
         {
-            // TO DO
+            configApp(aClient, app, auth, firebase_core_auth_task_type_reset_password);
+            resetTimer(app, true, 0);
         }
 
         void verify(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
         {
-            // TO DO
+            configApp(aClient, app, auth, firebase_core_auth_task_type_send_verify_email);
+            resetTimer(app, true, 0);
         }
 
         void deleteUser(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
         {
-            // TO DO
+            configApp(aClient, app, auth, firebase_core_auth_task_type_delete_user);
+            resetTimer(app, true, 0);
         }
     };
 

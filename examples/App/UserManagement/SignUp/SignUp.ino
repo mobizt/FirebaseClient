@@ -74,6 +74,9 @@ void setup()
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
+
+    if (app.ready())
+        Serial.printf("UID: %s\nID token: %s\nRefresh token: %s\n", app.getUid().c_str(), app.getToken().c_str(),app.getRefreshToken().c_str());
 }
 
 void loop()

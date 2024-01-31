@@ -490,12 +490,6 @@ private:
             lastErr.setClientError(sData->error.code);
             sData->aResult.error_available = true;
             sData->aResult.data_available = false;
-            if (sData->refResult)
-            {
-                sData->refResult->lastError.setClientError(sData->error.code);
-                sData->refResult->error_available = true;
-                sData->refResult->data_available = false;
-            }
         }
         else if (sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
         {
@@ -503,12 +497,6 @@ private:
             lastErr.setResponseError(sData->response.payload, sData->response.httpCode);
             sData->aResult.error_available = true;
             sData->aResult.data_available = false;
-            if (sData->refResult)
-            {
-                sData->refResult->lastError.setResponseError(sData->response.payload, sData->response.httpCode);
-                sData->refResult->error_available = true;
-                sData->refResult->data_available = false;
-            }
         }
     }
 
@@ -1424,7 +1412,7 @@ private:
                 slot = auth_index + 1;
             else if (sse_index > -1)
                 slot = sse_index;
-            
+
             // Multiple SSE modes
             if (sse_index > -1 && options.sse)
                 slot = -2;
