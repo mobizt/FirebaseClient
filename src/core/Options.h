@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created January 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -192,9 +192,7 @@ public:
 #define ENABLE_CUSTOM_AUTH
 #endif
 
-#if !__has_include(<ESP_SSLClient.h>)
-#include "./core/SSLClient/ESP_SSLClient.h"
-#endif
+
 #endif
 
 #endif

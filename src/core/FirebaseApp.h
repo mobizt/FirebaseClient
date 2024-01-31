@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created January 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -171,9 +171,9 @@ namespace firebase
                 {
                     if (auth_data.app_token.token.length() && auth_data.app_token.token[auth_data.app_token.token.length() - 1] == '"')
                         auth_data.app_token.token.remove(auth_data.app_token.token.length() - 1, 1);
-                    
+
                     parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refreshToken\"", ",", p1, p2);
-                    
+
                     if (auth_data.app_token.refresh.length() && auth_data.app_token.refresh[auth_data.app_token.refresh.length() - 1] == '"')
                         auth_data.app_token.refresh.remove(auth_data.app_token.refresh.length() - 1, 1);
 
@@ -359,7 +359,13 @@ namespace firebase
                     else
                         api_key = auth_data.user_auth.user.api_key;
 
-                    extras = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? FPSTR("/token") : FPSTR("/v1/accounts:signInWithCustomToken?key=") + api_key;
+                    if (auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token)
+                        extras = FPSTR("/token");
+                    else 
+                    {
+                        extras = FPSTR("/v1/accounts:signInWithCustomToken?key=");
+                        extras += api_key;
+                    }
 
                     authReq.asyncRequest(aClient, subdomain, extras, payload, aResult);
                     payload.remove(0, payload.length());

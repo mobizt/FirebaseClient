@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created January 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -36,6 +36,12 @@
 #include "./core/Error.h"
 
 #if defined(ENABLE_JWT)
+
+#if __has_include(<ESP_SSLClient.h>)
+#include <ESP_SSLClient.h>
+#else
+#include "./core/SSLClient/ESP_SSLClient.h"
+#endif
 
 using namespace firebase;
 
@@ -148,7 +154,6 @@ namespace firebase
 
                     if (auth_data.cust.scope.length() > 0)
                     {
-
                         char *p = reinterpret_cast<char *>(mem.alloc(auth_data.cust.scope.length()));
                         strcpy(p, auth_data.cust.scope.c_str());
                         char *pp = p;
