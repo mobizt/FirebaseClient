@@ -26,6 +26,10 @@
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
 
+#if defined(ESP8266) || defined(ESP32)
+#include <WiFiClientSecure.h>
+#endif
+
 void asyncCB(AsyncResult &aResult);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
@@ -91,13 +95,15 @@ void loop()
         ms = millis();
 
         Serial.println("App is authenticated as anonymous...");
-        Serial.printf("User ID: %s\n\n", app.getUid().c_str());
+        Serial.printf("User UID: %s\n\n", app.getUid().c_str());
+
+        app.isAuthenticated();
 
         if (cnt == 3)
         {
             Serial.println("[+] Deleting anonymous user...");
             UserAccount user(API_KEY);
-            deleteUser(aClient, app, getAuth(user));
+            deleteUser(aClient, app, getAuth(user.idToken(app.getToken())));
         }
     }
 }

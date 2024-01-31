@@ -1626,7 +1626,6 @@ private:
                     async_request_handler_t req;
                     while (!client->available() && netConnect())
                     {
-                        delay(1);
                         req.idle();
                         if (handleReadTimeout(sData))
                             break;

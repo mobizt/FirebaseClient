@@ -361,7 +361,7 @@ namespace firebase
 
                     if (auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token)
                         extras = FPSTR("/token");
-                    else 
+                    else
                     {
                         extras = FPSTR("/v1/accounts:signInWithCustomToken?key=");
                         extras += api_key;
@@ -393,13 +393,11 @@ namespace firebase
                     {
                         if (auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email)
                         {
-                            // {"requestType":"VERIFY_EMAIL","idToken":"<id token>"}
                             json.addObject(payload, json.toString("requestType"), json.toString("VERIFY_EMAIL"));
                             json.addObject(payload, json.toString("idToken"), json.toString(auth_data.user_auth.user.id_token.length() > 0 ? auth_data.user_auth.user.id_token : auth_data.app_token.token), true);
                         }
                         else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
                         {
-                            // {"requestType":"PASSWORD_RESET","email":"<email>"}
                             json.addObject(payload, json.toString("requestType"), json.toString("PASSWORD_RESET"));
                             json.addObject(payload, json.toString("email"), json.toString(auth_data.user_auth.user.email), true);
                         }
@@ -413,22 +411,18 @@ namespace firebase
                     }
                     else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
                     {
-                        // {"grantType":"refresh_token","refreshToken":"<refresh token>"}
                         json.addObject(payload, json.toString("grantType"), json.toString("refresh_token"));
                         json.addObject(payload, json.toString("refreshToken"), json.toString(auth_data.app_token.refresh), true);
                         extras = FPSTR("/v1/token?key=");
                     }
                     else
                     {
-                        // auth_data.user_auth.task_type = firebase_core_auth_task_type_authenticate or auth_data.user_auth.task_type = firebase_core_auth_task_type_signup
-                        // {"email":"<email>","password":"<password>","returnSecureToken":true}
-
                         if (auth_data.user_auth.user.email.length() && auth_data.user_auth.user.password.length())
                         {
                             json.addObject(payload, json.toString("email"), json.toString(auth_data.user_auth.user.email));
                             json.addObject(payload, json.toString("password"), json.toString(auth_data.user_auth.user.password));
-                            json.addObject(payload, json.toString("returnSecureToken"), "true", true);
                         }
+                        json.addObject(payload, json.toString("returnSecureToken"), "true", true);
                         extras = auth_data.user_auth.task_type == firebase_core_auth_task_type_signup ? FPSTR("/v1/accounts:signUp?key=") : FPSTR("/v1/accounts:signInWithPassword?key=");
                     }
 
@@ -464,7 +458,7 @@ namespace firebase
 
                     if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user || auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email || auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
                     {
-                        auth_data.app_token.authenticated = true;
+                        auth_data.app_token.authenticated = auth_data.user_auth.task_type != firebase_core_auth_task_type_delete_user && auth_data.user_auth.task_type != firebase_core_auth_task_type_reset_password;
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
                         auth_data.app_token.expire = 3600;

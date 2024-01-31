@@ -89,6 +89,14 @@
 
 #include <FirebaseClient.h>
 
+#if defined(ESP8266) || defined(ESP32)
+#include <WiFiClientSecure.h>
+#endif
+
+#if defined(ESP32)
+#include <SPIFFS.h>
+#endif
+
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
@@ -99,6 +107,7 @@
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
+
 
 void asyncCB(AsyncResult &aResult);
 

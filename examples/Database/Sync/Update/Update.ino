@@ -90,6 +90,10 @@
 
 #include <FirebaseClient.h>
 
+#if defined(ESP8266) || defined(ESP32)
+#include <WiFiClientSecure.h>
+#endif
+
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
