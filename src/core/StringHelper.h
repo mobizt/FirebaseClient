@@ -79,11 +79,6 @@ public:
                 if (p2 == -1)
                     p2 = str.length() - 1;
 
-                while (str[p2] == ' ' || str[p2] == '{' || str[p2] == '}' || str[p2] == '\r' || str[p2] == '\n')
-                {
-                    p2--;
-                }
-
                 return;
             }
         }
