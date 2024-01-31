@@ -33,7 +33,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.0.3"
+#define FIREBASE_CLIENT_VERSION "0.0.4"
 
 using namespace firebase;
 
@@ -143,8 +143,8 @@ namespace firebase
             else if (app.auth_data.user_auth.auth_type == auth_sa_access_token || app.auth_data.user_auth.auth_type == auth_sa_custom_token || app.auth_data.user_auth.auth_type == auth_user_id_token)
             {
                 app.auth_data.app_token.authenticated = false;
-                app.expire = app.auth_data.user_auth.auth_type == auth_user_id_token ? app.auth_data.user_auth.user.expire : app.auth_data.user_auth.sa.expire;
-                resetTimer(app, true, 0);
+                uint32_t exp = app.auth_data.user_auth.auth_type == auth_user_id_token ? app.auth_data.user_auth.user.expire : app.auth_data.user_auth.sa.expire;
+                resetTimer(app, true, 0, exp);
             }
         }
 

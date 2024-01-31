@@ -138,7 +138,7 @@ namespace firebase
             p2 = 0;
             return false;
         }
-        
+
         bool parseToken()
         {
             StringHelper sh;
@@ -182,6 +182,10 @@ namespace firebase
                 parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refresh_token\"", ",", p1, p2);
                 parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"id_token\"", ",", p1, p2);
                 parseItem(sh, aResult.payload(), auth_data.app_token.uid, "\"user_id\"", ",", p1, p2);
+                sh.trim(auth_data.app_token.refresh);
+                sh.trim(auth_data.app_token.token);
+                sh.trim(auth_data.app_token.uid);
+
             }
             else if (aResult.payload().indexOf("\"access_token\"") > -1)
             {

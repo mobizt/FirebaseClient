@@ -119,7 +119,13 @@ WiFiClientSecure ssl_client;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
+WiFiClientSecure ssl_client2;
+
+AsyncClient aClient2(ssl_client2, getNetwork(network));
+
 Database database;
+
+unsigned long ms = 0;
 
 void setup()
 {
@@ -150,7 +156,7 @@ void setup()
 
     app.setCallback(asyncCB);
 
-    initializeApp(aClient, app, getAuth(user_auth));
+    initializeApp(aClient2, app, getAuth(user_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
@@ -175,6 +181,12 @@ void loop()
 
     // This required when different AsyncClients than used in FirebaseApp assigned to the database functions.
     database.loop();
+
+    if (millis() - ms > 20000 && app.ready())
+    {
+        ms = millis();
+        database.set<int>(aClient2, "/test/stream/number", (int)random(10000, 30000), asyncCB);
+    }
 }
 
 void asyncCB(AsyncResult &aResult)

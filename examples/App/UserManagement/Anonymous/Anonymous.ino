@@ -20,15 +20,16 @@
 
 #include <FirebaseClient.h>
 
+#if defined(ESP8266) || defined(ESP32)
+#include <WiFiClientSecure.h>
+#endif
+
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
 
-#if defined(ESP8266) || defined(ESP32)
-#include <WiFiClientSecure.h>
-#endif
 
 void asyncCB(AsyncResult &aResult);
 
