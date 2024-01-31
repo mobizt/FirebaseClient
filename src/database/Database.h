@@ -889,7 +889,7 @@ private:
         app_token_t *app_token = appToken();
 
         if (!app_token)
-        return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
+            return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         FirebaseApp *app = reinterpret_cast<FirebaseApp *>(app_addr);
 
@@ -966,13 +966,14 @@ private:
 
     void setClientError(async_request_data_t &request, int code)
     {
-        request.aResult->error_available = true;
-
         if (request.aResult)
+        {
+            request.aResult->error_available = true;
             request.aResult->lastError.setClientError(code);
 
-        if (request.cb)
-            request.cb(*request.aResult);
+            if (request.cb)
+                request.cb(*request.aResult);
+        }
     }
 };
 
