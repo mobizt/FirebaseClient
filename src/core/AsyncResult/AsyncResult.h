@@ -130,6 +130,13 @@ public:
         friend class AsyncResult;
         friend class AsyncClient;
 
+        enum event_resume_status_t
+        {
+            event_resume_status_undefined,
+            event_resume_status_resuming,
+            event_resume_status_finished
+        };
+
     public:
         template <typename T>
         T to()
@@ -150,10 +157,7 @@ public:
 
         bool eventTimeout()
         {
-            bool ret = sse && sse_timer.remaining() == 0;
-            if (ret)
-                setSSEResumeStatus(true);
-            return ret;
+            return sse && sse_timer.remaining() == 0;
         }
 
         database_data_type type()
@@ -166,7 +170,7 @@ public:
         String *ref_payload = nullptr;
         bool null_etag = false;
         bool sse = false;
-        bool sse_resume_wait = false;
+        event_resume_status_t event_resume_status = event_resume_status_undefined;
         String node_name; // database node name that value was pushed
         String etag;
         uint16_t data_path_p1 = 0, data_path_p2 = 0;
@@ -183,6 +187,7 @@ public:
             data_p1 = 0;
             data_p2 = 0;
             sse = false;
+            event_resume_status = event_resume_status_undefined;
         }
 
         void parseNodeName()
@@ -196,14 +201,14 @@ public:
             }
         }
 
-        void setSSEResumeStatus(bool set)
+        void setEventResumeStatus(event_resume_status_t status)
         {
-            sse_resume_wait = set;
+            event_resume_status = status;
         }
 
-        bool sseResumeStatus()
+        event_resume_status_t eventResumeStatus()
         {
-            return sse_resume_wait;
+            return event_resume_status;
         }
 
         void parseSSE()
@@ -218,17 +223,17 @@ public:
                 event_p1 = p1;
                 event_p2 = p2;
                 p1 = p2;
-                setSSEResumeStatus(false);
+                setEventResumeStatus(event_resume_status_undefined);
                 sse_timer.stop();
                 sse_timer.setInterval(event().indexOf("cancel") > -1 || event().indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT);
                 sse_timer.start();
                 sse = true;
-                
             }
 
             sh.parse(*ref_payload, "data", "\n", p1, p2);
             if (p1 > -1 && p2 > -1)
             {
+                int p3 = p1, p4 = p2;
                 if (ref_payload->substring(p1, p2) == "null")
                 {
                     data_p1 = p1;
@@ -251,6 +256,12 @@ public:
                         p2--;
                     data_p1 = p1;
                     data_p2 = p2;
+                }
+
+                if (data_p1 == 0)
+                {
+                    data_p1 = p3;
+                    data_p2 = p4;
                 }
             }
         }

@@ -1643,7 +1643,21 @@ private:
                     sData->response.feedTimer();
                     sData->return_type = receive(sData);
                     handleReadTimeout(sData);
+
                     bool allRead = sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_OK && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining;
+
+                    if (allRead && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
+                    {
+                        if (sData->sse)
+                        {
+                            sData->aResult.data_available = false;
+#if defined(ENABLE_DATABASE)
+                            sData->aResult.database.clearSSE();
+#endif
+                        }
+                        sData->return_type = function_return_type_failure;
+                    }
+
                     if (sData->cancel || sData->async || allRead || sData->return_type == function_return_type_failure)
                         break;
                 }
@@ -1665,11 +1679,11 @@ private:
     }
 #if defined(ENABLE_DATABASE)
     void handleEventTimeout(async_data_item_t *sData)
-    { // Because this process will reset the connection when event was timed out,
-        // then sse resume status will be checked before event timeout checking.
-        // Reset the connection if sse resume status was not set, and event was timed out.
-        if ((!sData->cancel && sData->sse && !sData->aResult.database.sseResumeStatus() && sData->sse && sData->aResult.database.eventTimeout()))
+    {
+
+        if (!sData->cancel && sData->sse && sData->aResult.database.eventTimeout() && sData->aResult.database.eventResumeStatus() == AsyncResult::database_data_t::event_resume_status_undefined)
         {
+            sData->aResult.database.setEventResumeStatus(AsyncResult::database_data_t::event_resume_status_resuming);
             setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEDOUT, false, false);
             returnResult(sData, false);
             reset(sData, true);
@@ -1692,9 +1706,6 @@ private:
     {
         if (sData->return_type == function_return_type_failure)
         {
-#if defined(ENABLE_DATABASE)
-            sData->aResult.database.setSSEResumeStatus(false);
-#endif
             if (sData->async)
                 returnResult(sData, false);
             reset(sData, false);

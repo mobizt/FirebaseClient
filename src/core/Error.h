@@ -120,6 +120,8 @@ private:
     {
         if (code == FIREBASE_ERROR_HTTP_CODE_PRECONDITION_FAILED)
             err.message = FPSTR("precondition failed (ETag does not match)");
+        else if (code == FIREBASE_ERROR_HTTP_CODE_UNAUTHORIZED)
+            err.message = FPSTR("unauthorized");
         else if (message.length())
             err.message = message;
         else
