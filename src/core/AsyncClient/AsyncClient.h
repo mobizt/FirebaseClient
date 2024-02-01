@@ -459,8 +459,6 @@ private:
             error_notify_timeout = true;
         }
 
-        List list;
-
         if (sData->refResult)
         {
             if (setData || error_notify_timeout)
