@@ -102,7 +102,7 @@ DefaultNetwork network; // initilize with boolean parameter to enable/disable ne
 
 FileConfig user_auth_file("/user_auth.txt", fileCallback);
 
-UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
 
 FirebaseApp app;
 

@@ -53,9 +53,9 @@
 
 void asyncCB(AsyncResult &aResult);
 
-DefaultNetwork default_network; // initilize with boolean parameter to enable/disable network reconnection
+DefaultNetwork default_network(true); // initilize with boolean parameter to enable/disable network reconnection
 
-UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
 
 FirebaseApp app;
 

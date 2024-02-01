@@ -91,7 +91,7 @@ void asyncCB(AsyncResult &aResult);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-IDToken id_token(API_KEY, "ID token", 3600, "refresh");
+IDToken id_token(API_KEY, "ID token", 3000 /* expire period in seconds (<= 3600) */, "refresh");
 
 FirebaseApp app;
 

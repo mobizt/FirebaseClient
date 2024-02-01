@@ -116,7 +116,7 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "myId" /* UID */, "" /* scope */, "" /* claims */, 3600 /* expire */);
+CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "myId" /* UID */, "" /* scope */, "" /* claims */, 3600 /* expire period in seconds (<= 3600) */);
 
 FileConfig sa_file("/sa_file.json", fileCallback);
 

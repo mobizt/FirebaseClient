@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 1, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -204,7 +204,7 @@ namespace firebase
                 private_key_id.clear();
                 client_id.clear();
                 timestatus_cb = NULL;
-                expire= 3600;
+                expire = 3600;
             }
 
         protected:
@@ -627,9 +627,9 @@ namespace firebase
                 if (type == token_type_user_data)
                 {
                     userfile.print(auth_data.user.api_key.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
                     userfile.print(auth_data.user.email.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
                     userfile.print(auth_data.user.password.c_str());
                     return true;
                 }
@@ -637,13 +637,13 @@ namespace firebase
                 {
 #if defined(ENABLE_ACCESS_TOKEN)
                     userfile.print(auth_data.access_token.token.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
                     userfile.print(auth_data.access_token.refresh.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
                     userfile.print(auth_data.access_token.client_id.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
                     userfile.print(auth_data.access_token.client_secret.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
                     userfile.print(String(auth_data.access_token.expire).c_str());
 #endif
                     return true;
@@ -651,12 +651,12 @@ namespace firebase
                 else if (type == token_type_id_token)
                 {
                     userfile.print(auth_data.user.api_key.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
 #if defined(ENABLE_ID_TOKEN)
                     userfile.print(auth_data.id_token.token.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
                     userfile.print(auth_data.id_token.refresh.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
                     userfile.print(String(auth_data.id_token.expire).c_str());
 #endif
                     return true;
@@ -664,10 +664,10 @@ namespace firebase
                 else if (type == token_type_custom_token)
                 {
                     userfile.print(auth_data.user.api_key.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
 #if defined(ENABLE_CUSTOM_TOKEN)
                     userfile.print(auth_data.custom_token.token.c_str());
-                    userfile.print(",");
+                    userfile.print(FPSTR(","));
                     userfile.print(auth_data.custom_token.expire);
 #endif
                     return true;
@@ -1263,10 +1263,10 @@ namespace firebase
         user_auth_data_type auth_data_type = user_auth_data_undefined;
         void clear()
         {
-            token_type = "";
-            token = "";
-            refresh = "";
-            uid = "";
+            token_type.remove(0, token_type.length());
+            token.remove(0, token.length());
+            refresh.remove(0, refresh.length());
+            uid.remove(0, uid.length());
             expire = 0;
             authenticated = false;
             auth_type = auth_unknown_token;
