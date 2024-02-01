@@ -168,6 +168,9 @@ void loop()
 {
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
+
+    // To get the authentication time to live in seconds before expired.
+    // app.ttl();
 }
 
 void timeStatusCB(uint32_t &ts)

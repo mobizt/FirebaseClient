@@ -30,7 +30,6 @@
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
 
-
 void asyncCB(AsyncResult &aResult);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
@@ -89,6 +88,9 @@ void loop()
 {
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
+
+    // To get the authentication time to live in seconds before expired.
+    // app.ttl();
 
     if (app.ready() && (millis() - ms > 30 * 1000 || ms == 0))
     {
