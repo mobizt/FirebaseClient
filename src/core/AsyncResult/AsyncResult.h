@@ -152,7 +152,7 @@ public:
         {
             bool ret = sse && sse_timer.remaining() == 0;
             if (ret)
-               setSSEResumeStatus(true);
+                setSSEResumeStatus(true);
             return ret;
         }
 
@@ -198,7 +198,7 @@ public:
 
         void setSSEResumeStatus(bool set)
         {
-           sse_resume_wait = set;
+            sse_resume_wait = set;
         }
 
         bool sseResumeStatus()
@@ -218,11 +218,12 @@ public:
                 event_p1 = p1;
                 event_p2 = p2;
                 p1 = p2;
+                setSSEResumeStatus(false);
                 sse_timer.stop();
-                sse_timer.setInterval(FIREBASE_SSE_TIMEOUT);
+                sse_timer.setInterval(event().indexOf("cancel") > -1 || event().indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT);
                 sse_timer.start();
                 sse = true;
-                setSSEResumeStatus(false);
+                
             }
 
             sh.parse(*ref_payload, "data", "\n", p1, p2);
