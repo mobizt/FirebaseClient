@@ -149,16 +149,17 @@ public:
      * Get value at the node path.
      * @param aClient The async client.
      * @param path The node path to get value.
-     * @param cb The async result callback (AsyncResultCallback)
-     * @param sse The Server-sent events (Stream) mode
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param sse The Server-sent events (Stream) mode.
+     * @param uid The user specified UID of async result (optional).
      *
      * Example:
      *
      * database.get(aClient, "/path/to/data", cb);
      */
-    void get(AsyncClient &aClient, const String &path, AsyncResultCallback cb, bool sse = false)
+    void get(AsyncClient &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -191,8 +192,8 @@ public:
      * @param aClient The async client.
      * @param path The node path to get value.
      * @param options The database options (DataOptions).
-     * @param cb The async result callback (AsyncResultCallback)
-     * @return value that casts from response payload.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      * Example:
      *
@@ -204,9 +205,9 @@ public:
      *
      * database.get<String>(aClient, "/path/to/data", options, cb);
      */
-    void get(AsyncClient &aClient, const String &path, DataOptions &options, AsyncResultCallback cb)
+    void get(AsyncClient &aClient, const String &path, DataOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -289,7 +290,8 @@ public:
      *   }
      * }
      *
-     * @param cb The async result callback (AsyncResultCallback)
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      * Example:
      *
@@ -298,9 +300,9 @@ public:
      * database.get(aClient, "/path/to/data", getFile(fileConfig), cb);
      *
      */
-    void get(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb)
+    void get(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(), nullptr, &file, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -346,7 +348,8 @@ public:
      * Perform OTA update using a firmware file from the database.
      * @param aClient The async client.
      * @param path The node path to download.
-     * @param cb The async result callback (AsyncResultCallback)
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      * The data of node to download should be base64 encoded string of the firmware file.
      *
@@ -354,9 +357,9 @@ public:
      *
      * database.ota(aClient, "/path/to/data", aResult);
      */
-    void ota(AsyncClient &aClient, const String &path, AsyncResultCallback cb)
+    void ota(AsyncClient &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, false, false, true, false), nullptr, nullptr, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, false, false, true, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -414,7 +417,8 @@ public:
      * @param aClient The async client.
      * @param path The node path to set the value.
      * @param value The value to set.
-     * @param cb The async result callback (AsyncResultCallback)
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
      *
@@ -428,9 +432,9 @@ public:
      * database.set<number_t>(aClient, "/path/to/data", number_t(123.456789, 3), cb);
      */
     template <typename T = const char *>
-    void set(AsyncClient &aClient, const String &path, T value, AsyncResultCallback cb)
+    void set(AsyncClient &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
     {
-        storeAsync(aClient, path, value, async_request_handler_t::http_put, true, nullptr, cb);
+        storeAsync(aClient, path, value, async_request_handler_t::http_put, true, nullptr, cb, uid);
     }
 
     /**
@@ -512,7 +516,8 @@ public:
      *   }
      * }
      *
-     * @param cb The async result callback (AsyncResultCallback)
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      * Example:
      *
@@ -521,9 +526,9 @@ public:
      * database.set(aClient, "/path/to/data", getFile(fileConfig), cb);
      *
      */
-    void set(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb)
+    void set(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -591,6 +596,7 @@ public:
      * @param path The node path to set the value.
      * @param value The value to set.
      * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
      *
@@ -604,12 +610,12 @@ public:
      * database.push<number_t>(aClient, "/path/to/data", number_t(123.456789, 3), cb);
      */
     template <typename T = const char *>
-    void push(AsyncClient &aClient, const String &path, T value, AsyncResultCallback cb)
+    void push(AsyncClient &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
     {
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, nullptr, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq, payload.c_str());
     }
 
@@ -692,7 +698,8 @@ public:
      *   }
      * }
      *
-     * @param cb The async result callback (AsyncResultCallback)
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      * Example:
      *
@@ -701,9 +708,9 @@ public:
      * database.set(aClient, "/path/to/data", getFile(fileConfig), cb);
      *
      */
-    void push(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb)
+    void push(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -748,15 +755,16 @@ public:
      * @param path The node path to update.
      * @param value The JSON object (object_t) to update.
      * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      * Example:
      *
      * bool status = database.update<object_t>(aClient, "/path/to/data", object_t("{\"name\":\"Jack\"}"), cb);
      */
     template <typename T = object_t>
-    void update(AsyncClient &aClient, const String &path, const T &value, AsyncResultCallback cb)
+    void update(AsyncClient &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "")
     {
-        storeAsync(aClient, path, value, async_request_handler_t::http_patch, true, nullptr, cb);
+        storeAsync(aClient, path, value, async_request_handler_t::http_patch, true, nullptr, cb, uid);
     }
 
     /**
@@ -798,14 +806,15 @@ public:
      * @param aClient The async client.
      * @param path The node path to remove.
      * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      * Example:
      *
      * database.remove(aClient, "/path/to/data", aResult);
      */
-    void remove(AsyncClient &aClient, const String &path, AsyncResultCallback cb)
+    void remove(AsyncClient &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClient::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -848,6 +857,7 @@ private:
     public:
         AsyncClient *aClient = nullptr;
         String path;
+        String uid;
         async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
         AsyncClient::slot_options_t opt;
         DataOptions *options = nullptr;
@@ -855,7 +865,7 @@ private:
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         async_request_data_t() {}
-        async_request_data_t(AsyncClient *aClient, const String &path, async_request_handler_t::http_request_method method, AsyncClient::slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb)
+        async_request_data_t(AsyncClient *aClient, const String &path, async_request_handler_t::http_request_method method, AsyncClient::slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;
@@ -865,11 +875,12 @@ private:
             this->file = file;
             this->aResult = aResult;
             this->cb = cb;
+            this->uid = uid;
         }
     };
 
     template <typename T = object_t>
-    bool storeAsync(AsyncClient &aClient, const String &path, const T &value, async_request_handler_t::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb)
+    bool storeAsync(AsyncClient &aClient, const String &path, const T &value, async_request_handler_t::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb, const String &uid)
     {
         ValueConverter vcon;
         String payload;
@@ -877,7 +888,7 @@ private:
         DataOptions options;
         if (!async && aClient.reqEtag.length() == 0)
             options.silent = true;
-        async_request_data_t aReq(&aClient, path, mode, AsyncClient::slot_options_t(false, false, async, false, false, false), &options, nullptr, aResult, cb);
+        async_request_data_t aReq(&aClient, path, mode, AsyncClient::slot_options_t(false, false, async, false, false, false), &options, nullptr, aResult, cb, uid);
         asyncRequest(aReq, payload.c_str());
         if (!async)
             return aResult->lastError.code() == 0;
@@ -901,7 +912,7 @@ private:
         String extras = auth_param ? ".json?auth=" + app_token->token : ".json";
 
         addParams(auth_param, extras, request.method, request.options, request.file);
-        AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt);
+        AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt, request.uid);
 
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_NOT_PERMITTED);

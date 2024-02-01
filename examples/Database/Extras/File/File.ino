@@ -185,8 +185,14 @@ void setup()
     Serial.println("[+] Set file... ");
     database.set(aClient, "/test/file", getFile(upload_data), asyncCB);
 
+    // To assign UID for async result
+    // database.set(aClient, "/test/file", getFile(upload_data), asyncCB, "uploadTask");
+
     Serial.println("[+] Get file... ");
     database.get(aClient, "/test/file", getFile(download_data), asyncCB);
+
+    // To assign UID for async result
+    // database.get(aClient, "/test/file", getFile(download_data), asyncCB, "downloadTask");
 }
 
 void loop()
@@ -200,6 +206,9 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
+    // To get the UID (string) from async result
+    // aResult.uid();
+
     if (aResult.appEvent().code() > 0)
     {
         Serial.println("**************");

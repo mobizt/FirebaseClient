@@ -64,9 +64,13 @@
  * SYNTAXES:
  *
  * database.get(<AsyncClient>, <path>, <AsyncResult>, <SSE>);
- * database.get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>);
+ * database.get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ * 
+ * The uid is user specified UID of async result (optional) which used as async task identifier. 
+ * 
+ * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * To stop one (first) async operation,
  *
@@ -170,6 +174,9 @@ void setup()
 
     database.get(aClient, "/test/stream", asyncCB, true /* SSE mode */);
 
+    // To assign UID for async result
+    // database.get(aClient, "/test/stream", asyncCB, true /* SSE mode */, "myUID");
+
     // To stop the async (stream) operation.
     // aClient.stopAsync();
 }
@@ -186,6 +193,9 @@ void loop()
     {
         ms = millis();
         database.set<int>(aClient2, "/test/stream/number", (int)random(10000, 30000), asyncCB);
+
+        // To assign UID for async result
+        // database.set<int>(aClient2, "/test/stream/number", (int)random(10000, 30000), asyncCB, "myUID");
     }
 }
 
@@ -205,6 +215,8 @@ void asyncCB(AsyncResult &aResult)
 
     if (aResult.available())
     {
+        // To get the UID (string) from async result
+        // aResult.uid();
 
         Serial.println("**************");
         if (aResult.database.isStream())

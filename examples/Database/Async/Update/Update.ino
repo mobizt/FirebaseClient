@@ -64,9 +64,13 @@
  * SYNTAXES:
  *
  * database.update(<AsyncClient>, <path>, <object_t>, <AsyncResult>);
- * database.update(<AsyncClient>, <path>, <object_t>, <AsyncResultCallback>);
+ * database.update(<AsyncClient>, <path>, <object_t>, <AsyncResultCallback>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ * 
+ * The uid is user specified UID of async result (optional) which used as async task identifier. 
+ * 
+ * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The value type was JSON (object_t).
  *
@@ -160,6 +164,9 @@ void setup()
     String json = "{\"data\":" + String(random(1000, 2000)) + "}";
 
     database.update(aClient, "/test/json", object_t(json), asyncCB);
+
+    // To assign UID for async result
+    // database.update(aClient, "/test/json", object_t(json), asyncCB, "myUID");
 }
 
 void loop()
@@ -173,6 +180,9 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
+    // To get the UID (string) from async result
+    // aResult.uid();
+
     if (aResult.appEvent().code() > 0)
     {
         Serial.println("**************");

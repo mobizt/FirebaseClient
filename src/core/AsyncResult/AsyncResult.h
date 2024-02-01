@@ -93,6 +93,7 @@ class AsyncResult
 
 private:
     uint32_t addr = 0;
+    String result_uid;
     FirebaseError lastError;
     String data_path;
     String data_payload;
@@ -283,6 +284,7 @@ public:
     String payload() { return data_payload; }
     String path() { return data_path; }
     String etag() { return res_etag; }
+    String uid() { return result_uid; }
     int available()
     {
         bool ret = data_available;

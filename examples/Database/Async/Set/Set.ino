@@ -66,9 +66,13 @@
  * SYNTAXES:
  *
  * database.set<T>(<AsyncClient>, <path>, <value>, <AsyncResult>);
- * database.set<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>);
+ * database.set<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ * 
+ * The uid is user specified UID of async result (optional) which used as async task identifier. 
+ * 
+ * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
  *
@@ -198,6 +202,9 @@ void setup()
 
     // Set double
     database.set<number_t>(aClient, "/test/double", number_t(1234.56789, 4), asyncCB);
+
+    // To assign UID for async result
+    // database.set<number_t>(aClient, "/test/double", number_t(1234.56789, 4), asyncCB, "myUID");
 }
 
 void loop()
@@ -211,6 +218,9 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
+    // To get the UID (string) from async result
+    // aResult.uid();
+
     if (aResult.appEvent().code() > 0)
     {
         Serial.println("**************");

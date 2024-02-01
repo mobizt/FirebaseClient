@@ -64,9 +64,13 @@
  * SYNTAXES:
  *
  * database.ota(<AsyncClient>, <path>, <AsyncResult>);
- * database.ota(<AsyncClient>, <path>, <AsyncResultCallback>);
+ * database.ota(<AsyncClient>, <path>, <AsyncResultCallback>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ * 
+ * The uid is user specified UID of async result (optional) which used as async task identifier. 
+ * 
+ * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid(). 
  *
  */
 
@@ -160,6 +164,9 @@ void setup()
     Serial.println("[+] Asynchronous OTA update... ");
 
     database.ota(aClient, "/test/firmware/bin", asyncCB);
+
+    // To assign UID for async result
+    // database.ota(aClient, "/test/firmware/bin", asyncCB, "otaTask");
 }
 
 void loop()
@@ -173,6 +180,9 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
+    // To get the UID (string) from async result
+    // aResult.uid();
+
     if (aResult.appEvent().code() > 0)
     {
         Serial.println("**************");

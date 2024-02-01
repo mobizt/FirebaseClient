@@ -64,12 +64,16 @@
  * SYNTAXES:
  *
  * database.get(<AsyncClient>, <path>, <AsyncResult>, <SSE>);
- * database.get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>);
+ * database.get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
  *
  * database.get(<AsyncClient>, <path>, <DatabaseSession>, <AsyncResult>);
- * database.get(<AsyncClient>, <path>, <DatabaseSession>, <AsyncResultCallback>);
+ * database.get(<AsyncClient>, <path>, <DatabaseSession>, <AsyncResultCallback>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ * 
+ * The uid is user specified UID of async result (optional) which used as async task identifier. 
+ * 
+ * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * In case of filtering the data and additional request parameters are required,
  * the DataOptions can be assigned to the function via DataOptions object.
@@ -222,6 +226,9 @@ void setup()
 
     database.get(aClient, "/test/string", asyncCB);
 
+    // To assign UID for async result
+    // database.get(aClient, "/path/to/node", asyncCB, "myUID");
+
     // Filtering data
     // For REST API, indexing the data at /test/filter/json is required when filtering the data, please see examples/Database/Extras/IndexingData/IndexingData.ino.
     DataOptions options;
@@ -241,6 +248,10 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
+
+    // To get the UID (string) from async result
+    // aResult.uid();
+
     if (aResult.appEvent().code() > 0)
     {
         Serial.println("**************");

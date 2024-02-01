@@ -168,21 +168,31 @@ void setup()
   Serial.println("[+] Set blob... ");
   database.set(aClient, "/test/blob", getBlob(upload_data), asyncCB);
 
+  // To assign UID for async result
+  // database.set(aClient, "/test/blob", getBlob(upload_data), asyncCB, "uploadTask");
+
   Serial.println("[+] Get blob... ");
   database.get(aClient, "/test/blob", getBlob(download_data), asyncCB);
+
+  // To assign UID for async result
+  // database.get(aClient, "/test/blob", getBlob(download_data), asyncCB, "downloadTask");
 }
 
 void loop()
 {
-    // This function is required for handling async operations and maintaining the authentication tasks.
-    app.loop();
+  // This function is required for handling async operations and maintaining the authentication tasks.
+  app.loop();
 
-    // This required when different AsyncClients than used in FirebaseApp assigned to the database functions.
-    database.loop();
+  // This required when different AsyncClients than used in FirebaseApp assigned to the database functions.
+  database.loop();
 }
 
 void asyncCB(AsyncResult &aResult)
 {
+
+  // To get the UID (string) from async result
+  // aResult.uid();
+
   if (aResult.appEvent().code() > 0)
   {
     Serial.println("**************");

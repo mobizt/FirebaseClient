@@ -1425,7 +1425,7 @@ private:
         return slot;
     }
 
-    async_data_item_t *newSlot(std::vector<uint32_t> &clientList, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t options)
+    async_data_item_t *newSlot(std::vector<uint32_t> &clientList, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t options, const String &uid)
     {
         int slot_index = sIndex(options);
 
@@ -1443,6 +1443,7 @@ private:
         sData->sse = options.sse;
         sData->request.etag = reqEtag;
         clear(reqEtag);
+        sData->aResult.result_uid = uid;
         req.addRequestHeaderFirst(sData->request.header, method);
         if (path.length() == 0)
             sData->request.header += '/';

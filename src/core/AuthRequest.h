@@ -41,12 +41,12 @@ public:
     unsigned long request_sent_ms = 0;
     uint16_t slot = 0;
 
-    void asyncRequest(AsyncClient *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult)
+    void asyncRequest(AsyncClient *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult, const String &uid)
     {
         String host;
         async_request_handler_t req;
         req.addGAPIsHost(host, subdomain.c_str());
-        sData = aClient->newSlot(firebase_client_list, host, extras, "", async_request_handler_t::http_post, AsyncClient::slot_options_t(true, false, true, false, false, false));
+        sData = aClient->newSlot(firebase_client_list, host, extras, "", async_request_handler_t::http_post, AsyncClient::slot_options_t(true, false, true, false, false, false), uid);
         if (sData)
         {
             req.addContentTypeHeader(sData->request.header, "application/json");
