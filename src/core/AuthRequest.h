@@ -43,6 +43,9 @@ public:
 
     void asyncRequest(AsyncClient *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult, const String &uid)
     {
+        if (!aClient)
+            return;
+
         String host;
         async_request_handler_t req;
         req.addGAPIsHost(host, subdomain.c_str());
@@ -75,6 +78,9 @@ public:
 
     void process(AsyncClient *aClient, AsyncResult &aResult, AsyncResultCallback resultCb)
     {
+        if (!aClient)
+            return;
+
         aClient->process(true);
         aClient->handleRemove();
 
@@ -94,11 +100,15 @@ public:
 
     void remove(AsyncClient *aClient)
     {
+        if (!aClient)
+            return;
         aClient->handleRemove();
     }
 
     void stop(AsyncClient *aClient)
     {
+        if (!aClient)
+            return;
         aClient->stop();
     }
 

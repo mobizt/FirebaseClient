@@ -44,6 +44,7 @@ namespace firebase
     {
         friend class FirebaseClient;
         friend class Database;
+        friend class Firestore;
 
     private:
         auth_data_t auth_data;
@@ -185,7 +186,6 @@ namespace firebase
                 sh.trim(auth_data.app_token.refresh);
                 sh.trim(auth_data.app_token.token);
                 sh.trim(auth_data.app_token.uid);
-
             }
             else if (aResult.payload().indexOf("\"access_token\"") > -1)
             {

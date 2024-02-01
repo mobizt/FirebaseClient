@@ -41,7 +41,7 @@ enum database_data_type
     database_data_type_array = 7
 };
 
-struct object_t
+struct object_t : public Printable
 {
 private:
     String buf;
@@ -49,10 +49,12 @@ private:
 public:
     object_t() {}
     object_t(const String &o) { buf = o; }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
+    object_t(const char *o) { buf = o; }
+    size_t printTo(Print &p) const{return p.print(buf.c_str());}
 };
 
-struct string_t
+struct string_t : public Printable
 {
 private:
     String buf;
@@ -65,10 +67,11 @@ public:
         buf += v;
         buf += "\"";
     }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const{ return buf.c_str(); }
+    size_t printTo(Print &p) const{return p.print(buf.c_str());}
 };
 
-struct boolean_t
+struct boolean_t : public Printable
 {
 private:
     String buf;
@@ -81,10 +84,11 @@ private:
 public:
     boolean_t() {}
     boolean_t(bool v) { buf = v ? "true" : "false"; }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const{ return buf.c_str(); }
+    size_t printTo(Print &p) const{return p.print(buf.c_str());}
 };
 
-struct number_t
+struct number_t: public Printable
 {
 private:
     String buf;
@@ -93,7 +97,10 @@ public:
     number_t() {}
     template <typename T1 = int, typename T = int>
     number_t(T1 v, T d) { buf = String(v, d); }
-    const char *c_str() { return buf.c_str(); }
+    template <typename T = int>
+    number_t(T o) { buf = String(o); }
+    const char *c_str() const{ return buf.c_str(); }
+    size_t printTo(Print &p) const{return p.print(buf.c_str());}
 };
 
 class ValueConverter

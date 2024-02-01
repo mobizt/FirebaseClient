@@ -31,6 +31,8 @@ using namespace std;
 
 using namespace firebase;
 
+#if defined(ENABLE_DATABASE)
+
 class Database
 {
     friend class FirebaseApp;
@@ -47,10 +49,6 @@ public:
         return *this;
     }
 
-    ~Database()
-    {
-    }
-
     void setApp(uint32_t app_addr, app_token_t *app_token)
     {
         this->app_addr = app_addr;
@@ -61,6 +59,10 @@ public:
     {
         List list;
         return list.existed(firebase_app_list, app_addr) ? app_token : nullptr;
+    }
+
+    ~Database()
+    {
     }
 
     /**
@@ -902,14 +904,9 @@ private:
         if (!app_token)
             return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
-        FirebaseApp *app = reinterpret_cast<FirebaseApp *>(app_addr);
-
-        if (app && app->isExpired())
-            return setClientError(request, FIREBASE_ERROR_UNAUTHENTICATE);
-
         request.opt.app_token = app_token;
         bool auth_param = app_token->auth_data_type != user_auth_data_no_token && app_token->auth_type != auth_access_token && app_token->auth_type != auth_sa_access_token;
-        String extras = auth_param ? ".json?auth=" + app_token->token : ".json";
+        String extras = auth_param ? ".json?auth=" + String(FIREBASE_AUTH_PLACEHOLDER) : ".json";
 
         addParams(auth_param, extras, request.method, request.options, request.file);
         AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt, request.uid);
@@ -987,5 +984,7 @@ private:
         }
     }
 };
+
+#endif
 
 #endif

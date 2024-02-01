@@ -43,6 +43,7 @@ class AsyncClient
 {
     friend class AuthRequest;
     friend class Database;
+    friend class Firestore;
 
 private:
     enum async_state
@@ -354,6 +355,14 @@ private:
                     return connErrorHandler(sData, sData->state);
                 sse = sData->sse;
             }
+
+            if (sData->request.app_token)
+            {
+                String header = sData->request.header;
+                header.replace(FIREBASE_AUTH_PLACEHOLDER, sData->request.app_token->token);
+                 return sendHeader(sData, header.c_str());
+            }
+
             return sendHeader(sData, sData->request.header.c_str());
         }
         else if (sData->state == async_state_send_payload)
@@ -1456,10 +1465,11 @@ private:
 
         if (!options.auth_used)
         {
+            sData->request.app_token = options.app_token;
             if (options.app_token && (options.app_token->auth_type == auth_access_token || options.app_token->auth_type == auth_sa_access_token))
             {
                 req.addAuthHeaderFirst(sData->request.header, options.app_token->auth_type);
-                sData->request.header += options.app_token->token;
+                sData->request.header += FIREBASE_AUTH_PLACEHOLDER;
                 req.addNewLine(sData->request.header);
             }
 

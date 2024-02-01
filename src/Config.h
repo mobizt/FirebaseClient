@@ -16,31 +16,31 @@
  * ⛔ Use following build flag to disable.
  * -D DISABLE_FIRESTORE
  */
-// #define ENABLE_FIRESTORE
+#define ENABLE_FIRESTORE
 
 /**📍 For Firebase Cloud Messaging compilation
  * ⛔ Use following build flag to disable.
  * -D DISABLE_MESSAGING
  */
-// #define ENABLE_MESSAGING
+#define ENABLE_MESSAGING
 
 /**📍 For Firebase Storage compilation
  * ⛔ Use following build flag to disable.
  * -D DISABLE_STORAGE
  */
-// #define ENABLE_STORAGE
+#define ENABLE_STORAGE
 
 /**📍 For Google Cloud Storage compilation
  * ⛔ Use following build flag to disable.
  * -D DISABLE_CLOUD_STORAGE
  */
-// #define ENABLE_CLOUD_STORAGE
+ #define ENABLE_CLOUD_STORAGE
 
 /**📍 For Functions for Firebase compilation
  * ⛔ Use following build flag to disable.
  * -D DISABLE_FUNCTIONS
  */
-// #define ENABLE_FUNCTIONS
+ #define ENABLE_FUNCTIONS
 
 /**📍 For enabling PSRAM support
  * ⛔ Use following build flag to disable.
@@ -77,6 +77,10 @@
 #define ENABLE_CUSTOM_TOKEN
 #define ENABLE_ID_TOKEN
 #define ENABLE_LEGACY_TOKEN
+
+#if __has_include("UserConfig.h")
+#include "UserConfig.h"
+#endif
 
 #include "core/Options.h"
 

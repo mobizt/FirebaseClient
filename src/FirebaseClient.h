@@ -27,13 +27,48 @@
 #define FIREBASE_CLIENT_H
 #include <Arduino.h>
 #include "core/FirebaseApp.h"
+
+#if defined(ENABLE_DATABASE)
+#if __has_include("database/Database.h")
 #include "database/Database.h"
+#endif
+#endif
+
+#if defined(ENABLE_FIRESTORE)
+#if __has_include("firestore/Firestore.h")
+#include "firestore/Firestore.h"
+#endif
+#endif
+
+#if defined(ENABLE_MESSAGING)
+#if __has_include("messaging/Messaging.h")
+#include "messaging/Messaging.h"
+#endif
+#endif
+
+#if defined(ENABLE_STORAGE)
+#if __has_include("storage/Storage.h")
+#include "storage/Storage.h"
+#endif
+#endif
+
+#if defined(ENABLE_CLOUD_STORAGE)
+#if __has_include("cloud_storage/CloudStorage.h")
+#include "cloud_storage/CloudStorage.h"
+#endif
+#endif
+
+#if defined(ENABLE_FUNCTIONS)
+#if __has_include("functions/Functions.h")
+#include "functions/Functions.h"
+#endif
+#endif
 
 #if defined(FIREBASE_CLIENT_VERSION)
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.0.10"
+#define FIREBASE_CLIENT_VERSION "0.0.12"
 
 using namespace firebase;
 

@@ -32,6 +32,8 @@
 
 #define FIREBASE_TCP_WRITE_TIMEOUT 30 * 1000
 
+#define FIREBASE_AUTH_PLACEHOLDER "<token_placeholder>"
+
 typedef void (*NetworkStatus)(bool &status);
 typedef void (*NetworkReconnect)(void);
 
@@ -58,6 +60,7 @@ public:
     };
 
     String url, path, header, payload;
+    app_token_t *app_token = nullptr;
     uint16_t port = 443;
     size_t payloadLen = 0;
     uint8_t *data = nullptr;
