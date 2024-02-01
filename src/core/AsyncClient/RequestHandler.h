@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 1, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,9 +27,10 @@
 #include <Arduino.h>
 #include "./Config.h"
 #include "./core/Storage.h"
+#include "./core/Timer.h"
 
 
-#define FIREBASE_TCP_WRITE_TIMEOUT 30 * 1000;
+#define FIREBASE_TCP_WRITE_TIMEOUT 30 * 1000
 
 typedef void (*NetworkStatus)(bool &status);
 typedef void (*NetworkReconnect)(void);
@@ -71,8 +72,7 @@ public:
     int ota_error = 0;
     http_request_method method = http_undefined;
     String etag;
-    unsigned long last_request_ms = 0;
-    unsigned long request_tmo = FIREBASE_TCP_WRITE_TIMEOUT;
+    Timer send_timer;
 
     void addNewLine(String &header)
     {
@@ -222,6 +222,13 @@ public:
 #else
         delay(0);
 #endif
+    }
+
+    void feedTimer()
+    {
+        send_timer.stop();
+        send_timer.setInterval(FIREBASE_TCP_WRITE_TIMEOUT);
+        send_timer.start();
     }
 };
 

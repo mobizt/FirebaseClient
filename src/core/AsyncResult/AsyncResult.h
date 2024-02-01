@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 1, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,10 +27,11 @@
 #include "Value.h"
 #include "./core/Error.h"
 #include "./core/List.h"
+#include "./core/Timer.h"
 
 #define FIREBASE_CHUNK_SIZE 2048
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
-#define FIREBASE_SSE_TIMEOUT 40 * 1000;
+#define FIREBASE_SSE_TIMEOUT 40 * 1000
 
 using namespace firebase;
 
@@ -149,9 +150,9 @@ public:
 
         bool eventTimeout()
         {
-            bool ret = sse && millis() - event_time > FIREBASE_SSE_TIMEOUT;
+            bool ret = sse && sse_timer.remaining() == 0;
             if (ret)
-                sse_request = true;
+               setSSEResumeStatus(true);
             return ret;
         }
 
@@ -165,13 +166,13 @@ public:
         String *ref_payload = nullptr;
         bool null_etag = false;
         bool sse = false;
-        bool sse_request = false;
+        bool sse_resume_wait = false;
         String node_name; // database node name that value was pushed
         String etag;
         uint16_t data_path_p1 = 0, data_path_p2 = 0;
         uint16_t event_p1 = 0, event_p2 = 0;
         uint16_t data_p1 = 0, data_p2 = 0;
-        unsigned long event_time = 0;
+        Timer sse_timer;
 
         void clearSSE()
         {
@@ -195,6 +196,16 @@ public:
             }
         }
 
+        void setSSEResumeStatus(bool set)
+        {
+           sse_resume_wait = set;
+        }
+
+        bool sseResumeStatus()
+        {
+            return sse_resume_wait;
+        }
+
         void parseSSE()
         {
             clearSSE();
@@ -207,9 +218,11 @@ public:
                 event_p1 = p1;
                 event_p2 = p2;
                 p1 = p2;
-                event_time = millis();
+                sse_timer.stop();
+                sse_timer.setInterval(FIREBASE_SSE_TIMEOUT);
+                sse_timer.start();
                 sse = true;
-                sse_request = false;
+                setSSEResumeStatus(false);
             }
 
             sh.parse(*ref_payload, "data", "\n", p1, p2);

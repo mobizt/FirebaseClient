@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 1, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -90,8 +90,7 @@ public:
     uint16_t toFillIndex = 0;
     String header, payload, location, etag;
     chunk_info_t chunkInfo;
-    unsigned long last_response_ms = 0;
-    unsigned long response_tmo = FIREBASE_TCP_READ_TIMEOUT;
+    Timer read_timer;
 
     ~async_response_handler_t()
     {
@@ -100,6 +99,13 @@ public:
         toFill = nullptr;
         toFillLen = 0;
         toFillIndex = 0;
+    }
+
+    void feedTimer()
+    {
+        read_timer.stop();
+        read_timer.setInterval(FIREBASE_TCP_READ_TIMEOUT);
+        read_timer.start();
     }
 };
 

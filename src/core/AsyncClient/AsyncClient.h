@@ -1,5 +1,5 @@
 /**
- * Created January 31, 2024
+ * Created February 1, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -792,7 +792,8 @@ private:
 
         if (sData->response.flags.payload_remaining)
         {
-            sData->response.last_response_ms = millis();
+
+            sData->response.feedTimer();
 
             // the next chunk data is the payload
             if (sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
@@ -1578,15 +1579,15 @@ private:
             if (sData->state == async_state_undefined || sData->state == async_state_send_header || sData->state == async_state_send_payload)
             {
 
-                sData->request.last_request_ms = millis();
+                sData->request.feedTimer();
                 sending = true;
                 sData->return_type = send(sData);
 
                 while (sData->state == async_state_send_header || sData->state == async_state_send_payload)
                 {
                     sData->return_type = send(sData);
-                    sData->response.last_response_ms = millis();
-                    if (millis() - sData->request.last_request_ms > sData->request.request_tmo)
+                    sData->response.feedTimer();
+                    if (sData->request.send_timer.remaining() == 0)
                     {
                         setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
                         sData->return_type = function_return_type_failure;
@@ -1639,14 +1640,9 @@ private:
                 sData->error.code = 0;
                 while (sData->return_type == function_return_type_continue && (sData->response.httpCode == 0 || sData->response.flags.header_remaining || sData->response.flags.payload_remaining))
                 {
-                    sData->response.last_response_ms = millis();
+                    sData->response.feedTimer();
                     sData->return_type = receive(sData);
-
-                    if (sData->response.last_response_ms > 0 && millis() - sData->response.last_response_ms > sData->response.response_tmo)
-                    {
-                        setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
-                        sData->return_type = function_return_type_failure;
-                    }
+                    handleReadTimeout(sData);
                     bool allRead = sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_OK && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining;
                     if (sData->cancel || sData->async || allRead || sData->return_type == function_return_type_failure)
                         break;
@@ -1669,8 +1665,10 @@ private:
     }
 #if defined(ENABLE_DATABASE)
     void handleEventTimeout(async_data_item_t *sData)
-    {
-        if ((!sData->cancel && sData->sse && !sData->aResult.database.sse_request && sData->sse && sData->aResult.database.eventTimeout()))
+    { // Because this process will reset the connection when event was timed out,
+        // then sse resume status will be checked before event timeout checking.
+        // Reset the connection if sse resume status was not set, and event was timed out.
+        if ((!sData->cancel && sData->sse && !sData->aResult.database.sseResumeStatus() && sData->sse && sData->aResult.database.eventTimeout()))
         {
             setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEDOUT, false, false);
             returnResult(sData, false);
@@ -1681,7 +1679,7 @@ private:
 
     bool handleReadTimeout(async_data_item_t *sData)
     {
-        if (sData->response.last_response_ms > 0 && millis() - sData->response.last_response_ms > sData->response.response_tmo)
+        if (!sData->sse && sData->response.read_timer.remaining() == 0)
         {
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
             sData->return_type = function_return_type_failure;
@@ -1695,7 +1693,7 @@ private:
         if (sData->return_type == function_return_type_failure)
         {
 #if defined(ENABLE_DATABASE)
-            sData->aResult.database.sse_request = false;
+            sData->aResult.database.setSSEResumeStatus(false);
 #endif
             if (sData->async)
                 returnResult(sData, false);
