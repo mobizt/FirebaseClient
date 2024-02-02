@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 2, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -33,6 +33,7 @@ namespace firebase
     static vector<uint32_t> firebase_app_list;
     static vector<uint32_t> firebase_client_list;
     static vector<uint32_t> firebase_result_list;
+    static int slot_count = 0;
 
     class List
     {

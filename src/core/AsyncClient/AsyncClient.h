@@ -1,5 +1,5 @@
 /**
- * Created February 1, 2024
+ * Created February 2, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -356,11 +356,17 @@ private:
                 sse = sData->sse;
             }
 
-            if (sData->request.app_token)
+            if (sData->request.app_token && sData->request.app_token->auth_data_type != user_auth_data_no_token)
             {
+                if (sData->request.app_token->token.length() == 0)
+                {
+                    setAsyncError(sData, sData->state, FIREBASE_ERROR_UNAUTHENTICATE, !sData->sse, false);
+                    return function_return_type_failure;
+                }
+
                 String header = sData->request.header;
                 header.replace(FIREBASE_AUTH_PLACEHOLDER, sData->request.app_token->token);
-                 return sendHeader(sData, header.c_str());
+                return sendHeader(sData, header.c_str());
             }
 
             return sendHeader(sData, sData->request.header.c_str());
@@ -509,6 +515,8 @@ private:
 
     void removeSlot(uint8_t slot)
     {
+
+        slot_count++;
 
         async_data_item_t *sData = getData(slot);
 #if defined(ENABLE_DATABASE)
@@ -1442,6 +1450,8 @@ private:
 
         async_request_handler_t req;
         async_data_item_t *sData = addSlot(slot_index);
+
+        slot_count--;
 
         sData->async = options.async;
         sData->request.url = url;
