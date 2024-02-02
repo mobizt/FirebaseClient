@@ -974,14 +974,19 @@ private:
 
     void setClientError(async_request_data_t &request, int code)
     {
-        if (request.aResult)
-        {
-            request.aResult->error_available = true;
-            request.aResult->lastError.setClientError(code);
+        AsyncResult *aResult = request.aResult;
 
-            if (request.cb)
-                request.cb(*request.aResult);
-        }
+        if (!aResult)
+            aResult = new AsyncResult();
+
+        aResult->error_available = true;
+        aResult->lastError.setClientError(code);
+
+        if (request.cb)
+            request.cb(*aResult);
+
+        if (!request.aResult)
+            delete aResult;
     }
 };
 

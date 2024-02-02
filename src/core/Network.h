@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 2, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,6 +27,7 @@
 
 #include <Arduino.h>
 #include "./Config.h"
+
 
 typedef void (*NetworkConnectionCallback)(void);
 typedef void (*NetworkStatusCallback)(bool &);

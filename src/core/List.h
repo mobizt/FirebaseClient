@@ -33,7 +33,8 @@ namespace firebase
     static vector<uint32_t> firebase_app_list;
     static vector<uint32_t> firebase_client_list;
     static vector<uint32_t> firebase_result_list;
-    static int slot_count = 0;
+    static int slot_add = 0;
+    static int slot_remove = 0;
 
     class List
     {

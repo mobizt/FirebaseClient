@@ -209,7 +209,7 @@ private:
                 err.message = FPSTR("app was not assigned");
                 break;
             case FIREBASE_ERROR_OPERATION_NOT_PERMITTED:
-                err.message = FPSTR("operation not permitted");
+                err.message = FPSTR("operation not permitted or async queue is full");
                 break;
             default:
                 err.message = FPSTR("undefined");

@@ -1,5 +1,5 @@
 /**
- * Created February 1, 2024
+ * Created February 2, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -33,6 +33,14 @@
 #define FIREBASE_TCP_WRITE_TIMEOUT 30 * 1000
 
 #define FIREBASE_AUTH_PLACEHOLDER "<token_placeholder>"
+
+#if defined(ESP8266) 
+#define FIREBASE_ASYNC_QUEUE_LIMIT 3
+#elif defined(ESP32) || defined(ARDUINO_PICO_MODULE)
+#define FIREBASE_ASYNC_QUEUE_LIMIT 5
+#else 
+#define FIREBASE_ASYNC_QUEUE_LIMIT 2
+#endif
 
 typedef void (*NetworkStatus)(bool &status);
 typedef void (*NetworkReconnect)(void);

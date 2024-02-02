@@ -516,8 +516,6 @@ private:
     void removeSlot(uint8_t slot)
     {
 
-        slot_count++;
-
         async_data_item_t *sData = getData(slot);
 #if defined(ENABLE_DATABASE)
         sData->aResult.database.clearSSE();
@@ -536,6 +534,8 @@ private:
 
         delete sData;
         sData = nullptr;
+
+        slot_remove++;
 
         aDataList.erase(aDataList.begin() + slot);
     }
@@ -1430,11 +1430,12 @@ private:
                 slot = sse_index;
 
             // Multiple SSE modes
-            if (sse_index > -1 && options.sse)
+            if ((sse_index > -1 && options.sse) || aDataList.size() >= FIREBASE_ASYNC_QUEUE_LIMIT)
                 slot = -2;
 
             if (slot >= (int)aDataList.size())
                 slot = -1;
+
         }
 
         return slot;
@@ -1451,7 +1452,7 @@ private:
         async_request_handler_t req;
         async_data_item_t *sData = addSlot(slot_index);
 
-        slot_count--;
+        slot_add++;
 
         sData->async = options.async;
         sData->request.url = url;
