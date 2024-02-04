@@ -78,6 +78,39 @@
 #define ENABLE_ID_TOKEN
 #define ENABLE_LEGACY_TOKEN
 
+/** 🔖 Optional Build Options
+ *
+ * 🏷️ For external Ethernet module support.
+ * - Should define both library name and class object name.
+ * - FIREBASE_ETHERNET_MODULE_LIB is the Ethernet library name with extension (.h) and
+ *   should be inside "" or <> e.g. "Ethernet.h".
+ * - FIREBASE_ETHERNET_MODULE_CLASS is the name of static object defined from class e.g. Ethernet.
+ * - FIREBASE_ETHERNET_MODULE_TIMEOUT is the time out in milliseconds to wait network connection.
+ * 
+ * #define FIREBASE_ETHERNET_MODULE_LIB "EthernetLib.h"
+ * #define FIREBASE_ETHERNET_MODULE_CLASS EthernetClass
+ * #define FIREBASE_ETHERNET_MODULE_TIMEOUT 2000
+ *
+ * 🏷️ For native core library ENC28J60 Ethernet module support in ESP8266
+ * #define ENABLE_ESP8266_ENC28J60_ETH
+ *
+ * 🏷️ For native core library W5500 Ethernet module support in ESP8266
+ * #define ENABLE_ESP8266_W5500_ETH
+ *
+ * 🏷️ For native core library W5100 Ethernet module support in ESP8266
+ * #define ENABLE_ESP8266_W5100_ETH
+ *
+ * 🏷️ For disabling on-board WiFI functionality in case external Client usage
+ * #define FIREBASE_DISABLE_ONBOARD_WIFI
+ *
+ * 🏷️ For disabling native (sdk) Ethernet functionality in case external Client usage
+ * #define FIREBASE_DISABLE_NATIVE_ETHERNET
+ * 
+ * 🏷️ For debug port assignment.
+ * #define FIREBASE_DEFAULT_DEBUG_PORT Serial
+ *
+ */
+
 #if __has_include("UserConfig.h")
 #include "UserConfig.h"
 #endif

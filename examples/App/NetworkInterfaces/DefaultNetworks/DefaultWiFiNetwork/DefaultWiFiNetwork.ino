@@ -11,13 +11,17 @@
  *
  * SYNTAXES:
  *
- * DefaultNetwork network;
+ * DefaultWiFiNetwork network(<FirebaseWiFi>, <reconnect>);
  *
- * The DefaultNetwork is the Network class that provides the built-in WiFi network configuarion to work in this library.
+ * The DefaultWiFiNetwork is the Network class that provides the WiFiMulti network configuarion to work in this library for the WiFiMulti supported devices.
  *
- * The DefaultNetwork class constructor arguments.
+ * The DefaultWiFiNetwork class constructor arguments.
+ * 
+ * <FirebaseWiFi> - The FirebaseWiFi class object that used for keeping the network credentials (WiFi APs and WiFi passwords).
  *
- * <reconnect> - The bool option for network reconnection .
+ * <reconnect> - The bool option for network reconnection.
+ *
+ * For normal WiFi, see examples/NetworkInterfaces/DefaultNetwork/DefaultNetwork.ino
  *
  *
  */
@@ -41,8 +45,14 @@
 #include <WiFiClientSecure.h>
 #endif
 
-#define WIFI_SSID "WIFI_AP"
-#define WIFI_PASSWORD "WIFI_PASSWORD"
+#define WIFI_SSID1 "WIFI_AP1"
+#define WIFI_PASSWORD1 "WIFI_PASSWORD1"
+
+#define WIFI_SSID2 "WIFI_AP2"
+#define WIFI_PASSWORD2 "WIFI_PASSWORD2"
+
+#define WIFI_SSID3 "WIFI_AP3"
+#define WIFI_PASSWORD3 "WIFI_PASSWORD3"
 
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
@@ -53,7 +63,9 @@
 
 void asyncCB(AsyncResult &aResult);
 
-DefaultNetwork default_network(true); // initilize with boolean parameter to enable/disable network reconnection
+FirebaseWiFi wifimulti;
+
+DefaultWiFiNetwork default_network(wifimulti, true /* reconnect network */);
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
 
@@ -67,19 +79,10 @@ void setup()
 {
 
     Serial.begin(115200);
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-    Serial.print("Connecting to Wi-Fi");
-    unsigned long ms = millis();
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        Serial.print(".");
-        delay(300);
-    }
-    Serial.println();
-    Serial.print("Connected with IP: ");
-    Serial.println(WiFi.localIP());
-    Serial.println();
+    wifimulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
+    wifimulti.addAP(WIFI_SSID2, WIFI_PASSWORD2);
+    wifimulti.addAP(WIFI_SSID3, WIFI_PASSWORD3);
 
     Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
 
@@ -96,7 +99,7 @@ void setup()
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    ms = millis();
+    unsigned long ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
 }

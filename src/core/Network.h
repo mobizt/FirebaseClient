@@ -1,5 +1,5 @@
 /**
- * Created February 2, 2024
+ * Created February 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,7 +27,6 @@
 
 #include <Arduino.h>
 #include "./Config.h"
-
 
 typedef void (*NetworkConnectionCallback)(void);
 typedef void (*NetworkStatusCallback)(bool &);
@@ -184,6 +183,12 @@ typedef void (*NetworkStatusCallback)(bool &);
 #endif
 
 #if defined(MB_ARDUINO_PICO) && __has_include(<WiFiMulti.h>)
+#include <WiFiMulti.h>
+#define FIREBASE_HAS_WIFIMULTI
+#endif
+
+#if defined(ESP8266) && __has_include(<ESP8266WiFiMulti.h>)
+#include <ESP8266WiFiMulti.h>
 #define FIREBASE_HAS_WIFIMULTI
 #endif
 
@@ -250,26 +255,26 @@ typedef struct firebase_spi_ethernet_module_t
 
 } SPI_ETH_Module;
 
-struct firebase_wifi_credential_t
+struct FirebaseWiFi_credential_t
 {
     String ssid;
     String password;
 };
 
-class firebase_wifi
+class FirebaseWiFi
 {
     friend class AsyncClient;
 
 public:
-    firebase_wifi(){};
-    ~firebase_wifi()
+    FirebaseWiFi(){};
+    ~FirebaseWiFi()
     {
         clearAP();
         clearMulti();
     };
     void addAP(const String &ssid, const String &password)
     {
-        firebase_wifi_credential_t data;
+        FirebaseWiFi_credential_t data;
         data.ssid = ssid;
         data.password = password;
         credentials.push_back(data);
@@ -280,15 +285,19 @@ public:
     }
     size_t size() { return credentials.size(); }
 
-    firebase_wifi_credential_t operator[](size_t index)
+    FirebaseWiFi_credential_t operator[](size_t index)
     {
         return credentials[index];
     }
 
 private:
-    std::vector<firebase_wifi_credential_t> credentials;
+    std::vector<FirebaseWiFi_credential_t> credentials;
 #if defined(FIREBASE_HAS_WIFIMULTI)
+#if defined(ESP8266)
+    ESP8266WiFiMulti *multi = nullptr;
+#else
     WiFiMulti *multi = nullptr;
+#endif
 #endif
     void reconnect()
     {
@@ -302,9 +311,12 @@ private:
     void connect()
     {
 #if defined(FIREBASE_HAS_WIFIMULTI)
-
         clearMulti();
+#if defined(ESP8266)
+        multi = new ESP8266WiFiMulti();
+#else
         multi = new WiFiMulti();
+#endif
         for (size_t i = 0; i < credentials.size(); i++)
             multi->addAP(credentials[i].ssid.c_str(), credentials[i].password.c_str());
 
@@ -333,14 +345,13 @@ private:
     }
 };
 
-
 typedef enum
 {
-  firebase_network_data_undefined,
-  firebase_network_data_default_network,
-  firebase_network_data_generic_network,
-  firebase_network_data_gsm_network,
-  firebase_network_data_ethernet_network
+    firebase_network_data_undefined,
+    firebase_network_data_default_network,
+    firebase_network_data_generic_network,
+    firebase_network_data_gsm_network,
+    firebase_network_data_ethernet_network
 
 } firebase_network_data_type;
 

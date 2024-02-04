@@ -1234,7 +1234,6 @@ private:
         {
             if (gsmModem->getNetworkTime(&year3, &month3, &day3, &hour3, &min3, &sec3, &timezone))
             {
-
                 struct tm timeinfo;
                 timeinfo.tm_year = year3 - 1900;
                 timeinfo.tm_mon = month3 - 1;
@@ -1272,6 +1271,7 @@ private:
             digitalWrite(net.ethernet.ethernet_reset_pin, HIGH);
             delay(200);
         }
+
 #if defined(DEFAULT_DEBUG_PORT)
         DEFAULT_DEBUG_PORT.println((const char *)FPSTR("Starting Ethernet connection..."));
 #endif
@@ -1331,7 +1331,12 @@ private:
     {
         if (!netStatus())
         {
-            if (net.reconnect && (millis() - net.net_reconnect_ms > net.net_reconnect_timeout || net.net_reconnect_ms == 0))
+            bool recon = net.reconnect;
+
+            if (net.wifi && net.net_reconnect_ms == 0)
+                recon = true;
+
+            if (recon && (millis() - net.net_reconnect_ms > net.net_reconnect_timeout || net.net_reconnect_ms == 0))
             {
                 net.net_reconnect_ms = millis();
 
@@ -1364,8 +1369,10 @@ private:
 
 #if defined(FIREBASE_WIFI_IS_AVAILABLE)
 #if defined(ESP32) || defined(ESP8266)
-
-                    WiFi.reconnect();
+                    if (net.wifi && net.wifi->credentials.size())
+                        net.wifi->reconnect();
+                    else
+                        WiFi.reconnect();
 #else
                         if (net.wifi && net.wifi->credentials.size())
                             net.wifi->reconnect();
@@ -1623,10 +1630,14 @@ private:
                 }
             }
 
-            if (sending && sData->async && (handleSendTimeout(sData) || sData->return_type == function_return_type_continue))
+            if (sending)
             {
-                inProcess = false;
-                return;
+                handleSendTimeout(sData);
+                if (sData->async && sData->return_type == function_return_type_continue)
+                {
+                    inProcess = false;
+                    return;
+                }
             }
 
             async_request_handler_t req;

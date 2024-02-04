@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -115,11 +115,10 @@ private:
     bool initialized = false;
     bool network_status = false;
     bool reconnect = true;
-    firebase_wifi *wifi = nullptr;
+    FirebaseWiFi *wifi = nullptr;
     SPI_ETH_Module *eth = NULL;
-    unsigned long net_reconnect_ms =0;
+    unsigned long net_reconnect_ms = 0;
     unsigned long net_reconnect_timeout = 10000;
-
 
 public:
     ~network_config_data() { clear(); }
@@ -137,6 +136,14 @@ public:
         generic.copy(rhs.generic);
         gsm.copy(rhs.gsm);
         ethernet.copy(rhs.ethernet);
+
+        this->initialized = rhs.initialized;
+        this->network_status = rhs.network_status;
+        this->reconnect = rhs.reconnect;
+        this->wifi = rhs.wifi;
+        this->eth = rhs.eth;
+        this->net_reconnect_ms = rhs.net_reconnect_ms;
+        this->net_reconnect_timeout = rhs.net_reconnect_timeout;
     }
 
     void clear()
@@ -148,6 +155,10 @@ public:
         initialized = false;
         network_status = false;
         reconnect = true;
+        wifi = nullptr;
+        eth = NULL;
+        net_reconnect_ms = 0;
+        net_reconnect_timeout = 10000;
     }
 };
 
@@ -228,24 +239,30 @@ class DefaultEthernetNetwork : public DefaultNetwork
 {
 
 public:
-    DefaultEthernetNetwork(SPI_ETH_Module *eth)
+    DefaultEthernetNetwork(SPI_ETH_Module &eth)
     {
         init();
-        network_data.eth = eth;
+        network_data.eth = &eth;
+        network_data.network_data_type = firebase_network_data_default_network;
+    }
+
+    DefaultEthernetNetwork()
+    {
+        init();
         network_data.network_data_type = firebase_network_data_default_network;
     }
     ~DefaultEthernetNetwork() { clear(); }
 };
 
-
 class DefaultWiFiNetwork : public DefaultNetwork
 {
 
 public:
-    DefaultWiFiNetwork(firebase_wifi *wifi)
+    DefaultWiFiNetwork(FirebaseWiFi &wifi, bool reconnect = true)
     {
         init();
-        network_data.wifi = wifi;
+        network_data.wifi = &wifi;
+        network_data.reconnect = reconnect;
         network_data.network_data_type = firebase_network_data_default_network;
     }
     ~DefaultWiFiNetwork() { clear(); }
