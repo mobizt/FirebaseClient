@@ -40,12 +40,12 @@ class Database
 public:
     Database(const String &url = "")
     {
-        this->dbUrl = url;
+        this->service_url = url;
     };
 
     Database &operator=(Database &rhs)
     {
-        this->dbUrl = rhs.dbUrl;
+        this->service_url = rhs.service_url;
         return *this;
     }
 
@@ -826,7 +826,7 @@ public:
      */
     void url(const String &url)
     {
-        this->dbUrl = url;
+        this->service_url = url;
     }
 
     /**
@@ -850,7 +850,7 @@ public:
     }
 
 private:
-    String dbUrl;
+    String service_url;
     uint32_t app_addr = 0;
     app_token_t *app_token = nullptr;
 
@@ -909,7 +909,7 @@ private:
         String extras = auth_param ? ".json?auth=" + String(FIREBASE_AUTH_PLACEHOLDER) : ".json";
 
         addParams(auth_param, extras, request.method, request.options, request.file);
-        AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt, request.uid);
+        AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, service_url, request.path, extras, request.method, request.opt, request.uid);
 
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);

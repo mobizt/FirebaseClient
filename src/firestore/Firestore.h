@@ -40,7 +40,7 @@ class Firestore
 
 private:
     AsyncClient *aClient = nullptr;
-    String url;
+    String service_url;
     String path;
     String uid;
     uint32_t app_addr = 0;
@@ -123,18 +123,26 @@ public:
         firebase_firestore_transaction_read_write_option_t readWrite;
     } TransactionOptions;
 
-    
     ~Firestore(){};
 
     Firestore(const String &url = "")
     {
-        this->url = url;
+        this->service_url = url;
     };
 
     Firestore &operator=(Firestore &rhs)
     {
-        this->url = rhs.url;
+        this->service_url = rhs.service_url;
         return *this;
+    }
+
+    /**
+     * Set the database URL
+     * @param url The Firestore URL.
+     */
+    void url(const String &url)
+    {
+        this->service_url = url;
     }
 
     void setApp(uint32_t app_addr, app_token_t *app_token)
