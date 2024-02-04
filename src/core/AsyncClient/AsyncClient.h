@@ -967,9 +967,7 @@ private:
             if (sData->response.flags.chunks && client->available() <= 2)
             {
                 while (client->available())
-                {
                     client->read();
-                }
                 client->stop();
             }
 
