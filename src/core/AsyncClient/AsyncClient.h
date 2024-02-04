@@ -1615,7 +1615,6 @@ private:
             }
 
             bool sending = false;
-
             if (sData->state == async_state_undefined || sData->state == async_state_send_header || sData->state == async_state_send_payload)
             {
                 sData->request.feedTimer();
@@ -1626,9 +1625,7 @@ private:
                 {
                     sData->return_type = send(sData);
                     sData->response.feedTimer();
-
                     handleSendTimeout(sData);
-
                     if (sData->async || sData->return_type == function_return_type_failure)
                         break;
                 }
@@ -1659,7 +1656,6 @@ private:
                     handleEventTimeout(sData);
 #endif
                     handleReadTimeout(sData);
-
                     inProcess = false;
                     return;
                 }
@@ -1687,7 +1683,6 @@ private:
                     handleReadTimeout(sData);
 
                     bool allRead = sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_OK && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining;
-
                     if (allRead && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
                     {
                         if (sData->sse)
@@ -1802,25 +1797,19 @@ public:
             return;
 
         inStopAsync = true;
-
         size_t size = slotCount();
-
         if (size)
         {
             for (size_t i = size - 1; i >= 0; i--)
             {
                 async_request_handler_t req;
                 req.idle();
-
                 async_data_item_t *sData = getData(i);
-
                 if (sData && sData->async && !sData->auth_used && !sData->cancel)
                 {
                     if (!sse && sData->sse)
                         continue;
-
                     sData->cancel = true;
-
                     if (!all)
                     {
                         inStopAsync = false;

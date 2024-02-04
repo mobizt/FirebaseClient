@@ -87,10 +87,7 @@ public:
             AsyncClient *aClient = reinterpret_cast<AsyncClient *>(firebase_client_list[clientSlot]);
             if (aClient)
             {
-                for (size_t slot = 0; slot < aClient->slotCount(); slot++)
-                {
-                    aClient->process(true);
-                }
+                aClient->process(true);
                 aClient->handleRemove();
             }
         }

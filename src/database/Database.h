@@ -840,10 +840,7 @@ public:
             AsyncClient *aClient = reinterpret_cast<AsyncClient *>(firebase_client_list[clientSlot]);
             if (aClient)
             {
-                for (size_t slot = 0; slot < aClient->slotCount(); slot++)
-                {
-                    aClient->process(true);
-                }
+                aClient->process(true);
                 aClient->handleRemove();
             }
         }
@@ -890,7 +887,7 @@ private:
         DataOptions options;
         if (!async && aClient.reqEtag.length() == 0)
             options.silent = true;
-        async_request_data_t aReq(&aClient, path, mode, AsyncClient::slot_options_t(false, false, async, false, false, false), &options, nullptr, aResult, cb, uid);
+        async_request_data_t aReq(&aClient, path, mode, AsyncClient::slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid);
         asyncRequest(aReq, payload.c_str());
         if (!async)
             return aResult->lastError.code() == 0;
