@@ -70,9 +70,9 @@
  * database.get(<AsyncClient>, <path>, <DatabaseSession>, <AsyncResultCallback>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- * 
- * The uid is user specified UID of async result (optional) which used as async task identifier. 
- * 
+ *
+ * The uid is user specified UID of async result (optional) which used as async task identifier.
+ *
  * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * In case of filtering the data and additional request parameters are required,
@@ -169,6 +169,8 @@
 
 void asyncCB(AsyncResult &aResult);
 
+void printResult(AsyncResult &aResult);
+
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
@@ -180,6 +182,8 @@ WiFiClientSecure ssl_client;
 AsyncClient aClient(ssl_client, getNetwork(network));
 
 Database database;
+
+AsyncResult aResult_no_callback;
 
 void setup()
 {
@@ -235,6 +239,9 @@ void setup()
     options.filter.orderBy("Data").startAt(105).endAt(120).limitToLast(8);
 
     database.get(aClient, "/test/filter/json", options, asyncCB);
+
+    // To get anyc result without callback
+    // database.get(aClient, "/test/filter/json", options, aResult_no_callback);
 }
 
 void loop()
@@ -244,6 +251,9 @@ void loop()
 
     // This required when different AsyncClients than used in FirebaseApp assigned to the database functions.
     database.loop();
+
+    // To get anyc result without callback
+    // printResult(aResult_no_callback);
 }
 
 void asyncCB(AsyncResult &aResult)
@@ -252,6 +262,11 @@ void asyncCB(AsyncResult &aResult)
     // To get the UID (string) from async result
     // aResult.uid();
 
+    printResult(aResult);
+}
+
+void printResult(AsyncResult &aResult)
+{
     if (aResult.appEvent().code() > 0)
     {
         Serial.println("**************");

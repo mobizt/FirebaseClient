@@ -67,9 +67,9 @@
  * database.get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- * 
- * The uid is user specified UID of async result (optional) which used as async task identifier. 
- * 
+ *
+ * The uid is user specified UID of async result (optional) which used as async task identifier.
+ *
  * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * To stop one (first) async operation,
@@ -113,6 +113,8 @@
 
 void asyncCB(AsyncResult &aResult);
 
+void printResult(AsyncResult &aResult);
+
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
@@ -128,6 +130,8 @@ WiFiClientSecure ssl_client2;
 AsyncClient aClient2(ssl_client2, getNetwork(network));
 
 Database database;
+
+AsyncResult aResult_no_callback;
 
 unsigned long ms = 0;
 
@@ -176,6 +180,9 @@ void setup()
 
     database.get(aClient, "/test/stream", asyncCB, true /* SSE mode */);
 
+    // To get anyc result without callback
+    // database.get(aClient, "/test/stream", aResult_no_callback);
+
     // To assign UID for async result
     // database.get(aClient, "/test/stream", asyncCB, true /* SSE mode */, "myUID");
 
@@ -199,9 +206,20 @@ void loop()
         // To assign UID for async result
         // database.set<int>(aClient2, "/test/stream/number", (int)random(10000, 30000), asyncCB, "myUID");
     }
+
+    // To get anyc result without callback
+    // printResult(aResult_no_callback);
 }
 
 void asyncCB(AsyncResult &aResult)
+{
+    // To get the UID (string) from async result
+    // aResult.uid();
+
+    printResult(aResult);
+}
+
+void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {

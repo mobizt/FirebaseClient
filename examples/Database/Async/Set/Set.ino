@@ -69,9 +69,9 @@
  * database.set<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- * 
- * The uid is user specified UID of async result (optional) which used as async task identifier. 
- * 
+ *
+ * The uid is user specified UID of async result (optional) which used as async task identifier.
+ *
  * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
@@ -127,6 +127,8 @@
 
 void asyncCB(AsyncResult &aResult);
 
+void printResult(AsyncResult &aResult);
+
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
@@ -138,6 +140,8 @@ WiFiClientSecure ssl_client;
 AsyncClient aClient(ssl_client, getNetwork(network));
 
 Database database;
+
+AsyncResult aResult_no_callback;
 
 void setup()
 {
@@ -205,6 +209,9 @@ void setup()
 
     // To assign UID for async result
     // database.set<number_t>(aClient, "/test/double", number_t(1234.56789, 4), asyncCB, "myUID");
+
+    // To get anyc result without callback
+    // database.set<number_t>(aClient, "/test/double", number_t(1234.56789, 4), aResult_no_callback);
 }
 
 void loop()
@@ -214,13 +221,22 @@ void loop()
 
     // This required when different AsyncClients than used in FirebaseApp assigned to the database functions.
     database.loop();
+
+    // To get anyc result without callback
+    // printResult(aResult_no_callback);
 }
 
 void asyncCB(AsyncResult &aResult)
 {
+
     // To get the UID (string) from async result
     // aResult.uid();
 
+    printResult(aResult);
+}
+
+void printResult(AsyncResult &aResult)
+{
     if (aResult.appEvent().code() > 0)
     {
         Serial.println("**************");
