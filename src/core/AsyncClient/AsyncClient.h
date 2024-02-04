@@ -44,6 +44,10 @@ class AsyncClient
     friend class AuthRequest;
     friend class Database;
     friend class Firestore;
+    friend class Functions;
+    friend class Messaging;
+    friend class Storage;
+    friend class CloudStorage;
 
 private:
     enum async_state

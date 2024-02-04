@@ -45,6 +45,10 @@ namespace firebase
         friend class FirebaseClient;
         friend class Database;
         friend class Firestore;
+        friend class Functions;
+        friend class Messaging;
+        friend class Storage;
+        friend class CloudStorage;
 
     private:
         auth_data_t auth_data;
