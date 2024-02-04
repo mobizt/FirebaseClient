@@ -1,5 +1,5 @@
 /**
- * Created February 2, 2024
+ * Created February 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -68,7 +68,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.0.13"
+#define FIREBASE_CLIENT_VERSION "0.0.15"
 
 using namespace firebase;
 

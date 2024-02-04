@@ -912,7 +912,7 @@ private:
         AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, dbUrl, request.path, extras, request.method, request.opt, request.uid);
 
         if (!sData)
-            return setClientError(request, FIREBASE_ERROR_OPERATION_NOT_PERMITTED);
+            return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
         if (request.options && request.options->customHeaders.length() && sData->request.header.indexOf("X-Firebase-") == -1 && sData->request.header.indexOf("-ETag") == -1)
         {

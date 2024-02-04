@@ -1,5 +1,5 @@
 /**
- * Created February 2, 2024
+ * Created February 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -29,16 +29,15 @@
 #include "./core/Storage.h"
 #include "./core/Timer.h"
 
-
-#define FIREBASE_TCP_WRITE_TIMEOUT 30 * 1000
+#define FIREBASE_TCP_WRITE_TIMEOUT_SEC 30
 
 #define FIREBASE_AUTH_PLACEHOLDER "<token_placeholder>"
 
-#if defined(ESP8266) 
+#if defined(ESP8266)
 #define FIREBASE_ASYNC_QUEUE_LIMIT 3
 #elif defined(ESP32) || defined(ARDUINO_PICO_MODULE)
 #define FIREBASE_ASYNC_QUEUE_LIMIT 5
-#else 
+#else
 #define FIREBASE_ASYNC_QUEUE_LIMIT 2
 #endif
 
@@ -235,10 +234,10 @@ public:
 #endif
     }
 
-    void feedTimer()
+    void feedTimer(int interval = -1)
     {
         send_timer.stop();
-        send_timer.setInterval(FIREBASE_TCP_WRITE_TIMEOUT);
+        send_timer.setInterval(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval);
         send_timer.start();
     }
 };

@@ -1,5 +1,5 @@
 /**
- * Created February 2, 2024
+ * Created February 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -132,6 +132,7 @@ private:
     network_config_data net;
     uint32_t addr = 0;
     bool inProcess = false;
+    bool inStopAsync = false;
 
     void closeFile(async_data_item_t *sData)
     {
@@ -276,12 +277,6 @@ private:
     function_return_type send(async_data_item_t *sData, uint8_t *data, size_t len, size_t size, async_state state = async_state_send_payload)
     {
         sData->state = state;
-
-        if (sData->cancel)
-        {
-            sData->return_type = function_return_type_complete;
-            return sData->return_type;
-        }
 
         if (data && len && this->client)
         {
@@ -517,18 +512,23 @@ private:
     {
 
         async_data_item_t *sData = getData(slot);
+
+        if (!sData)
+            return;
+
 #if defined(ENABLE_DATABASE)
         sData->aResult.database.clearSSE();
 #endif
 
         closeFile(sData);
 
-        if (!sData->cancel)
-        {
-            setLastError(sData);
-            // data available from sync and asyn request except for sse
-            returnResult(sData, true);
-        }
+        setLastError(sData);
+        // data available from sync and asyn request except for sse
+        returnResult(sData, true);
+
+        setLastError(sData);
+        // data available from sync and asyn request except for sse
+        returnResult(sData, true);
 
         reset(sData, sData->auth_used);
 
@@ -593,12 +593,6 @@ private:
     {
         if (!netConnect() || !client || !sData)
             return false;
-
-        if (sData->cancel)
-        {
-            sData->return_type = function_return_type_complete;
-            return true;
-        }
 
         if (client->available() > 0)
         {
@@ -807,7 +801,6 @@ private:
 
         if (sData->response.flags.payload_remaining)
         {
-
             sData->response.feedTimer();
 
             // the next chunk data is the payload
@@ -961,6 +954,16 @@ private:
 
         if (sData->response.payloadLen > 0 && sData->response.payloadRead >= sData->response.payloadLen)
         {
+            // payload+header data interfered workaround from session reusage.
+            if (sData->response.payloadRead > sData->response.payloadLen)
+            {
+                sData->response.header = sData->response.payload.substring(sData->response.payloadRead - sData->response.payloadLen);
+                sData->response.payload.remove(sData->response.payloadLen);
+                sData->return_type = function_return_type_continue;
+                sData->state = async_state_read_response;
+                sData->response.flags.header_remaining = true;
+            }
+
             if (sData->response.flags.chunks && client->available() <= 2)
             {
                 while (client->available())
@@ -1418,10 +1421,13 @@ private:
             int sse_index = -1, auth_index = -1;
             for (size_t i = 0; i < aDataList.size(); i++)
             {
-                if (getData(i)->auth_used)
-                    auth_index = i;
-                else if (getData(i)->sse)
-                    sse_index = i;
+                if (getData(i))
+                {
+                    if (getData(i)->auth_used)
+                        auth_index = i;
+                    else if (getData(i)->sse)
+                        sse_index = i;
+                }
             }
 
             if (auth_index > -1)
@@ -1435,7 +1441,6 @@ private:
 
             if (slot >= (int)aDataList.size())
                 slot = -1;
-
         }
 
         return slot;
@@ -1561,7 +1566,7 @@ private:
         for (size_t slot = 0; slot < slotCount(); slot++)
         {
             async_data_item_t *sData = getData(slot);
-            if (sData->cancel || sData->to_remove)
+            if (sData && sData->to_remove)
                 removeSlot(slot);
         }
     }
@@ -1575,6 +1580,12 @@ private:
         {
             size_t slot = 0;
             async_data_item_t *sData = getData(slot);
+
+            if (!sData)
+            {
+                inProcess = false;
+                return;
+            }
 
             if (!netConnect())
             {
@@ -1598,7 +1609,6 @@ private:
 
             if (sData->state == async_state_undefined || sData->state == async_state_send_header || sData->state == async_state_send_payload)
             {
-
                 sData->request.feedTimer();
                 sending = true;
                 sData->return_type = send(sData);
@@ -1607,17 +1617,15 @@ private:
                 {
                     sData->return_type = send(sData);
                     sData->response.feedTimer();
-                    if (sData->request.send_timer.remaining() == 0)
-                    {
-                        setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
-                        sData->return_type = function_return_type_failure;
-                    }
-                    if (sData->cancel || sData->async || sData->return_type == function_return_type_failure)
+
+                    handleSendTimeout(sData);
+
+                    if (sData->async || sData->return_type == function_return_type_failure)
                         break;
                 }
             }
 
-            if (sending && sData->async && sData->return_type == function_return_type_continue)
+            if (sending && sData->async && (handleSendTimeout(sData) || sData->return_type == function_return_type_continue))
             {
                 inProcess = false;
                 return;
@@ -1662,6 +1670,7 @@ private:
                 {
                     sData->response.feedTimer();
                     sData->return_type = receive(sData);
+
                     handleReadTimeout(sData);
 
                     bool allRead = sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_OK && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining;
@@ -1678,7 +1687,7 @@ private:
                         sData->return_type = function_return_type_failure;
                     }
 
-                    if (sData->cancel || sData->async || allRead || sData->return_type == function_return_type_failure)
+                    if (sData->async || allRead || sData->return_type == function_return_type_failure)
                         break;
                 }
             }
@@ -1691,7 +1700,7 @@ private:
 
             setAsyncError(sData, sData->state, 0, !sData->sse && sData->return_type == function_return_type_complete, false);
 
-            if (sData->cancel || sData->to_remove)
+            if (sData->to_remove)
                 removeSlot(slot);
         }
 
@@ -1700,8 +1709,7 @@ private:
 #if defined(ENABLE_DATABASE)
     void handleEventTimeout(async_data_item_t *sData)
     {
-
-        if (!sData->cancel && sData->sse && sData->aResult.database.eventTimeout() && sData->aResult.database.eventResumeStatus() == AsyncResult::database_data_t::event_resume_status_undefined)
+        if (sData->sse && sData->aResult.database.eventTimeout() && sData->aResult.database.eventResumeStatus() == AsyncResult::database_data_t::event_resume_status_undefined)
         {
             sData->aResult.database.setEventResumeStatus(AsyncResult::database_data_t::event_resume_status_resuming);
             setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEDOUT, false, false);
@@ -1711,9 +1719,20 @@ private:
     }
 #endif
 
+    bool handleSendTimeout(async_data_item_t *sData)
+    {
+        if (sData->request.send_timer.remaining() == 0 || sData->cancel)
+        {
+            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
+            sData->return_type = function_return_type_failure;
+            return true;
+        }
+        return false;
+    }
+
     bool handleReadTimeout(async_data_item_t *sData)
     {
-        if (!sData->sse && sData->response.read_timer.remaining() == 0)
+        if (!sData->sse && (sData->response.read_timer.remaining() == 0 || sData->cancel))
         {
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
             sData->return_type = function_return_type_failure;
@@ -1766,19 +1785,39 @@ public:
 
     void stopAsync(bool all = false)
     {
-        if (slotCount())
+        if (inStopAsync)
+            return;
+
+        inStopAsync = true;
+
+        size_t size = slotCount();
+
+        if (size)
         {
-            for (size_t i = 0; i < slotCount(); i++)
+            for (size_t i = size - 1; i >= 0; i--)
             {
+                async_request_handler_t req;
+                req.idle();
+
                 async_data_item_t *sData = getData(i);
-                if (sData->async)
+
+                if (sData && sData->async && !sData->auth_used && !sData->cancel)
                 {
+                    if (!sse && sData->sse)
+                        continue;
+
                     sData->cancel = true;
+
                     if (!all)
-                        break;
+                    {
+                        inStopAsync = false;
+                        return;
+                    }
                 }
             }
         }
+
+        inStopAsync = false;
     }
 
     void stop()

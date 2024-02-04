@@ -1,5 +1,5 @@
 /**
- * Created January 31, 2024
+ * Created February 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -445,7 +445,7 @@ namespace firebase
             if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
             {
 
-                if (aResult.error().code() != 0 || millis() - authReq.request_sent_ms > FIREBASE_TCP_READ_TIMEOUT)
+                if (aResult.error().code() != 0 || millis() - authReq.request_sent_ms > (FIREBASE_TCP_READ_TIMEOUT_SEC * 1000))
                 {
                     setEvent(auth_event_error);
                     return false;
@@ -453,7 +453,6 @@ namespace firebase
 
                 if (aResult.available())
                 {
-
                     setEvent(auth_event_auth_response_received);
 
                     if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user || auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email || auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)

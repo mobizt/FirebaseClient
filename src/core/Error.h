@@ -89,7 +89,7 @@
 #define FIREBASE_ERROR_STREAM_TIMEDOUT -115
 #define FIREBASE_ERROR_STREAM_AUTH_REVOKED -116
 #define FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED -117
-#define FIREBASE_ERROR_OPERATION_NOT_PERMITTED -118
+#define FIREBASE_ERROR_OPERATION_CANCELLED -118
 
 #if !defined(FPSTR)
 #define FPSTR
@@ -208,8 +208,8 @@ private:
             case FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED:
                 err.message = FPSTR("app was not assigned");
                 break;
-            case FIREBASE_ERROR_OPERATION_NOT_PERMITTED:
-                err.message = FPSTR("operation not permitted or async queue is full");
+            case FIREBASE_ERROR_OPERATION_CANCELLED:
+                err.message = FPSTR("operation was cancelled");
                 break;
             default:
                 err.message = FPSTR("undefined");

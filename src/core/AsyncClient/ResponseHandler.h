@@ -1,5 +1,5 @@
 /**
- * Created February 1, 2024
+ * Created February 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,7 +27,7 @@
 #include <Arduino.h>
 #include <Client.h>
 
-#define FIREBASE_TCP_READ_TIMEOUT 30 * 1000
+#define FIREBASE_TCP_READ_TIMEOUT_SEC 30
 
 struct async_response_handler_t
 {
@@ -101,10 +101,10 @@ public:
         toFillIndex = 0;
     }
 
-    void feedTimer()
+    void feedTimer(int interval = -1)
     {
         read_timer.stop();
-        read_timer.setInterval(FIREBASE_TCP_READ_TIMEOUT);
+        read_timer.setInterval(interval == -1 ? FIREBASE_TCP_READ_TIMEOUT_SEC : interval);
         read_timer.start();
     }
 };
