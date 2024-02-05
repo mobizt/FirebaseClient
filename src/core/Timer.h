@@ -37,6 +37,7 @@ private:
     unsigned long now = 0;
     unsigned long ms = 0;
     bool enable = false;
+    uint8_t feed_count = 0;
 
 public:
     Timer(unsigned long sec = 60) { setInterval(sec); }
@@ -65,9 +66,12 @@ public:
 
     void feed(unsigned long sec)
     {
-      stop();
-      setInterval(sec);
-      start();
+        feed_count++;
+        if (feed_count == 0)
+            feed_count = 1;
+        stop();
+        setInterval(sec);
+        start();
     }
 
     void loop()
@@ -90,6 +94,10 @@ public:
     {
         return ready() ? 0 : end - ts;
     }
+
+    uint8_t feedCount() const { return feed_count; }
+
+    bool isRunning() const { return enable; };
 
     bool ready()
     {

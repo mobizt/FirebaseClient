@@ -127,9 +127,14 @@ private:
 public:
     struct database_data_t
     {
-        friend class Database;
         friend class AsyncResult;
         friend class AsyncClient;
+        friend class Database;
+        friend class Firesrore;
+        friend class Messaging;
+        friend class Functions;
+        friend class Storage;
+        friend class CloudStorage;
 
         enum event_resume_status_t
         {
@@ -144,9 +149,9 @@ public:
         {
             return vcon.to<T>(data().c_str());
         }
-        bool isStream() { return sse; }
-        String name() { return node_name; }
-        String ETag() { return etag; }
+        bool isStream() const { return sse; }
+        String name() const { return node_name; }
+        String ETag() const { return etag; }
         String dataPath() { return ref_payload ? ref_payload->substring(data_path_p1, data_path_p2) : ""; }
         String event() { return ref_payload ? ref_payload->substring(event_p1, event_p2) : ""; }
         String data()
@@ -207,7 +212,7 @@ public:
             event_resume_status = status;
         }
 
-        event_resume_status_t eventResumeStatus()
+        event_resume_status_t eventResumeStatus() const
         {
             return event_resume_status;
         }
@@ -281,10 +286,10 @@ public:
         vec.addRemoveList(rVec, addr, false);
     };
 
-    String payload() { return data_payload; }
-    String path() { return data_path; }
-    String etag() { return res_etag; }
-    String uid() { return result_uid; }
+    String payload() const { return data_payload; }
+    String path() const { return data_path; }
+    String etag() const { return res_etag; }
+    String uid() const { return result_uid; }
     int available()
     {
         bool ret = data_available;
@@ -292,10 +297,7 @@ public:
         return ret ? data_payload.length() : 0;
     }
 
-    app_event_t appEvent()
-    {
-        return app_event;
-    }
+    app_event_t appEvent() const { return app_event; }
 
     bool uploadProgress()
     {
@@ -311,7 +313,7 @@ public:
         return false;
     }
 
-    upload_data_t uploadInfo() { return upload_data; }
+    upload_data_t uploadInfo() const { return upload_data; }
 
     bool downloadProgress()
     {
@@ -327,7 +329,7 @@ public:
         return false;
     }
 
-    download_data_t downloadInfo() { return download_data; }
+    download_data_t downloadInfo() const { return download_data; }
 
     bool isError()
     {
@@ -340,10 +342,7 @@ public:
         return false;
     }
 
-    FirebaseError error()
-    {
-        return lastError;
-    }
+    FirebaseError error() const { return lastError; }
 
     database_data_t database;
 };

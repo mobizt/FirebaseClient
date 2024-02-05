@@ -1,5 +1,5 @@
 /**
- * Created January 31, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -24,7 +24,6 @@
  */
 #ifndef FIREBASE_BUILD_OPTIONS_H
 #define FIREBASE_BUILD_OPTIONS_H
-
 
 #if defined(ARDUINO_ARCH_RP2040)
 
@@ -147,17 +146,17 @@
 class dmFile : public Stream
 {
 public:
-    operator bool() { return 0; }
-    size_t write(uint8_t) { return 0; }
-    size_t write(const uint8_t *buf, size_t size) { return 0; }
+    operator bool() const { return 0; }
+    size_t write(uint8_t) const { return 0; }
+    size_t write(const uint8_t *buf, size_t size) const { return 0; }
     int available() { return 0; }
-    int read() { return 0; }
-    int peek() { return 0; }
+    int read() const { return 0; }
+    int peek() const { return 0; }
     void flush() {}
-    int read(uint8_t *buf, size_t size) { return 0; }
+    int read(uint8_t *buf, size_t size) const{ return 0; }
     void close() {}
-    size_t position() { return 0; }
-    size_t size() { return 0; }
+    size_t position() const { return 0; }
+    size_t size() const { return 0; }
 };
 #define FILEOBJ dmFile
 #endif
@@ -192,7 +191,6 @@ public:
 #if !defined(ENABLE_CUSTOM_AUTH)
 #define ENABLE_CUSTOM_AUTH
 #endif
-
 
 #endif
 

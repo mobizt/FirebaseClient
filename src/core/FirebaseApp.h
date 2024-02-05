@@ -443,7 +443,6 @@ namespace firebase
 
             if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
             {
-
                 if (aResult.error().code() != 0 || authReq.req_timer.remaining() == 0)
                 {
                     setEvent(auth_event_error);
@@ -492,66 +491,30 @@ namespace firebase
             app_addr = reinterpret_cast<uint32_t>(this);
             vec.addRemoveList(aVec, app_addr, true);
         };
-        ~FirebaseApp()
-        {
-            vec.addRemoveList(aVec, app_addr, false);
-        };
+        ~FirebaseApp() { vec.addRemoveList(aVec, app_addr, false); };
 
-        bool isInitialized()
-        {
-            return auth_data.user_auth.initialized;
-        }
+        bool isInitialized() const { return auth_data.user_auth.initialized; }
 
-        void loop()
-        {
-            processAuth();
-        }
+        void loop() { processAuth(); }
 
-        bool ready()
-        {
-            return processAuth() && auth_data.app_token.authenticated;
-        }
+        bool ready() { return processAuth() && auth_data.app_token.authenticated; }
 
         template <typename T>
-        void getApp(T &app)
-        {
-            app.setApp(app_addr, &auth_data.app_token);
-        }
+        void getApp(T &app) { app.setApp(app_addr, &auth_data.app_token); }
 
-        String getToken()
-        {
-            return auth_data.app_token.token;
-        }
+        String getToken() const { return auth_data.app_token.token; }
 
-        String getRefreshToken()
-        {
-            return auth_data.app_token.refresh;
-        }
+        String getRefreshToken() const { return auth_data.app_token.refresh; }
 
-        String getUid()
-        {
-            return auth_data.app_token.uid;
-        }
+        String getUid() const { return auth_data.app_token.uid; }
 
-        bool isAuthenticated()
-        {
-            return auth_data.app_token.authenticated;
-        }
+        bool isAuthenticated() const { return auth_data.app_token.authenticated; }
 
-        bool isExpired()
-        {
-            return auth_timer.remaining() == 0;
-        }
+        bool isExpired() { return auth_timer.remaining() == 0; }
 
-        unsigned long ttl()
-        {
-            return auth_timer.remaining();
-        }
+        unsigned long ttl() { return auth_timer.remaining(); }
 
-        void setCallback(AsyncResultCallback cb)
-        {
-            this->resultCb = cb;
-        }
+        void setCallback(AsyncResultCallback cb) { this->resultCb = cb; }
     };
 };
 

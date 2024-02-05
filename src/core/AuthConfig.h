@@ -147,7 +147,7 @@ namespace firebase
         }
 
     public:
-        firebase_auth_event_type event() { return _event; }
+        firebase_auth_event_type event() const { return _event; }
     };
 
     typedef void (*TimeStatusCallback)(uint32_t &ts);

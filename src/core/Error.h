@@ -1,5 +1,5 @@
 /**
- * Created January 31, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -221,8 +221,8 @@ private:
 public:
     FirebaseError(){};
     ~FirebaseError(){};
-    String message() { return err.message; }
-    int code() { return err.code; }
+    String message() const { return err.message; }
+    int code() const { return err.code; }
 };
 
 #endif

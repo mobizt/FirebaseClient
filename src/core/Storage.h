@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -70,7 +70,7 @@ public:
         index = 0;
     }
 
-    size_t curIndex() { return index; }
+    size_t curIndex() const { return index; }
 
     size_t write(const uint8_t *buf, size_t size)
     {
@@ -105,7 +105,7 @@ struct file_config_data
     String filename;
     size_t file_size = 0;
     FileConfigCallback cb = NULL;
-    file_operating_status file_status =file_status_closed;
+    file_operating_status file_status = file_status_closed;
     uint8_t *data = nullptr;
     size_t data_pos = 0;
     size_t data_size = 0;
@@ -228,8 +228,8 @@ public:
     ~BlobConfig() {}
     void clear() { data.clear(); }
 
-    uint8_t *blob() { return data.data; }
-    size_t size() { return data.data_size; }
+    uint8_t *blob() const { return data.data; }
+    size_t size() const { return data.data_size; }
 
     file_config_data &getData() { return data; }
 
@@ -239,7 +239,6 @@ private:
 
 template <typename T>
 static file_config_data &getFile(T &file) { return file.get(); }
-
 
 template <typename T>
 static file_config_data &getBlob(T &blob) { return blob.getData(); }

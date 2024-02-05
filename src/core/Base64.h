@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -72,7 +72,7 @@ public:
         return pLen - uLen;
     }
 
-    size_t encodedLength(size_t len)
+    size_t encodedLength(size_t len) const
     {
         return ((len + 2) / 3 * 4) + 1;
     }
@@ -126,7 +126,6 @@ public:
     template <typename T = uint8_t>
     bool writeOutput(firebase_base64_io_t<T> &out)
     {
-
         size_t write = out.bufWrite;
         out.bufWrite = 0;
 
@@ -170,7 +169,6 @@ public:
     template <typename T>
     bool decode(Memory &mem, unsigned char *base64DecBuf, const char *src, size_t len, firebase_base64_io_t<T> &out)
     {
-
         // the maximum chunk size that writes to output is limited by out.bufLen, the minimum is depending on the source length
         bool ret = false;
         unsigned char *block = reinterpret_cast<unsigned char *>(mem.alloc(4, false));
@@ -311,7 +309,6 @@ public:
 
     bool decodeToFile(Memory &mem, FILEOBJ file, const char *src)
     {
-
         firebase_base64_io_t<uint8_t> out;
         out.file = file;
         uint8_t *buf = reinterpret_cast<uint8_t *>(mem.alloc(out.bufLen));
@@ -325,7 +322,6 @@ public:
 
     bool decodeToBlob(Memory &mem, firebase_blob_writer *bWriter, const char *src)
     {
-
         firebase_base64_io_t<uint8_t> out;
         out.outB = bWriter;
         uint8_t *buf = reinterpret_cast<uint8_t *>(mem.alloc(out.bufLen));
@@ -339,7 +335,6 @@ public:
 
     void encodeUrl(Memory &mem, char *encoded, unsigned char *string, size_t len)
     {
-
         size_t i;
         char *p = encoded;
         unsigned char *base64EncBuf = creatBase64EncBuffer(mem, true);
@@ -365,7 +360,6 @@ public:
         }
 
         *p++ = '\0';
-
         mem.release(&base64EncBuf);
     }
 

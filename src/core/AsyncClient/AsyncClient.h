@@ -1343,7 +1343,7 @@ private:
         {
             bool recon = net.reconnect;
 
-            if (net.wifi && net.net_timer.remaining() == 0)
+            if (net.wifi && net.net_timer.feedCount() == 0)
                 recon = true;
 
             if (recon && (net.net_timer.remaining() == 0))
@@ -1397,7 +1397,6 @@ private:
 
     bool netStatus()
     {
-
         // We will not invoke the network status request when device has built-in WiFi or Ethernet and it is connected.
         if (net.network_data_type == firebase_network_data_gsm_network)
         {
@@ -1562,16 +1561,12 @@ private:
         }
     }
 
-    uint8_t slotCount()
-    {
-        return sVec.size();
-    }
+    uint8_t slotCount() const { return sVec.size(); }
 
     bool processLocked()
     {
         if (inProcess)
             return true;
-
         inProcess = true;
         return false;
     }
@@ -1792,10 +1787,7 @@ public:
 
     bool networkStatus() { return netStatus(); }
 
-    void asyncConnect(bool opt)
-    {
-        asyncCon = opt;
-    }
+    void asyncConnect(bool opt) { asyncCon = opt; }
 
     void stopAsync(bool all = false)
     {
@@ -1834,9 +1826,9 @@ public:
             client->stop();
     }
 
-    FirebaseError lastError() { return lastErr; }
+    FirebaseError lastError() const { return lastErr; }
 
-    String etag() { return resETag; }
+    String etag() const { return resETag; }
 
     void setETag(const String &etag) { reqEtag = etag; }
 };
