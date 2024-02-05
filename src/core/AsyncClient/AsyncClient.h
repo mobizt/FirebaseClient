@@ -1,5 +1,5 @@
 /**
- * Created February 5, 2024
+ * Created February 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -118,10 +118,12 @@ private:
         AsyncResult *refResult = nullptr;
         uint32_t ref_result_addr = 0;
         AsyncResultCallback cb = NULL;
-        unsigned long last_error_notify_ms = 0;
+        Timer err_timer;
         async_data_item_t()
         {
             addr = reinterpret_cast<uint32_t>(this);
+            err_timer.setInterval(0);
+            err_timer.start();
         }
 
         void setRefResult(AsyncResult *refResult)
@@ -129,23 +131,15 @@ private:
             this->refResult = refResult;
             ref_result_addr = refResult->addr;
         }
-
-        AsyncResult *getRefResult()
-        {
-            List vec;
-            if (vec.existed(rVec, ref_result_addr))
-                return refResult;
-            return nullptr;
-        }
     };
 
     FirebaseError lastErr;
     String reqEtag, resETag;
-    int8_t netErrState = 0;
+    int netErrState = 0;
     Client *client = nullptr;
     bool sse = false;
     bool asyncCon = false;
-    std::vector<uint32_t> sDV;
+    std::vector<uint32_t> sVec;
     Memory mem;
     network_config_data net;
     uint32_t addr = 0;
@@ -461,8 +455,8 @@ private:
 
     async_data_item_t *getData(uint8_t slot)
     {
-        if (slot < sDV.size())
-            return reinterpret_cast<async_data_item_t *>(sDV[slot]);
+        if (slot < sVec.size())
+            return reinterpret_cast<async_data_item_t *>(sVec[slot]);
         return nullptr;
     }
 
@@ -470,9 +464,9 @@ private:
     {
         async_data_item_t *sData = new async_data_item_t();
         if (index > -1)
-            sDV.insert(sDV.begin() + index, sData->addr);
+            sVec.insert(sVec.begin() + index, sData->addr);
         else
-            sDV.push_back(sData->addr);
+            sVec.push_back(sData->addr);
 
         return sData;
     }
@@ -481,13 +475,15 @@ private:
     {
 
         bool error_notify_timeout = false;
-        if (sData->last_error_notify_ms == 0 || millis() - sData->last_error_notify_ms > 5000)
+        if (sData->err_timer.remaining() == 0)
         {
-            sData->last_error_notify_ms = millis();
+            sData->err_timer.stop();
+            sData->err_timer.setInterval(5000);
+            sData->err_timer.start();
             error_notify_timeout = true;
         }
 
-        if (sData->getRefResult())
+        if (sData->refResult)
         {
             if (setData || error_notify_timeout)
             {
@@ -555,7 +551,7 @@ private:
 
         slot_remove++;
 
-        sDV.erase(sDV.begin() + slot);
+        sVec.erase(sVec.begin() + slot);
     }
 
     int readLine(Client *client, String &buf)
@@ -678,7 +674,6 @@ private:
         if (sData->response.httpCode > 0)
             return false;
 
-        sData->response.dataTime = millis();
         sData->response.header.reserve(1024);
 
         // the first chunk (line) can be http response status or already connected stream payload
@@ -1306,9 +1301,11 @@ private:
         else
             ETH_MODULE_CLASS.begin(net.ethernet.ethernet_mac);
 
-        unsigned long to = millis();
+        net.eth_timer.stop();
+        net.eth_timer.setInterval(FIREBASE_ETHERNET_MODULE_TIMEOUT);
+        net.eth_timer.start();
 
-        while (ETH_MODULE_CLASS.linkStatus() == LinkOFF && millis() - to < FIREBASE_ETHERNET_MODULE_TIMEOUT)
+        while (ETH_MODULE_CLASS.linkStatus() == LinkOFF && net.eth_timer.remaining() > 0)
         {
             delay(100);
         }
@@ -1351,12 +1348,14 @@ private:
         {
             bool recon = net.reconnect;
 
-            if (net.wifi && net.net_reconnect_ms == 0)
+            if (net.wifi && net.net_timer.remaining() == 0)
                 recon = true;
 
-            if (recon && (millis() - net.net_reconnect_ms > net.net_reconnect_timeout || net.net_reconnect_ms == 0))
+            if (recon && (net.net_timer.remaining() == 0))
             {
-                net.net_reconnect_ms = millis();
+                net.net_timer.stop();
+                net.net_timer.setInterval(FIREBASE_NET_RECONNECT_TIMEOUT_SEC);
+                net.net_timer.start();
 
                 if (net.network_data_type == firebase_network_data_generic_network)
                 {
@@ -1442,7 +1441,7 @@ private:
         else
         {
             int sse_index = -1, auth_index = -1;
-            for (size_t i = 0; i < sDV.size(); i++)
+            for (size_t i = 0; i < sVec.size(); i++)
             {
                 if (getData(i))
                 {
@@ -1459,10 +1458,10 @@ private:
                 slot = sse_index;
 
             // Multiple SSE modes
-            if ((sse_index > -1 && options.sse) || sDV.size() >= FIREBASE_ASYNC_QUEUE_LIMIT)
+            if ((sse_index > -1 && options.sse) || sVec.size() >= FIREBASE_ASYNC_QUEUE_LIMIT)
                 slot = -2;
 
-            if (slot >= (int)sDV.size())
+            if (slot >= (int)sVec.size())
                 slot = -1;
         }
 
@@ -1572,7 +1571,7 @@ private:
 
     uint8_t slotCount()
     {
-        return sDV.size();
+        return sVec.size();
     }
 
     bool processLocked()
@@ -1786,16 +1785,16 @@ public:
     {
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
-        List vec;
-        vec.addRemoveList(cVec, addr, true);
+        List list;
+        list.addRemoveList(cVec, addr, true);
     }
 
     ~AsyncClient()
     {
-        for (size_t i = 0; i < sDV.size(); i++)
+        for (size_t i = 0; i < sVec.size(); i++)
             reset(getData(i), true);
-        List vec;
-        vec.addRemoveList(cVec, addr, false);
+        List list;
+        list.addRemoveList(cVec, addr, false);
     }
 
     bool networkStatus() { return netStatus(); }

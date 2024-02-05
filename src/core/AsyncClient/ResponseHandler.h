@@ -1,5 +1,5 @@
 /**
- * Created February 4, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -84,7 +84,6 @@ public:
     size_t payloadLen = 0;
     size_t payloadRead = 0;
     auth_error_t error;
-    unsigned long dataTime = 0;
     uint8_t *toFill = nullptr;
     uint16_t toFillLen = 0;
     uint16_t toFillIndex = 0;

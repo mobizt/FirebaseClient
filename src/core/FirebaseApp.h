@@ -43,7 +43,7 @@ namespace firebase
     class FirebaseApp
     {
         friend class FirebaseClient;
-        //friend class Database;
+        // friend class Database;
         friend class Firestore;
         friend class Functions;
         friend class Messaging;
@@ -59,10 +59,8 @@ namespace firebase
         AsyncResultCallback resultCb = NULL;
         AsyncResult aResult;
         AuthRequest authReq;
-        Timer timer;
+        Timer auth_timer, err_timer;
         List vec;
-        unsigned long last_error_ms = 0;
-        unsigned long last_auth_ms = 0;
         bool processing = false;
         uint32_t expire = 3600;
 
@@ -212,12 +210,11 @@ namespace firebase
 
             if (event == auth_event_error)
             {
-                last_error_ms = millis();
-                timer.stop();
+                err_timer.stop();
+                err_timer.setInterval(5);
+                err_timer.start();
+                auth_timer.stop();
             }
-
-            if (event == auth_event_ready)
-                last_auth_ms = millis();
 
             authReq.setEventResult(aResult, auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
 
@@ -265,7 +262,7 @@ namespace firebase
                 }
             }
 
-            if (auth_data.user_auth.status._event == auth_event_uninitialized && millis() - last_error_ms < 5000)
+            if (auth_data.user_auth.status._event == auth_event_uninitialized && err_timer.remaining() > 0)
                 return false;
 
             if (auth_data.user_auth.auth_type == auth_access_token ||
@@ -449,7 +446,7 @@ namespace firebase
             if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
             {
 
-                if (aResult.error().code() != 0 || millis() - authReq.request_sent_ms > (FIREBASE_TCP_READ_TIMEOUT_SEC * 1000))
+                if (aResult.error().code() != 0 || authReq.req_timer.remaining() == 0)
                 {
                     setEvent(auth_event_error);
                     return false;
@@ -465,8 +462,8 @@ namespace firebase
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
                         auth_data.app_token.expire = 3600;
-                        timer.setInterval(3600);
-                        timer.start();
+                        auth_timer.setInterval(3600);
+                        auth_timer.start();
                         setEvent(auth_event_ready);
                         return true;
                     }
@@ -476,12 +473,11 @@ namespace firebase
 
                     if (parseToken())
                     {
-                        timer.setInterval(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
-                        timer.start();
+                        auth_timer.setInterval(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
+                        auth_timer.start();
                         auth_data.app_token.authenticated = true;
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
-                        last_auth_ms = millis();
                         setEvent(auth_event_ready);
                     }
                     else
@@ -548,12 +544,12 @@ namespace firebase
 
         bool isExpired()
         {
-            return timer.remaining() == 0;
+            return auth_timer.remaining() == 0;
         }
 
         unsigned long ttl()
         {
-            return timer.remaining();
+            return auth_timer.remaining();
         }
 
         void setCallback(AsyncResultCallback cb)

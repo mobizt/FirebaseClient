@@ -1,5 +1,5 @@
 /**
- * Created February 4, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -29,6 +29,8 @@
 #include "./Config.h"
 #include "./core/Network.h"
 #include "./core/Memory.h"
+
+#define FIREBASE_NET_RECONNECT_TIMEOUT_SEC 10000
 
 struct network_config_data
 {
@@ -117,8 +119,8 @@ private:
     bool reconnect = true;
     FirebaseWiFi *wifi = nullptr;
     SPI_ETH_Module *eth = NULL;
-    unsigned long net_reconnect_ms = 0;
-    unsigned long net_reconnect_timeout = 10000;
+    Timer net_timer;
+    Timer eth_timer;
 
 public:
     ~network_config_data() { clear(); }
@@ -142,8 +144,8 @@ public:
         this->reconnect = rhs.reconnect;
         this->wifi = rhs.wifi;
         this->eth = rhs.eth;
-        this->net_reconnect_ms = rhs.net_reconnect_ms;
-        this->net_reconnect_timeout = rhs.net_reconnect_timeout;
+        this->net_timer = rhs.net_timer;
+        this->net_timer.start();
     }
 
     void clear()
@@ -157,8 +159,8 @@ public:
         reconnect = true;
         wifi = nullptr;
         eth = NULL;
-        net_reconnect_ms = 0;
-        net_reconnect_timeout = 10000;
+        net_timer.stop();
+        net_timer.setInterval(0);
     }
 };
 

@@ -25,6 +25,9 @@
 
 #ifndef FIREBASE_CLIENT_H
 #define FIREBASE_CLIENT_H
+
+#define FIREBASE_CLIENT_VERSION "0.0.21"
+
 #include <Arduino.h>
 #include "core/FirebaseApp.h"
 
@@ -68,8 +71,6 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.0.20"
-
 using namespace firebase;
 
 namespace firebase
@@ -93,11 +94,14 @@ namespace firebase
 
         void resetTimer(FirebaseApp &app, bool start, int interval = 0, int exp = -1)
         {
-            app.timer.stop();
-            app.timer.setInterval(interval);
+            app.err_timer.setInterval(0);
+            app.err_timer.start();
+
+            app.auth_timer.stop();
+            app.auth_timer.setInterval(interval);
             app.expire = exp == -1 ? interval : exp;
             if (start)
-                app.timer.start();
+                app.auth_timer.start();
         }
 
     public:

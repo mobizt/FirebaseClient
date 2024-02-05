@@ -28,6 +28,7 @@
 #include "./core/AsyncClient/AsyncClient.h"
 #include "./core/JSON.h"
 #include "./core/JWT.h"
+#include "./core/Timer.h"
 
 class AuthRequest
 {
@@ -37,8 +38,7 @@ private:
 public:
     AuthRequest(){};
     ~AuthRequest(){};
-
-    unsigned long request_sent_ms = 0;
+    Timer req_timer;
     uint16_t slot = 0;
 
     void asyncRequest(AsyncClient *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult, const String &uid)
@@ -56,8 +56,10 @@ public:
             sData->request.payload = payload;
             aClient->setContentLength(sData, sData->request.payload.length());
             sData->setRefResult(&aResult);
-            request_sent_ms = millis();
-            slot = aClient->sDV.size() - 1;
+            req_timer.stop();
+            req_timer.setInterval(FIREBASE_TCP_READ_TIMEOUT_SEC);
+            req_timer.start();
+            slot = aClient->sVec.size() - 1;
             aClient->process(sData->async);
             aClient->handleRemove();
         }
@@ -92,7 +94,7 @@ public:
 
     FirebaseError err()
     {
-        if (sData && sData->getRefResult())
+        if (sData && sData->refResult)
             return sData->refResult->error();
         return FirebaseError();
     }
