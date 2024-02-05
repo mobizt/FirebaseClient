@@ -1,5 +1,5 @@
 /**
- * Created January 31, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -57,8 +57,8 @@ public:
 
     app_token_t *appToken()
     {
-        List list;
-        return list.existed(firebase_app_list, app_addr) ? app_token : nullptr;
+        List vec;
+        return vec.existed(aVec, app_addr) ? app_token : nullptr;
     }
 
     ~Database()
@@ -835,9 +835,9 @@ public:
      */
     void loop()
     {
-        for (size_t clientSlot = 0; clientSlot < firebase_client_list.size(); clientSlot++)
+        for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(firebase_client_list[clientSlot]);
+            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(cVec[i]);
             if (aClient)
             {
                 aClient->process(true);
@@ -906,7 +906,7 @@ private:
         String extras = auth_param ? ".json?auth=" + String(FIREBASE_AUTH_PLACEHOLDER) : ".json";
 
         addParams(auth_param, extras, request.method, request.options, request.file);
-        AsyncClient::async_data_item_t *sData = request.aClient->newSlot(firebase_client_list, service_url, request.path, extras, request.method, request.opt, request.uid);
+        AsyncClient::async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
 
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
@@ -937,11 +937,9 @@ private:
 
         if (request.cb)
             sData->cb = request.cb;
+
         if (request.aResult)
-        {
-            sData->refResult = request.aResult;
-            sData->ref_result_addr = request.aResult->addr;
-        }
+            sData->setRefResult(request.aResult);
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();

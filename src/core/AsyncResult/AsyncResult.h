@@ -1,9 +1,9 @@
 /**
- * Created February 1, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
- *
+ *4
  *
  * Permission is hereby granted, free of charge, to any person returning a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -272,13 +272,13 @@ public:
     {
         database.ref_payload = &data_payload;
         addr = reinterpret_cast<uint32_t>(this);
-        List list;
-        list.addRemoveList(firebase_result_list, addr, true);
+        List vec;
+        vec.addRemoveList(rVec, addr, true);
     };
     ~AsyncResult()
     {
-        List list;
-        list.addRemoveList(firebase_result_list, addr, false);
+        List vec;
+        vec.addRemoveList(rVec, addr, false);
     };
 
     String payload() { return data_payload; }

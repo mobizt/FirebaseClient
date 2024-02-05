@@ -1,5 +1,5 @@
 /**
- * Created February 4, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -43,7 +43,7 @@ namespace firebase
     class FirebaseApp
     {
         friend class FirebaseClient;
-        friend class Database;
+        //friend class Database;
         friend class Firestore;
         friend class Functions;
         friend class Messaging;
@@ -60,7 +60,7 @@ namespace firebase
         AsyncResult aResult;
         AuthRequest authReq;
         Timer timer;
-        List list;
+        List vec;
         unsigned long last_error_ms = 0;
         unsigned long last_auth_ms = 0;
         bool processing = false;
@@ -498,11 +498,11 @@ namespace firebase
         FirebaseApp()
         {
             app_addr = reinterpret_cast<uint32_t>(this);
-            list.addRemoveList(firebase_app_list, app_addr, true);
+            vec.addRemoveList(aVec, app_addr, true);
         };
         ~FirebaseApp()
         {
-            list.addRemoveList(firebase_app_list, app_addr, false);
+            vec.addRemoveList(aVec, app_addr, false);
         };
 
         bool isInitialized()
@@ -559,11 +559,6 @@ namespace firebase
         void setCallback(AsyncResultCallback cb)
         {
             this->resultCb = cb;
-        }
-
-        AsyncResult getResult()
-        {
-            return aResult;
         }
     };
 };

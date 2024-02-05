@@ -1,5 +1,5 @@
 /**
- * Created February 2, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,9 +30,9 @@ using namespace std;
 
 namespace firebase
 {
-    static vector<uint32_t> firebase_app_list;
-    static vector<uint32_t> firebase_client_list;
-    static vector<uint32_t> firebase_result_list;
+    static vector<uint32_t> aVec; // FirebaseApp vector
+    static vector<uint32_t> cVec; // AsyncClient vector
+    static vector<uint32_t> rVec; // AsyncResult vector
     static int slot_add = 0;
     static int slot_remove = 0;
 
@@ -43,27 +43,27 @@ namespace firebase
         List(){};
         ~List(){};
 
-        void addRemoveList(vector<uint32_t> &list, uint32_t addr, bool add)
+        void addRemoveList(vector<uint32_t> &vec, uint32_t addr, bool add)
         {
-            for (size_t i = 0; i < list.size(); i++)
+            for (size_t i = 0; i < vec.size(); i++)
             {
-                if (list[i] == addr)
+                if (vec[i] == addr)
                 {
                     if (add)
                         return;
                     else
-                        list.erase(list.begin() + i);
+                        vec.erase(vec.begin() + i);
                 }
             }
             if (add)
-                list.push_back(addr);
+                vec.push_back(addr);
         }
 
-        bool existed(vector<uint32_t> &list, uint32_t addr)
+        bool existed(vector<uint32_t> &vec, uint32_t addr)
         {
-            for (size_t i = 0; i < list.size(); i++)
+            for (size_t i = 0; i < vec.size(); i++)
             {
-                if (list[i] == addr)
+                if (vec[i] == addr)
                     return true;
             }
             return false;

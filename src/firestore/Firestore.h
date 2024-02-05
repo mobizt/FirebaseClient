@@ -1,5 +1,5 @@
 /**
- * Created February 1, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -153,8 +153,8 @@ public:
 
     app_token_t *appToken()
     {
-        List list;
-        return list.existed(firebase_app_list, app_addr) ? app_token : nullptr;
+        List vec;
+        return vec.existed(aVec, app_addr) ? app_token : nullptr;
     }
 
     /** Export the documents in the database to the Firebase Storage data bucket.
@@ -363,7 +363,7 @@ public:
      * @param aClient The async client.
      * @param projectId The Firebase project id (only the name without the firebaseio.com).
      * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
-     * @param documentPaths The list of relative path of documents to get. Use comma (,) to separate between the field names.
+     * @param documentPaths The vec of relative path of documents to get. Use comma (,) to separate between the field names.
      * @param mask The fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
      * that field will not be returned in the response. Use comma (,) to separate between the field names.
      *@param batchOperationCallback The callback fuction that accepts const char* as argument.
@@ -503,7 +503,7 @@ public:
      * @param orderBy The order to sort results by. For example: priority desc, name.
      * @param mask The fields to return. If not set, returns all fields.
      * If a document has a field that is not present in this mask, that field will not be returned in the response.
-     * @param showMissing If the list should show missing documents.
+     * @param showMissing If the vec should show missing documents.
      * A missing document is a document that does not exist but has sub-documents.
      *
      * @return Boolean value, indicates the success of the operation.
@@ -513,8 +513,8 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication (when showMissing is true).
      *
      */
-    bool listDocuments(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &pageSize,
-                       const String &pageToken, const String &orderBy, const String &mask, bool showMissing)
+    bool vecDocuments(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &pageSize,
+                      const String &pageToken, const String &orderBy, const String &mask, bool showMissing)
     {
         return false;
     }
@@ -533,7 +533,7 @@ public:
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      */
-    bool listCollectionIds(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &pageSize, const String &pageToken)
+    bool vecCollectionIds(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &pageSize, const String &pageToken)
     {
         return false;
     }
@@ -597,7 +597,7 @@ public:
      * @param projectId The Firebase project id (only the name without the firebaseio.com).
      * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
      * @param collectionId The relative path of document colection.
-     * @param filter The filter to apply to list results.
+     * @param filter The filter to apply to vec results.
      * @param pageSize The number of results to return.
      * @param pageToken A page token, returned from a previous call to FirestoreAdmin.ListIndexes,
      * that may be used to get the next page of results.
@@ -608,10 +608,10 @@ public:
      *
      * This function requires OAuth2.0 authentication.
      *
-     * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/list
+     * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/vec
      *
      */
-    bool listIndex(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
+    bool vecIndex(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
     {
         return false;
     }
@@ -644,9 +644,9 @@ public:
      */
     void loop()
     {
-        for (size_t clientSlot = 0; clientSlot < firebase_client_list.size(); clientSlot++)
+        for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(firebase_client_list[clientSlot]);
+            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(cVec[i]);
             if (aClient)
             {
                 aClient->process(true);

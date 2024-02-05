@@ -1,5 +1,5 @@
 /**
- * Created January 31, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -49,16 +49,15 @@ public:
         String host;
         async_request_handler_t req;
         req.addGAPIsHost(host, subdomain.c_str());
-        sData = aClient->newSlot(firebase_client_list, host, extras, "", async_request_handler_t::http_post, AsyncClient::slot_options_t(true, false, true, false, false, false), uid);
+        sData = aClient->newSlot(cVec, host, extras, "", async_request_handler_t::http_post, AsyncClient::slot_options_t(true, false, true, false, false, false), uid);
         if (sData)
         {
             req.addContentTypeHeader(sData->request.header, "application/json");
             sData->request.payload = payload;
             aClient->setContentLength(sData, sData->request.payload.length());
-            sData->refResult = &aResult;
-            sData->ref_result_addr = aResult.addr;
+            sData->setRefResult(&aResult);
             request_sent_ms = millis();
-            slot = aClient->aDataList.size() - 1;
+            slot = aClient->sDV.size() - 1;
             aClient->process(sData->async);
             aClient->handleRemove();
         }
@@ -93,7 +92,7 @@ public:
 
     FirebaseError err()
     {
-        if (sData)
+        if (sData && sData->getRefResult())
             return sData->refResult->error();
         return FirebaseError();
     }

@@ -1,5 +1,5 @@
 /**
- * Created February 4, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -123,15 +123,29 @@ private:
         {
             addr = reinterpret_cast<uint32_t>(this);
         }
+
+        void setRefResult(AsyncResult *refResult)
+        {
+            this->refResult = refResult;
+            ref_result_addr = refResult->addr;
+        }
+
+        AsyncResult *getRefResult()
+        {
+            List vec;
+            if (vec.existed(rVec, ref_result_addr))
+                return refResult;
+            return nullptr;
+        }
     };
 
     FirebaseError lastErr;
     String reqEtag, resETag;
-    int netErrState = 0;
+    int8_t netErrState = 0;
     Client *client = nullptr;
     bool sse = false;
     bool asyncCon = false;
-    std::vector<uint32_t> aDataList;
+    std::vector<uint32_t> sDV;
     Memory mem;
     network_config_data net;
     uint32_t addr = 0;
@@ -447,8 +461,8 @@ private:
 
     async_data_item_t *getData(uint8_t slot)
     {
-        if (slot < aDataList.size())
-            return reinterpret_cast<async_data_item_t *>(aDataList[slot]);
+        if (slot < sDV.size())
+            return reinterpret_cast<async_data_item_t *>(sDV[slot]);
         return nullptr;
     }
 
@@ -456,9 +470,9 @@ private:
     {
         async_data_item_t *sData = new async_data_item_t();
         if (index > -1)
-            aDataList.insert(aDataList.begin() + index, sData->addr);
+            sDV.insert(sDV.begin() + index, sData->addr);
         else
-            aDataList.push_back(sData->addr);
+            sDV.push_back(sData->addr);
 
         return sData;
     }
@@ -473,7 +487,7 @@ private:
             error_notify_timeout = true;
         }
 
-        if (sData->refResult)
+        if (sData->getRefResult())
         {
             if (setData || error_notify_timeout)
             {
@@ -541,7 +555,7 @@ private:
 
         slot_remove++;
 
-        aDataList.erase(aDataList.begin() + slot);
+        sDV.erase(sDV.begin() + slot);
     }
 
     int readLine(Client *client, String &buf)
@@ -1428,7 +1442,7 @@ private:
         else
         {
             int sse_index = -1, auth_index = -1;
-            for (size_t i = 0; i < aDataList.size(); i++)
+            for (size_t i = 0; i < sDV.size(); i++)
             {
                 if (getData(i))
                 {
@@ -1445,10 +1459,10 @@ private:
                 slot = sse_index;
 
             // Multiple SSE modes
-            if ((sse_index > -1 && options.sse) || aDataList.size() >= FIREBASE_ASYNC_QUEUE_LIMIT)
+            if ((sse_index > -1 && options.sse) || sDV.size() >= FIREBASE_ASYNC_QUEUE_LIMIT)
                 slot = -2;
 
-            if (slot >= (int)aDataList.size())
+            if (slot >= (int)sDV.size())
                 slot = -1;
         }
 
@@ -1558,7 +1572,7 @@ private:
 
     uint8_t slotCount()
     {
-        return aDataList.size();
+        return sDV.size();
     }
 
     bool processLocked()
@@ -1772,16 +1786,16 @@ public:
     {
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
-        List list;
-        list.addRemoveList(firebase_client_list, addr, true);
+        List vec;
+        vec.addRemoveList(cVec, addr, true);
     }
 
     ~AsyncClient()
     {
-        for (size_t i = 0; i < aDataList.size(); i++)
+        for (size_t i = 0; i < sDV.size(); i++)
             reset(getData(i), true);
-        List list;
-        list.addRemoveList(firebase_client_list, addr, false);
+        List vec;
+        vec.addRemoveList(cVec, addr, false);
     }
 
     bool networkStatus() { return netStatus(); }

@@ -1,5 +1,5 @@
 /**
- * Created February 4, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -72,8 +72,8 @@ public:
 
     app_token_t *appToken()
     {
-        List list;
-        return list.existed(firebase_app_list, app_addr) ? app_token : nullptr;
+        List vec;
+        return vec.existed(aVec, app_addr) ? app_token : nullptr;
     }
 
     /**
@@ -82,9 +82,9 @@ public:
      */
     void loop()
     {
-        for (size_t clientSlot = 0; clientSlot < firebase_client_list.size(); clientSlot++)
+        for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(firebase_client_list[clientSlot]);
+            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(cVec[i]);
             if (aClient)
             {
                 aClient->process(true);
