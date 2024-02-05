@@ -973,7 +973,7 @@ private:
         if (sData->response.payloadLen > 0 && sData->response.payloadRead >= sData->response.payloadLen)
         {
             // Async payload and header data collision workaround from session reusage.
-            if (sData->response.payloadRead > sData->response.payloadLen)
+            if (!sData->response.flags.chunks && sData->response.payloadRead > sData->response.payloadLen)
             {
                 sData->response.header = sData->response.payload.substring(sData->response.payloadRead - sData->response.payloadLen);
                 sData->response.payload.remove(sData->response.payloadLen);
