@@ -26,7 +26,11 @@
 #ifndef FIREBASE_CLIENT_H
 #define FIREBASE_CLIENT_H
 
-#define FIREBASE_CLIENT_VERSION "0.0.21"
+#if defined(FIREBASE_CLIENT_VERSION)
+#undef FIREBASE_CLIENT_VERSION
+#endif
+
+#define FIREBASE_CLIENT_VERSION "0.0.22"
 
 #include <Arduino.h>
 #include "core/FirebaseApp.h"
@@ -67,9 +71,7 @@
 #endif
 #endif
 
-#if defined(FIREBASE_CLIENT_VERSION)
-#undef FIREBASE_CLIENT_VERSION
-#endif
+
 
 using namespace firebase;
 
