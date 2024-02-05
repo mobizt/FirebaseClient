@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -51,7 +51,28 @@ public:
     object_t(const String &o) { buf = o; }
     const char *c_str() const { return buf.c_str(); }
     object_t(const char *o) { buf = o; }
-    size_t printTo(Print &p) const{return p.print(buf.c_str());}
+
+    object_t &operator+=(const String &rval)
+    {
+        buf += rval;
+        return *this;
+    }
+
+    object_t &operator+=(const object_t &rval)
+    {
+        buf += rval.c_str();
+        return *this;
+    }
+
+    object_t &operator+=(const char rval)
+    {
+        buf += rval;
+        return *this;
+    }
+
+    size_t length() const { return buf.length(); }
+    object_t substring(unsigned int beginIndex, unsigned int endIndex) const { return buf.substring(beginIndex, endIndex); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
 struct string_t : public Printable
@@ -67,8 +88,8 @@ public:
         buf += v;
         buf += "\"";
     }
-    const char *c_str() const{ return buf.c_str(); }
-    size_t printTo(Print &p) const{return p.print(buf.c_str());}
+    const char *c_str() const { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
 struct boolean_t : public Printable
@@ -84,11 +105,11 @@ private:
 public:
     boolean_t() {}
     boolean_t(bool v) { buf = v ? "true" : "false"; }
-    const char *c_str() const{ return buf.c_str(); }
-    size_t printTo(Print &p) const{return p.print(buf.c_str());}
+    const char *c_str() const { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
-struct number_t: public Printable
+struct number_t : public Printable
 {
 private:
     String buf;
@@ -99,8 +120,8 @@ public:
     number_t(T1 v, T d) { buf = String(v, d); }
     template <typename T = int>
     number_t(T o) { buf = String(o); }
-    const char *c_str() const{ return buf.c_str(); }
-    size_t printTo(Print &p) const{return p.print(buf.c_str());}
+    const char *c_str() const { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
 class ValueConverter

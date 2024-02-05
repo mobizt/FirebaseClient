@@ -71,8 +71,6 @@
 #endif
 #endif
 
-
-
 using namespace firebase;
 
 namespace firebase
