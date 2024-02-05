@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -61,6 +61,13 @@ public:
         loop();
         period = sec;
         reset();
+    }
+
+    void feed(unsigned long sec)
+    {
+      stop();
+      setInterval(sec);
+      start();
     }
 
     void loop()

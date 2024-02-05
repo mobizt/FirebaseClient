@@ -102,9 +102,7 @@ public:
 
     void feedTimer(int interval = -1)
     {
-        read_timer.stop();
-        read_timer.setInterval(interval == -1 ? FIREBASE_TCP_READ_TIMEOUT_SEC : interval);
-        read_timer.start();
+        read_timer.feed(interval == -1 ? FIREBASE_TCP_READ_TIMEOUT_SEC : interval);
     }
 };
 

@@ -210,9 +210,7 @@ namespace firebase
 
             if (event == auth_event_error)
             {
-                err_timer.stop();
-                err_timer.setInterval(5);
-                err_timer.start();
+                err_timer.feed(5);
                 auth_timer.stop();
             }
 
@@ -462,8 +460,7 @@ namespace firebase
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
                         auth_data.app_token.expire = 3600;
-                        auth_timer.setInterval(3600);
-                        auth_timer.start();
+                        auth_timer.feed(3600);
                         setEvent(auth_event_ready);
                         return true;
                     }
@@ -473,8 +470,7 @@ namespace firebase
 
                     if (parseToken())
                     {
-                        auth_timer.setInterval(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
-                        auth_timer.start();
+                        auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         auth_data.app_token.authenticated = true;
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;

@@ -56,9 +56,7 @@ public:
             sData->request.payload = payload;
             aClient->setContentLength(sData, sData->request.payload.length());
             sData->setRefResult(&aResult);
-            req_timer.stop();
-            req_timer.setInterval(FIREBASE_TCP_READ_TIMEOUT_SEC);
-            req_timer.start();
+            req_timer.feed(FIREBASE_TCP_READ_TIMEOUT_SEC);
             slot = aClient->sVec.size() - 1;
             aClient->process(sData->async);
             aClient->handleRemove();

@@ -122,8 +122,7 @@ private:
         async_data_item_t()
         {
             addr = reinterpret_cast<uint32_t>(this);
-            err_timer.setInterval(0);
-            err_timer.start();
+            err_timer.feed(0);
         }
 
         void setRefResult(AsyncResult *refResult)
@@ -477,9 +476,7 @@ private:
         bool error_notify_timeout = false;
         if (sData->err_timer.remaining() == 0)
         {
-            sData->err_timer.stop();
-            sData->err_timer.setInterval(5000);
-            sData->err_timer.start();
+            sData->err_timer.feed(5000);
             error_notify_timeout = true;
         }
 
@@ -1301,9 +1298,7 @@ private:
         else
             ETH_MODULE_CLASS.begin(net.ethernet.ethernet_mac);
 
-        net.eth_timer.stop();
-        net.eth_timer.setInterval(FIREBASE_ETHERNET_MODULE_TIMEOUT);
-        net.eth_timer.start();
+        net.eth_timer.feed(FIREBASE_ETHERNET_MODULE_TIMEOUT);
 
         while (ETH_MODULE_CLASS.linkStatus() == LinkOFF && net.eth_timer.remaining() > 0)
         {
@@ -1353,9 +1348,7 @@ private:
 
             if (recon && (net.net_timer.remaining() == 0))
             {
-                net.net_timer.stop();
-                net.net_timer.setInterval(FIREBASE_NET_RECONNECT_TIMEOUT_SEC);
-                net.net_timer.start();
+                net.net_timer.feed(FIREBASE_NET_RECONNECT_TIMEOUT_SEC);
 
                 if (net.network_data_type == firebase_network_data_generic_network)
                 {

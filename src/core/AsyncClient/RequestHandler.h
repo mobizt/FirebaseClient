@@ -236,9 +236,7 @@ public:
 
     void feedTimer(int interval = -1)
     {
-        send_timer.stop();
-        send_timer.setInterval(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval);
-        send_timer.start();
+        send_timer.feed(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval);
     }
 };
 
