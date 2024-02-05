@@ -521,7 +521,6 @@ private:
 
     void removeSlot(uint8_t slot)
     {
-
         async_data_item_t *sData = getData(slot);
 
         if (!sData)
@@ -532,22 +531,16 @@ private:
 #endif
 
         closeFile(sData);
-
         setLastError(sData);
         // data available from sync and asyn request except for sse
         returnResult(sData, true);
-
         setLastError(sData);
         // data available from sync and asyn request except for sse
         returnResult(sData, true);
-
         reset(sData, sData->auth_used);
 
         delete sData;
         sData = nullptr;
-
-        slot_remove++;
-
         sVec.erase(sVec.begin() + slot);
     }
 
@@ -1470,9 +1463,6 @@ private:
 
         async_request_handler_t req;
         async_data_item_t *sData = addSlot(slot_index);
-
-        slot_add++;
-
         sData->async = options.async;
         sData->request.url = url;
         sData->request.path = path;
@@ -1779,8 +1769,16 @@ public:
 
     ~AsyncClient()
     {
+        stop();
+
         for (size_t i = 0; i < sVec.size(); i++)
+        {
             reset(getData(i), true);
+            async_data_item_t *sData = getData(i);
+            delete sData;
+            sData = nullptr;
+        }
+
         List list;
         list.addRemoveList(cVec, addr, false);
     }

@@ -33,9 +33,7 @@ namespace firebase
     static vector<uint32_t> aVec; // FirebaseApp vector
     static vector<uint32_t> cVec; // AsyncClient vector
     static vector<uint32_t> rVec; // AsyncResult vector
-    static int slot_add = 0;
-    static int slot_remove = 0;
-
+    
     class List
     {
     private:
