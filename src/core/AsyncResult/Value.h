@@ -84,7 +84,10 @@ public:
     string_t(T v)
     {
         aq(true);
-        buf += v;
+        if (is_same<T, bool>::value)
+            buf += v ? FPSTR("true") : FPSTR("false");
+        else
+            buf += v;
         aq();
     }
     string_t(number_t v)
@@ -157,6 +160,8 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 
 private:
+    explicit operator bool() const { return buf.length() > 0; }
+
     template <typename T = String>
     object_t &operator+=(const T &rval)
     {

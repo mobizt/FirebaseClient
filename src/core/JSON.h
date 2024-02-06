@@ -70,18 +70,13 @@ public:
         buf += '"';
         return buf;
     }
-
 };
 
 class JsonWriter
 {
 
 private:
-public:
-    JsonWriter(){};
-    ~JsonWriter(){};
-
-    void create(const String &path, object_t &o, const String &value)
+    int prek(object_t &obj, const String &path)
     {
         StringHelper sh;
         char *p = new char[path.length() + 1];
@@ -91,7 +86,7 @@ public:
         char *end = p;
         String tmp;
         int i = 0;
-        o = "{";
+        obj = "{";
         while (pp != NULL)
         {
             sh.strsepImpl(&end, "/");
@@ -99,49 +94,70 @@ public:
             {
                 tmp = pp;
                 if (i > 0)
-                    o += '{';
-                o += '"';
-                o += tmp;
-                o += '"';
-                o += ':';
+                    obj += '{';
+                obj += '"';
+                obj += tmp;
+                obj += '"';
+                obj += ':';
                 i++;
             }
             pp = end;
         }
 
         delete p;
-
-        o += value;
-        for (int j = 0; j < i; j++)
-            o += '}';
+        return i;
     }
-
-    void create(object_t &o, const String &path, object_t &value)
+    void ek(object_t &obj, int i)
     {
-        create(path, o, value.c_str());
+        for (int j = 0; j < i; j++)
+            obj += '}';
     }
 
-    void join(object_t &o, int nunArgs, ...)
+public:
+    JsonWriter(){};
+    ~JsonWriter(){};
+
+    template <typename T>
+    auto create(object_t &obj, const String &path, T value) -> typename std::enable_if<!is_same<T, object_t>::value && !is_same<T, string_t>::value && !is_same<T, number_t>::value && !is_same<T, boolean_t>::value, void>::type
+    {
+        int i = prek(obj, path);
+        if (ValueConverter::is_string<T>::value)
+            obj += "\"";
+        obj += value;
+        if (ValueConverter::is_string<T>::value)
+            obj += "\"";
+        ek(obj, i);
+    }
+
+    template <typename T>
+    auto create(object_t &obj, const String &path, T value) -> typename std::enable_if<is_same<T, object_t>::value || is_same<T, string_t>::value || is_same<T, number_t>::value || is_same<T, boolean_t>::value, void>::type
+    {
+        int i = prek(obj, path);
+        obj += value.c_str();
+        ek(obj, i);
+    }
+
+    void join(object_t &obj, int nunArgs, ...)
     {
         bool arr = false;
-        if (strcmp(o.c_str(), "[]") == 0)
+        if (strcmp(obj.c_str(), "[]") == 0)
             arr = true;
-        o = "";
-        o += !arr ? '{' : '[';
-
+        obj = "";
+        obj += !arr ? '{' : '[';
         va_list ap;
         va_start(ap, nunArgs);
         object_t p = va_arg(ap, object_t);
-
-        o += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
+        if (p)
+            obj += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
         for (int i = 2; i <= nunArgs; i++)
         {
-            o += ',';
+            obj += ',';
             p = va_arg(ap, object_t);
-            o += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
+            if (p)
+                obj += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
         }
         va_end(ap);
-        o += !arr ? '}' : ']';
+        obj += !arr ? '}' : ']';
     }
 };
 
