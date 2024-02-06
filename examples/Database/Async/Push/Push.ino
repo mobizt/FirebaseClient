@@ -204,7 +204,9 @@ void setup()
     writer.join(obj4, 3 /* no. of object_t (s) to join */, obj1, obj2, obj3);
     writer.create(json, "node/list", obj4);
 
-    Serial.println(json);
+    // To print object_t
+    // Serial.println(json);
+    
     database.push<object_t>(aClient, "/test/json", json, asyncCB);
 
     object_t arr("[]"); // initialize with [] to be used as array

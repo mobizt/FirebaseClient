@@ -198,8 +198,28 @@ void setup()
     // Set json
     database.set<object_t>(aClient, "/test/json", object_t("{\"data\":123}"), asyncCB);
 
+    // Library does not provide JSON parser library, the following JSON writer class will be used with
+    // object_t for simple demonstration.
+
+    object_t json, obj1, obj2, obj3, obj4;
+    JsonWriter writer;
+
+    writer.create(obj1, "int/value", 9999);
+    writer.create(obj2, "string/value", string_t("hello"));
+    writer.create(obj3, "float/value", number_t(123.456, 2));
+    writer.join(obj4, 3 /* no. of object_t (s) to join */, obj1, obj2, obj3);
+    writer.create(json, "node/list", obj4);
+    
+    // To print object_t
+    // Serial.println(json);
+    
+    database.set<object_t>(aClient, "/test/json", json, asyncCB);
+
+    object_t arr("[]"); // initialize with [] to be used as array
+    writer.join(arr, 4 /* no. of object_t (s) to join */, object_t("[12,34]"), object_t("[56,78]"), object_t(string_t("steve")), object_t(888));
+
     // Set array
-    database.set<object_t>(aClient, "/test/arr", object_t("[1, 2, 3, 4, 5, \"test\", true]"), asyncCB);
+    database.set<object_t>(aClient, "/test/arr", arr, asyncCB);
 
     // Set float
     database.set<number_t>(aClient, "/test/float", number_t(123.456, 2), asyncCB);
