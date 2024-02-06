@@ -125,7 +125,7 @@ public:
     auto get(AsyncClient &aClient, const String &path, DataOptions &options) -> typename enable_if<!is_same<T1, void>::value && !is_same<T1, AsyncResult>::value, T1>::type
     {
         AsyncResult result;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, false, false, false, options.shallow), &options, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClient::slot_options_t(false, false, false, false, false, false, options.shallow), &options, nullptr, &result, NULL);
         asyncRequest(aReq);
         return result.database.to<T1>();
     }
@@ -588,7 +588,7 @@ public:
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, nullptr, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq, payload.c_str());
     }
 
@@ -617,7 +617,7 @@ public:
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true), nullptr, nullptr, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq, payload.c_str());
     }
 
@@ -664,7 +664,7 @@ public:
      */
     void push(AsyncClient &aClient, const String &path, file_config_data file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, &aResult, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -712,7 +712,7 @@ public:
      */
     void push(AsyncClient &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClient::slot_options_t(false, false, true, false, false, false), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
