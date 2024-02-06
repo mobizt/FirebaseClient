@@ -212,6 +212,9 @@ void setup()
     object_t arr("[]"); // initialize with [] to be used as array
     writer.join(arr, 4 /* no. of object_t (s) to join */, object_t("[12,34]"), object_t("[56,78]"), object_t(string_t("steve")), object_t(888));
 
+    // Note that value that sets to object_t other than JSON ({}) and Array ([]) can be valid only if it 
+    // used as array member value as above i.e. object_t(string_t("steve")) and object_t(888).
+
     // Push array
     database.push<object_t>(aClient, "/test/arr", arr, asyncCB);
 
