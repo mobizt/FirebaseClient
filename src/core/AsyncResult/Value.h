@@ -122,6 +122,7 @@ public:
 
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 
 private:
     void sap()
@@ -158,36 +159,25 @@ public:
     object_t(string_t o) { buf = o.c_str(); }
     object_t(bool o) { buf = o ? FPSTR("true") : FPSTR("false"); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 
 private:
     explicit operator bool() const { return buf.length() > 0; }
 
     template <typename T = String>
-    object_t &operator+=(const T &rval)
+    auto operator+=(const T &rval) -> typename std::enable_if<!is_same<T, object_t>::value && !is_same<T, string_t>::value && !is_same<T, number_t>::value && !is_same<T, boolean_t>::value, object_t &>::type
     {
         buf += rval;
         return *this;
     }
-    object_t &operator+=(const object_t &rval)
+
+    template <typename T>
+    auto operator+=(const T &rval) -> typename std::enable_if<is_same<T, object_t>::value || is_same<T, string_t>::value || is_same<T, number_t>::value || is_same<T, boolean_t>::value, object_t &>::type
     {
         buf += rval.c_str();
         return *this;
     }
-    object_t &operator+=(const number_t &rval)
-    {
-        buf += rval.c_str();
-        return *this;
-    }
-    object_t &operator+=(const string_t &rval)
-    {
-        buf += rval.c_str();
-        return *this;
-    }
-    object_t &operator+=(const boolean_t &rval)
-    {
-        buf += rval.c_str();
-        return *this;
-    }
+
     size_t length() const { return buf.length(); }
     object_t substring(unsigned int beginIndex, unsigned int endIndex) const { return buf.substring(beginIndex, endIndex); }
 };
