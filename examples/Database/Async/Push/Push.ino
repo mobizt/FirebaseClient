@@ -213,8 +213,6 @@ void setup()
     // Push array
     database.push<object_t>(aClient, "/test/arr", arr, asyncCB);
 
-
-
     // Push float
     database.push<number_t>(aClient, "/test/float", number_t(123.456, 2), asyncCB);
 
