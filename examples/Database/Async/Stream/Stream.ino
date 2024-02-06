@@ -81,6 +81,50 @@
  * aClient.stopAsync(true);
  */
 
+/**
+ * The AsyncResult object in the AsyncResultCallback function provides the result of async and non-async operations.
+ *
+ * APP EVENT
+ * ===========
+ *
+ * The event information can be obtained from aResult.appEvent().code() and aResult.appEvent().message() respectively.
+ *
+ * The following event code (firebase_auth_event_type), auth_event_uninitialized, auth_event_initializing, auth_event_signup, auth_event_send_verify_email,
+ * auth_event_delete_user, auth_event_reset_password, auth_event_token_signing, auth_event_authenticating, auth_event_auth_request_sent
+ * auth_event_auth_response_received, auth_event_ready and auth_event_error are available.
+ *
+ *
+ * The following event strings "undefined", "initializing", "sign up", "send verification email", "delete user", "reset password",
+ * "token signing", "authenticating", "auth request sent", "auth response received", "ready" and "error" are available.
+ *
+ * RESULT DATA
+ * ===========
+ *
+ * The result data can be obtained from AsyncResult object via aResult.payload(), aResult.available(), aResult.path(), aResult.etag()
+ * aResult.database.isStream(), aResult.database.event(), aResult.database.dataPath(), aResult.database.type() and result.database.name().
+ *
+ * The function aResult.payload() returns server serponse payload.
+ *
+ * The function aResult.available() returns the size of data that is ready to read.
+ *
+ * The function aResult.path() returns the resource path that the request was sent.
+ *
+ * The function aResult.etag() returns the ETag from server response header.
+ *
+ * The function aResult.database.name() returns the name (random UID) of node that will be creaated after calling push.
+ *
+ * The function aResult.database.type() returns the following database data type enum.
+ * database_data_type_undefined (-1), database_data_type_null (0), database_data_type_integer(1), database_data_type_float (2),
+ * database_data_type_double (3), database_data_type_boolean (4), database_data_type_string (5), database_data_type_json (6),
+ * and database_data_type_array (7).
+ *
+ * The aResult.database.dataPath() are aResult.database.event() the database node path that data has changed and type of event in server-sent events (stream) mode.
+ *
+ * The server response payload in AsyncResult can be converted to the the values e.g. boolean, integer,
+ * float, double and string via aResult.database.to<T>() or result.database.to<T>().
+ *
+ */
+
 #include <Arduino.h>
 #if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFi.h>
@@ -201,10 +245,19 @@ void loop()
     if (millis() - ms > 20000 && app.ready())
     {
         ms = millis();
-        database.set<int>(aClient2, "/test/stream/number", (int)random(10000, 30000), asyncCB);
+
+        JsonWriter writer;
+
+        object_t json, obj1, obj2;
+
+        writer.create(obj1, "ms", ms);
+        writer.create(obj2, "rand", random(10000, 30000));
+        writer.join(json, 2, obj1, obj2);
+
+        database.set<object_t>(aClient2, "/test/stream/number", json, asyncCB);
 
         // To assign UID for async result
-        // database.set<int>(aClient2, "/test/stream/number", (int)random(10000, 30000), asyncCB, "myUID");
+        // database.set<object_t>(aClient2, "/test/stream/number", json, asyncCB, "myUID");
     }
 
     // To get anyc result without callback

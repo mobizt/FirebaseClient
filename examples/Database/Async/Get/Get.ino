@@ -126,9 +126,9 @@
  * The function aResult.database.name() returns the name (random UID) of node that will be creaated after calling push.
  *
  * The function aResult.database.type() returns the following database data type enum.
- * database_data_type_undefined, database_data_type_null, database_data_type_integer, database_data_type_float,
- * database_data_type_double, database_data_type_boolean, database_data_type_string, database_data_type_json,
- * and database_data_type_array.
+ * database_data_type_undefined (-1), database_data_type_null (0), database_data_type_integer(1), database_data_type_float (2),
+ * database_data_type_double (3), database_data_type_boolean (4), database_data_type_string (5), database_data_type_json (6),
+ * and database_data_type_array (7).
  *
  * The aResult.database.dataPath() are aResult.database.event() the database node path that data has changed and type of event in server-sent events (stream) mode.
  *
