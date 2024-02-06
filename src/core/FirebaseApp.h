@@ -1,5 +1,5 @@
 /**
- * Created February 5, 2024
+ * Created February 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -310,7 +310,7 @@ namespace firebase
                 {
                     String payload;
                     String extras;
-                    JSON json;
+                    JsonHelper json;
                     String subdomain = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? FPSTR("oauth2") : FPSTR("identitytoolkit");
 
                     if (auth_data.user_auth.auth_type == auth_sa_access_token)
@@ -383,7 +383,7 @@ namespace firebase
 
                 String payload;
                 String extras;
-                JSON json;
+                JsonHelper json;
                 String subdomain = auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? FPSTR("securetoken") : FPSTR("identitytoolkit");
 
                 if (auth_data.user_auth.status._event == auth_event_authenticating)

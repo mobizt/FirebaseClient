@@ -31,12 +31,13 @@
 #include "./core/Memory.h"
 #include "./core/StringHelper.h"
 
-class JSON
+class JsonHelper
 {
+
 private:
 public:
-    JSON(){};
-    ~JSON(){};
+    JsonHelper(){};
+    ~JsonHelper(){};
 
     void addObject(String &buf, const String &name, const String &value, bool last = false)
     {
@@ -70,7 +71,17 @@ public:
         return buf;
     }
 
-    void createObject(const String &path, object_t &dest, const String &value)
+};
+
+class JsonWriter
+{
+
+private:
+public:
+    JsonWriter(){};
+    ~JsonWriter(){};
+
+    void create(const String &path, object_t &o, const String &value)
     {
         StringHelper sh;
         char *p = new char[path.length() + 1];
@@ -80,7 +91,7 @@ public:
         char *end = p;
         String tmp;
         int i = 0;
-        dest = "{";
+        o = "{";
         while (pp != NULL)
         {
             sh.strsepImpl(&end, "/");
@@ -88,11 +99,11 @@ public:
             {
                 tmp = pp;
                 if (i > 0)
-                    dest += '{';
-                dest += '"';
-                dest += tmp;
-                dest += '"';
-                dest += ':';
+                    o += '{';
+                o += '"';
+                o += tmp;
+                o += '"';
+                o += ':';
                 i++;
             }
             pp = end;
@@ -100,37 +111,37 @@ public:
 
         delete p;
 
-        dest += value;
+        o += value;
         for (int j = 0; j < i; j++)
-            dest += '}';
+            o += '}';
     }
 
-    void createObject(const String &path, object_t &dest, object_t &value)
+    void create(object_t &o, const String &path, object_t &value)
     {
-        createObject(path, dest, value.c_str());
+        create(path, o, value.c_str());
     }
 
-    void joinObject(object_t &str, int nunArgs, ...)
+    void join(object_t &o, int nunArgs, ...)
     {
         bool arr = false;
-        if (strcmp(str.c_str(), "[]") == 0)
+        if (strcmp(o.c_str(), "[]") == 0)
             arr = true;
-        str = "";
-        str += !arr ? '{' : '[';
+        o = "";
+        o += !arr ? '{' : '[';
 
         va_list ap;
         va_start(ap, nunArgs);
         object_t p = va_arg(ap, object_t);
 
-        str += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
+        o += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
         for (int i = 2; i <= nunArgs; i++)
         {
-            str += ',';
+            o += ',';
             p = va_arg(ap, object_t);
-            str += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
+            o += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
         }
         va_end(ap);
-        str += !arr ? '}' : ']';
+        o += !arr ? '}' : ']';
     }
 };
 

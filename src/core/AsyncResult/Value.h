@@ -41,70 +41,19 @@ enum database_data_type
     database_data_type_array = 7
 };
 
-struct object_t : public Printable
-{
-private:
-    String buf;
-
-public:
-    object_t() {}
-    object_t(const String &o) { buf = o; }
-    const char *c_str() const { return buf.c_str(); }
-    object_t(const char *o) { buf = o; }
-
-    object_t &operator+=(const String &rval)
-    {
-        buf += rval;
-        return *this;
-    }
-
-    object_t &operator+=(const object_t &rval)
-    {
-        buf += rval.c_str();
-        return *this;
-    }
-
-    object_t &operator+=(const char rval)
-    {
-        buf += rval;
-        return *this;
-    }
-
-    size_t length() const { return buf.length(); }
-    object_t substring(unsigned int beginIndex, unsigned int endIndex) const { return buf.substring(beginIndex, endIndex); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-};
-
-struct string_t : public Printable
-{
-private:
-    String buf;
-
-public:
-    string_t() {}
-    string_t(const char *v)
-    {
-        buf = "\"";
-        buf += v;
-        buf += "\"";
-    }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-};
-
 struct boolean_t : public Printable
 {
 private:
     String buf;
     boolean_t &copy(bool rhs)
     {
-        buf = rhs ? "true" : "false";
+        buf = rhs ? FPSTR("true") : FPSTR("false");
         return *this;
     }
 
 public:
     boolean_t() {}
-    boolean_t(bool v) { buf = v ? "true" : "false"; }
+    boolean_t(bool v) { buf = v ? FPSTR("true") : FPSTR("false"); }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
@@ -122,6 +71,120 @@ public:
     number_t(T o) { buf = String(o); }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+struct string_t : public Printable
+{
+private:
+    String buf;
+
+public:
+    string_t() {}
+    template <typename T = const char *>
+    string_t(T v)
+    {
+        aq(true);
+        buf += v;
+        aq();
+    }
+    string_t(number_t v)
+    {
+        aq(true);
+        buf += v.c_str();
+        aq();
+    }
+    string_t(boolean_t v)
+    {
+        aq(true);
+        buf += v.c_str();
+        aq();
+    }
+    template <typename T>
+    auto operator+=(const T &rval) -> typename std::enable_if<is_same<T, number_t>::value || is_same<T, boolean_t>::value, string_t &>::type
+    {
+        sap();
+        buf += rval.c_str();
+        aq();
+        return *this;
+    }
+
+    template <typename T>
+    auto operator+=(const T &rval) -> typename std::enable_if<!is_same<T, number_t>::value && !is_same<T, boolean_t>::value, string_t &>::type
+    {
+        sap();
+        buf += rval;
+        aq();
+        return *this;
+    }
+
+    const char *c_str() const { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+
+private:
+    void sap()
+    {
+        String temp;
+        if (buf.length())
+            temp = buf.substring(1, buf.length() - 1);
+        aq(true);
+        buf += temp;
+    }
+    void aq(bool clear = false)
+    {
+        if (clear)
+            buf.remove(0, buf.length());
+        buf += '"';
+    }
+};
+
+struct object_t : public Printable
+{
+    friend class JsonWriter;
+
+private:
+    String buf;
+
+public:
+    object_t() {}
+    object_t(const String &o) { buf = o; }
+    const char *c_str() const { return buf.c_str(); }
+    template <typename T = const char *>
+    object_t(T o) { buf = o; }
+    object_t(boolean_t o) { buf = o.c_str(); }
+    object_t(number_t o) { buf = o.c_str(); }
+    object_t(string_t o) { buf = o.c_str(); }
+    object_t(bool o) { buf = o ? FPSTR("true") : FPSTR("false"); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+
+private:
+    template <typename T = String>
+    object_t &operator+=(const T &rval)
+    {
+        buf += rval;
+        return *this;
+    }
+    object_t &operator+=(const object_t &rval)
+    {
+        buf += rval.c_str();
+        return *this;
+    }
+    object_t &operator+=(const number_t &rval)
+    {
+        buf += rval.c_str();
+        return *this;
+    }
+    object_t &operator+=(const string_t &rval)
+    {
+        buf += rval.c_str();
+        return *this;
+    }
+    object_t &operator+=(const boolean_t &rval)
+    {
+        buf += rval.c_str();
+        return *this;
+    }
+    size_t length() const { return buf.length(); }
+    object_t substring(unsigned int beginIndex, unsigned int endIndex) const { return buf.substring(beginIndex, endIndex); }
 };
 
 class ValueConverter

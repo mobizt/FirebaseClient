@@ -1,5 +1,5 @@
 /**
- * Created January 31, 2024
+ * Created February 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -105,7 +105,7 @@ namespace firebase
 
                 String payload;
 
-                JSON json;
+                JsonHelper json;
 
                 json.addObject(payload, json.toString("iss"), json.toString(auth_data.sa.client_email));
                 json.addObject(payload, json.toString("sub"), json.toString(auth_data.sa.client_email));
