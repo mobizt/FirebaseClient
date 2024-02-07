@@ -144,22 +144,30 @@ void setup()
 
     database.url(DATABASE_URL);
 
-    String ts_json("{\".sv\": \"timestamp\"}");
+    // Library does not provide JSON parser library, the following JSON writer class will be used with
+    // object_t for simple demonstration.
+
+    object_t ts_json;
+    JsonWriter writer;
+    writer.create(ts_json, ".sv", "timestamp"); // -> {".sv": "timestamp"}
 
     Serial.println("[+] Set timestamp only (async)... ");
-    database.set<object_t>(aClient, "/test/timestamp", object_t(ts_json), asyncCB);
+    database.set<object_t>(aClient, "/test/timestamp", ts_json, asyncCB);
 
     Serial.println("[+] Set timestamp only (sync)... ");
-    bool status = database.set<object_t>(aClient, "/test/timestamp", object_t(ts_json));
+    bool status = database.set<object_t>(aClient, "/test/timestamp", ts_json);
     if (status)
         Serial.println(String("ok"));
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
-    String ts_data_json("{\"data\":\"hello\", \".sv\": \"timestamp\"}");
+    object_t data_json, ts_data_json;
+
+    writer.create(data_json, "data", "hello"); // -> {"data": "hello"}
+    writer.join(ts_data_json, 2, data_json, ts_json); // -> {"data":"hello",".sv":"timestamp"}
 
     Serial.println("[+] Set timestamp and data (async)... ");
-    database.set<object_t>(aClient, "/test/timestamp", object_t(ts_data_json), asyncCB);
+    database.set<object_t>(aClient, "/test/timestamp", ts_data_json, asyncCB);
 }
 
 void loop()

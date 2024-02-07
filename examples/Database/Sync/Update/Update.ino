@@ -164,9 +164,15 @@ void setup()
 
     Serial.println("[+] Synchronous Update... ");
 
-    String json = "{\"data\":" + String(random(1000, 2000)) + "}";
+    // Library does not provide JSON parser library, the following JSON writer class will be used with
+    // object_t for simple demonstration.
 
-    bool status = database.update(aClient, "/test/json", object_t(json));
+    object_t json;
+    JsonWriter writer;
+    writer.create(json, "data/value", random(1000, 2000)); //-> {"data":{"value":x}}
+    // Or set the seialized JSON string to the object_t as object_t("{\"data\":{\"value\":x}}")
+
+    bool status = database.update(aClient, "/test/json", json);
 
     if (status)
         Serial.println("Update is ok");

@@ -56,8 +56,8 @@ public:
     }
 
     /**
-     * Set the database URL
-     * @param url The Storage URL.
+     * Set the Firebase Storage URL
+     * @param url The Firebase Storage URL.
      */
     void url(const String &url)
     {

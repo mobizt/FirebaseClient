@@ -67,9 +67,9 @@
  * database.update(<AsyncClient>, <path>, <object_t>, <AsyncResultCallback>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- * 
- * The uid is user specified UID of async result (optional) which used as async task identifier. 
- * 
+ *
+ * The uid is user specified UID of async result (optional) which used as async task identifier.
+ *
  * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The value type was JSON (object_t).
@@ -161,9 +161,15 @@ void setup()
 
     database.url(DATABASE_URL);
 
-    String json = "{\"data\":" + String(random(1000, 2000)) + "}";
+    // Library does not provide JSON parser library, the following JSON writer class will be used with
+    // object_t for simple demonstration.
 
-    database.update(aClient, "/test/json", object_t(json), asyncCB);
+    object_t json;
+    JsonWriter writer;
+    writer.create(json, "data/value", random(1000, 2000)); //-> {"data":{"value":x}}
+    // Or set the seialized JSON string to the object_t as object_t("{\"data\":{\"value\":x}}")
+
+    database.update(aClient, "/test/json", json, asyncCB);
 
     // To assign UID for async result
     // database.update(aClient, "/test/json", object_t(json), asyncCB, "myUID");

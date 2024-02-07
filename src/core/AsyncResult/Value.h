@@ -1,5 +1,5 @@
 /**
- * Created February 6, 2024
+ * Created February 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -160,6 +160,8 @@ public:
     object_t(bool o) { buf = o ? FPSTR("true") : FPSTR("false"); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
+    void initObject() { buf = FPSTR("{}"); };
+    void initArray() { buf = FPSTR("[]"); };
 
 private:
     explicit operator bool() const { return buf.length() > 0; }

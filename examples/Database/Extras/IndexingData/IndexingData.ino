@@ -157,7 +157,19 @@ void setup()
 
         // The path to index: /test/filter/json
         // The node name to index: Data
-        String new_indexon_rules = "\"test\":{\"filter\":{\"json\":{\".indexOn\":\"Data\"}}}";
+
+        // Library does not provide JSON parser library, the following JSON writer class will be used with
+        // object_t for simple demonstration.
+
+        object_t json;
+        JsonWriter writer;
+        writer.create(json, "test/filter/json/.indexOn", "Data"); // -> {"test":{"filter":{"json":{".indexOn":"Data"}}}}
+
+        String new_indexon_rules = json.c_str();
+        
+        // Remove { and } before insert. -> "test":{"filter":{"json":{".indexOn":"Data"}}}
+        new_indexon_rules.remove(0, 1);
+        new_indexon_rules.remove(new_indexon_rules.length() - 1, 1);
 
         insertJson(json_rules, new_indexon_rules);
 
@@ -210,17 +222,17 @@ void printError(int code, const String &msg)
 
 void insertJson(String &json, const String &value)
 {
-    int p1 = json.indexOf("\".write\"");
+    int p1 = json.indexOf("\".write\""); // Find pos of ".write" in the database rules
 
     if (p1 > -1)
     {
-        int p2 = json.indexOf(",", p1);
+        int p2 = json.indexOf(",", p1); // Find pos of , after ".write"
         if (p2 == -1)
-            p2 = json.indexOf("}", p1);
+            p2 = json.indexOf("}", p1); // Or if it is the last node, find pos of } after ".write"
 
         String part1 = json.substring(0, p2);
         String part2 = json.substring(p2);
 
-        json = part1 + "," + value + part2;
+        json = part1 + "," + value + part2; // Insert the new rule between two sections.
     }
 }

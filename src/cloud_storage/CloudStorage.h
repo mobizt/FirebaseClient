@@ -56,8 +56,8 @@ public:
     }
 
     /**
-     * Set the database URL
-     * @param url The CloudStorage URL.
+     * Set the Google Cloud Storage URL
+     * @param url The Google Cloud Storage URL.
      */
     void url(const String &url)
     {

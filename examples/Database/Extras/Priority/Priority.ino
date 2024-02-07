@@ -91,8 +91,6 @@ void asyncCB(AsyncResult &aResult);
 
 void printError(int code, const String &msg);
 
-void addJson(String &buf, const String &name, const String &value, bool last = false);
-
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
@@ -150,20 +148,23 @@ void setup()
 
     Serial.println("[+] Set data with priority (sync)... ");
 
+    // Library does not provide JSON parser library, the following JSON writer class will be used with
+    // object_t for simple demonstration.
+    object_t json, obj1, obj2;
+    JsonWriter writer;
+
     for (int i = 0; i < 15; i++)
     {
         // Set priority to object or node that contains children.
         float priority = 15 - i;
-        String key = "\"item_" + String(i + 1) + "\"";
-        String val = "\"value_" + String(i + 1) + "\"";
 
-        String json;
+        writer.create(obj1, "item_" + String(i + 1), string_t("value_" + String(i + 1))); // -> {"item_x":"value_x"}
+        writer.create(obj2, ".priority", string_t(priority));                             // -> {".priority":x}
+        writer.join(json, 2, obj1, obj2);
 
-        addJson(json, key, val);
-        addJson(json, "\".priority\"", String(priority), true);
         String path = "/test/items/priority_" + String(15 - i);
 
-        bool status = database.set<object_t>(aClient, path, object_t(json));
+        bool status = database.set<object_t>(aClient, path, json);
         if (status)
             Serial.println(String("ok"));
         else
@@ -174,12 +175,12 @@ void setup()
     Serial.println();
     Serial.println("[+] Set value with priority (sync)... ");
 
-    String json;
-
-    addJson(json, "\".value\"", "\"item_15\"");
+    writer.create(obj1, ".value", "item_15");
     // Set priority to primitive value.
-    addJson(json, "\".priority\"", "6.0", true);
-    bool status = database.set<object_t>(aClient, "/test/items/priority_1", object_t(json));
+    writer.create(obj2, ".priority", 6.0);
+    writer.join(json, 2, obj1, obj2);
+
+    bool status = database.set<object_t>(aClient, "/test/items/priority_1", json);
     if (status)
         Serial.println(String("ok"));
     else
@@ -235,17 +236,4 @@ void asyncCB(AsyncResult &aResult)
 void printError(int code, const String &msg)
 {
     Serial.printf("Error, msg: %s, code: %d\n", msg.c_str(), code);
-}
-
-void addJson(String &buf, const String &name, const String &value, bool last)
-{
-    if (buf.length() == 0)
-        buf += '{';
-    else
-        buf += ',';
-    buf += name;
-    buf += ':';
-    buf += value;
-    if (last)
-        buf += '}';
 }

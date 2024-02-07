@@ -169,6 +169,8 @@ void setup()
 
     Serial.println("[+] Synchronous Get... ");
 
+    // Library does not provide JSON parser library, to get JSON object, get the string and deseialize it.
+
     Serial.print("Get int... ");
     int v1 = database.get<int>(aClient, "/test/int");
     if (aClient.lastError().code() == 0)

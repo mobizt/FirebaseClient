@@ -56,7 +56,7 @@ public:
     }
 
     /**
-     * Set the database URL
+     * Set the Messaging URL
      * @param url The Messaging URL.
      */
     void url(const String &url)

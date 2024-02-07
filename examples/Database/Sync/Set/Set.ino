@@ -189,14 +189,29 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Set json
-    status = database.set<object_t>(aClient, "/test/json", object_t("{\"data\":123}"));
+
+    // Library does not provide JSON parser library, the following JSON writer class will be used with
+    // object_t for simple demonstration.
+
+    object_t json;
+    JsonWriter writer;
+    writer.create(json, "test/data", 123); // -> {"test":{"data":123}}
+    // Or set the seialized JSON string to object_t as object_t("{\"test\":{\"data\":123}}")
+
+    status = database.set<object_t>(aClient, "/test/json", json);
     if (status)
         Serial.println("Set json is ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Set array
-    status = database.set<object_t>(aClient, "/test/arr", object_t("[1, 2, 3, 4, 5, \"test\", true]"));
+
+    object_t arr;
+    arr.initArray();// To use as Array placeholder
+    writer.join(arr, 4, object_t(1), object_t(2), object_t(string_t("test")), object_t(boolean_t(true)));// -> [1,2,"test",true]
+    // Or set the seialized JSON Array string to the object_t as object_t("[1,2,\"test\",true]")
+
+    status = database.set<object_t>(aClient, "/test/arr", arr);
     if (status)
         Serial.println("Set array is ok");
     else

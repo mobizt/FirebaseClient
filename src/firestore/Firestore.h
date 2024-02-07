@@ -137,7 +137,7 @@ public:
     }
 
     /**
-     * Set the database URL
+     * Set the Firestore URL
      * @param url The Firestore URL.
      */
     void url(const String &url)

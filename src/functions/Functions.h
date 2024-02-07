@@ -56,7 +56,7 @@ public:
     }
 
     /**
-     * Set the database URL
+     * Set the Functions URL
      * @param url The Functions URL.
      */
     void url(const String &url)

@@ -821,8 +821,8 @@ public:
     }
 
     /**
-     * Set the database URL
-     * @param url The database URL.
+     * Set the Firebase database URL
+     * @param url The Firebase database URL.
      */
     void url(const String &url)
     {
