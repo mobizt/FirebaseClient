@@ -1,5 +1,5 @@
 /**
- * Created February 4, 2024
+ * Created February 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -263,7 +263,7 @@ struct FirebaseWiFi_credential_t
 
 class FirebaseWiFi
 {
-    friend class AsyncClient;
+    friend class FIREBASE_ASYNC_CLIENT;
 
 public:
     FirebaseWiFi(){};

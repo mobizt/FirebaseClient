@@ -36,7 +36,7 @@ class Filter
 {
     friend class DataOptions;
     friend class Database;
-    friend class AsyncClient;
+    friend class FIREBASE_ASYNC_CLIENT;
 
 private:
     void copy(Filter &rhs)

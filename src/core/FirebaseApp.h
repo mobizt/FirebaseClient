@@ -52,7 +52,7 @@ namespace firebase
 
     private:
         auth_data_t auth_data;
-        AsyncClient *aClient = nullptr;
+        FIREBASE_ASYNC_CLIENT *aClient = nullptr;
         uint32_t aclient_addr = 0;
         uint32_t app_addr = 0;
         uint32_t ref_ts = 0;

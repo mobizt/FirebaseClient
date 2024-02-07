@@ -1,5 +1,5 @@
 /**
- * Created February 4, 2024
+ * Created February 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -26,12 +26,16 @@
 #define ASYNC_REQUEST_HANDLER_H
 #include <Arduino.h>
 #include "./Config.h"
-#include "./core/Storage.h"
+#include "./core/FileConfig.h"
 #include "./core/Timer.h"
+
+#if defined(ENABLE_ASYNC_TCP_CLIENT)
+#include "./core/AsyncTCPConfig.h"
+#endif
 
 #define FIREBASE_TCP_WRITE_TIMEOUT_SEC 30
 
-#define FIREBASE_AUTH_PLACEHOLDER "<token_placeholder>"
+#define FIREBASE_AUTH_PLACEHOLDER (const char *)FPSTR("<auth_token>")
 
 #if defined(ESP8266)
 #define FIREBASE_ASYNC_QUEUE_LIMIT 3
@@ -49,6 +53,12 @@ using namespace firebase;
 struct async_request_handler_t
 {
 public:
+    enum tcp_client_type
+    {
+        tcp_client_type_sync,
+        tcp_client_type_async
+    };
+
     enum http_request_method
     {
         http_undefined,
@@ -237,6 +247,27 @@ public:
     void feedTimer(int interval = -1)
     {
         send_timer.feed(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval);
+    }
+
+    size_t tcpWrite(async_request_handler_t::tcp_client_type client_type, Client *client, void *atcp_config, uint8_t *data, size_t size)
+    {
+        if (client_type == tcp_client_type_sync)
+            return client ? client->write(data, size) : 0;
+        else
+        {
+
+#if defined(ENABLE_ASYNC_TCP_CLIENT)
+
+            AsyncTCPConfig *async_tcp_config = reinterpret_cast<AsyncTCPConfig *>(atcp_config);
+            if (!async_tcp_config && !async_tcp_config->tcpSend)
+                return 0;
+
+            uint32_t sent = 0;
+            async_tcp_config->tcpSend(data, size, sent);
+            return sent;
+#endif
+        }
+        return 0;
     }
 };
 

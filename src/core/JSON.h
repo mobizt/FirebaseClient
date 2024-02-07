@@ -139,9 +139,7 @@ public:
 
     void join(object_t &obj, int nunArgs, ...)
     {
-        bool arr = false;
-        if (strcmp(obj.c_str(), "[]") == 0)
-            arr = true;
+        bool arr = strcmp(obj.c_str(), "[]") == 0;
         obj = "";
         obj += !arr ? '{' : '[';
         va_list ap;

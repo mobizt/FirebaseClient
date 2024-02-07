@@ -97,7 +97,7 @@
 
 class FirebaseError
 {
-    friend class AsyncClient;
+    friend class FIREBASE_ASYNC_CLIENT;
     friend class AuthRequest;
     friend class Database;
 

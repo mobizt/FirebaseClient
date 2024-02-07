@@ -1,5 +1,5 @@
 /**
- * Created February 1, 2024
+ * Created February 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -25,7 +25,7 @@
 #ifndef CORE_AUTH_CONFIG_H
 #define CORE_AUTH_CONFIG_H
 #include <Arduino.h>
-#include "./core/Storage.h"
+#include "./core/FileConfig.h"
 #include "./core/StringHelper.h"
 namespace firebase
 {

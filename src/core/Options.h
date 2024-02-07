@@ -1,5 +1,5 @@
 /**
- * Created February 5, 2024
+ * Created February 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -192,6 +192,10 @@ public:
 #define ENABLE_CUSTOM_AUTH
 #endif
 
+#endif
+
+#if !defined(FIREBASE_ASYNC_CLIENT)
+#define FIREBASE_ASYNC_CLIENT AsyncClient
 #endif
 
 #endif

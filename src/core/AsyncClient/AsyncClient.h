@@ -1,5 +1,5 @@
 /**
- * Created February 4, 2024
+ * Created February 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -29,7 +29,7 @@
 #include "./core/AsyncClient/ResponseHandler.h"
 #include "./core/NetConfig.h"
 #include "./core/Memory.h"
-#include "./core/Storage.h"
+#include "./core/FileConfig.h"
 #include "./core/Base64.h"
 #include "./core/Error.h"
 #include "./core/OTA.h"
@@ -37,9 +37,13 @@
 #include "./core/AuthConfig.h"
 #include "./core/List.h"
 
+#if defined(ENABLE_ASYNC_TCP_CLIENT)
+#include "./core/AsyncTCPConfig.h"
+#endif
+
 using namespace firebase;
 
-class AsyncClient
+class FIREBASE_ASYNC_CLIENT
 {
     friend class AuthRequest;
     friend class Database;
@@ -136,8 +140,13 @@ private:
     String reqEtag, resETag;
     int netErrState = 0;
     Client *client = nullptr;
+#if defined(ENABLE_ASYNC_TCP_CLIENT)
+    AsyncTCPConfig *async_tcp_config = nullptr;
+#else
+    void *async_tcp_config = nullptr;
+#endif
+    async_request_handler_t::tcp_client_type client_type = async_request_handler_t::tcp_client_type_sync;
     bool sse = false;
-    bool asyncCon = false;
     std::vector<uint32_t> sVec;
     Memory mem;
     network_config_data net;
@@ -292,7 +301,7 @@ private:
         if (data && len && this->client)
         {
             uint16_t toSend = len - sData->request.dataIndex > FIREBASE_CHUNK_SIZE ? FIREBASE_CHUNK_SIZE : len - sData->request.dataIndex;
-            size_t sent = this->client->write(data + sData->request.dataIndex, toSend);
+            size_t sent = sData->request.tcpWrite(client_type, client, async_tcp_config, data + sData->request.dataIndex, toSend);
             async_request_handler_t req;
             req.idle();
 
@@ -354,11 +363,17 @@ private:
             if ((sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined))
                 stop();
 
-            if (!client->connected())
+            if ((client_type == async_request_handler_t::tcp_client_type_sync && !client->connected()) || client_type == async_request_handler_t::tcp_client_type_async)
             {
                 ret = connect(sData, getHost(sData, true).c_str(), sData->request.port);
+
+                // allow non-blocking async tcp connection
+                if (ret == function_return_type_continue)
+                    return ret;
+
                 if (ret != function_return_type_complete)
                     return connErrorHandler(sData, sData->state);
+
                 sse = sData->sse;
             }
 
@@ -430,10 +445,6 @@ private:
 
     function_return_type connErrorHandler(async_data_item_t *sData, async_state state)
     {
-        // allow non-blocking connection
-        if (sData->async && asyncCon)
-            return function_return_type_continue;
-
         setAsyncError(sData, state, FIREBASE_ERROR_TCP_CONNECTION, !sData->sse, false);
         return function_return_type_failure;
     }
@@ -544,19 +555,13 @@ private:
         sVec.erase(sVec.begin() + slot);
     }
 
-    int readLine(Client *client, String &buf)
+    int readLine(async_data_item_t *sData, String &buf)
     {
-        if (!client)
-            return 0;
-
         int p = 0;
 
-        while (client->available())
+        while (sData->response.tcpAvailable(client_type, client, async_tcp_config))
         {
-            if (!client)
-                break;
-
-            int res = client->read();
+            int res = sData->response.tcpRead(client_type, client, async_tcp_config);
             if (res > -1)
             {
                 buf += (char)res;
@@ -598,7 +603,7 @@ private:
         if (!netConnect() || !client || !sData)
             return false;
 
-        if (client->available() > 0)
+        if (sData->response.tcpAvailable(client_type, client, async_tcp_config) > 0)
         {
             // status line or data?
             if (!readStatusLine(sData))
@@ -667,7 +672,7 @@ private:
         sData->response.header.reserve(1024);
 
         // the first chunk (line) can be http response status or already connected stream payload
-        readLine(client, sData->response.header);
+        readLine(sData, sData->response.header);
         int status = getStatusCode(sData->response.header);
         if (status > 0)
         {
@@ -682,7 +687,7 @@ private:
     {
         if (sData->response.flags.header_remaining)
         {
-            int read = readLine(client, sData->response.header);
+            int read = readLine(sData, sData->response.header);
             if ((read == 1 && sData->response.header[sData->response.header.length() - 1] == '\r') ||
                 (read == 2 && sData->response.header[sData->response.header.length() - 2] == '\r' && sData->response.header[sData->response.header.length() - 1] == '\n'))
             {
@@ -742,7 +747,7 @@ private:
     int getChunkSize(async_data_item_t *sData, Client *client)
     {
         String line;
-        readLine(client, line);
+        readLine(sData, line);
         int p = line.indexOf(";");
         if (p == -1)
             p = line.indexOf("\r\n");
@@ -774,7 +779,7 @@ private:
         {
             if (sData->response.chunkInfo.chunkSize > -1)
             {
-                int read = readLine(client, *out);
+                int read = readLine(sData, *out);
                 if (read)
                 {
                     sData->response.chunkInfo.dataLen += read;
@@ -857,7 +862,7 @@ private:
                                 ofs = sData->request.base64 && sData->response.payloadRead == 0 ? 1 : 0;
                                 toRead = (int)(sData->response.payloadLen - sData->response.payloadRead) > FIREBASE_CHUNK_SIZE + ofs ? FIREBASE_CHUNK_SIZE + ofs : sData->response.payloadLen - sData->response.payloadRead;
                                 buf = reinterpret_cast<uint8_t *>(mem.alloc(toRead));
-                                read = client->read(buf, toRead);
+                                read = sData->response.tcpRead(client_type, client, async_tcp_config, buf, toRead);
                             }
 
                             if (read > 0)
@@ -946,7 +951,7 @@ private:
                         }
                     }
                     else
-                        sData->response.payloadRead += readLine(client, sData->response.payload);
+                        sData->response.payloadRead += readLine(sData, sData->response.payload);
                 }
             }
         }
@@ -967,11 +972,11 @@ private:
                 sData->response.flags.header_remaining = true;
             }
 
-            if (sData->response.flags.chunks && client->available() <= 2)
+            if (sData->response.flags.chunks && sData->response.tcpAvailable(client_type, client, async_tcp_config) <= 2)
             {
-                while (client->available())
-                    client->read();
-                client->stop();
+                while (sData->response.tcpAvailable(client_type, client, async_tcp_config))
+                    sData->response.tcpRead(client_type, client, async_tcp_config);
+                stop();
             }
 
             if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK && (sData->request.ota || (sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size)))
@@ -997,7 +1002,7 @@ private:
         {
             if (sData->response.toFill && sData->response.toFillLen)
             {
-                int currentRead = client->read(sData->response.toFill + sData->response.toFillIndex, sData->response.toFillLen);
+                int currentRead = sData->response.tcpRead(client_type, client, async_tcp_config, sData->response.toFill + sData->response.toFillIndex, sData->response.toFillLen);
                 if (currentRead == sData->response.toFillLen)
                 {
                     buf = reinterpret_cast<uint8_t *>(mem.alloc(sData->response.toFillIndex + sData->response.toFillLen));
@@ -1054,7 +1059,33 @@ private:
     {
         sData->aResult.lastError.clearError();
         lastErr.clearError();
-        sData->return_type = client && client->connect(host, port) > 0 ? function_return_type_complete : function_return_type_failure;
+
+        if (client && !client->connected() && client_type == async_request_handler_t::tcp_client_type_sync)
+            sData->return_type = client->connect(host, port) > 0 ? function_return_type_complete : function_return_type_failure;
+        else if (client_type == async_request_handler_t::tcp_client_type_async)
+        {
+
+#if defined(ENABLE_ASYNC_TCP_CLIENT)
+            if (async_tcp_config && async_tcp_config->tcpStatus && async_tcp_config->tcpConnect)
+            {
+                bool status = false;
+                if (async_tcp_config->tcpStatus)
+                    async_tcp_config->tcpStatus(status);
+
+                if (!status)
+                {
+                    if (async_tcp_config->tcpConnect)
+                        async_tcp_config->tcpConnect(host, port);
+
+                    if (async_tcp_config->tcpStatus)
+                        async_tcp_config->tcpStatus(status);
+                }
+
+                sData->return_type = status ? function_return_type_complete : function_return_type_continue;
+            }
+#endif
+        }
+
         return sData->return_type;
     }
 
@@ -1641,7 +1672,7 @@ private:
                 if (sData->return_type == function_return_type_complete)
                     sData->return_type = function_return_type_continue;
 
-                if (sData->async && !client->available())
+                if (sData->async && !sData->response.tcpAvailable(client_type, client, async_tcp_config))
                 {
 #if defined(ENABLE_DATABASE)
                     handleEventTimeout(sData);
@@ -1653,7 +1684,7 @@ private:
                 else if (!sData->async) // wait for non async
                 {
                     async_request_handler_t req;
-                    while (!client->available() && netConnect())
+                    while (!sData->response.tcpAvailable(client_type, client, async_tcp_config) && netConnect())
                     {
                         req.idle();
                         if (handleReadTimeout(sData))
@@ -1759,15 +1790,27 @@ private:
     }
 
 public:
-    AsyncClient(Client &client, network_config_data &net) : client(&client)
+    FIREBASE_ASYNC_CLIENT(Client &client, network_config_data &net) : client(&client)
     {
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
         List list;
+        client_type = async_request_handler_t::tcp_client_type_sync;
         list.addRemoveList(cVec, addr, true);
     }
 
-    ~AsyncClient()
+#if defined(ENABLE_ASYNC_TCP_CLIENT)
+    FIREBASE_ASYNC_CLIENT(AsyncTCPConfig &tcpClientConfig, network_config_data &net) : async_tcp_config(&tcpClientConfig)
+    {
+        this->net.copy(net);
+        this->addr = reinterpret_cast<uint32_t>(this);
+        List list;
+        client_type = async_request_handler_t::tcp_client_type_async;
+        list.addRemoveList(cVec, addr, true);
+    }
+#endif
+
+    ~FIREBASE_ASYNC_CLIENT()
     {
         stop();
 
@@ -1784,8 +1827,6 @@ public:
     }
 
     bool networkStatus() { return netStatus(); }
-
-    void asyncConnect(bool opt) { asyncCon = opt; }
 
     void stopAsync(bool all = false)
     {
@@ -1820,8 +1861,18 @@ public:
 
     void stop()
     {
-        if (client)
-            client->stop();
+        if (client_type == async_request_handler_t::tcp_client_type_sync)
+        {
+            if (client)
+                client->stop();
+        }
+        else
+        {
+#if defined(ENABLE_ASYNC_TCP_CLIENT)
+            if (async_tcp_config && async_tcp_config->tcpStop)
+                async_tcp_config->tcpStop();
+#endif
+        }
     }
 
     FirebaseError lastError() const { return lastErr; }

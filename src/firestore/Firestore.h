@@ -39,7 +39,7 @@ class Firestore
     friend class FirebaseApp;
 
 private:
-    AsyncClient *aClient = nullptr;
+    FIREBASE_ASYNC_CLIENT *aClient = nullptr;
     String service_url;
     String path;
     String uid;
@@ -174,7 +174,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool exportDocuments(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &bucketID, const String &storagePath, const String &collectionIds = "")
+    bool exportDocuments(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &bucketID, const String &storagePath, const String &collectionIds = "")
     {
         return false;
     }
@@ -196,7 +196,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool importDocuments(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &bucketID, const String &storagePath, const String &collectionIds = "")
+    bool importDocuments(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &bucketID, const String &storagePath, const String &collectionIds = "")
     {
         return false;
     }
@@ -218,7 +218,7 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool createDocument(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &content, const String &mask = "")
+    bool createDocument(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &content, const String &mask = "")
     {
         return false;
     }
@@ -241,7 +241,7 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool createDocument(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &documentId, const String &content, const String &mask = "")
+    bool createDocument(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &documentId, const String &content, const String &mask = "")
     {
         return false;
     }
@@ -273,7 +273,7 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool patchDocument(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &content,
+    bool patchDocument(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &content,
                        const String &updateMask, const String &mask = "", const String &exists = "", const String &updateTime = "")
     {
         return false;
@@ -297,7 +297,7 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool commitDocument(AsyncClient &aClient, const String &projectId, const String &databaseId,
+    bool commitDocument(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId,
                         std::vector<firebase_firestore_document_write_t> writes, const String &transaction = "")
     {
         return false;
@@ -326,7 +326,7 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
      *
      */
-    bool batchWriteDocuments(AsyncClient &aClient, const String &projectId, const String &databaseId,
+    bool batchWriteDocuments(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId,
                              std::vector<firebase_firestore_document_write_t> writes, const object_t &labels)
     {
         return false;
@@ -352,7 +352,7 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool getDocument(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &mask = "",
+    bool getDocument(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &mask = "",
                      const String &transaction = "", const String &readTime = "")
     {
         return false;
@@ -386,7 +386,7 @@ public:
      * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
      *
      */
-    bool batchGetDocuments(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &documentPaths, const String &mask,
+    bool batchGetDocuments(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &documentPaths, const String &mask,
                            FirestoreBatchOperationsCallback batchOperationCallback, const String &transaction, const object_t &newTransaction, const String &readTime)
     {
         return false;
@@ -421,7 +421,7 @@ public:
      *
      * See https://cloud.google.com/firestore/docs/reference/rest/v1/TransactionOptions for transaction options.
      */
-    bool beginTransaction(AsyncClient &aClient, const String &projectId, const String &databaseId, TransactionOptions &transactionOptions)
+    bool beginTransaction(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, TransactionOptions &transactionOptions)
     {
         return false;
     }
@@ -439,7 +439,7 @@ public:
      *
      * This function requires OAuth2.0 authentication.
      */
-    bool rollback(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &transaction)
+    bool rollback(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &transaction)
     {
         return false;
     }
@@ -463,7 +463,7 @@ public:
      *
      *
      */
-    bool runQuery(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &documentPath, const object_t &structuredQuery = "",
+    bool runQuery(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &documentPath, const object_t &structuredQuery = "",
                   firebase_firestore_consistency_mode consistencyMode = firebase_firestore_consistency_mode_undefined,
                   const String &consistency = "")
     {
@@ -487,7 +487,7 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool deleteDocument(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &exists = "", const String &updateTime = "")
+    bool deleteDocument(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &exists = "", const String &updateTime = "")
     {
         return false;
     }
@@ -513,7 +513,7 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication (when showMissing is true).
      *
      */
-    bool vecDocuments(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &pageSize,
+    bool vecDocuments(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &pageSize,
                       const String &pageToken, const String &orderBy, const String &mask, bool showMissing)
     {
         return false;
@@ -533,7 +533,7 @@ public:
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      */
-    bool vecCollectionIds(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &pageSize, const String &pageToken)
+    bool vecCollectionIds(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &pageSize, const String &pageToken)
     {
         return false;
     }
@@ -563,7 +563,7 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/create
      *
      */
-    bool createIndex(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId,
+    bool createIndex(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &collectionId,
                      const String &apiScope, const String &queryScope, const object_t &fields)
     {
         return false;
@@ -586,7 +586,7 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
      *
      */
-    bool deleteIndex(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &indexId)
+    bool deleteIndex(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &indexId)
     {
         return false;
     }
@@ -611,7 +611,7 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/vec
      *
      */
-    bool vecIndex(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
+    bool vecIndex(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
     {
         return false;
     }
@@ -633,7 +633,7 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/get
      *
      */
-    bool getIndex(AsyncClient &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &indexId)
+    bool getIndex(FIREBASE_ASYNC_CLIENT &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &indexId)
     {
         return false;
     }
@@ -646,7 +646,7 @@ public:
     {
         for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(cVec[i]);
+            FIREBASE_ASYNC_CLIENT *aClient = reinterpret_cast<FIREBASE_ASYNC_CLIENT *>(cVec[i]);
             if (aClient)
             {
                 aClient->process(true);

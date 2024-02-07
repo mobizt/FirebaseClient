@@ -35,7 +35,7 @@ using namespace firebase;
 class CloudStorage
 {
 private:
-    AsyncClient *aClient = nullptr;
+    FIREBASE_ASYNC_CLIENT *aClient = nullptr;
     String service_url;
     String path;
     String uid;
@@ -84,7 +84,7 @@ public:
     {
         for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClient *aClient = reinterpret_cast<AsyncClient *>(cVec[i]);
+            FIREBASE_ASYNC_CLIENT *aClient = reinterpret_cast<FIREBASE_ASYNC_CLIENT *>(cVec[i]);
             if (aClient)
             {
                 aClient->process(true);
