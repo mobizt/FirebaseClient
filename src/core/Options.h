@@ -1,5 +1,5 @@
 /**
- * Created February 6, 2024
+ * Created February 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -39,10 +39,6 @@
 
 #endif
 
-#if !defined(DEFAULT_DEBUG_PORT)
-#define DEFAULT_DEBUG_PORT Serial
-#endif
-
 #if defined(DISABLE_ALL_OPTIONS)
 
 #undef ENABLE_DATABASE
@@ -54,7 +50,6 @@
 #undef ENABLE_PSRAM
 #undef ENABLE_OTA
 #undef ENABLE_FS
-#undef DEFAULT_DEBUG_PORT
 #undef ENABLE_SERVICE_AUTH
 #undef ENABLE_CUSTOM_AUTH
 #undef ENABLE_USER_AUTH
@@ -100,10 +95,6 @@
 
 #if defined(DISABLE_FS)
 #undef ENABLE_FS
-#endif
-
-#if defined(DISABLE_DEBUG)
-#undef DEFAULT_DEBUG_PORT
 #endif
 
 #if defined(DISABLE_SERVICE_AUTH)

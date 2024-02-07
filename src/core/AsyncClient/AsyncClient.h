@@ -350,7 +350,7 @@ private:
 
     function_return_type send(async_data_item_t *sData)
     {
-        if (!sData || !netConnect())
+        if (!sData || !netConnect(sData))
         {
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
             return function_return_type_failure;
@@ -411,7 +411,7 @@ private:
 
     function_return_type receive(async_data_item_t *sData)
     {
-        if (!sData || !netConnect())
+        if (!sData || !netConnect(sData))
         {
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
             return function_return_type_failure;
@@ -545,9 +545,6 @@ private:
         setLastError(sData);
         // data available from sync and asyn request except for sse
         returnResult(sData, true);
-        setLastError(sData);
-        // data available from sync and asyn request except for sse
-        returnResult(sData, true);
         reset(sData, sData->auth_used);
 
         delete sData;
@@ -600,7 +597,7 @@ private:
 
     bool readResponse(async_data_item_t *sData)
     {
-        if (!netConnect() || !client || !sData)
+        if (!netConnect(sData) || !client || !sData)
             return false;
 
         if (sData->response.tcpAvailable(client_type, client, async_tcp_config) > 0)
@@ -1166,7 +1163,7 @@ private:
         return strcmp(buf, "0.0.0.0") != 0;
     }
 
-    bool gprsConnect()
+    bool gprsConnect(async_data_item_t *sData)
     {
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
         TinyGsm *gsmModem = (TinyGsm *)_modem;
@@ -1180,47 +1177,42 @@ private:
             // The XBee must run the gprsConnect function BEFORE waiting for network!
             gsmModem->gprsConnect(_apn.c_str(), _user.c_str(), _password.c_str());
 #endif
-
-#if defined(DEFAULT_DEBUG_PORT)
-            if (netErrState == 0)
-                DEFAULT_DEBUG_PORT.print((const char *)FPSTR("Waiting for network..."));
-#endif
+            if (netErrState == 0 && sData)
+                sData->aResult.setDebug(FPSTR("Waiting for network..."));
             if (!gsmModem->waitForNetwork())
             {
-#if defined(DEFAULT_DEBUG_PORT)
-                if (netErrState == 0)
-                    DEFAULT_DEBUG_PORT.println((const char *)FPSTR(" fail"));
-#endif
+                if (netErrState == 0 && sData)
+                    sData->aResult.setDebug(FPSTR("failed"));
                 netErrState = 1;
                 net.network_status = false;
                 return false;
             }
-#if defined(DEFAULT_DEBUG_PORT)
-            if (netErrState == 0)
-                DEFAULT_DEBUG_PORT.println((const char *)FPSTR(" success"));
-#endif
+
+            if (netErrState == 0 && sData)
+                sData->aResult.setDebug(FPSTR("success"));
+
             if (gsmModem->isNetworkConnected())
             {
-#if defined(DEFAULT_DEBUG_PORT)
-                if (netErrState == 0)
+
+                if (netErrState == 0 && sData)
                 {
-                    DEFAULT_DEBUG_PORT.print((const char *)FPSTR("Connecting to "));
-                    DEFAULT_DEBUG_PORT.print(_apn.c_str());
+                    String debug = FPSTR("Connecting to ");
+                    debug += _apn.c_str();
+                    sData->aResult.setDebug(debug);
                 }
-#endif
+
                 net.network_status = gsmModem->gprsConnect(_apn.c_str(), _user.c_str(), _password.c_str()) &&
                                      gsmModem->isGprsConnected();
 
-#if defined(DEFAULT_DEBUG_PORT)
-                if (netErrState == 0)
+                if (netErrState == 0 && sData)
                 {
                     if (net.network_status)
-                        DEFAULT_DEBUG_PORT.println((const char *)FPSTR(" success"));
+                        sData->aResult.setDebug(FPSTR("success"));
                     else
-                        DEFAULT_DEBUG_PORT.println((const char *)FPSTR(" fail"));
+                        sData->aResult.setDebug(FPSTR("failed"));
                 }
             }
-#endif
+
             if (!net.network_status)
                 netErrState = 1;
 
@@ -1249,41 +1241,7 @@ private:
         return !net.network_status;
     }
 
-    uint32_t gprsGetTime()
-    {
-#if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(TINY_GSM_MODEM_HAS_TIME)
-
-        if (!gprsConnected())
-            return 0;
-
-        TinyGsm *gsmModem = (TinyGsm *)_modem;
-        int year3 = 0;
-        int month3 = 0;
-        int day3 = 0;
-        int hour3 = 0;
-        int min3 = 0;
-        int sec3 = 0;
-        float timezone = 0;
-        for (int8_t i = 5; i; i--)
-        {
-            if (gsmModem->getNetworkTime(&year3, &month3, &day3, &hour3, &min3, &sec3, &timezone))
-            {
-                struct tm timeinfo;
-                timeinfo.tm_year = year3 - 1900;
-                timeinfo.tm_mon = month3 - 1;
-                timeinfo.tm_mday = day3;
-                timeinfo.tm_hour = hour3;
-                timeinfo.tm_min = min3;
-                timeinfo.tm_sec = sec3;
-                time_t ts = mktime(&timeinfo);
-                return ts;
-            }
-        }
-#endif
-        return 0;
-    }
-
-    bool ethernetConnect()
+    bool ethernetConnect(async_data_item_t *sData)
     {
         bool ret = false;
 
@@ -1294,9 +1252,9 @@ private:
 
         if (net.ethernet.ethernet_reset_pin > -1)
         {
-#if defined(DEFAULT_DEBUG_PORT)
-            DEFAULT_DEBUG_PORT.println((const char *)FPSTR("Resetting Ethernet Board..."));
-#endif
+            if (sData)
+                sData->aResult.setDebug(FPSTR("Resetting Ethernet Board..."));
+
             pinMode(net.ethernet.ethernet_reset_pin, OUTPUT);
             digitalWrite(net.ethernet.ethernet_reset_pin, HIGH);
             delay(200);
@@ -1306,9 +1264,9 @@ private:
             delay(200);
         }
 
-#if defined(DEFAULT_DEBUG_PORT)
-        DEFAULT_DEBUG_PORT.println((const char *)FPSTR("Starting Ethernet connection..."));
-#endif
+        if (sData)
+            sData->aResult.setDebug(FPSTR("Starting Ethernet connection..."));
+
         if (net.ethernet.static_ip)
         {
 
@@ -1330,18 +1288,16 @@ private:
         }
 
         ret = ethernetConnected();
-#if defined(DEFAULT_DEBUG_PORT)
-        if (ret)
-        {
-            DEFAULT_DEBUG_PORT.print((const char *)FPSTR("Connected with IP "));
-            DEFAULT_DEBUG_PORT.println(ETH_MODULE_CLASS.localIP());
-        }
-#endif
 
-#if defined(DEFAULT_DEBUG_PORT)
-        if (!ret)
-            DEFAULT_DEBUG_PORT.println((const char *)FPSTR("Can't connect"));
-#endif
+        if (ret && sData)
+        {
+            String debug = FPSTR("Starting Ethernet connection...");
+            debug += ETH_MODULE_CLASS.localIP();
+            sData->aResult.setDebug(debug);
+        }
+
+        if (!ret && sData)
+            sData->aResult.setDebug(FPSTR("Can't connect"));
 
 #endif
 
@@ -1361,9 +1317,9 @@ private:
         return net.network_status;
     }
 
-    bool netConnect()
+    bool netConnect(async_data_item_t *sData)
     {
-        if (!netStatus())
+        if (!netStatus(sData))
         {
             bool recon = net.reconnect;
 
@@ -1381,22 +1337,20 @@ private:
                     if (WiFI_CONNECTED)
                     {
                         WiFi.reconnect();
-                        return netStatus();
+                        return netStatus(sData);
                     }
-
 #endif
-
                     if (net.generic.net_con_cb)
                         net.generic.net_con_cb();
                 }
                 else if (net.network_data_type == firebase_network_data_gsm_network)
                 {
                     gprsDisconnect();
-                    gprsConnect();
+                    gprsConnect(sData);
                 }
                 else if (net.network_data_type == firebase_network_data_ethernet_network)
                 {
-                    ethernetConnect();
+                    ethernetConnect(sData);
                 }
                 else if (net.network_data_type == firebase_network_data_default_network)
                 {
@@ -1408,30 +1362,30 @@ private:
                     else
                         WiFi.reconnect();
 #else
-                        if (net.wifi && net.wifi->credentials.size())
-                            net.wifi->reconnect();
+                    if (net.wifi && net.wifi->credentials.size())
+                        net.wifi->reconnect();
 #endif
 #endif
                 }
             }
         }
 
-        return netStatus();
+        return netStatus(sData);
     }
 
-    bool netStatus()
+    bool netStatus(async_data_item_t *sData)
     {
         // We will not invoke the network status request when device has built-in WiFi or Ethernet and it is connected.
         if (net.network_data_type == firebase_network_data_gsm_network)
         {
             net.network_status = gprsConnected();
             if (!net.network_status)
-                gprsConnect();
+                gprsConnect(sData);
         }
         else if (net.network_data_type == firebase_network_data_ethernet_network)
         {
             if (!ethernetConnected())
-                ethernetConnect();
+                ethernetConnect(sData);
         }
         // also check the native network before calling external cb
         else if (net.network_data_type == firebase_network_data_default_network || WiFI_CONNECTED || ethLinkUp())
@@ -1618,7 +1572,7 @@ private:
                 return;
             }
 
-            if (!netConnect())
+            if (!netConnect(sData))
             {
                 setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
                 if (sData->async)
@@ -1684,7 +1638,7 @@ private:
                 else if (!sData->async) // wait for non async
                 {
                     async_request_handler_t req;
-                    while (!sData->response.tcpAvailable(client_type, client, async_tcp_config) && netConnect())
+                    while (!sData->response.tcpAvailable(client_type, client, async_tcp_config) && netConnect(sData))
                     {
                         req.idle();
                         if (handleReadTimeout(sData))
@@ -1826,7 +1780,7 @@ public:
         list.addRemoveList(cVec, addr, false);
     }
 
-    bool networkStatus() { return netStatus(); }
+    bool networkStatus() { return netStatus(nullptr); }
 
     void stopAsync(bool all = false)
     {
@@ -1848,10 +1802,7 @@ public:
                         continue;
                     sData->cancel = true;
                     if (!all)
-                    {
-                        inStopAsync = false;
-                        return;
-                    }
+                        break;
                 }
             }
         }

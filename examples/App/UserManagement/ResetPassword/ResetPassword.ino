@@ -61,7 +61,7 @@ void setup()
 
     UserAccount user(API_KEY);
 
-        ssl_client.setInsecure();
+    ssl_client.setInsecure();
 #if defined(ESP8266)
     ssl_client.setBufferSizes(4096, 1024);
 #endif
@@ -100,5 +100,11 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.println("**************");
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 }

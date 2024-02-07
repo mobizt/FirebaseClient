@@ -166,7 +166,7 @@ void setup()
         writer.create(json, "test/filter/json/.indexOn", "Data"); // -> {"test":{"filter":{"json":{".indexOn":"Data"}}}}
 
         String new_indexon_rules = json.c_str();
-        
+
         // Remove { and } before insert. -> "test":{"filter":{"json":{".indexOn":"Data"}}}
         new_indexon_rules.remove(0, 1);
         new_indexon_rules.remove(new_indexon_rules.length() - 1, 1);
@@ -206,6 +206,12 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.println("**************");
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 
     if (aResult.available())

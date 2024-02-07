@@ -81,6 +81,8 @@
 
 #define DATABASE_SECRET "DATABASE_SECRET"
 
+void asyncCB(AsyncResult &aResult);
+
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 LegacyToken legacy_token(DATABASE_SECRET);
@@ -116,6 +118,8 @@ void setup()
     ssl_client.setBufferSizes(4096, 1024);
 #endif
 
+    app.setCallback(asyncCB);
+
     initializeApp(aClient, app, getAuth(legacy_token));
 }
 
@@ -123,4 +127,19 @@ void loop()
 {
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
+}
+
+void asyncCB(AsyncResult &aResult)
+{
+    if (aResult.isError())
+    {
+        Serial.println("**************");
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
 }

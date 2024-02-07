@@ -80,7 +80,7 @@ void setup()
         ;
 
     if (app.ready())
-        Serial.printf("UID: %s\nID token: %s\nRefresh token: %s\n", app.getUid().c_str(), app.getToken().c_str(),app.getRefreshToken().c_str());
+        Serial.printf("UID: %s\nID token: %s\nRefresh token: %s\n", app.getUid().c_str(), app.getToken().c_str(), app.getRefreshToken().c_str());
 }
 
 void loop()
@@ -104,5 +104,11 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.println("**************");
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 }

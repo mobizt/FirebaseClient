@@ -98,8 +98,10 @@ private:
     String data_path;
     String data_payload;
     String res_etag;
+    String debug_info;
     bool data_available = false;
     bool error_available = false;
+    bool debug_info_available = false;
     download_data_t download_data;
     upload_data_t upload_data;
     app_event_t app_event;
@@ -122,6 +124,15 @@ private:
     void setPath(const String &path)
     {
         data_path = path;
+    }
+
+    void setDebug(const String &debug)
+    {
+        data_available = false;
+        error_available = false;
+        debug_info = debug;
+        if (debug.length())
+            debug_info_available = true;
     }
 
 public:
@@ -288,6 +299,7 @@ public:
     String path() const { return data_path; }
     String etag() const { return res_etag; }
     String uid() const { return result_uid; }
+    String debug() const { return debug_info; }
     int available()
     {
         bool ret = data_available;
@@ -336,6 +348,17 @@ public:
         {
             error_available = false;
             return err;
+        }
+        return false;
+    }
+
+    bool isDebug()
+    {
+        bool dbg = debug_info.length() > 0;
+        if (debug_info_available)
+        {
+            debug_info_available = false;
+            return dbg;
         }
         return false;
     }

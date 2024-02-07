@@ -207,8 +207,8 @@ void setup()
     // Set array
 
     object_t arr;
-    arr.initArray();// To use as Array placeholder
-    writer.join(arr, 4, object_t(1), object_t(2), object_t(string_t("test")), object_t(boolean_t(true)));// -> [1,2,"test",true]
+    arr.initArray();                                                                                      // To use as Array placeholder
+    writer.join(arr, 4, object_t(1), object_t(2), object_t(string_t("test")), object_t(boolean_t(true))); // -> [1,2,"test",true]
     // Or set the seialized JSON Array string to the object_t as object_t("[1,2,\"test\",true]")
 
     status = database.set<object_t>(aClient, "/test/arr", arr);
@@ -253,6 +253,12 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.println("**************");
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 }
 

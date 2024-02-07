@@ -106,9 +106,6 @@
  * 🏷️ For disabling native (sdk) Ethernet functionality in case external Client usage
  * #define FIREBASE_DISABLE_NATIVE_ETHERNET
  * 
- * 🏷️ For debug port assignment.
- * #define FIREBASE_DEFAULT_DEBUG_PORT Serial
- * 
  * 🏷️ For AsyncClient class name assignment.
  * This prevent naming conflicts for the generic name AsyncClient usage.
  * #define FIREBASE_ASYNC_CLIENT MyAsyncClient

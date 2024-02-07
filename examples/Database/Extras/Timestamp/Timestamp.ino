@@ -163,7 +163,7 @@ void setup()
 
     object_t data_json, ts_data_json;
 
-    writer.create(data_json, "data", "hello"); // -> {"data": "hello"}
+    writer.create(data_json, "data", "hello");        // -> {"data": "hello"}
     writer.join(ts_data_json, 2, data_json, ts_json); // -> {"data":"hello",".sv":"timestamp"}
 
     Serial.println("[+] Set timestamp and data (async)... ");
@@ -191,6 +191,12 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.println("**************");
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 
     if (aResult.available())

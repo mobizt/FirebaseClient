@@ -185,6 +185,12 @@ void asyncCB(AsyncResult &aResult)
         Serial.println("**************");
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
+
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
 }
 
 void fileCallback(File &file, const char *filename, file_operating_mode mode)

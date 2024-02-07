@@ -16,7 +16,7 @@
  * The DefaultWiFiNetwork is the Network class that provides the WiFiMulti network configuarion to work in this library for the WiFiMulti supported devices.
  *
  * The DefaultWiFiNetwork class constructor arguments.
- * 
+ *
  * <FirebaseWiFi> - The FirebaseWiFi class object that used for keeping the network credentials (WiFi APs and WiFi passwords).
  *
  * <reconnect> - The bool option for network reconnection.
@@ -125,5 +125,11 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.println("**************");
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 }

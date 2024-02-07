@@ -286,6 +286,12 @@ void printResult(AsyncResult &aResult)
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
     if (aResult.available())
     {
         // To get the UID (string) from async result

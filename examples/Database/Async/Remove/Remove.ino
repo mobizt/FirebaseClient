@@ -67,9 +67,9 @@
  * database.remove<T>(<AsyncClient>, <path>, <AsyncResultCallback>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- * 
- * The uid is user specified UID of async result (optional) which used as async task identifier. 
- * 
+ *
+ * The uid is user specified UID of async result (optional) which used as async task identifier.
+ *
  * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  */
@@ -191,6 +191,12 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.println("**************");
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Serial.println("**************");
+        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 
     if (aResult.available())
