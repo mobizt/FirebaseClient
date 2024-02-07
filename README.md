@@ -11,7 +11,7 @@ Please stay tuned for update.
 
 * Simple APIs.
 
-* Supports most Arduino devices (except for AVR) with or without external neywork module.
+* Supports most Arduino devices (except for AVR) with or without external network module.
 
 * Supports most Firebase Services included Google Cloud Storage.
 
