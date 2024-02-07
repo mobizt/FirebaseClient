@@ -1,5 +1,5 @@
 /**
- * Created February 5, 2024
+ * Created February 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -67,7 +67,7 @@ public:
     void feed(unsigned long sec)
     {
         feed_count++;
-        if (feed_count == 0)
+        if (sec == 0 || feed_count == 0)
             feed_count = 1;
         stop();
         setInterval(sec);

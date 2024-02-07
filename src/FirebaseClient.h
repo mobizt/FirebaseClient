@@ -95,7 +95,6 @@ namespace firebase
         void resetTimer(FirebaseApp &app, bool start, int interval = 0, int exp = -1)
         {
             app.err_timer.feed(0);
-
             app.auth_timer.stop();
             app.auth_timer.setInterval(interval);
             app.expire = exp == -1 ? interval : exp;

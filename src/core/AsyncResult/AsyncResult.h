@@ -1,5 +1,5 @@
 /**
- * Created February 6, 2024
+ * Created February 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -230,9 +230,7 @@ public:
                 event_p2 = p2;
                 p1 = p2;
                 setEventResumeStatus(event_resume_status_undefined);
-                sse_timer.stop();
-                sse_timer.setInterval(event().indexOf("cancel") > -1 || event().indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT);
-                sse_timer.start();
+                sse_timer.feed(event().indexOf("cancel") > -1 || event().indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT);
                 sse = true;
             }
 
