@@ -130,7 +130,7 @@
  * database_data_type_double (3), database_data_type_boolean (4), database_data_type_string (5), database_data_type_json (6),
  * and database_data_type_array (7).
  *
- * The aResult.database.dataPath() are aResult.database.event() the database node path that data has changed and type of event in server-sent events (stream) mode.
+ * The aResult.database.dataPath() and aResult.database.event() are the database node path that data has changed and type of event in server-sent events (stream) mode.
  *
  * The server response payload in AsyncResult can be converted to the the values e.g. boolean, integer,
  * float, double and string via aResult.database.to<T>() or result.database.to<T>().
