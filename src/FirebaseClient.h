@@ -78,7 +78,7 @@ namespace firebase
     class FirebaseClient
     {
     private:
-        void configApp(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth, firebase_core_auth_task_type task_type = firebase_core_auth_task_type_undefined)
+        void configApp(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth, firebase_core_auth_task_type task_type = firebase_core_auth_task_type_undefined)
         {
             app.aClient = &aClient;
             app.aclient_addr = reinterpret_cast<uint32_t>(&aClient);
@@ -106,7 +106,7 @@ namespace firebase
         FirebaseClient(){};
         ~FirebaseClient(){};
 
-        void initializeApp(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        void initializeApp(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth)
         {
             configApp(aClient, app, auth);
 
@@ -185,25 +185,25 @@ namespace firebase
             }
         }
 
-        void signup(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        void signup(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth)
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_signup);
             resetTimer(app, true, 0);
         }
 
-        void resetPassword(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        void resetPassword(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth)
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_reset_password);
             resetTimer(app, true, 0);
         }
 
-        void verify(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        void verify(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth)
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_send_verify_email);
             resetTimer(app, true, 0);
         }
 
-        void deleteUser(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth)
+        void deleteUser(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth)
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_delete_user);
             resetTimer(app, true, 0);
@@ -216,14 +216,14 @@ extern FirebaseClient Firebase;
 
 template <typename T>
 static user_auth_data &getAuth(T &auth) { return auth.get(); }
-static void initializeApp(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.initializeApp(aClient, app, auth); }
+static void initializeApp(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.initializeApp(aClient, app, auth); }
 template <typename T = const char *>
-static void signup(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.signup(aClient, app, auth); }
+static void signup(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.signup(aClient, app, auth); }
 template <typename T = const char *>
-static void resetPassword(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.resetPassword(aClient, app, auth); }
+static void resetPassword(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.resetPassword(aClient, app, auth); }
 template <typename T = const char *>
-static void verify(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.verify(aClient, app, auth); }
+static void verify(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.verify(aClient, app, auth); }
 template <typename T = const char *>
-static void deleteUser(AsyncClient &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.deleteUser(aClient, app, auth); }
+static void deleteUser(FIREBASE_ASYNC_CLIENT &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.deleteUser(aClient, app, auth); }
 
 #endif
