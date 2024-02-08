@@ -1,5 +1,5 @@
 /**
- * Created February 6, 2024
+ * Created February 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -41,7 +41,7 @@ public:
     Timer req_timer;
     uint16_t slot = 0;
 
-    void asyncRequest(FIREBASE_ASYNC_CLIENT *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult, const String &uid)
+    void asyncRequest(FIREBASE_ASYNC_CLIENT *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult, AsyncResultCallback resultCb, const String &uid)
     {
         if (!aClient)
             return;
@@ -58,6 +58,9 @@ public:
             sData->setRefResult(&aResult);
             req_timer.feed(FIREBASE_TCP_READ_TIMEOUT_SEC);
             slot = aClient->sVec.size() - 1;
+            sData->aResult.setDebug(FPSTR("Connecting to server..."));
+            if (resultCb)
+                resultCb(sData->aResult);
             aClient->process(sData->async);
             aClient->handleRemove();
         }
@@ -108,7 +111,7 @@ public:
     {
         if (!aClient)
             return;
-        aClient->stop();
+        aClient->stop(sData);
     }
 
     void setEventResult(AsyncResult &aResult, const String &msg, int code)

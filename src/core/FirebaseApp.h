@@ -1,5 +1,5 @@
 /**
- * Created February 6, 2024
+ * Created February 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -366,7 +366,7 @@ namespace firebase
                         extras += api_key;
                     }
 
-                    authReq.asyncRequest(aClient, subdomain, extras, payload, aResult, "");
+                    authReq.asyncRequest(aClient, subdomain, extras, payload, aResult,resultCb, "");
                     payload.remove(0, payload.length());
                     setEvent(auth_event_auth_request_sent);
                 }
@@ -434,7 +434,7 @@ namespace firebase
                     else
                         extras += auth_data.user_auth.user.api_key;
 
-                    authReq.asyncRequest(aClient, subdomain, extras, payload, aResult, "");
+                    authReq.asyncRequest(aClient, subdomain, extras, payload, aResult,resultCb, "");
                     payload.remove(0, payload.length());
                     setEvent(auth_event_auth_request_sent);
                     return true;

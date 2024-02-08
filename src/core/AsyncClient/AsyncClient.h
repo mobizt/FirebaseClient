@@ -1,5 +1,5 @@
 /**
- * Created February 7, 2024
+ * Created February 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -361,7 +361,7 @@ private:
         if (sData->state == async_state_undefined || sData->state == async_state_send_header)
         {
             if ((sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined))
-                stop();
+                stop(sData);
 
             if ((client_type == async_request_handler_t::tcp_client_type_sync && !client->connected()) || client_type == async_request_handler_t::tcp_client_type_async)
             {
@@ -428,6 +428,7 @@ private:
 
         if (sData->response.location.length())
         {
+            stop(sData);
             if (connect(sData, getHost(sData, false).c_str(), sData->request.port) > function_return_type_failure)
                 return function_return_type_continue;
 
@@ -973,7 +974,7 @@ private:
             {
                 while (sData->response.tcpAvailable(client_type, client, async_tcp_config))
                     sData->response.tcpRead(client_type, client, async_tcp_config);
-                stop();
+                stop(sData);
             }
 
             if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK && (sData->request.ota || (sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size)))
@@ -1039,7 +1040,7 @@ private:
     void reset(async_data_item_t *sData, bool disconnect)
     {
         if (disconnect)
-            stop();
+            stop(sData);
         sData->response.httpCode = 0;
         sData->error.code = 0;
         sData->response.flags.reset();
@@ -1056,6 +1057,8 @@ private:
     {
         sData->aResult.lastError.clearError();
         lastErr.clearError();
+
+        sData->aResult.setDebug(FPSTR("Connecting to server..."));
 
         if (client && !client->connected() && client_type == async_request_handler_t::tcp_client_type_sync)
             sData->return_type = client->connect(host, port) > 0 ? function_return_type_complete : function_return_type_failure;
@@ -1182,14 +1185,14 @@ private:
             if (!gsmModem->waitForNetwork())
             {
                 if (netErrState == 0 && sData)
-                    sData->aResult.setDebug(FPSTR("failed"));
+                    sData->aResult.setDebug(FPSTR("Network connection failed"));
                 netErrState = 1;
                 net.network_status = false;
                 return false;
             }
 
             if (netErrState == 0 && sData)
-                sData->aResult.setDebug(FPSTR("success"));
+                sData->aResult.setDebug(FPSTR("Network connected"));
 
             if (gsmModem->isNetworkConnected())
             {
@@ -1207,9 +1210,9 @@ private:
                 if (netErrState == 0 && sData)
                 {
                     if (net.network_status)
-                        sData->aResult.setDebug(FPSTR("success"));
+                        sData->aResult.setDebug(FPSTR("GPRS/EPS connected"));
                     else
-                        sData->aResult.setDebug(FPSTR("failed"));
+                        sData->aResult.setDebug(FPSTR("GPRS/EPS connection failed"));
                 }
             }
 
@@ -1297,7 +1300,7 @@ private:
         }
 
         if (!ret && sData)
-            sData->aResult.setDebug(FPSTR("Can't connect"));
+            sData->aResult.setDebug(FPSTR("Can't connect to network"));
 
 #endif
 
@@ -1329,6 +1332,9 @@ private:
             if (recon && (net.net_timer.remaining() == 0))
             {
                 net.net_timer.feed(FIREBASE_NET_RECONNECT_TIMEOUT_SEC);
+
+                if (sData)
+                    sData->aResult.setDebug(FPSTR("Reconnecting to network..."));
 
                 if (net.network_data_type == firebase_network_data_generic_network)
                 {
@@ -1766,7 +1772,7 @@ public:
 
     ~FIREBASE_ASYNC_CLIENT()
     {
-        stop();
+        stop(nullptr);
 
         for (size_t i = 0; i < sVec.size(); i++)
         {
@@ -1810,8 +1816,10 @@ public:
         inStopAsync = false;
     }
 
-    void stop()
+    void stop(async_data_item_t *sData)
     {
+        if (sData)
+            sData->aResult.setDebug(FPSTR("Terminating the server connection..."));
         if (client_type == async_request_handler_t::tcp_client_type_sync)
         {
             if (client)

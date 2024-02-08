@@ -1,5 +1,5 @@
 /**
- * Created February 7, 2024
+ * Created February 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -128,8 +128,6 @@ private:
 
     void setDebug(const String &debug)
     {
-        data_available = false;
-        error_available = false;
         debug_info = debug;
         if (debug.length())
             debug_info_available = true;
