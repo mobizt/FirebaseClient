@@ -26,7 +26,6 @@
  */
 
 #include <Arduino.h>
-#include <FirebaseClient.h>
 
 #define TINY_GSM_MODEM_SIM7600 // SIMA7670 Compatible with SIM7600 AT instructions
 
@@ -74,6 +73,7 @@ const char gprsPass[] = "";
 #define SD_CS 13
 
 #include <TinyGsmClient.h>
+#include <FirebaseClient.h>
 
 // https://github.com/mobizt/ESP_SSLClient
 #include <ESP_SSLClient.h>
