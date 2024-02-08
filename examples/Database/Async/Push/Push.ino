@@ -101,7 +101,7 @@
  *
  * If the authentication async operation was required, it will insert to the first slot of the queue.
  *
- * If the sync operation was called, it will insert to the first slot in the queue too.
+ * If the sync operation was called, it will insert to the first slot in the queue too (but after the authentication task slot).
  *
  * When async Get operation in SSE mode (stream) was currently stored in queue, the new sync and async operation will insert before
  * the SSE slot.

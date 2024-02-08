@@ -55,6 +55,30 @@
  *
  * Deallocation of FirebaseApp causes these services apps uninitialized and cannot be used.
  *
+ * ASYNC QUEUE
+ * ===========
+ *
+ * Each sync and async request data consume memory upto 1k. When many async operations are added to queue (FIFO), the memory usage was increased.
+ *
+ * Each AsyncClient handles this queue separately. Then to limit the memory used for each AsyncClient, 
+ * this library allows 3-5 async operations (called slot) can be stored in the queue at the same time.
+ *
+ * If the authentication async operation was required, it will insert to the first slot of the queue.
+ *
+ * If the sync operation was called, it will insert to the first slot in the queue too (but after the authentication task slot).
+ *
+ * When async Get operation in SSE mode (stream) was currently stored in queue, the new sync and async operation will insert before
+ * the SSE slot.
+ *
+ * When the async operation queue was full, the operation will be cancelled for new sync and async operation.
+ *
+ * The queue cannot be cleard by user unless the async operation that processed was timed out, it will be removed from queue
+ * and allow the vacant slot for the new async operation.
+ * 
+ * The SSL Client e.g. WiFiClientSecure that binds to the AsyncClient should not be shared among various AsyncClients because of interferences in async operations.
+ * 
+ * Only one SSL Client should be assign to or used with only one AsyncClient.
+ *
  */
 
 #include <Arduino.h>
@@ -121,6 +145,8 @@ void setup()
     app.setCallback(asyncCB);
 
     initializeApp(aClient, app, getAuth(legacy_token));
+
+    // To re-authenticate manually at any time, just call initializeApp again.
 }
 
 void loop()
