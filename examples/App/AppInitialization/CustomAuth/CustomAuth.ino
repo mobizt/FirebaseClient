@@ -70,27 +70,60 @@
  * ASYNC QUEUE
  * ===========
  *
- * Each sync and async request data consume memory upto 1k. When many async operations are added to queue (FIFO), the memory usage was increased.
+ * Each sync and async requests data consume memory up to 1k. When many async operations are added to queue (FIFO), the memory usage was increased.
  *
- * Each AsyncClient handles this queue separately. Then to limit the memory used for each AsyncClient,
- * this library allows 3-5 async operations (called slot) can be stored in the queue at the same time.
+ * Each AsyncClient handles this queue separately. Then in order to limit the memory used for each AsyncClient,
+ * this library allows 3-5 async operations (called slots) can be stored in the queue at the same time.
  *
  * If the authentication async operation was required, it will insert to the first slot of the queue.
  *
- * If the sync operation was called, it will insert to the first slot in the queue too (but after the authentication task slot).
+ * If the sync operation was called, it will insert to the first slot in the queue too but after the authentication task slot.
  *
- * When async Get operation in SSE mode (stream) was currently stored in queue, the new sync and async operation will insert before
- * the SSE slot.
+ * When async Get operation in SSE mode (HTTP Streaming) was currently stored in queue, the new sync and async operations will be inserted before
+ * the async SSE (HTTP Streaming) slot.
  *
- * When the async operation queue was full, the operation will be cancelled for new sync and async operation.
+ * When the async operation queue is full, the new sync and async operations will be cancelled.
+ * 
+ * The finished and timed out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
+ * 
+ * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app 
+ * (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
+ * 
+ * STOP QUEUE
+ * ===========
+ * 
+ * SYNTAX:
+ * 
+ * The async operation will be cancelled and remove from the queue by calling thes functions.
+ * 
+ * asyncClient.stopAsync() - stop the last async operation in the queue.
+ * 
+ * asyncClient.stopAsync(true) - stop all async operation in the queue.
+ * 
+ * asyncClient.stopAsync("xxxx") - stop the async operation in the queue that has the async result UID xxxx.
+ * 
+ * ASYNC CLIENT
+ * ============
+ * 
+ * The async client stores the async operating data in its queue and holds the pointer of SSL Client that assigned with it.
+ * 
+ * The SSL Client should be existed in the AsyncClient usage scope in case of sync or should defined as global object for async usage.
+ * 
+ * The SSL Client should not be shared among various AsyncClients because of interferences in async operations.
  *
- * The queue cannot be cleard by user unless the async operation that processed was timed out, it will be removed from queue
- * and allow the vacant slot for the new async operation.
- *
- * The SSL Client e.g. WiFiClientSecure that binds to the AsyncClient should not be shared among various AsyncClients because of interferences in async operations.
- *
- * Only one SSL Client should be assign to or used with only one AsyncClient.
- *
+ * Only one SSL Client should be assigned to or used with only one AsyncClient.
+ * 
+ * SSL Client can force to stop by user or calling stop() from asyncClient.
+ * 
+ * SYNTAX:
+ * 
+ * asyncClient.stop() - stop the SSL Client to terminate the server connection.
+ * 
+ * In case the AsyncClient class name was ambigous and used by other library, 
+ * you can change the library's AsyncClient class name to other by define the following macro 
+ * in src/Config.h or user created config file in src/UserConfig.h.
+ * 
+ * #define FIREBASE_ASYNC_CLIENT newAsyncClient
  */
 
 #include <Arduino.h>

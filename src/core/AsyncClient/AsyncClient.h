@@ -1749,6 +1749,40 @@ private:
         return url_info.host;
     }
 
+    void stopAsyncImpl(bool all = false, const String &uid = "")
+    {
+        if (inStopAsync)
+            return;
+
+        inStopAsync = true;
+        size_t size = slotCount();
+        if (size)
+        {
+            for (size_t i = size - 1; i >= 0; i--)
+            {
+                async_request_handler_t req;
+                req.idle();
+                async_data_item_t *sData = getData(i);
+                if (sData && sData->async && !sData->auth_used && !sData->cancel)
+                {
+                    if (uid.length())
+                    {
+                        if (strcmp(sData->aResult.uid().c_str(), uid.c_str()) == 0)
+                            sData->cancel = true;
+                    }
+                    else
+                    {
+                        sData->cancel = true;
+                        if (!all)
+                            break;
+                    }
+                }
+            }
+        }
+
+        inStopAsync = false;
+    }
+
 public:
     FIREBASE_ASYNC_CLIENT(Client &client, network_config_data &net) : client(&client)
     {
@@ -1788,33 +1822,8 @@ public:
 
     bool networkStatus() { return netStatus(nullptr); }
 
-    void stopAsync(bool all = false)
-    {
-        if (inStopAsync)
-            return;
-
-        inStopAsync = true;
-        size_t size = slotCount();
-        if (size)
-        {
-            for (size_t i = size - 1; i >= 0; i--)
-            {
-                async_request_handler_t req;
-                req.idle();
-                async_data_item_t *sData = getData(i);
-                if (sData && sData->async && !sData->auth_used && !sData->cancel)
-                {
-                    if (!sse && sData->sse)
-                        continue;
-                    sData->cancel = true;
-                    if (!all)
-                        break;
-                }
-            }
-        }
-
-        inStopAsync = false;
-    }
+    void stopAsync(bool all = false) { stopAsyncImpl(all); }
+    void stopAsync(const String &uid) { stopAsyncImpl(false, uid); }
 
     void stop(async_data_item_t *sData)
     {
