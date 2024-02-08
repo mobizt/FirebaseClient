@@ -97,7 +97,7 @@
  * The AsyncResult object in the AsyncResultCallback function provides the result of async and non-async operations.
  *
  * APP EVENT
- * ===========
+ * =========
  *
  * The event information can be obtained from aResult.appEvent().code() and aResult.appEvent().message() respectively.
  *
@@ -134,6 +134,30 @@
  *
  * The server response payload in AsyncResult can be converted to the the values e.g. boolean, integer,
  * float, double and string via aResult.database.to<T>() or result.database.to<T>().
+ *
+ * ASYNC QUEUE
+ * ===========
+ *
+ * Each sync and async request data consume memory upto 1k. When many async operations are added to queue (FIFO), the memory usage was increased.
+ *
+ * Each AsyncClient handles this queue separately. Then to limit the memory used for each AsyncClient, 
+ * this library allows 3-5 async operations (called slot) can be stored in the queue at the same time.
+ *
+ * If the authentication async operation was required, it will insert to the first slot of the queue.
+ *
+ * If the sync operation was called, it will insert to the first slot in the queue too.
+ *
+ * When async Get operation in SSE mode (stream) was currently stored in queue, the new sync and async operation will insert before
+ * the SSE slot.
+ *
+ * When the async operation queue was full, the operation will be cancelled for new sync and async operation.
+ *
+ * The queue cannot be cleard by user unless the async operation that processed was timed out, it will be removed from queue
+ * and allow the vacant slot for the new async operation.
+ * 
+ * The SSL Client e.g. WiFiClientSecure that binds to the AsyncClient should not be shared among various AsyncClients because of interferences in async operations.
+ * 
+ * Only one SSL Client should be assign to or used with only one AsyncClient.
  *
  */
 
