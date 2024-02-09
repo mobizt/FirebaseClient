@@ -1702,7 +1702,7 @@ private:
         if (sData->sse && sData->aResult.database.eventTimeout() && sData->aResult.database.eventResumeStatus() == AsyncResult::database_data_t::event_resume_status_undefined)
         {
             sData->aResult.database.setEventResumeStatus(AsyncResult::database_data_t::event_resume_status_resuming);
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEDOUT, false, false);
+            setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEOUT, false, false);
             returnResult(sData, false);
             reset(sData, true);
         }

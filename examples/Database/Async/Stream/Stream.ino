@@ -140,7 +140,7 @@
  *
  * When the async operation queue is full, the new sync and async operations will be cancelled.
  * 
- * The finished and timed out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
+ * The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
  * 
  * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app 
  * (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
@@ -317,7 +317,7 @@ void loop()
         database.set<object_t>(aClient2, "/test/stream/number", json, asyncCB);
 
         // When the async operation queue was full, the operation will be cancelled for new sync and async operation.
-        // When the async operation was timed out, it will be removed from queue and allow the slot for the new async operation.
+        // When the async operation was time out, it will be removed from queue and allow the slot for the new async operation.
 
         // To assign UID for async result
         // database.set<object_t>(aClient2, "/test/stream/number", json, asyncCB, "myUID");

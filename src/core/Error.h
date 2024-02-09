@@ -86,7 +86,7 @@
 #define FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE -112
 #define FIREBASE_ERROR_FW_UPDATE_WRITE_FAILED -113
 #define FIREBASE_ERROR_FW_UPDATE_END_FAILED -114
-#define FIREBASE_ERROR_STREAM_TIMEDOUT -115
+#define FIREBASE_ERROR_STREAM_TIMEOUT -115
 #define FIREBASE_ERROR_STREAM_AUTH_REVOKED -116
 #define FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED -117
 #define FIREBASE_ERROR_OPERATION_CANCELLED -118
@@ -146,7 +146,7 @@ private:
                 err.message = FPSTR("TCP send failed");
                 break;
             case FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT:
-                err.message = FPSTR("TCP receive timed out");
+                err.message = FPSTR("TCP receive time out");
                 break;
             case FIREBASE_ERROR_TCP_DISCONNECTED:
                 err.message = FPSTR("TCP disconnected");
@@ -199,8 +199,8 @@ private:
             case FIREBASE_ERROR_FW_UPDATE_END_FAILED:
                 err.message = FPSTR("firmware end failed");
                 break;
-            case FIREBASE_ERROR_STREAM_TIMEDOUT:
-                err.message = FPSTR("stream timed out");
+            case FIREBASE_ERROR_STREAM_TIMEOUT:
+                err.message = FPSTR("stream time out");
                 break;
             case FIREBASE_ERROR_STREAM_AUTH_REVOKED:
                 err.message = FPSTR("auth revoked");

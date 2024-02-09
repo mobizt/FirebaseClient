@@ -110,7 +110,7 @@
  *
  * When the async operation queue is full, the new sync and async operations will be cancelled.
  *
- * The finished and timed out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
+ * The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
  *
  * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app
  * (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
