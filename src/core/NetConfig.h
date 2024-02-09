@@ -1,5 +1,5 @@
 /**
- * Created February 6, 2024
+ * Created February 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -40,7 +40,7 @@ struct network_config_data
     friend class GSMNetwork;
     friend class DefaultEthernetNetwork;
     friend class DefaultWiFiNetwork;
-    friend class FIREBASE_ASYNC_CLIENT;
+    friend class AsyncClientClass;
 
 private:
     struct generic_data

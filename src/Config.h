@@ -106,10 +106,6 @@
  * 🏷️ For disabling native (sdk) Ethernet functionality in case external Client usage
  * #define FIREBASE_DISABLE_NATIVE_ETHERNET
  * 
- * 🏷️ For AsyncClient class name assignment.
- * This prevent naming conflicts for the generic name AsyncClient usage.
- * #define FIREBASE_ASYNC_CLIENT MyAsyncClient
- * 
  * 🏷️ For Async TCP Client usage.
  * #define ENABLE_ASYNC_TCP_CLIENT
  */

@@ -50,11 +50,12 @@ FirebaseApp app;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 AsyncTCPConfig asyncTCP(AsyncTCPConnectCB, AsyncTCPStatusCB, AsyncTCPSendCB, AsyncTCPReceiveCB, AsyncTCPStop);
 
-// In case the AsyncClient class name was ambigous and used by other async TCP client library, you can change
-// the library's AsyncClient class name to other by define the following macro in src/Config.h
-// or user created config file in src/UserConfig.h.
+/**
+ * In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
+ * it with other name with keyword "using" or use the class name AsyncClientClass directly.
+ */
 
-// #define FIREBASE_ASYNC_CLIENT MyAsyncClient
+using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(asyncTCP, getNetwork(network));
 

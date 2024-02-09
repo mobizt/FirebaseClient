@@ -1,5 +1,5 @@
 /**
- * Created February 8, 2024
+ * Created February 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -52,7 +52,7 @@ namespace firebase
 
     private:
         auth_data_t auth_data;
-        FIREBASE_ASYNC_CLIENT *aClient = nullptr;
+        AsyncClientClass *aClient = nullptr;
         uint32_t aclient_addr = 0;
         uint32_t app_addr = 0;
         uint32_t ref_ts = 0;

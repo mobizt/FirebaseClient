@@ -1,5 +1,5 @@
 /**
- * Created February 7, 2024
+ * Created February 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -82,7 +82,7 @@ typedef void (*AsyncTCPStop)();
 
 class AsyncTCPConfig
 {
-    friend class FIREBASE_ASYNC_CLIENT;
+    friend class AsyncClientClass;
     friend class async_request_handler_t;
     friend class async_response_handler_t;
 

@@ -37,6 +37,11 @@ FirebaseApp app;
 
 WiFiClientSecure ssl_client;
 
+// In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
+// it with other name with keyword "using" or use the class name AsyncClientClass directly.
+
+using AsyncClient = AsyncClientClass;
+
 AsyncClient aClient(ssl_client, getNetwork(network));
 
 void setup()

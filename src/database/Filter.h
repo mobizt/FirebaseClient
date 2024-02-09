@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -36,7 +36,7 @@ class Filter
 {
     friend class DataOptions;
     friend class Database;
-    friend class FIREBASE_ASYNC_CLIENT;
+    friend class AsyncClientClass;
 
 private:
     void copy(Filter &rhs)

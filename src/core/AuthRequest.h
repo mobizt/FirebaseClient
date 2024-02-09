@@ -1,5 +1,5 @@
 /**
- * Created February 8, 2024
+ * Created February 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -33,7 +33,7 @@
 class AuthRequest
 {
 private:
-    FIREBASE_ASYNC_CLIENT::async_data_item_t *sData = nullptr;
+    AsyncClientClass::async_data_item_t *sData = nullptr;
 
 public:
     AuthRequest(){};
@@ -41,7 +41,7 @@ public:
     Timer req_timer;
     uint16_t slot = 0;
 
-    void asyncRequest(FIREBASE_ASYNC_CLIENT *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult, AsyncResultCallback resultCb, const String &uid)
+    void asyncRequest(AsyncClientClass *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult, AsyncResultCallback resultCb, const String &uid)
     {
         if (!aClient)
             return;
@@ -49,7 +49,7 @@ public:
         String host;
         async_request_handler_t req;
         req.addGAPIsHost(host, subdomain.c_str());
-        sData = aClient->newSlot(cVec, host, extras, "", async_request_handler_t::http_post, FIREBASE_ASYNC_CLIENT::slot_options_t(true, false, true, false, false, false), uid);
+        sData = aClient->newSlot(cVec, host, extras, "", async_request_handler_t::http_post, AsyncClientClass::slot_options_t(true, false, true, false, false, false), uid);
         if (sData)
         {
             req.addContentTypeHeader(sData->request.header, "application/json");
@@ -78,7 +78,7 @@ public:
         aResult.lastError.err.code = 0;
     }
 
-    void process(FIREBASE_ASYNC_CLIENT *aClient, AsyncResult &aResult, AsyncResultCallback resultCb)
+    void process(AsyncClientClass *aClient, AsyncResult &aResult, AsyncResultCallback resultCb)
     {
         if (!aClient)
             return;
@@ -100,14 +100,14 @@ public:
         return FirebaseError();
     }
 
-    void remove(FIREBASE_ASYNC_CLIENT *aClient)
+    void remove(AsyncClientClass *aClient)
     {
         if (!aClient)
             return;
         aClient->handleRemove();
     }
 
-    void stop(FIREBASE_ASYNC_CLIENT *aClient)
+    void stop(AsyncClientClass *aClient)
     {
         if (!aClient)
             return;

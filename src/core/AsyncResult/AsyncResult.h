@@ -1,5 +1,5 @@
 /**
- * Created February 8, 2024
+ * Created February 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -37,7 +37,7 @@ using namespace firebase;
 
 class AsyncResult
 {
-    friend class FIREBASE_ASYNC_CLIENT;
+    friend class AsyncClientClass;
     friend class FirebaseApp;
     friend class AuthRequest;
     friend class Database;
@@ -137,7 +137,7 @@ public:
     struct database_data_t
     {
         friend class AsyncResult;
-        friend class FIREBASE_ASYNC_CLIENT;
+        friend class AsyncClientClass;
         friend class Database;
         friend class Firesrore;
         friend class Messaging;

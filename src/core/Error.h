@@ -1,5 +1,5 @@
 /**
- * Created February 5, 2024
+ * Created February 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -97,7 +97,7 @@
 
 class FirebaseError
 {
-    friend class FIREBASE_ASYNC_CLIENT;
+    friend class AsyncClientClass;
     friend class AuthRequest;
     friend class Database;
 

@@ -112,11 +112,6 @@
  * 
  * asyncClient.stop() - stop the SSL Client to terminate the server connection.
  * 
- * In case the AsyncClient class name was ambigous and used by other library, 
- * you can change the library's AsyncClient class name to other by define the following macro 
- * in src/Config.h or user created config file in src/UserConfig.h.
- * 
- * #define FIREBASE_ASYNC_CLIENT newAsyncClient
  */
 
 #include <Arduino.h>
@@ -153,6 +148,11 @@ IDToken id_token(API_KEY, "ID token", 3000 /* expire period in seconds (<= 3600)
 FirebaseApp app;
 
 WiFiClientSecure ssl_client;
+
+// In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
+// it with other name with keyword "using" or use the class name AsyncClientClass directly.
+
+using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 

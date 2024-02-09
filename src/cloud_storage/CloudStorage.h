@@ -1,5 +1,5 @@
 /**
- * Created February 5, 2024
+ * Created February 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -35,7 +35,7 @@ using namespace firebase;
 class CloudStorage
 {
 private:
-    FIREBASE_ASYNC_CLIENT *aClient = nullptr;
+    AsyncClientClass *aClient = nullptr;
     String service_url;
     String path;
     String uid;
@@ -84,7 +84,7 @@ public:
     {
         for (size_t i = 0; i < cVec.size(); i++)
         {
-            FIREBASE_ASYNC_CLIENT *aClient = reinterpret_cast<FIREBASE_ASYNC_CLIENT *>(cVec[i]);
+            AsyncClientClass *aClient = reinterpret_cast<AsyncClientClass *>(cVec[i]);
             if (aClient)
             {
                 aClient->process(true);

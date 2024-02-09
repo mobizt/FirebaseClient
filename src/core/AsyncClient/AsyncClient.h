@@ -1,5 +1,5 @@
 /**
- * Created February 8, 2024
+ * Created February 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -43,7 +43,7 @@
 
 using namespace firebase;
 
-class FIREBASE_ASYNC_CLIENT
+class AsyncClientClass
 {
     friend class AuthRequest;
     friend class Database;
@@ -1784,7 +1784,7 @@ private:
     }
 
 public:
-    FIREBASE_ASYNC_CLIENT(Client &client, network_config_data &net) : client(&client)
+    AsyncClientClass(Client &client, network_config_data &net) : client(&client)
     {
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
@@ -1794,7 +1794,7 @@ public:
     }
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
-    FIREBASE_ASYNC_CLIENT(AsyncTCPConfig &tcpClientConfig, network_config_data &net) : async_tcp_config(&tcpClientConfig)
+    AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net) : async_tcp_config(&tcpClientConfig)
     {
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
@@ -1804,7 +1804,7 @@ public:
     }
 #endif
 
-    ~FIREBASE_ASYNC_CLIENT()
+    ~AsyncClientClass()
     {
         stop(nullptr);
 

@@ -107,47 +107,42 @@
  * the async SSE (HTTP Streaming) slot.
  *
  * When the async operation queue is full, the new sync and async operations will be cancelled.
- * 
+ *
  * The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
- * 
- * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app 
+ *
+ * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app
  * (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
- * 
+ *
  * STOP QUEUE
  * ===========
- * 
+ *
  * SYNTAX:
- * 
+ *
  * The async operation will be cancelled and remove from the queue by calling thes functions.
- * 
+ *
  * asyncClient.stopAsync() - stop the last async operation in the queue.
- * 
+ *
  * asyncClient.stopAsync(true) - stop all async operation in the queue.
- * 
+ *
  * asyncClient.stopAsync("xxxx") - stop the async operation in the queue that has the async result UID xxxx.
- * 
+ *
  * ASYNC CLIENT
  * ============
- * 
+ *
  * The async client stores the async operating data in its queue and holds the pointer of SSL Client that assigned with it.
- * 
+ *
  * The SSL Client should be existed in the AsyncClient usage scope in case of sync or should defined as global object for async usage.
- * 
+ *
  * The SSL Client should not be shared among various AsyncClients because of interferences in async operations.
  *
  * Only one SSL Client should be assigned to or used with only one AsyncClient.
- * 
+ *
  * SSL Client can force to stop by user or calling stop() from asyncClient.
- * 
+ *
  * SYNTAX:
- * 
+ *
  * asyncClient.stop() - stop the SSL Client to terminate the server connection.
- * 
- * In case the AsyncClient class name was ambigous and used by other library, 
- * you can change the library's AsyncClient class name to other by define the following macro 
- * in src/Config.h or user created config file in src/UserConfig.h.
- * 
- * #define FIREBASE_ASYNC_CLIENT newAsyncClient
+ *
  */
 
 #include <Arduino.h>
@@ -189,6 +184,11 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 FirebaseApp app;
 
 WiFiClientSecure ssl_client;
+
+// In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
+// it with other name with keyword "using" or use the class name AsyncClientClass directly.
+
+using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
