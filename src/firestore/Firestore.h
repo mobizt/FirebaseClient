@@ -770,7 +770,7 @@ public:
 
     void asyncRequest(async_request_data_t &request)
     {
-
+        URLHelper uh;
         app_token_t *app_token = appToken();
 
         if (!app_token)
@@ -778,6 +778,8 @@ public:
 
         request.opt.app_token = app_token;
         String extras;
+
+        uh.addGAPIv1Path(request.path);
 
         addParams(request, extras);
 
@@ -811,8 +813,6 @@ public:
         app_token_t *app_token = appToken();
 
         bool hasQueryParams = false;
-
-        uh.addGAPIv1Path(extras);
 
         extras += request.options->resource.projectId.length() == 0 ? app_token->project_id : request.options->resource.projectId;
         extras += FPSTR("/databases/");

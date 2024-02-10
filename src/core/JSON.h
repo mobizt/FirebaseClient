@@ -62,7 +62,7 @@ public:
         if (last)
             buf += ']';
     }
-    
+
     /* convert comma separated tokens into JSON Array and add to JSON object */
     void addTokens(String &buf, const String &name, const String &value, bool last = false)
     {
@@ -73,6 +73,8 @@ public:
         char *pp = p;
         char *end = p;
         String tmp;
+        if (value.length() == 0)
+            tmp += '[';
         while (pp != NULL)
         {
             sh.strsepImpl(&end, ",");
