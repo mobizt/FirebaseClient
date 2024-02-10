@@ -85,14 +85,14 @@
  * The <ProjectResource> is the ProjectResource object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- * 
- * The <collectionIds> is the collection ids to export. 
- * Unspecified means all collections. 
+ *
+ * The <collectionIds> is the collection ids to export.
+ * Unspecified means all collections.
  * Use comma (,) to separate between the collection ids.
- * 
+ *
  * The <bucketID> is the Firebase storage bucket ID in the project.
  * The <storagePath> is the path in the Firebase Storage data bucket to store the exported database.
- * 
+ *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
  * The uid is user specified UID of async result (optional) which used as async task identifier.
@@ -219,6 +219,8 @@ AsyncClient aClient(ssl_client, getNetwork(network));
 
 Firestore firestore;
 
+AsyncResult aResult_no_callback;
+
 bool taskCompleted = false;
 
 void setup()
@@ -271,6 +273,12 @@ void loop()
     // To get the authentication time to live in seconds before expired.
     // app.ttl();
 
+    // This required when different AsyncClients than used in FirebaseApp assigned to the firestore functions.
+    firestore.loop();
+
+    // To get anyc result without callback
+    // printResult(aResult_no_callback);
+
     if (app.ready() && !taskCompleted)
     {
         taskCompleted = true;
@@ -281,6 +289,12 @@ void loop()
         // See how to add permission here, https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
 
         firestore.exportDocuments(aClient, ProjectResource(FIREBASE_PROJECT_ID, "" /* databaseId can be (default) or empty */), "" /* Which collection ids to export. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket to store the data */, asyncCB);
+
+        // To assign UID for async result
+        // firestore.exportDocuments(aClient, ProjectResource(FIREBASE_PROJECT_ID, ""), "", STORAGE_BUCKET_ID, "test_path", asyncCB, "myUID");
+
+        // To get anyc result without callback
+        // firestore.exportDocuments(aClient, ProjectResource(FIREBASE_PROJECT_ID, ""), "", STORAGE_BUCKET_ID, "test_path", aResult_no_callback);
     }
 }
 
