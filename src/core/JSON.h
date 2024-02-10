@@ -62,6 +62,31 @@ public:
         if (last)
             buf += ']';
     }
+    
+    /* convert comma separated tokens into JSON Array and add to JSON object */
+    void addTokens(String &buf, const String &name, const String &value, bool last = false)
+    {
+        StringHelper sh;
+        char *p = new char[value.length() + 1];
+        memset(p, 0, value.length() + 1);
+        strcpy(p, value.c_str());
+        char *pp = p;
+        char *end = p;
+        String tmp;
+        while (pp != NULL)
+        {
+            sh.strsepImpl(&end, ",");
+            if (strlen(pp) > 0)
+            {
+                addArray(tmp, toString(pp));
+            }
+            pp = end;
+        }
+        tmp += ']';
+        addObject(buf, name, tmp, last);
+        delete p;
+    }
+
     String toString(const String &value)
     {
         String buf;

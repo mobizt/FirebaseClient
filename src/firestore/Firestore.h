@@ -955,7 +955,7 @@ public:
         uh.addGStorageURL(uriPrefix, bucketID, storagePath);
         JsonHelper json;
         json.addObject(options.payload, isImport ? json.toString("inputUriPrefix") : json.toString("outputUriPrefix"), json.toString(uriPrefix));
-        json.addObject(options.payload, json.toString("collectionIds"), json.toString(collectionIds), true);
+        json.addTokens(options.payload, json.toString("collectionIds"), collectionIds, true);
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
