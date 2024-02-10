@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created February 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -88,10 +88,10 @@ public:
      * Get value at the node path.
      * @param aClient The async client.
      * @param path The node path to get value.
-     * @param options The database options (DataOptions).
+     * @param options The database options (DatabaseOptions).
      * @return value that casts from response payload.
      *
-     * The DataOptions related to the Conditional Requests and Query Parameters supported by
+     * The DatabaseOptions related to the Conditional Requests and Query Parameters supported by
      * Firebase Realtime Database REST API are following.
      *
      * readTimeout, the timeout (number) in ms which limits how long the read takes on the server side.
@@ -113,7 +113,7 @@ public:
      *
      * Example:
      *
-     * DataOptions options;
+     * DatabaseOptions options;
      * options.filter.orderBy("Data");
      * options.filter.startAt(105);
      * options.filter.endAt(120);
@@ -122,7 +122,7 @@ public:
      * String json = database.get<String>(aClient, "/path/to/data", options);
      */
     template <typename T1 = int>
-    auto get(AsyncClientClass &aClient, const String &path, DataOptions &options) -> typename enable_if<!is_same<T1, void>::value && !is_same<T1, AsyncResult>::value, T1>::type
+    auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename enable_if<!is_same<T1, void>::value && !is_same<T1, AsyncResult>::value, T1>::type
     {
         AsyncResult result;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, false, false, false, false, options.shallow), &options, nullptr, &result, NULL);
@@ -169,13 +169,13 @@ public:
      * Get value at the node path.
      * @param aClient The async client.
      * @param path The node path to get value.
-     * @param options The database options (DataOptions).
+     * @param options The database options (DatabaseOptions).
      * @param aResult The async result (AsyncResult)
      * @return value that casts from response payload.
      *
      * Example:
      *
-     * DataOptions options;
+     * DatabaseOptions options;
      * options.filter.orderBy("Data");
      * options.filter.startAt(105);
      * options.filter.endAt(120);
@@ -183,7 +183,7 @@ public:
      *
      * database.get<String>(aClient, "/path/to/data", options, aResult);
      */
-    void get(AsyncClientClass &aClient, const String &path, DataOptions &options, AsyncResult &aResult)
+    void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult)
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, true, false, false, false), &options, nullptr, &aResult, NULL);
         asyncRequest(aReq);
@@ -193,13 +193,13 @@ public:
      * Get value at the node path.
      * @param aClient The async client.
      * @param path The node path to get value.
-     * @param options The database options (DataOptions).
+     * @param options The database options (DatabaseOptions).
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
      * Example:
      *
-     * DataOptions options;
+     * DatabaseOptions options;
      * options.filter.orderBy("Data");
      * options.filter.startAt(105);
      * options.filter.endAt(120);
@@ -207,7 +207,7 @@ public:
      *
      * database.get<String>(aClient, "/path/to/data", options, cb);
      */
-    void get(AsyncClientClass &aClient, const String &path, DataOptions &options, AsyncResultCallback cb, const String &uid = "")
+    void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
@@ -321,7 +321,7 @@ public:
     bool existed(AsyncClientClass &aClient, const String &path)
     {
         AsyncResult result;
-        DataOptions options;
+        DatabaseOptions options;
         options.silent = true;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(), &options, nullptr, &result, NULL);
         asyncRequest(aReq);
@@ -859,12 +859,12 @@ private:
         String uid;
         async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
         AsyncClientClass::slot_options_t opt;
-        DataOptions *options = nullptr;
+        DatabaseOptions *options = nullptr;
         file_config_data *file = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, AsyncClientClass::slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, AsyncClientClass::slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;
@@ -884,7 +884,7 @@ private:
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
-        DataOptions options;
+        DatabaseOptions options;
         if (!async && aClient.reqEtag.length() == 0)
             options.silent = true;
         async_request_data_t aReq(&aClient, path, mode, AsyncClientClass::slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid);
@@ -945,7 +945,7 @@ private:
         request.aClient->handleRemove();
     }
 
-    void addParams(bool hasQueryParams, String &extras, async_request_handler_t::http_request_method method, DataOptions *options, bool isFile)
+    void addParams(bool hasQueryParams, String &extras, async_request_handler_t::http_request_method method, DatabaseOptions *options, bool isFile)
     {
         URLHelper uh;
 

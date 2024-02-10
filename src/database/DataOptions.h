@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -33,7 +33,7 @@
 #if defined(ENABLE_DATABASE)
 
 
-class DataOptions
+class DatabaseOptions
 {
     friend class Database;
 
@@ -46,7 +46,7 @@ public:
     String customHeaders;
     Filter filter;
 
-    void copy(DataOptions &rhs)
+    void copy(DatabaseOptions &rhs)
     {
         this->readTimeout = rhs.readTimeout;
         this->writeSizeLimit = rhs.writeSizeLimit;

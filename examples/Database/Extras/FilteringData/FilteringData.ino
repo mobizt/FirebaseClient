@@ -154,7 +154,7 @@ void setup()
 
     /**
      *
-     * The DataOptions related to the Conditional Requests and Query Parameters supported by
+     * The DatabaseOptions related to the Conditional Requests and Query Parameters supported by
      * Firebase Realtime Database REST API which the following options are available.
      *
      * readTimeout, the timeout (number) in ms which limits how long the read takes on the server side.
@@ -176,7 +176,7 @@ void setup()
      *
      */
 
-    DataOptions options;
+    DatabaseOptions options;
     options.filter.orderBy("Data").startAt(105).endAt(120).limitToLast(8);
 
     // For REST API, indexing the data at /test/filter/json is required when filtering the data, please see examples/Database/Extras/IndexingData/IndexingData.ino.

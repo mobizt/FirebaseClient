@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created February 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -34,7 +34,7 @@
 
 class Filter
 {
-    friend class DataOptions;
+    friend class DatabaseOptions;
     friend class Database;
     friend class AsyncClientClass;
 

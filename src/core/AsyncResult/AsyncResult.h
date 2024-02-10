@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created February 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -41,6 +41,11 @@ class AsyncResult
     friend class FirebaseApp;
     friend class AuthRequest;
     friend class Database;
+    friend class Firestore;
+    friend class Messaging;
+    friend class Functions;
+    friend class Storage;
+    friend class CloudStorage;
 
     struct app_event_t
     {

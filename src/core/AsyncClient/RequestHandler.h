@@ -1,5 +1,5 @@
 /**
- * Created February 7, 2024
+ * Created February 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -193,9 +193,13 @@ public:
     /* Append the string with first part of Authorization header */
     void addAuthHeaderFirst(String &header, auth_token_type type)
     {
-        header += "Authorization: ";
+        header += FPSTR("Authorization: ");
         if (type == auth_access_token || type == auth_sa_access_token)
-            header += "Bearer ";
+            header += FPSTR("Bearer ");
+        else if (type == auth_id_token || type == auth_custom_token)
+            header += FPSTR("Firebase ");
+        else
+            header += FPSTR("key=");
     }
 
     void parse(Memory &mem, const String &url, struct async_request_handler_t::url_info_t &info)

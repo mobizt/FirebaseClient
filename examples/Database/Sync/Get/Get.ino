@@ -64,10 +64,10 @@
  * SYNTAXES:
  *
  * T value  = database.get<T>(<AsyncClient>, <path>);
- * T value  = database.get<T>(<AsyncClient>, <path>, <DataOptions>);
+ * T value  = database.get<T>(<AsyncClient>, <path>, <DatabaseOptions>);
  *
  * In case of filtering the data and additional request parameters are required,
- * the DataOptions can be assigned to the function.
+ * the DatabaseOptions can be assigned to the function.
  *
  * Please see examples/Database/extras/FilteringData/FilteringData.ino for how to filter the data.
  *

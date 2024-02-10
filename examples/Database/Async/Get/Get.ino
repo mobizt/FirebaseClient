@@ -76,7 +76,7 @@
  * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * In case of filtering the data and additional request parameters are required,
- * the DataOptions can be assigned to the function via DataOptions object.
+ * the DatabaseOptions can be assigned to the function via DatabaseOptions object.
  *
  * Please see examples/Database/extras/FilteringData/FilteringData.ino for how to filter the data.
  *
@@ -292,7 +292,7 @@ void setup()
 
     // Filtering data
     // For REST API, indexing the data at /test/filter/json is required when filtering the data, please see examples/Database/Extras/IndexingData/IndexingData.ino.
-    DataOptions options;
+    DatabaseOptions options;
     options.filter.orderBy("Data").startAt(105).endAt(120).limitToLast(8);
 
     database.get(aClient, "/test/filter/json", options, asyncCB);

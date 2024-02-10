@@ -1,5 +1,5 @@
 /**
- * Created February 6, 2024
+ * Created February 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -1257,6 +1257,7 @@ namespace firebase
         String token;
         String refresh;
         String uid;
+        String project_id;
         uint32_t expire = 0;
         bool authenticated = false;
         auth_token_type auth_type = auth_unknown_token;

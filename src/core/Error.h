@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created February 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -100,6 +100,11 @@ class FirebaseError
     friend class AsyncClientClass;
     friend class AuthRequest;
     friend class Database;
+    friend class Firestore;
+    friend class Messaging;
+    friend class Functions;
+    friend class Storage;
+    friend class CloudStorage;
 
 private:
     struct firebase_error_info_t

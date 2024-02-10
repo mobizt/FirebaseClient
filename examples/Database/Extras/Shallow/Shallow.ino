@@ -151,7 +151,7 @@ void setup()
 
     Serial.println("[+] Get shalow data (sync)... ");
 
-    DataOptions options;
+    DatabaseOptions options;
 
     options.shallow = true;
 

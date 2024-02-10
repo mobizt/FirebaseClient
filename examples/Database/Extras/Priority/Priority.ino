@@ -202,7 +202,7 @@ void setup()
 
     Serial.println();
     Serial.println("[+] Filtering data with priority (sync)... ");
-    DataOptions options;
+    DatabaseOptions options;
     // Now the node priority_1 which its priority changed to 6.0 should include in the filtering result.
     options.filter.orderBy("$priority").startAt(3.0).endAt(8.0);
     database.get(aClient, "/test/items", options, asyncCB);

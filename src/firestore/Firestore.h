@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created February 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -26,6 +26,8 @@
 #define ASYNC_FIRESTORE_H
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
+#include "./firestore/DataOptions.h"
+
 using namespace std;
 
 using namespace firebase;
@@ -45,6 +47,30 @@ private:
     String uid;
     uint32_t app_addr = 0;
     app_token_t *app_token = nullptr;
+
+    struct async_request_data_t
+    {
+    public:
+        AsyncClientClass *aClient = nullptr;
+        String path;
+        String uid;
+        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
+        AsyncClientClass::slot_options_t opt;
+        FirestoreOptions *options = nullptr;
+        AsyncResult *aResult = nullptr;
+        AsyncResultCallback cb = NULL;
+        async_request_data_t() {}
+        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, AsyncClientClass::slot_options_t opt, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        {
+            this->aClient = aClient;
+            this->path = path;
+            this->method = method;
+            this->opt = opt;
+            this->aResult = aResult;
+            this->cb = cb;
+            this->uid = uid;
+        }
+    };
 
 public:
     enum firebase_firestore_transform_type
@@ -653,6 +679,192 @@ public:
                 aClient->handleRemove();
             }
         }
+    }
+
+    void asyncRequest(async_request_data_t &request, const char *payload = "")
+    {
+
+        app_token_t *app_token = appToken();
+
+        if (!app_token)
+            return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
+
+        request.opt.app_token = app_token;
+        String extras;
+
+        addParams(request, extras);
+
+        url(FPSTR("firestore.googleapis.com"));
+
+        if (request.options->requestType >= firebase_firestore_request_type_delete_doc)
+            request.method = async_request_handler_t::http_delete;
+        else if (request.options->requestType >= firebase_firestore_request_type_patch_doc)
+            request.method = async_request_handler_t::http_patch;
+        if (request.options->requestType >= firebase_firestore_request_type_get_doc)
+            request.method = async_request_handler_t::http_get;
+        else if (request.options->requestType >= firebase_firestore_request_type_rollback)
+            request.method = async_request_handler_t::http_post;
+
+        AsyncClientClass::async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
+
+        if (!sData)
+            return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
+
+        if (strlen(payload))
+        {
+            sData->request.payload = payload;
+            request.aClient->setContentLength(sData, strlen(payload));
+        }
+
+        if (request.cb)
+            sData->cb = request.cb;
+
+        if (request.aResult)
+            sData->setRefResult(request.aResult);
+
+        request.aClient->process(sData->async);
+        request.aClient->handleRemove();
+    }
+
+    void addParams(async_request_data_t &request, String &extras)
+    {
+        URLHelper uh;
+
+        app_token_t *app_token = appToken();
+
+        bool hasQueryParams = false;
+
+        uh.addGAPIv1Path(extras);
+
+        extras += request.options->projectId.length() == 0 ? app_token->project_id : request.options->projectId;
+        extras += FPSTR("/databases/");
+        extras += request.options->databaseId.length() > 0 ? request.options->databaseId : FPSTR("(default)");
+        if (request.options->requestType == firebase_firestore_request_type_export_docs)
+            extras += FPSTR(":exportDocuments");
+        else if (request.options->requestType == firebase_firestore_request_type_import_docs)
+            extras += FPSTR(":importDocuments");
+        else if (request.options->requestType == firebase_firestore_request_type_begin_transaction)
+        {
+            extras += FPSTR("/documents");
+            extras += FPSTR(":beginTransaction");
+        }
+        else if (request.options->requestType == firebase_firestore_request_type_rollback)
+        {
+            extras += FPSTR("/documents");
+            extras += FPSTR(":rollback");
+        }
+        else if (request.options->requestType == firebase_firestore_request_type_batch_get_doc)
+        {
+            extras += FPSTR("/documents");
+            extras += FPSTR(":batchGet");
+        }
+        else if (request.options->requestType == firebase_firestore_request_type_batch_write_doc)
+        {
+            extras += FPSTR("/documents");
+            extras += FPSTR(":batchWrite");
+        }
+        else if (request.options->requestType == firebase_firestore_request_type_commit_document ||
+                 request.options->requestType == firebase_firestore_request_type_run_query ||
+                 request.options->requestType == firebase_firestore_request_type_list_collection ||
+                 request.options->requestType == firebase_firestore_request_type_list_doc ||
+                 request.options->requestType == firebase_firestore_request_type_get_doc ||
+                 request.options->requestType == firebase_firestore_request_type_create_doc ||
+                 request.options->requestType == firebase_firestore_request_type_patch_doc ||
+                 request.options->requestType == firebase_firestore_request_type_delete_doc)
+        {
+            extras += FPSTR("/documents");
+
+            if (request.options->requestType == firebase_firestore_request_type_create_doc)
+            {
+                uh.addPath(extras, request.options->collectionId);
+                uh.addParam(extras, "documentId=", request.options->documentId, hasQueryParams);
+            }
+            else if (request.options->requestType == firebase_firestore_request_type_run_query ||
+                     request.options->requestType == firebase_firestore_request_type_list_collection ||
+                     request.options->requestType == firebase_firestore_request_type_get_doc ||
+                     request.options->requestType == firebase_firestore_request_type_patch_doc ||
+                     request.options->requestType == firebase_firestore_request_type_delete_doc)
+            {
+                uh.addPath(extras, request.options->documentPath);
+                extras += (request.options->requestType == firebase_firestore_request_type_list_collection)
+                              ? ":listCollectionIds"
+                          : request.options->requestType == firebase_firestore_request_type_run_query
+                              ? ":runQuery"
+                              : "";
+            }
+            else if (request.options->requestType == firebase_firestore_request_type_list_doc)
+            {
+                uh.addPath(extras, request.options->collectionId);
+                uh.addParam(extras, "pageSize", String(request.options->pageSize), hasQueryParams);
+                uh.addParam(extras, "pageToken", request.options->pageToken, hasQueryParams);
+                uh.addParam(extras, "orderBy=", request.options->orderBy, hasQueryParams);
+                uh.addParam(extras, "showMissing=", String(request.options->showMissing), hasQueryParams);
+            }
+
+            if (request.options->requestType == firebase_firestore_request_type_patch_doc)
+            {
+                uh.addParamsTokens(extras, "updateMask.fieldPaths=", request.options->updateMask, hasQueryParams);
+            }
+            else if (request.options->requestType == firebase_firestore_request_type_commit_document)
+            {
+                extras += FPSTR(":commit");
+            }
+
+            uh.addParamsTokens(extras, "mask.fieldPaths=", request.options->mask, hasQueryParams);
+
+            if (request.options->requestType == firebase_firestore_request_type_get_doc)
+            {
+                uh.addParam(extras, "transaction=", request.options->transaction, hasQueryParams);
+                uh.addParam(extras, "readTime=", request.options->readTime, hasQueryParams);
+            }
+            else if (request.options->requestType == firebase_firestore_request_type_patch_doc ||
+                     request.options->requestType == firebase_firestore_request_type_delete_doc)
+            {
+                uh.addParam(extras, "currentDocument.exists=", request.options->exists, hasQueryParams);
+                uh.addParam(extras, "currentDocument.updateTime=", request.options->updateTime, hasQueryParams);
+            }
+        }
+        else if (request.options->requestType == firebase_firestore_request_type_create_index ||
+                 request.options->requestType == firebase_firestore_request_type_delete_index ||
+                 request.options->requestType == firebase_firestore_request_type_get_index ||
+                 request.options->requestType == firebase_firestore_request_type_list_index)
+        {
+            extras += FPSTR("/collectionGroups/");
+            extras += request.options->collectionId;
+            extras += FPSTR("/indexes");
+
+            if (request.options->requestType == firebase_firestore_request_type_delete_index ||
+                request.options->requestType == firebase_firestore_request_type_get_index)
+            {
+                extras += FPSTR("/");
+                extras += request.options->payload;
+            }
+            else if (request.options->requestType == firebase_firestore_request_type_list_index)
+            {
+                if (request.options->pageSize > -1)
+                    uh.addParam(extras, "pageSize", String(request.options->pageSize), hasQueryParams);
+                uh.addParam(extras, "pageToken", request.options->pageToken, hasQueryParams);
+                if (request.options->payload.length() > 0)
+                    uh.addParam(extras, "filter", request.options->payload, hasQueryParams);
+            }
+        }
+    }
+
+    void setClientError(async_request_data_t &request, int code)
+    {
+        AsyncResult *aResult = request.aResult;
+
+        if (!aResult)
+            aResult = new AsyncResult();
+
+        aResult->error_available = true;
+        aResult->lastError.setClientError(code);
+
+        if (request.cb)
+            request.cb(*aResult);
+
+        if (!request.aResult)
+            delete aResult;
     }
 };
 
