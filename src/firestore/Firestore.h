@@ -681,7 +681,7 @@ public:
         }
     }
 
-    void asyncRequest(async_request_data_t &request, const char *payload = "")
+    void asyncRequest(async_request_data_t &request)
     {
 
         app_token_t *app_token = appToken();
@@ -710,10 +710,10 @@ public:
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
-        if (strlen(payload))
+        if (request.options->payload.length())
         {
-            sData->request.payload = payload;
-            request.aClient->setContentLength(sData, strlen(payload));
+            sData->request.payload = request.options->payload;
+            request.aClient->setContentLength(sData, request.options->payload.length());
         }
 
         if (request.cb)
@@ -865,6 +865,27 @@ public:
 
         if (!request.aResult)
             delete aResult;
+    }
+
+    void mImportExportDocuments(const String &projectId, const String &databaseId, const String &bucketID, const String &storagePath, const String &collectionIds, bool isImport)
+    {
+        URLHelper uh;
+        async_request_data_t request;
+        FirestoreOptions options;
+        request.options = &options;
+
+        options.requestType = isImport ? firebase_firestore_request_type_import_docs : firebase_firestore_request_type_export_docs;
+        options.projectId;
+        options.databaseId;
+
+        String uriPrefix, payload;
+
+        uh.addGStorageURL(uriPrefix, bucketID, storagePath);
+        JsonHelper json;
+        json.addObject(options.payload, isImport ? json.toString("inputUriPrefix") : json.toString("outputUriPrefix"), json.toString(uriPrefix));
+        json.addObject(options.payload, json.toString("collectionIds"), json.toString(collectionIds), true);
+
+        asyncRequest(request);
     }
 };
 
