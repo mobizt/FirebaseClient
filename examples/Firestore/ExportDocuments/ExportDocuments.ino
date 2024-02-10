@@ -70,6 +70,38 @@
  *
  * Deallocation of FirebaseApp causes these services apps uninitialized and cannot be used.
  *
+ */
+
+/**
+ * EXPORT DOCUMENTS FUNCTIONS
+ * ==========================
+ *
+ * SYNTAXES:
+ *
+ * firestore.exportDocuments(<AsyncClient>, <ProjectResource>, <collectionIds>, <bucketID>, <storagePath>);
+ * firestore.exportDocuments(<AsyncClient>, <ProjectResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
+ * firestore.exportDocuments(<AsyncClient>, <ProjectResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
+ *
+ * The <ProjectResource> is the ProjectResource object included project Id and database Id in its constructor.
+ * The Firebase project Id should be only the name without the firebaseio.com.
+ * The Firestore database id should be (default) or empty "".
+ * 
+ * The <collectionIds> is the collection ids to export. 
+ * Unspecified means all collections. 
+ * Use comma (,) to separate between the collection ids.
+ * 
+ * The <bucketID> is the Firebase storage bucket ID in the project.
+ * The <storagePath> is the path in the Firebase Storage data bucket to store the exported database.
+ * 
+ * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ *
+ * The uid is user specified UID of async result (optional) which used as async task identifier.
+ *
+ * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ *
+ */
+
+/**
  * ASYNC QUEUE
  * ===========
  *
