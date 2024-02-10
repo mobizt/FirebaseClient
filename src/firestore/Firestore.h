@@ -203,7 +203,7 @@ public:
     bool exportDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath)
     {
         AsyncResult result;
-        eximDocs(aClient, &result, NULL, "", resource, bucketID, storagePath, collectionIds, false);
+        eximDocs(aClient, &result, NULL, "", resource, bucketID, storagePath, collectionIds, false, false);
         return result.lastError.code() == 0;
     }
 
@@ -224,7 +224,7 @@ public:
      */
     void exportDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
     {
-        eximDocs(aClient, &aResult, NULL, "", resource, bucketID, storagePath, collectionIds, false);
+        eximDocs(aClient, &aResult, NULL, "", resource, bucketID, storagePath, collectionIds, false, true);
     }
 
     /** Export the documents in the database to the Firebase Storage data bucket.
@@ -245,7 +245,7 @@ public:
      */
     void exportDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
     {
-        eximDocs(aClient, nullptr, cb, uid, resource, bucketID, storagePath, collectionIds, false);
+        eximDocs(aClient, nullptr, cb, uid, resource, bucketID, storagePath, collectionIds, false, true);
     }
 
     /** Import the exported documents stored in the Firebase Storage data bucket.
@@ -269,7 +269,7 @@ public:
     bool importDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath)
     {
         AsyncResult result;
-        eximDocs(aClient, &result, NULL, "", resource, bucketID, storagePath, collectionIds, true);
+        eximDocs(aClient, &result, NULL, "", resource, bucketID, storagePath, collectionIds, true, false);
         return result.lastError.code() == 0;
     }
 
@@ -290,7 +290,7 @@ public:
      */
     void importDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
     {
-        eximDocs(aClient, &aResult, NULL, "", resource, bucketID, storagePath, collectionIds, true);
+        eximDocs(aClient, &aResult, NULL, "", resource, bucketID, storagePath, collectionIds, true, true);
     }
 
     /** Import the exported documents stored in the Firebase Storage data bucket.
@@ -311,7 +311,7 @@ public:
      */
     void importDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
     {
-        eximDocs(aClient, nullptr, cb, uid, resource, bucketID, storagePath, collectionIds, true);
+        eximDocs(aClient, nullptr, cb, uid, resource, bucketID, storagePath, collectionIds, true, true);
     }
 
     /** Create a document at the defined document path.
@@ -945,22 +945,18 @@ public:
             delete aResult;
     }
 
-    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ProjectResource &resource, const String &bucketID, const String &storagePath, const String &collectionIds, bool isImport)
+    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ProjectResource &resource, const String &bucketID, const String &storagePath, const String &collectionIds, bool isImport, bool async)
     {
         URLHelper uh;
         FirestoreOptions options;
-
         options.requestType = isImport ? firebase_firestore_request_type_import_docs : firebase_firestore_request_type_export_docs;
         options.resource = resource;
-
         String uriPrefix;
-
         uh.addGStorageURL(uriPrefix, bucketID, storagePath);
         JsonHelper json;
         json.addObject(options.payload, isImport ? json.toString("inputUriPrefix") : json.toString("outputUriPrefix"), json.toString(uriPrefix));
         json.addObject(options.payload, json.toString("collectionIds"), json.toString(collectionIds), true);
-
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 };
