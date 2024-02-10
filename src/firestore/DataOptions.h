@@ -56,38 +56,57 @@ enum firebase_firestore_request_type
     firebase_firestore_request_type_delete_index
 };
 
+typedef struct firebase_firestore_project_resource_t
+{
+    String projectId;
+    String databaseId;
+    String documentPath;
+
+public:
+    firebase_firestore_project_resource_t(){}
+    firebase_firestore_project_resource_t(const String &projectId, const String &databaseId)
+    {
+        this->projectId = projectId;
+        this->databaseId = databaseId;
+    }
+
+    firebase_firestore_project_resource_t(const String &projectId, const String &databaseId, const String &documentPath)
+    {
+        this->projectId = projectId;
+        this->databaseId = databaseId;
+        this->documentPath = documentPath;
+    }
+
+} ProjectResource;
+
 class FirestoreOptions
 {
     friend class Firestore;
 
 public:
-        String projectId;
-        String databaseId;
-        String collectionId;
-        String documentId;
-        String documentPath;
-        String mask;
-        String updateMask;
-        String payload;
-        String exists;
-        String updateTime;
-        String readTime;
-        String transaction;
-        int pageSize = 10;
-        String pageToken;
-        String orderBy;
-        bool showMissing = false;
-        size_t size = 0;
-        firebase_firestore_request_type requestType = firebase_firestore_request_type_undefined;
-        unsigned long requestTime = 0;
+    ProjectResource resource;
+    String collectionId;
+    String documentId;
+    String mask;
+    String updateMask;
+    String payload;
+    String exists;
+    String updateTime;
+    String readTime;
+    String transaction;
+    int pageSize = 10;
+    String pageToken;
+    String orderBy;
+    bool showMissing = false;
+    size_t size = 0;
+    firebase_firestore_request_type requestType = firebase_firestore_request_type_undefined;
+    unsigned long requestTime = 0;
 
     void copy(FirestoreOptions &rhs)
     {
-        this->projectId = rhs.projectId;
-        this->databaseId = rhs.databaseId;
+        this->resource = rhs.resource;
         this->collectionId = rhs.collectionId;
         this->documentId = rhs.documentId;
-        this->documentPath = rhs.documentPath;
         this->mask = rhs.mask;
         this->updateMask = rhs.updateMask;
         this->payload = rhs.payload;

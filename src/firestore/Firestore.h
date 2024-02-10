@@ -60,12 +60,13 @@ private:
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, AsyncClientClass::slot_options_t opt, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, AsyncClientClass::slot_options_t opt, FirestoreOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;
             this->method = method;
             this->opt = opt;
+            this->options = options;
             this->aResult = aResult;
             this->cb = cb;
             this->uid = uid;
@@ -186,35 +187,78 @@ public:
     /** Export the documents in the database to the Firebase Storage data bucket.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
-     * @param bucketID The Firebase storage bucket ID in the project.
-     * @param storagePath The path in the Firebase Storage data bucket to store the exported database.
+     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param collectionIds Which collection ids to export. Unspecified means all collections. Use comma (,)
      * to separate between the collection ids.
-     * .
-     * @return Boolean value, indicates the success of the operation.
+     * @param bucketID The Firebase storage bucket ID in the project.
+     * @param storagePath The path in the Firebase Storage data bucket to store the exported database.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
+     * @return Boolean value, indicates the success of the operation.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool exportDocuments(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &bucketID, const String &storagePath, const String &collectionIds = "")
+    bool exportDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath)
     {
-        return false;
+        AsyncResult result;
+        eximDocs(aClient, &result, NULL, "", resource, bucketID, storagePath, collectionIds, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Export the documents in the database to the Firebase Storage data bucket.
+     *
+     * @param aClient The async client.
+     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param collectionIds Which collection ids to export. Unspecified means all collections. Use comma (,)
+     * to separate between the collection ids.
+     * @param bucketID The Firebase storage bucket ID in the project.
+     * @param storagePath The path in the Firebase Storage data bucket to store the exported database.
+     * @param aResult The async result (AsyncResult)
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void exportDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
+    {
+        eximDocs(aClient, &aResult, NULL, "", resource, bucketID, storagePath, collectionIds, false);
+    }
+
+    /** Export the documents in the database to the Firebase Storage data bucket.
+     *
+     * @param aClient The async client.
+     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param collectionIds Which collection ids to export. Unspecified means all collections. Use comma (,)
+     * to separate between the collection ids.
+     * @param bucketID The Firebase storage bucket ID in the project.
+     * @param storagePath The path in the Firebase Storage data bucket to store the exported database.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void exportDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
+    {
+        eximDocs(aClient, nullptr, cb, uid, resource, bucketID, storagePath, collectionIds, false);
     }
 
     /** Import the exported documents stored in the Firebase Storage data bucket.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
-     * @param bucketID The Firebase storage bucket ID in the project.
-     * @param storagePath The path in the Firebase Storage data bucket that stores the exported database.
+     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param collectionIds Which collection ids to import. Unspecified means all collections included in the import.
      * Use comma (,) to separate between the collection ids.
-     * .
+     * @param bucketID The Firebase storage bucket ID in the project.
+     * @param storagePath The path in the Firebase Storage data bucket that stores the exported database.
+     *
      * @return Boolean value, indicates the success of the operation.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
@@ -222,9 +266,52 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool importDocuments(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &bucketID, const String &storagePath, const String &collectionIds = "")
+    bool importDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath)
     {
-        return false;
+        AsyncResult result;
+        eximDocs(aClient, &result, NULL, "", resource, bucketID, storagePath, collectionIds, true);
+        return result.lastError.code() == 0;
+    }
+
+    /** Import the exported documents stored in the Firebase Storage data bucket.
+     *
+     * @param aClient The async client.
+     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param collectionIds Which collection ids to import. Unspecified means all collections included in the import.
+     * Use comma (,) to separate between the collection ids.
+     * @param bucketID The Firebase storage bucket ID in the project.
+     * @param storagePath The path in the Firebase Storage data bucket that stores the exported database.
+     * @param aResult The async result (AsyncResult)
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void importDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
+    {
+        eximDocs(aClient, &aResult, NULL, "", resource, bucketID, storagePath, collectionIds, true);
+    }
+
+    /** Import the exported documents stored in the Firebase Storage data bucket.
+     *
+     * @param aClient The async client.
+     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param collectionIds Which collection ids to import. Unspecified means all collections included in the import.
+     * Use comma (,) to separate between the collection ids.
+     * @param bucketID The Firebase storage bucket ID in the project.
+     * @param storagePath The path in the Firebase Storage data bucket that stores the exported database.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void importDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
+    {
+        eximDocs(aClient, nullptr, cb, uid, resource, bucketID, storagePath, collectionIds, true);
     }
 
     /** Create a document at the defined document path.
@@ -539,8 +626,8 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication (when showMissing is true).
      *
      */
-    bool vecDocuments(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &pageSize,
-                      const String &pageToken, const String &orderBy, const String &mask, bool showMissing)
+    bool listDocuments(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &pageSize,
+                       const String &pageToken, const String &orderBy, const String &mask, bool showMissing)
     {
         return false;
     }
@@ -559,7 +646,7 @@ public:
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      */
-    bool vecCollectionIds(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &pageSize, const String &pageToken)
+    bool listCollectionIds(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &pageSize, const String &pageToken)
     {
         return false;
     }
@@ -637,7 +724,7 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/vec
      *
      */
-    bool vecIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
+    bool listIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
     {
         return false;
     }
@@ -696,15 +783,6 @@ public:
 
         url(FPSTR("firestore.googleapis.com"));
 
-        if (request.options->requestType >= firebase_firestore_request_type_delete_doc)
-            request.method = async_request_handler_t::http_delete;
-        else if (request.options->requestType >= firebase_firestore_request_type_patch_doc)
-            request.method = async_request_handler_t::http_patch;
-        if (request.options->requestType >= firebase_firestore_request_type_get_doc)
-            request.method = async_request_handler_t::http_get;
-        else if (request.options->requestType >= firebase_firestore_request_type_rollback)
-            request.method = async_request_handler_t::http_post;
-
         AsyncClientClass::async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
 
         if (!sData)
@@ -736,9 +814,9 @@ public:
 
         uh.addGAPIv1Path(extras);
 
-        extras += request.options->projectId.length() == 0 ? app_token->project_id : request.options->projectId;
+        extras += request.options->resource.projectId.length() == 0 ? app_token->project_id : request.options->resource.projectId;
         extras += FPSTR("/databases/");
-        extras += request.options->databaseId.length() > 0 ? request.options->databaseId : FPSTR("(default)");
+        extras += request.options->resource.databaseId.length() > 0 ? request.options->resource.databaseId : FPSTR("(default)");
         if (request.options->requestType == firebase_firestore_request_type_export_docs)
             extras += FPSTR(":exportDocuments");
         else if (request.options->requestType == firebase_firestore_request_type_import_docs)
@@ -785,7 +863,7 @@ public:
                      request.options->requestType == firebase_firestore_request_type_patch_doc ||
                      request.options->requestType == firebase_firestore_request_type_delete_doc)
             {
-                uh.addPath(extras, request.options->documentPath);
+                uh.addPath(extras, request.options->resource.documentPath);
                 extras += (request.options->requestType == firebase_firestore_request_type_list_collection)
                               ? ":listCollectionIds"
                           : request.options->requestType == firebase_firestore_request_type_run_query
@@ -867,25 +945,23 @@ public:
             delete aResult;
     }
 
-    void mImportExportDocuments(const String &projectId, const String &databaseId, const String &bucketID, const String &storagePath, const String &collectionIds, bool isImport)
+    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ProjectResource &resource, const String &bucketID, const String &storagePath, const String &collectionIds, bool isImport)
     {
         URLHelper uh;
-        async_request_data_t request;
         FirestoreOptions options;
-        request.options = &options;
 
         options.requestType = isImport ? firebase_firestore_request_type_import_docs : firebase_firestore_request_type_export_docs;
-        options.projectId;
-        options.databaseId;
+        options.resource = resource;
 
-        String uriPrefix, payload;
+        String uriPrefix;
 
         uh.addGStorageURL(uriPrefix, bucketID, storagePath);
         JsonHelper json;
         json.addObject(options.payload, isImport ? json.toString("inputUriPrefix") : json.toString("outputUriPrefix"), json.toString(uriPrefix));
         json.addObject(options.payload, json.toString("collectionIds"), json.toString(collectionIds), true);
 
-        asyncRequest(request);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(), &options, result, cb, uid);
+        asyncRequest(aReq);
     }
 };
 
