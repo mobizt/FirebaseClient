@@ -213,7 +213,7 @@ namespace firebase
 
 }
 
-extern FirebaseClient Firebase;
+static FirebaseClient Firebase;
 
 template <typename T>
 static user_auth_data &getAuth(T &auth) { return auth.get(); }
