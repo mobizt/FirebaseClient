@@ -1,5 +1,5 @@
 /**
- * Created February 7, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -26,7 +26,6 @@
 #define VALUE_H
 #include <Arduino.h>
 #include <string>
-using namespace std;
 
 enum database_data_type
 {
@@ -84,7 +83,7 @@ public:
     string_t(T v)
     {
         aq(true);
-        if (is_same<T, bool>::value)
+        if (std::is_same<T, bool>::value)
             buf += v ? FPSTR("true") : FPSTR("false");
         else
             buf += v;
@@ -103,7 +102,7 @@ public:
         aq();
     }
     template <typename T>
-    auto operator+=(const T &rval) -> typename std::enable_if<is_same<T, number_t>::value || is_same<T, boolean_t>::value, string_t &>::type
+    auto operator+=(const T &rval) -> typename std::enable_if<std::is_same<T, number_t>::value || std::is_same<T, boolean_t>::value, string_t &>::type
     {
         sap();
         buf += rval.c_str();
@@ -112,7 +111,7 @@ public:
     }
 
     template <typename T>
-    auto operator+=(const T &rval) -> typename std::enable_if<!is_same<T, number_t>::value && !is_same<T, boolean_t>::value, string_t &>::type
+    auto operator+=(const T &rval) -> typename std::enable_if<!std::is_same<T, number_t>::value && !std::is_same<T, boolean_t>::value, string_t &>::type
     {
         sap();
         buf += rval;
@@ -167,14 +166,14 @@ private:
     explicit operator bool() const { return buf.length() > 0; }
 
     template <typename T = String>
-    auto operator+=(const T &rval) -> typename std::enable_if<!is_same<T, object_t>::value && !is_same<T, string_t>::value && !is_same<T, number_t>::value && !is_same<T, boolean_t>::value, object_t &>::type
+    auto operator+=(const T &rval) -> typename std::enable_if<!std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, number_t>::value && !std::is_same<T, boolean_t>::value, object_t &>::type
     {
         buf += rval;
         return *this;
     }
 
     template <typename T>
-    auto operator+=(const T &rval) -> typename std::enable_if<is_same<T, object_t>::value || is_same<T, string_t>::value || is_same<T, number_t>::value || is_same<T, boolean_t>::value, object_t &>::type
+    auto operator+=(const T &rval) -> typename std::enable_if<std::is_same<T, object_t>::value || std::is_same<T, string_t>::value || std::is_same<T, number_t>::value || std::is_same<T, boolean_t>::value, object_t &>::type
     {
         buf += rval.c_str();
         return *this;
@@ -191,38 +190,38 @@ public:
     ~ValueConverter() {}
 
     template <typename T>
-    struct is_string
+    struct v_sring
     {
-        static bool const value = is_same<T, const char *>::value || is_same<T, string>::value || is_same<T, String>::value;
+        static bool const value = std::is_same<T, const char *>::value || std::is_same<T, std::string>::value || std::is_same<T, String>::value;
     };
 
     template <typename T>
-    struct is_number
+    struct v_number
     {
-        static bool const value = is_same<T, uint64_t>::value || is_same<T, int64_t>::value || is_same<T, uint32_t>::value || is_same<T, int32_t>::value ||
-                                  is_same<T, uint16_t>::value || is_same<T, int16_t>::value || is_same<T, uint8_t>::value || is_same<T, int8_t>::value ||
-                                  is_same<T, double>::value || is_same<T, float>::value || is_same<T, bool>::value;
+        static bool const value = std::is_same<T, uint64_t>::value || std::is_same<T, int64_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+                                  std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value ||
+                                  std::is_same<T, double>::value || std::is_same<T, float>::value || std::is_same<T, bool>::value;
     };
 
     template <typename T = object_t>
-    auto getVal(String &buf, T value) -> typename enable_if<is_same<T, object_t>::value || is_same<T, string_t>::value || is_same<T, boolean_t>::value || is_same<T, number_t>::value, void>::type
+    auto getVal(String &buf, T value) -> typename std::enable_if<std::is_same<T, object_t>::value || std::is_same<T, string_t>::value || std::is_same<T, boolean_t>::value || std::is_same<T, number_t>::value, void>::type
     {
         buf = value.c_str();
     }
 
     template <typename T = const char *>
-    auto getVal(String &buf, T value) -> typename enable_if<(is_number<T>::value || is_string<T>::value) && !is_same<T, object_t>::value && !is_same<T, string_t>::value && !is_same<T, boolean_t>::value && !is_same<T, number_t>::value, void>::type
+    auto getVal(String &buf, T value) -> typename std::enable_if<(v_number<T>::value || v_sring<T>::value) && !std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, boolean_t>::value && !std::is_same<T, number_t>::value, void>::type
     {
         buf = "";
-        if (is_string<T>::value)
+        if (v_sring<T>::value)
             buf = '\"';
         buf += value;
-        if (is_string<T>::value)
+        if (v_sring<T>::value)
             buf += '\"';
     }
 
     template <typename T>
-    auto to(const char *payload) -> typename enable_if<is_number<T>::value, T>::type
+    auto to(const char *payload) -> typename std::enable_if<v_number<T>::value, T>::type
     {
         if (!useLength && strlen(payload) > 0)
         {
@@ -237,34 +236,34 @@ public:
         else
             setBool(strlen(payload));
 
-        if (is_same<T, bool>::value)
+        if (std::is_same<T, bool>::value)
             return iVal.int32 > 0;
-        else if (is_same<T, int8_t>::value)
+        else if (std::is_same<T, int8_t>::value)
             return iVal.int8;
-        else if (is_same<T, uint8_t>::value)
+        else if (std::is_same<T, uint8_t>::value)
             return iVal.uint8;
-        else if (is_same<T, int16_t>::value)
+        else if (std::is_same<T, int16_t>::value)
             return iVal.int16;
-        else if (is_same<T, uint16_t>::value)
+        else if (std::is_same<T, uint16_t>::value)
             return iVal.uint16;
-        else if (is_same<T, int32_t>::value)
+        else if (std::is_same<T, int32_t>::value)
             return iVal.int32;
-        else if (is_same<T, uint32_t>::value)
+        else if (std::is_same<T, uint32_t>::value)
             return iVal.uint32;
-        else if (is_same<T, int64_t>::value)
+        else if (std::is_same<T, int64_t>::value)
             return iVal.int64;
-        else if (is_same<T, uint64_t>::value)
+        else if (std::is_same<T, uint64_t>::value)
             return iVal.uint64;
-        else if (is_same<T, float>::value)
+        else if (std::is_same<T, float>::value)
             return fVal.f;
-        else if (is_same<T, double>::value)
+        else if (std::is_same<T, double>::value)
             return fVal.d;
         else
             return 0;
     }
 
     template <typename T>
-    auto to(const char *payload) -> typename enable_if<is_string<T>::value, T>::type
+    auto to(const char *payload) -> typename std::enable_if<v_sring<T>::value, T>::type
     {
         if (payload && payload[0] == '"' && payload[strlen(payload) - 1] == '"')
         {

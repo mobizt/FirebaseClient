@@ -1,5 +1,5 @@
 /**
- * Created February 5, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -26,13 +26,12 @@
 #define CORE_LIST_H
 #include <Arduino.h>
 #include <vector>
-using namespace std;
 
 namespace firebase
 {
-    static vector<uint32_t> aVec; // FirebaseApp vector
-    static vector<uint32_t> cVec; // AsyncClient vector
-    static vector<uint32_t> rVec; // AsyncResult vector
+    static std::vector<uint32_t> aVec; // FirebaseApp vector
+    static std::vector<uint32_t> cVec; // AsyncClient vector
+    static std::vector<uint32_t> rVec; // AsyncResult vector
     
     class List
     {
@@ -41,7 +40,7 @@ namespace firebase
         List(){};
         ~List(){};
 
-        void addRemoveList(vector<uint32_t> &vec, uint32_t addr, bool add)
+        void addRemoveList(std::vector<uint32_t> &vec, uint32_t addr, bool add)
         {
             for (size_t i = 0; i < vec.size(); i++)
             {
@@ -57,7 +56,7 @@ namespace firebase
                 vec.push_back(addr);
         }
 
-        bool existed(vector<uint32_t> &vec, uint32_t addr)
+        bool existed(std::vector<uint32_t> &vec, uint32_t addr)
         {
             for (size_t i = 0; i < vec.size(); i++)
             {

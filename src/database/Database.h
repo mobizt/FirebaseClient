@@ -1,5 +1,5 @@
 /**
- * Created February 10, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,7 +27,6 @@
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
 #include "./database/DataOptions.h"
-using namespace std;
 
 using namespace firebase;
 
@@ -76,7 +75,7 @@ public:
      * String json = database.get<String>(aClient, "/path/to/data");
      */
     template <typename T1 = int>
-    auto get(AsyncClientClass &aClient, const String &path) -> typename enable_if<!is_same<T1, void>::value && !is_same<T1, AsyncResult>::value, T1>::type
+    auto get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T1, void>::value && !std::is_same<T1, AsyncResult>::value, T1>::type
     {
         AsyncResult result;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(), nullptr, nullptr, &result, NULL);
@@ -122,7 +121,7 @@ public:
      * String json = database.get<String>(aClient, "/path/to/data", options);
      */
     template <typename T1 = int>
-    auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename enable_if<!is_same<T1, void>::value && !is_same<T1, AsyncResult>::value, T1>::type
+    auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T1, void>::value && !std::is_same<T1, AsyncResult>::value, T1>::type
     {
         AsyncResult result;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, false, false, false, false, options.shallow), &options, nullptr, &result, NULL);
@@ -902,12 +901,11 @@ private:
             return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = app_token;
-        bool auth_param = app_token->auth_data_type != user_auth_data_no_token && app_token->auth_type != auth_access_token && app_token->auth_type != auth_sa_access_token;
-        String extras = auth_param ? ".json?auth=" + String(FIREBASE_AUTH_PLACEHOLDER) : ".json";
+        request.opt.auth_param = app_token->auth_data_type != user_auth_data_no_token && app_token->auth_type != auth_access_token && app_token->auth_type != auth_sa_access_token;
+        String extras = request.opt.auth_param ? ".json?auth=" + String(FIREBASE_AUTH_PLACEHOLDER) : ".json";
 
-        addParams(auth_param, extras, request.method, request.options, request.file);
+        addParams(request.opt.auth_param, extras, request.method, request.options, request.file);
         AsyncClientClass::async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
-
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 

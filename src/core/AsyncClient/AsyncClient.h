@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -81,9 +81,10 @@ private:
         bool sv = false;
         bool ota = false;
         bool no_etag = false;
+        bool auth_param = false;
         app_token_t *app_token = nullptr;
         slot_options_t() {}
-        slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, bool no_etag, app_token_t *app_token = nullptr)
+        slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, bool no_etag, bool auth_param = false)
         {
             this->auth_used = auth_used;
             this->sse = sse;
@@ -91,7 +92,7 @@ private:
             this->sv = sv;
             this->ota = ota;
             this->no_etag = no_etag;
-            app_token = nullptr;
+            this->auth_param = auth_param;
         }
     };
 
@@ -365,6 +366,7 @@ private:
 
             if ((client_type == async_request_handler_t::tcp_client_type_sync && !client->connected()) || client_type == async_request_handler_t::tcp_client_type_async)
             {
+
                 ret = connect(sData, getHost(sData, true).c_str(), sData->request.port);
 
                 // allow non-blocking async tcp connection
@@ -977,6 +979,13 @@ private:
                 stop(sData);
             }
 
+            if (sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
+            {
+                setAsyncError(sData, sData->state, sData->response.httpCode , !sData->sse, true);
+                sData->return_type = function_return_type_failure;
+                returnResult(sData, false);
+            }
+
             if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK && (sData->request.ota || (sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size)))
             {
                 sData->aResult.download_data.total = sData->response.payloadLen;
@@ -1477,7 +1486,7 @@ private:
         if (!options.auth_used)
         {
             sData->request.app_token = options.app_token;
-            if (options.app_token && (options.app_token->auth_type == auth_access_token || options.app_token->auth_type == auth_sa_access_token))
+            if (options.app_token && !options.auth_param && (options.app_token->auth_type == auth_id_token || options.app_token->auth_type == auth_user_id_token || options.app_token->auth_type == auth_access_token || options.app_token->auth_type == auth_sa_access_token))
             {
                 req.addAuthHeaderFirst(sData->request.header, options.app_token->auth_type);
                 sData->request.header += FIREBASE_AUTH_PLACEHOLDER;
@@ -1509,6 +1518,7 @@ private:
 
         if (method == async_request_handler_t::http_get || method == async_request_handler_t::http_delete)
             req.addNewLine(sData->request.header);
+
         return sData;
     }
 

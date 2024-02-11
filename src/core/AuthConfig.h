@@ -1,5 +1,5 @@
 /**
- * Created February 10, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -1272,6 +1272,9 @@ namespace firebase
             authenticated = false;
             auth_type = auth_unknown_token;
             auth_data_type = user_auth_data_undefined;
+        }
+        app_token_t()
+        {
         }
     };
 

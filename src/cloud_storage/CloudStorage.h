@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -26,7 +26,6 @@
 #define ASYNC_CLOUD_STORAGE_H
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
-using namespace std;
 
 using namespace firebase;
 

@@ -1,5 +1,5 @@
 /**
- * Created February 10, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -56,39 +56,99 @@ enum firebase_firestore_request_type
     firebase_firestore_request_type_delete_index
 };
 
-typedef struct firebase_firestore_project_resource_t
+typedef struct firebase_firestore_parent_resource_t
 {
+    friend class Firestore;
+
+private:
     String projectId;
     String databaseId;
     String documentPath;
 
 public:
-    firebase_firestore_project_resource_t(){}
-    firebase_firestore_project_resource_t(const String &projectId, const String &databaseId)
+    firebase_firestore_parent_resource_t() {}
+    firebase_firestore_parent_resource_t(const String &projectId, const String &databaseId)
     {
         this->projectId = projectId;
         this->databaseId = databaseId;
     }
 
-    firebase_firestore_project_resource_t(const String &projectId, const String &databaseId, const String &documentPath)
+} ParentResource;
+
+typedef struct firebase_firestore_document_mask_t
+{
+    friend class Firestore;
+
+private:
+    String mask;
+
+    String get()
     {
-        this->projectId = projectId;
-        this->databaseId = databaseId;
-        this->documentPath = documentPath;
+        String buf;
+        JsonHelper jh;
+        jh.addTokens(buf, jh.toString("fieldPaths"), mask, true);
+        return buf;
     }
 
-} ProjectResource;
+    String getQuery(const String &mask, bool hasParam)
+    {
+        String buf;
+        URLHelper uh;
+        uh.addParamsTokens(buf, String(mask + ".fieldPaths="), this->mask, hasParam);
+        return buf;
+    }
+
+public:
+    firebase_firestore_document_mask_t() {}
+    firebase_firestore_document_mask_t(const String &mask)
+    {
+        this->mask = mask;
+    }
+
+} DocumentMask;
+
+typedef struct firebase_firestore_document_t
+{
+    friend class Firestore;
+
+private:
+    String name;
+    String createTime;
+    String updateTime;
+    object_t fields;
+    String get()
+    {
+        String buf;
+        JsonHelper jh;
+        if (createTime.length())
+            jh.addObject(buf, jh.toString("createTime"), jh.toString(createTime));
+        if (createTime.length())
+            jh.addObject(buf, jh.toString("updateTime"), jh.toString(updateTime));
+        jh.addObject(buf, jh.toString("fields"), fields.c_str(), true);
+        return buf;
+    }
+
+public:
+    firebase_firestore_document_t() {}
+    firebase_firestore_document_t(const object_t &fields, const String &name = "", const String &createTime = "", const String &updateTime = "")
+    {
+        this->name = name;
+        this->fields = fields;
+        this->createTime = createTime;
+        this->updateTime = updateTime;
+    }
+
+} Document;
 
 class FirestoreOptions
 {
     friend class Firestore;
 
 public:
-    ProjectResource resource;
+    ParentResource parent;
     String collectionId;
     String documentId;
-    String mask;
-    String updateMask;
+    DocumentMask mask, updateMask;
     String payload;
     String exists;
     String updateTime;
@@ -104,7 +164,7 @@ public:
 
     void copy(FirestoreOptions &rhs)
     {
-        this->resource = rhs.resource;
+        this->parent = rhs.parent;
         this->collectionId = rhs.collectionId;
         this->documentId = rhs.documentId;
         this->mask = rhs.mask;

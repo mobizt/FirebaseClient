@@ -1,5 +1,5 @@
 /**
- * Created February 10, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -147,6 +147,7 @@ namespace firebase
             StringHelper sh;
             int p1 = 0, p2 = 0;
             auth_data.app_token.clear();
+            String token;
 
             if (aResult.payload().indexOf("\"error\"") > -1)
             {
@@ -171,9 +172,9 @@ namespace firebase
                 p1 = 0;
                 p2 = 0;
                 sh.trim(auth_data.app_token.uid);
-                if (parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"idToken\"", ",", p1, p2))
+                if (parseItem(sh, aResult.payload(), token, "\"idToken\"", ",", p1, p2))
                 {
-                    sh.trim(auth_data.app_token.token);
+                    sh.trim(token);
                     parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refreshToken\"", ",", p1, p2);
                     sh.trim(auth_data.app_token.refresh);
                     parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expiresIn\"", "}", p1, p2);
@@ -183,23 +184,23 @@ namespace firebase
             {
                 parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
                 parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refresh_token\"", ",", p1, p2);
-                parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"id_token\"", ",", p1, p2);
+                parseItem(sh, aResult.payload(), token, "\"id_token\"", ",", p1, p2);
                 parseItem(sh, aResult.payload(), auth_data.app_token.uid, "\"user_id\"", ",", p1, p2);
                 sh.trim(auth_data.app_token.refresh);
-                sh.trim(auth_data.app_token.token);
+                sh.trim(token);
                 sh.trim(auth_data.app_token.uid);
             }
             else if (aResult.payload().indexOf("\"access_token\"") > -1)
             {
-                if (parseItem(sh, aResult.payload(), auth_data.app_token.token, "\"access_token\"", ",", p1, p2))
+                if (parseItem(sh, aResult.payload(), token, "\"access_token\"", ",", p1, p2))
                 {
                     parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
                     parseItem(sh, aResult.payload(), auth_data.app_token.token_type, "\"token_type\"", "}", p1, p2);
                 }
             }
-            
+            auth_data.app_token.token = token;
             auth_data.app_token.project_id = auth_data.user_auth.sa.project_id;
-            return auth_data.app_token.token.length() > 0;
+            return token.length() > 0;
         }
 
         void setEvent(firebase_auth_event_type event)

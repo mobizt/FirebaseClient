@@ -1,5 +1,5 @@
 /**
- * Created February 10, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,8 +27,6 @@
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
 #include "./firestore/DataOptions.h"
-
-using namespace std;
 
 using namespace firebase;
 
@@ -187,7 +185,7 @@ public:
     /** Export the documents in the database to the Firebase Storage data bucket.
      *
      * @param aClient The async client.
-     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param collectionIds Which collection ids to export. Unspecified means all collections. Use comma (,)
@@ -200,17 +198,17 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool exportDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath)
+    bool exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath)
     {
         AsyncResult result;
-        eximDocs(aClient, &result, NULL, "", resource, bucketID, storagePath, collectionIds, false, false);
+        eximDocs(aClient, &result, NULL, "", parent, bucketID, storagePath, collectionIds, false, false);
         return result.lastError.code() == 0;
     }
 
     /** Export the documents in the database to the Firebase Storage data bucket.
      *
      * @param aClient The async client.
-     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param collectionIds Which collection ids to export. Unspecified means all collections. Use comma (,)
@@ -222,15 +220,15 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void exportDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
+    void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
     {
-        eximDocs(aClient, &aResult, NULL, "", resource, bucketID, storagePath, collectionIds, false, true);
+        eximDocs(aClient, &aResult, NULL, "", parent, bucketID, storagePath, collectionIds, false, true);
     }
 
     /** Export the documents in the database to the Firebase Storage data bucket.
      *
      * @param aClient The async client.
-     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param collectionIds Which collection ids to export. Unspecified means all collections. Use comma (,)
@@ -243,15 +241,15 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void exportDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
+    void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
     {
-        eximDocs(aClient, nullptr, cb, uid, resource, bucketID, storagePath, collectionIds, false, true);
+        eximDocs(aClient, nullptr, cb, uid, parent, bucketID, storagePath, collectionIds, false, true);
     }
 
     /** Import the exported documents stored in the Firebase Storage data bucket.
      *
      * @param aClient The async client.
-     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param collectionIds Which collection ids to import. Unspecified means all collections included in the import.
@@ -261,22 +259,20 @@ public:
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
-     *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool importDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath)
+    bool importDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath)
     {
         AsyncResult result;
-        eximDocs(aClient, &result, NULL, "", resource, bucketID, storagePath, collectionIds, true, false);
+        eximDocs(aClient, &result, NULL, "", parent, bucketID, storagePath, collectionIds, true, false);
         return result.lastError.code() == 0;
     }
 
     /** Import the exported documents stored in the Firebase Storage data bucket.
      *
      * @param aClient The async client.
-     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param collectionIds Which collection ids to import. Unspecified means all collections included in the import.
@@ -288,15 +284,15 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void importDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
+    void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
     {
-        eximDocs(aClient, &aResult, NULL, "", resource, bucketID, storagePath, collectionIds, true, true);
+        eximDocs(aClient, &aResult, NULL, "", parent, bucketID, storagePath, collectionIds, true, true);
     }
 
     /** Import the exported documents stored in the Firebase Storage data bucket.
      *
      * @param aClient The async client.
-     * @param resource The ProjectResource object included project Id and database Id in its constructor.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param collectionIds Which collection ids to import. Unspecified means all collections included in the import.
@@ -309,54 +305,146 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void importDocuments(AsyncClientClass &aClient, const ProjectResource &resource, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
+    void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
     {
-        eximDocs(aClient, nullptr, cb, uid, resource, bucketID, storagePath, collectionIds, true, true);
+        eximDocs(aClient, nullptr, cb, uid, parent, bucketID, storagePath, collectionIds, true, true);
     }
 
     /** Create a document at the defined document path.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param documentPath The relative path of document to create in the collection.
-     * @param content A Firestore document.
-     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
      * @param mask The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
-     * .
-     * @return Boolean value, indicates the success of the operation.
+     * @param document A Firestore document.
+     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
+     * @return Boolean value, indicates the success of the operation.
      *
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool createDocument(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &content, const String &mask = "")
+    bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document &document)
     {
-        return false;
+        AsyncResult result;
+        parent.documentPath = documentPath;
+        createDoc(aClient, &result, NULL, "", parent, mask, document, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Create a document at the defined document path.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to create in the collection.
+     * @param mask The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
+     * @param document A Firestore document.
+     * @param aResult The async result (AsyncResult)
+     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
+     *
+     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     *
+     */
+    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document &document, AsyncResult &aResult)
+    {
+        parent.documentPath = documentPath;
+        createDoc(aClient, &aResult, NULL, "", parent, mask, document, true);
+    }
+
+    /** Create a document at the defined document path.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to create in the collection.
+     * @param mask The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
+     * @param document A Firestore document.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
+     *
+     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     *
+     */
+    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document &document, AsyncResultCallback cb, const String &uid = "")
+    {
+        parent.documentPath = documentPath;
+        createDoc(aClient, nullptr, cb, uid, parent, mask, document, true);
     }
 
     /** Create a document in the defined collection id.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param collectionId The relative path of document collection id to create the document.
      * @param documentId The document id of document to be created.
-     * @param content A Firestore document.
-     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
      * @param mask The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
-     * .
-     * @return Boolean value, indicates the success of the operation.
+     * @param document A Firestore document.
+     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
+     * @return Boolean value, indicates the success of the operation.
      *
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool createDocument(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &documentId, const String &content, const String &mask = "")
+    bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document &document)
     {
-        return false;
+        AsyncResult result;
+        createDoc(aClient, &result, NULL, "", parent, collectionId, documentId, mask, document, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Create a document in the defined collection id.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param collectionId The relative path of document collection id to create the document.
+     * @param documentId The document id of document to be created.
+     * @param mask The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
+     * @param document A Firestore document.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
+     *
+     *
+     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     *
+     */
+    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document &document, AsyncResult &aResult)
+    {
+        createDoc(aClient, &aResult, NULL, "", parent, collectionId, documentId, mask, document, true);
+    }
+
+    /** Create a document in the defined collection id.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param collectionId The relative path of document collection id to create the document.
+     * @param documentId The document id of document to be created.
+     * @param mask The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
+     * @param document A Firestore document.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
+     *
+     *
+     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     *
+     */
+    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document &document, AsyncResultCallback cb, const String &uid = "")
+    {
+        createDoc(aClient, nullptr, cb, uid, parent, collectionId, documentId, mask, document, true);
     }
 
     /** Patch or update a document at the defined path.
@@ -809,14 +897,12 @@ public:
     void addParams(async_request_data_t &request, String &extras)
     {
         URLHelper uh;
-
         app_token_t *app_token = appToken();
-
         bool hasQueryParams = false;
 
-        extras += request.options->resource.projectId.length() == 0 ? app_token->project_id : request.options->resource.projectId;
+        extras += request.options->parent.projectId.length() == 0 ? app_token->project_id : request.options->parent.projectId;
         extras += FPSTR("/databases/");
-        extras += request.options->resource.databaseId.length() > 0 ? request.options->resource.databaseId : FPSTR("(default)");
+        extras += request.options->parent.databaseId.length() > 0 ? request.options->parent.databaseId : FPSTR("(default)");
         if (request.options->requestType == firebase_firestore_request_type_export_docs)
             extras += FPSTR(":exportDocuments");
         else if (request.options->requestType == firebase_firestore_request_type_import_docs)
@@ -863,7 +949,7 @@ public:
                      request.options->requestType == firebase_firestore_request_type_patch_doc ||
                      request.options->requestType == firebase_firestore_request_type_delete_doc)
             {
-                uh.addPath(extras, request.options->resource.documentPath);
+                uh.addPath(extras, request.options->parent.documentPath);
                 extras += (request.options->requestType == firebase_firestore_request_type_list_collection)
                               ? ":listCollectionIds"
                           : request.options->requestType == firebase_firestore_request_type_run_query
@@ -881,14 +967,14 @@ public:
 
             if (request.options->requestType == firebase_firestore_request_type_patch_doc)
             {
-                uh.addParamsTokens(extras, "updateMask.fieldPaths=", request.options->updateMask, hasQueryParams);
+                extras += request.options->updateMask.getQuery("updateMask", hasQueryParams);
             }
             else if (request.options->requestType == firebase_firestore_request_type_commit_document)
             {
                 extras += FPSTR(":commit");
             }
 
-            uh.addParamsTokens(extras, "mask.fieldPaths=", request.options->mask, hasQueryParams);
+            extras += request.options->mask.getQuery("mask", hasQueryParams);
 
             if (request.options->requestType == firebase_firestore_request_type_get_doc)
             {
@@ -945,17 +1031,50 @@ public:
             delete aResult;
     }
 
-    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ProjectResource &resource, const String &bucketID, const String &storagePath, const String &collectionIds, bool isImport, bool async)
+    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &bucketID, const String &storagePath, const String &collectionIds, bool isImport, bool async)
     {
         URLHelper uh;
         FirestoreOptions options;
         options.requestType = isImport ? firebase_firestore_request_type_import_docs : firebase_firestore_request_type_export_docs;
-        options.resource = resource;
+        options.parent = parent;
         String uriPrefix;
         uh.addGStorageURL(uriPrefix, bucketID, storagePath);
         JsonHelper json;
         json.addObject(options.payload, isImport ? json.toString("inputUriPrefix") : json.toString("outputUriPrefix"), json.toString(uriPrefix));
         json.addTokens(options.payload, json.toString("collectionIds"), collectionIds, true);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, DocumentMask &mask, Document &document, bool async)
+    {
+        size_t count = 0;
+        String collectionId, documentId;
+        collectionId = parent.documentPath;
+        int p = collectionId.lastIndexOf("/");
+        String _documentPath = parent.documentPath;
+
+        for (size_t i = 0; i < _documentPath.length(); i++)
+            count += _documentPath[i] == '/' ? 1 : 0;
+
+        if (p > -1 && count % 2 > 0)
+        {
+            documentId = collectionId.substring(p + 1, collectionId.length());
+            collectionId = collectionId.substring(0, p);
+        }
+
+        return createDoc(aClient, result, cb, uid, parent, collectionId, documentId, mask, document, async);
+    }
+
+    void createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &collectionId, const String &documentId, DocumentMask &mask, Document &document, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_create_doc;
+        options.parent = parent;
+        options.collectionId = collectionId;
+        options.documentId = documentId;
+        options.payload = document.get();
+        options.mask = mask;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }

@@ -30,7 +30,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.0.34"
+#define FIREBASE_CLIENT_VERSION "0.0.35"
 
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"

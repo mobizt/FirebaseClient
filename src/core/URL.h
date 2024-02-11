@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -35,7 +35,7 @@ class URLHelper
 {
 public:
     /* Append a parameter to URL */
-    bool addParam(String &url, PGM_P key, const String &val, bool &hasParam, bool allowEmptyValue = false)
+    bool addParam(String &url, const String &key, const String &val, bool &hasParam, bool allowEmptyValue = false)
     {
         if (!allowEmptyValue && val.length() == 0)
             return false;
@@ -60,7 +60,7 @@ public:
     }
 
     /* Append the comma separated tokens as URL parameters */
-    void addParamsTokens(String &url, PGM_P key, String val, bool &hasParam)
+    void addParamsTokens(String &url, const String &key, String val, bool &hasParam)
     {
         if (val.length() == 0)
             return;
