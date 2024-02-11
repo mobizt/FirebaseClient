@@ -58,39 +58,34 @@
  */
 
 /**
- * ASYNC GET FUNCTIONS
- * ===================
+ * CREATE DOCUMENTS FUNCTIONS
+ * ==========================
  *
  * SYNTAXES:
  *
- * database.get(<AsyncClient>, <path>, <AsyncResult>, <SSE>);
- * database.get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
+ * firestore.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <document>);
+ * firestore.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <document>, <AsyncResult>);
+ * firestore.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <document>, <AsyncResultCallback>, <uid>);
+ * 
+ * firestore.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <document>);
+ * firestore.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <document>, <AsyncResult>);
+ * firestore.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <document>, <AsyncResultCallback>, <uid>);
  *
- * database.get(<AsyncClient>, <path>, <DatabaseSession>, <AsyncResult>);
- * database.get(<AsyncClient>, <path>, <DatabaseSession>, <AsyncResultCallback>, <uid>);
+ * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The Firebase project Id should be only the name without the firebaseio.com.
+ * The Firestore database id should be (default) or empty "".
  *
+ * The <documentPath> is the relative path of document to create in the collection.
+ * The <DocumentMask> is the fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
+ * The <collectionId> is document id of document to be created.
+ * The <documentId> is the relative path of document collection id to create the document.
+ * The <Document> is Firestore document.
+ * 
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
  * The uid is user specified UID of async result (optional) which used as async task identifier.
  *
  * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
- *
- * In case of filtering the data and additional request parameters are required,
- * the DatabaseOptions can be assigned to the function via DatabaseOptions object.
- *
- * Please see examples/Database/extras/FilteringData/FilteringData.ino for how to filter the data.
- *
- * Storing (upload) and restoring (download) the binary data in form of File from filesystems or BLOB (memory) are supported.
- *
- * The binary data will be convert to base64 encoded string when upload and base64 string stored at the node will be converted to data
- * and save to file or keep in memory when download.
- *
- * No additional data added to base64 encoded string which you can manage it freely.
- *
- * To work with BLOB and File upload and download, the file config data can be assigned to the function.
- * The file config data (also contains blob data) can be obtained from static functions getBlob and getFile.
- *
- * Please see examples/Database/extras/BLOB and examples/Database/extras/File for the usagw guidelines.
  */
 
 /**
