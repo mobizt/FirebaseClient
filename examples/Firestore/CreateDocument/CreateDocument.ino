@@ -66,7 +66,7 @@
  * firestore.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <document>);
  * firestore.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <document>, <AsyncResult>);
  * firestore.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <document>, <AsyncResultCallback>, <uid>);
- * 
+ *
  * firestore.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <document>);
  * firestore.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <document>, <AsyncResult>);
  * firestore.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <document>, <AsyncResultCallback>, <uid>);
@@ -80,7 +80,7 @@
  * The <collectionId> is document id of document to be created.
  * The <documentId> is the relative path of document collection id to create the document.
  * The <Document> is Firestore document.
- * 
+ *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
  * The uid is user specified UID of async result (optional) which used as async task identifier.
@@ -301,9 +301,6 @@ void loop()
     {
         taskCompleted = true;
 
-        // For the usage of FirebaseJson, see examples/FirebaseJson/BasicUsage/Create_Edit_Parse/Create_Edit_Parse.ino
-        object_t fields;
-
         // Note: If new document created under non-existent ancestor documents, that document will not appear in queries and snapshot
         // https://cloud.google.com/firestore/docs/using-console#non-existent_ancestor_documents.
 
@@ -315,7 +312,10 @@ void loop()
         // If the document path contains space e.g. "a b c/d e f"
         // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
 
+        // Library does not provide JSON parser library, the following JSON writer class will be used with
+        // object_t for simple demonstration.
         JsonWriter writer;
+        object_t fields;
         object_t val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14;
 
         // double
@@ -367,6 +367,9 @@ void loop()
         Serial.println("[+] Create a document... ");
 
         writer.join(fields, 10, val1, val2, val3, val4, val5, val6, val7, val12, val13, val14);
+
+        // To view the content of object_t, string_t, number_t, and boolean_t, you can print it on Serial.
+        // To view the content of Document, use doc.toString().
 
         Document doc(fields);
 

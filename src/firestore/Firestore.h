@@ -1073,7 +1073,7 @@ public:
         options.parent = parent;
         options.collectionId = collectionId;
         options.documentId = documentId;
-        options.payload = document.get();
+        options.payload = document.toString();
         options.mask = mask;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);

@@ -116,17 +116,6 @@ private:
     String createTime;
     String updateTime;
     object_t fields;
-    String get()
-    {
-        String buf;
-        JsonHelper jh;
-        if (createTime.length())
-            jh.addObject(buf, jh.toString("createTime"), jh.toString(createTime));
-        if (createTime.length())
-            jh.addObject(buf, jh.toString("updateTime"), jh.toString(updateTime));
-        jh.addObject(buf, jh.toString("fields"), fields.c_str(), true);
-        return buf;
-    }
 
 public:
     firebase_firestore_document_t() {}
@@ -136,6 +125,17 @@ public:
         this->fields = fields;
         this->createTime = createTime;
         this->updateTime = updateTime;
+    }
+    String toString()
+    {
+        String buf;
+        JsonHelper jh;
+        if (createTime.length())
+            jh.addObject(buf, jh.toString("createTime"), jh.toString(createTime));
+        if (createTime.length())
+            jh.addObject(buf, jh.toString("updateTime"), jh.toString(updateTime));
+        jh.addObject(buf, jh.toString("fields"), fields.c_str(), true);
+        return buf;
     }
 
 } Document;
