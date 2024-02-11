@@ -348,7 +348,7 @@ void loop()
         writer.create(val9, "integerValue", string_t("20"));
         writer.create(val10, "booleanValue", boolean_t(true));
         val11.initArray();
-        writer.join(val11, 2, val8, val10);
+        writer.join(val11, 3, val8, val9, val10);
         writer.create(val12, "myArray/arrayValue/values", val11);
 
         // map
