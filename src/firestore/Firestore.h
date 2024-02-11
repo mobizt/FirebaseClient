@@ -195,7 +195,7 @@ public:
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * This function requires OAuth2.0 authentication.
+     * This function requires ServiceAuth or AccessToken authentication.
      *
      */
     bool exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath)
@@ -217,7 +217,7 @@ public:
      * @param storagePath The path in the Firebase Storage data bucket to store the exported database.
      * @param aResult The async result (AsyncResult)
      *
-     * This function requires OAuth2.0 authentication.
+     * This function requires ServiceAuth or AccessToken authentication.
      *
      */
     void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
@@ -238,7 +238,7 @@ public:
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
-     * This function requires OAuth2.0 authentication.
+     * This function requires ServiceAuth or AccessToken authentication.
      *
      */
     void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
@@ -259,7 +259,7 @@ public:
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * This function requires OAuth2.0 authentication.
+     * This function requires ServiceAuth or AccessToken authentication.
      *
      */
     bool importDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath)
@@ -281,7 +281,7 @@ public:
      * @param storagePath The path in the Firebase Storage data bucket that stores the exported database.
      * @param aResult The async result (AsyncResult)
      *
-     * This function requires OAuth2.0 authentication.
+     * This function requires ServiceAuth or AccessToken authentication.
      *
      */
     void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
@@ -302,7 +302,7 @@ public:
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
-     * This function requires OAuth2.0 authentication.
+     * This function requires ServiceAuth or AccessToken authentication.
      *
      */
     void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
@@ -323,14 +323,16 @@ public:
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
     bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document &document)
     {
         AsyncResult result;
         parent.documentPath = documentPath;
-        createDoc(aClient, &result, NULL, "", parent, mask, document, false);
+        String collectionId, documentId;
+        parent.pathResove(collectionId, documentId);
+        createDoc(aClient, &result, NULL, "", parent, collectionId, documentId, mask, document, false);
         return result.lastError.code() == 0;
     }
 
@@ -346,13 +348,15 @@ public:
      * @param aResult The async result (AsyncResult)
      * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
      *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
     void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document &document, AsyncResult &aResult)
     {
         parent.documentPath = documentPath;
-        createDoc(aClient, &aResult, NULL, "", parent, mask, document, true);
+        String collectionId, documentId;
+        parent.pathResove(collectionId, documentId);
+        createDoc(aClient, &aResult, NULL, "", parent, collectionId, documentId, mask, document, true);
     }
 
     /** Create a document at the defined document path.
@@ -368,13 +372,15 @@ public:
      * @param uid The user specified UID of async result (optional).
      * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
      *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
     void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document &document, AsyncResultCallback cb, const String &uid = "")
     {
         parent.documentPath = documentPath;
-        createDoc(aClient, nullptr, cb, uid, parent, mask, document, true);
+        String collectionId, documentId;
+        parent.pathResove(collectionId, documentId);
+        createDoc(aClient, nullptr, cb, uid, parent, collectionId, documentId, mask, document, true);
     }
 
     /** Create a document in the defined collection id.
@@ -391,7 +397,7 @@ public:
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
     bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document &document)
@@ -411,12 +417,11 @@ public:
      * @param documentId The document id of document to be created.
      * @param mask The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
      * @param document A Firestore document.
-     * @param cb The async result callback (AsyncResultCallback).
-     * @param uid The user specified UID of async result (optional).
+     * @param aResult The async result (AsyncResult)
      * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
      *
      *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
     void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document &document, AsyncResult &aResult)
@@ -439,7 +444,7 @@ public:
      * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
      *
      *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
     void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document &document, AsyncResultCallback cb, const String &uid = "")
@@ -450,8 +455,9 @@ public:
     /** Patch or update a document at the defined path.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param documentPath The relative path of document to patch with the input document.
      * @param content A Firestore document.
      * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
@@ -460,24 +466,101 @@ public:
      * Fields referenced in the mask, but not present in the input document (content), are deleted from the document on the server.
      * Use comma (,) to separate between the field names.
      * @param mask The fields to return. If not set, returns all fields. If the document has a field that is not present in
-     * this mask, that field
-     * will not be returned in the response. Use comma (,) to separate between the field names.
-     * @param exists When set to true, the target document must exist. When set to false, the target document must not exist.
-     * @param updateTime When set, the target document must exist and have been last updated at that time.
+     * this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
+     * @param document A Firestore document.
+     * @param currentDocument An optional precondition on the document. The request will fail if this is set and not met by the target document.
+     *
+     * When currentDocument as defined with true or false as constructor argument, the exists condition will be set.
+     * When currentDocument as defined with string(Timestamp format) as constructor argument, the updateTime condition will be set.
+     *
+     * When exists condition was set to true, the target document must exist. When set to false, the target document must not exist.
+     * When updateTime was set, the target document must exist and have been last updated at that time.
      * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
      * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
-     *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    bool patchDocument(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &content,
-                       const String &updateMask, const String &mask = "", const String &exists = "", const String &updateTime = "")
+    bool patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document &document, Precondition currentDocument)
     {
-        return false;
+        AsyncResult result;
+        patchDoc(aClient, &result, NULL, "", parent, documentPath, updateMask, mask, document, currentDocument, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Patch or update a document at the defined path.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to patch with the input document.
+     * @param content A Firestore document.
+     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
+     * @param updateMask The fields to update. If the document exists on the server and has fields not referenced in the mask,
+     * they are left unchanged.
+     * Fields referenced in the mask, but not present in the input document (content), are deleted from the document on the server.
+     * Use comma (,) to separate between the field names.
+     * @param mask The fields to return. If not set, returns all fields. If the document has a field that is not present in
+     * this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
+     * @param document A Firestore document.
+     * @param currentDocument An optional precondition on the document. The request will fail if this is set and not met by the target document.
+     *
+     * When currentDocument as defined with true or false as constructor argument, the exists condition will be set.
+     * When currentDocument as defined with string(Timestamp format) as constructor argument, the updateTime condition will be set.
+     *
+     * When exists condition was set to true, the target document must exist. When set to false, the target document must not exist.
+     * When updateTime was set, the target document must exist and have been last updated at that time.
+     * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     *
+     * @param aResult The async result (AsyncResult).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document &document, Precondition currentDocument, AsyncResult &aResult)
+    {
+        patchDoc(aClient, &aResult, NULL, "", parent, documentPath, updateMask, mask, document, currentDocument, true);
+    }
+
+    /** Patch or update a document at the defined path.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to patch with the input document.
+     * @param content A Firestore document.
+     * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
+     * @param updateMask The fields to update. If the document exists on the server and has fields not referenced in the mask,
+     * they are left unchanged.
+     * Fields referenced in the mask, but not present in the input document (content), are deleted from the document on the server.
+     * Use comma (,) to separate between the field names.
+     * @param mask The fields to return. If not set, returns all fields. If the document has a field that is not present in
+     * this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
+     * @param document A Firestore document.
+     * @param currentDocument An optional precondition on the document. The request will fail if this is set and not met by the target document.
+     *
+     * When currentDocument as defined with true or false as constructor argument, the exists condition will be set.
+     * When currentDocument as defined with string(Timestamp format) as constructor argument, the updateTime condition will be set.
+     *
+     * When exists condition was set to true, the target document must exist. When set to false, the target document must not exist.
+     * When updateTime was set, the target document must exist and have been last updated at that time.
+     * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     *
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document &document, Precondition currentDocument, AsyncResultCallback cb, const String &uid = "")
+    {
+        patchDoc(aClient, nullptr, cb, uid, parent, documentPath, updateMask, mask, document, currentDocument, true);
     }
 
     /** Commits a transaction, while optionally updating documents.
@@ -498,8 +581,7 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool commitDocument(AsyncClientClass &aClient, const String &projectId, const String &databaseId,
-                        std::vector<firebase_firestore_document_write_t> writes, const String &transaction = "")
+    bool commitDocument(AsyncClientClass &aClient, const ParentResource &parent, std::vector<firebase_firestore_document_write_t> writes, const String &transaction = "")
     {
         return false;
     }
@@ -968,6 +1050,7 @@ public:
             if (request.options->requestType == firebase_firestore_request_type_patch_doc)
             {
                 extras += request.options->updateMask.getQuery("updateMask", hasQueryParams);
+                extras += request.options->currentDocument.getQuery("currentDocument", hasQueryParams);
             }
             else if (request.options->requestType == firebase_firestore_request_type_commit_document)
             {
@@ -1046,26 +1129,6 @@ public:
         asyncRequest(aReq);
     }
 
-    void createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, DocumentMask &mask, Document &document, bool async)
-    {
-        size_t count = 0;
-        String collectionId, documentId;
-        collectionId = parent.documentPath;
-        int p = collectionId.lastIndexOf("/");
-        String _documentPath = parent.documentPath;
-
-        for (size_t i = 0; i < _documentPath.length(); i++)
-            count += _documentPath[i] == '/' ? 1 : 0;
-
-        if (p > -1 && count % 2 > 0)
-        {
-            documentId = collectionId.substring(p + 1, collectionId.length());
-            collectionId = collectionId.substring(0, p);
-        }
-
-        return createDoc(aClient, result, cb, uid, parent, collectionId, documentId, mask, document, async);
-    }
-
     void createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &collectionId, const String &documentId, DocumentMask &mask, Document &document, bool async)
     {
         FirestoreOptions options;
@@ -1075,6 +1138,21 @@ public:
         options.documentId = documentId;
         options.payload = document.toString();
         options.mask = mask;
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, DocumentMask &updateMask, DocumentMask &mask, Document &document, Precondition currentDocument, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_patch_doc;
+        options.parent = parent;
+        options.parent.pathResove(options.collectionId, options.documentId);
+        options.payload = document.toString();
+        options.mask = mask;
+        options.updateMask = updateMask;
+        options.currentDocument = currentDocument;
+
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }

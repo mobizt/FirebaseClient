@@ -65,6 +65,23 @@ private:
     String databaseId;
     String documentPath;
 
+    void pathResove(String &collectionId, String &documentId)
+    {
+        size_t count = 0;
+        collectionId = this->documentPath;
+        int p = collectionId.lastIndexOf("/");
+        String _documentPath = this->documentPath;
+
+        for (size_t i = 0; i < _documentPath.length(); i++)
+            count += _documentPath[i] == '/' ? 1 : 0;
+
+        if (p > -1 && count % 2 > 0)
+        {
+            documentId = collectionId.substring(p + 1, collectionId.length());
+            collectionId = collectionId.substring(0, p);
+        }
+    }
+
 public:
     firebase_firestore_parent_resource_t() {}
     firebase_firestore_parent_resource_t(const String &projectId, const String &databaseId)
@@ -106,6 +123,41 @@ public:
     }
 
 } DocumentMask;
+
+typedef struct firebase_firestore_precondition_t
+{
+    friend class Firestore;
+
+private:
+    String buf;
+
+    String getQuery(const String &mask, bool hasParam)
+    {
+        String tmp;
+        if (buf.length())
+        {
+            tmp += hasParam ? '&' : '?';
+            tmp += mask + buf;
+        }
+        return tmp;
+    }
+
+public:
+    firebase_firestore_precondition_t() {}
+    firebase_firestore_precondition_t(bool exists)
+    {
+        buf = FPSTR(".exists=");
+        buf += exists ? FPSTR("true") : FPSTR("false");
+    }
+
+    firebase_firestore_precondition_t(const String &updateTime)
+    {
+        JsonHelper jh;
+        buf = FPSTR(".updateTime=");
+        buf += jh.toString(updateTime);
+    }
+
+} Precondition;
 
 typedef struct firebase_firestore_document_t
 {
@@ -149,6 +201,7 @@ public:
     String collectionId;
     String documentId;
     DocumentMask mask, updateMask;
+    Precondition currentDocument;
     String payload;
     String exists;
     String updateTime;
