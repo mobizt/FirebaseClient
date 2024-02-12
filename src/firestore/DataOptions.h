@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created February 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -84,7 +84,7 @@ private:
 
 public:
     firebase_firestore_parent_resource_t() {}
-    firebase_firestore_parent_resource_t(const String &projectId, const String &databaseId)
+    firebase_firestore_parent_resource_t(const String &projectId, const String &databaseId = "")
     {
         this->projectId = projectId;
         this->databaseId = databaseId;
@@ -132,190 +132,348 @@ namespace Values
 
     public:
         NullValue() {}
-        const char *c_str() { return (const char *)FPSTR("{\"nullValue\":null}"); }
+        const char *c_str() { return (const char *)FPSTR("null"); }
+        const char *val() { return (const char *)FPSTR("{\"nullValue\":null}"); }
     };
 
     struct BooleanValue
     {
     private:
-        String buf;
+        String buf, str;
 
     public:
         BooleanValue(bool value)
         {
-            buf = FPSTR("{\"booleanValue\":");
-            buf += value ? FPSTR("true") : FPSTR("false");
-            buf += '}';
+            buf = value ? FPSTR("true") : FPSTR("false");
         }
         const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"booleanValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
     };
 
     struct IntegerValue
     {
 
     private:
-        String buf;
+        String buf, str;
 
     public:
-        IntegerValue(int v)
+        IntegerValue(int value)
         {
-            buf = FPSTR("{\"integerValue\":\"");
-            buf += v;
-            buf += FPSTR("\"}");
+            buf = FPSTR("\"");
+            buf += value;
+            buf += '"';
         }
         const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"integerValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
     };
 
     struct DoubleValue
     {
 
     private:
-        String buf;
+        String buf, str;
 
     public:
         DoubleValue(double value)
         {
-            buf = FPSTR("{\"doubleValue\":");
-            buf += String(value);
-            buf += '}';
+            buf = String(value);
         }
         const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"doubleValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
     };
 
     struct TimestampValue
     {
 
     private:
-        String buf;
+        String buf, str;
 
     public:
         TimestampValue(const String &value)
         {
-            buf = FPSTR("{\"timestampValue\":\"");
+            buf = FPSTR("\"");
             buf += value;
-            buf += FPSTR("\"}");
+            buf += '"';
         }
         const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"timestampValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
     };
 
     struct StringValue
     {
 
     private:
-        String buf;
+        String buf, str;
 
     public:
         StringValue(const String &value)
         {
-            buf = FPSTR("{\"stringValue\":\"");
+            buf = FPSTR("\"");
             buf += value;
-            buf += FPSTR("\"}");
+            buf += '"';
         }
         const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"stringValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
     };
 
     struct BytesValue
     {
     private:
-        String buf;
+        String buf, str;
 
     public:
         BytesValue(const String &value)
         {
-            buf = FPSTR("{\"bytesValue\":\"");
+            buf = FPSTR("\"");
             buf += value;
-            buf += FPSTR("\"}");
+            buf += '"';
         }
         const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"bytesValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
     };
 
     struct ReferenceValue
     {
 
     private:
-        String buf;
+        String buf, str;
 
     public:
         ReferenceValue(const String &value)
         {
-            buf = FPSTR("{\"referenceValue\":\"");
+            buf = FPSTR("\"");
             buf += value;
-            buf += FPSTR("\"}");
+            buf += '"';
         }
         const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"referenceValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
     };
 
     struct GeoPointValue
     {
     private:
-        String buf;
+        String buf, str;
 
     public:
         GeoPointValue(double lat, double lng)
         {
-            buf = FPSTR("{\"geoPointValue\":{\"latitude\":");
+            buf = FPSTR("{\"latitude\":");
             buf += String(lat);
             buf += FPSTR(",\"longitude\":");
             buf += String(lng);
-            buf += FPSTR("}}");
+            buf += '}';
         }
         const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"geoPointValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
     };
 
     struct ArrayValue
     {
 
     private:
-        String buf;
+        String buf, str;
+        uint8_t flags[11];
+
+        template <typename T>
+        bool isExisted(T value)
+        {
+            String tmp = value.val();
+            if (tmp.indexOf("nullValue") > -1)
+            {
+                if (flags[0])
+                    return true;
+                flags[0] = 1;
+            }
+            else if (tmp.indexOf("booleanValue") > -1)
+            {
+                if (flags[1])
+                    return true;
+                flags[1] = 1;
+            }
+            else if (tmp.indexOf("integerValue") > -1)
+            {
+                if (flags[2])
+                    return true;
+                flags[2] = 1;
+            }
+            else if (tmp.indexOf("doubleValue") > -1)
+            {
+                if (flags[3])
+                    return true;
+                flags[3] = 1;
+            }
+            else if (tmp.indexOf("timestampValue") > -1)
+            {
+                if (flags[4])
+                    return true;
+                flags[4] = 1;
+            }
+            else if (tmp.indexOf("stringValue") > -1)
+            {
+                if (flags[5])
+                    return true;
+                flags[5] = 1;
+            }
+            else if (tmp.indexOf("bytesValue") > -1)
+            {
+                if (flags[6])
+                    return true;
+                flags[6] = 1;
+            }
+            else if (tmp.indexOf("referenceValue") > -1)
+            {
+                if (flags[7])
+                    return true;
+                flags[7] = 1;
+            }
+            else if (tmp.indexOf("geoPointValue") > -1)
+            {
+                if (flags[8])
+                    return true;
+                flags[8] = 1;
+            }
+            else if (tmp.indexOf("arrayValue") > -1)
+            {
+                if (flags[9])
+                    return true;
+                flags[9] = 1;
+            }
+            else if (tmp.indexOf("mapValue") > -1)
+            {
+                if (flags[10])
+                    return true;
+                flags[10] = 1;
+            }
+
+            return false;
+        }
         template <typename T>
         void set(T value)
         {
-            buf = FPSTR("{\"arrayValue\":{\"values\":[");
-            buf += value.c_str();
-            buf += FPSTR("]}}");
+            if (isExisted(value))
+                return;
+            buf = FPSTR("{\"values\":[");
+            buf += value.val();
+            buf += FPSTR("]}");
         }
 
     public:
         template <typename T>
         ArrayValue(T value)
         {
+            memset(flags, 0, 11);
             set(value);
         }
         template <typename T>
         ArrayValue &add(T value)
         {
-            if (buf.length() == 0)
-                set(value);
-            else
+            if (!isExisted(value))
             {
-                int p = buf.lastIndexOf("]}}");
-                String str = buf.substring(0, p);
-                str += ',';
-                str += value.c_str();
-                str += FPSTR("]}}");
-                buf = str;
+                if (buf.length() == 0)
+                    set(value);
+                else
+                {
+                    int p = buf.lastIndexOf("]}");
+                    String str = buf.substring(0, p);
+                    str += ',';
+                    str += value.val();
+                    str += FPSTR("]}");
+                    buf = str;
+                }
             }
-
             return *this;
+        }
+        const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"arrayValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
+    };
+
+    struct MAP
+    {
+    private:
+        String buf;
+
+    public:
+        template <typename T>
+        MAP(const String &key, T value, bool val)
+        {
+            buf = FPSTR("{\"");
+            buf += key;
+            buf += FPSTR("\":");
+            buf += val ? value.val() : value.c_str();
+            buf += '}';
         }
         const char *c_str() { return buf.c_str(); }
     };
 
     struct MapValue
     {
+
     private:
-        String buf;
+        String buf, str;
         template <typename T>
         void set(const String &key, T value)
         {
-            buf = FPSTR("{\"mapValue\":{\"fields\":{\"");
-            buf += key;
-            buf += FPSTR("\":");
-            buf += value.c_str();
-            buf += FPSTR("}}}");
+            buf = FPSTR("{\"fields\":");
+            buf += MAP(key, value, true).c_str();
+            buf += '}';
         }
 
     public:
+        MapValue() {}
         template <typename T>
         MapValue(const String &key, T value)
         {
@@ -328,20 +486,41 @@ namespace Values
                 set(key, value);
             else
             {
-                int p = buf.lastIndexOf("}}}");
+                int p = buf.lastIndexOf("}}");
                 String str = buf.substring(0, p);
-                str += FPSTR(",\"");
-                str += key;
-                str += FPSTR("\":");
-                str += value.c_str();
-                str += FPSTR("}}}");
+                str += FPSTR(",");
+                String tmp = MAP(key, value, true).c_str();
+                str += tmp.substring(1, tmp.length() - 1);
+                str += FPSTR("}}");
                 buf = str;
             }
             return *this;
         }
         const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"mapValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
     };
 
+    struct Value
+    {
+    private:
+        String buf;
+
+    public:
+        Value() {}
+        template <typename T>
+        Value(T value)
+        {
+            buf = value.val();
+        }
+        const char *c_str() { return buf.c_str(); }
+        const char *val() { return buf.c_str(); }
+    };
 };
 
 namespace FieldTransform
@@ -514,38 +693,27 @@ public:
 
 } Precondition;
 
-typedef struct firebase_firestore_document_t
+template <typename T = Values::Value>
+struct Document
 {
     friend class Firestore;
 
 private:
-    String name;
-    String createTime;
-    String updateTime;
-    object_t fields;
+    Values::MapValue mv;
 
 public:
-    firebase_firestore_document_t() {}
-    firebase_firestore_document_t(const object_t &fields, const String &name = "", const String &createTime = "", const String &updateTime = "")
+    Document() {}
+    Document(const String &key, T value)
     {
-        this->name = name;
-        this->fields = fields;
-        this->createTime = createTime;
-        this->updateTime = updateTime;
+        mv.add(key, value);
     }
-    String toString()
+    Document &add(const String &key, T value)
     {
-        String buf;
-        JsonHelper jh;
-        if (createTime.length())
-            jh.addObject(buf, jh.toString("createTime"), jh.toString(createTime));
-        if (createTime.length())
-            jh.addObject(buf, jh.toString("updateTime"), jh.toString(updateTime));
-        jh.addObject(buf, jh.toString("fields"), fields.c_str(), true);
-        return buf;
+        mv.add(key, value);
+        return *this;
     }
-
-} Document;
+    const char *c_str() { return mv.c_str(); }
+};
 
 class FirestoreOptions
 {

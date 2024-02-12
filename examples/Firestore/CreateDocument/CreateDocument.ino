@@ -312,74 +312,67 @@ void loop()
         // If the document path contains space e.g. "a b c/d e f"
         // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
 
-        // Library does not provide JSON parser library, the following JSON writer class will be used with
-        // object_t for simple demonstration.
-        JsonWriter writer;
-        object_t fields;
-        object_t val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14;
+        // If the document path contains space e.g. "a b c/d e f"
+        // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
 
         // double
-        writer.create(val1, "myDouble/doubleValue", random(1, 500) / 100.0);
+        Values::DoubleValue dblV(random(1, 500) / 100.0);
 
         // boolean
-        writer.create(val2, "myBool/booleanValue", boolean_t(true));
+        Values::BooleanValue bolV(true);
 
         // integer
-        writer.create(val3, "myInteger/integerValue", string_t(random(500, 1000)));
+        Values::IntegerValue intV(random(500, 1000));
 
         // null
-        writer.create(val4, "myNull/nullValue", object_t("null"));
+        Values::NullValue nullV;
 
         String doc_path = "projects/";
         doc_path += FIREBASE_PROJECT_ID;
         doc_path += "/databases/(default)/documents/coll_id/doc_id"; // coll_id and doc_id are your collection id and document id
 
         // reference
-        writer.create(val5, "myRef/referenceValue", string_t(doc_path));
+        Values::ReferenceValue refV(doc_path);
 
         // timestamp
-        writer.create(val6, "myTimestamp/timestampValue", string_t("2014-10-02T15:01:23Z")); // RFC3339 UTC "Zulu" format
+        Values::TimestampValue tsV("2014-10-02T15:01:23Z");
 
         // bytes
-        writer.create(val7, "myBytes/bytesValue", string_t("aGVsbG8=")); // base64 encoded
+        Values::BytesValue bytesV("aGVsbG8=");
+
+        // string
+        Values::StringValue strV("hello");
 
         // array
-        writer.create(val8, "stringValue", string_t("test"));
-        writer.create(val9, "integerValue", string_t("20"));
-        writer.create(val10, "booleanValue", boolean_t(true));
-        val11.initArray();
-        writer.join(val11, 3, val8, val9, val10);
-        writer.create(val12, "myArray/arrayValue/values", val11);
+        Values::ArrayValue arrV(Values::StringValue("test"));
+        arrV.add(Values::IntegerValue(20)).add(Values::BooleanValue(true));
 
         // map
-        writer.create(val8, "name/stringValue", string_t("wrench"));
-        writer.create(val9, "mass/stringValue", string_t("1.3kg"));
-        writer.create(val10, "count/integerValue", string_t("3"));
-        writer.join(val11, 3, val8, val9, val10);
-        writer.create(val13, "myMap/mapValue/fields", val11);
+        Values::MapValue mapV("name", Values::StringValue("wrench"));
+        mapV.add("mass", Values::StringValue("1.3kg")).add("count", Values::IntegerValue(3));
 
         // lat long
-        writer.create(val8, "latitude", 1.486284);
-        writer.create(val9, "longitude", 23.678198);
-        writer.join(val10, 2, val8, val9);
-        writer.create(val14, "myLatLng/geoPointValue", val10);
+        Values::GeoPointValue geoV(1.486284, 23.678198);
 
-        Serial.println("[+] Create a document... ");
+        Document doc("myDouble", Values::Value(dblV));
+        doc.add("myBool", Values::Value(bolV));
+        doc.add("myInt", Values::Value(intV));
+        doc.add("myNull", Values::Value(nullV));
+        doc.add("myRef", Values::Value(refV));
+        doc.add("myTimestamp", Values::Value(tsV));
+        doc.add("myBytes", Values::Value(bytesV));
+        doc.add("myString", Values::Value(strV));
+        doc.add("myArr", Values::Value(arrV));
+        doc.add("myMap", Values::Value(mapV));
+        doc.add("myGeo", Values::Value(geoV));
 
-        writer.join(fields, 10, val1, val2, val3, val4, val5, val6, val7, val12, val13, val14);
-
-        // To view the content of object_t, string_t, number_t, and boolean_t, you can print it on Serial.
-        // To view the content of Document, use doc.toString().
-
-        Document doc(fields);
-
-        firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID, "" /* databaseId can be (default) or empty */), documentPath, DocumentMask(), doc, asyncCB);
+        firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
 
         // To assign UID for async result
-        // firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID, "" /* databaseId can be (default) or empty */), documentPath, DocumentMask(), doc, asyncCB, "myUID");
+        // firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID, "" /* databaseId can be (default) or empty */), documentPath, DocumentMask(), doc, aResult_no_callback);
+        // firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, aResult_no_callback);
     }
 }
 

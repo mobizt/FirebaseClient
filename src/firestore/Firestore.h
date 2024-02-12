@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created February 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -326,7 +326,7 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document &document)
+    bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
     {
         AsyncResult result;
         parent.documentPath = documentPath;
@@ -351,7 +351,7 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document &document, AsyncResult &aResult)
+    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
     {
         parent.documentPath = documentPath;
         String collectionId, documentId;
@@ -375,7 +375,7 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document &document, AsyncResultCallback cb, const String &uid = "")
+    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
     {
         parent.documentPath = documentPath;
         String collectionId, documentId;
@@ -400,7 +400,7 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document &document)
+    bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
     {
         AsyncResult result;
         createDoc(aClient, &result, NULL, "", parent, collectionId, documentId, mask, document, false);
@@ -424,7 +424,7 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document &document, AsyncResult &aResult)
+    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
     {
         createDoc(aClient, &aResult, NULL, "", parent, collectionId, documentId, mask, document, true);
     }
@@ -447,7 +447,7 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document &document, AsyncResultCallback cb, const String &uid = "")
+    void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
     {
         createDoc(aClient, nullptr, cb, uid, parent, collectionId, documentId, mask, document, true);
     }
@@ -483,7 +483,7 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    bool patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document &document, Precondition currentDocument)
+    bool patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document<Values::Value> &document, Precondition currentDocument)
     {
         AsyncResult result;
         patchDoc(aClient, &result, NULL, "", parent, documentPath, updateMask, mask, document, currentDocument, false);
@@ -521,7 +521,7 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document &document, Precondition currentDocument, AsyncResult &aResult)
+    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document<Values::Value> &document, Precondition currentDocument, AsyncResult &aResult)
     {
         patchDoc(aClient, &aResult, NULL, "", parent, documentPath, updateMask, mask, document, currentDocument, true);
     }
@@ -558,7 +558,7 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document &document, Precondition currentDocument, AsyncResultCallback cb, const String &uid = "")
+    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document<Values::Value> &document, Precondition currentDocument, AsyncResultCallback cb, const String &uid = "")
     {
         patchDoc(aClient, nullptr, cb, uid, parent, documentPath, updateMask, mask, document, currentDocument, true);
     }
@@ -1129,26 +1129,26 @@ public:
         asyncRequest(aReq);
     }
 
-    void createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &collectionId, const String &documentId, DocumentMask &mask, Document &document, bool async)
+    void createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &collectionId, const String &documentId, DocumentMask &mask, Document<Values::Value> &document, bool async)
     {
         FirestoreOptions options;
         options.requestType = firebase_firestore_request_type_create_doc;
         options.parent = parent;
         options.collectionId = collectionId;
         options.documentId = documentId;
-        options.payload = document.toString();
+        options.payload = document.c_str();
         options.mask = mask;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
-    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, DocumentMask &updateMask, DocumentMask &mask, Document &document, Precondition currentDocument, bool async)
+    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, DocumentMask &updateMask, DocumentMask &mask, Document<Values::Value> &document, Precondition currentDocument, bool async)
     {
         FirestoreOptions options;
         options.requestType = firebase_firestore_request_type_patch_doc;
         options.parent = parent;
         options.parent.pathResove(options.collectionId, options.documentId);
-        options.payload = document.toString();
+        options.payload = document.c_str();
         options.mask = mask;
         options.updateMask = updateMask;
         options.currentDocument = currentDocument;

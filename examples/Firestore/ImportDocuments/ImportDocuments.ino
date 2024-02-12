@@ -287,13 +287,13 @@ void loop()
         // This required the Owner and Editor permissions for the account.
         // See how to add permission here, https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
 
-        firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID, "" /* databaseId can be (default) or empty */), "" /* Which collection ids to export. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket that store the exported data */, asyncCB);
+        firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), "" /* Which collection ids to export. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket that store the exported data */, asyncCB);
 
         // To assign UID for async result
-        // firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID, ""), "", STORAGE_BUCKET_ID, "test_path", asyncCB, "myUID");
+        // firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), "", STORAGE_BUCKET_ID, "test_path", asyncCB, "myUID");
 
         // To get anyc result without callback
-        // firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID, ""), "", STORAGE_BUCKET_ID, "test_path", aResult_no_callback); }
+        // firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), "", STORAGE_BUCKET_ID, "test_path", aResult_no_callback); }
     }
 }
 
