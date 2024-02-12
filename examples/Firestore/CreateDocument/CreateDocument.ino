@@ -355,15 +355,9 @@ void loop()
         Values::GeoPointValue geoV(1.486284, 23.678198);
 
         Document doc("myDouble", Values::Value(dblV));
-        doc.add("myBool", Values::Value(bolV));
-        doc.add("myInt", Values::Value(intV));
-        doc.add("myNull", Values::Value(nullV));
-        doc.add("myRef", Values::Value(refV));
-        doc.add("myTimestamp", Values::Value(tsV));
-        doc.add("myBytes", Values::Value(bytesV));
-        doc.add("myString", Values::Value(strV));
-        doc.add("myArr", Values::Value(arrV));
-        doc.add("myMap", Values::Value(mapV));
+        doc.add("myBool", Values::Value(bolV)).add("myInt", Values::Value(intV)).add("myNull", Values::Value(nullV));
+        doc.add("myRef", Values::Value(refV)).add("myTimestamp", Values::Value(tsV)).add("myBytes", Values::Value(bytesV));
+        doc.add("myString", Values::Value(strV)).add("myArr", Values::Value(arrV)).add("myMap", Values::Value(mapV));
         doc.add("myGeo", Values::Value(geoV));
 
         firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
