@@ -92,12 +92,13 @@ public:
 
 } ParentResource;
 
-typedef struct firebase_firestore_document_mask_t
+class DocumentMask : public Printable
 {
     friend class Firestore;
 
 private:
     String mask;
+    String str;
 
     String get()
     {
@@ -116,13 +117,16 @@ private:
     }
 
 public:
-    firebase_firestore_document_mask_t() {}
-    firebase_firestore_document_mask_t(const String &mask)
+    DocumentMask() {}
+    DocumentMask(const String &mask)
     {
         this->mask = mask;
+        JsonHelper jh;
+        jh.addTokens(str, "\"fieldPaths\"", mask, true);
     }
-
-} DocumentMask;
+    const char *c_str() { return str.c_str(); }
+    size_t printTo(Print &p) const { return p.print(str.c_str()); }
+};
 
 namespace Values
 {
@@ -656,12 +660,12 @@ namespace FieldTransform
 
 };
 
-typedef struct firebase_firestore_precondition_t
+class Precondition : public Printable
 {
     friend class Firestore;
 
 private:
-    String buf;
+    String buf, str;
 
     String getQuery(const String &mask, bool hasParam)
     {
@@ -675,21 +679,28 @@ private:
     }
 
 public:
-    firebase_firestore_precondition_t() {}
-    firebase_firestore_precondition_t(bool exists)
+    Precondition() {}
+    Precondition(bool exists)
     {
         buf = FPSTR(".exists=");
         buf += exists ? FPSTR("true") : FPSTR("false");
+        str = FPSTR("{\"exists\":");
+        str += exists ? FPSTR("true") : FPSTR("false");
+        str += '}';
     }
 
-    firebase_firestore_precondition_t(const String &updateTime)
+    Precondition(const String &updateTime)
     {
         JsonHelper jh;
         buf = FPSTR(".updateTime=");
         buf += jh.toString(updateTime);
+        str = FPSTR("{\"updateTime\":");
+        str += jh.toString(updateTime);
+        str += '}';
     }
-
-} Precondition;
+    const char *c_str() { return str.c_str(); }
+    size_t printTo(Print &p) const { return p.print(str.c_str()); }
+};
 
 template <typename T = Values::Value>
 class Document : public Printable
@@ -714,6 +725,117 @@ public:
         return *this;
     }
     const char *c_str() { return mv.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+class DocumentTransform : public Printable
+{
+private:
+    String buf;
+
+public:
+    DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
+    {
+        buf = FPSTR("{\"document\":\"");
+        buf += document;
+        buf += FPSTR("\",\"fieldTransforms\":");
+        buf += fieldTransforms.c_str();
+        buf += '}';
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+class Write : public Printable
+{
+private:
+    String buf;
+
+    void set(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument)
+    {
+        buf += FPSTR("\"updateMask\":\"");
+        buf += updateMask.c_str();
+        buf += FPSTR("\",\"currentDocument\":");
+        buf += currentDocument.c_str();
+        buf += FPSTR(",\"updateTransforms\":[");
+        buf += updateTransforms.c_str();
+        buf += FPSTR("]}");
+    }
+
+public:
+    Write(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument, Document<Values::Value> update)
+    {
+        buf = FPSTR("{\"update\":");
+        buf += update.c_str();
+        buf += ',';
+        set(updateMask, updateTransforms, currentDocument);
+    }
+
+    Write(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument, const String &Delete)
+    {
+        buf = FPSTR("{\"delete\":\"");
+        buf += Delete;
+        buf += FPSTR("\",");
+        set(updateMask, updateTransforms, currentDocument);
+    }
+
+    Write(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument, DocumentTransform transform)
+    {
+        buf = FPSTR("{\"transform\":");
+        buf += transform.c_str();
+        buf += ',';
+        set(updateMask, updateTransforms, currentDocument);
+    }
+
+    Write &add(FieldTransform::FieldTransform updateTransforms)
+    {
+        int p = buf.lastIndexOf("]}");
+        String str = buf.substring(0, p);
+        str += ',';
+        str += updateTransforms.c_str();
+        str += FPSTR("]}");
+        buf = str;
+        return *this;
+    }
+
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+class Writes : public Printable
+{
+private:
+    String buf;
+
+public:
+    Writes(Write write, const String &transaction = "")
+    {
+        if (transaction.length())
+        {
+            buf = FPSTR("{\"transaction\":\"");
+            buf += transaction;
+            buf += FPSTR("\",");
+        }
+        else
+            buf = "{";
+
+        buf += FPSTR("\"writes\":[");
+        buf += write.c_str();
+        buf += FPSTR("]}");
+    }
+
+    Writes &add(Write write)
+    {
+        int p = buf.lastIndexOf("]}");
+        String str = buf.substring(0, p);
+        str += ',';
+        str += write.c_str();
+        str += FPSTR("]}");
+        buf = str;
+        return *this;
+    }
+
+    const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
