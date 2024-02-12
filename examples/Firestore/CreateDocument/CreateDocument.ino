@@ -312,9 +312,6 @@ void loop()
         // If the document path contains space e.g. "a b c/d e f"
         // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
 
-        // If the document path contains space e.g. "a b c/d e f"
-        // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
-
         // double
         Values::DoubleValue dblV(random(1, 500) / 100.0);
 
