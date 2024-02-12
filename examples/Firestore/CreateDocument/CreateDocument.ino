@@ -357,6 +357,8 @@ void loop()
         doc.add("myString", Values::Value(strV)).add("myArr", Values::Value(arrV)).add("myMap", Values::Value(mapV));
         doc.add("myGeo", Values::Value(geoV));
 
+        // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
+
         firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
 
         // To assign UID for async result

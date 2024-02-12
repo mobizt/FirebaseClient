@@ -127,16 +127,25 @@ public:
 namespace Values
 {
 
-    struct NullValue
+    class NullValue : public Printable
     {
+    private:
+        String buf, str;
 
     public:
-        NullValue() {}
-        const char *c_str() { return (const char *)FPSTR("null"); }
-        const char *val() { return (const char *)FPSTR("{\"nullValue\":null}"); }
+        NullValue() { buf = FPSTR("null"); }
+        const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"nullValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct StringValue
+    class StringValue : public Printable
     {
 
     private:
@@ -157,9 +166,10 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct BooleanValue
+    class BooleanValue : public Printable
     {
     private:
         String buf, str;
@@ -174,9 +184,10 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct IntegerValue
+    class IntegerValue : public Printable
     {
 
     private:
@@ -192,9 +203,10 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct DoubleValue
+    class DoubleValue : public Printable
     {
 
     private:
@@ -213,9 +225,10 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct TimestampValue
+    class TimestampValue : public Printable
     {
 
     private:
@@ -231,9 +244,10 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct BytesValue
+    class BytesValue : public Printable
     {
     private:
         String buf, str;
@@ -249,9 +263,10 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct ReferenceValue
+    class ReferenceValue : public Printable
     {
 
     private:
@@ -267,9 +282,10 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct GeoPointValue
+    class GeoPointValue : public Printable
     {
     private:
         String buf, str;
@@ -291,9 +307,10 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct ArrayValue
+    class ArrayValue : public Printable
     {
 
     private:
@@ -417,6 +434,7 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
     struct MAP
@@ -437,7 +455,7 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
     };
 
-    struct MapValue
+    class MapValue : public Printable
     {
 
     private:
@@ -482,9 +500,10 @@ namespace Values
             str += '}';
             return str.c_str();
         }
+        size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
-    struct Value
+    class Value : public Printable
     {
     private:
         String buf;
@@ -498,6 +517,7 @@ namespace Values
         }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return buf.c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     };
 };
 
@@ -672,25 +692,29 @@ public:
 } Precondition;
 
 template <typename T = Values::Value>
-struct Document
+class Document : public Printable
 {
     friend class Firestore;
 
 private:
     Values::MapValue mv;
+    String buf;
 
 public:
     Document() {}
     Document(const String &key, T value)
     {
         mv.add(key, value);
+        buf = mv.c_str();
     }
     Document &add(const String &key, T value)
     {
         mv.add(key, value);
+        buf = mv.c_str();
         return *this;
     }
     const char *c_str() { return mv.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
 class FirestoreOptions

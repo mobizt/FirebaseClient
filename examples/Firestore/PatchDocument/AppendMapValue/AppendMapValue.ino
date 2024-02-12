@@ -309,6 +309,8 @@ void loop()
 
         Serial.print("Update a document... ");
 
+        // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
+
         firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask("myMap.key" + String(cnt)) /* updateMask */, DocumentMask() /* mask */, doc, Precondition() /* precondition */, asyncCB);
 
         // To assign UID for async result
