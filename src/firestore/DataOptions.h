@@ -136,16 +136,36 @@ namespace Values
         const char *val() { return (const char *)FPSTR("{\"nullValue\":null}"); }
     };
 
+    struct StringValue
+    {
+
+    private:
+        String buf, str;
+
+    public:
+        StringValue(const String &value)
+        {
+            buf = FPSTR("\"");
+            buf += value;
+            buf += '"';
+        }
+        const char *c_str() { return buf.c_str(); }
+        const char *val()
+        {
+            str = FPSTR("{\"stringValue\":");
+            str += buf;
+            str += '}';
+            return str.c_str();
+        }
+    };
+
     struct BooleanValue
     {
     private:
         String buf, str;
 
     public:
-        BooleanValue(bool value)
-        {
-            buf = value ? FPSTR("true") : FPSTR("false");
-        }
+        BooleanValue(bool value) { buf = value ? FPSTR("true") : FPSTR("false"); }
         const char *c_str() { return buf.c_str(); }
         const char *val()
         {
@@ -163,12 +183,7 @@ namespace Values
         String buf, str;
 
     public:
-        IntegerValue(int value)
-        {
-            buf = FPSTR("\"");
-            buf += value;
-            buf += '"';
-        }
+        IntegerValue(int value) { buf = StringValue(String(value)).c_str(); }
         const char *c_str() { return buf.c_str(); }
         const char *val()
         {
@@ -207,39 +222,11 @@ namespace Values
         String buf, str;
 
     public:
-        TimestampValue(const String &value)
-        {
-            buf = FPSTR("\"");
-            buf += value;
-            buf += '"';
-        }
+        TimestampValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
         const char *val()
         {
             str = FPSTR("{\"timestampValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
-    };
-
-    struct StringValue
-    {
-
-    private:
-        String buf, str;
-
-    public:
-        StringValue(const String &value)
-        {
-            buf = FPSTR("\"");
-            buf += value;
-            buf += '"';
-        }
-        const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"stringValue\":");
             str += buf;
             str += '}';
             return str.c_str();
@@ -252,12 +239,8 @@ namespace Values
         String buf, str;
 
     public:
-        BytesValue(const String &value)
-        {
-            buf = FPSTR("\"");
-            buf += value;
-            buf += '"';
-        }
+        BytesValue(const String &value) { buf = StringValue(value).c_str(); }
+
         const char *c_str() { return buf.c_str(); }
         const char *val()
         {
@@ -275,12 +258,7 @@ namespace Values
         String buf, str;
 
     public:
-        ReferenceValue(const String &value)
-        {
-            buf = FPSTR("\"");
-            buf += value;
-            buf += '"';
-        }
+        ReferenceValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
         const char *val()
         {
