@@ -359,6 +359,8 @@ void loop()
 
         // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
+        Serial.println("[+] Create document... ");
+
         firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
 
         // To assign UID for async result

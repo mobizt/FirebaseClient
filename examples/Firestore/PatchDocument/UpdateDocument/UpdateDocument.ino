@@ -313,12 +313,12 @@ void loop()
             Values::IntegerValue intV(cnt);
             Values::BooleanValue boolV(cnt % 2 == 0);
 
-            Serial.print("Create a document... ");
-
             Document doc("count", Values::Value(intV));
             doc.add("status", Values::Value(boolV));
 
             // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
+
+            Serial.println("[+] Create a document... ");
 
             firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
         }
@@ -327,16 +327,16 @@ void loop()
         Values::IntegerValue intV(cnt);
         Values::BooleanValue boolV(cnt % 2 == 0);
 
-        Serial.print("Update a document... ");
-
         Document doc("count", Values::Value(intV));
         doc.add("status", Values::Value(boolV));
+
+        // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
+
+        Serial.println("[+] Update a document... ");
 
         /** if updateMask contains the field name that exists in the remote document and
          * this field name does not exist in the document (content), that field will be deleted from remote document
          */
-
-        // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
         firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask("count,status") /* updateMask */, DocumentMask() /* mask */, doc, Precondition() /* precondition */, asyncCB);
 

@@ -282,7 +282,7 @@ void loop()
         taskCompleted = true;
 
         // Assume that the document was already exported to the Storage bucket at test_path as in the example ExportDocuments.ino
-        Serial.print("[+] Import documents from the Storage bucket... ");
+        Serial.println("[+] Import documents from the Storage bucket... ");
 
         // This required the Owner and Editor permissions for the account.
         // See how to add permission here, https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
