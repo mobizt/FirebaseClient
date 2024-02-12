@@ -1147,13 +1147,12 @@ public:
         FirestoreOptions options;
         options.requestType = firebase_firestore_request_type_patch_doc;
         options.parent = parent;
-        options.parent.pathResove(options.collectionId, options.documentId);
+        options.parent.documentPath = documentPath;
         options.payload = document.c_str();
         options.mask = mask;
         options.updateMask = updateMask;
         options.currentDocument = currentDocument;
-
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_patch, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 };

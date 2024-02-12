@@ -298,7 +298,7 @@ namespace Values
 
     private:
         String buf, str;
-        uint8_t flags[11];
+        bool flags[11];
 
         template <typename T>
         bool isExisted(T value)

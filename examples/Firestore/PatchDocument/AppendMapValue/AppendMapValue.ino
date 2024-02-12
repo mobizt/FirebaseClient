@@ -58,28 +58,25 @@
  */
 
 /**
- * CREATE DOCUMENTS FUNCTIONS
- * ==========================
+ * PATCH DOCUMENTS FUNCTIONS
+ * =========================
  *
  * SYNTAXES:
  *
- * firestore.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <Document>);
- * firestore.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <Document>, <AsyncResult>);
- * firestore.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <Document>, <AsyncResultCallback>, <uid>);
- *
- * firestore.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <Document>);
- * firestore.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <Document>, <AsyncResult>);
- * firestore.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <Document>, <AsyncResultCallback>, <uid>);
+ * firestore.patchDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>);
+ * firestore.patchDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResult>);
+ * firestore.patchDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResultCallback>, <uid>);
  *
  * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
- * The <documentPath> is the relative path of document to create in the collection.
- * The <DocumentMask> is the fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
- * The <collectionId> is document id of document to be created.
- * The <documentId> is the relative path of document collection id to create the document.
+ * The <documentPath> is the relative path of document to patch with the input document.
+ * The <DocumentMask(updateMask)> is the fields to update. If the document exists on the server and has fields not referenced in the mask, they are left unchanged. 
+ * The <DocumentMask(mask)> is fields to return. If not set, returns all fields. If the document has a field that is not present in this mask, that field will 
+ * not be returned in the response. Use comma (,) to separate between the field names.
  * The <Document> is Firestore document.
+ * The <Precondition(currentDocument)> is an optional precondition on the document. The request will fail if this is set and not met by the target document.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
@@ -239,9 +236,9 @@ Firestore firestore;
 
 AsyncResult aResult_no_callback;
 
-bool taskCompleted = false;
-
 int cnt = 0;
+
+unsigned long dataMillis = 0;
 
 void setup()
 {
@@ -297,73 +294,28 @@ void loop()
     // To get anyc result without callback
     // printResult(aResult_no_callback);
 
-    if (app.ready() && !taskCompleted)
+    if (app.ready() && (millis() - dataMillis > 60000 || dataMillis == 0))
     {
-        taskCompleted = true;
+        dataMillis = millis();
+        cnt++;
 
-        // Note: If new document created under non-existent ancestor documents, that document will not appear in queries and snapshot
-        // https://cloud.google.com/firestore/docs/using-console#non-existent_ancestor_documents.
-
-        // We will create the document in the parent path "a0/b?
-        // a0 is the collection id, b? is the document id in collection a0.
-
-        String documentPath = "a0/b" + String(cnt);
-
-        // If the document path contains space e.g. "a b c/d e f"
-        // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
-
-        // double
-        Values::DoubleValue dblV(random(1, 500) / 100.0);
-
-        // boolean
-        Values::BooleanValue bolV(true);
-
-        // integer
-        Values::IntegerValue intV(random(500, 1000));
-
-        // null
-        Values::NullValue nullV;
-
-        String doc_path = "projects/";
-        doc_path += FIREBASE_PROJECT_ID;
-        doc_path += "/databases/(default)/documents/coll_id/doc_id"; // coll_id and doc_id are your collection id and document id
-
-        // reference
-        Values::ReferenceValue refV(doc_path);
-
-        // timestamp
-        Values::TimestampValue tsV("2014-10-02T15:01:23Z");
-
-        // bytes
-        Values::BytesValue bytesV("aGVsbG8=");
-
-        // string
-        Values::StringValue strV("hello");
-
-        // array
-        Values::ArrayValue arrV(Values::StringValue("test"));
-        arrV.add(Values::IntegerValue(20)).add(Values::BooleanValue(true));
+        // test_collection is the collection id, test_document is the document id.
+        String documentPath = "test_collection/test_document";
 
         // map
-        Values::MapValue mapV("name", Values::StringValue("wrench"));
-        mapV.add("mass", Values::StringValue("1.3kg")).add("count", Values::IntegerValue(3));
+        Values::MapValue mapV("key" + String(cnt), Values::StringValue("value" + String(cnt)));
 
-        // lat long
-        Values::GeoPointValue geoV(1.486284, 23.678198);
+        Document doc("myMap", Values::Value(mapV));
 
-        Document doc("myDouble", Values::Value(dblV));
-        doc.add("myBool", Values::Value(bolV)).add("myInt", Values::Value(intV)).add("myNull", Values::Value(nullV));
-        doc.add("myRef", Values::Value(refV)).add("myTimestamp", Values::Value(tsV)).add("myBytes", Values::Value(bytesV));
-        doc.add("myString", Values::Value(strV)).add("myArr", Values::Value(arrV)).add("myMap", Values::Value(mapV));
-        doc.add("myGeo", Values::Value(geoV));
+        Serial.print("Update a document... ");
 
-        firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
+        firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask("myMap.key" + String(cnt)) /* updateMask */, DocumentMask() /* mask */, doc, Precondition() /* precondition */, asyncCB);
 
         // To assign UID for async result
-        // firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB, "myUID");
+        // firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask("myMap.key" + String(cnt)), DocumentMask(), doc, Precondition(), asyncCB, "myUID");
 
         // To get anyc result without callback
-        // firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, aResult_no_callback);
+        // firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask("myMap.key" + String(cnt)), DocumentMask(), doc, Precondition(), aResult_no_callback);
     }
 }
 

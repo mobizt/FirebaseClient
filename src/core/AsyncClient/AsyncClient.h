@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created February 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -976,12 +976,14 @@ private:
             {
                 while (sData->response.tcpAvailable(client_type, client, async_tcp_config))
                     sData->response.tcpRead(client_type, client, async_tcp_config);
-                stop(sData);
+
+                if (sData->auth_used)
+                    stop(sData);
             }
 
             if (sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
             {
-                setAsyncError(sData, sData->state, sData->response.httpCode , !sData->sse, true);
+                setAsyncError(sData, sData->state, sData->response.httpCode, !sData->sse, true);
                 sData->return_type = function_return_type_failure;
                 returnResult(sData, false);
             }
