@@ -566,24 +566,65 @@ public:
     /** Commits a transaction, while optionally updating documents.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
-     * @param writes The dyamic array of write object firebase_firestore_document_write_t.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to patch with the input document.
+     * @param writes The writes to apply.
      *
      * For the write object, see https://firebase.google.com/docs/firestore/reference/rest/v1/Write
      *
-     * @param transaction A base64-encoded string. If set, applies all writes in this transaction, and commits it.
-     *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
-     *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    bool commitDocument(AsyncClientClass &aClient, const ParentResource &parent, std::vector<firebase_firestore_document_write_t> writes, const String &transaction = "")
+    bool commitDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, Writes &writes)
     {
-        return false;
+        AsyncResult result;
+        commitDoc(aClient, &result, NULL, "", parent, documentPath, writes, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Commits a transaction, while optionally updating documents.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to patch with the input document.
+     * @param writes The writes to apply.
+     * @param aResult The async result (AsyncResult).
+     *
+     * For the write object, see https://firebase.google.com/docs/firestore/reference/rest/v1/Write
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void commitDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, Writes &writes, AsyncResult &aResult)
+    {
+        commitDoc(aClient, &aResult, NULL, "", parent, documentPath, writes, true);
+    }
+
+    /** Commits a transaction, while optionally updating documents.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to patch with the input document.
+     * @param writes The writes to apply.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * For the write object, see https://firebase.google.com/docs/firestore/reference/rest/v1/Write
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void commitDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, Writes &writes, AsyncResultCallback cb, const String &uid = "")
+    {
+        commitDoc(aClient, nullptr, cb, uid, parent, documentPath, writes, true);
     }
 
     /** Applies a batch of write operations.
@@ -1153,6 +1194,18 @@ public:
         options.updateMask = updateMask;
         options.currentDocument = currentDocument;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_patch, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void commitDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, Writes &writes, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_commit_document;
+        options.parent = parent;
+        options.parent.documentPath = documentPath;
+        options.parent.pathResove(options.collectionId, options.documentId);
+        options.payload = writes.c_str();
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 };
