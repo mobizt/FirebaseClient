@@ -1,5 +1,5 @@
 /**
- * Created February 12, 2024
+ * Created February 13, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -54,6 +54,51 @@ enum firebase_firestore_request_type
 
     firebase_firestore_request_type_delete_doc = 500,
     firebase_firestore_request_type_delete_index
+};
+
+class FSUT
+{
+public:
+    void addArray(String &buf, const String &v)
+    {
+        int p = buf.lastIndexOf("]}");
+        String str = buf.substring(0, p);
+        str += ',';
+        str += v;
+        str += FPSTR("]}");
+        buf = str;
+    }
+    const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
+    {
+        buf = FPSTR("{\"");
+        buf += key;
+        buf += FPSTR("\":");
+        if (isArrayValue)
+            buf += '[';
+        buf += value;
+        if (isArrayValue)
+            buf += ']';
+        buf += '}';
+        return buf.c_str();
+    }
+    void setBool(String &buf, bool value) { buf = getBoolStr(value); }
+
+    String getBoolStr(bool value) { return value ? FPSTR("true") : FPSTR("false"); }
+
+    String getArrayStr(const String &value)
+    {
+        String str = FPSTR("[");
+        str += value;
+        str += ']';
+        return str;
+    }
+
+    void setString(String &buf, const String &value)
+    {
+        buf = FPSTR("\"");
+        buf += value;
+        buf += '"';
+    }
 };
 
 typedef struct firebase_firestore_parent_resource_t
@@ -122,7 +167,7 @@ public:
     {
         this->mask = mask;
         JsonHelper jh;
-        jh.addTokens(str, "\"fieldPaths\"", mask, true);
+        jh.addTokens(str, "fieldPaths", mask, true);
     }
     const char *c_str() { return str.c_str(); }
     size_t printTo(Print &p) const { return p.print(str.c_str()); }
@@ -135,17 +180,12 @@ namespace Values
     {
     private:
         String buf, str;
+        FSUT fsut;
 
     public:
         NullValue() { buf = FPSTR("null"); }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"nullValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("nullValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -154,22 +194,12 @@ namespace Values
 
     private:
         String buf, str;
+        FSUT fsut;
 
     public:
-        StringValue(const String &value)
-        {
-            buf = FPSTR("\"");
-            buf += value;
-            buf += '"';
-        }
+        StringValue(const String &value) { fsut.setString(buf, value); }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"stringValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("stringValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -177,17 +207,12 @@ namespace Values
     {
     private:
         String buf, str;
+        FSUT fsut;
 
     public:
-        BooleanValue(bool value) { buf = value ? FPSTR("true") : FPSTR("false"); }
+        BooleanValue(bool value) { fsut.setBool(buf, value); }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"booleanValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("booleanValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -196,17 +221,12 @@ namespace Values
 
     private:
         String buf, str;
+        FSUT fsut;
 
     public:
         IntegerValue(int value) { buf = StringValue(String(value)).c_str(); }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"integerValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("integerValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -215,20 +235,12 @@ namespace Values
 
     private:
         String buf, str;
+        FSUT fsut;
 
     public:
-        DoubleValue(double value)
-        {
-            buf = String(value);
-        }
+        DoubleValue(double value) { buf = String(value); }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"doubleValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("doubleValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -237,17 +249,12 @@ namespace Values
 
     private:
         String buf, str;
+        FSUT fsut;
 
     public:
         TimestampValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"timestampValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("timestampValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -255,18 +262,13 @@ namespace Values
     {
     private:
         String buf, str;
+        FSUT fsut;
 
     public:
         BytesValue(const String &value) { buf = StringValue(value).c_str(); }
 
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"bytesValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("bytesValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -275,17 +277,12 @@ namespace Values
 
     private:
         String buf, str;
+        FSUT fsut;
 
     public:
         ReferenceValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"referenceValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("referenceValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -293,6 +290,7 @@ namespace Values
     {
     private:
         String buf, str;
+        FSUT fsut;
 
     public:
         GeoPointValue(double lat, double lng)
@@ -304,13 +302,7 @@ namespace Values
             buf += '}';
         }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"geoPointValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("geoPointValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -319,6 +311,7 @@ namespace Values
 
     private:
         String buf, str;
+        FSUT fsut;
         bool flags[11];
 
         template <typename T>
@@ -399,9 +392,7 @@ namespace Values
         {
             if (isExisted(value))
                 return;
-            buf = FPSTR("{\"values\":[");
-            buf += value.val();
-            buf += FPSTR("]}");
+            fsut.setPair(buf, FPSTR("values"), value.val(), true);
         }
 
     public:
@@ -420,24 +411,14 @@ namespace Values
                     set(value);
                 else
                 {
-                    int p = buf.lastIndexOf("]}");
-                    String str = buf.substring(0, p);
-                    str += ',';
-                    str += value.val();
-                    str += FPSTR("]}");
-                    buf = str;
+                    FSUT fsut;
+                    fsut.addArray(buf, value.val());
                 }
             }
             return *this;
         }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"arrayValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("arrayValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -445,17 +426,11 @@ namespace Values
     {
     private:
         String buf;
+        FSUT fsut;
 
     public:
         template <typename T>
-        MAP(const String &key, T value, bool val)
-        {
-            buf = FPSTR("{\"");
-            buf += key;
-            buf += FPSTR("\":");
-            buf += val ? value.val() : value.c_str();
-            buf += '}';
-        }
+        MAP(const String &key, T value, bool val) { fsut.setPair(buf, key, val ? value.val() : value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -464,13 +439,9 @@ namespace Values
 
     private:
         String buf, str;
+        FSUT fsut;
         template <typename T>
-        void set(const String &key, T value)
-        {
-            buf = FPSTR("{\"fields\":");
-            buf += MAP(key, value, true).c_str();
-            buf += '}';
-        }
+        void set(const String &key, T value) { fsut.setPair(buf, FPSTR("fields"), MAP(key, value, true).c_str()); }
 
     public:
         MapValue() {}
@@ -497,13 +468,7 @@ namespace Values
             return *this;
         }
         const char *c_str() { return buf.c_str(); }
-        const char *val()
-        {
-            str = FPSTR("{\"mapValue\":");
-            str += buf;
-            str += '}';
-            return str.c_str();
-        }
+        const char *val() { return fsut.setPair(str, FPSTR("mapValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -537,15 +502,11 @@ namespace FieldTransform
     {
     private:
         String buf;
+        FSUT fsut;
 
     public:
         template <typename T>
-        Increment(T value)
-        {
-            buf = FPSTR("{\"increment\":");
-            buf += value.c_str();
-            buf += '}';
-        }
+        Increment(T value) { fsut.setPair(buf, FPSTR("increment"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -553,15 +514,11 @@ namespace FieldTransform
     {
     private:
         String buf;
+        FSUT fsut;
 
     public:
         template <typename T>
-        Maximum(T value)
-        {
-            buf = FPSTR("{\"maximum\":");
-            buf += value.c_str();
-            buf += '}';
-        }
+        Maximum(T value) { fsut.setPair(buf, FPSTR("maximum"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -569,15 +526,11 @@ namespace FieldTransform
     {
     private:
         String buf;
+        FSUT fsut;
 
     public:
         template <typename T>
-        Minimum(T value)
-        {
-            buf = FPSTR("{\"minimum\":");
-            buf += value.c_str();
-            buf += '}';
-        }
+        Minimum(T value) { fsut.setPair(buf, FPSTR("minimum"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -586,14 +539,10 @@ namespace FieldTransform
     {
     private:
         String buf;
+        FSUT fsut;
 
     public:
-        AppendMissingElements(T value)
-        {
-            buf = FPSTR("{\"appendMissingElements\":");
-            buf += value.c_str();
-            buf += '}';
-        }
+        AppendMissingElements(T value) { fsut.setPair(buf, FPSTR("appendMissingElements"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -602,27 +551,20 @@ namespace FieldTransform
     {
     private:
         String buf;
+        FSUT fsut;
 
     public:
-        RemoveAllFromArray(T value)
-        {
-            buf = FPSTR("{\"removeAllFromArray\":");
-            buf += value.c_str();
-            buf += '}';
-        }
+        RemoveAllFromArray(T value) { fsut.setPair(buf, FPSTR("removeAllFromArray"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
     struct SetToServerValue
     {
     private:
         String buf;
+        FSUT fsut;
 
     public:
-        SetToServerValue(ServerValue value)
-        {
-            buf = FPSTR("{\"setToServerValue\":");
-            buf += value == SERVER_VALUE_UNSPECIFIED ? FPSTR("\"SERVER_VALUE_UNSPECIFIED\"}") : FPSTR("\"REQUEST_TIME\"}");
-        }
+        SetToServerValue(ServerValue value) { fsut.setPair(buf, FPSTR("setToServerValue"), value == SERVER_VALUE_UNSPECIFIED ? FPSTR("\"SERVER_VALUE_UNSPECIFIED\"") : FPSTR("\"REQUEST_TIME\"")); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -630,12 +572,12 @@ namespace FieldTransform
     {
     private:
         String buf;
+        JsonHelper jh;
         template <typename T>
         void set(const String &fieldPath, T v)
         {
-            buf = FPSTR("{\"fieldPath\":\"");
-            buf += fieldPath;
-            buf += FPSTR("\",");
+            jh.addObject(buf, FPSTR("fieldPath"), jh.toString(fieldPath));
+            buf +=',';
             String str = v.c_str();
             buf += str.substring(1, str.length() - 1);
             buf += '}';
@@ -666,6 +608,8 @@ class Precondition : public Printable
 
 private:
     String buf, str;
+    FSUT fsut;
+    JsonHelper jh;
 
     String getQuery(const String &mask, bool hasParam)
     {
@@ -683,20 +627,15 @@ public:
     Precondition(bool exists)
     {
         buf = FPSTR(".exists=");
-        buf += exists ? FPSTR("true") : FPSTR("false");
-        str = FPSTR("{\"exists\":");
-        str += exists ? FPSTR("true") : FPSTR("false");
-        str += '}';
+        buf += fsut.getBoolStr(exists);
+        fsut.setPair(str, FPSTR("exists"), fsut.getBoolStr(exists));
     }
 
     Precondition(const String &updateTime)
     {
-        JsonHelper jh;
         buf = FPSTR(".updateTime=");
         buf += jh.toString(updateTime);
-        str = FPSTR("{\"updateTime\":");
-        str += jh.toString(updateTime);
-        str += '}';
+        fsut.setPair(str, FPSTR("updateTime"), jh.toString(updateTime));
     }
     const char *c_str() { return str.c_str(); }
     size_t printTo(Print &p) const { return p.print(str.c_str()); }
@@ -732,15 +671,13 @@ class DocumentTransform : public Printable
 {
 private:
     String buf;
+    JsonHelper jh;
 
 public:
     DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
     {
-        buf = FPSTR("{\"document\":\"");
-        buf += document;
-        buf += FPSTR("\",\"fieldTransforms\":");
-        buf += fieldTransforms.c_str();
-        buf += '}';
+        jh.addObject(buf, FPSTR("document"), jh.toString(document));
+        jh.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), true);
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -750,51 +687,38 @@ class Write : public Printable
 {
 private:
     String buf;
+    JsonHelper jh;
+    FSUT fsut;
 
-    void set(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument)
+    void set(DocumentMask &updateMask, FieldTransform::FieldTransform &updateTransforms, Precondition &currentDocument)
     {
-        buf += FPSTR("\"updateMask\":\"");
-        buf += updateMask.c_str();
-        buf += FPSTR("\",\"currentDocument\":");
-        buf += currentDocument.c_str();
-        buf += FPSTR(",\"updateTransforms\":[");
-        buf += updateTransforms.c_str();
-        buf += FPSTR("]}");
+        jh.addObject(buf, FPSTR("updateMask"), updateMask.c_str());
+        jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str());
+        jh.addObject(buf, FPSTR("updateTransforms"), fsut.getArrayStr(currentDocument.c_str()), true);
     }
 
 public:
     Write(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument, Document<Values::Value> update)
     {
-        buf = FPSTR("{\"update\":");
-        buf += update.c_str();
-        buf += ',';
+        jh.addObject(buf, FPSTR("update"), update.c_str());
         set(updateMask, updateTransforms, currentDocument);
     }
 
     Write(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument, const String &Delete)
     {
-        buf = FPSTR("{\"delete\":\"");
-        buf += Delete;
-        buf += FPSTR("\",");
+        jh.addObject(buf, FPSTR("delete"), jh.toString(Delete));
         set(updateMask, updateTransforms, currentDocument);
     }
 
     Write(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument, DocumentTransform transform)
     {
-        buf = FPSTR("{\"transform\":");
-        buf += transform.c_str();
-        buf += ',';
+        jh.addObject(buf, FPSTR("transform"), transform.c_str());
         set(updateMask, updateTransforms, currentDocument);
     }
 
     Write &add(FieldTransform::FieldTransform updateTransforms)
     {
-        int p = buf.lastIndexOf("]}");
-        String str = buf.substring(0, p);
-        str += ',';
-        str += updateTransforms.c_str();
-        str += FPSTR("]}");
-        buf = str;
+        fsut.addArray(buf, updateTransforms.c_str());
         return *this;
     }
 
@@ -806,32 +730,21 @@ class Writes : public Printable
 {
 private:
     String buf;
+    JsonHelper jh;
+    FSUT fsut;
 
 public:
     Writes(Write write, const String &transaction = "")
     {
         if (transaction.length())
-        {
-            buf = FPSTR("{\"transaction\":\"");
-            buf += transaction;
-            buf += FPSTR("\",");
-        }
-        else
-            buf = "{";
-
-        buf += FPSTR("\"writes\":[");
-        buf += write.c_str();
-        buf += FPSTR("]}");
+            jh.addObject(buf, FPSTR("transaction"), jh.toString(transaction));
+        jh.addObject(buf, FPSTR("writes"), fsut.getArrayStr(write.c_str()), true);
     }
 
     Writes &add(Write write)
     {
-        int p = buf.lastIndexOf("]}");
-        String str = buf.substring(0, p);
-        str += ',';
-        str += write.c_str();
-        str += FPSTR("]}");
-        buf = str;
+        FSUT fsut;
+        fsut.addArray(buf, write.c_str());
         return *this;
     }
 

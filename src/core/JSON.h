@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created February 13, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -41,11 +41,18 @@ public:
 
     void addObject(String &buf, const String &name, const String &value, bool last = false)
     {
+        if (name.length() == 0)
+            return;
+
         if (buf.length() == 0)
             buf += '{';
         else
             buf += ',';
+        if (name[0] != '"')
+            buf += '"';
         buf += name;
+        if (name[name.length() - 1] != '"')
+            buf += '"';
         buf += ':';
         buf += value;
         if (last)
