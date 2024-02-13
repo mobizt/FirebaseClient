@@ -56,6 +56,41 @@ enum firebase_firestore_request_type
     firebase_firestore_request_type_delete_index
 };
 
+
+enum firestore_const_key_type
+{
+    firestore_const_key_nullValue,
+    firestore_const_key_booleanValue,
+    firestore_const_key_integerValue,
+    firestore_const_key_doubleValue,
+    firestore_const_key_timestampValue,
+    firestore_const_key_stringValue,
+    firestore_const_key_bytesValue,
+    firestore_const_key_referenceValue,
+    firestore_const_key_geoPointValue,
+    firestore_const_key_arrayValue,
+    firestore_const_key_mapValue,
+    firestore_const_key_maxType
+};
+
+struct firebase_firestore_const_key_t
+{
+    char text[15];
+};
+
+const struct firebase_firestore_const_key_t firestore_const_key[firestore_const_key_maxType] PROGMEM = {
+    "nullValue",
+    "booleanValue",
+    "integerValue",
+    "doubleValue",
+    "timestampValue",
+    "stringValue",
+    "bytesValue",
+    "referenceValue",
+    "geoPointValue",
+    "arrayValue",
+    "mapValue"};
+
 class FSUT
 {
 private:
@@ -191,7 +226,7 @@ namespace Values
     public:
         NullValue() { buf = FPSTR("null"); }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("nullValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_nullValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -205,7 +240,7 @@ namespace Values
     public:
         StringValue(const String &value) { fsut.setString(buf, value); }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("stringValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_stringValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -218,7 +253,7 @@ namespace Values
     public:
         BooleanValue(bool value) { fsut.setBool(buf, value); }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("booleanValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_booleanValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -232,7 +267,7 @@ namespace Values
     public:
         IntegerValue(int value) { buf = StringValue(String(value)).c_str(); }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("integerValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_integerValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -246,7 +281,7 @@ namespace Values
     public:
         DoubleValue(double value) { buf = String(value); }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("doubleValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_doubleValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -260,7 +295,7 @@ namespace Values
     public:
         TimestampValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("timestampValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_timestampValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -273,7 +308,7 @@ namespace Values
     public:
         BytesValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("bytesValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_bytesValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -287,7 +322,7 @@ namespace Values
     public:
         ReferenceValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("referenceValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_referenceValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -305,7 +340,7 @@ namespace Values
             jh.addObject(buf, FPSTR("longitude"), String(lng), true);
         }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("geoPointValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_geoPointValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -321,71 +356,14 @@ namespace Values
         bool isExisted(T value)
         {
             String tmp = value.val();
-            if (tmp.indexOf("nullValue") > -1)
+             for (size_t i = 0; i <= firestore_const_key_mapValue; i++)
             {
-                if (flags[0])
-                    return true;
-                flags[0] = 1;
-            }
-            else if (tmp.indexOf("booleanValue") > -1)
-            {
-                if (flags[1])
-                    return true;
-                flags[1] = 1;
-            }
-            else if (tmp.indexOf("integerValue") > -1)
-            {
-                if (flags[2])
-                    return true;
-                flags[2] = 1;
-            }
-            else if (tmp.indexOf("doubleValue") > -1)
-            {
-                if (flags[3])
-                    return true;
-                flags[3] = 1;
-            }
-            else if (tmp.indexOf("timestampValue") > -1)
-            {
-                if (flags[4])
-                    return true;
-                flags[4] = 1;
-            }
-            else if (tmp.indexOf("stringValue") > -1)
-            {
-                if (flags[5])
-                    return true;
-                flags[5] = 1;
-            }
-            else if (tmp.indexOf("bytesValue") > -1)
-            {
-                if (flags[6])
-                    return true;
-                flags[6] = 1;
-            }
-            else if (tmp.indexOf("referenceValue") > -1)
-            {
-                if (flags[7])
-                    return true;
-                flags[7] = 1;
-            }
-            else if (tmp.indexOf("geoPointValue") > -1)
-            {
-                if (flags[8])
-                    return true;
-                flags[8] = 1;
-            }
-            else if (tmp.indexOf("arrayValue") > -1)
-            {
-                if (flags[9])
-                    return true;
-                flags[9] = 1;
-            }
-            else if (tmp.indexOf("mapValue") > -1)
-            {
-                if (flags[10])
-                    return true;
-                flags[10] = 1;
+                if (tmp.indexOf(firestore_const_key[i].text) > -1)
+                {
+                    if (flags[i])
+                        return true;
+                    flags[i] = 1;
+                }
             }
 
             return false;
@@ -418,7 +396,7 @@ namespace Values
             return *this;
         }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("arrayValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_arrayValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
@@ -457,7 +435,7 @@ namespace Values
             return *this;
         }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, FPSTR("mapValue"), buf); }
+        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_mapValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
 
