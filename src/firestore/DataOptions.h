@@ -58,6 +58,9 @@ enum firebase_firestore_request_type
 
 class FSUT
 {
+private:
+    JsonHelper jh;
+
 public:
     void addArray(String &buf, const String &v)
     {
@@ -80,15 +83,7 @@ public:
     }
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
-        buf = FPSTR("{\"");
-        buf += key;
-        buf += FPSTR("\":");
-        if (isArrayValue)
-            buf += '[';
-        buf += value;
-        if (isArrayValue)
-            buf += ']';
-        buf += '}';
+        jh.addObject(buf, key, isArrayValue ? getArrayStr(value) : value);
         return buf.c_str();
     }
     void setBool(String &buf, bool value) { buf = getBoolStr(value); }
@@ -276,7 +271,6 @@ namespace Values
 
     public:
         BytesValue(const String &value) { buf = StringValue(value).c_str(); }
-
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, FPSTR("bytesValue"), buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
