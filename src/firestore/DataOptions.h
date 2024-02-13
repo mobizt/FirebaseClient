@@ -483,7 +483,10 @@ namespace Values
         MAP(const String &key, T value, bool val) { fsut.setPair(buf, key, val ? value.val() : value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
-
+    
+    /**
+     * A map value.
+    */
     class MapValue : public Printable
     {
 
@@ -628,6 +631,9 @@ namespace FieldTransform
         RemoveAllFromArray(T arrayValue) { fsut.setPair(buf, FPSTR("removeAllFromArray"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
+    /**
+     *  Sets the field to the given server value.
+     */
     struct SetToServerValue
     {
     private:
