@@ -1,5 +1,5 @@
 /**
- * Created February 13, 2024
+ * Created February 14, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,6 +30,8 @@
 
 #if defined(ENABLE_FIRESTORE)
 
+#define FIRESTORE_RESOURCE_PATH_BASE FPSTR("<resource_path>")
+
 enum firebase_firestore_request_type
 {
     firebase_firestore_request_type_undefined,
@@ -55,7 +57,6 @@ enum firebase_firestore_request_type
     firebase_firestore_request_type_delete_doc = 500,
     firebase_firestore_request_type_delete_index
 };
-
 
 enum firestore_const_key_type
 {
@@ -118,7 +119,7 @@ public:
     }
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
-        buf.remove(0,buf.length());
+        buf.remove(0, buf.length());
         jh.addObject(buf, key, isArrayValue ? getArrayStr(value) : value, true);
         return buf.c_str();
     }
@@ -139,6 +140,18 @@ public:
         buf = FPSTR("\"");
         buf += value;
         buf += '"';
+    }
+
+    String getDocPath(const String &document)
+    {
+        String doc_path = FIRESTORE_RESOURCE_PATH_BASE;
+        if (document.length())
+        {
+            if (document.length() && document[0] != '/')
+                doc_path += '/';
+            doc_path += document;
+        }
+        return doc_path;
     }
 };
 
@@ -204,9 +217,17 @@ private:
 
 public:
     DocumentMask() {}
-    DocumentMask(const String &mask)
+    /**
+     * A set of field paths on a document.
+     * Used to restrict a get or update operation on a document to a subset of its fields.
+     * This is different from standard field masks, as this is always scoped to a Document,
+     * and takes in account the dynamic nature of Value.
+     *
+     * @param mask The list of field paths in the mask. See Document.fields for a field path syntax reference.
+     */
+    DocumentMask(const String &fieldPaths)
     {
-        this->mask = mask;
+        this->mask = fieldPaths;
         JsonHelper jh;
         jh.addTokens(str, "fieldPaths", mask, true);
     }
@@ -214,6 +235,9 @@ public:
     size_t printTo(Print &p) const { return p.print(str.c_str()); }
 };
 
+/**
+ * A message that can hold any of the supported value types.
+ */
 namespace Values
 {
 
@@ -224,6 +248,9 @@ namespace Values
         FSUT fsut;
 
     public:
+        /**
+         * A null value.
+         */
         NullValue() { buf = FPSTR("null"); }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_nullValue].text, buf); }
@@ -238,6 +265,10 @@ namespace Values
         FSUT fsut;
 
     public:
+        /**
+         * A string value.
+         *  @param value The string vakue
+         */
         StringValue(const String &value) { fsut.setString(buf, value); }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_stringValue].text, buf); }
@@ -251,6 +282,10 @@ namespace Values
         FSUT fsut;
 
     public:
+        /**
+         * A boolean value.
+         *  @param value The boolean value
+         */
         BooleanValue(bool value) { fsut.setBool(buf, value); }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_booleanValue].text, buf); }
@@ -265,6 +300,10 @@ namespace Values
         FSUT fsut;
 
     public:
+        /**
+         * A integer value.
+         *  @param value The integer value
+         */
         IntegerValue(int value) { buf = StringValue(String(value)).c_str(); }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_integerValue].text, buf); }
@@ -279,6 +318,10 @@ namespace Values
         FSUT fsut;
 
     public:
+        /**
+         * A double value.
+         *  @param value The double value
+         */
         DoubleValue(double value) { buf = String(value); }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_doubleValue].text, buf); }
@@ -293,6 +336,11 @@ namespace Values
         FSUT fsut;
 
     public:
+        /**
+         * A timestamp value.
+         * Precise only to microseconds. When stored, any additional precision is rounded down.
+         * @param value The timestamp value string
+         */
         TimestampValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_timestampValue].text, buf); }
@@ -306,6 +354,12 @@ namespace Values
         FSUT fsut;
 
     public:
+        /**
+         * A bytes value.
+         * Must not exceed 1 MiB - 89 bytes. Only the first 1,500 bytes are considered by queries.
+         * A base64-encoded string.
+         * @param value The bytes value string
+         */
         BytesValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_bytesValue].text, buf); }
@@ -320,6 +374,10 @@ namespace Values
         FSUT fsut;
 
     public:
+        /**
+         * A reference to a document.
+         * @param value The resource name of document
+         */
         ReferenceValue(const String &value) { buf = StringValue(value).c_str(); }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_referenceValue].text, buf); }
@@ -334,6 +392,11 @@ namespace Values
         JsonHelper jh;
 
     public:
+        /**
+         * A geo point value representing a point on the surface of Earth.
+         * @param lat The latitude
+         * @param lng The longitude
+         */
         GeoPointValue(double lat, double lng)
         {
             jh.addObject(buf, FPSTR("latitude"), String(lat));
@@ -356,7 +419,7 @@ namespace Values
         bool isExisted(T value)
         {
             String tmp = value.val();
-             for (size_t i = 0; i <= firestore_const_key_mapValue; i++)
+            for (size_t i = 0; i <= firestore_const_key_mapValue; i++)
             {
                 if (tmp.indexOf(firestore_const_key[i].text) > -1)
                 {
@@ -377,12 +440,21 @@ namespace Values
         }
 
     public:
+        /**
+         * An array value.
+         * Cannot directly contain another array value, though can contain an map which contains another array.
+         * @param value The object except for array value
+         */
         template <typename T>
         ArrayValue(T value)
         {
             memset(flags, 0, 11);
             set(value);
         }
+        /**
+         * Add object to array value
+         * @param value The resource name of document
+         */
         template <typename T>
         ArrayValue &add(T value)
         {
@@ -423,6 +495,10 @@ namespace Values
 
     public:
         MapValue() {}
+        /**
+         * A map value.
+         * @param value The map value
+         */
         template <typename T>
         MapValue(const String &key, T value) { set(key, value); }
         template <typename T>
@@ -438,7 +514,9 @@ namespace Values
         const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_mapValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
     };
-
+    /**
+     * A message that can hold any of the supported value types.
+     */
     class Value : public Printable
     {
     private:
@@ -446,6 +524,9 @@ namespace Values
 
     public:
         Value() {}
+        /**
+         * @param value The object value
+         */
         template <typename T>
         Value(T value) { buf = value.val(); }
         const char *c_str() { return buf.c_str(); }
@@ -456,9 +537,13 @@ namespace Values
 
 namespace FieldTransform
 {
+
     enum ServerValue
     {
         SERVER_VALUE_UNSPECIFIED,
+        // REQUEST_TIME The time at which the server processed the request, with millisecond precision.
+        //  If used on multiple fields (same or different documents) in a transaction, all the fields
+        // will get the same server timestamp.
         REQUEST_TIME
     };
 
@@ -469,8 +554,12 @@ namespace FieldTransform
         FSUT fsut;
 
     public:
+        /**
+         * Increment object to use with FieldTransform object class constructor.
+         * @param value Adds the given value to the field's current value.
+         */
         template <typename T>
-        Increment(T value) { fsut.setPair(buf, FPSTR("increment"), value.c_str()); }
+        Increment(T value) { fsut.setPair(buf, FPSTR("increment"), value.val()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -481,6 +570,10 @@ namespace FieldTransform
         FSUT fsut;
 
     public:
+        /**
+         * Maximum object to use with FieldTransform object class constructor.
+         * @param value Sets the field to the maximum of its current value and the given value.
+         */
         template <typename T>
         Maximum(T value) { fsut.setPair(buf, FPSTR("maximum"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
@@ -493,6 +586,10 @@ namespace FieldTransform
         FSUT fsut;
 
     public:
+        /**
+         * Mainimum object to use with FieldTransform object class constructor.
+         * @param value Sets the field to the minimum of its current value and the given value.
+         */
         template <typename T>
         Minimum(T value) { fsut.setPair(buf, FPSTR("minimum"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
@@ -506,7 +603,12 @@ namespace FieldTransform
         FSUT fsut;
 
     public:
-        AppendMissingElements(T value) { fsut.setPair(buf, FPSTR("appendMissingElements"), value.c_str()); }
+        /**
+         * Append the given elements in order if they are not already present in the current field value.
+         * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
+         * @param arrayValue The array value object to append.
+         */
+        AppendMissingElements(T arrayValue) { fsut.setPair(buf, FPSTR("appendMissingElements"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -518,7 +620,12 @@ namespace FieldTransform
         FSUT fsut;
 
     public:
-        RemoveAllFromArray(T value) { fsut.setPair(buf, FPSTR("removeAllFromArray"), value.c_str()); }
+        /**
+         * Remove all of the given elements from the array in the field.
+         * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
+         * @param arrayValue The array value object to remove.
+         */
+        RemoveAllFromArray(T arrayValue) { fsut.setPair(buf, FPSTR("removeAllFromArray"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
     struct SetToServerValue
@@ -529,10 +636,17 @@ namespace FieldTransform
         JsonHelper jh;
 
     public:
-        SetToServerValue(ServerValue value) { fsut.setPair(buf, FPSTR("setToServerValue"), jh.toString(value == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
+        /**
+         * Sets the field to the given server value.
+         * @param enumValue The ServerValue enum
+         *
+         */
+        SetToServerValue(ServerValue enumValue) { fsut.setPair(buf, FPSTR("setToServerValue"), jh.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
         const char *c_str() { return buf.c_str(); }
     };
-
+    /**
+     * A transformation of a field of the document.
+     */
     struct FieldTransform
     {
     private:
@@ -549,15 +663,31 @@ namespace FieldTransform
         }
 
     public:
+        /**
+         * @param fieldPath The path of the field.
+         * @param object The Increment, Maximum and Minimum objects.
+         */
         template <typename T>
-        FieldTransform(const String &fieldPath, T v) { set(fieldPath, v); }
-        FieldTransform(const String &fieldPath, AppendMissingElements<Values::ArrayValue> v) { set(fieldPath, v); }
-        FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> v) { set(fieldPath, v); }
+        FieldTransform(const String &fieldPath, T object) { set(fieldPath, value); }
+        /**
+         * @param fieldPath The path of the field.
+         * @param arrayValue Append the given elements in order if they are not already present in the current field value.
+         * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
+         */
+        FieldTransform(const String &fieldPath, AppendMissingElements<Values::ArrayValue> arrayvaluev) { set(fieldPath, arrayvaluev); }
+        /**
+         * @param fieldPath The path of the field.
+         * @param arrayValue Remove all of the given elements from the array in the field.
+         * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
+         */
+        FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> arrayvaluev) { set(fieldPath, arrayvaluev); }
         const char *c_str() { return buf.c_str(); }
     };
 
 };
-
+/**
+ * A precondition on a document, used for conditional operations.
+ */
 class Precondition : public Printable
 {
     friend class Firestore;
@@ -580,13 +710,23 @@ private:
 
 public:
     Precondition() {}
+    /**
+     * A precondition on a document, used for conditional operations.
+     * @param exists When set to true, the target document must exist.
+     * When set to false, the target document must not exist.
+     */
     Precondition(bool exists)
     {
         buf = FPSTR(".exists=");
         buf += fsut.getBoolStr(exists);
         fsut.setPair(str, FPSTR("exists"), fsut.getBoolStr(exists));
     }
-
+    /**
+     * A precondition on a document, used for conditional operations.
+     * @param updateTime A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     * When set, the target document must exist and have been last updated at that time. Timestamp must be microsecond aligned.
+     */
     Precondition(const String &updateTime)
     {
         buf = FPSTR(".updateTime=");
@@ -604,35 +744,91 @@ class Document : public Printable
 
 private:
     Values::MapValue mv;
-    String buf;
+    String buf, map_obj, name_obj, name;
+    FSUT fsut;
+    JsonHelper jh;
+
+    void getBuf()
+    {
+        map_obj = mv.c_str();
+        name_obj.remove(0, name_obj.length());
+        jh.addObject(name_obj, FPSTR("name"), jh.toString(fsut.getDocPath(name)), true);
+        buf = name_obj;
+        if (map_obj.length())
+        {
+            buf[buf.length() - 1] = ',';
+            buf += map_obj.substring(1, map_obj.length() - 1);
+            buf += '}';
+        }
+    }
 
 public:
-    Document() {}
+    /**
+     * A Firestore document constructor with document resource name.
+     * @param name The resource name of the document.
+     */
+    Document(const String &name = "")
+    {
+        this->name = name;
+        getBuf();
+    }
+    /**
+     * A Firestore document constructor with object.
+     * @param key The key of an object.
+     * @param value The value of an object.
+     */
     Document(const String &key, T value)
     {
         mv.add(key, value);
-        buf = mv.c_str();
+        getBuf();
     }
+    /**
+     * Add the object to Firestore document.
+     * @param key The key of an object.
+     * @param value The value of an object.
+     */
     Document &add(const String &key, T value)
     {
         mv.add(key, value);
-        buf = mv.c_str();
+        getBuf();
         return *this;
     }
-    const char *c_str() { return mv.c_str(); }
+    /**
+     * Set the document resource name.
+     * @param name The resource name of the document.
+     */
+    void setName(const String &name)
+    {
+        this->name = name;
+        getBuf();
+    }
+    const char *c_str()
+    {
+        getBuf();
+        return buf.c_str();
+    }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
 class DocumentTransform : public Printable
 {
+    friend class Firestore;
+    friend class Write;
+
 private:
     String buf;
+    FSUT fsut;
     JsonHelper jh;
 
 public:
+    /**
+     * A transformation of a document.
+     * @param document The name of the document to transform.
+     * @param fieldTransforms The list of transformations to apply to the fields of the document, in order. This must not be empty.
+     */
     DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
     {
-        jh.addObject(buf, FPSTR("document"), jh.toString(document));
+        jh.addObject(buf, FPSTR("document"), jh.toString(fsut.getDocPath(document)));
         jh.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), true);
     }
     const char *c_str() { return buf.c_str(); }
@@ -641,40 +837,89 @@ public:
 
 class Write : public Printable
 {
+    friend class Firestore;
+    friend class Writes;
+
 private:
+    enum firestore_write_type
+    {
+        firestore_write_type_undefined,
+        firestore_write_type_update,
+        firestore_write_type_delete,
+        firestore_write_type_transform
+    };
     String buf;
     JsonHelper jh;
     FSUT fsut;
-
-    void set(DocumentMask &updateMask, FieldTransform::FieldTransform &updateTransforms, Precondition &currentDocument)
-    {
-        jh.addObject(buf, FPSTR("updateMask"), updateMask.c_str());
-        jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str());
-        jh.addObject(buf, FPSTR("updateTransforms"), fsut.getArrayStr(currentDocument.c_str()), true);
-    }
+    firestore_write_type write_type = firestore_write_type_undefined;
+    bool updateTrans = false;
 
 public:
-    Write(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument, Document<Values::Value> update)
+    /**
+     * A write on a document.
+     * @param updateMask The fields to update in this write. This field can be set only when the operation is update.
+     * If the mask is not set for an update and the document exists, any existing data will be overwritten.
+     * If the mask is set and the document on the server has fields not covered by the mask, they are left unchanged.
+     * Fields referenced in the mask, but not present in the input document, are deleted from the document on the server. The field paths in this mask must not contain a reserved field name.
+     * @param update A document to write.
+     * @param currentDocument An optional precondition on the document. The write will fail if this is set and not met by the target document.
+     */
+    Write(DocumentMask updateMask, Document<Values::Value> update, Precondition currentDocument)
     {
-        jh.addObject(buf, FPSTR("update"), update.c_str());
-        set(updateMask, updateTransforms, currentDocument);
+        bool curdoc = strlen(currentDocument.c_str());
+        bool updatemask = strlen(updateMask.c_str());
+        write_type = firestore_write_type_update;
+        jh.addObject(buf, FPSTR("update"), update.c_str(), !updatemask && !curdoc);
+        if (updatemask)
+            jh.addObject(buf, FPSTR("updateMask"), updateMask.c_str(), !curdoc);
+        if (curdoc)
+            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), true);
+    }
+    /**
+     * A write on a document.
+     * @param deletePath A document name to delete.
+     */
+    Write(const String &deletePath, Precondition currentDocument)
+    {
+        write_type = firestore_write_type_delete;
+        if (strlen(currentDocument.c_str()))
+            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str());
+        jh.addObject(buf, FPSTR("delete"), jh.toString(fsut.getDocPath(deletePath)), true);
     }
 
-    Write(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument, const String &Delete)
+    /**
+     * A write on a document.
+     * @param transform Applies a transformation to a document.
+     * @param currentDocument An optional precondition on the document. The write will fail if this is set and not met by the target document.
+     */
+    Write(DocumentTransform transform, Precondition currentDocument)
     {
-        jh.addObject(buf, FPSTR("delete"), jh.toString(Delete));
-        set(updateMask, updateTransforms, currentDocument);
+        write_type = firestore_write_type_transform;
+        if (strlen(currentDocument.c_str()))
+            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str());
+        jh.addObject(buf, FPSTR("transform"), transform.c_str(), true);
     }
-
-    Write(DocumentMask updateMask, FieldTransform::FieldTransform updateTransforms, Precondition currentDocument, DocumentTransform transform)
+    /**
+     * Add the update transform.
+     * @param updateTransforms The transforms to perform after update.
+     * This field can be set only when the operation is update.
+     * If present, this write is equivalent to performing update and transform to
+     * the same document atomically and in order.
+     */
+    Write &addUpdateTransform(FieldTransform::FieldTransform updateTransforms)
     {
-        jh.addObject(buf, FPSTR("transform"), transform.c_str());
-        set(updateMask, updateTransforms, currentDocument);
-    }
+        if (write_type == firestore_write_type_update)
+        {
+            if (!updateTrans)
+            {
+                buf[buf.length() - 1] = '\0';
+                jh.addObject(buf, FPSTR("updateTransforms"), fsut.getArrayStr(updateTransforms.c_str()), true);
+            }
+            else
+                fsut.addArray(buf, updateTransforms.c_str());
+            updateTrans = true;
+        }
 
-    Write &add(FieldTransform::FieldTransform updateTransforms)
-    {
-        fsut.addArray(buf, updateTransforms.c_str());
         return *this;
     }
 
@@ -690,6 +935,12 @@ private:
     FSUT fsut;
 
 public:
+    /**
+     * The writes to apply.
+     * @param write A write on a document.
+     * @param transaction f set, applies all writes in this transaction, and commits it.
+     * A base64-encoded string.
+     */
     Writes(Write write, const String &transaction = "")
     {
         if (transaction.length())
@@ -697,6 +948,10 @@ public:
         jh.addObject(buf, FPSTR("writes"), fsut.getArrayStr(write.c_str()), true);
     }
 
+    /**
+     * Add the write.
+     * @param write A write on a document.
+     */
     Writes &add(Write write)
     {
         FSUT fsut;
