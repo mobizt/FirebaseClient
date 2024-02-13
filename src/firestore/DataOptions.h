@@ -68,6 +68,16 @@ public:
         str += FPSTR("]}");
         buf = str;
     }
+    void addObject(String &buf, const String &v)
+    {
+        int p = buf.lastIndexOf("}}");
+        String str = buf.substring(0, p);
+        str += ',';
+        String tmp = v;
+        str += tmp.substring(1, tmp.length() - 1);
+        str += FPSTR("}}");
+        buf = str;
+    }
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
         buf = FPSTR("{\"");
@@ -291,15 +301,13 @@ namespace Values
     private:
         String buf, str;
         FSUT fsut;
+        JsonHelper jh;
 
     public:
         GeoPointValue(double lat, double lng)
         {
-            buf = FPSTR("{\"latitude\":");
-            buf += String(lat);
-            buf += FPSTR(",\"longitude\":");
-            buf += String(lng);
-            buf += '}';
+            jh.addObject(buf, FPSTR("latitude"), String(lat));
+            jh.addObject(buf, FPSTR("longitude"), String(lng), true);
         }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return fsut.setPair(str, FPSTR("geoPointValue"), buf); }
@@ -410,10 +418,7 @@ namespace Values
                 if (buf.length() == 0)
                     set(value);
                 else
-                {
-                    FSUT fsut;
                     fsut.addArray(buf, value.val());
-                }
             }
             return *this;
         }
@@ -446,25 +451,14 @@ namespace Values
     public:
         MapValue() {}
         template <typename T>
-        MapValue(const String &key, T value)
-        {
-            set(key, value);
-        }
+        MapValue(const String &key, T value) { set(key, value); }
         template <typename T>
         MapValue &add(const String &key, T value)
         {
             if (buf.length() == 0)
                 set(key, value);
             else
-            {
-                int p = buf.lastIndexOf("}}");
-                String str = buf.substring(0, p);
-                str += FPSTR(",");
-                String tmp = MAP(key, value, true).c_str();
-                str += tmp.substring(1, tmp.length() - 1);
-                str += FPSTR("}}");
-                buf = str;
-            }
+                fsut.addObject(buf, MAP(key, value, true).c_str());
             return *this;
         }
         const char *c_str() { return buf.c_str(); }
@@ -480,10 +474,7 @@ namespace Values
     public:
         Value() {}
         template <typename T>
-        Value(T value)
-        {
-            buf = value.val();
-        }
+        Value(T value) { buf = value.val(); }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return buf.c_str(); }
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -562,9 +553,10 @@ namespace FieldTransform
     private:
         String buf;
         FSUT fsut;
+        JsonHelper jh;
 
     public:
-        SetToServerValue(ServerValue value) { fsut.setPair(buf, FPSTR("setToServerValue"), value == SERVER_VALUE_UNSPECIFIED ? FPSTR("\"SERVER_VALUE_UNSPECIFIED\"") : FPSTR("\"REQUEST_TIME\"")); }
+        SetToServerValue(ServerValue value) { fsut.setPair(buf, FPSTR("setToServerValue"), jh.toString(value == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -577,7 +569,7 @@ namespace FieldTransform
         void set(const String &fieldPath, T v)
         {
             jh.addObject(buf, FPSTR("fieldPath"), jh.toString(fieldPath));
-            buf +=',';
+            buf += ',';
             String str = v.c_str();
             buf += str.substring(1, str.length() - 1);
             buf += '}';
@@ -585,18 +577,9 @@ namespace FieldTransform
 
     public:
         template <typename T>
-        FieldTransform(const String &fieldPath, T v)
-        {
-            set(fieldPath, v);
-        }
-        FieldTransform(const String &fieldPath, AppendMissingElements<Values::ArrayValue> v)
-        {
-            set(fieldPath, v);
-        }
-        FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> v)
-        {
-            set(fieldPath, v);
-        }
+        FieldTransform(const String &fieldPath, T v) { set(fieldPath, v); }
+        FieldTransform(const String &fieldPath, AppendMissingElements<Values::ArrayValue> v) { set(fieldPath, v); }
+        FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> v) { set(fieldPath, v); }
         const char *c_str() { return buf.c_str(); }
     };
 
