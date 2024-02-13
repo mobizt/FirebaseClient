@@ -83,7 +83,8 @@ public:
     }
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
-        jh.addObject(buf, key, isArrayValue ? getArrayStr(value) : value);
+        buf.remove(0,buf.length());
+        jh.addObject(buf, key, isArrayValue ? getArrayStr(value) : value, true);
         return buf.c_str();
     }
     void setBool(String &buf, bool value) { buf = getBoolStr(value); }
