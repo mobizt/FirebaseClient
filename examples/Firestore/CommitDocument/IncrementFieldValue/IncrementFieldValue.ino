@@ -285,9 +285,6 @@ void loop()
     // To get anyc result without callback
     // printResult(aResult_no_callback);
 
-    // To get anyc result without callback
-    // printResult(aResult_no_callback);
-
     if (app.ready() && (millis() - dataMillis > 20 || dataMillis == 0))
     {
         dataMillis = millis();
