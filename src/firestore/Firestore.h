@@ -610,7 +610,7 @@ public:
      * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
-     * @param writes The writes to apply.
+     * @param writes The writes to apply. This Writes object accepts the Write object and transaction string (base64 encoded string) in its constructor.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
@@ -627,30 +627,66 @@ public:
     /** Applies a batch of write operations.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
-     * @param writes The dyamic array of write object firebase_firestore_document_write_t.
-     * Method does not apply writes atomically and does not guarantee ordering.
-     * Each write succeeds or fails independently.
-     * You cannot write to the same document more than once per request.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param writes The writes to apply. This Writes object accepts the Write object and Labels (MapValue) associated with this batch write, in its constructor.
      *
      * For the write object, see https://firebase.google.com/docs/firestore/reference/rest/v1/Write
      *
-     * @param labels The JSON object that represents the Labels (map) associated with this batch write.
-     *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
-     *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth authentication.
      *
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
      *
      */
-    bool batchWriteDocuments(AsyncClientClass &aClient, const String &projectId, const String &databaseId,
-                             std::vector<firebase_firestore_document_write_t> writes, const object_t &labels)
+    bool batchWriteDocuments(AsyncClientClass &aClient, const ParentResource &parent, Writes &writes)
     {
-        return false;
+        AsyncResult result;
+        batchWriteDoc(aClient, &result, NULL, "", parent, writes, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Applies a batch of write operations.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param writes The writes to apply. This Writes object accepts the Write object and Labels (MapValue) associated with this batch write, in its constructor.
+     * @param aResult The async result (AsyncResult).
+     * For the write object, see https://firebase.google.com/docs/firestore/reference/rest/v1/Write
+     *
+     * This function requires ServiceAuth authentication.
+     *
+     * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
+     *
+     */
+    void batchWriteDocuments(AsyncClientClass &aClient, const ParentResource &parent, Writes &writes, AsyncResult &aResult)
+    {
+        batchWriteDoc(aClient, &aResult, NULL, "", parent, writes, true);
+    }
+
+    /** Applies a batch of write operations.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param writes The writes to apply. This Writes object accepts the Write object and Labels (MapValue) associated with this batch write, in its constructor.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     * For the write object, see https://firebase.google.com/docs/firestore/reference/rest/v1/Write
+     *
+     * This function requires ServiceAuth authentication.
+     *
+     * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
+     *
+     */
+    void batchWriteDocuments(AsyncClientClass &aClient, const ParentResource &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
+    {
+        batchWriteDoc(aClient, nullptr, cb, uid, parent, writes, true);
     }
 
     /** Get a document at the defined path.
@@ -1200,7 +1236,18 @@ public:
         options.requestType = firebase_firestore_request_type_commit_document;
         options.parent = parent;
         options.payload = writes.c_str();
-        options.payload.replace((const char*)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
+        options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void batchWriteDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, Writes &writes, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_batch_write_doc;
+        options.parent = parent;
+        options.payload = writes.c_str();
+        options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
@@ -1208,7 +1255,7 @@ public:
     String makeResourcePath(const ParentResource &parent)
     {
         String str = FPSTR("projects/");
-        str +=  parent.projectId;
+        str += parent.projectId;
         str += FPSTR("/databases/");
         str += parent.databaseId.length() > 0 ? parent.databaseId : FPSTR("(default)");
         str += FPSTR("/documents");

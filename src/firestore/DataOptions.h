@@ -483,10 +483,10 @@ namespace Values
         MAP(const String &key, T value, bool val) { fsut.setPair(buf, key, val ? value.val() : value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
-    
+
     /**
      * A map value.
-    */
+     */
     class MapValue : public Printable
     {
 
@@ -611,7 +611,7 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
          * @param arrayValue The array value object to append.
          */
-        AppendMissingElements(T arrayValue) { fsut.setPair(buf, FPSTR("appendMissingElements"), value.c_str()); }
+        AppendMissingElements(T arrayValue) { fsut.setPair(buf, FPSTR("appendMissingElements"), arrayValue.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -628,7 +628,7 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
          * @param arrayValue The array value object to remove.
          */
-        RemoveAllFromArray(T arrayValue) { fsut.setPair(buf, FPSTR("removeAllFromArray"), value.c_str()); }
+        RemoveAllFromArray(T arrayValue) { fsut.setPair(buf, FPSTR("removeAllFromArray"), arrayValue.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
     /**
@@ -674,7 +674,7 @@ namespace FieldTransform
          * @param object The Increment, Maximum and Minimum objects.
          */
         template <typename T>
-        FieldTransform(const String &fieldPath, T object) { set(fieldPath, value); }
+        FieldTransform(const String &fieldPath, T object) { set(fieldPath, object); }
         /**
          * @param fieldPath The path of the field.
          * @param arrayValue Append the given elements in order if they are not already present in the current field value.
@@ -944,13 +944,26 @@ public:
     /**
      * The writes to apply.
      * @param write A write on a document.
-     * @param transaction f set, applies all writes in this transaction, and commits it.
-     * A base64-encoded string.
+     * @param transaction A base64-encoded string. If set, applies all writes in this transaction, and commits it.
+     * 
      */
     Writes(Write write, const String &transaction = "")
     {
         if (transaction.length())
             jh.addObject(buf, FPSTR("transaction"), jh.toString(transaction));
+        jh.addObject(buf, FPSTR("writes"), fsut.getArrayStr(write.c_str()), true);
+    }
+
+    /**
+     * The writes to apply.
+     * @param write A write on a document.
+     * @param labels Labels associated with this batch write. 
+     * An object containing a list of "key": value pairs.
+     */
+    Writes(Write write, Values::MapValue labels)
+    {
+        if (strlen(labels.c_str()))
+            jh.addObject(buf, FPSTR("labels"), labels.c_str());
         jh.addObject(buf, FPSTR("writes"), fsut.getArrayStr(write.c_str()), true);
     }
 
