@@ -680,13 +680,13 @@ namespace FieldTransform
          * @param arrayValue Append the given elements in order if they are not already present in the current field value.
          * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
          */
-        FieldTransform(const String &fieldPath, AppendMissingElements<Values::ArrayValue> arrayvaluev) { set(fieldPath, arrayvaluev); }
+        FieldTransform(const String &fieldPath, AppendMissingElements<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
         /**
          * @param fieldPath The path of the field.
          * @param arrayValue Remove all of the given elements from the array in the field.
          * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
          */
-        FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> arrayvaluev) { set(fieldPath, arrayvaluev); }
+        FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
         const char *c_str() { return buf.c_str(); }
     };
 
