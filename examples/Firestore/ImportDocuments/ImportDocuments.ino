@@ -170,10 +170,6 @@
 #include <WiFiS3.h>
 #endif
 
-#if defined(ESP32)
-#include <SPIFFS.h>
-#endif
-
 #include <FirebaseClient.h>
 
 #if defined(ESP8266) || defined(ESP32)
@@ -205,6 +201,7 @@ void asyncCB(AsyncResult &aResult);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
+// ServiceAuth is required for import and export documents.
 ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
 
 FirebaseApp app;
@@ -241,8 +238,6 @@ void setup()
     Serial.print("Connected with IP: ");
     Serial.println(WiFi.localIP());
     Serial.println();
-
-    SPIFFS.begin();
 
     Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
 
@@ -287,13 +282,15 @@ void loop()
         // This required the Owner and Editor permissions for the account.
         // See how to add permission here, https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
 
-        firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), "" /* Which collection ids to export. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket that store the exported data */, asyncCB);
+        EximDocumentOptions importOptions("" /* Which collection ids to import. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket that store the exported data */);
+
+        firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), importOptions, asyncCB);
 
         // To assign UID for async result
-        // firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), "", STORAGE_BUCKET_ID, "test_path", asyncCB, "myUID");
+        // firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), importOptions, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), "", STORAGE_BUCKET_ID, "test_path", aResult_no_callback); }
+        // firestore.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), importOptions, aResult_no_callback); }
     }
 }
 

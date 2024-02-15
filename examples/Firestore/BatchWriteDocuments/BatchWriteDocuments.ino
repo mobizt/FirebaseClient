@@ -201,20 +201,32 @@
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
 
-// User Email and password that already registerd or added in your project.
-#define USER_EMAIL "USER_EMAIL"
-#define USER_PASSWORD "USER_PASSWORD"
-#define DATABASE_URL "URL"
-
+/**
+ * This information can be taken from the service account JSON file.
+ *
+ * To download service account file, from the Firebase console, goto project settings,
+ * select "Service accounts" tab and click at "Generate new private key" button
+ */
 #define FIREBASE_PROJECT_ID "PROJECT_ID"
+#define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
+const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
+
+void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
 
 void printResult(AsyncResult &aResult);
 
+void fileCallback(File &file, const char *filename, file_operating_mode mode);
+
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
+// ServiceAuth is required for batch write.
+ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
+
+// FileConfig sa_file("/sa_file.json", fileCallback);
+
+// ServiceAuth sa_file_auth(timeStatusCB, getFile(sa_file));
 
 FirebaseApp app;
 
@@ -264,7 +276,7 @@ void setup()
 
     app.setCallback(asyncCB);
 
-    initializeApp(aClient, app, getAuth(user_auth));
+    initializeApp(aClient, app, getAuth(sa_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
@@ -294,7 +306,7 @@ void loop()
         Serial.println("[+] Batch write documents... ");
 
         String documentPath = "test_collection/test_document_map_value";
-        
+
         Values::MapValue mapV("name", Values::StringValue("value" + String(counter)));
         mapV.add("count", Values::StringValue(String(counter)));
 
@@ -328,6 +340,20 @@ void loop()
         // To get anyc result without callback
         // firestore.batchWriteDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), writes, aResult_no_callback);
     }
+}
+
+void timeStatusCB(uint32_t &ts)
+{
+    if (time(nullptr) < FIREBASE_DEFAULT_TS)
+    {
+        configTime(3 * 3600, 0, "pool.ntp.org");
+        while (time(nullptr) < FIREBASE_DEFAULT_TS)
+        {
+            delay(100);
+        }
+    }
+
+    ts = time(nullptr);
 }
 
 void asyncCB(AsyncResult &aResult)

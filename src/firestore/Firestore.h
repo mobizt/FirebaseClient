@@ -1,5 +1,5 @@
 /**
- * Created February 14, 2024
+ * Created February 15, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -188,20 +188,22 @@ public:
      * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
-     * @param collectionIds Which collection ids to export. Unspecified means all collections. Use comma (,)
-     * to separate between the collection ids.
-     * @param bucketID The Firebase storage bucket ID in the project.
-     * @param storagePath The path in the Firebase Storage data bucket to store the exported database.
+     * @param exportOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
+     * The EximDocumentOptions constructor parameters.
+     * - collectionIds is collection ids to export. Unspecified means all collections. Use comma (,)
+     *   to separate between the collection ids.
+     * - bucketID is the Firebase storage bucket ID in the project.
+     * - storagePath is the path in the Firebase Storage data bucket to store the exported database.
      *
      * @return Boolean value, indicates the success of the operation.
      *
      * This function requires ServiceAuth or AccessToken authentication.
      *
      */
-    bool exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath)
+    bool exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions exportOptions)
     {
         AsyncResult result;
-        eximDocs(aClient, &result, NULL, "", parent, bucketID, storagePath, collectionIds, false, false);
+        eximDocs(aClient, &result, NULL, "", parent, exportOptions, false, false);
         return result.lastError.code() == 0;
     }
 
@@ -211,18 +213,20 @@ public:
      * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
-     * @param collectionIds Which collection ids to export. Unspecified means all collections. Use comma (,)
-     * to separate between the collection ids.
-     * @param bucketID The Firebase storage bucket ID in the project.
-     * @param storagePath The path in the Firebase Storage data bucket to store the exported database.
+     * @param exportOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
+     * The EximDocumentOptions constructor parameters.
+     * - collectionIds is collection ids to export. Unspecified means all collections. Use comma (,)
+     *   to separate between the collection ids.
+     * - bucketID is the Firebase storage bucket ID in the project.
+     * - storagePath is the path in the Firebase Storage data bucket to store the exported database.
      * @param aResult The async result (AsyncResult)
      *
      * This function requires ServiceAuth or AccessToken authentication.
      *
      */
-    void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
+    void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions exportOptions, AsyncResult &aResult)
     {
-        eximDocs(aClient, &aResult, NULL, "", parent, bucketID, storagePath, collectionIds, false, true);
+        eximDocs(aClient, &aResult, NULL, "", parent, exportOptions, false, true);
     }
 
     /** Export the documents in the database to the Firebase Storage data bucket.
@@ -231,19 +235,21 @@ public:
      * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
-     * @param collectionIds Which collection ids to export. Unspecified means all collections. Use comma (,)
-     * to separate between the collection ids.
-     * @param bucketID The Firebase storage bucket ID in the project.
-     * @param storagePath The path in the Firebase Storage data bucket to store the exported database.
+     * @param exportOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
+     * The EximDocumentOptions constructor parameters.
+     * - collectionIds is collection ids to export. Unspecified means all collections. Use comma (,)
+     *   to separate between the collection ids.
+     * - bucketID is the Firebase storage bucket ID in the project.
+     * - storagePath is the path in the Firebase Storage data bucket to store the exported database.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
      * This function requires ServiceAuth or AccessToken authentication.
      *
      */
-    void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
+    void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions exportOptions, AsyncResultCallback cb, const String &uid = "")
     {
-        eximDocs(aClient, nullptr, cb, uid, parent, bucketID, storagePath, collectionIds, false, true);
+        eximDocs(aClient, nullptr, cb, uid, parent, exportOptions, false, true);
     }
 
     /** Import the exported documents stored in the Firebase Storage data bucket.
@@ -252,20 +258,22 @@ public:
      * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
-     * @param collectionIds Which collection ids to import. Unspecified means all collections included in the import.
-     * Use comma (,) to separate between the collection ids.
-     * @param bucketID The Firebase storage bucket ID in the project.
-     * @param storagePath The path in the Firebase Storage data bucket that stores the exported database.
+     * @param importOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
+     * The EximDocumentOptions constructor parameters.
+     * - collectionIds is collection ids to import. Unspecified means all collections included in the import.
+     *   Use comma (,) to separate between the collection ids.
+     * - bucketID is the Firebase storage bucket ID in the project.
+     * - storagePath is the path in the Firebase Storage data bucket that stores the exported database.
      *
      * @return Boolean value, indicates the success of the operation.
      *
      * This function requires ServiceAuth or AccessToken authentication.
      *
      */
-    bool importDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath)
+    bool importDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions importOptions)
     {
         AsyncResult result;
-        eximDocs(aClient, &result, NULL, "", parent, bucketID, storagePath, collectionIds, true, false);
+        eximDocs(aClient, &result, NULL, "", parent, importOptions, true, false);
         return result.lastError.code() == 0;
     }
 
@@ -275,18 +283,20 @@ public:
      * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
-     * @param collectionIds Which collection ids to import. Unspecified means all collections included in the import.
-     * Use comma (,) to separate between the collection ids.
-     * @param bucketID The Firebase storage bucket ID in the project.
-     * @param storagePath The path in the Firebase Storage data bucket that stores the exported database.
+     * @param importOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
+     * The EximDocumentOptions constructor parameters.
+     * - collectionIds is collection ids to import. Unspecified means all collections included in the import.
+     *   Use comma (,) to separate between the collection ids.
+     * - bucketID is the Firebase storage bucket ID in the project.
+     * - storagePath is the path in the Firebase Storage data bucket that stores the exported database.
      * @param aResult The async result (AsyncResult)
      *
      * This function requires ServiceAuth or AccessToken authentication.
      *
      */
-    void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResult &aResult)
+    void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions importOptions, AsyncResult &aResult)
     {
-        eximDocs(aClient, &aResult, NULL, "", parent, bucketID, storagePath, collectionIds, true, true);
+        eximDocs(aClient, &aResult, NULL, "", parent, importOptions, true, true);
     }
 
     /** Import the exported documents stored in the Firebase Storage data bucket.
@@ -295,19 +305,21 @@ public:
      * @param parent The ParentResource object included project Id and database Id in its constructor.
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
-     * @param collectionIds Which collection ids to import. Unspecified means all collections included in the import.
-     * Use comma (,) to separate between the collection ids.
-     * @param bucketID The Firebase storage bucket ID in the project.
-     * @param storagePath The path in the Firebase Storage data bucket that stores the exported database.
+     * @param importOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
+     * The EximDocumentOptions constructor parameters.
+     * - collectionIds is collection ids to import. Unspecified means all collections included in the import.
+     *   Use comma (,) to separate between the collection ids.
+     * - bucketID is the Firebase storage bucket ID in the project.
+     * - storagePath is the path in the Firebase Storage data bucket that stores the exported database.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
      * This function requires ServiceAuth or AccessToken authentication.
      *
      */
-    void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionIds, const String &bucketID, const String &storagePath, AsyncResultCallback cb, const String &uid = "")
+    void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions importOptions, AsyncResultCallback cb, const String &uid = "")
     {
-        eximDocs(aClient, nullptr, cb, uid, parent, bucketID, storagePath, collectionIds, true, true);
+        eximDocs(aClient, nullptr, cb, uid, parent, importOptions, true, true);
     }
 
     /** Create a document at the defined document path.
@@ -483,10 +495,10 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    bool patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document<Values::Value> &document, Precondition currentDocument)
+    bool patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
     {
         AsyncResult result;
-        patchDoc(aClient, &result, NULL, "", parent, documentPath, updateMask, mask, document, currentDocument, false);
+        patchDoc(aClient, &result, NULL, "", parent, documentPath, patchOptions, document, false);
         return result.lastError.code() == 0;
     }
 
@@ -521,9 +533,9 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document<Values::Value> &document, Precondition currentDocument, AsyncResult &aResult)
+    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
     {
-        patchDoc(aClient, &aResult, NULL, "", parent, documentPath, updateMask, mask, document, currentDocument, true);
+        patchDoc(aClient, &aResult, NULL, "", parent, documentPath, patchOptions, document, true);
     }
 
     /** Patch or update a document at the defined path.
@@ -558,9 +570,9 @@ public:
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, DocumentMask updateMask, DocumentMask mask, Document<Values::Value> &document, Precondition currentDocument, AsyncResultCallback cb, const String &uid = "")
+    void patchDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
     {
-        patchDoc(aClient, nullptr, cb, uid, parent, documentPath, updateMask, mask, document, currentDocument, true);
+        patchDoc(aClient, nullptr, cb, uid, parent, documentPath, patchOptions, document, true);
     }
 
     /** Commits a transaction, while optionally updating documents.
@@ -692,27 +704,77 @@ public:
     /** Get a document at the defined path.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param documentPath The relative path of document to get.
-     * @param mask The fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
+     * @param options The GetDocumentOptions object included mask, transaction and readTime in its constructor.
+     * - mask is the fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
      * that field will not be returned in the response. Use comma (,) to separate between the field names.
-     * @param transaction Reads the document in a transaction. A base64-encoded string.
-     * @param readTime Reads the version of the document at the given time. This may not be older than 270 seconds.
-     * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * - transaction is a base64-encoded string. If set, reads the document in a transaction.
+     * - readTime is a timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * If set, reads the version of the document at the given time. This may not be older than 270 seconds.
      * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
-     *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    bool getDocument(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &mask = "",
-                     const String &transaction = "", const String &readTime = "")
+    bool getDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const GetDocumentOptions &options)
     {
-        return false;
+        AsyncResult result;
+        getDoc(aClient, &result, NULL, "", parent, documentPath, options, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Get a document at the defined path.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to get.
+     * @param options The GetDocumentOptions object included mask, transaction and readTime in its constructor.
+     * - mask is the fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
+     * that field will not be returned in the response. Use comma (,) to separate between the field names.
+     * - transaction is a base64-encoded string. If set, reads the document in a transaction.
+     * - readTime is a timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * If set, reads the version of the document at the given time. This may not be older than 270 seconds.
+     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     * @param aResult The async result (AsyncResult).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void getDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult)
+    {
+        getDoc(aClient, &aResult, NULL, "", parent, documentPath, options, true);
+    }
+
+    /** Get a document at the defined path.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to get.
+     * @param options The GetDocumentOptions object included mask, transaction and readTime in its constructor.
+     * - mask is the fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
+     * that field will not be returned in the response. Use comma (,) to separate between the field names.
+     * - transaction is a base64-encoded string. If set, reads the document in a transaction.
+     * - readTime is a timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * If set, reads the version of the document at the given time. This may not be older than 270 seconds.
+     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void getDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "")
+    {
+        getDoc(aClient, nullptr, cb, uid, parent, documentPath, options, true);
     }
 
     /** Gets multiple documents.
@@ -1024,6 +1086,9 @@ public:
         String extras;
 
         uh.addGAPIv1Path(request.path);
+        request.path += request.options->parent.projectId.length() == 0 ? app_token->project_id : request.options->parent.projectId;
+        request.path += FPSTR("/databases/");
+        request.path += request.options->parent.databaseId.length() > 0 ? request.options->parent.databaseId : FPSTR("(default)");
 
         addParams(request, extras);
 
@@ -1046,19 +1111,16 @@ public:
         if (request.aResult)
             sData->setRefResult(request.aResult);
 
+        Serial.println(sData->request.header);
+        Serial.println(sData->request.payload);
+
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
     }
 
     void addParams(async_request_data_t &request, String &extras)
     {
-        URLHelper uh;
-        app_token_t *app_token = appToken();
-        bool hasQueryParams = false;
-
-        extras += request.options->parent.projectId.length() == 0 ? app_token->project_id : request.options->parent.projectId;
-        extras += FPSTR("/databases/");
-        extras += request.options->parent.databaseId.length() > 0 ? request.options->parent.databaseId : FPSTR("(default)");
+          URLHelper uh;
         if (request.options->requestType == firebase_firestore_request_type_export_docs)
             extras += FPSTR(":exportDocuments");
         else if (request.options->requestType == firebase_firestore_request_type_import_docs)
@@ -1087,22 +1149,15 @@ public:
                  request.options->requestType == firebase_firestore_request_type_run_query ||
                  request.options->requestType == firebase_firestore_request_type_list_collection ||
                  request.options->requestType == firebase_firestore_request_type_list_doc ||
-                 request.options->requestType == firebase_firestore_request_type_get_doc ||
-                 request.options->requestType == firebase_firestore_request_type_create_doc ||
-                 request.options->requestType == firebase_firestore_request_type_patch_doc ||
                  request.options->requestType == firebase_firestore_request_type_delete_doc)
         {
             extras += FPSTR("/documents");
-
-            if (request.options->requestType == firebase_firestore_request_type_create_doc)
+            if (request.options->requestType == firebase_firestore_request_type_commit_document)
             {
-                uh.addPath(extras, request.options->collectionId);
-                uh.addParam(extras, "documentId=", request.options->documentId, hasQueryParams);
+                extras += FPSTR(":commit");
             }
             else if (request.options->requestType == firebase_firestore_request_type_run_query ||
                      request.options->requestType == firebase_firestore_request_type_list_collection ||
-                     request.options->requestType == firebase_firestore_request_type_get_doc ||
-                     request.options->requestType == firebase_firestore_request_type_patch_doc ||
                      request.options->requestType == firebase_firestore_request_type_delete_doc)
             {
                 uh.addPath(extras, request.options->parent.documentPath);
@@ -1112,37 +1167,10 @@ public:
                               ? ":runQuery"
                               : "";
             }
+
             else if (request.options->requestType == firebase_firestore_request_type_list_doc)
             {
                 uh.addPath(extras, request.options->collectionId);
-                uh.addParam(extras, "pageSize", String(request.options->pageSize), hasQueryParams);
-                uh.addParam(extras, "pageToken", request.options->pageToken, hasQueryParams);
-                uh.addParam(extras, "orderBy=", request.options->orderBy, hasQueryParams);
-                uh.addParam(extras, "showMissing=", String(request.options->showMissing), hasQueryParams);
-            }
-
-            if (request.options->requestType == firebase_firestore_request_type_patch_doc)
-            {
-                extras += request.options->updateMask.getQuery("updateMask", hasQueryParams);
-                extras += request.options->currentDocument.getQuery("currentDocument", hasQueryParams);
-            }
-            else if (request.options->requestType == firebase_firestore_request_type_commit_document)
-            {
-                extras += FPSTR(":commit");
-            }
-
-            extras += request.options->mask.getQuery("mask", hasQueryParams);
-
-            if (request.options->requestType == firebase_firestore_request_type_get_doc)
-            {
-                uh.addParam(extras, "transaction=", request.options->transaction, hasQueryParams);
-                uh.addParam(extras, "readTime=", request.options->readTime, hasQueryParams);
-            }
-            else if (request.options->requestType == firebase_firestore_request_type_patch_doc ||
-                     request.options->requestType == firebase_firestore_request_type_delete_doc)
-            {
-                uh.addParam(extras, "currentDocument.exists=", request.options->exists, hasQueryParams);
-                uh.addParam(extras, "currentDocument.updateTime=", request.options->updateTime, hasQueryParams);
             }
         }
         else if (request.options->requestType == firebase_firestore_request_type_create_index ||
@@ -1153,22 +1181,9 @@ public:
             extras += FPSTR("/collectionGroups/");
             extras += request.options->collectionId;
             extras += FPSTR("/indexes");
-
-            if (request.options->requestType == firebase_firestore_request_type_delete_index ||
-                request.options->requestType == firebase_firestore_request_type_get_index)
-            {
-                extras += FPSTR("/");
-                extras += request.options->payload;
-            }
-            else if (request.options->requestType == firebase_firestore_request_type_list_index)
-            {
-                if (request.options->pageSize > -1)
-                    uh.addParam(extras, "pageSize", String(request.options->pageSize), hasQueryParams);
-                uh.addParam(extras, "pageToken", request.options->pageToken, hasQueryParams);
-                if (request.options->payload.length() > 0)
-                    uh.addParam(extras, "filter", request.options->payload, hasQueryParams);
-            }
         }
+
+        extras += request.options->extras;
     }
 
     void setClientError(async_request_data_t &request, int code)
@@ -1188,17 +1203,14 @@ public:
             delete aResult;
     }
 
-    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &bucketID, const String &storagePath, const String &collectionIds, bool isImport, bool async)
+    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, EximDocumentOptions &eximOptions, bool isImport, bool async)
     {
-        URLHelper uh;
         FirestoreOptions options;
         options.requestType = isImport ? firebase_firestore_request_type_import_docs : firebase_firestore_request_type_export_docs;
         options.parent = parent;
-        String uriPrefix;
-        uh.addGStorageURL(uriPrefix, bucketID, storagePath);
-        JsonHelper json;
-        json.addObject(options.payload, isImport ? json.toString("inputUriPrefix") : json.toString("outputUriPrefix"), json.toString(uriPrefix));
-        json.addTokens(options.payload, json.toString("collectionIds"), collectionIds, true);
+        options.payload = eximOptions.c_str();
+        if (!isImport)
+            options.payload.replace("inputUriPrefix", "outputUriPrefix");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
@@ -1211,21 +1223,33 @@ public:
         options.collectionId = collectionId;
         options.documentId = documentId;
         options.payload = document.c_str();
-        options.mask = mask;
+
+        addDocsPath(options.extras);
+        options.extras += '/';
+        options.extras += options.collectionId;
+
+        URLHelper uh;
+        bool hasQueryParams = false;
+        uh.addParam(options.extras, "documentId", options.documentId, hasQueryParams);
+        options.extras += mask.getQuery("mask", hasQueryParams);
+
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
-    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, DocumentMask &updateMask, DocumentMask &mask, Document<Values::Value> &document, Precondition currentDocument, bool async)
+    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, bool async)
     {
         FirestoreOptions options;
         options.requestType = firebase_firestore_request_type_patch_doc;
         options.parent = parent;
-        options.parent.documentPath = documentPath;
         options.payload = document.c_str();
-        options.mask = mask;
-        options.updateMask = updateMask;
-        options.currentDocument = currentDocument;
+
+        addDocsPath(options.extras);
+        options.extras += '/';
+        options.extras += documentPath;
+
+        options.extras += patchOptions.c_str();
+
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_patch, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
@@ -1252,15 +1276,48 @@ public:
         asyncRequest(aReq);
     }
 
+    void getDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, GetDocumentOptions getOptions, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_get_doc;
+        options.parent = parent;
+
+        addDocsPath(options.extras);
+        options.extras += '/';
+        options.extras += documentPath;
+
+        options.extras += getOptions.c_str();
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void listDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, GetDocumentOptions getOptions, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_list_doc;
+        options.parent = parent;
+
+        addDocsPath(options.extras);
+        options.extras += '/';
+        options.extras += documentPath;
+
+        options.extras += getOptions.c_str();
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
     String makeResourcePath(const ParentResource &parent)
     {
         String str = FPSTR("projects/");
         str += parent.projectId;
-        str += FPSTR("/databases/");
+        addDatabasePath(str);
+        str += '/';
         str += parent.databaseId.length() > 0 ? parent.databaseId : FPSTR("(default)");
-        str += FPSTR("/documents");
+        addDocsPath(str);
         return str;
     }
+    void addDatabasePath(String &buf) { buf += FPSTR("/databases"); }
+    void addDocsPath(String &buf) { buf += FPSTR("/documents"); }
 };
 
 #endif

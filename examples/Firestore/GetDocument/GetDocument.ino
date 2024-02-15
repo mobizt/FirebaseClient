@@ -58,25 +58,24 @@
  */
 
 /**
- * PATCH DOCUMENTS FUNCTIONS
- * =========================
+ * GET DOCUMENT FUNCTIONS
+ * ======================
  *
  * SYNTAXES:
  *
- * firestore.patchDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>);
- * firestore.patchDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResult>);
- * firestore.patchDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResultCallback>, <uid>);
+ * firestore.getDocument(<AsyncClient>, <ParentResource>, <documentPath>, <GetDocumentOptions>);
+ * firestore.getDocument(<AsyncClient>, <ParentResource>, <documentPath>, <GetDocumentOptions>, <AsyncResult>);
+ * firestore.getDocument(<AsyncClient>, <ParentResource>, <documentPath>, <GetDocumentOptions>, <AsyncResultCallback>, <uid>);
  *
  * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
- * The <documentPath> is the relative path of document to patch with the input document.
- * The <DocumentMask(updateMask)> is the fields to update. If the document exists on the server and has fields not referenced in the mask, they are left unchanged.
- * The <DocumentMask(mask)> is fields to return. If not set, returns all fields. If the document has a field that is not present in this mask, that field will
- * not be returned in the response. Use comma (,) to separate between the field names.
- * The <Document> is Firestore document.
- * The <Precondition(currentDocument)> is an optional precondition on the document. The request will fail if this is set and not met by the target document.
+ * The <GetDocumentOptions> is the GetDocumentOptions object included mask, transaction and readTime in its constructor.
+ * The mask is the fields to return. If not set, returns all fields. If the document has a field that is not present in this mask, 
+ * that field will not be returned in the response. Use comma (,) to separate between the field names.
+ * The transaction is a base64-encoded string. If set, reads the document in a transaction.
+ * The readTime is a timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
@@ -236,11 +235,11 @@ Firestore firestore;
 
 AsyncResult aResult_no_callback;
 
-int cnt = 0;
+int counter = 0;
 
 unsigned long dataMillis = 0;
 
-bool taskcomplete = false;
+bool taskCompleted = false;
 
 void setup()
 {
@@ -297,53 +296,49 @@ void loop()
     {
         dataMillis = millis();
 
-        // aa is the collection id, bb is the document id.
-        String documentPath = "aa/bb";
-
-        // If the document path contains space e.g. "a b c/d e f"
-        // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
-
-        if (!taskcomplete)
+        if (!taskCompleted)
         {
-            taskcomplete = true;
+            taskCompleted = true;
 
-            Values::IntegerValue intV(cnt);
-            Values::BooleanValue boolV(cnt % 2 == 0);
+            // Map value to append
+            Values::MapValue jp("time_zone", Values::IntegerValue(9));
+            jp.add("population", Values::IntegerValue(125570000));
 
-            Document doc("count", Values::Value(intV));
-            doc.add("status", Values::Value(boolV));
+            Document doc("japan", Values::Value(jp));
+
+            Values::MapValue bg("time_zone", Values::IntegerValue(1));
+            bg.add("population", Values::IntegerValue(11492641));
+
+            doc.add("Belgium", Values::Value(bg));
+
+            Values::MapValue sg("time_zone", Values::IntegerValue(8));
+            sg.add("population", Values::IntegerValue(5703600));
+
+            doc.add("Singapore", Values::Value(sg));
+
+            String documentPath = "info/countries";
 
             // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
-            Serial.println("[+] Create a document... ");
+            Serial.println("[+] Create document... ");
 
             firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
         }
 
-        cnt++;
-        Values::IntegerValue intV(cnt);
-        Values::BooleanValue boolV(cnt % 2 == 0);
+        String documentPath = "info/countries";
 
-        Document doc("count", Values::Value(intV));
-        doc.add("status", Values::Value(boolV));
+        // If the document path contains space e.g. "a b c/d e f"
+        // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
 
-        // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
+        Serial.println("[+] Get a document... ");
 
-        Serial.println("[+] Update a document... ");
-
-        /** if updateMask contains the field name that exists in the remote document and
-         * this field name does not exist in the document (content), that field will be deleted from remote document
-         */
-
-        patchDocumentOptions patchOptions(DocumentMask("count,status") /* updateMask */, DocumentMask() /* mask */,  Precondition() /* precondition */);
-
-        firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB);
+        firestore.getDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), asyncCB);
 
         // To assign UID for async result
-        // firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB, "myUID");
+        // firestore.getDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), asyncCB, "myUID");
 
         // To get anyc result without callback
-        // firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, aResult_no_callback);
+        // firestore.getDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), aResult_no_callback);
     }
 }
 

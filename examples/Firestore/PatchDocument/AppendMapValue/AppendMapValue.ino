@@ -308,13 +308,15 @@ void loop()
 
         Serial.println("[+] Update a document... ");
 
-        firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask("myMap.key" + String(cnt)) /* updateMask */, DocumentMask() /* mask */, doc, Precondition() /* precondition */, asyncCB);
+        patchDocumentOptions patchOptions(DocumentMask("myMap.key" + String(cnt)) /* updateMask */, DocumentMask() /* mask */,  Precondition() /* precondition */);
+
+        firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB);
 
         // To assign UID for async result
-        // firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask("myMap.key" + String(cnt)), DocumentMask(), doc, Precondition(), asyncCB, "myUID");
+        // firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask("myMap.key" + String(cnt)), DocumentMask(), doc, Precondition(), aResult_no_callback);
+        // firestore.patchDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, aResult_no_callback);
     }
 }
 

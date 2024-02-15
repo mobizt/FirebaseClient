@@ -1,5 +1,5 @@
 /**
- * Created February 14, 2024
+ * Created February 15, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -155,7 +155,7 @@ public:
     }
 };
 
-typedef struct firebase_firestore_parent_resource_t
+class ParentResource
 {
     friend class Firestore;
 
@@ -182,18 +182,19 @@ private:
     }
 
 public:
-    firebase_firestore_parent_resource_t() {}
-    firebase_firestore_parent_resource_t(const String &projectId, const String &databaseId = "")
+    ParentResource() {}
+    ParentResource(const String &projectId, const String &databaseId = "")
     {
         this->projectId = projectId;
         this->databaseId = databaseId;
     }
-
-} ParentResource;
+};
 
 class DocumentMask : public Printable
 {
     friend class Firestore;
+    friend class GetDocumentOptions;
+    friend class patchDocumentOptions;
 
 private:
     String mask;
@@ -216,7 +217,6 @@ private:
     }
 
 public:
-    DocumentMask() {}
     /**
      * A set of field paths on a document.
      * Used to restrict a get or update operation on a document to a subset of its fields.
@@ -225,11 +225,18 @@ public:
      *
      * @param mask The list of field paths in the mask. See Document.fields for a field path syntax reference.
      */
-    DocumentMask(const String &fieldPaths)
+    DocumentMask(const String &fieldPaths = "")
     {
-        this->mask = fieldPaths;
-        JsonHelper jh;
-        jh.addTokens(str, "fieldPaths", mask, true);
+        setFieldPaths(fieldPaths);
+    }
+    void setFieldPaths(const String &fieldPaths)
+    {
+        if (fieldPaths.length())
+        {
+            this->mask = fieldPaths;
+            JsonHelper jh;
+            jh.addTokens(str, "fieldPaths", mask, true);
+        }
     }
     const char *c_str() { return str.c_str(); }
     size_t printTo(Print &p) const { return p.print(str.c_str()); }
@@ -702,42 +709,82 @@ private:
     String buf, str;
     FSUT fsut;
     JsonHelper jh;
+    String estr;
+    String eut;
 
-    String getQuery(const String &mask, bool hasParam)
+    String getQuery(const String &mask)
     {
-        String tmp;
-        if (buf.length())
+        buf.remove(0, buf.length());
+        if (estr.length())
         {
-            tmp += hasParam ? '&' : '?';
-            tmp += mask + buf;
+            buf = FPSTR("?");
+            buf = mask;
+            buf += FPSTR(".exists=");
+            buf += estr;
         }
-        return tmp;
+
+        if (eut.length())
+        {
+            if (buf.length())
+                buf += '&';
+            else
+                buf = FPSTR("?");
+            buf = mask;
+            buf += FPSTR(".updateTime=");
+            buf += jh.toString(eut);
+        }
+        return buf;
+    }
+
+    void setObject()
+    {
+        if (estr.length())
+        {
+            if (str.length() == 0)
+                fsut.setPair(str, FPSTR("exists"), estr);
+            else
+            {
+                str[str.length() - 1] = '\0';
+                jh.addObject(str, FPSTR("exists"), estr, true);
+            }
+        }
+
+        if (eut.length())
+        {
+            if (str.length() == 0)
+                fsut.setPair(str, FPSTR("updateTime"), eut);
+            else
+            {
+                str[str.length() - 1] = '\0';
+                jh.addObject(str, FPSTR("updateTime"), eut, true);
+            }
+        }
     }
 
 public:
     Precondition() {}
     /**
-     * A precondition on a document, used for conditional operations.
-     * @param exists When set to true, the target document must exist.
+     * Set the exists condition.
+     * @param value When set to true, the target document must exist.
      * When set to false, the target document must not exist.
      */
-    Precondition(bool exists)
+    Precondition &exists(bool value)
     {
-        buf = FPSTR(".exists=");
-        buf += fsut.getBoolStr(exists);
-        fsut.setPair(str, FPSTR("exists"), fsut.getBoolStr(exists));
+        this->estr = fsut.getBoolStr(value);
+        setObject();
+        return *this;
     }
     /**
-     * A precondition on a document, used for conditional operations.
+     * Set the update time condition.
      * @param updateTime A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
      * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
      * When set, the target document must exist and have been last updated at that time. Timestamp must be microsecond aligned.
      */
-    Precondition(const String &updateTime)
+    Precondition &updateTime(const String &timestamp)
     {
-        buf = FPSTR(".updateTime=");
-        buf += jh.toString(updateTime);
-        fsut.setPair(str, FPSTR("updateTime"), jh.toString(updateTime));
+        this->eut = timestamp;
+        setObject();
+        return *this;
     }
     const char *c_str() { return str.c_str(); }
     size_t printTo(Print &p) const { return p.print(str.c_str()); }
@@ -758,7 +805,14 @@ private:
     {
         map_obj = mv.c_str();
         name_obj.remove(0, name_obj.length());
-        jh.addObject(name_obj, FPSTR("name"), jh.toString(fsut.getDocPath(name)), true);
+        if (name.length())
+            jh.addObject(name_obj, FPSTR("name"), jh.toString(fsut.getDocPath(name)), true);
+        else
+        {
+            buf = map_obj;
+            return;
+        }
+
         buf = name_obj;
         if (map_obj.length())
         {
@@ -945,7 +999,7 @@ public:
      * The writes to apply.
      * @param write A write on a document.
      * @param transaction A base64-encoded string. If set, applies all writes in this transaction, and commits it.
-     * 
+     *
      */
     Writes(Write write, const String &transaction = "")
     {
@@ -957,7 +1011,7 @@ public:
     /**
      * The writes to apply.
      * @param write A write on a document.
-     * @param labels Labels associated with this batch write. 
+     * @param labels Labels associated with this batch write.
      * An object containing a list of "key": value pairs.
      */
     Writes(Write write, Values::MapValue labels)
@@ -982,6 +1036,110 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
+class EximDocumentOptions : public Printable
+{
+private:
+    String buf;
+    URLHelper uh;
+    JsonHelper json;
+
+public:
+    EximDocumentOptions(const String &collectionIds, const String &bucketID, const String &storagePath)
+    {
+        String uriPrefix;
+        uh.addGStorageURL(uriPrefix, bucketID, storagePath);
+        json.addObject(buf, json.toString("inputUriPrefix"), json.toString(uriPrefix));
+        json.addTokens(buf, json.toString("collectionIds"), collectionIds, true);
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+class GetDocumentOptions : public Printable
+{
+private:
+    String buf;
+    URLHelper uh;
+
+public:
+    GetDocumentOptions() {}
+    GetDocumentOptions(DocumentMask mask, const String &transaction = "", const String &readTime = "")
+    {
+        bool hasParam = false;
+        if (strlen(mask.c_str()))
+            buf = mask.getQuery("mask", hasParam);
+        if (transaction.length())
+            uh.addParam(buf, FPSTR("transaction"), transaction, hasParam);
+        if (readTime.length())
+            uh.addParam(buf, FPSTR("readTime"), readTime, hasParam);
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+class patchDocumentOptions : public Printable
+{
+private:
+    String buf;
+    URLHelper uh;
+
+public:
+    patchDocumentOptions(DocumentMask updateMask, DocumentMask mask, Precondition currentDocument)
+    {
+        bool hasParam = false;
+        if (strlen(updateMask.c_str()))
+            buf = updateMask.getQuery("updateMask", hasParam);
+        if (strlen(mask.c_str()))
+            buf += mask.getQuery("mask", hasParam);
+        if (strlen(currentDocument.c_str()))
+            uh.addParam(buf, FPSTR("currentDocument"), currentDocument.c_str(), hasParam);
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+class ListDocumentsOptions : public Printable
+{
+private:
+    String buf;
+    int pz = 0;
+    String ptk;
+    String ordby;
+    DocumentMask msk;
+    String sms;
+    FSUT fsut;
+
+public:
+    ListDocumentsOptions() {}
+    ListDocumentsOptions &pageSize(int pageSize)
+    {
+        pz = pageSize;
+        return *this;
+    }
+    ListDocumentsOptions &pageToken(const String &pageToken)
+    {
+        ptk = pageToken;
+        return *this;
+    }
+    ListDocumentsOptions &orderBy(const String orderBy)
+    {
+        ordby = orderBy;
+        return *this;
+    }
+    ListDocumentsOptions &mask(DocumentMask mask)
+    {
+        msk = mask;
+        return *this;
+    }
+    ListDocumentsOptions &showMissing(bool value)
+    {
+        sms = fsut.getBoolStr(value);
+        return *this;
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
 class FirestoreOptions
 {
     friend class Firestore;
@@ -990,18 +1148,8 @@ public:
     ParentResource parent;
     String collectionId;
     String documentId;
-    DocumentMask mask, updateMask;
-    Precondition currentDocument;
+    String extras;
     String payload;
-    String exists;
-    String updateTime;
-    String readTime;
-    String transaction;
-    int pageSize = 10;
-    String pageToken;
-    String orderBy;
-    bool showMissing = false;
-    size_t size = 0;
     firebase_firestore_request_type requestType = firebase_firestore_request_type_undefined;
     unsigned long requestTime = 0;
 
@@ -1010,20 +1158,8 @@ public:
         this->parent = rhs.parent;
         this->collectionId = rhs.collectionId;
         this->documentId = rhs.documentId;
-        this->mask = rhs.mask;
-        this->updateMask = rhs.updateMask;
+        this->extras = rhs.extras;
         this->payload = rhs.payload;
-        this->exists = rhs.exists;
-        this->updateTime = rhs.updateTime;
-        this->readTime = rhs.readTime;
-        this->transaction = rhs.transaction;
-        this->pageSize = rhs.pageSize;
-        this->pageToken = rhs.pageToken;
-        this->orderBy = rhs.orderBy;
-        this->showMissing = rhs.showMissing;
-        this->size = rhs.size;
-        this->requestType = rhs.requestType;
-        this->requestTime = rhs.requestTime;
     }
 
 private:
