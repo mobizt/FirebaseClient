@@ -1,5 +1,5 @@
 /**
- * Created February 15, 2024
+ * Created February 16, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -98,23 +98,19 @@ private:
     JsonHelper jh;
 
 public:
-    void addArray(String &buf, const String &v)
+    void addMember(String &buf, const String &v, bool isObjValue, const String &token = "}}")
     {
-        int p = buf.lastIndexOf("]}");
+        int p = buf.lastIndexOf(token);
         String str = buf.substring(0, p);
         str += ',';
-        str += v;
-        str += FPSTR("]}");
-        buf = str;
-    }
-    void addObject(String &buf, const String &v)
-    {
-        int p = buf.lastIndexOf("}}");
-        String str = buf.substring(0, p);
-        str += ',';
-        String tmp = v;
-        str += tmp.substring(1, tmp.length() - 1);
-        str += FPSTR("}}");
+        if (isObjValue)
+        {
+            String tmp = v;
+            str += tmp.substring(1, tmp.length() - 1);
+        }
+        else
+            str += v;
+        str += token;
         buf = str;
     }
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
@@ -470,7 +466,7 @@ namespace Values
                 if (buf.length() == 0)
                     set(value);
                 else
-                    fsut.addArray(buf, value.val());
+                    fsut.addMember(buf, value.val(), true, "]}");
             }
             return *this;
         }
@@ -517,7 +513,7 @@ namespace Values
             if (buf.length() == 0)
                 set(key, value);
             else
-                fsut.addObject(buf, MAP(key, value, true).c_str());
+                fsut.addMember(buf, MAP(key, value, true).c_str(), true);
             return *this;
         }
         const char *c_str() { return buf.c_str(); }
@@ -665,6 +661,7 @@ namespace FieldTransform
     private:
         String buf;
         JsonHelper jh;
+        FSUT fsut;
         template <typename T>
         void set(const String &fieldPath, T v)
         {
@@ -815,11 +812,7 @@ private:
 
         buf = name_obj;
         if (map_obj.length())
-        {
-            buf[buf.length() - 1] = ',';
-            buf += map_obj.substring(1, map_obj.length() - 1);
-            buf += '}';
-        }
+            fsut.addMember(buf, map_obj, true, "}");
     }
 
 public:
@@ -976,7 +969,7 @@ public:
                 jh.addObject(buf, FPSTR("updateTransforms"), fsut.getArrayStr(updateTransforms.c_str()), true);
             }
             else
-                fsut.addArray(buf, updateTransforms.c_str());
+                fsut.addMember(buf, updateTransforms.c_str(), true, "]}");
             updateTrans = true;
         }
 
@@ -1028,10 +1021,87 @@ public:
     Writes &add(Write write)
     {
         FSUT fsut;
-        fsut.addArray(buf, write.c_str());
+        fsut.addMember(buf, write.c_str(), true, "]}");
         return *this;
     }
 
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+/**
+ * Options for a transaction that can be used to read and write documents.
+ */
+class ReadWrite : public Printable
+{
+private:
+    String buf;
+    JsonHelper jh;
+
+public:
+    /**
+     * @param retryTransaction An optional transaction to retry.
+     * A base64-encoded string.
+     */
+    ReadWrite(const String &retryTransaction)
+    {
+        if (retryTransaction.length())
+            jh.addObject(buf, "retryTransaction", jh.toString(retryTransaction), true);
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+/**
+ * Options for a transaction that can only be used to read documents.
+ */
+class ReadOnly : public Printable
+{
+private:
+    String buf;
+    JsonHelper jh;
+
+public:
+    ReadOnly() {}
+    /**
+     * @param readTime Timestamp. Reads documents at the given time.
+     */
+    ReadOnly(const String &readTime)
+    {
+        if (readTime.length())
+            jh.addObject(buf, "readTime", jh.toString(readTime), true);
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+/**
+ * Options for creating a new transaction.
+ */
+class TransactionOptions : public Printable
+{
+private:
+    String buf;
+    JsonHelper jh;
+
+public:
+    TransactionOptions() {}
+    /**
+     * @param readOnly The transaction can only be used for read operations.
+     */
+    TransactionOptions(ReadOnly readOnly)
+    {
+        if (strlen(readOnly.c_str()))
+            jh.addObject(buf, "readOnly", readOnly.c_str(), true);
+    }
+    /**
+     * @param readWrite The transaction can be used for both read and write operations.
+     */
+    TransactionOptions(ReadWrite readWrite)
+    {
+        if (strlen(readWrite.c_str()))
+            jh.addObject(buf, "readWrite", readWrite.c_str(), true);
+    }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
@@ -1072,6 +1142,120 @@ public:
             uh.addParam(buf, FPSTR("transaction"), transaction, hasParam);
         if (readTime.length())
             uh.addParam(buf, FPSTR("readTime"), readTime, hasParam);
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+class BatchGetDocumentOptions : public Printable
+{
+private:
+    String buf, doc, msk, trans, newtrans, rt;
+    JsonHelper jh;
+    FSUT fsut;
+
+    void setbuf()
+    {
+        buf.remove(0, buf.length());
+        if (doc.length())
+        {
+            if (buf.length() == 0)
+                buf = doc.c_str();
+            else
+                fsut.addMember(buf, doc, true, "}");
+        }
+
+        if (msk.length())
+        {
+            if (buf.length() == 0)
+                buf = msk.c_str();
+            else
+                fsut.addMember(buf, msk, true, "}");
+        }
+
+        if (trans.length())
+        {
+            if (buf.length() == 0)
+                buf = trans.c_str();
+            else
+                fsut.addMember(buf, trans, true, "}");
+        }
+
+        if (newtrans.length())
+        {
+            if (buf.length() == 0)
+                buf = newtrans.c_str();
+            else
+                fsut.addMember(buf, newtrans, true, "}");
+        }
+
+        if (rt.length())
+        {
+            if (buf.length() == 0)
+                buf = rt.c_str();
+            else
+                fsut.addMember(buf, rt, true, "}");
+        }
+    }
+
+public:
+    BatchGetDocumentOptions() {}
+    /**
+     * @param document The names of the documents to retrieve.
+     */
+    void addDocument(const String &document)
+    {
+        if (doc.length() == 0)
+        {
+            String str;
+            jh.addArray(str, jh.toString(fsut.getDocPath(document)), true);
+            jh.addObject(doc, "documents", str, true);
+        }
+        else
+            fsut.addMember(doc, jh.toString(fsut.getDocPath(document)), false, "]}");
+        setbuf();
+    }
+    /**
+     * @param mask The fields to return. If not set, returns all fields.
+     */
+    void mask(DocumentMask mask)
+    {
+        jh.addObject(msk, "mask", mask.c_str(), true);
+        setbuf();
+    }
+    /**
+     * @param transaction Timestamp Reads documents in a transaction.
+     */
+    void transaction(const String &transaction)
+    {
+        if (transaction.length() && newtrans.length() == 0 && rt.length() == 0)
+        {
+            jh.addObject(trans, "transaction", jh.toString(transaction), true);
+            setbuf();
+        }
+    }
+    /**
+     * @param transOptions Starts a new transaction and reads the documents. Defaults to a read-only transaction.
+     * The new transaction ID will be returned as the first response in the stream.
+     */
+    void newTransaction(TransactionOptions transOptions)
+    {
+        if (strlen(transOptions.c_str()) && trans.length() == 0 && rt.length() == 0)
+        {
+            jh.addObject(newtrans, "newTransaction", transOptions.c_str(), true);
+            setbuf();
+        }
+    }
+    /**
+     * @param readTime Timestamp. Reads documents as they were at the given time.
+     */
+    void readTime(const String &readTime)
+    {
+        if (readTime.length() && trans.length() == 0 && newtrans.length() == 0)
+        {
+            jh.addObject(rt, "readTime", jh.toString(readTime), true);
+            setbuf();
+        }
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }

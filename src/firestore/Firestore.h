@@ -1,5 +1,5 @@
 /**
- * Created February 15, 2024
+ * Created February 16, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -31,8 +31,6 @@
 using namespace firebase;
 
 #if defined(ENABLE_FIRESTORE)
-
-typedef void (*FirestoreBatchOperationsCallback)(const char *);
 
 class Firestore
 {
@@ -780,35 +778,109 @@ public:
     /** Gets multiple documents.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
-     * @param documentPaths The vec of relative path of documents to get. Use comma (,) to separate between the field names.
-     * @param mask The fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param batchOptions The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
+     * addDocument, mask, transaction, newTransaction and readTime.
+     *
+     * addDocument used for adding the document path to read.
+     * mask used for setting the mask fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
      * that field will not be returned in the response. Use comma (,) to separate between the field names.
-     *@param batchOperationCallback The callback fuction that accepts const char* as argument.
-     * Union field consistency_selector can be only one of the following
-     * @param transaction Reads the document in a transaction. A base64-encoded string.
-     * @param newTransaction JSON object that represents TransactionOptions object.
-     * Starts a new transaction and reads the documents.
-     * Defaults to a read-only transaction.
-     * The new transaction ID will be returned as the first response in the stream.
-     * @param readTime Reads documents as they were at the given time. This may not be older than 270 seconds.
+     * 
+     * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
+     * transaction, newTransaction and readTime.
+     * 
+     * Then the following functions can't be mixed used. 
+     * - transaction used for reading the document in a transaction. A base64-encoded string.
+     * - newTransaction used for creating the transaction.
+     * - readTime used for setting the documents as they were at the given time. This may not be older than 270 seconds.
      * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
      * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
-     *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
      *
      */
-    bool batchGetDocuments(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPaths, const String &mask,
-                           FirestoreBatchOperationsCallback batchOperationCallback, const String &transaction, const object_t &newTransaction, const String &readTime)
+    bool batchGetDocuments(AsyncClientClass &aClient, const ParentResource &parent, BatchGetDocumentOptions batchOptions)
     {
-        return false;
+        AsyncResult result;
+        batchGetDoc(aClient, &result, NULL, "", parent, batchOptions, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Gets multiple documents.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param batchOptions The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
+     * addDocument, mask, transaction, newTransaction and readTime.
+     *
+     * addDocument used for adding the document path to read.
+     * mask used for setting the mask fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
+     * that field will not be returned in the response. Use comma (,) to separate between the field names.
+     * 
+     * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
+     * transaction, newTransaction and readTime.
+     * 
+     * Then the following functions can't be mixed used. 
+     * - transaction used for reading the document in a transaction. A base64-encoded string.
+     * - newTransaction used for creating the transaction.
+     * - readTime used for setting the documents as they were at the given time. This may not be older than 270 seconds.
+     * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     *
+     * @param aResult The async result (AsyncResult).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
+     *
+     */
+    void batchGetDocuments(AsyncClientClass &aClient, const ParentResource &parent, BatchGetDocumentOptions batchOptions, AsyncResult &aResult)
+    {
+        batchGetDoc(aClient, &aResult, NULL, "", parent, batchOptions, true);
+    }
+
+    /** Gets multiple documents.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param batchOptions The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
+     * addDocument, mask, transaction, newTransaction and readTime.
+     *
+     * addDocument used for adding the document path to read.
+     * mask used for setting the mask fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
+     * that field will not be returned in the response. Use comma (,) to separate between the field names.
+     * 
+     * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
+     * transaction, newTransaction and readTime.
+     * 
+     * Then the following functions can't be mixed used. 
+     * - transaction used for reading the document in a transaction. A base64-encoded string.
+     * - newTransaction used for creating the transaction.
+     * - readTime used for setting the documents as they were at the given time. This may not be older than 270 seconds.
+     * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     *
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
+     *
+     */
+    void batchGetDocuments(AsyncClientClass &aClient, const ParentResource &parent, BatchGetDocumentOptions batchOptions, AsyncResultCallback cb, const String &uid = "")
+    {
+        batchGetDoc(aClient, nullptr, cb, uid, parent, batchOptions, true);
     }
 
     /** Starts a new transaction.
@@ -1111,21 +1183,15 @@ public:
         if (request.aResult)
             sData->setRefResult(request.aResult);
 
-        Serial.println(sData->request.header);
-        Serial.println(sData->request.payload);
-
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
     }
 
     void addParams(async_request_data_t &request, String &extras)
     {
-          URLHelper uh;
-        if (request.options->requestType == firebase_firestore_request_type_export_docs)
-            extras += FPSTR(":exportDocuments");
-        else if (request.options->requestType == firebase_firestore_request_type_import_docs)
-            extras += FPSTR(":importDocuments");
-        else if (request.options->requestType == firebase_firestore_request_type_begin_transaction)
+        URLHelper uh;
+
+        if (request.options->requestType == firebase_firestore_request_type_begin_transaction)
         {
             extras += FPSTR("/documents");
             extras += FPSTR(":beginTransaction");
@@ -1135,30 +1201,22 @@ public:
             extras += FPSTR("/documents");
             extras += FPSTR(":rollback");
         }
-        else if (request.options->requestType == firebase_firestore_request_type_batch_get_doc)
-        {
-            extras += FPSTR("/documents");
-            extras += FPSTR(":batchGet");
-        }
+
         else if (request.options->requestType == firebase_firestore_request_type_batch_write_doc)
         {
             extras += FPSTR("/documents");
             extras += FPSTR(":batchWrite");
         }
-        else if (request.options->requestType == firebase_firestore_request_type_commit_document ||
-                 request.options->requestType == firebase_firestore_request_type_run_query ||
-                 request.options->requestType == firebase_firestore_request_type_list_collection ||
-                 request.options->requestType == firebase_firestore_request_type_list_doc ||
-                 request.options->requestType == firebase_firestore_request_type_delete_doc)
+        else if (
+            request.options->requestType == firebase_firestore_request_type_run_query ||
+            request.options->requestType == firebase_firestore_request_type_list_collection ||
+            request.options->requestType == firebase_firestore_request_type_list_doc ||
+            request.options->requestType == firebase_firestore_request_type_delete_doc)
         {
             extras += FPSTR("/documents");
-            if (request.options->requestType == firebase_firestore_request_type_commit_document)
-            {
-                extras += FPSTR(":commit");
-            }
-            else if (request.options->requestType == firebase_firestore_request_type_run_query ||
-                     request.options->requestType == firebase_firestore_request_type_list_collection ||
-                     request.options->requestType == firebase_firestore_request_type_delete_doc)
+            if (request.options->requestType == firebase_firestore_request_type_run_query ||
+                request.options->requestType == firebase_firestore_request_type_list_collection ||
+                request.options->requestType == firebase_firestore_request_type_delete_doc)
             {
                 uh.addPath(extras, request.options->parent.documentPath);
                 extras += (request.options->requestType == firebase_firestore_request_type_list_collection)
@@ -1184,6 +1242,7 @@ public:
         }
 
         extras += request.options->extras;
+        extras.replace(" ", "%20");
     }
 
     void setClientError(async_request_data_t &request, int code)
@@ -1211,6 +1270,7 @@ public:
         options.payload = eximOptions.c_str();
         if (!isImport)
             options.payload.replace("inputUriPrefix", "outputUriPrefix");
+        options.extras += isImport ? FPSTR(":importDocuments") : FPSTR(":exportDocuments");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
@@ -1223,16 +1283,13 @@ public:
         options.collectionId = collectionId;
         options.documentId = documentId;
         options.payload = document.c_str();
-
         addDocsPath(options.extras);
         options.extras += '/';
         options.extras += options.collectionId;
-
         URLHelper uh;
         bool hasQueryParams = false;
         uh.addParam(options.extras, "documentId", options.documentId, hasQueryParams);
         options.extras += mask.getQuery("mask", hasQueryParams);
-
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
@@ -1243,13 +1300,10 @@ public:
         options.requestType = firebase_firestore_request_type_patch_doc;
         options.parent = parent;
         options.payload = document.c_str();
-
         addDocsPath(options.extras);
         options.extras += '/';
         options.extras += documentPath;
-
         options.extras += patchOptions.c_str();
-
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_patch, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
@@ -1260,6 +1314,8 @@ public:
         options.requestType = firebase_firestore_request_type_commit_document;
         options.parent = parent;
         options.payload = writes.c_str();
+        addDocsPath(options.extras);
+        options.extras += FPSTR(":commit");
         options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
@@ -1281,13 +1337,24 @@ public:
         FirestoreOptions options;
         options.requestType = firebase_firestore_request_type_get_doc;
         options.parent = parent;
-
         addDocsPath(options.extras);
         options.extras += '/';
         options.extras += documentPath;
-
         options.extras += getOptions.c_str();
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void batchGetDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, BatchGetDocumentOptions batchOptions, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_batch_get_doc;
+        options.parent = parent;
+        options.payload = batchOptions.c_str();
+        options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
+        addDocsPath(options.extras);
+        options.extras += FPSTR(":batchGet");
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
