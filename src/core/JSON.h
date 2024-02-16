@@ -30,6 +30,7 @@
 #include "./Config.h"
 #include "./core/Memory.h"
 #include "./core/StringHelper.h"
+#include "./AsyncResult/Value.h"
 
 class JsonHelper
 {

@@ -32,6 +32,8 @@ using namespace firebase;
 
 #if defined(ENABLE_FIRESTORE)
 
+#include "./firestore/Query.h"
+
 class Firestore
 {
     friend class FirebaseApp;
@@ -70,82 +72,6 @@ private:
     };
 
 public:
-    enum firebase_firestore_transform_type
-    {
-        firebase_firestore_transform_type_undefined,
-        firebase_firestore_transform_type_set_to_server_value,
-        firebase_firestore_transform_type_increment,
-        firebase_firestore_transform_type_maaximum,
-        firebase_firestore_transform_type_minimum,
-        firebase_firestore_transform_type_append_missing_elements,
-        firebase_firestore_transform_type_remove_all_from_array
-    };
-
-    enum firebase_firestore_document_write_type
-    {
-        firebase_firestore_document_write_type_undefined,
-        firebase_firestore_document_write_type_update,
-        firebase_firestore_document_write_type_delete,
-        firebase_firestore_document_write_type_transform
-    };
-
-    enum firebase_firestore_consistency_mode
-    {
-        firebase_firestore_consistency_mode_undefined,
-        firebase_firestore_consistency_mode_transaction,
-        firebase_firestore_consistency_mode_newTransaction,
-        firebase_firestore_consistency_mode_readTime
-    };
-
-    struct firebase_firestore_document_write_field_transforms_t
-    {
-        String fieldPath; // string The path of the field. See Document.fields for the field path syntax reference.
-        firebase_firestore_transform_type transform_type = firebase_firestore_transform_type_undefined;
-        String transform_content; // string of enum of ServerValue for setToServerValue, string of object of values for increment, maximum and minimum
-        //, string of array object for appendMissingElements or removeAllFromArray.
-    };
-
-    struct firebase_firestore_document_precondition_t
-    {
-        String exists;      // bool
-        String update_time; // string of timestamp. When set, the target document must exist and have been last updated at that time.
-        // A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.Examples : "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
-    };
-
-    struct firebase_firestore_document_write_document_transform_t
-    {
-        String transform_document_path;                                                     // The relative path of document to transform.
-        std::vector<firebase_firestore_document_write_field_transforms_t> field_transforms; // array of firebase_firestore_document_write_field_transforms_t data.
-    };
-
-    struct firebase_firestore_document_write_t
-    {
-        String update_masks; // string The fields to update. Use comma (,) to separate between the field names
-        firebase_firestore_document_write_field_transforms_t update_transforms;
-        firebase_firestore_document_precondition_t current_document; // An optional precondition on the document.
-        firebase_firestore_document_write_type type = firebase_firestore_document_write_type_undefined;
-        String update_document_content;                                            // A document object to write for firebase_firestore_document_write_type_update.
-        String update_document_path;                                               // The relative path of document to update for firebase_firestore_document_write_type_update.
-        String delete_document_path;                                               // The relative path of document to delete for firebase_firestore_document_write_type_delete.
-        firebase_firestore_document_write_document_transform_t document_transform; // for firebase_firestore_document_write_type_transform
-    };
-
-    struct firebase_firestore_transaction_read_only_option_t
-    {
-        String readTime;
-    };
-
-    struct firebase_firestore_transaction_read_write_option_t
-    {
-        String retryTransaction;
-    };
-
-    typedef struct firebase_firestore_transaction_options_t
-    {
-        firebase_firestore_transaction_read_only_option_t readOnly;
-        firebase_firestore_transaction_read_write_option_t readWrite;
-    } TransactionOptions;
-
     ~Firestore(){};
 
     Firestore(const String &url = "")
@@ -782,16 +708,16 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param batchOptions The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
-     * addDocument, mask, transaction, newTransaction and readTime.
+     * addDocument, mask, transaction, newTransaction and readTime functions.
      *
      * addDocument used for adding the document path to read.
      * mask used for setting the mask fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
      * that field will not be returned in the response. Use comma (,) to separate between the field names.
-     * 
+     *
      * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
-     * transaction, newTransaction and readTime.
-     * 
-     * Then the following functions can't be mixed used. 
+     * transaction, newTransaction and readTime functions.
+     *
+     * Then the following functions can't be mixed used.
      * - transaction used for reading the document in a transaction. A base64-encoded string.
      * - newTransaction used for creating the transaction.
      * - readTime used for setting the documents as they were at the given time. This may not be older than 270 seconds.
@@ -800,7 +726,7 @@ public:
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     * This function requires ServiceAuth authentication.
      *
      * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
      *
@@ -819,16 +745,16 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param batchOptions The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
-     * addDocument, mask, transaction, newTransaction and readTime.
+     * addDocument, mask, transaction, newTransaction and readTime functions.
      *
      * addDocument used for adding the document path to read.
      * mask used for setting the mask fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
      * that field will not be returned in the response. Use comma (,) to separate between the field names.
-     * 
+     *
      * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
-     * transaction, newTransaction and readTime.
-     * 
-     * Then the following functions can't be mixed used. 
+     * transaction, newTransaction and readTime functions.
+     *
+     * Then the following functions can't be mixed used.
      * - transaction used for reading the document in a transaction. A base64-encoded string.
      * - newTransaction used for creating the transaction.
      * - readTime used for setting the documents as they were at the given time. This may not be older than 270 seconds.
@@ -837,7 +763,7 @@ public:
      *
      * @param aResult The async result (AsyncResult).
      *
-     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     * This function requires ServiceAuth authentication.
      *
      * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
      *
@@ -854,16 +780,16 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param batchOptions The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
-     * addDocument, mask, transaction, newTransaction and readTime.
+     * addDocument, mask, transaction, newTransaction and readTime functions.
      *
      * addDocument used for adding the document path to read.
      * mask used for setting the mask fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
      * that field will not be returned in the response. Use comma (,) to separate between the field names.
-     * 
+     *
      * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
-     * transaction, newTransaction and readTime.
-     * 
-     * Then the following functions can't be mixed used. 
+     * transaction, newTransaction and readTime functions.
+     *
+     * Then the following functions can't be mixed used.
      * - transaction used for reading the document in a transaction. A base64-encoded string.
      * - newTransaction used for creating the transaction.
      * - readTime used for setting the documents as they were at the given time. This may not be older than 270 seconds.
@@ -873,7 +799,7 @@ public:
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
-     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     * This function requires ServiceAuth authentication.
      *
      * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
      *
@@ -886,79 +812,236 @@ public:
     /** Starts a new transaction.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
-     * @param transactionOptions Optional. The TransactionOptions type data that represents the options for creating a new transaction.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param transOptions Options for creating a new transaction.
+     *
+     * The TransactionOptions object can be initialized with two objects represent two modes
+     * readOnly and readWrite.
+     *
+     * Use readOnly option used when transaction can only be used for read operations.
+     * Use readWrite option used when transaction can be used for both read and write operations.
+     *
+     * The readOnly object (option) accepts the readTime (timestamp) in the constructor for reading the documents at the given time.
+     * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
+     *
+     * The readWrite object (option) accepts the retryTransaction (base64 encoded string) in the constructor represents a transaction that can be used to read and write documents.
+     *
+     * See https://cloud.google.com/firestore/docs/reference/rest/v1/TransactionOptions for transaction options.
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
+     * This function requires ServiceAuth authentication.
+     */
+    bool beginTransaction(AsyncClientClass &aClient, const ParentResource &parent, const TransactionOptions &transOptions)
+    {
+        AsyncResult result;
+        beginTrans(aClient, &result, NULL, "", parent, transOptions, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Starts a new transaction.
      *
-     * This function requires OAuth2.0 authentication.
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param transOptions Options for creating a new transaction.
      *
-     * The TransactionOptions struct contains two properties i.e.
+     * The TransactionOptions object can be initialized with two objects represent two modes
      * readOnly and readWrite.
      *
-     * Use readOnly for options for a transaction that can only be used to read documents.
-     * Use readWrite for options for a transaction that can be used to read and write documents.
+     * Use readOnly option used when transaction can only be used for read operations.
+     * Use readWrite option used when transaction can be used for both read and write operations.
      *
-     * The readOnly property contains one property, readTime.
-     * The readTime is for reading the documents at the given time. This may not be older than 60 seconds.
-     * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
-     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     * The readOnly object (option) accepts the readTime (timestamp) in the constructor for reading the documents at the given time.
+     * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
      *
-     * The readWrite property contains one property, retryTransaction.
-     * The retryTransaction is a base64-encoded string represents a transaction that can be used to read and write documents.
+     * The readWrite object (option) accepts the retryTransaction (base64 encoded string) in the constructor represents a transaction that can be used to read and write documents.
      *
      * See https://cloud.google.com/firestore/docs/reference/rest/v1/TransactionOptions for transaction options.
+     *
+     * @param aResult The async result (AsyncResult).
+     *
+     * This function requires ServiceAuth authentication.
      */
-    bool beginTransaction(AsyncClientClass &aClient, const String &projectId, const String &databaseId, TransactionOptions &transactionOptions)
+    void beginTransaction(AsyncClientClass &aClient, const ParentResource &parent, const TransactionOptions &transOptions, AsyncResult &aResult)
     {
-        return false;
+        beginTrans(aClient, &aResult, NULL, "", parent, transOptions, true);
+    }
+
+    /** Starts a new transaction.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param transOptions Options for creating a new transaction.
+     *
+     * The TransactionOptions object can be initialized with two objects represent two modes
+     * readOnly and readWrite.
+     *
+     * Use readOnly option used when transaction can only be used for read operations.
+     * Use readWrite option used when transaction can be used for both read and write operations.
+     *
+     * The readOnly object (option) accepts the readTime (timestamp) in the constructor for reading the documents at the given time.
+     * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
+     *
+     * The readWrite object (option) accepts the retryTransaction (base64 encoded string) in the constructor represents a transaction that can be used to read and write documents.
+     *
+     * See https://cloud.google.com/firestore/docs/reference/rest/v1/TransactionOptions for transaction options.
+     *
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires ServiceAuth authentication.
+     */
+    void beginTransaction(AsyncClientClass &aClient, const ParentResource &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "")
+    {
+        beginTrans(aClient, nullptr, cb, uid, parent, transOptions, true);
     }
 
     /** Rolls back a transaction.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param transaction Required. A base64-encoded string of the transaction to roll back.
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
-     *
-     * This function requires OAuth2.0 authentication.
+     * This function requires ServiceAuth authentication.
      */
-    bool rollback(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &transaction)
+    bool rollback(AsyncClientClass &aClient, const ParentResource &parent, const String &transaction)
     {
-        return false;
+        AsyncResult result;
+        transRollback(aClient, &result, NULL, "", parent, transaction, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Rolls back a transaction.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param transaction Required. A base64-encoded string of the transaction to roll back.
+     *
+     * @param aResult The async result (AsyncResult).
+     *
+     * This function requires ServiceAuth authentication.
+     */
+    void rollback(AsyncClientClass &aClient, const ParentResource &parent, const String &transaction, AsyncResult &aResult)
+    {
+        transRollback(aClient, &aResult, NULL, "", parent, transaction, true);
+    }
+
+    /** Rolls back a transaction.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param transaction Required. A base64-encoded string of the transaction to roll back.
+     *
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires ServiceAuth authentication.
+     */
+    void rollback(AsyncClientClass &aClient, const ParentResource &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "")
+    {
+        transRollback(aClient, nullptr, cb, uid, parent, transaction, true);
     }
 
     /** Runs a query.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param documentPath The relative path of document to get.
-     * @param structuredQuery The pointer to JSON object that contains the Firestore query. For the description of structuredQuery, see https://cloud.google.com/firestore/docs/reference/rest/v1/StructuredQuery
-     * @param consistencyMode Optional. The consistency mode for this transaction e.g. firebase_firestore_consistency_mode_transaction,firebase_firestore_consistency_mode_newTransaction
-     * and firebase_firestore_consistency_mode_readTime
-     * @param consistency Optional. The value based on consistency mode e.g. transaction string, TransactionOptions (JSON) and date time string.
+     * @param queryOptions The QueryOptions object that provide the function to create the query (StructuredQuery) and consistency mode which included
+     * structuredQuery, transaction, newTransaction and readTime functions.
      *
-     * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/runQuery#body.request_body.FIELDS
+     * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
+     * transaction, newTransaction and readTime  functions.
+     *
+     * Then the following functions can't be mixed used.
+     * - transaction used for running the query within an already active transaction. A base64-encoded string.
+     * - newTransaction used for starting a new transaction and reads the documents. Defaults to a read-only transaction.
+     * The new transaction ID will be returned as the first response in the stream.
+     * - readTime used for reading the documents as they were at the given time.
+     *
+     * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
+     */
+    bool runQuery(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions)
+    {
+        AsyncResult result;
+        runQueryImpl(aClient, &result, NULL, "", parent, documentPath, queryOptions, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Runs a query.
      *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to get.
+     * @param queryOptions The QueryOptions object that provide the function to create the query (StructuredQuery) and consistency mode which included
+     * structuredQuery, transaction, newTransaction and readTime functions.
+     *
+     * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
+     * transaction, newTransaction and readTime  functions.
+     *
+     * Then the following functions can't be mixed used.
+     * - transaction used for running the query within an already active transaction. A base64-encoded string.
+     * - newTransaction used for starting a new transaction and reads the documents. Defaults to a read-only transaction.
+     * The new transaction ID will be returned as the first response in the stream.
+     * - readTime used for reading the documents as they were at the given time.
+     * @param aResult The async result (AsyncResult).
+     *
+     * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
      *
      */
-    bool runQuery(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const object_t &structuredQuery = "",
-                  firebase_firestore_consistency_mode consistencyMode = firebase_firestore_consistency_mode_undefined,
-                  const String &consistency = "")
+    void runQuery(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult)
     {
-        return false;
+        runQueryImpl(aClient, &aResult, NULL, "", parent, documentPath, queryOptions, true);
+    }
+
+    /** Runs a query.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to get.
+     * @param queryOptions The QueryOptions object that provide the function to create the query (StructuredQuery) and consistency mode which included
+     * structuredQuery, transaction, newTransaction and readTime functions.
+     *
+     * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
+     * transaction, newTransaction and readTime  functions.
+     *
+     * Then the following functions can't be mixed used.
+     * - transaction used for running the query within an already active transaction. A base64-encoded string.
+     * - newTransaction used for starting a new transaction and reads the documents. Defaults to a read-only transaction.
+     * The new transaction ID will be returned as the first response in the stream.
+     * - readTime used for reading the documents as they were at the given time.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
+     *
+     */
+    void runQuery(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions, AsyncResultCallback cb, const String &uid = "")
+    {
+        runQueryImpl(aClient, nullptr, cb, uid, parent, documentPath, queryOptions, true);
     }
 
     /** Delete a document at the defined path.
@@ -978,10 +1061,10 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication.
      *
      */
-    bool deleteDocument(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &exists = "", const String &updateTime = "")
-    {
-        return false;
-    }
+    // bool deleteDocument(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &exists = "", const String &updateTime = "")
+    //{
+    //  return false;
+    //}
 
     /** List the documents in the defined documents collection.
      *
@@ -1004,11 +1087,11 @@ public:
      * This function requires Email/password, Custom token or OAuth2.0 authentication (when showMissing is true).
      *
      */
-    bool listDocuments(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &pageSize,
-                       const String &pageToken, const String &orderBy, const String &mask, bool showMissing)
-    {
-        return false;
-    }
+    // bool listDocuments(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &pageSize,
+    //                   const String &pageToken, const String &orderBy, const String &mask, bool showMissing)
+    //{
+    //  return false;
+    //}
 
     /** List the document collection ids in the defined document path.
      *
@@ -1024,10 +1107,10 @@ public:
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      */
-    bool listCollectionIds(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &pageSize, const String &pageToken)
-    {
-        return false;
-    }
+    // bool listCollectionIds(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &pageSize, const String &pageToken)
+    //{
+    // return false;
+    //}
 
     /** Creates a composite index.
      *
@@ -1054,11 +1137,11 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/create
      *
      */
-    bool createIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId,
-                     const String &apiScope, const String &queryScope, const object_t &fields)
-    {
-        return false;
-    }
+    // bool createIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId,
+    //                const String &apiScope, const String &queryScope, const object_t &fields)
+    //{
+    // return false;
+    //}
 
     /** Deletes an index.
      *
@@ -1077,10 +1160,10 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
      *
      */
-    bool deleteIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &indexId)
-    {
-        return false;
-    }
+    // bool deleteIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &indexId)
+    //{
+    //  return false;
+    //}
 
     /** Lists the indexes that match the specified filters.
      *
@@ -1102,10 +1185,10 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/vec
      *
      */
-    bool listIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
-    {
-        return false;
-    }
+    // bool listIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
+    // {
+    // return false;
+    //}
 
     /** Get an index.
      *
@@ -1124,10 +1207,10 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/get
      *
      */
-    bool getIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &indexId)
-    {
-        return false;
-    }
+    // bool getIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &indexId)
+    //{
+    // return false;
+    //}
 
     /**
      * Perform the async task repeatedly.
@@ -1191,38 +1274,19 @@ public:
     {
         URLHelper uh;
 
-        if (request.options->requestType == firebase_firestore_request_type_begin_transaction)
-        {
-            extras += FPSTR("/documents");
-            extras += FPSTR(":beginTransaction");
-        }
-        else if (request.options->requestType == firebase_firestore_request_type_rollback)
-        {
-            extras += FPSTR("/documents");
-            extras += FPSTR(":rollback");
-        }
-
-        else if (request.options->requestType == firebase_firestore_request_type_batch_write_doc)
-        {
-            extras += FPSTR("/documents");
-            extras += FPSTR(":batchWrite");
-        }
-        else if (
+        if (
             request.options->requestType == firebase_firestore_request_type_run_query ||
             request.options->requestType == firebase_firestore_request_type_list_collection ||
             request.options->requestType == firebase_firestore_request_type_list_doc ||
             request.options->requestType == firebase_firestore_request_type_delete_doc)
         {
             extras += FPSTR("/documents");
-            if (request.options->requestType == firebase_firestore_request_type_run_query ||
-                request.options->requestType == firebase_firestore_request_type_list_collection ||
+            if (request.options->requestType == firebase_firestore_request_type_list_collection ||
                 request.options->requestType == firebase_firestore_request_type_delete_doc)
             {
                 uh.addPath(extras, request.options->parent.documentPath);
                 extras += (request.options->requestType == firebase_firestore_request_type_list_collection)
                               ? ":listCollectionIds"
-                          : request.options->requestType == firebase_firestore_request_type_run_query
-                              ? ":runQuery"
                               : "";
             }
 
@@ -1328,6 +1392,8 @@ public:
         options.parent = parent;
         options.payload = writes.c_str();
         options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
+        addDocsPath(options.extras);
+        options.extras += FPSTR(":batchWrite");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
@@ -1354,6 +1420,47 @@ public:
         options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
         addDocsPath(options.extras);
         options.extras += FPSTR(":batchGet");
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void beginTrans(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, TransactionOptions transOptions, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_begin_transaction;
+        options.parent = parent;
+        JsonHelper jh;
+        jh.addObject(options.payload, "options", transOptions.c_str(), true);
+        addDocsPath(options.extras);
+        options.extras += FPSTR(":beginTransaction");
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void transRollback(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &transaction, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_rollback;
+        options.parent = parent;
+        JsonHelper jh;
+        jh.addObject(options.payload, "transaction", jh.toString(transaction), true);
+        addDocsPath(options.extras);
+        options.extras += FPSTR(":rollback");
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void runQueryImpl(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_run_query;
+        options.parent = parent;
+        options.parent.documentPath = documentPath;
+        options.payload = queryOptions.c_str();
+        addDocsPath(options.extras);
+        options.extras += '/';
+        options.extras += documentPath;
+        options.extras += FPSTR(":runQuery");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }

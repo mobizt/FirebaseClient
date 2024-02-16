@@ -28,9 +28,14 @@
 #include <Arduino.h>
 #include "./Config.h"
 
+#include "./core/JSON.h"
+
 #if defined(ENABLE_FIRESTORE)
 
-#define FIRESTORE_RESOURCE_PATH_BASE FPSTR("<resource_path>")
+#include "./firestore/FSUT.h"
+#include "./firestore/Query.h"
+
+using namespace FirestoreQuery;
 
 enum firebase_firestore_request_type
 {
@@ -56,99 +61,6 @@ enum firebase_firestore_request_type
 
     firebase_firestore_request_type_delete_doc = 500,
     firebase_firestore_request_type_delete_index
-};
-
-enum firestore_const_key_type
-{
-    firestore_const_key_nullValue,
-    firestore_const_key_booleanValue,
-    firestore_const_key_integerValue,
-    firestore_const_key_doubleValue,
-    firestore_const_key_timestampValue,
-    firestore_const_key_stringValue,
-    firestore_const_key_bytesValue,
-    firestore_const_key_referenceValue,
-    firestore_const_key_geoPointValue,
-    firestore_const_key_arrayValue,
-    firestore_const_key_mapValue,
-    firestore_const_key_maxType
-};
-
-struct firebase_firestore_const_key_t
-{
-    char text[15];
-};
-
-const struct firebase_firestore_const_key_t firestore_const_key[firestore_const_key_maxType] PROGMEM = {
-    "nullValue",
-    "booleanValue",
-    "integerValue",
-    "doubleValue",
-    "timestampValue",
-    "stringValue",
-    "bytesValue",
-    "referenceValue",
-    "geoPointValue",
-    "arrayValue",
-    "mapValue"};
-
-class FSUT
-{
-private:
-    JsonHelper jh;
-
-public:
-    void addMember(String &buf, const String &v, bool isObjValue, const String &token = "}}")
-    {
-        int p = buf.lastIndexOf(token);
-        String str = buf.substring(0, p);
-        str += ',';
-        if (isObjValue)
-        {
-            String tmp = v;
-            str += tmp.substring(1, tmp.length() - 1);
-        }
-        else
-            str += v;
-        str += token;
-        buf = str;
-    }
-    const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
-    {
-        buf.remove(0, buf.length());
-        jh.addObject(buf, key, isArrayValue ? getArrayStr(value) : value, true);
-        return buf.c_str();
-    }
-    void setBool(String &buf, bool value) { buf = getBoolStr(value); }
-
-    String getBoolStr(bool value) { return value ? FPSTR("true") : FPSTR("false"); }
-
-    String getArrayStr(const String &value)
-    {
-        String str = FPSTR("[");
-        str += value;
-        str += ']';
-        return str;
-    }
-
-    void setString(String &buf, const String &value)
-    {
-        buf = FPSTR("\"");
-        buf += value;
-        buf += '"';
-    }
-
-    String getDocPath(const String &document)
-    {
-        String doc_path = FIRESTORE_RESOURCE_PATH_BASE;
-        if (document.length())
-        {
-            if (document.length() && document[0] != '/')
-                doc_path += '/';
-            doc_path += document;
-        }
-        return doc_path;
-    }
 };
 
 class ParentResource
@@ -236,309 +148,6 @@ public:
     }
     const char *c_str() { return str.c_str(); }
     size_t printTo(Print &p) const { return p.print(str.c_str()); }
-};
-
-/**
- * A message that can hold any of the supported value types.
- */
-namespace Values
-{
-
-    class NullValue : public Printable
-    {
-    private:
-        String buf, str;
-        FSUT fsut;
-
-    public:
-        /**
-         * A null value.
-         */
-        NullValue() { buf = FPSTR("null"); }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_nullValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    class StringValue : public Printable
-    {
-
-    private:
-        String buf, str;
-        FSUT fsut;
-
-    public:
-        /**
-         * A string value.
-         *  @param value The string vakue
-         */
-        StringValue(const String &value) { fsut.setString(buf, value); }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_stringValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    class BooleanValue : public Printable
-    {
-    private:
-        String buf, str;
-        FSUT fsut;
-
-    public:
-        /**
-         * A boolean value.
-         *  @param value The boolean value
-         */
-        BooleanValue(bool value) { fsut.setBool(buf, value); }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_booleanValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    class IntegerValue : public Printable
-    {
-
-    private:
-        String buf, str;
-        FSUT fsut;
-
-    public:
-        /**
-         * A integer value.
-         *  @param value The integer value
-         */
-        IntegerValue(int value) { buf = StringValue(String(value)).c_str(); }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_integerValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    class DoubleValue : public Printable
-    {
-
-    private:
-        String buf, str;
-        FSUT fsut;
-
-    public:
-        /**
-         * A double value.
-         *  @param value The double value
-         */
-        DoubleValue(double value) { buf = String(value); }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_doubleValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    class TimestampValue : public Printable
-    {
-
-    private:
-        String buf, str;
-        FSUT fsut;
-
-    public:
-        /**
-         * A timestamp value.
-         * Precise only to microseconds. When stored, any additional precision is rounded down.
-         * @param value The timestamp value string
-         */
-        TimestampValue(const String &value) { buf = StringValue(value).c_str(); }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_timestampValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    class BytesValue : public Printable
-    {
-    private:
-        String buf, str;
-        FSUT fsut;
-
-    public:
-        /**
-         * A bytes value.
-         * Must not exceed 1 MiB - 89 bytes. Only the first 1,500 bytes are considered by queries.
-         * A base64-encoded string.
-         * @param value The bytes value string
-         */
-        BytesValue(const String &value) { buf = StringValue(value).c_str(); }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_bytesValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    class ReferenceValue : public Printable
-    {
-
-    private:
-        String buf, str;
-        FSUT fsut;
-
-    public:
-        /**
-         * A reference to a document.
-         * @param value The resource name of document
-         */
-        ReferenceValue(const String &value) { buf = StringValue(value).c_str(); }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_referenceValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    class GeoPointValue : public Printable
-    {
-    private:
-        String buf, str;
-        FSUT fsut;
-        JsonHelper jh;
-
-    public:
-        /**
-         * A geo point value representing a point on the surface of Earth.
-         * @param lat The latitude
-         * @param lng The longitude
-         */
-        GeoPointValue(double lat, double lng)
-        {
-            jh.addObject(buf, FPSTR("latitude"), String(lat));
-            jh.addObject(buf, FPSTR("longitude"), String(lng), true);
-        }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_geoPointValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    class ArrayValue : public Printable
-    {
-
-    private:
-        String buf, str;
-        FSUT fsut;
-        bool flags[11];
-
-        template <typename T>
-        bool isExisted(T value)
-        {
-            String tmp = value.val();
-            for (size_t i = 0; i <= firestore_const_key_mapValue; i++)
-            {
-                if (tmp.indexOf(firestore_const_key[i].text) > -1)
-                {
-                    if (flags[i])
-                        return true;
-                    flags[i] = 1;
-                }
-            }
-
-            return false;
-        }
-        template <typename T>
-        void set(T value)
-        {
-            if (isExisted(value))
-                return;
-            fsut.setPair(buf, FPSTR("values"), value.val(), true);
-        }
-
-    public:
-        /**
-         * An array value.
-         * Cannot directly contain another array value, though can contain an map which contains another array.
-         * @param value The object except for array value
-         */
-        template <typename T>
-        ArrayValue(T value)
-        {
-            memset(flags, 0, 11);
-            set(value);
-        }
-        /**
-         * Add object to array value
-         * @param value The resource name of document
-         */
-        template <typename T>
-        ArrayValue &add(T value)
-        {
-            if (!isExisted(value))
-            {
-                if (buf.length() == 0)
-                    set(value);
-                else
-                    fsut.addMember(buf, value.val(), true, "]}");
-            }
-            return *this;
-        }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_arrayValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-
-    struct MAP
-    {
-    private:
-        String buf;
-        FSUT fsut;
-
-    public:
-        template <typename T>
-        MAP(const String &key, T value, bool val) { fsut.setPair(buf, key, val ? value.val() : value.c_str()); }
-        const char *c_str() { return buf.c_str(); }
-    };
-
-    /**
-     * A map value.
-     */
-    class MapValue : public Printable
-    {
-
-    private:
-        String buf, str;
-        FSUT fsut;
-        template <typename T>
-        void set(const String &key, T value) { fsut.setPair(buf, FPSTR("fields"), MAP(key, value, true).c_str()); }
-
-    public:
-        MapValue() {}
-        /**
-         * A map value.
-         * @param value The map value
-         */
-        template <typename T>
-        MapValue(const String &key, T value) { set(key, value); }
-        template <typename T>
-        MapValue &add(const String &key, T value)
-        {
-            if (buf.length() == 0)
-                set(key, value);
-            else
-                fsut.addMember(buf, MAP(key, value, true).c_str(), true);
-            return *this;
-        }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return fsut.setPair(str, firestore_const_key[firestore_const_key_mapValue].text, buf); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    };
-    /**
-     * A message that can hold any of the supported value types.
-     */
-    class Value : public Printable
-    {
-    private:
-        String buf;
-
-    public:
-        Value() {}
-        /**
-         * @param value The object value
-         */
-        template <typename T>
-        Value(T value) { buf = value.val(); }
-        const char *c_str() { return buf.c_str(); }
-        const char *val() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    };
 };
 
 namespace FieldTransform
@@ -1277,6 +886,102 @@ public:
             buf += mask.getQuery("mask", hasParam);
         if (strlen(currentDocument.c_str()))
             uh.addParam(buf, FPSTR("currentDocument"), currentDocument.c_str(), hasParam);
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+class QueryOptions : public Printable
+{
+private:
+    String buf, query, trans, newtrans, rt;
+    JsonHelper jh;
+    FSUT fsut;
+
+    void setbuf()
+    {
+        buf.remove(0, buf.length());
+
+        if (query.length())
+        {
+            if (buf.length() == 0)
+                buf = query.c_str();
+            else
+                fsut.addMember(buf, query, true, "}");
+        }
+
+        if (trans.length())
+        {
+            if (buf.length() == 0)
+                buf = trans.c_str();
+            else
+                fsut.addMember(buf, trans, true, "}");
+        }
+
+        if (newtrans.length())
+        {
+            if (buf.length() == 0)
+                buf = newtrans.c_str();
+            else
+                fsut.addMember(buf, newtrans, true, "}");
+        }
+
+        if (rt.length())
+        {
+            if (buf.length() == 0)
+                buf = rt.c_str();
+            else
+                fsut.addMember(buf, rt, true, "}");
+        }
+    }
+
+public:
+    QueryOptions() {}
+
+    /**
+     * A structured query.
+     * @param structuredQuery A structured query.
+     */
+    void structuredQuery(StructuredQuery structuredQuery)
+    {
+        jh.addObject(query, "structuredQuery", structuredQuery.c_str(), true);
+        setbuf();
+    }
+    /**
+     * @param transaction Run the query within an already active transaction.
+     */
+    void transaction(const String &transaction)
+    {
+        if (transaction.length() && newtrans.length() == 0 && rt.length() == 0)
+        {
+            jh.addObject(trans, "transaction", jh.toString(transaction), true);
+            setbuf();
+        }
+    }
+    /**
+     * @param transOptions Starts a new transaction and reads the documents. Defaults to a read-only transaction. 
+     * The new transaction ID will be returned as the first response in the stream.
+     */
+    void newTransaction(TransactionOptions transOptions)
+    {
+        if (strlen(transOptions.c_str()) && trans.length() == 0 && rt.length() == 0)
+        {
+            jh.addObject(newtrans, "newTransaction", transOptions.c_str(), true);
+            setbuf();
+        }
+    }
+    /**
+     * @param readTime Timestamp. Reads documents as they were at the given time.
+     * This must be a microsecond precision timestamp within the past one hour, 
+     * or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
+     */
+    void readTime(const String &readTime)
+    {
+        if (readTime.length() && trans.length() == 0 && newtrans.length() == 0)
+        {
+            jh.addObject(rt, "readTime", jh.toString(readTime), true);
+            setbuf();
+        }
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
