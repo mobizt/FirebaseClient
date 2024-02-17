@@ -29,7 +29,7 @@
 #include <Arduino.h>
 #include "./Config.h"
 
-#if defined(ENABLE_FIRESTORE)
+#if defined(ENABLE_FIRESTORE) && defined(ENABLE_FIRESTORE_QUERY)
 
 #include "./firestore/Query.h"
 
@@ -51,7 +51,7 @@ namespace FirestoreQuery
         if (frm_ar.length() == 0)
             jh.addArray(frm_ar, collSelector.c_str(), true);
         else
-            fsut.addMember(frm_ar, collSelector.c_str(), true, "]");
+            owriter.addMember(frm_ar, collSelector.c_str(), true, "]");
         frm.remove(0, frm.length());
         jh.addObject(frm, "from", frm_ar, true);
         set();
@@ -71,7 +71,7 @@ namespace FirestoreQuery
         if (ordby_ar.length() == 0)
             jh.addArray(ordby_ar, orderBy.c_str(), true);
         else
-            fsut.addMember(ordby_ar, orderBy.c_str(), true, "]");
+            owriter.addMember(ordby_ar, orderBy.c_str(), true, "]");
 
         ordby.remove(0, ordby.length());
         jh.addObject(ordby, "orderBy", ordby_ar, true);
@@ -125,7 +125,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = frm;
             else
-                fsut.addMember(buf, frm, true, "}");
+                owriter.addMember(buf, frm, true, "}");
         }
 
         if (where_str.length())
@@ -133,7 +133,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = where_str;
             else
-                fsut.addMember(buf, where_str, true, "}");
+                owriter.addMember(buf, where_str, true, "}");
         }
 
         if (ordby.length())
@@ -141,7 +141,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = ordby;
             else
-                fsut.addMember(buf, ordby, true, "}");
+                owriter.addMember(buf, ordby, true, "}");
         }
 
         if (sta.length())
@@ -149,7 +149,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = sta;
             else
-                fsut.addMember(buf, sta, true, "}");
+                owriter.addMember(buf, sta, true, "}");
         }
 
         if (ea.length())
@@ -157,7 +157,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = ea;
             else
-                fsut.addMember(buf, ea, true, "}");
+                owriter.addMember(buf, ea, true, "}");
         }
 
         if (ofs.length())
@@ -165,7 +165,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = ofs;
             else
-                fsut.addMember(buf, ofs, true, "}");
+                owriter.addMember(buf, ofs, true, "}");
         }
 
         if (lim.length())
@@ -173,7 +173,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = lim;
             else
-                fsut.addMember(buf, lim, true, "}");
+                owriter.addMember(buf, lim, true, "}");
         }
     }
 
@@ -197,7 +197,7 @@ namespace FirestoreQuery
         if (filter_arr.length() == 0)
             jh.addArray(filter_arr, filter.c_str(), true);
         else
-            fsut.addMember(filter_arr, filter.c_str(), false, "]");
+            owriter.addMember(filter_arr, filter.c_str(), false, "]");
 
         return *this;
     }
@@ -285,7 +285,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = op_str;
             else
-                fsut.addMember(buf, op_str, true, "}");
+                owriter.addMember(buf, op_str, true, "}");
         }
 
         if (field_str.length())
@@ -293,7 +293,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = field_str;
             else
-                fsut.addMember(buf, field_str, true, "}");
+                owriter.addMember(buf, field_str, true, "}");
         }
     }
 
@@ -331,7 +331,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = field_str;
             else
-                fsut.addMember(buf, field_str, true, "}");
+                owriter.addMember(buf, field_str, true, "}");
         }
 
         if (direction_str.length())
@@ -339,7 +339,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = direction_str;
             else
-                fsut.addMember(buf, direction_str, true, "}");
+                owriter.addMember(buf, direction_str, true, "}");
         }
     }
 

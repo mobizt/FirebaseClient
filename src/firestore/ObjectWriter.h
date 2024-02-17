@@ -1,5 +1,5 @@
 /**
- * Created February 16, 2024
+ * Created February 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -22,8 +22,8 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef FIRESTORE_UTILS_H
-#define FIRESTORE_UTILS_H
+#ifndef FIRESTORE_OBJECT_WRITER_H
+#define FIRESTORE_OBJECT_WRITER_H
 
 #include <Arduino.h>
 #include "./Config.h"
@@ -34,7 +34,7 @@
 
 #define FIRESTORE_RESOURCE_PATH_BASE FPSTR("<resource_path>")
 
-class FSUT
+class ObjectWriter
 {
 private:
     JsonHelper jh;

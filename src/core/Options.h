@@ -1,5 +1,5 @@
 /**
- * Created February 7, 2024
+ * Created February 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -43,6 +43,7 @@
 
 #undef ENABLE_DATABASE
 #undef ENABLE_FIRESTORE
+#undef ENABLE_FIRESTORE_QUERY
 #undef ENABLE_MESSAGING
 #undef ENABLE_STORAGE
 #undef ENABLE_CLOUD_STORAGE
@@ -67,6 +68,11 @@
 
 #if defined(DISABLE_FIRESTORE)
 #undef ENABLE_FIRESTORE
+#undef ENABLE_FIRESTORE_QUERY
+#endif
+
+#if defined(DISABLE_FIRESTORE_QUERY)
+#undef ENABLE_FIRESTORE_QUERY
 #endif
 
 #if defined(DISABLE_MESSAGING)

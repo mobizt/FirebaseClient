@@ -1,5 +1,5 @@
 /**
- * Created February 16, 2024
+ * Created February 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -32,10 +32,12 @@
 
 #if defined(ENABLE_FIRESTORE)
 
-#include "./firestore/FSUT.h"
+#include "./firestore/ObjectWriter.h"
+#include "./firestore/Values.h"
+#if defined(ENABLE_FIRESTORE_QUERY)
 #include "./firestore/Query.h"
-
 using namespace FirestoreQuery;
+#endif
 
 enum firebase_firestore_request_type
 {
@@ -166,7 +168,7 @@ namespace FieldTransform
     {
     private:
         String buf;
-        FSUT fsut;
+        ObjectWriter owriter;
 
     public:
         /**
@@ -174,7 +176,7 @@ namespace FieldTransform
          * @param value Adds the given value to the field's current value.
          */
         template <typename T>
-        Increment(T value) { fsut.setPair(buf, FPSTR("increment"), value.val()); }
+        Increment(T value) { owriter.setPair(buf, FPSTR("increment"), value.val()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -182,7 +184,7 @@ namespace FieldTransform
     {
     private:
         String buf;
-        FSUT fsut;
+        ObjectWriter owriter;
 
     public:
         /**
@@ -190,7 +192,7 @@ namespace FieldTransform
          * @param value Sets the field to the maximum of its current value and the given value.
          */
         template <typename T>
-        Maximum(T value) { fsut.setPair(buf, FPSTR("maximum"), value.c_str()); }
+        Maximum(T value) { owriter.setPair(buf, FPSTR("maximum"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -198,7 +200,7 @@ namespace FieldTransform
     {
     private:
         String buf;
-        FSUT fsut;
+        ObjectWriter owriter;
 
     public:
         /**
@@ -206,7 +208,7 @@ namespace FieldTransform
          * @param value Sets the field to the minimum of its current value and the given value.
          */
         template <typename T>
-        Minimum(T value) { fsut.setPair(buf, FPSTR("minimum"), value.c_str()); }
+        Minimum(T value) { owriter.setPair(buf, FPSTR("minimum"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -215,7 +217,7 @@ namespace FieldTransform
     {
     private:
         String buf;
-        FSUT fsut;
+        ObjectWriter owriter;
 
     public:
         /**
@@ -223,7 +225,7 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
          * @param arrayValue The array value object to append.
          */
-        AppendMissingElements(T arrayValue) { fsut.setPair(buf, FPSTR("appendMissingElements"), arrayValue.c_str()); }
+        AppendMissingElements(T arrayValue) { owriter.setPair(buf, FPSTR("appendMissingElements"), arrayValue.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
 
@@ -232,7 +234,7 @@ namespace FieldTransform
     {
     private:
         String buf;
-        FSUT fsut;
+        ObjectWriter owriter;
 
     public:
         /**
@@ -240,7 +242,7 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
          * @param arrayValue The array value object to remove.
          */
-        RemoveAllFromArray(T arrayValue) { fsut.setPair(buf, FPSTR("removeAllFromArray"), arrayValue.c_str()); }
+        RemoveAllFromArray(T arrayValue) { owriter.setPair(buf, FPSTR("removeAllFromArray"), arrayValue.c_str()); }
         const char *c_str() { return buf.c_str(); }
     };
     /**
@@ -250,7 +252,7 @@ namespace FieldTransform
     {
     private:
         String buf;
-        FSUT fsut;
+        ObjectWriter owriter;
         JsonHelper jh;
 
     public:
@@ -259,7 +261,7 @@ namespace FieldTransform
          * @param enumValue The ServerValue enum
          *
          */
-        SetToServerValue(ServerValue enumValue) { fsut.setPair(buf, FPSTR("setToServerValue"), jh.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
+        SetToServerValue(ServerValue enumValue) { owriter.setPair(buf, FPSTR("setToServerValue"), jh.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
         const char *c_str() { return buf.c_str(); }
     };
     /**
@@ -270,7 +272,7 @@ namespace FieldTransform
     private:
         String buf;
         JsonHelper jh;
-        FSUT fsut;
+        ObjectWriter owriter;
         template <typename T>
         void set(const String &fieldPath, T v)
         {
@@ -313,7 +315,7 @@ class Precondition : public Printable
 
 private:
     String buf, str;
-    FSUT fsut;
+    ObjectWriter owriter;
     JsonHelper jh;
     String estr;
     String eut;
@@ -347,7 +349,7 @@ private:
         if (estr.length())
         {
             if (str.length() == 0)
-                fsut.setPair(str, FPSTR("exists"), estr);
+                owriter.setPair(str, FPSTR("exists"), estr);
             else
             {
                 str[str.length() - 1] = '\0';
@@ -358,7 +360,7 @@ private:
         if (eut.length())
         {
             if (str.length() == 0)
-                fsut.setPair(str, FPSTR("updateTime"), eut);
+                owriter.setPair(str, FPSTR("updateTime"), eut);
             else
             {
                 str[str.length() - 1] = '\0';
@@ -376,7 +378,7 @@ public:
      */
     Precondition &exists(bool value)
     {
-        this->estr = fsut.getBoolStr(value);
+        this->estr = owriter.getBoolStr(value);
         setObject();
         return *this;
     }
@@ -404,7 +406,7 @@ class Document : public Printable
 private:
     Values::MapValue mv;
     String buf, map_obj, name_obj, name;
-    FSUT fsut;
+    ObjectWriter owriter;
     JsonHelper jh;
 
     void getBuf()
@@ -412,7 +414,7 @@ private:
         map_obj = mv.c_str();
         name_obj.remove(0, name_obj.length());
         if (name.length())
-            jh.addObject(name_obj, FPSTR("name"), jh.toString(fsut.getDocPath(name)), true);
+            jh.addObject(name_obj, FPSTR("name"), jh.toString(owriter.getDocPath(name)), true);
         else
         {
             buf = map_obj;
@@ -421,7 +423,7 @@ private:
 
         buf = name_obj;
         if (map_obj.length())
-            fsut.addMember(buf, map_obj, true, "}");
+            owriter.addMember(buf, map_obj, true, "}");
     }
 
 public:
@@ -479,7 +481,7 @@ class DocumentTransform : public Printable
 
 private:
     String buf;
-    FSUT fsut;
+    ObjectWriter owriter;
     JsonHelper jh;
 
 public:
@@ -490,7 +492,7 @@ public:
      */
     DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
     {
-        jh.addObject(buf, FPSTR("document"), jh.toString(fsut.getDocPath(document)));
+        jh.addObject(buf, FPSTR("document"), jh.toString(owriter.getDocPath(document)));
         jh.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), true);
     }
     const char *c_str() { return buf.c_str(); }
@@ -512,7 +514,7 @@ private:
     };
     String buf;
     JsonHelper jh;
-    FSUT fsut;
+    ObjectWriter owriter;
     firestore_write_type write_type = firestore_write_type_undefined;
     bool updateTrans = false;
 
@@ -546,7 +548,7 @@ public:
         write_type = firestore_write_type_delete;
         if (strlen(currentDocument.c_str()))
             jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str());
-        jh.addObject(buf, FPSTR("delete"), jh.toString(fsut.getDocPath(deletePath)), true);
+        jh.addObject(buf, FPSTR("delete"), jh.toString(owriter.getDocPath(deletePath)), true);
     }
 
     /**
@@ -575,10 +577,10 @@ public:
             if (!updateTrans)
             {
                 buf[buf.length() - 1] = '\0';
-                jh.addObject(buf, FPSTR("updateTransforms"), fsut.getArrayStr(updateTransforms.c_str()), true);
+                jh.addObject(buf, FPSTR("updateTransforms"), owriter.getArrayStr(updateTransforms.c_str()), true);
             }
             else
-                fsut.addMember(buf, updateTransforms.c_str(), true, "]}");
+                owriter.addMember(buf, updateTransforms.c_str(), true, "]}");
             updateTrans = true;
         }
 
@@ -594,7 +596,7 @@ class Writes : public Printable
 private:
     String buf;
     JsonHelper jh;
-    FSUT fsut;
+    ObjectWriter owriter;
 
 public:
     /**
@@ -607,7 +609,7 @@ public:
     {
         if (transaction.length())
             jh.addObject(buf, FPSTR("transaction"), jh.toString(transaction));
-        jh.addObject(buf, FPSTR("writes"), fsut.getArrayStr(write.c_str()), true);
+        jh.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), true);
     }
 
     /**
@@ -620,7 +622,7 @@ public:
     {
         if (strlen(labels.c_str()))
             jh.addObject(buf, FPSTR("labels"), labels.c_str());
-        jh.addObject(buf, FPSTR("writes"), fsut.getArrayStr(write.c_str()), true);
+        jh.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), true);
     }
 
     /**
@@ -629,8 +631,8 @@ public:
      */
     Writes &add(Write write)
     {
-        FSUT fsut;
-        fsut.addMember(buf, write.c_str(), true, "]}");
+        ObjectWriter owriter;
+        owriter.addMember(buf, write.c_str(), true, "]}");
         return *this;
     }
 
@@ -761,7 +763,7 @@ class BatchGetDocumentOptions : public Printable
 private:
     String buf, doc, msk, trans, newtrans, rt;
     JsonHelper jh;
-    FSUT fsut;
+    ObjectWriter owriter;
 
     void setbuf()
     {
@@ -771,7 +773,7 @@ private:
             if (buf.length() == 0)
                 buf = doc.c_str();
             else
-                fsut.addMember(buf, doc, true, "}");
+                owriter.addMember(buf, doc, true, "}");
         }
 
         if (msk.length())
@@ -779,7 +781,7 @@ private:
             if (buf.length() == 0)
                 buf = msk.c_str();
             else
-                fsut.addMember(buf, msk, true, "}");
+                owriter.addMember(buf, msk, true, "}");
         }
 
         if (trans.length())
@@ -787,7 +789,7 @@ private:
             if (buf.length() == 0)
                 buf = trans.c_str();
             else
-                fsut.addMember(buf, trans, true, "}");
+                owriter.addMember(buf, trans, true, "}");
         }
 
         if (newtrans.length())
@@ -795,7 +797,7 @@ private:
             if (buf.length() == 0)
                 buf = newtrans.c_str();
             else
-                fsut.addMember(buf, newtrans, true, "}");
+                owriter.addMember(buf, newtrans, true, "}");
         }
 
         if (rt.length())
@@ -803,7 +805,7 @@ private:
             if (buf.length() == 0)
                 buf = rt.c_str();
             else
-                fsut.addMember(buf, rt, true, "}");
+                owriter.addMember(buf, rt, true, "}");
         }
     }
 
@@ -817,11 +819,11 @@ public:
         if (doc.length() == 0)
         {
             String str;
-            jh.addArray(str, jh.toString(fsut.getDocPath(document)), true);
+            jh.addArray(str, jh.toString(owriter.getDocPath(document)), true);
             jh.addObject(doc, "documents", str, true);
         }
         else
-            fsut.addMember(doc, jh.toString(fsut.getDocPath(document)), false, "]}");
+            owriter.addMember(doc, jh.toString(owriter.getDocPath(document)), false, "]}");
         setbuf();
     }
     /**
@@ -891,12 +893,14 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
+#if defined(ENABLE_FIRESTORE_QUERY)
+
 class QueryOptions : public Printable
 {
 private:
     String buf, query, trans, newtrans, rt;
     JsonHelper jh;
-    FSUT fsut;
+    ObjectWriter owriter;
 
     void setbuf()
     {
@@ -907,7 +911,7 @@ private:
             if (buf.length() == 0)
                 buf = query.c_str();
             else
-                fsut.addMember(buf, query, true, "}");
+                owriter.addMember(buf, query, true, "}");
         }
 
         if (trans.length())
@@ -915,7 +919,7 @@ private:
             if (buf.length() == 0)
                 buf = trans.c_str();
             else
-                fsut.addMember(buf, trans, true, "}");
+                owriter.addMember(buf, trans, true, "}");
         }
 
         if (newtrans.length())
@@ -923,7 +927,7 @@ private:
             if (buf.length() == 0)
                 buf = newtrans.c_str();
             else
-                fsut.addMember(buf, newtrans, true, "}");
+                owriter.addMember(buf, newtrans, true, "}");
         }
 
         if (rt.length())
@@ -931,7 +935,7 @@ private:
             if (buf.length() == 0)
                 buf = rt.c_str();
             else
-                fsut.addMember(buf, rt, true, "}");
+                owriter.addMember(buf, rt, true, "}");
         }
     }
 
@@ -959,7 +963,7 @@ public:
         }
     }
     /**
-     * @param transOptions Starts a new transaction and reads the documents. Defaults to a read-only transaction. 
+     * @param transOptions Starts a new transaction and reads the documents. Defaults to a read-only transaction.
      * The new transaction ID will be returned as the first response in the stream.
      */
     void newTransaction(TransactionOptions transOptions)
@@ -972,7 +976,7 @@ public:
     }
     /**
      * @param readTime Timestamp. Reads documents as they were at the given time.
-     * This must be a microsecond precision timestamp within the past one hour, 
+     * This must be a microsecond precision timestamp within the past one hour,
      * or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
      */
     void readTime(const String &readTime)
@@ -987,6 +991,8 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
+#endif
+
 class ListDocumentsOptions : public Printable
 {
 private:
@@ -996,7 +1002,7 @@ private:
     String ordby;
     DocumentMask msk;
     String sms;
-    FSUT fsut;
+    ObjectWriter owriter;
 
 public:
     ListDocumentsOptions() {}
@@ -1022,7 +1028,7 @@ public:
     }
     ListDocumentsOptions &showMissing(bool value)
     {
-        sms = fsut.getBoolStr(value);
+        sms = owriter.getBoolStr(value);
         return *this;
     }
     const char *c_str() { return buf.c_str(); }

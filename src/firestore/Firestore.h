@@ -956,6 +956,8 @@ public:
         transRollback(aClient, nullptr, cb, uid, parent, transaction, true);
     }
 
+#if defined(ENABLE_FIRESTORE_QUERY)
+
     /** Runs a query.
      *
      * @param aClient The async client.
@@ -976,9 +978,9 @@ public:
      * - readTime used for reading the documents as they were at the given time.
      *
      * @return Boolean value, indicates the success of the operation.
-     * 
+     *
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
-     * 
+     *
      * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
      *
      */
@@ -1010,7 +1012,7 @@ public:
      * @param aResult The async result (AsyncResult).
      *
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
-     * 
+     *
      * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
      *
      */
@@ -1041,7 +1043,7 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
-     * 
+     *
      * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
      *
      */
@@ -1049,6 +1051,8 @@ public:
     {
         runQueryImpl(aClient, nullptr, cb, uid, parent, documentPath, queryOptions, true);
     }
+
+#endif
 
     /** Delete a document at the defined path.
      *
@@ -1454,7 +1458,8 @@ public:
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
-
+    
+#if defined(ENABLE_FIRESTORE_QUERY)
     void runQueryImpl(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions, bool async)
     {
         FirestoreOptions options;
@@ -1470,6 +1475,7 @@ public:
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
+#endif
 
     void listDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, GetDocumentOptions getOptions, bool async)
     {

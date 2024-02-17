@@ -18,6 +18,12 @@
  */
 #define ENABLE_FIRESTORE
 
+/**📍 For Firestore Query feature compilation
+ * ⛔ Use following build flag to disable.
+ * -D DISABLE_FIRESTORE_QUERY
+ */
+#define ENABLE_FIRESTORE_QUERY
+
 /**📍 For Firebase Cloud Messaging compilation
  * ⛔ Use following build flag to disable.
  * -D DISABLE_MESSAGING
