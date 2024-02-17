@@ -1,5 +1,5 @@
 /**
- * Created February 16, 2024
+ * Created February 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -963,7 +963,7 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param documentPath The relative path of document to get.
-     * @param queryOptions The QueryOptions object that provide the function to create the query (StructuredQuery) and consistency mode which included
+     * @param queryOptions The QueryOptions object that provides the function to create the query (StructuredQuery) and consistency mode which included
      * structuredQuery, transaction, newTransaction and readTime functions.
      *
      * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
@@ -975,9 +975,11 @@ public:
      * The new transaction ID will be returned as the first response in the stream.
      * - readTime used for reading the documents as they were at the given time.
      *
-     * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
-     *
      * @return Boolean value, indicates the success of the operation.
+     * 
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     * 
+     * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
      *
      */
     bool runQuery(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions)
@@ -994,7 +996,7 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param documentPath The relative path of document to get.
-     * @param queryOptions The QueryOptions object that provide the function to create the query (StructuredQuery) and consistency mode which included
+     * @param queryOptions The QueryOptions object that provides the function to create the query (StructuredQuery) and consistency mode which included
      * structuredQuery, transaction, newTransaction and readTime functions.
      *
      * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
@@ -1007,6 +1009,8 @@ public:
      * - readTime used for reading the documents as they were at the given time.
      * @param aResult The async result (AsyncResult).
      *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     * 
      * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
      *
      */
@@ -1022,7 +1026,7 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The Firestore database id should be (default) or empty "".
      * @param documentPath The relative path of document to get.
-     * @param queryOptions The QueryOptions object that provide the function to create the query (StructuredQuery) and consistency mode which included
+     * @param queryOptions The QueryOptions object that provides the function to create the query (StructuredQuery) and consistency mode which included
      * structuredQuery, transaction, newTransaction and readTime functions.
      *
      * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
@@ -1036,6 +1040,8 @@ public:
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     * 
      * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
      *
      */
@@ -1275,7 +1281,6 @@ public:
         URLHelper uh;
 
         if (
-            request.options->requestType == firebase_firestore_request_type_run_query ||
             request.options->requestType == firebase_firestore_request_type_list_collection ||
             request.options->requestType == firebase_firestore_request_type_list_doc ||
             request.options->requestType == firebase_firestore_request_type_delete_doc)
@@ -1457,9 +1462,10 @@ public:
         options.parent = parent;
         options.parent.documentPath = documentPath;
         options.payload = queryOptions.c_str();
+
         addDocsPath(options.extras);
-        options.extras += '/';
-        options.extras += documentPath;
+        URLHelper uh;
+        uh.addPath(options.extras, documentPath);
         options.extras += FPSTR(":runQuery");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);

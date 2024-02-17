@@ -1,5 +1,5 @@
 /**
- * Created February 16, 2024
+ * Created February 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -512,6 +512,7 @@ namespace FirestoreQuery
 
     public:
         Order();
+        Order(FieldReference field, FilterSort::Direction direction);
         Order &field(FieldReference field);
         Order &direction(FilterSort::Direction direction);
         const char *c_str();
@@ -529,7 +530,12 @@ namespace FirestoreQuery
         {
             buf.remove(0, buf.length());
             if (collId.length())
-                buf = collId;
+            {
+                if (buf.length() == 0)
+                    buf = collId;
+                else
+                    fsut.addMember(buf, collId, true, "}");
+            }
 
             if (allDes.length())
             {
@@ -542,6 +548,11 @@ namespace FirestoreQuery
 
     public:
         CollectionSelector() {}
+        CollectionSelector(const String &collectionId, bool allDescendants)
+        {
+            CollectionSelector::collectionId(collectionId);
+            CollectionSelector::allDescendants(allDescendants);
+        }
         CollectionSelector &collectionId(const String &collectionId)
         {
             collId.remove(0, collId.length());

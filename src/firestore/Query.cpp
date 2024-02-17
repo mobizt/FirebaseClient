@@ -1,6 +1,6 @@
 
 /**
- * Created February 16, 2024
+ * Created February 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -72,6 +72,7 @@ namespace FirestoreQuery
             jh.addArray(ordby_ar, orderBy.c_str(), true);
         else
             fsut.addMember(ordby_ar, orderBy.c_str(), true, "]");
+
         ordby.remove(0, ordby.length());
         jh.addObject(ordby, "orderBy", ordby_ar, true);
         set();
@@ -115,7 +116,7 @@ namespace FirestoreQuery
 
     void StructuredQuery::set()
     {
-        sel.remove(0, sel.length());
+        buf.remove(0, buf.length());
         if (sel.length())
             buf = sel;
 
@@ -280,7 +281,12 @@ namespace FirestoreQuery
         buf.remove(0, buf.length());
 
         if (op_str.length())
-            buf = op_str;
+        {
+            if (buf.length() == 0)
+                buf = op_str;
+            else
+                fsut.addMember(buf, op_str, true, "}");
+        }
 
         if (field_str.length())
         {
@@ -292,6 +298,11 @@ namespace FirestoreQuery
     }
 
     Order::Order(){};
+    Order::Order(FieldReference field, FilterSort::Direction direction)
+    {
+        Order::field(field);
+        Order::direction(direction);
+    }
     Order &Order::field(FieldReference field)
     {
         field_str.remove(0, field_str.length());
@@ -316,11 +327,16 @@ namespace FirestoreQuery
     {
         buf.remove(0, buf.length());
         if (field_str.length())
-            buf = field_str;
+        {
+            if (buf.length() == 0)
+                buf = field_str;
+            else
+                fsut.addMember(buf, field_str, true, "}");
+        }
 
         if (direction_str.length())
         {
-            if (field_str.length())
+            if (buf.length() == 0)
                 buf = direction_str;
             else
                 fsut.addMember(buf, direction_str, true, "}");

@@ -1,5 +1,5 @@
 /**
- * Created February 12, 2024
+ * Created February 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -779,7 +779,10 @@ private:
         {
             if (sData->response.chunkInfo.chunkSize > -1)
             {
-                int read = readLine(sData, *out);
+                String chunk;
+                int read = readLine(sData, chunk);
+                if (read && chunk[0] != '\r')
+                    *out += chunk;
                 if (read)
                 {
                     sData->response.chunkInfo.dataLen += read;
@@ -960,7 +963,7 @@ private:
         if (buf)
             mem.release(&buf);
 
-        if (sData->response.payloadLen > 0 && sData->response.payloadRead >= sData->response.payloadLen)
+        if (sData->response.payloadLen > 0 && sData->response.payloadRead >= sData->response.payloadLen && sData->response.tcpAvailable(client_type, client, async_tcp_config) == 0)
         {
             // Async payload and header data collision workaround from session reusage.
             if (!sData->response.flags.chunks && sData->response.payloadRead > sData->response.payloadLen)
@@ -972,14 +975,8 @@ private:
                 sData->response.flags.header_remaining = true;
             }
 
-            if (sData->response.flags.chunks && sData->response.tcpAvailable(client_type, client, async_tcp_config) <= 2)
-            {
-                while (sData->response.tcpAvailable(client_type, client, async_tcp_config))
-                    sData->response.tcpRead(client_type, client, async_tcp_config);
-
-                if (sData->auth_used)
-                    stop(sData);
-            }
+            if (sData->response.flags.chunks && sData->auth_used)
+                stop(sData);
 
             if (sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
             {
