@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -517,6 +517,8 @@ namespace firebase
         }
     };
 
+#if defined(ENABLE_FS)
+
 #if defined(ENABLE_USER_AUTH) || defined(ENABLE_ACCESS_TOKEN) || defined(ENABLE_CUSTOM_TOKEN) || defined(ENABLE_ID_TOKEN) || defined(ENABLE_LEGACY_TOKEN)
 
     class UserTokenFileParser
@@ -748,6 +750,8 @@ namespace firebase
 
 #endif
 
+#endif
+
 #if defined(ENABLE_USER_AUTH)
     class UserAuth
     {
@@ -768,12 +772,14 @@ namespace firebase
 
         UserAuth(file_config_data &userFile)
         {
+#if defined(ENABLE_FS)
             data.clear();
             if (userFile.initialized)
             {
                 userFile.cb(userFile.file, userFile.filename.c_str(), file_mode_open_read);
                 if (userFile.file)
                 {
+
                     if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_user_data, userFile.file, data))
                     {
 
@@ -782,11 +788,13 @@ namespace firebase
                     userFile.file.close();
                 }
             }
+#endif
         }
 
         bool save(file_config_data &userFile)
         {
             bool ret = false;
+#if defined(ENABLE_FS)
             if (userFile.initialized)
             {
                 userFile.cb(userFile.file, userFile.filename.c_str(), file_mode_open_write);
@@ -796,6 +804,7 @@ namespace firebase
                     userFile.file.close();
                 }
             }
+#endif
             return ret;
         }
 
@@ -835,6 +844,7 @@ namespace firebase
 
         ServiceAuth(TimeStatusCallback cb, file_config_data &safile)
         {
+#if defined(ENABLE_FS)
             data.clear();
             if (safile.initialized)
             {
@@ -846,6 +856,7 @@ namespace firebase
                 }
                 data.timestatus_cb = cb;
             }
+#endif
         }
 
         ~ServiceAuth() { data.clear(); };
@@ -885,6 +896,7 @@ namespace firebase
 
         CustomAuth(TimeStatusCallback cb, file_config_data &safile, const String &uid)
         {
+#if defined(ENABLE_FS)
             data.clear();
             if (safile.initialized)
             {
@@ -901,6 +913,7 @@ namespace firebase
                     data.timestatus_cb = cb;
                 }
             }
+#endif
         }
 
         ~CustomAuth() { data.clear(); };
@@ -993,6 +1006,7 @@ namespace firebase
 
         IDToken(file_config_data &tokenFile)
         {
+#if defined(ENABLE_FS)
             data.clear();
             if (tokenFile.initialized)
             {
@@ -1008,11 +1022,13 @@ namespace firebase
                     tokenFile.file.close();
                 }
             }
+#endif
         }
 
         bool save(file_config_data &tokenFile)
         {
             bool ret = false;
+#if defined(ENABLE_FS)
             if (tokenFile.initialized)
             {
                 tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_write);
@@ -1022,6 +1038,7 @@ namespace firebase
                     tokenFile.file.close();
                 }
             }
+#endif
             return ret;
         }
 
@@ -1060,6 +1077,7 @@ namespace firebase
 
         AccessToken(file_config_data &tokenFile)
         {
+#if defined(ENABLE_FS)
             data.clear();
             if (tokenFile.initialized)
             {
@@ -1075,11 +1093,13 @@ namespace firebase
                     tokenFile.file.close();
                 }
             }
+#endif
         }
 
         bool save(file_config_data &tokenFile)
         {
             bool ret = false;
+#if defined(ENABLE_FS)
             if (tokenFile.initialized)
             {
                 tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_write);
@@ -1089,6 +1109,7 @@ namespace firebase
                     tokenFile.file.close();
                 }
             }
+#endif
             return ret;
         }
 
@@ -1128,6 +1149,7 @@ namespace firebase
             data.clear();
             if (tokenFile.initialized)
             {
+#if defined(ENABLE_FS)
                 tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_read);
                 if (tokenFile.file)
                 {
@@ -1140,12 +1162,14 @@ namespace firebase
                     tokenFile.file.close();
                     data.timestatus_cb = cb;
                 }
+#endif
             }
         }
 
         bool save(file_config_data &tokenFile)
         {
             bool ret = false;
+#if defined(ENABLE_FS)
             if (tokenFile.initialized)
             {
                 tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_write);
@@ -1155,6 +1179,7 @@ namespace firebase
                     tokenFile.file.close();
                 }
             }
+#endif
             return ret;
         }
 
@@ -1187,6 +1212,7 @@ namespace firebase
 
         LegacyToken(file_config_data &tokenFile)
         {
+#if defined(ENABLE_FS)
             data.clear();
             if (tokenFile.initialized)
             {
@@ -1202,11 +1228,13 @@ namespace firebase
                     tokenFile.file.close();
                 }
             }
+#endif
         }
 
         bool save(file_config_data &tokenFile)
         {
             bool ret = false;
+#if defined(ENABLE_FS)
             if (tokenFile.initialized)
             {
                 tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_write);
@@ -1216,6 +1244,7 @@ namespace firebase
                     tokenFile.file.close();
                 }
             }
+#endif
             return ret;
         }
 

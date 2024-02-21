@@ -40,13 +40,13 @@
  * ⛔ Use following build flag to disable.
  * -D DISABLE_CLOUD_STORAGE
  */
- #define ENABLE_CLOUD_STORAGE
+#define ENABLE_CLOUD_STORAGE
 
 /**📍 For Functions for Firebase compilation
  * ⛔ Use following build flag to disable.
  * -D DISABLE_FUNCTIONS
  */
- #define ENABLE_FUNCTIONS
+#define ENABLE_FUNCTIONS
 
 /**📍 For enabling PSRAM support
  * ⛔ Use following build flag to disable.
@@ -92,7 +92,7 @@
  *   should be inside "" or <> e.g. "Ethernet.h".
  * - FIREBASE_ETHERNET_MODULE_CLASS is the name of static object defined from class e.g. Ethernet.
  * - FIREBASE_ETHERNET_MODULE_TIMEOUT is the time out in milliseconds to wait network connection.
- * 
+ *
  * #define FIREBASE_ETHERNET_MODULE_LIB "EthernetLib.h"
  * #define FIREBASE_ETHERNET_MODULE_CLASS EthernetClass
  * #define FIREBASE_ETHERNET_MODULE_TIMEOUT 2000
@@ -111,7 +111,7 @@
  *
  * 🏷️ For disabling native (sdk) Ethernet functionality in case external Client usage
  * #define FIREBASE_DISABLE_NATIVE_ETHERNET
- * 
+ *
  * 🏷️ For Async TCP Client usage.
  * #define ENABLE_ASYNC_TCP_CLIENT
  */

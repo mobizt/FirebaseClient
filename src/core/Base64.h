@@ -1,5 +1,5 @@
 /**
- * Created February 5, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -33,7 +33,6 @@
 static const char firebase_boundary_table[] PROGMEM = "=_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static const unsigned char firebase_base64_table[65] PROGMEM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-
 template <typename T>
 struct firebase_base64_io_t
 {
@@ -41,8 +40,10 @@ struct firebase_base64_io_t
     int bufWrite = 0;
     // the size of output buffer
     size_t bufLen = 1024;
-    // for file to write
+// for file to write
+#if defined(ENABLE_FS)
     FILEOBJ file;
+#endif
     // for T array
     T *outT = nullptr;
     // for T vector
@@ -54,7 +55,6 @@ struct firebase_base64_io_t
     // for ota
     bool ota = false;
 };
-
 
 class Base64Helper
 {
@@ -134,8 +134,10 @@ public:
 
         if (out.outC && out.outC->write((uint8_t *)out.outT, write) == write)
             return true;
+#if defined(ENABLE_FS)
         else if (out.file && out.file.write((uint8_t *)out.outT, write) == write)
             return true;
+#endif
         else if (out.outB && out.outB->write((uint8_t *)out.outT, write) == write)
             return true;
 
@@ -151,7 +153,11 @@ public:
     {
         if (out.outT)
         {
+#if defined(ENABLE_FS)
             if (out.ota || out.outC || out.file || out.outB)
+#else
+            if (out.ota || out.outC || out.outB)
+#endif
             {
                 out.outT[out.bufWrite++] = val;
                 if (out.bufWrite == (int)out.bufLen && !writeOutput(out))
@@ -307,6 +313,7 @@ public:
         return true;
     }
 
+#if defined(ENABLE_FS)
     bool decodeToFile(Memory &mem, FILEOBJ file, const char *src)
     {
         firebase_base64_io_t<uint8_t> out;
@@ -319,7 +326,7 @@ public:
         mem.release(&base64DecBuf);
         return ret;
     }
-
+#endif
     bool decodeToBlob(Memory &mem, firebase_blob_writer *bWriter, const char *src)
     {
         firebase_base64_io_t<uint8_t> out;
@@ -363,7 +370,7 @@ public:
         mem.release(&base64EncBuf);
     }
 
-    char* encodeToChars(Memory &mem, uint8_t *src, size_t len)
+    char *encodeToChars(Memory &mem, uint8_t *src, size_t len)
     {
         String str;
         char *encoded = reinterpret_cast<char *>(mem.alloc(encodedLength(len) + 1));
@@ -374,7 +381,6 @@ public:
         mem.release(&base64EncBuf);
         return encoded;
     }
-
 };
 
 #endif

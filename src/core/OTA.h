@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -34,7 +34,7 @@
 class OtaHelper
 {
 public:
-    void getPad(uint8_t *s, int &len, int &pad)
+    void getPad(uint8_t *s, int &len, int8_t &pad)
     {
         pad = -1;
         if (len > 1)
@@ -58,7 +58,7 @@ public:
         }
     }
 
-    bool decodeBase64OTA(Memory &mem, Base64Helper *bh, const char *src, size_t len, int &code)
+    bool decodeBase64OTA(Memory &mem, Base64Helper *bh, const char *src, size_t len, int16_t &code)
     {
 
         bool ret = true;
@@ -77,7 +77,7 @@ public:
         return ret;
     }
 
-    void prepareDownloadOTA(size_t payloadLen, bool base64, int &code)
+    void prepareDownloadOTA(size_t payloadLen, bool base64, int16_t &code)
     {
         code = 0;
 #if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(MB_ARDUINO_PICO))
@@ -93,7 +93,7 @@ public:
 #endif
     }
 
-    bool endDownloadOTA(int pad, int &code)
+    bool endDownloadOTA(int pad, int16_t &code)
     {
         Base64Helper bh;
 

@@ -1,5 +1,5 @@
 /**
- * Created February 17, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -28,9 +28,9 @@
 #include "./core/FirebaseApp.h"
 #include "./firestore/DataOptions.h"
 
-using namespace firebase;
-
 #if defined(ENABLE_FIRESTORE)
+
+using namespace firebase;
 
 #include "./firestore/Query.h"
 
@@ -39,7 +39,6 @@ class Firestore
     friend class FirebaseApp;
 
 private:
-    AsyncClientClass *aClient = nullptr;
     String service_url;
     String path;
     String uid;
@@ -53,12 +52,12 @@ private:
         String path;
         String uid;
         async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
-        AsyncClientClass::slot_options_t opt;
+        slot_options_t opt;
         FirestoreOptions *options = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, AsyncClientClass::slot_options_t opt, FirestoreOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, FirestoreOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;
@@ -1057,77 +1056,256 @@ public:
     /** Delete a document at the defined path.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param documentPath The relative path of document to delete.
-     * @param exists When set to true, the target document must exist. When set to false, the target document must not exist.
-     * @param updateTime When set, the target document must exist and have been last updated at that time.
-     * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * @param currentDocument The Precondition object for an optional precondition on the document.
+     * The request will fail if this is set and not met by the target document.
+     *
+     * There are the member functions exists and updateTime for creating the union field exists and updateTime respectively.
+     *
+     * The exists option, when set to true, the target document must exist. When set to false, the target document must not exist.
+     * The updateTime (timestamp) option, when set, the target document must exist and have been last updated at that time.
+     * A timestamp is in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
      * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication.
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    // bool deleteDocument(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &exists = "", const String &updateTime = "")
-    //{
-    //  return false;
-    //}
+    bool deleteDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const Precondition &currentDocument)
+    {
+        AsyncResult result;
+        deleteDoc(aClient, &result, NULL, "", parent, documentPath, currentDocument, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Delete a document at the defined path.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to delete.
+     * @param currentDocument The Precondition object for an optional precondition on the document.
+     * The request will fail if this is set and not met by the target document.
+     *
+     * There are the member functions exists and updateTime for creating the union field exists and updateTime respectively.
+     *
+     * The exists option, when set to true, the target document must exist. When set to false, the target document must not exist.
+     * The updateTime (timestamp) option, when set, the target document must exist and have been last updated at that time.
+     * A timestamp is in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     *
+     * @param aResult The async result (AsyncResult).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void deleteDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult)
+    {
+        deleteDoc(aClient, &aResult, NULL, "", parent, documentPath, currentDocument, true);
+    }
+
+    /** Delete a document at the defined path.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to delete.
+     * @param currentDocument The Precondition object for an optional precondition on the document.
+     * The request will fail if this is set and not met by the target document.
+     *
+     * There are the member functions exists and updateTime for creating the union field exists and updateTime respectively.
+     *
+     * The exists option, when set to true, the target document must exist. When set to false, the target document must not exist.
+     * The updateTime (timestamp) option, when set, the target document must exist and have been last updated at that time.
+     * A timestamp is in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
+     * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+     *
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void deleteDocument(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "")
+    {
+        deleteDoc(aClient, nullptr, cb, uid, parent, documentPath, currentDocument, true);
+    }
 
     /** List the documents in the defined documents collection.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param collectionId The relative path of document colection.
-     * @param pageSize The maximum number of documents to return.
-     * @param pageToken The nextPageToken value returned from a previous List request, if any.
-     * @param orderBy The order to sort results by. For example: priority desc, name.
-     * @param mask The fields to return. If not set, returns all fields.
+     * @param listDocsOptions The ListDocumentsOptions object that provides the member functions pageSize, pageToken, orderBy, mask and
+     * showMissing for creating the query string options pageSize, pageToken, orderBy, mask and showMissing respectively.
+     * The option pageSize is for setting the maximum number of documents to return.
+     * The option pageToken is the nextPageToken value returned from a previous List request, if any.
+     * The option orderBy is the order to sort results by. For example: priority desc, name.
+     * The option mask is for setting the fields to return. If not set, returns all fields.
      * If a document has a field that is not present in this mask, that field will not be returned in the response.
-     * @param showMissing If the vec should show missing documents.
+     * The option showMissing is for setting if the list should show missing documents.
      * A missing document is a document that does not exist but has sub-documents.
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
-     *
-     * This function requires Email/password, Custom token or OAuth2.0 authentication (when showMissing is true).
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
      *
      */
-    // bool listDocuments(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &pageSize,
-    //                   const String &pageToken, const String &orderBy, const String &mask, bool showMissing)
-    //{
-    //  return false;
-    //}
+    bool listDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
+    {
+        AsyncResult result;
+        listDocs(aClient, &result, NULL, "", parent, collectionId, listDocsOptions, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** List the documents in the defined documents collection.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param collectionId The relative path of document colection.
+     * @param listDocsOptions The ListDocumentsOptions object that provides the member functions pageSize, pageToken, orderBy, mask and
+     * showMissing for creating the query string options pageSize, pageToken, orderBy, mask and showMissing respectively.
+     * The option pageSize is for setting the maximum number of documents to return.
+     * The option pageToken is the nextPageToken value returned from a previous List request, if any.
+     * The option orderBy is the order to sort results by. For example: priority desc, name.
+     * The option mask is for setting the fields to return. If not set, returns all fields.
+     * If a document has a field that is not present in this mask, that field will not be returned in the response.
+     * The option showMissing is for setting if the list should show missing documents.
+     * A missing document is a document that does not exist but has sub-documents.
+     *
+     * @param aResult The async result (AsyncResult).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void listDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult)
+    {
+        listDocs(aClient, &aResult, NULL, "", parent, collectionId, listDocsOptions, true);
+    }
+
+    /** List the documents in the defined documents collection.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param collectionId The relative path of document colection.
+     * @param listDocsOptions The ListDocumentsOptions object that provides the member functions pageSize, pageToken, orderBy, mask and
+     * showMissing for creating the query string options pageSize, pageToken, orderBy, mask and showMissing respectively.
+     * The option pageSize is for setting the maximum number of documents to return.
+     * The option pageToken is the nextPageToken value returned from a previous List request, if any.
+     * The option orderBy is the order to sort results by. For example: priority desc, name.
+     * The option mask is for setting the fields to return. If not set, returns all fields.
+     * If a document has a field that is not present in this mask, that field will not be returned in the response.
+     * The option showMissing is for setting if the list should show missing documents.
+     * A missing document is a document that does not exist but has sub-documents.
+     *
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
+     *
+     */
+    void listDocuments(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResultCallback cb, const String &uid = "")
+    {
+        listDocs(aClient, nullptr, cb, uid, parent, collectionId, listDocsOptions, true);
+    }
 
     /** List the document collection ids in the defined document path.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param documentPath The relative path of document to get its collections' id.
-     * @param pageSize The maximum number of results to return.
-     * @param pageToken The nextPageToken value returned from a previous List request, if any.
+     * @param listCollectionIdsOptions The ListCollectionIdsOptions object that provides the member functions pageSize, pageToken and readTime
+     * for creating the query string options pageSize, pageToken and readTime respectively.
+     * The option pageSize is for setting the  maximum number of results to return.
+     * The option pageToken is the page token. Must be a value from ListCollectionIdsResponse.
+     * The option readTime is the timestamp for reading the documents as they were at the given time.
+     * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled,
+     * can additionally be a whole minute timestamp within the past 7 days.
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
+     * This function requires ServiceAuth authentication.
      *
      */
-    // bool listCollectionIds(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &documentPath, const String &pageSize, const String &pageToken)
-    //{
-    // return false;
-    //}
+    bool listCollectionIds(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
+    {
+        AsyncResult result;
+        listCollIds(aClient, &result, NULL, "", parent, documentPath, listCollectionIdsOptions, false);
+        return result.lastError.code() == 0;
+    }
 
-    /** Creates a composite index.
+    /** List the document collection ids in the defined document path.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
-     * @param collectionId The relative path of document colection.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to get its collections' id.
+     * @param listCollectionIdsOptions The ListCollectionIdsOptions object that provides the member functions pageSize, pageToken and readTime
+     * for creating the query string options pageSize, pageToken and readTime respectively.
+     * The option pageSize is for setting the  maximum number of results to return.
+     * The option pageToken is the page token. Must be a value from ListCollectionIdsResponse.
+     * The option readTime is the timestamp for reading the documents as they were at the given time.
+     * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled,
+     * can additionally be a whole minute timestamp within the past 7 days.
+     *
+     * @param aResult The async result (AsyncResult).
+     *
+     * This function requires ServiceAuth authentication.
+     *
+     */
+    void listCollectionIds(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult)
+    {
+        listCollIds(aClient, &aResult, NULL, "", parent, documentPath, listCollectionIdsOptions, true);
+    }
+
+    /** List the document collection ids in the defined document path.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param documentPath The relative path of document to get its collections' id.
+     * @param listCollectionIdsOptions The ListCollectionIdsOptions object that provides the member functions pageSize, pageToken and readTime
+     * for creating the query string options pageSize, pageToken and readTime respectively.
+     * The option pageSize is for setting the  maximum number of results to return.
+     * The option pageToken is the page token. Must be a value from ListCollectionIdsResponse.
+     * The option readTime is the timestamp for reading the documents as they were at the given time.
+     * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled,
+     * can additionally be a whole minute timestamp within the past 7 days.
+     *
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * This function requires ServiceAuth authentication.
+     *
+     */
+    void listCollectionIds(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
+    {
+        listCollIds(aClient, nullptr, cb, uid, parent, documentPath, listCollectionIdsOptions, true);
+    }
+
+    /** Creates the specified index.
+     *
+     * @param aClient The async client.
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
+     * @param indexes The Indexes object that provides the  path of document colection.
      * @param apiScope The API scope enum e.g., ANY_API and DATASTORE_MODE_API
      * @param queryScope The QueryScope enum string e.g., QUERY_SCOPE_UNSPECIFIED, COLLECTION, and COLLECTION_GROUP
      * See https://cloud.google.com/firestore/docs/reference/rest/Shared.Types/QueryScope
@@ -1140,24 +1318,34 @@ public:
      *
      * @return Boolean value, indicates the success of the operation.
      *
-     * @note Use FirebaseData.payload() to get the returned payload.
+     * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/create
      *
-     * This function requires OAuth2.0 authentication.
-     *
-     * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/create
+     * This function requires ServiceAuth authentication.
      *
      */
-    // bool createIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId,
-    //                const String &apiScope, const String &queryScope, const object_t &fields)
-    //{
-    // return false;
-    //}
+    bool createIndex(AsyncClientClass &aClient, const ParentResource &parent, Indexes indexes)
+    {
+        AsyncResult result;
+        docIndexManager(aClient, &result, NULL, "", parent, indexes, "", false, false);
+        return result.lastError.code() == 0;
+    }
+
+    void createIndex(AsyncClientClass &aClient, const ParentResource &parent, Indexes indexes, AsyncResult &aResult)
+    {
+        docIndexManager(aClient, &aResult, NULL, "", parent, indexes, "", false, true);
+    }
+
+    void createIndex(AsyncClientClass &aClient, const ParentResource &parent, Indexes indexes, AsyncResultCallback cb, const String &uid = "")
+    {
+        docIndexManager(aClient, nullptr, cb, uid, parent, indexes, "", false, true);
+    }
 
     /** Deletes an index.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param collectionId The relative path of document colection.
      * @param indexId The index to delete.
      *
@@ -1178,8 +1366,9 @@ public:
     /** Lists the indexes that match the specified filters.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param collectionId The relative path of document colection.
      * @param filter The filter to apply to vec results.
      * @param pageSize The number of results to return.
@@ -1195,7 +1384,7 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/vec
      *
      */
-    // bool listIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
+    // bool listIndex(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, const String &filter = "", int pageSize = -1, const String &pageToken = "")
     // {
     // return false;
     //}
@@ -1203,8 +1392,9 @@ public:
     /** Get an index.
      *
      * @param aClient The async client.
-     * @param projectId The Firebase project id (only the name without the firebaseio.com).
-     * @param databaseId The Firebase Cloud Firestore database id which is (default) or empty "".
+     * @param parent The ParentResource object included project Id and database Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The Firestore database id should be (default) or empty "".
      * @param collectionId The relative path of document colection.
      * @param indexId The index to get.
      *
@@ -1217,7 +1407,7 @@ public:
      * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.collectionGroups.indexes/get
      *
      */
-    // bool getIndex(AsyncClientClass &aClient, const String &projectId, const String &databaseId, const String &collectionId, const String &indexId)
+    // bool getIndex(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, const String &indexId)
     //{
     // return false;
     //}
@@ -1239,7 +1429,7 @@ public:
         }
     }
 
-    void asyncRequest(async_request_data_t &request)
+    void asyncRequest(async_request_data_t &request, bool beta = false)
     {
         URLHelper uh;
         app_token_t *app_token = appToken();
@@ -1249,8 +1439,10 @@ public:
 
         request.opt.app_token = app_token;
         String extras;
-
-        uh.addGAPIv1Path(request.path);
+        if (beta)
+            uh.addGAPIv1beta1Path(request.path);
+        else
+            uh.addGAPIv1Path(request.path);
         request.path += request.options->parent.projectId.length() == 0 ? app_token->project_id : request.options->parent.projectId;
         request.path += FPSTR("/databases/");
         request.path += request.options->parent.databaseId.length() > 0 ? request.options->parent.databaseId : FPSTR("(default)");
@@ -1259,7 +1451,7 @@ public:
 
         url(FPSTR("firestore.googleapis.com"));
 
-        AsyncClientClass::async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
+        async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
 
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
@@ -1282,32 +1474,10 @@ public:
 
     void addParams(async_request_data_t &request, String &extras)
     {
-        URLHelper uh;
-
-        if (
-            request.options->requestType == firebase_firestore_request_type_list_collection ||
-            request.options->requestType == firebase_firestore_request_type_list_doc ||
-            request.options->requestType == firebase_firestore_request_type_delete_doc)
-        {
-            extras += FPSTR("/documents");
-            if (request.options->requestType == firebase_firestore_request_type_list_collection ||
-                request.options->requestType == firebase_firestore_request_type_delete_doc)
-            {
-                uh.addPath(extras, request.options->parent.documentPath);
-                extras += (request.options->requestType == firebase_firestore_request_type_list_collection)
-                              ? ":listCollectionIds"
-                              : "";
-            }
-
-            else if (request.options->requestType == firebase_firestore_request_type_list_doc)
-            {
-                uh.addPath(extras, request.options->collectionId);
-            }
-        }
-        else if (request.options->requestType == firebase_firestore_request_type_create_index ||
-                 request.options->requestType == firebase_firestore_request_type_delete_index ||
-                 request.options->requestType == firebase_firestore_request_type_get_index ||
-                 request.options->requestType == firebase_firestore_request_type_list_index)
+        if (request.options->requestType == firebase_firestore_request_type_create_composite_index ||
+            request.options->requestType == firebase_firestore_request_type_delete_index ||
+            request.options->requestType == firebase_firestore_request_type_get_index ||
+            request.options->requestType == firebase_firestore_request_type_list_index)
         {
             extras += FPSTR("/collectionGroups/");
             extras += request.options->collectionId;
@@ -1344,7 +1514,7 @@ public:
         if (!isImport)
             options.payload.replace("inputUriPrefix", "outputUriPrefix");
         options.extras += isImport ? FPSTR(":importDocuments") : FPSTR(":exportDocuments");
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -1363,7 +1533,7 @@ public:
         bool hasQueryParams = false;
         uh.addParam(options.extras, "documentId", options.documentId, hasQueryParams);
         options.extras += mask.getQuery("mask", hasQueryParams);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -1377,7 +1547,7 @@ public:
         options.extras += '/';
         options.extras += documentPath;
         options.extras += patchOptions.c_str();
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_patch, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_patch, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -1390,7 +1560,7 @@ public:
         addDocsPath(options.extras);
         options.extras += FPSTR(":commit");
         options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -1403,7 +1573,7 @@ public:
         options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
         addDocsPath(options.extras);
         options.extras += FPSTR(":batchWrite");
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -1416,7 +1586,7 @@ public:
         options.extras += '/';
         options.extras += documentPath;
         options.extras += getOptions.c_str();
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -1429,7 +1599,7 @@ public:
         options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
         addDocsPath(options.extras);
         options.extras += FPSTR(":batchGet");
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -1442,7 +1612,7 @@ public:
         jh.addObject(options.payload, "options", transOptions.c_str(), true);
         addDocsPath(options.extras);
         options.extras += FPSTR(":beginTransaction");
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -1455,10 +1625,10 @@ public:
         jh.addObject(options.payload, "transaction", jh.toString(transaction), true);
         addDocsPath(options.extras);
         options.extras += FPSTR(":rollback");
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
-    
+
 #if defined(ENABLE_FIRESTORE_QUERY)
     void runQueryImpl(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions, bool async)
     {
@@ -1472,24 +1642,80 @@ public:
         URLHelper uh;
         uh.addPath(options.extras, documentPath);
         options.extras += FPSTR(":runQuery");
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 #endif
 
-    void listDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, GetDocumentOptions getOptions, bool async)
+    void deleteDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, Precondition currentDocument, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_delete_doc;
+        options.parent = parent;
+        options.parent.documentPath = documentPath;
+
+        addDocsPath(options.extras);
+        URLHelper uh;
+        uh.addPath(options.extras, documentPath);
+        options.extras += currentDocument.getQuery("currentDocument");
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void listDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, bool async)
     {
         FirestoreOptions options;
         options.requestType = firebase_firestore_request_type_list_doc;
         options.parent = parent;
 
         addDocsPath(options.extras);
-        options.extras += '/';
-        options.extras += documentPath;
+        URLHelper uh;
+        uh.addPath(options.extras, collectionId);
 
-        options.extras += getOptions.c_str();
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        options.extras += listDocsOptions.c_str();
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+    }
+
+    void listCollIds(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_list_collection;
+        options.parent = parent;
+        options.parent.documentPath = documentPath;
+        options.payload = listCollectionIdsOptions.c_str();
+
+        addDocsPath(options.extras);
+        URLHelper uh;
+        uh.addPath(options.extras, documentPath);
+        options.extras += FPSTR(":listCollectionIds");
+
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void docIndexManager(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, Indexes indexes, const String &indexId, bool deleteMode, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_create_field_index;
+        options.parent = parent;
+        options.payload = indexes.c_str();
+        options.extras += FPSTR("/indexes");
+        if (indexId.length())
+            options.extras += '/';
+        options.extras += indexId;
+
+        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
+
+        if (strlen(indexes.c_str()) > 0)
+            method = async_request_handler_t::http_post; // create
+        else if (indexId.length() > 0)
+            method = deleteMode ? async_request_handler_t::http_delete : async_request_handler_t::http_get; // get index or delete by id
+        if (strlen(indexes.c_str()) == 0 && indexId.length() == 0)
+            method = async_request_handler_t::http_get; // list
+
+        async_request_data_t aReq(&aClient, path, method, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq, true);
     }
 
     String makeResourcePath(const ParentResource &parent)

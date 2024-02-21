@@ -1,5 +1,5 @@
 /**
- * Created February 10, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -32,14 +32,14 @@
 
 #if defined(ENABLE_DATABASE)
 
-class Filter
+class DatabaseFilter
 {
     friend class DatabaseOptions;
     friend class Database;
     friend class AsyncClientClass;
 
 private:
-    void copy(Filter &rhs)
+    void copy(DatabaseFilter &rhs)
     {
         this->uri = rhs.uri;
         this->complete = rhs.complete;
@@ -57,10 +57,10 @@ private:
     String uri;
 
 public:
-    Filter(){};
-    ~Filter() { clear(); };
+    DatabaseFilter(){};
+    ~DatabaseFilter() { clear(); };
 
-    Filter &orderBy(const String &val)
+    DatabaseFilter &orderBy(const String &val)
     {
 
         complete = true;
@@ -72,20 +72,20 @@ public:
     }
 
     template <typename T = int>
-    Filter &limitToFirst(T val)
+    DatabaseFilter &limitToFirst(T val)
     {
         uh.addParam(uri, "limitToFirst", String(val), hasParams);
         return *this;
     }
 
     template <typename T = int>
-    Filter &limitToLast(T val)
+    DatabaseFilter &limitToLast(T val)
     {
         uh.addParam(uri, "limitToLast", String(val), hasParams);
         return *this;
     }
 
-    Filter &startAt(const String &val)
+    DatabaseFilter &startAt(const String &val)
     {
         String sa = "\"";
         sa += val;
@@ -94,13 +94,13 @@ public:
         return *this;
     }
 
-    Filter &startAt(int val)
+    DatabaseFilter &startAt(int val)
     {
         uh.addParam(uri, "startAt", String(val), hasParams);
         return *this;
     }
 
-    Filter &endAt(const String &val)
+    DatabaseFilter &endAt(const String &val)
     {
         String sa = "\"";
         sa += val;
@@ -109,13 +109,13 @@ public:
         return *this;
     }
 
-    Filter &endAt(int val)
+    DatabaseFilter &endAt(int val)
     {
         uh.addParam(uri, "endAt", String(val), hasParams);
         return *this;
     }
 
-    Filter &equalTo(const String &val)
+    DatabaseFilter &equalTo(const String &val)
     {
         String sa = "\"";
         sa += val;
@@ -124,13 +124,13 @@ public:
         return *this;
     }
 
-    Filter &equalTo(int val)
+    DatabaseFilter &equalTo(int val)
     {
         uh.addParam(uri, "equalTo", String(val), hasParams);
         return *this;
     }
 
-    Filter &clear()
+    DatabaseFilter &clear()
     {
         uri.clear();
         complete = false;

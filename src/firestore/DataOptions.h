@@ -1,5 +1,5 @@
 /**
- * Created February 17, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -52,7 +52,8 @@ enum firebase_firestore_request_type
     firebase_firestore_request_type_import_docs,
     firebase_firestore_request_type_create_doc,
     firebase_firestore_request_type_batch_get_doc,
-    firebase_firestore_request_type_create_index,
+    firebase_firestore_request_type_create_composite_index,
+    firebase_firestore_request_type_create_field_index,
 
     firebase_firestore_request_type_get_doc = 300,
     firebase_firestore_request_type_list_doc,
@@ -68,6 +69,7 @@ enum firebase_firestore_request_type
 class ParentResource
 {
     friend class Firestore;
+    friend class FirestoreDocuments;
 
 private:
     String projectId;
@@ -105,6 +107,8 @@ class DocumentMask : public Printable
     friend class Firestore;
     friend class GetDocumentOptions;
     friend class patchDocumentOptions;
+    friend class ListDocumentsOptions;
+     friend class FirestoreDocuments;
 
 private:
     String mask;
@@ -312,6 +316,7 @@ namespace FieldTransform
 class Precondition : public Printable
 {
     friend class Firestore;
+    friend class FirestoreDocuments;
 
 private:
     String buf, str;
@@ -998,42 +1003,333 @@ class ListDocumentsOptions : public Printable
 private:
     String buf;
     int pz = 0;
-    String ptk;
-    String ordby;
+    String ptk, ordby, sms, tsc, rt;
     DocumentMask msk;
-    String sms;
     ObjectWriter owriter;
+    URLHelper uh;
+
+    void set()
+    {
+        bool hasParam = false;
+        buf.remove(0, buf.length());
+
+        if (pz > 0)
+            uh.addParam(buf, FPSTR("pageSize"), String(pz), hasParam);
+        if (ptk.length() > 0)
+            uh.addParam(buf, FPSTR("pageToken"), ptk, hasParam);
+        if (ordby.length() > 0)
+            uh.addParam(buf, FPSTR("orderBy"), ordby, hasParam);
+        if (strlen(msk.c_str()) > 0)
+            buf += msk.getQuery("mask", hasParam);
+        if (sms.length() > 0)
+            uh.addParam(buf, FPSTR("showMissing"), sms, hasParam);
+        if (tsc.length() > 0)
+            uh.addParam(buf, FPSTR("transaction"), tsc, hasParam);
+        if (rt.length() > 0)
+            uh.addParam(buf, FPSTR("readTime"), rt, hasParam);
+    }
 
 public:
     ListDocumentsOptions() {}
+    /**
+     * Optional. The maximum number of documents to return in a single response.
+     * Firestore may return fewer than this value.
+     * @param pageSize The maximum number of documents to return in a single response.
+     */
     ListDocumentsOptions &pageSize(int pageSize)
     {
         pz = pageSize;
+        set();
         return *this;
     }
+    /**
+     * Optional. A page token, received from a previous documents.list response.
+     * @param pageToken Optional. A page token, received from a previous documents.list response.
+     */
     ListDocumentsOptions &pageToken(const String &pageToken)
     {
         ptk = pageToken;
+        set();
         return *this;
     }
+    /**
+     * Optional. The optional ordering of the documents to return.
+     * For example: priority desc, __name__ desc.
+     * @param orderBy
+     */
     ListDocumentsOptions &orderBy(const String orderBy)
     {
         ordby = orderBy;
+        set();
         return *this;
     }
+    /**
+     * Optional. The fields to return. If not set, returns all fields.
+     * If a document has a field that is not present in this mask, that field will not be returned in the response.
+     * @param mask The fields to return.
+     */
     ListDocumentsOptions &mask(DocumentMask mask)
     {
         msk = mask;
+        set();
         return *this;
     }
+    /**
+     * If the list should show missing documents.
+     * A document is missing if it does not exist, but there are sub-documents nested underneath it. When true, such missing documents will be returned with a key but will not have fields, createTime, or updateTime set.
+     * Requests with showMissing may not specify where or orderBy.
+     * @param value
+     */
     ListDocumentsOptions &showMissing(bool value)
     {
         sms = owriter.getBoolStr(value);
+        set();
+        return *this;
+    }
+    /**
+     * Perform the read as part of an already active transaction.
+     * A base64-encoded string.
+     * @param transaction
+     */
+    ListDocumentsOptions &transaction(const String transaction)
+    {
+        tsc = transaction;
+        set();
+        return *this;
+    }
+    /**
+     * Perform the read at the provided time.
+     * This must be a microsecond precision timestamp within the past one hour,
+     * or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
+     * @param readTime
+     */
+    ListDocumentsOptions &readTime(const String readTime)
+    {
+        rt = readTime;
+        set();
         return *this;
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
+
+class ListCollectionIdsOptions : public Printable
+{
+private:
+    String buf;
+    String pz, ptk, rt;
+    ObjectWriter owriter;
+    JsonHelper jh;
+
+    void set()
+    {
+        buf.remove(0, buf.length());
+
+        if (pz.length() > 0)
+        {
+            if (buf.length() == 0)
+                buf = pz;
+            else
+                owriter.addMember(buf, pz, true, "}");
+        }
+        if (ptk.length() > 0)
+        {
+            if (buf.length() == 0)
+                buf = ptk;
+            else
+                owriter.addMember(buf, ptk, true, "}");
+        }
+        if (rt.length() > 0)
+        {
+            if (buf.length() == 0)
+                buf = rt;
+            else
+                owriter.addMember(buf, rt, true, "}");
+        }
+    }
+
+public:
+    ListCollectionIdsOptions() {}
+    /**
+     * The maximum number of results to return.
+     * @param pageSize The maximum number of results to return.
+     */
+    ListCollectionIdsOptions &pageSize(int pageSize)
+    {
+        jh.addObject(pz, FPSTR("pageSize"), String(pageSize), true);
+        set();
+        return *this;
+    }
+    /**
+     * A page token. Must be a value from ListCollectionIdsResponse.
+     * @param pageToken A page token. Must be a value from ListCollectionIdsResponse.
+     */
+    ListCollectionIdsOptions &pageToken(const String &pageToken)
+    {
+        jh.addObject(ptk, FPSTR("pageToken"), jh.toString(pageToken), true);
+        set();
+        return *this;
+    }
+    /**
+     * Reads documents as they were at the given time.
+     * This must be a microsecond precision timestamp within the past one hour,
+     * or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
+     * @param readTime Timestamp
+     */
+    ListCollectionIdsOptions &readTime(const String readTime)
+    {
+        jh.addObject(rt, FPSTR("readTime"), jh.toString(readTime), true);
+        set();
+        return *this;
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+namespace Index
+{
+    /**
+     * The mode determines how a field is indexed.
+     */
+    enum Mode
+    {
+        MODE_UNSPECIFIED, // The mode is unspecified.
+        ASCENDING,        // The field's values are indexed so as to support sequencing in ascending order
+        // and also query by <, >, <=, >=, and =.
+        DESCENDING, // The field's values are indexed so as to support sequencing in descending
+        // order and also query by <, >, <=, >=, and =.
+        ARRAY_CONTAINS // The field's array values are indexed so as to support membership using ARRAY_CONTAINS queries.
+    };
+
+}
+
+/**
+ * A field of an index.
+ */
+class IndexField : public Printable
+{
+private:
+    String buf;
+    String fp, md;
+    ObjectWriter owriter;
+    JsonHelper jh;
+
+    void set()
+    {
+        buf.remove(0, buf.length());
+        if (fp.length() > 0)
+        {
+            if (buf.length() == 0)
+                buf = fp;
+            else
+                owriter.addMember(buf, fp, true, "}");
+        }
+        if (md.length() > 0)
+        {
+            if (buf.length() == 0)
+                buf = md;
+            else
+                owriter.addMember(buf, md, true, "}");
+        }
+    }
+
+public:
+    IndexField() {}
+    /**
+     * The path of the field. Must match the field path specification described by
+     * [google.firestore.v1beta1.Document.fields][fields]. Special field path __name__
+     * may be used by itself or at the end of a path. __type__ may be used only at the end of path.
+     * @param fieldPath
+     */
+    IndexField &fieldPath(const String &fieldPath)
+    {
+        jh.addObject(fp, "fieldPath", jh.toString(fieldPath), true);
+        set();
+        return *this;
+    }
+    /**
+     * The field's mode.
+     * @param mode
+     */
+    IndexField &mode(Index::Mode mode)
+    {
+        if (mode == Index::ASCENDING)
+            jh.addObject(md, "mode", jh.toString("ASCENDING"), true);
+        else if (mode == Index::DESCENDING)
+            jh.addObject(md, "mode", jh.toString("DESCENDING"), true);
+        else if (mode == Index::ARRAY_CONTAINS)
+            jh.addObject(md, "mode", jh.toString("ARRAY_CONTAINS"), true);
+        set();
+        return *this;
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
+/**
+ * An index definition.
+ */
+class Indexes : public Printable
+{
+private:
+    String buf;
+    String collid, flds, flds_ar;
+    ObjectWriter owriter;
+    JsonHelper jh;
+
+    void set()
+    {
+        buf.remove(0, buf.length());
+        if (collid.length() > 0)
+        {
+            if (buf.length() == 0)
+                buf = collid;
+            else
+                owriter.addMember(buf, collid, true, "}");
+        }
+        if (flds.length() > 0)
+        {
+            if (buf.length() == 0)
+                buf = flds;
+            else
+                owriter.addMember(buf, flds, true, "}");
+        }
+    }
+
+public:
+    Indexes(const String &collId)
+    {
+        collectionId(collId);
+    }
+    /**
+     * The collection ID to which this index applies. Required.
+     * @param collectionId The collection ID to which this index applies. Required.
+     */
+    Indexes &collectionId(const String &collectionId)
+    {
+        jh.addObject(collid, FPSTR("collectionId"), jh.toString(collectionId), true);
+        set();
+        return *this;
+    }
+    /**
+     * Add the field to index.
+     * @param field the field to index.
+     */
+    Indexes &addField(IndexField field)
+    {
+        flds.remove(0, flds.length());
+        if (flds_ar.length() == 0)
+            jh.addArray(flds_ar, field.c_str(), true);
+        else
+            owriter.addMember(flds_ar, field.c_str(), false, "]");
+        jh.addObject(flds, FPSTR("fields"), flds_ar, true);
+        set();
+        return *this;
+    }
+    const char *c_str() { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+};
+
 
 class FirestoreOptions
 {

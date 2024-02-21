@@ -1,5 +1,5 @@
 /**
- * Created February 6, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -59,6 +59,10 @@ namespace firebase
     public:
         struct jwt_token_data
         {
+            friend class JWT;
+            friend class FirebaseApp;
+
+        private:
             String token;
             int err_code = 0;
             String msg;
@@ -71,16 +75,54 @@ namespace firebase
             String encPayload;
             String encHeadPayload;
             String encSignature;
+
+        public:
+            jwt_token_data()
+            {
+            }
+
+            ~jwt_token_data()
+            {
+                clear();
+            }
+            void clear()
+            {
+                token.clear();
+                msg.clear();
+                pk.clear();
+                encHeader.clear();
+                encPayload.clear();
+                encHeadPayload.clear();
+                encSignature.clear();
+
+                if (hash)
+                {
+                    delete hash;
+                    hash = nullptr;
+                }
+
+                if (signature)
+                {
+                    delete signature;
+                    signature = nullptr;
+                }
+            }
         };
 
         String token() { return jwt; }
+
+        void addGAPIsHost(String &str, PGM_P sub)
+        {
+            str += sub;
+            if (str[str.length() - 1] != '.')
+                str += ".";
+            str += FPSTR("googleapis.com");
+        }
 
         bool create(Memory &mem, jwt_token_data *jwt_data, user_auth_data &auth_data, time_t now)
         {
 
 #if !defined(USE_LEGACY_TOKEN_ONLY) && !defined(FIREBASE_USE_LEGACY_TOKEN_ONLY)
-
-            async_request_handler_t req;
 
             if (auth_data.sa.step == jwt_step_encode_header_payload)
             {
@@ -90,14 +132,8 @@ namespace firebase
                 // header
                 // {"alg":"RS256","typ":"JWT"}
 
-                String header = FPSTR("{\"alg\":\"RS256\",\"typ\":\"JWT\"}");
-
-                size_t len = bh.encodedLength(header.length());
-                char *buf = reinterpret_cast<char *>(mem.alloc(len));
-                bh.encodeUrl(mem, buf, (unsigned char *)header.c_str(), header.length());
-                jwt_data->encHeader = buf;
-                mem.release(&buf);
-                jwt_data->encHeadPayload = jwt_data->encHeader;
+                size_t len = 0;
+                jwt_data->encHeadPayload = FPSTR("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9");
 
                 // payload
                 // {"iss":"<email>","sub":"<email>","aud":"<audience>","iat":<timstamp>,"exp":<expire>,"scope":"<scope>"}
@@ -113,12 +149,12 @@ namespace firebase
                 String t = FPSTR("https://");
                 if (auth_data.auth_type == auth_sa_custom_token)
                 {
-                    req.addGAPIsHost(t, "identitytoolkit");
+                    addGAPIsHost(t, "identitytoolkit");
                     t += FPSTR("/google.identity.identitytoolkit.v1.IdentityToolkit");
                 }
                 else if (auth_data.auth_type == auth_sa_access_token)
                 {
-                    req.addGAPIsHost(t, "oauth2");
+                    addGAPIsHost(t, "oauth2");
                     t += FPSTR("/token");
                 }
 
@@ -130,7 +166,7 @@ namespace firebase
                 {
                     String buri;
                     String host;
-                    req.addGAPIsHost(host, "www");
+                    addGAPIsHost(host, "www");
                     uh.host2Url(buri, host);
                     buri += FPSTR("/auth/");
 
@@ -154,7 +190,7 @@ namespace firebase
 
                     if (auth_data.cust.scope.length() > 0)
                     {
-                        char *p = reinterpret_cast<char *>(mem.alloc(auth_data.cust.scope.length()));
+                        char *p = new char[auth_data.cust.scope.length()];
                         strcpy(p, auth_data.cust.scope.c_str());
                         char *pp = p;
                         char *end = p;
@@ -173,7 +209,8 @@ namespace firebase
                             pp = end;
                         }
                         // release memory
-                        mem.release(&p);
+                        delete p;
+                        p = nullptr;
                     }
 
                     json.addObject(payload, json.toString("scope"), json.toString(s), true);
@@ -189,10 +226,11 @@ namespace firebase
                 }
 
                 len = bh.encodedLength(payload.length());
-                buf = reinterpret_cast<char *>(mem.alloc(len));
+                char *buf = new char[len];
                 bh.encodeUrl(mem, buf, (unsigned char *)payload.c_str(), payload.length());
                 jwt_data->encPayload = buf;
-                mem.release(&buf);
+                delete buf;
+                buf = nullptr;
 
                 jwt_data->encHeadPayload += '.';
                 jwt_data->encHeadPayload += jwt_data->encPayload;
@@ -202,7 +240,7 @@ namespace firebase
 
                 // create message digest from encoded header and payload
 
-                jwt_data->hash = reinterpret_cast<char *>(mem.alloc(jwt_data->hashSize));
+                jwt_data->hash = new char[jwt_data->hashSize];
                 br_sha256_context mc;
                 br_sha256_init(&mc);
                 br_sha256_update(&mc, jwt_data->encHeadPayload.c_str(), jwt_data->encHeadPayload.length());
@@ -219,7 +257,7 @@ namespace firebase
 
                 // RSA private key
                 PrivateKey *pk = nullptr;
-                req.idle();
+                sys_idle();
                 // parse priv key
                 if (jwt_data->pk.length() > 0)
                     pk = new PrivateKey(jwt_data->pk.c_str());
@@ -249,18 +287,17 @@ namespace firebase
                 // generate RSA signature from private key and message digest
                 jwt_data->signature = new unsigned char[jwt_data->signatureSize];
 
-                req.idle();
+                sys_idle();
                 int ret = br_rsa_i15_pkcs1_sign(BR_HASH_OID_SHA256, (const unsigned char *)jwt_data->hash,
                                                 br_sha256_SIZE, br_rsa_key, jwt_data->signature);
-                req.idle();
-                mem.release(&jwt_data->hash);
+                sys_idle();
 
                 size_t len = bh.encodedLength(jwt_data->signatureSize);
-                char *buf = reinterpret_cast<char *>(mem.alloc(len));
+                char *buf = new char[len];
                 bh.encodeUrl(mem, buf, jwt_data->signature, jwt_data->signatureSize);
                 jwt_data->encSignature = buf;
-                mem.release(&buf);
-                mem.release(&jwt_data->signature);
+                delete buf;
+                buf = nullptr;
                 delete pk;
                 pk = nullptr;
 
@@ -281,6 +318,8 @@ namespace firebase
                     auth_data.sa.step = jwt_step_error;
                     return false;
                 }
+
+                ESP.wdtEnable(WDTO_8S);
             }
 
 #endif

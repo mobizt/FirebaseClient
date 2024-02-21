@@ -1,5 +1,5 @@
 /**
- * Created February 7, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -33,12 +33,6 @@
 struct async_response_handler_t
 {
 public:
-    enum response_type
-    {
-        RES_UNDEFINED = -1,
-        RES_ERROR = 0,
-        RES_OK = 1,
-    };
     enum chunk_phase
     {
         READ_CHUNK_SIZE = 0,
@@ -76,7 +70,6 @@ public:
     struct auth_error_t
     {
         String string;
-        response_type resp_type = RES_UNDEFINED;
         int resp_code = 0;
     };
 
@@ -92,6 +85,10 @@ public:
     chunk_info_t chunkInfo;
     Timer read_timer;
 
+    async_response_handler_t()
+    {
+    }
+
     ~async_response_handler_t()
     {
         if (toFill)
@@ -99,6 +96,28 @@ public:
         toFill = nullptr;
         toFillLen = 0;
         toFillIndex = 0;
+    }
+
+    void clear()
+    {
+        httpCode = 0;
+        flags.reset();
+        payloadLen = 0;
+        payloadRead = 0;
+        error.resp_code = 0;
+        error.string.remove(0, error.string.length());
+        if (toFill)
+            delete toFill;
+        toFill = nullptr;
+        toFillLen = 0;
+        toFillIndex = 0;
+        location.remove(0, location.length());
+        etag.remove(0, etag.length());
+        header.remove(0, header.length());
+        payload.remove(0, payload.length());
+        chunkInfo.chunkSize = 0;
+        chunkInfo.dataLen = 0;
+        chunkInfo.phase = READ_CHUNK_SIZE;
     }
 
     void feedTimer(int interval = -1)

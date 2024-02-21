@@ -1,5 +1,5 @@
 /**
- * Created February 10, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -105,6 +105,7 @@ class FirebaseError
     friend class Functions;
     friend class Storage;
     friend class CloudStorage;
+    friend class FirestoreDocuments;
 
 private:
     struct firebase_error_info_t
@@ -228,6 +229,11 @@ public:
     ~FirebaseError(){};
     String message() const { return err.message; }
     int code() const { return err.code; }
+    void setLastError(int code, const String &msg)
+    {
+        err.code = code;
+        err.message = msg;
+    }
 };
 
 #endif

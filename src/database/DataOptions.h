@@ -1,5 +1,5 @@
 /**
- * Created February 10, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,7 +27,7 @@
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "./database/Filter.h"
+#include "./database/DatabaseFilter.h"
 
 
 #if defined(ENABLE_DATABASE)
@@ -44,7 +44,7 @@ public:
     bool silent = false;
     bool classicRequest = false;
     String customHeaders;
-    Filter filter;
+    DatabaseFilter filter;
 
     void copy(DatabaseOptions &rhs)
     {

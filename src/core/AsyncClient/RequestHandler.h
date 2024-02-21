@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -28,6 +28,8 @@
 #include "./Config.h"
 #include "./core/FileConfig.h"
 #include "./core/Timer.h"
+#include "Client.h"
+#include "./core/AuthConfig.h"
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncTCPConfig.h"
@@ -69,32 +71,51 @@ public:
         http_delete,
     };
 
-    struct url_info_t
-    {
-        String host;
-        String uri;
-        String auth;
-    };
-
-    String url, path, header, payload;
+    String url, path, etag;
+    String header, payload;
     app_token_t *app_token = nullptr;
     uint16_t port = 443;
-    size_t payloadLen = 0;
     uint8_t *data = nullptr;
     file_config_data file_data;
     bool base64 = false;
-
-    size_t dataLen = 0;
+    bool ota = false;
+    uint32_t payloadLen = 0;
+    uint32_t dataLen = 0;
     uint32_t payloadIndex = 0;
     uint16_t dataIndex = 0;
-    bool ota = false;
-    int b64Pad = 0;
-    int ota_error = 0;
+    int8_t b64Pad = 0;
+    int16_t ota_error = 0;
     http_request_method method = http_undefined;
-    String etag;
     Timer send_timer;
 
-    void addNewLine(String &header)
+    async_request_handler_t()
+    {
+    }
+
+    void clear()
+    {
+        url.remove(0, url.length());
+        path.remove(0, etag.length());
+        etag.remove(0, path.length());
+        header.remove(0, header.length());
+        payload.remove(0, payload.length());
+        port = 443;
+        if (data)
+            delete data;
+        data = nullptr;
+        file_data.clear();
+        base64 = false;
+        ota = false;
+        payloadLen = 0;
+        dataLen = 0;
+        payloadIndex = 0;
+        dataIndex = 0;
+        b64Pad = 0;
+        ota_error = 0;
+        method = http_undefined;
+    }
+
+    void addNewLine()
     {
         header += "\r\n";
     }
@@ -107,48 +128,48 @@ public:
         str += FPSTR("googleapis.com");
     }
 
-    void addGAPIsHostHeader(String &header, PGM_P sub)
+    void addGAPIsHostHeader(PGM_P sub)
     {
         header += FPSTR("Host: ");
         addGAPIsHost(header, sub);
-        addNewLine(header);
+        addNewLine();
     }
 
-    void addHostHeader(String &header, PGM_P host)
+    void addHostHeader(PGM_P host)
     {
         header += FPSTR("Host: ");
         header += host;
-        addNewLine(header);
+        addNewLine();
     }
 
-    void addContentTypeHeader(String &header, PGM_P v)
+    void addContentTypeHeader(PGM_P v)
     {
         header += FPSTR("Content-Type: ");
         header += v;
-        addNewLine(header);
+        addNewLine();
     }
 
-    void addContentLengthHeader(String &header, size_t len)
+    void addContentLengthHeader(size_t len)
     {
         header += FPSTR("Content-Length: ");
         header += len;
-        addNewLine(header);
+        addNewLine();
     }
 
-    void addUAHeader(String &header)
+    void addUAHeader()
     {
         header += FPSTR("User-Agent: ESP");
-        addNewLine(header);
+        addNewLine();
     }
 
-    void addConnectionHeader(String &header, bool keepAlive)
+    void addConnectionHeader(bool keepAlive)
     {
         header += keepAlive ? FPSTR("Connection: keep-alive") : FPSTR("Connection: close");
-        addNewLine(header);
+        addNewLine();
     }
 
     /* Append the string with first request line (HTTP method) */
-    bool addRequestHeaderFirst(String &header, async_request_handler_t::http_request_method method)
+    bool addRequestHeaderFirst(async_request_handler_t::http_request_method method)
     {
         bool post = false;
         switch (method)
@@ -185,13 +206,13 @@ public:
     }
 
     /* Append the string with last request line (HTTP version) */
-    void addRequestHeaderLast(String &header)
+    void addRequestHeaderLast()
     {
         header += FPSTR(" HTTP/1.1\r\n");
     }
 
     /* Append the string with first part of Authorization header */
-    void addAuthHeaderFirst(String &header, auth_token_type type)
+    void addAuthHeaderFirst(auth_token_type type)
     {
         header += FPSTR("Authorization: ");
         if (type == auth_access_token || type == auth_sa_access_token)
@@ -200,52 +221,6 @@ public:
             header += FPSTR("Firebase ");
         else
             header += FPSTR("key=");
-    }
-
-    void parse(Memory &mem, const String &url, struct async_request_handler_t::url_info_t &info)
-    {
-
-        char *host = reinterpret_cast<char *>(mem.alloc(url.length()));
-        char *uri = reinterpret_cast<char *>(mem.alloc(url.length()));
-        char *auth = reinterpret_cast<char *>(mem.alloc(url.length()));
-
-        int p1 = 0;
-        int x = sscanf(url.c_str(), "https://%[^/]/%s", host, uri);
-        x ? p1 = 8 : x = sscanf(url.c_str(), "http://%[^/]/%s", host, uri);
-        x ? p1 = 7 : x = sscanf(url.c_str(), "%[^/]/%s", host, uri);
-
-        int p2 = 0;
-        if (x > 0)
-        {
-            p2 = String(host).indexOf("?", 0);
-            if (p2 != -1)
-                x = sscanf(url.c_str() + p1, "%[^?]?%s", host, uri);
-        }
-
-        if (strlen(uri) > 0)
-        {
-#if defined(ENABLE_DATABASE)
-            p2 = String(uri).indexOf("auth=", 0);
-            if (p2 != -1)
-                x = sscanf(uri + p2 + 5, "%[^&]", auth);
-#endif
-        }
-
-        info.uri = uri;
-        info.host = host;
-        info.auth = auth;
-        mem.release(&host);
-        mem.release(&uri);
-        mem.release(&auth);
-    }
-
-    void idle()
-    {
-#if defined(ARDUINO_ESP8266_MAJOR) && defined(ARDUINO_ESP8266_MINOR) && defined(ARDUINO_ESP8266_REVISION) && ((ARDUINO_ESP8266_MAJOR == 3 && ARDUINO_ESP8266_MINOR >= 1) || ARDUINO_ESP8266_MAJOR > 3)
-        esp_yield();
-#else
-        delay(0);
-#endif
     }
 
     void feedTimer(int interval = -1)

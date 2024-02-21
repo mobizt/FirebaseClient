@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -32,7 +32,6 @@
 #if defined(ENABLE_JWT)
 #include "./core/JWT.h"
 #endif
-#include "./core/AuthRequest.h"
 #include "./core/Timer.h"
 
 #define FIREBASE_DEFAULT_TS 1618971013
@@ -51,6 +50,9 @@ namespace firebase
         friend class CloudStorage;
 
     private:
+        Timer req_timer;
+        uint16_t slot = 0;
+        async_data_item_t *sData = nullptr;
         auth_data_t auth_data;
         AsyncClientClass *aClient = nullptr;
         uint32_t aclient_addr = 0;
@@ -58,11 +60,14 @@ namespace firebase
         uint32_t ref_ts = 0;
         AsyncResultCallback resultCb = NULL;
         AsyncResult aResult;
-        AuthRequest authReq;
         Timer auth_timer, err_timer;
         List vec;
         bool processing = false;
         uint32_t expire = 3600;
+
+        String payload;
+        String extras;
+        JsonHelper json;
 
 #if defined(ENABLE_JWT)
         JWT jwt;
@@ -79,7 +84,7 @@ namespace firebase
 
             if (!jwt.create(mem, jwt_data, auth_data, ref_ts))
             {
-                authReq.setLastError(aResult, jwt_data->err_code, jwt_data->msg);
+                setLastError(aResult, jwt_data->err_code, jwt_data->msg);
                 clearJWT();
                 return false;
             }
@@ -87,20 +92,19 @@ namespace firebase
             return true;
         }
 
+        void setLastError(AsyncResult &aResult, int code, const String &message)
+        {
+            aResult.lastError.setLastError(code, message);
+        }
+
         void clearJWT()
         {
             if (jwt_data)
             {
-                jwt_data->token.clear();
-                jwt_data->msg.clear();
-                jwt_data->pk.clear();
-                jwt_data->encHeader.clear();
-                jwt_data->encPayload.clear();
-                jwt_data->encHeadPayload.clear();
-                jwt_data->encSignature.clear();
+                jwt_data->clear();
                 delete jwt_data;
+                jwt_data = nullptr;
             }
-            jwt_data = nullptr;
         }
 
 #endif
@@ -147,7 +151,7 @@ namespace firebase
             StringHelper sh;
             int p1 = 0, p2 = 0;
             auth_data.app_token.clear();
-            String token;
+            String token, refresh;
 
             if (aResult.payload().indexOf("\"error\"") > -1)
             {
@@ -163,7 +167,7 @@ namespace firebase
                     parseItem(sh, aResult.payload(), str, "\"error_description\"", "}", p1, p2);
                     if (str[str.length() - 1] == '"')
                         str[str.length() - 1] = '\0';
-                    authReq.setLastError(aResult, code, str);
+                    setLastError(aResult, code, str);
                 }
             }
             else if (aResult.payload().indexOf("\"idToken\"") > -1)
@@ -175,18 +179,18 @@ namespace firebase
                 if (parseItem(sh, aResult.payload(), token, "\"idToken\"", ",", p1, p2))
                 {
                     sh.trim(token);
-                    parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refreshToken\"", ",", p1, p2);
-                    sh.trim(auth_data.app_token.refresh);
+                    parseItem(sh, aResult.payload(), refresh, "\"refreshToken\"", ",", p1, p2);
+                    sh.trim(refresh);
                     parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expiresIn\"", "}", p1, p2);
                 }
             }
             else if (aResult.payload().indexOf("\"id_token\"") > -1)
             {
                 parseItem(sh, aResult.payload(), auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
-                parseItem(sh, aResult.payload(), auth_data.app_token.refresh, "\"refresh_token\"", ",", p1, p2);
+                parseItem(sh, aResult.payload(), refresh, "\"refresh_token\"", ",", p1, p2);
                 parseItem(sh, aResult.payload(), token, "\"id_token\"", ",", p1, p2);
                 parseItem(sh, aResult.payload(), auth_data.app_token.uid, "\"user_id\"", ",", p1, p2);
-                sh.trim(auth_data.app_token.refresh);
+                sh.trim(refresh);
                 sh.trim(token);
                 sh.trim(auth_data.app_token.uid);
             }
@@ -199,6 +203,7 @@ namespace firebase
                 }
             }
             auth_data.app_token.token = token;
+            auth_data.app_token.refresh = refresh;
             auth_data.app_token.project_id = auth_data.user_auth.sa.project_id;
             return token.length() > 0;
         }
@@ -216,7 +221,7 @@ namespace firebase
                 auth_timer.stop();
             }
 
-            authReq.setEventResult(aResult, auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
+            setEventResult(aResult, auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
 
             if (resultCb)
                 resultCb(aResult);
@@ -224,11 +229,28 @@ namespace firebase
             if (event == auth_event_error || event == auth_event_ready)
             {
                 processing = false;
-                authReq.stop(aClient);
+                stop(aClient);
                 event = auth_event_uninitialized;
-                authReq.clearLastError(aResult);
-                authReq.remove(aClient);
+                clearLastError(aResult);
+                remove(aClient);
             }
+        }
+
+        void remove(AsyncClientClass *aClient)
+        {
+            if (!aClient)
+                return;
+            aClient->handleRemove();
+        }
+
+        void clearLastError(AsyncResult &aResult)
+        {
+            aResult.lastError.setLastError(0, "");
+        }
+
+        void setEventResult(AsyncResult &aResult, const String &msg, int code)
+        {
+            aResult.app_event.setEvent(code, msg);
         }
 
         void getTime()
@@ -237,12 +259,77 @@ namespace firebase
                 auth_data.user_auth.timestatus_cb(ref_ts);
         }
 
+        void addGAPIsHost(String &str, PGM_P sub)
+        {
+            str += sub;
+            if (str[str.length() - 1] != '.')
+                str += ".";
+            str += FPSTR("googleapis.com");
+        }
+
+        void addContentTypeHeader(String &header, PGM_P v)
+        {
+            header += FPSTR("Content-Type: ");
+            header += v;
+            header += FPSTR("\r\n");
+        }
+
+        void asyncRequest(AsyncClientClass *aClient, const String &subdomain, const String &extras, const String &payload, AsyncResult &aResult, AsyncResultCallback resultCb, const String &uid)
+        {
+            if (!aClient)
+                return;
+
+            String host;
+            addGAPIsHost(host, subdomain.c_str());
+
+            sData = aClient->newSlot(cVec, host, extras, "", async_request_handler_t::http_post, slot_options_t(true, false, true, false, false, false), uid);
+
+            if (sData)
+            {
+                addContentTypeHeader(sData->request.header, "application/json");
+                sData->request.payload = payload;
+                aClient->setContentLength(sData, sData->request.payload.length());
+                sData->setRefResult(&aResult);
+                req_timer.feed(FIREBASE_TCP_READ_TIMEOUT_SEC);
+                slot = aClient->slotCount() - 1;
+                sData->aResult.setDebug(FPSTR("Connecting to server..."));
+                if (resultCb)
+                    resultCb(sData->aResult);
+                aClient->process(sData->async);
+                aClient->handleRemove();
+            }
+        }
+
+        void process(AsyncClientClass *aClient, AsyncResult &aResult, AsyncResultCallback resultCb)
+        {
+            if (!aClient)
+                return;
+
+            aClient->process(true);
+            aClient->handleRemove();
+
+            if (resultCb && aResult.error().code() != 0 && aResult.error_available)
+            {
+                aResult.data_available = false;
+                resultCb(aResult);
+            }
+        }
+
+        void stop(AsyncClientClass *aClient)
+        {
+            if (!aClient)
+                return;
+            aClient->stop(sData);
+            if (sData)
+            {
+                delete sData;
+            }
+            sData = nullptr;
+        }
+
         bool processAuth()
         {
-            async_request_handler_t req;
-            req.idle();
-
-            authReq.process(aClient, aResult, resultCb);
+            process(aClient, aResult, resultCb);
 
             if (!isExpired())
                 return true;
@@ -285,6 +372,7 @@ namespace firebase
 #if defined(ENABLE_JWT)
                     if (auth_data.user_auth.sa.step == jwt_step_begin)
                     {
+                        stop(aClient);
                         clearJWT();
                         auth_data.user_auth.sa.step = jwt_step_encode_header_payload;
                         if (!createJwt(auth_data.user_auth))
@@ -303,16 +391,15 @@ namespace firebase
                     {
                         if (createJwt(auth_data.user_auth) && auth_data.user_auth.sa.step == jwt_step_ready)
                             setEvent(auth_event_authenticating);
-
                         auth_data.user_auth.sa.step = jwt_step_begin;
                     }
 #endif
                 }
                 else if (auth_data.user_auth.status._event == auth_event_authenticating)
                 {
-                    String payload;
-                    String extras;
-                    JsonHelper json;
+                    payload.remove(0, payload.length());
+                    extras.remove(0, extras.length());
+
                     String subdomain = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? FPSTR("oauth2") : FPSTR("identitytoolkit");
 
                     if (auth_data.user_auth.auth_type == auth_sa_access_token)
@@ -367,8 +454,8 @@ namespace firebase
                         extras = FPSTR("/v1/accounts:signInWithCustomToken?key=");
                         extras += api_key;
                     }
-
-                    authReq.asyncRequest(aClient, subdomain, extras, payload, aResult, resultCb, "");
+                    asyncRequest(aClient, subdomain, extras, payload, aResult, resultCb, "");
+                    extras.remove(0, extras.length());
                     payload.remove(0, payload.length());
                     setEvent(auth_event_auth_request_sent);
                 }
@@ -376,7 +463,6 @@ namespace firebase
             else
             {
                 // user/pass auth
-
                 if (auth_data.user_auth.status._event == auth_event_uninitialized)
                     setEvent(auth_event_authenticating);
 
@@ -435,8 +521,7 @@ namespace firebase
                     }
                     else
                         extras += auth_data.user_auth.user.api_key;
-
-                    authReq.asyncRequest(aClient, subdomain, extras, payload, aResult, resultCb, "");
+                    asyncRequest(aClient, subdomain, extras, payload, aResult, resultCb, "");
                     payload.remove(0, payload.length());
                     setEvent(auth_event_auth_request_sent);
                     return true;
@@ -445,7 +530,7 @@ namespace firebase
 
             if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
             {
-                if (aResult.error().code() != 0 || authReq.req_timer.remaining() == 0)
+                if (aResult.error().code() != 0 || req_timer.remaining() == 0)
                 {
                     setEvent(auth_event_error);
                     return false;

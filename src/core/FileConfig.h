@@ -1,5 +1,5 @@
 /**
- * Created February 5, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -33,22 +33,7 @@
 #include <FS.h>
 #define FILEOBJ File
 #else
-class dmFile : public Stream
-{
-public:
-    operator bool() { return 0; }
-    size_t write(uint8_t) { return 0; }
-    size_t write(const uint8_t *buf, size_t size) { return 0; }
-    int available() { return 0; }
-    int read() { return 0; }
-    int peek() { return 0; }
-    void flush() {}
-    int read(uint8_t *buf, size_t size) { return 0; }
-    void close() {}
-    size_t position() { return 0; }
-    size_t size() { return 0; }
-};
-#define FILEOBJ dmFile
+
 #endif
 
 enum file_operating_mode
@@ -100,8 +85,9 @@ struct file_config_data
         file_status_closed,
         file_status_opened
     };
-
+#if defined(ENABLE_FS)
     FILEOBJ file;
+#endif
     String filename;
     size_t file_size = 0;
     FileConfigCallback cb = NULL;
@@ -117,8 +103,8 @@ struct file_config_data
     {
         if (internal_data && data && data_size > 0)
         {
-            Memory mem;
-            mem.release(&data);
+            delete data;
+            data = nullptr;
         }
         data_size = 0;
         internal_data = false;
@@ -127,8 +113,7 @@ struct file_config_data
     void initBlobWriter(size_t size)
     {
         clearInternalData();
-        Memory mem;
-        data = reinterpret_cast<uint8_t *>(mem.alloc(size));
+        data = new uint8_t[size];
         if (data)
         {
             data_size = size;
@@ -146,7 +131,9 @@ public:
 
     void copy(file_config_data rhs)
     {
+#if defined(ENABLE_FS)
         this->file = rhs.file;
+#endif
         this->filename = rhs.filename;
         this->cb = rhs.cb;
 
@@ -164,7 +151,7 @@ public:
     void clear()
     {
         clearInternalData();
-        filename.clear();
+        filename.remove(0, filename.length());
         cb = NULL;
         data = nullptr;
         data_size = 0;

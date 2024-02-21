@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -78,7 +78,7 @@ public:
     auto get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T1, void>::value && !std::is_same<T1, AsyncResult>::value, T1>::type
     {
         AsyncResult result;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(), nullptr, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, nullptr, &result, NULL);
         asyncRequest(aReq);
         return result.database.to<T1>();
     }
@@ -124,7 +124,7 @@ public:
     auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T1, void>::value && !std::is_same<T1, AsyncResult>::value, T1>::type
     {
         AsyncResult result;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, false, false, false, false, options.shallow), &options, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, false, false, options.shallow), &options, nullptr, &result, NULL);
         asyncRequest(aReq);
         return result.database.to<T1>();
     }
@@ -142,7 +142,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, bool sse = false)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -160,7 +160,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -184,7 +184,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, true, false, false, false), &options, nullptr, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -208,7 +208,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -255,7 +255,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(), nullptr, &file, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, &file, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -303,7 +303,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(), nullptr, &file, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -322,7 +322,7 @@ public:
         AsyncResult result;
         DatabaseOptions options;
         options.silent = true;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(), &options, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), &options, nullptr, &result, NULL);
         asyncRequest(aReq);
         return !result.database.null_etag;
     }
@@ -341,7 +341,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, false, false, true, false), nullptr, nullptr, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, true, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -360,7 +360,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, AsyncClientClass::slot_options_t(false, false, false, false, true, false), nullptr, nullptr, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, true, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -481,7 +481,7 @@ public:
      */
     void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClientClass::slot_options_t(false, false, true, false, true, false), nullptr, &file, &aResult, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -529,7 +529,7 @@ public:
      */
     void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, AsyncClientClass::slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -558,7 +558,7 @@ public:
         AsyncResult result;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(), nullptr, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(), nullptr, nullptr, &result, NULL);
         asyncRequest(aReq, payload.c_str());
         return result.database.name();
     }
@@ -587,7 +587,7 @@ public:
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq, payload.c_str());
     }
 
@@ -616,7 +616,7 @@ public:
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq, payload.c_str());
     }
 
@@ -663,7 +663,7 @@ public:
      */
     void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -711,7 +711,7 @@ public:
      */
     void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, AsyncClientClass::slot_options_t(false, false, true, false, false, false), nullptr, &file, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -781,7 +781,7 @@ public:
     bool remove(AsyncClientClass &aClient, const String &path)
     {
         AsyncResult result;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClientClass::slot_options_t(), nullptr, nullptr, &result, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(), nullptr, nullptr, &result, nullptr);
         asyncRequest(aReq);
         return result.database.null_etag && result.database.data().indexOf("null") > -1;
     }
@@ -798,7 +798,7 @@ public:
      */
     void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClientClass::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -815,7 +815,7 @@ public:
      */
     void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, AsyncClientClass::slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -857,13 +857,13 @@ private:
         String path;
         String uid;
         async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
-        AsyncClientClass::slot_options_t opt;
+        slot_options_t opt;
         DatabaseOptions *options = nullptr;
         file_config_data *file = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, AsyncClientClass::slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;
@@ -886,7 +886,7 @@ private:
         DatabaseOptions options;
         if (!async && aClient.reqEtag.length() == 0)
             options.silent = true;
-        async_request_data_t aReq(&aClient, path, mode, AsyncClientClass::slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid);
+        async_request_data_t aReq(&aClient, path, mode, slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid);
         asyncRequest(aReq, payload.c_str());
         if (!async)
             return aResult->lastError.code() == 0;
@@ -905,7 +905,7 @@ private:
         String extras = request.opt.auth_param ? ".json?auth=" + String(FIREBASE_AUTH_PLACEHOLDER) : ".json";
 
         addParams(request.opt.auth_param, extras, request.method, request.options, request.file);
-        AsyncClientClass::async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
+        async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 

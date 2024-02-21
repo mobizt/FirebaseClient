@@ -1,5 +1,5 @@
 /**
- * Created February 10, 2024
+ * Created February 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -28,6 +28,7 @@
 #include "./core/Error.h"
 #include "./core/List.h"
 #include "./core/Timer.h"
+#include "./core/StringHelper.h"
 
 #define FIREBASE_CHUNK_SIZE 2048
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
@@ -46,6 +47,8 @@ class AsyncResult
     friend class Functions;
     friend class Storage;
     friend class CloudStorage;
+    friend class FirestoreDocuments;
+    friend class async_data_item_t;
 
     struct app_event_t
     {
@@ -58,6 +61,11 @@ class AsyncResult
     public:
         String message() { return ev_msg; }
         int code() { return ev_code; }
+        void setEvent(int code, const String &msg)
+        {
+            ev_code = code;
+            ev_msg = msg;
+        }
     };
 
     struct download_data_t
@@ -99,17 +107,14 @@ class AsyncResult
 private:
     uint32_t addr = 0;
     String result_uid;
-    FirebaseError lastError;
+
     String data_path;
     String data_payload;
     String res_etag;
     String debug_info;
-    bool data_available = false;
-    bool error_available = false;
     bool debug_info_available = false;
     download_data_t download_data;
     upload_data_t upload_data;
-    app_event_t app_event;
 
     void setPayload(const String &data)
     {
@@ -131,14 +136,18 @@ private:
         data_path = path;
     }
 
+public:
+    bool data_available = false;
+    bool error_available = false;
+    app_event_t app_event;
+    FirebaseError lastError;
+
     void setDebug(const String &debug)
     {
         debug_info = debug;
         if (debug.length())
             debug_info_available = true;
     }
-
-public:
     struct database_data_t
     {
         friend class AsyncResult;
