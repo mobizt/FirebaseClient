@@ -386,7 +386,7 @@ public:
     bool set(AsyncClientClass &aClient, const String &path, T value)
     {
         AsyncResult result;
-        return storeAsync(aClient, path, value, async_request_handler_t::http_put, false, &result, NULL);
+        return storeAsync(aClient, path, value, async_request_handler_t::http_put, false, &result, NULL, "");
     }
 
     /**
@@ -410,7 +410,7 @@ public:
     template <typename T = const char *>
     void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
     {
-        storeAsync(aClient, path, value, async_request_handler_t::http_put, true, &aResult, NULL);
+        storeAsync(aClient, path, value, async_request_handler_t::http_put, true, &aResult, NULL, "");
     }
 
     /**
@@ -730,7 +730,7 @@ public:
     bool update(AsyncClientClass &aClient, const String &path, const T &value)
     {
         AsyncResult result;
-        return storeAsync(aClient, path, value, async_request_handler_t::http_patch, false, &result, NULL);
+        return storeAsync(aClient, path, value, async_request_handler_t::http_patch, false, &result, NULL, "");
     }
 
     /**
@@ -747,7 +747,7 @@ public:
     template <typename T = object_t>
     void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult)
     {
-        storeAsync(aClient, path, value, async_request_handler_t::http_patch, true, &aResult, NULL);
+        storeAsync(aClient, path, value, async_request_handler_t::http_patch, true, &aResult, NULL, "");
     }
 
     /**
@@ -905,6 +905,7 @@ private:
         String extras = request.opt.auth_param ? ".json?auth=" + String(FIREBASE_AUTH_PLACEHOLDER) : ".json";
 
         addParams(request.opt.auth_param, extras, request.method, request.options, request.file);
+
         async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
