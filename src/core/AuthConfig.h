@@ -1,5 +1,5 @@
 /**
- * Created February 21, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -151,6 +151,13 @@ namespace firebase
     };
 
     typedef void (*TimeStatusCallback)(uint32_t &ts);
+    
+    /**
+     * JWT Token signing callback
+     * @param able_to_run The status to allow the JWT signing process to run inside the callback,
+     * otherwise it should run in main.
+    */
+    typedef void (*JWTCallback)(bool able_to_run);
 
     struct user_auth_data
     {
@@ -162,7 +169,7 @@ namespace firebase
         friend class AccessToken;
         friend class CustomToken;
         friend class AuthRequest;
-        friend class JWT;
+        friend class JWTClass;
         friend class FirebaseApp;
         friend class UserTokenFileParser;
         friend class LegacyToken;
@@ -179,7 +186,7 @@ namespace firebase
             friend class CustomAuth;
             friend class ServiceAuth;
             friend class FirebaseApp;
-            friend class JWT;
+            friend class JWTClass;
             friend class FirebaseClient;
 
         public:
@@ -193,6 +200,7 @@ namespace firebase
                 this->private_key_id = rhs.private_key_id;
                 this->client_id = rhs.client_id;
                 this->timestatus_cb = rhs.timestatus_cb;
+                this->jwt_cb = rhs.jwt_cb;
                 this->expire = rhs.expire;
             }
 
@@ -204,6 +212,7 @@ namespace firebase
                 private_key_id.clear();
                 client_id.clear();
                 timestatus_cb = NULL;
+                jwt_cb = NULL;
                 expire = 3600;
             }
 
@@ -215,6 +224,7 @@ namespace firebase
             String client_id;
             jwt_step step = jwt_step_begin;
             TimeStatusCallback timestatus_cb = NULL;
+            JWTCallback jwt_cb = NULL;
             size_t expire = 3600;
         };
 #endif
@@ -228,6 +238,7 @@ namespace firebase
             String scope;
             String claims;
             TimeStatusCallback timestatus_cb = NULL;
+            JWTCallback jwt_cb = NULL;
 
         public:
             custom_data() {}
@@ -239,6 +250,7 @@ namespace firebase
                 this->scope = rhs.scope;
                 this->claims = rhs.claims;
                 this->timestatus_cb = rhs.timestatus_cb;
+                this->jwt_cb = rhs.jwt_cb;
             }
 
             void clear()
@@ -248,6 +260,7 @@ namespace firebase
                 scope.clear();
                 claims.clear();
                 timestatus_cb = NULL;
+                jwt_cb = NULL;
             }
         };
 #endif
@@ -314,9 +327,12 @@ namespace firebase
             String client_secret;
             size_t expire = 3600;
             TimeStatusCallback timestatus_cb = NULL;
+            JWTCallback jwt_cb = NULL;
 
         public:
-            access_token_data() {}
+            access_token_data()
+            {
+            }
             ~access_token_data() { clear(); }
             void copy(access_token_data &rhs)
             {
@@ -326,6 +342,7 @@ namespace firebase
                 this->client_secret = rhs.client_secret;
                 this->expire = rhs.expire;
                 this->timestatus_cb = rhs.timestatus_cb;
+                this->jwt_cb = rhs.jwt_cb;
             }
             void clear()
             {
@@ -335,6 +352,7 @@ namespace firebase
                 client_secret.clear();
                 expire = 3600;
                 timestatus_cb = NULL;
+                jwt_cb = NULL;
             }
         };
 #endif
@@ -345,6 +363,7 @@ namespace firebase
             String token;
             size_t expire = 3600;
             TimeStatusCallback timestatus_cb = NULL;
+            JWTCallback jwt_cb = NULL;
 
         public:
             custom_token_data() {}
@@ -354,12 +373,14 @@ namespace firebase
                 this->token = rhs.token;
                 this->expire = rhs.expire;
                 this->timestatus_cb = rhs.timestatus_cb;
+                this->jwt_cb = rhs.jwt_cb;
             }
             void clear()
             {
                 token.clear();
                 expire = 3600;
                 timestatus_cb = NULL;
+                jwt_cb = NULL;
             }
         };
 #endif
@@ -417,6 +438,7 @@ namespace firebase
             this->anonymous = rhs.anonymous;
             this->initialized = rhs.initialized;
             this->timestatus_cb = rhs.timestatus_cb;
+            this->jwt_cb = rhs.jwt_cb;
         }
 
         void clear()
@@ -482,6 +504,7 @@ namespace firebase
         firebase_core_auth_task_type task_type = firebase_core_auth_task_type_undefined;
         auth_status status;
         TimeStatusCallback timestatus_cb = NULL;
+        JWTCallback jwt_cb = NULL;
     };
 
     struct token_info_t
@@ -829,7 +852,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        ServiceAuth(TimeStatusCallback cb, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = 3600)
+        ServiceAuth(TimeStatusCallback timeCb, JWTCallback JWTCallback, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = 3600)
         {
             data.clear();
             data.sa.client_email = clientEmail;
@@ -839,10 +862,11 @@ namespace firebase
             data.initialized = isInitialized();
             data.auth_type = auth_sa_access_token;
             data.auth_data_type = user_auth_data_service_account;
-            data.timestatus_cb = cb;
+            data.timestatus_cb = timeCb;
+            data.jwt_cb = JWTCallback;
         };
 
-        ServiceAuth(TimeStatusCallback cb, file_config_data &safile)
+        ServiceAuth(TimeStatusCallback timeCb, JWTCallback JWTCallback, file_config_data &safile)
         {
 #if defined(ENABLE_FS)
             data.clear();
@@ -854,7 +878,8 @@ namespace firebase
                     SAParser::parseSAFile(safile.file, data);
                     safile.file.close();
                 }
-                data.timestatus_cb = cb;
+                data.timestatus_cb = timeCb;
+                data.jwt_cb = JWTCallback;
             }
 #endif
         }
@@ -877,7 +902,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        CustomAuth(TimeStatusCallback cb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = 3600)
+        CustomAuth(TimeStatusCallback timeCb, JWTCallback JWTCallback, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = 3600)
         {
             data.clear();
             data.sa.client_email = clientEmail;
@@ -891,10 +916,11 @@ namespace firebase
             data.initialized = isInitialized();
             data.auth_type = auth_sa_custom_token;
             data.auth_data_type = user_auth_data_custom_data;
-            data.timestatus_cb = cb;
+            data.timestatus_cb = timeCb;
+            data.jwt_cb = JWTCallback;
         };
 
-        CustomAuth(TimeStatusCallback cb, file_config_data &safile, const String &uid)
+        CustomAuth(TimeStatusCallback timeCb, JWTCallback JWTCallback, file_config_data &safile, const String &uid)
         {
 #if defined(ENABLE_FS)
             data.clear();
@@ -910,7 +936,8 @@ namespace firebase
                         data.auth_data_type = user_auth_data_custom_data;
                     }
                     safile.file.close();
-                    data.timestatus_cb = cb;
+                    data.timestatus_cb = timeCb;
+                    data.jwt_cb = JWTCallback;
                 }
             }
 #endif
@@ -1144,7 +1171,7 @@ namespace firebase
             this->data.auth_data_type = user_auth_data_custom_token;
         }
 
-        CustomToken(TimeStatusCallback cb, file_config_data &tokenFile)
+        CustomToken(TimeStatusCallback timeCb, JWTCallback JWTCallback, file_config_data &tokenFile)
         {
             data.clear();
             if (tokenFile.initialized)
@@ -1160,7 +1187,8 @@ namespace firebase
                         data.auth_data_type = user_auth_data_custom_token;
                     }
                     tokenFile.file.close();
-                    data.timestatus_cb = cb;
+                    data.timestatus_cb = timeCb;
+                    data.jwt_cb = JWTCallback;
                 }
 #endif
             }

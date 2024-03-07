@@ -306,7 +306,7 @@ void loop()
 
         Values::MapValue mapV2("key" + String(counter), mapV);
 
-        Document updateDoc;
+        Document<Values::Value> updateDoc;
         updateDoc.setName(documentPath);
         updateDoc.add("myMap", Values::Value(mapV2));
 

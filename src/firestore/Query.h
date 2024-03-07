@@ -1,5 +1,5 @@
 /**
- * Created February 17, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -160,6 +160,7 @@ namespace FirestoreQuery
 
         const char *c_str() { return buf.c_str(); }
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        void clear() { buf.remove(0, buf.length()); }
     };
 
     /**
@@ -180,6 +181,7 @@ namespace FirestoreQuery
         Order &direction(FilterSort::Direction direction);
         const char *c_str();
         size_t printTo(Print &p) const;
+        void clear();
     };
 
     class CollectionSelector : public Printable
@@ -240,7 +242,7 @@ namespace FirestoreQuery
     class Cursor : public Printable
     {
     private:
-        String buf, field_str, direction_str;
+        String buf, before_str, value_str, value_ar_str;
         ObjectWriter owriter;
         JsonHelper jh;
         void set();
@@ -260,6 +262,7 @@ namespace FirestoreQuery
         Cursor &addValue(Values::Value value);
         const char *c_str();
         size_t printTo(Print &p) const;
+        void clear();
     };
 
     /**
@@ -328,6 +331,7 @@ namespace FirestoreQuery
 
         const char *c_str();
         size_t printTo(Print &p) const;
+        void clear();
     };
 
     /**
@@ -354,6 +358,7 @@ namespace FirestoreQuery
         CompositeFilter &addFilter(Filter filter);
         const char *c_str();
         size_t printTo(Print &p) const;
+        void clear();
     };
 
     /**
@@ -385,6 +390,7 @@ namespace FirestoreQuery
         FieldFilter &value(Values::Value value);
         const char *c_str();
         size_t printTo(Print &p) const;
+        void clear();
     };
     /**
      * A filter with a single operand.
@@ -415,6 +421,7 @@ namespace FirestoreQuery
         UnaryFilter &field(FieldReference field);
         const char *c_str();
         size_t printTo(Print &p) const;
+        void clear();
     };
 
     /**
@@ -446,6 +453,7 @@ namespace FirestoreQuery
         Filter(UnaryFilter unaryFilter);
         const char *c_str();
         size_t printTo(Print &p) const;
+        void clear();
     };
 
 }

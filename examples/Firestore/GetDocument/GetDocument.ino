@@ -304,7 +304,7 @@ void loop()
             Values::MapValue jp("time_zone", Values::IntegerValue(9));
             jp.add("population", Values::IntegerValue(125570000));
 
-            Document doc("japan", Values::Value(jp));
+            Document<Values::Value> doc("japan", Values::Value(jp));
 
             Values::MapValue bg("time_zone", Values::IntegerValue(1));
             bg.add("population", Values::IntegerValue(11492641));

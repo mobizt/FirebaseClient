@@ -1,5 +1,5 @@
 /**
- * Created February 17, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -86,6 +86,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_nullValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     class StringValue : public Printable
@@ -104,6 +109,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_stringValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     class BooleanValue : public Printable
@@ -121,6 +131,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_booleanValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     class IntegerValue : public Printable
@@ -139,6 +154,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_integerValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     class DoubleValue : public Printable
@@ -157,6 +177,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_doubleValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     class TimestampValue : public Printable
@@ -176,6 +201,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_timestampValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     class BytesValue : public Printable
@@ -195,6 +225,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_bytesValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     class ReferenceValue : public Printable
@@ -213,6 +248,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_referenceValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     class GeoPointValue : public Printable
@@ -236,6 +276,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_geoPointValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     class ArrayValue : public Printable
@@ -301,6 +346,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_arrayValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
 
     struct MAP
@@ -313,6 +363,7 @@ namespace Values
         template <typename T>
         MAP(const String &key, T value, bool val) { owriter.setPair(buf, key, val ? value.val() : value.c_str()); }
         const char *c_str() { return buf.c_str(); }
+        void clear() { buf.remove(0, buf.length()); }
     };
 
     /**
@@ -347,6 +398,11 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_mapValue].text, buf); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            str.remove(0, str.length());
+        }
     };
     /**
      * A message that can hold any of the supported value types.
@@ -366,6 +422,7 @@ namespace Values
         const char *c_str() { return buf.c_str(); }
         const char *val() { return buf.c_str(); }
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        void clear() { buf.remove(0, buf.length()); }
     };
 };
 

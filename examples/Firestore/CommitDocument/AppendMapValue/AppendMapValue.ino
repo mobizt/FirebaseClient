@@ -302,7 +302,7 @@ void loop()
         // Map value to append
         Values::MapValue mapV("key" + String(counter), Values::IntegerValue(counter));
 
-        Document updateDoc;
+        Document<Values::Value> updateDoc;
         updateDoc.setName(documentPath);
         updateDoc.add("myMap", Values::Value(mapV));
 

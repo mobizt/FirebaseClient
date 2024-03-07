@@ -1,5 +1,5 @@
 /**
- * Created February 21, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -29,6 +29,9 @@
 #include <Client.h>
 #include "./Config.h"
 #include "./core/Memory.h"
+#if __has_include(<vector>)
+#include <vector>
+#endif
 
 static const char firebase_boundary_table[] PROGMEM = "=_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static const unsigned char firebase_base64_table[65] PROGMEM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

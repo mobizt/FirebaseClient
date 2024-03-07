@@ -302,7 +302,7 @@ void loop()
         // map
         Values::MapValue mapV("key" + String(cnt), Values::StringValue("value" + String(cnt)));
 
-        Document doc("myMap", Values::Value(mapV));
+        Document<Values::Value> doc("myMap", Values::Value(mapV));
 
         // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 

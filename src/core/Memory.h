@@ -1,5 +1,5 @@
 /**
- * Created January 29, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -50,7 +50,7 @@ public:
     {
         void *p;
         size_t newLen = getReservedLen(len);
-#if defined(BOARD_HAS_PSRAM) && defined(MB_STRING_USE_PSRAM)
+#if defined(BOARD_HAS_PSRAM)
         if (ESP.getPsramSize() > 0)
             p = (void *)ps_malloc(newLen);
         else

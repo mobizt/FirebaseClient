@@ -303,7 +303,7 @@ void loop()
 
         Values::ArrayValue arrV(mapV);
 
-        FieldTransform::AppendMissingElements appendValue(arrV);
+        FieldTransform::AppendMissingElements<Values::ArrayValue> appendValue(arrV);
         FieldTransform::FieldTransform fieldTransforms(fieldPath, appendValue);
         DocumentTransform transform(documentPath, fieldTransforms);
 

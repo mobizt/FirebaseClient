@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -60,7 +60,7 @@ private:
             net_status_cb = NULL;
         }
     };
-
+#if defined(ENABLE_GSM_NETWORK)
     struct gsm_data
     {
         String pin, apn, user, password;
@@ -84,7 +84,8 @@ private:
             password.clear();
         }
     };
-
+#endif
+#if defined(ENABLE_ETHERNET_NETWORK)
     struct ethernet_data
     {
         int ethernet_reset_pin = -1;
@@ -108,17 +109,22 @@ private:
             static_ip = nullptr;
         }
     };
+#endif
 
     firebase_network_data_type network_data_type = firebase_network_data_undefined;
 
     generic_data generic;
+#if defined(ENABLE_GSM_NETWORK)
     gsm_data gsm;
+#endif
+#if defined(ENABLE_ETHERNET_NETWORK)
     ethernet_data ethernet;
+    SPI_ETH_Module *eth = NULL;
+#endif
     bool initialized = false;
     bool network_status = false;
     bool reconnect = true;
     FirebaseWiFi *wifi = nullptr;
-    SPI_ETH_Module *eth = NULL;
     Timer net_timer;
     Timer eth_timer;
 
@@ -136,14 +142,21 @@ public:
         this->initialized = rhs.initialized;
         this->reconnect = rhs.reconnect;
         generic.copy(rhs.generic);
+#if defined(ENABLE_GSM_NETWORK)
         gsm.copy(rhs.gsm);
+#endif
+
+#if defined(ENABLE_ETHERNET_NETWORK)
         ethernet.copy(rhs.ethernet);
+#endif
 
         this->initialized = rhs.initialized;
         this->network_status = rhs.network_status;
         this->reconnect = rhs.reconnect;
         this->wifi = rhs.wifi;
+#if defined(ENABLE_ETHERNET_NETWORK)
         this->eth = rhs.eth;
+#endif
         this->net_timer = rhs.net_timer;
         this->net_timer.start();
     }
@@ -151,14 +164,20 @@ public:
     void clear()
     {
         generic.clear();
+#if defined(ENABLE_GSM_NETWORK)
         gsm.clear();
+#endif
+#if defined(ENABLE_ETHERNET_NETWORK)
         ethernet.clear();
+#endif
         network_data_type = firebase_network_data_undefined;
         initialized = false;
         network_status = false;
         reconnect = true;
         wifi = nullptr;
+#if defined(ENABLE_ETHERNET_NETWORK)
         eth = NULL;
+#endif
         net_timer.stop();
         net_timer.setInterval(0);
     }
@@ -204,6 +223,7 @@ public:
     ~GenericNetwork() { clear(); }
 };
 
+#if defined(ENABLE_GSM_NETWORK)
 class GSMNetwork : public DefaultNetwork
 {
 public:
@@ -220,7 +240,9 @@ public:
     }
     ~GSMNetwork() { clear(); }
 };
+#endif
 
+#if defined(ENABLE_ETHERNET_NETWORK)
 class EthernetNetwork : public DefaultNetwork
 {
 
@@ -237,6 +259,8 @@ public:
     ~EthernetNetwork() { clear(); }
 };
 
+#endif
+
 class DefaultEthernetNetwork : public DefaultNetwork
 {
 
@@ -244,7 +268,9 @@ public:
     DefaultEthernetNetwork(SPI_ETH_Module &eth)
     {
         init();
+#if defined(ENABLE_ETHERNET_NETWORK)
         network_data.eth = &eth;
+#endif
         network_data.network_data_type = firebase_network_data_default_network;
     }
 

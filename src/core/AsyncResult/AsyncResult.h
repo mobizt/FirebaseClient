@@ -1,5 +1,5 @@
 /**
- * Created February 21, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -36,20 +36,8 @@
 
 using namespace firebase;
 
-class AsyncResult
+namespace firebase
 {
-    friend class AsyncClientClass;
-    friend class FirebaseApp;
-    friend class AuthRequest;
-    friend class Database;
-    friend class Firestore;
-    friend class Messaging;
-    friend class Functions;
-    friend class Storage;
-    friend class CloudStorage;
-    friend class FirestoreDocuments;
-    friend class async_data_item_t;
-
     struct app_event_t
     {
         friend class AuthRequest;
@@ -67,87 +55,7 @@ class AsyncResult
             ev_msg = msg;
         }
     };
-
-    struct download_data_t
-    {
-    public:
-        String sourcePath;
-        size_t total = 0;
-        size_t downloaded = 0;
-        bool progress_available = false;
-        int progress = -1;
-        void reset()
-        {
-            sourcePath = "";
-            total = 0;
-            downloaded = 0;
-            progress_available = false;
-            progress = -1;
-        }
-    };
-
-    struct upload_data_t
-    {
-    public:
-        String targetPath;
-        size_t total = 0;
-        size_t uploaded = 0;
-        bool progress_available = false;
-        int progress = -1;
-        void reset()
-        {
-            targetPath = "";
-            total = 0;
-            uploaded = 0;
-            progress_available = false;
-            progress = -1;
-        }
-    };
-
-private:
-    uint32_t addr = 0;
-    String result_uid;
-
-    String data_path;
-    String data_payload;
-    String res_etag;
-    String debug_info;
-    bool debug_info_available = false;
-    download_data_t download_data;
-    upload_data_t upload_data;
-
-    void setPayload(const String &data)
-    {
-        if (data.length())
-        {
-            data_available = true;
-            data_payload = data;
-        }
-        database.ref_payload = &data_payload;
-    }
-
-    void setETag(const String &etag)
-    {
-        res_etag = etag;
-    }
-
-    void setPath(const String &path)
-    {
-        data_path = path;
-    }
-
-public:
-    bool data_available = false;
-    bool error_available = false;
-    app_event_t app_event;
-    FirebaseError lastError;
-
-    void setDebug(const String &debug)
-    {
-        debug_info = debug;
-        if (debug.length())
-            debug_info_available = true;
-    }
+#if defined(ENABLE_DATABASE)
     struct database_data_t
     {
         friend class AsyncResult;
@@ -193,20 +101,6 @@ public:
         {
             return vcon.getType(data().c_str());
         }
-
-    private:
-        ValueConverter vcon;
-        String *ref_payload = nullptr;
-        bool null_etag = false;
-        bool sse = false;
-        event_resume_status_t event_resume_status = event_resume_status_undefined;
-        String node_name; // database node name that value was pushed
-        String etag;
-        uint16_t data_path_p1 = 0, data_path_p2 = 0;
-        uint16_t event_p1 = 0, event_p2 = 0;
-        uint16_t data_p1 = 0, data_p2 = 0;
-        Timer sse_timer;
-
         void clearSSE()
         {
             data_path_p1 = 0;
@@ -218,7 +112,6 @@ public:
             sse = false;
             event_resume_status = event_resume_status_undefined;
         }
-
         void parseNodeName()
         {
             StringHelper sh;
@@ -229,17 +122,6 @@ public:
                 node_name = ref_payload->substring(p1 + 1, p2 - 1);
             }
         }
-
-        void setEventResumeStatus(event_resume_status_t status)
-        {
-            event_resume_status = status;
-        }
-
-        event_resume_status_t eventResumeStatus() const
-        {
-            return event_resume_status;
-        }
-
         void parseSSE()
         {
             clearSSE();
@@ -292,11 +174,132 @@ public:
                 }
             }
         }
+        void setEventResumeStatus(event_resume_status_t status)
+        {
+            event_resume_status = status;
+        }
+
+        event_resume_status_t eventResumeStatus() const
+        {
+            return event_resume_status;
+        }
+
+        bool null_etag = false;
+        String *ref_payload = nullptr;
+
+    private:
+        ValueConverter vcon;
+
+        bool sse = false;
+        event_resume_status_t event_resume_status = event_resume_status_undefined;
+        String node_name; // database node name that value was pushed
+        String etag;
+        uint16_t data_path_p1 = 0, data_path_p2 = 0;
+        uint16_t event_p1 = 0, event_p2 = 0;
+        uint16_t data_p1 = 0, data_p2 = 0;
+        Timer sse_timer;
     };
+#endif
+}
+
+class AsyncResult
+{
+    friend class AsyncClientClass;
+    friend class FirebaseApp;
+    friend class AuthRequest;
+    friend class Database;
+    friend class Firestore;
+    friend class Messaging;
+    friend class Functions;
+    friend class Storage;
+    friend class CloudStorage;
+    friend class FirestoreDocuments;
+    friend class async_data_item_t;
+
+    struct download_data_t
+    {
+    public:
+        size_t total = 0;
+        size_t downloaded = 0;
+        bool progress_available = false;
+        int progress = -1;
+        void reset()
+        {
+            total = 0;
+            downloaded = 0;
+            progress_available = false;
+            progress = -1;
+        }
+    };
+
+    struct upload_data_t
+    {
+    public:
+        size_t total = 0;
+        size_t uploaded = 0;
+        bool progress_available = false;
+        int progress = -1;
+        void reset()
+        {
+            total = 0;
+            uploaded = 0;
+            progress_available = false;
+            progress = -1;
+        }
+    };
+
+private:
+    uint32_t addr = 0;
+    String result_uid;
+
+    String data_path;
+    String data_payload;
+    String res_etag;
+    String debug_info;
+    bool debug_info_available = false;
+    download_data_t download_data;
+    upload_data_t upload_data;
+
+    void setPayload(const String &data)
+    {
+        if (data.length())
+        {
+            data_available = true;
+            data_payload = data;
+        }
+#if defined(ENABLE_DATABASE)
+        database.ref_payload = &data_payload;
+#endif
+    }
+
+    void setETag(const String &etag)
+    {
+        res_etag = etag;
+    }
+
+    void setPath(const String &path)
+    {
+        data_path = path;
+    }
+
+public:
+    bool data_available = false;
+    bool error_available = false;
+    app_event_t app_event;
+    FirebaseError lastError;
+
+    void setDebug(const String &debug)
+    {
+        debug_info = debug;
+        if (debug.length())
+            debug_info_available = true;
+    }
 
     AsyncResult()
     {
+#if defined(ENABLE_DATABASE)
         database.ref_payload = &data_payload;
+#endif
         addr = reinterpret_cast<uint32_t>(this);
         List vec;
         vec.addRemoveList(rVec, addr, true);
@@ -306,12 +309,12 @@ public:
         List vec;
         vec.addRemoveList(rVec, addr, false);
     };
-
-    String payload() const { return data_payload; }
-    String path() const { return data_path; }
-    String etag() const { return res_etag; }
-    String uid() const { return result_uid; }
-    String debug() const { return debug_info; }
+    const char *c_str() { return data_payload.c_str(); }
+    String payload() const { return data_payload.c_str(); }
+    String path() const { return data_path.c_str(); }
+    String etag() const { return res_etag.c_str(); }
+    String uid() const { return result_uid.c_str(); }
+    String debug() const { return debug_info.c_str(); }
     int available()
     {
         bool ret = data_available;
@@ -376,8 +379,9 @@ public:
     }
 
     FirebaseError error() const { return lastError; }
-
+#if defined(ENABLE_DATABASE)
     database_data_t database;
+#endif
 };
 
 typedef void (*AsyncResultCallback)(AsyncResult &aResult);

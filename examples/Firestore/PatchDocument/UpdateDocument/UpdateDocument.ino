@@ -310,7 +310,7 @@ void loop()
             Values::IntegerValue intV(cnt);
             Values::BooleanValue boolV(cnt % 2 == 0);
 
-            Document doc("count", Values::Value(intV));
+            Document<Values::Value> doc("count", Values::Value(intV));
             doc.add("status", Values::Value(boolV));
 
             // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
@@ -324,7 +324,7 @@ void loop()
         Values::IntegerValue intV(cnt);
         Values::BooleanValue boolV(cnt % 2 == 0);
 
-        Document doc("count", Values::Value(intV));
+        Document<Values::Value> doc("count", Values::Value(intV));
         doc.add("status", Values::Value(boolV));
 
         // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.

@@ -304,7 +304,7 @@ void loop()
         Values::ArrayValue arrV(Values::IntegerValue((int)rand()));
         arrV.add(Values::StringValue("word don't come easy " + String(counter)));
 
-        FieldTransform::AppendMissingElements appendValue(arrV);
+        FieldTransform::AppendMissingElements<Values::ArrayValue> appendValue(arrV);
         FieldTransform::FieldTransform fieldTransforms(fieldPath, appendValue);
         DocumentTransform transform(documentPath, fieldTransforms);
 
@@ -314,7 +314,7 @@ void loop()
         Values::ArrayValue arrV2(Values::DoubleValue((int)rand() * 1.234));
         arrV2.add(Values::StringValue("never gonna give you up " + String(counter)));
         // Another append array object
-        FieldTransform::AppendMissingElements appendValue2(arrV2);
+        FieldTransform::AppendMissingElements<Values::ArrayValue> appendValue2(arrV2);
         // Another field transform
         FieldTransform::FieldTransform fieldTransforms2(fieldPath, appendValue2);
         // Another doc transform

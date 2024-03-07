@@ -318,6 +318,7 @@ void loop()
         Order order;
         order.field(FieldReference("myInteger"));
         order.direction(FilterSort::DESCENDING);
+        query.orderBy(order);
         // Or shorter form
         // query.orderBy(Order(FieldReference("myInteger"), FilterSort::DESCENDING));
 
@@ -326,9 +327,14 @@ void loop()
         QueryOptions queryOptions;
         queryOptions.structuredQuery(query);
 
+        query.clear();
+        projection.clear();
+        order.clear();
+
         String documentPath = "/"; // Query from all collections under root
 
         firestore.runQuery(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, queryOptions, asyncCB);
+        queryOptions.clear();
 
         // Note that in this case the document path is the root ("/") because the collection a0 is at the root.
 

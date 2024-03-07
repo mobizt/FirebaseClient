@@ -34,9 +34,10 @@
  *
  * SYNTAX:
  *
- * ServiceAuth service_auth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
+ * ServiceAuth service_auth(<TimeStatusCallback>, <JWTCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
  *
  * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
+ * <JWTCallback> - The JWT token process callback. This callback was required for JWT token processing inside or outside the callback.
  * <client_email> - The service account client Email.
  * <project_id> - The service account project ID.
  * <private_key> - The service account private key.
@@ -157,13 +158,17 @@ const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----
 
 void timeStatusCB(uint32_t &ts);
 
+void jwtCB(bool able_to_run);
+
+void processJWT(const char *str = __builtin_FUNCTION());
+
 void asyncCB(AsyncResult &aResult);
 
 void fileCallback(File &file, const char *filename, file_operating_mode mode);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
+ServiceAuth sa_auth(timeStatusCB, jwtCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
 
 // FileConfig sa_file("/sa_file.json", fileCallback);
 
@@ -172,6 +177,8 @@ ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PR
 FirebaseApp app;
 
 WiFiClientSecure ssl_client;
+
+bool jwt_loop_process = false;
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
@@ -225,6 +232,11 @@ void setup()
 
 void loop()
 {
+    if (jwt_loop_process)
+    {
+        processJWT();
+    }
+
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
 
@@ -244,6 +256,23 @@ void timeStatusCB(uint32_t &ts)
     }
 
     ts = time(nullptr);
+}
+
+void jwtCB(bool able_to_run)
+{
+    jwt_loop_process = !able_to_run;
+    processJWT();
+}
+
+void processJWT(const char *str)
+{
+    // This prevents the stack overflow in ESP8266
+    // Exit the function when it was called from jwt callback while it was unable to run from there.
+    if (jwt_loop_process && strcmp(str, "jwtCB") == 0)
+        return;
+    jwt_loop_process = false;
+    JWT.begin(app.getAuth());
+    JWT.create();
 }
 
 void asyncCB(AsyncResult &aResult)

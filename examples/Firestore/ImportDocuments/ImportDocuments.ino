@@ -197,16 +197,22 @@ const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----
 
 void timeStatusCB(uint32_t &ts);
 
+void jwtCB(bool able_to_run);
+
+void processJWT(const char *str = __builtin_FUNCTION());
+
 void asyncCB(AsyncResult &aResult);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 // ServiceAuth is required for import and export documents.
-ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
+ServiceAuth sa_auth(timeStatusCB, jwtCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
 
 FirebaseApp app;
 
 WiFiClientSecure ssl_client;
+
+bool jwt_loop_process = false;
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
@@ -263,6 +269,11 @@ void setup()
 
 void loop()
 {
+    if (jwt_loop_process)
+    {
+        processJWT();
+    }
+
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
 
@@ -306,6 +317,23 @@ void timeStatusCB(uint32_t &ts)
     }
 
     ts = time(nullptr);
+}
+
+void jwtCB(bool able_to_run)
+{
+    jwt_loop_process = !able_to_run;
+    processJWT();
+}
+
+void processJWT(const char *str)
+{
+    // This prevents the stack overflow in ESP8266
+    // Exit the function when it was called from jwt callback while it was unable to run from there.
+    if (jwt_loop_process && strcmp(str, "jwtCB") == 0)
+        return;
+    jwt_loop_process = false;
+    JWT.begin(app.getAuth());
+    JWT.create();
 }
 
 void asyncCB(AsyncResult &aResult)

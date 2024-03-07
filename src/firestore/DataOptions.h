@@ -1,5 +1,5 @@
 /**
- * Created February 21, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -108,7 +108,7 @@ class DocumentMask : public Printable
     friend class GetDocumentOptions;
     friend class patchDocumentOptions;
     friend class ListDocumentsOptions;
-     friend class FirestoreDocuments;
+    friend class FirestoreDocuments;
 
 private:
     String mask;
@@ -154,6 +154,11 @@ public:
     }
     const char *c_str() { return str.c_str(); }
     size_t printTo(Print &p) const { return p.print(str.c_str()); }
+    void clear()
+    {
+        str.remove(0, str.length());
+        mask.remove(0, mask.length());
+    }
 };
 
 namespace FieldTransform
@@ -182,6 +187,7 @@ namespace FieldTransform
         template <typename T>
         Increment(T value) { owriter.setPair(buf, FPSTR("increment"), value.val()); }
         const char *c_str() { return buf.c_str(); }
+        void clear() { buf.remove(0, buf.length()); }
     };
 
     struct Maximum
@@ -198,6 +204,7 @@ namespace FieldTransform
         template <typename T>
         Maximum(T value) { owriter.setPair(buf, FPSTR("maximum"), value.c_str()); }
         const char *c_str() { return buf.c_str(); }
+        void clear() { buf.remove(0, buf.length()); }
     };
 
     struct Minimum
@@ -231,6 +238,7 @@ namespace FieldTransform
          */
         AppendMissingElements(T arrayValue) { owriter.setPair(buf, FPSTR("appendMissingElements"), arrayValue.c_str()); }
         const char *c_str() { return buf.c_str(); }
+        void clear() { buf.remove(0, buf.length()); }
     };
 
     template <typename T = Values::ArrayValue>
@@ -307,6 +315,7 @@ namespace FieldTransform
          */
         FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
         const char *c_str() { return buf.c_str(); }
+        void clear() { buf.remove(0, buf.length()); }
     };
 
 };
@@ -401,6 +410,13 @@ public:
     }
     const char *c_str() { return str.c_str(); }
     size_t printTo(Print &p) const { return p.print(str.c_str()); }
+    void clear()
+    {
+        buf.remove(0, buf.length());
+        str.remove(0, str.length());
+        eut.remove(0, eut.length());
+        estr.remove(0, estr.length());
+    }
 };
 
 template <typename T = Values::Value>
@@ -477,6 +493,14 @@ public:
         return buf.c_str();
     }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear()
+    {
+        buf.remove(0, buf.length());
+        map_obj.remove(0, map_obj.length());
+        name_obj.remove(0, name_obj.length());
+        name.remove(0, name.length());
+        mv.clear();
+    }
 };
 
 class DocumentTransform : public Printable
@@ -502,6 +526,7 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 };
 
 class Write : public Printable
@@ -594,6 +619,7 @@ public:
 
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 };
 
 class Writes : public Printable
@@ -643,6 +669,7 @@ public:
 
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 };
 
 /**
@@ -666,6 +693,7 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 };
 
 /**
@@ -689,6 +717,7 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 };
 
 /**
@@ -720,6 +749,7 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 };
 
 class EximDocumentOptions : public Printable
@@ -739,6 +769,7 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 };
 
 class GetDocumentOptions : public Printable
@@ -875,6 +906,15 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear()
+    {
+        buf.remove(0, buf.length());
+        doc.remove(0, doc.length());
+        msk.remove(0, msk.length());
+        trans.remove(0, trans.length());
+        newtrans.remove(0, newtrans.length());
+        rt.remove(0, rt.length());
+    }
 };
 
 class patchDocumentOptions : public Printable
@@ -896,6 +936,7 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
 };
 
 #if defined(ENABLE_FIRESTORE_QUERY)
@@ -994,6 +1035,14 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear()
+    {
+        buf.remove(0, buf.length());
+        query.remove(0, query.length());
+        trans.remove(0, trans.length());
+        newtrans.remove(0, newtrans.length());
+        rt.remove(0, rt.length());
+    }
 };
 
 #endif
@@ -1111,6 +1160,16 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear()
+    {
+        buf.remove(0, buf.length());
+        msk.clear();
+        ptk.remove(0, ptk.length());
+        ordby.remove(0, ordby.length());
+        sms.remove(0, sms.length());
+        tsc.remove(0, tsc.length());
+        rt.remove(0, rt.length());
+    }
 };
 
 class ListCollectionIdsOptions : public Printable
@@ -1184,6 +1243,13 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear()
+    {
+        buf.remove(0, buf.length());
+        ptk.remove(0, ptk.length());
+        pz.remove(0, pz.length());
+        rt.remove(0, rt.length());
+    }
 };
 
 namespace Index
@@ -1264,6 +1330,12 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear()
+    {
+        buf.remove(0, buf.length());
+        fp.remove(0, fp.length());
+        md.remove(0, md.length());
+    }
 };
 
 /**
@@ -1328,8 +1400,14 @@ public:
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear()
+    {
+        buf.remove(0, buf.length());
+        collid.remove(0, collid.length());
+        flds.remove(0, flds.length());
+        flds_ar.remove(0, flds_ar.length());
+    }
 };
-
 
 class FirestoreOptions
 {

@@ -309,7 +309,7 @@ void loop()
 
             Serial.println("[+] Create a document... ");
 
-            Document doc("myDouble", Values::Value(Values::DoubleValue(123.456)));
+            Document<Values::Value> doc("myDouble", Values::Value(Values::DoubleValue(123.456)));
 
             firestore.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
 

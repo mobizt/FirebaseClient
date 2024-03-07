@@ -1,5 +1,5 @@
 /**
- * Created February 21, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -84,6 +84,7 @@ public:
     String header, payload, location, etag;
     chunk_info_t chunkInfo;
     Timer read_timer;
+    bool auth_data_available = false;
 
     async_response_handler_t()
     {

@@ -1,5 +1,5 @@
 /**
- * Created February 21, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -906,9 +906,12 @@ private:
 
         addParams(request.opt.auth_param, extras, request.method, request.options, request.file);
 
-        async_data_item_t *sData = request.aClient->newSlot(cVec, service_url, request.path, extras, request.method, request.opt, request.uid);
+        async_data_item_t *sData = request.aClient->createSlot(request.opt);
+
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
+
+        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
         if (request.options && request.options->customHeaders.length() && sData->request.header.indexOf("X-Firebase-") == -1 && sData->request.header.indexOf("-ETag") == -1)
         {

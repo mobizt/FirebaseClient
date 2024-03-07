@@ -1,5 +1,5 @@
 /**
- * Created February 21, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -36,21 +36,13 @@
 #include "./core/AsyncResult/AsyncResult.h"
 #include "./core/AuthConfig.h"
 #include "./core/List.h"
+#include "./core/Core.h"
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncTCPConfig.h"
 #endif
 
 using namespace firebase;
-
-static void sys_idle()
-{
-#if defined(ARDUINO_ESP8266_MAJOR) && defined(ARDUINO_ESP8266_MINOR) && defined(ARDUINO_ESP8266_REVISION) && ((ARDUINO_ESP8266_MAJOR == 3 && ARDUINO_ESP8266_MINOR >= 1) || ARDUINO_ESP8266_MAJOR > 3)
-    esp_yield();
-#else
-    delay(0);
-#endif
-}
 
 static void meminfo(int pos)
 {
@@ -194,6 +186,7 @@ private:
     uint32_t addr = 0;
     bool inProcess = false;
     bool inStopAsync = false;
+    String header;
 
     void closeFile(async_data_item_t *sData)
     {
@@ -256,11 +249,11 @@ private:
             }
         }
 
+#if defined(ENABLE_FS)
+
         uint8_t *buf = nullptr;
         int toSend = 0;
         Memory mem;
-
-#if defined(ENABLE_FS)
 
         if (sData->request.file_data.filename.length() > 0 ? sData->request.file_data.file.available() : sData->request.file_data.data_pos < sData->request.file_data.data_size)
         {
@@ -330,12 +323,11 @@ private:
         else if (sData->request.base64)
             ret = send(sData, (uint8_t *)"\"", 1, sData->request.file_data.file_size, async_state_send_payload);
 
-#endif
-
     exit:
 
         if (buf)
             mem.release(&buf);
+#endif
 
         return ret;
     }
@@ -415,8 +407,6 @@ private:
 
             if ((client_type == async_request_handler_t::tcp_client_type_sync && !client->connected()) || client_type == async_request_handler_t::tcp_client_type_async)
             {
-                // ret = function_return_type_failure;
-
                 ret = connect(sData, getHost(sData, true).c_str(), sData->request.port);
 
                 // allow non-blocking async tcp connection
@@ -437,9 +427,11 @@ private:
                     return function_return_type_failure;
                 }
 
-                String header = sData->request.header;
+                header = sData->request.header;
                 header.replace(FIREBASE_AUTH_PLACEHOLDER, sData->request.app_token->token);
-                return sendHeader(sData, header.c_str());
+                ret = sendHeader(sData, header.c_str());
+                header.remove(0, header.length());
+                return ret;
             }
 
             return sendHeader(sData, sData->request.header.c_str());
@@ -670,31 +662,33 @@ private:
 
                     if (sData->response.flags.sse || !sData->response.flags.payload_remaining)
                     {
+                        if (!sData->auth_used)
+                        {
+                            sData->aResult.setPayload(sData->response.payload);
 
-                        sData->aResult.setPayload(sData->response.payload);
-
-                        if (sData->aResult.download_data.total > 0)
-                            sData->aResult.data_available = false;
+                            if (sData->aResult.download_data.total > 0)
+                                sData->aResult.data_available = false;
 #if defined(ENABLE_DATABASE)
 
-                        if (sData->request.method == async_request_handler_t::http_post)
-                            sData->aResult.database.parseNodeName();
+                            if (sData->request.method == async_request_handler_t::http_post)
+                                sData->aResult.database.parseNodeName();
 
-                        // data available from sse event
-                        if (sData->response.flags.sse && sData->response.payload.length())
-                        {
-                            // order of checking: event, data, newline
-                            if (sData->response.payload.indexOf("event: ") > -1 && sData->response.payload.indexOf("data: ") > -1 && sData->response.payload.indexOf("\n") > -1)
+                            // data available from sse event
+                            if (sData->response.flags.sse && sData->response.payload.length())
                             {
-                                // save payload to slot result
-                                sData->aResult.setPayload(sData->response.payload);
-                                clear(sData->response.payload);
-                                sData->aResult.database.parseSSE();
-                                sData->response.flags.payload_available = true;
-                                returnResult(sData, true);
+                                // order of checking: event, data, newline
+                                if (sData->response.payload.indexOf("event: ") > -1 && sData->response.payload.indexOf("data: ") > -1 && sData->response.payload.indexOf("\n") > -1)
+                                {
+                                    // save payload to slot result
+                                    sData->aResult.setPayload(sData->response.payload);
+                                    clear(sData->response.payload);
+                                    sData->aResult.database.parseSSE();
+                                    sData->response.flags.payload_available = true;
+                                    returnResult(sData, true);
+                                }
                             }
-                        }
 #endif
+                        }
                     }
                 }
             }
@@ -1024,7 +1018,7 @@ private:
             if (!sData->response.flags.chunks && sData->response.payloadRead > sData->response.payloadLen)
             {
                 sData->response.header = sData->response.payload.substring(sData->response.payloadRead - sData->response.payloadLen);
-                sData->response.payload.remove(sData->response.payloadLen);
+                sData->response.payload.remove(0, sData->response.payloadLen);
                 sData->return_type = function_return_type_continue;
                 sData->state = async_state_read_response;
                 sData->response.flags.header_remaining = true;
@@ -1049,6 +1043,9 @@ private:
 
             sData->response.flags.payload_remaining = false;
             closeFile(sData);
+
+            if (sData->auth_used)
+                sData->response.auth_data_available = true;
         }
 
         return sData->error.code == 0;
@@ -1088,7 +1085,8 @@ private:
     void clear(async_data_item_t *sData)
     {
         clear(sData->response.header);
-        clear(sData->response.payload);
+        if (!sData->auth_used)
+            clear(sData->response.payload);
         sData->response.flags.header_remaining = false;
         sData->response.flags.payload_remaining = false;
         sData->response.payloadRead = 0;
@@ -1159,6 +1157,8 @@ private:
     {
         bool ret = false;
 
+#if defined(ENABLE_ETHERNET_NETWORK)
+
 #if defined(FIREBASE_ETH_IS_AVAILABLE)
 
 #if defined(ESP32)
@@ -1197,6 +1197,8 @@ private:
 #endif
 
 #elif defined(MB_ARDUINO_PICO)
+
+#endif
 
 #endif
 
@@ -1541,9 +1543,9 @@ private:
 #if defined(ENABLE_DATABASE)
     void handleEventTimeout(async_data_item_t *sData)
     {
-        if (sData->sse && sData->aResult.database.eventTimeout() && sData->aResult.database.eventResumeStatus() == AsyncResult::database_data_t::event_resume_status_undefined)
+        if (sData->sse && sData->aResult.database.eventTimeout() && sData->aResult.database.eventResumeStatus() == database_data_t::event_resume_status_undefined)
         {
-            sData->aResult.database.setEventResumeStatus(AsyncResult::database_data_t::event_resume_status_resuming);
+            sData->aResult.database.setEventResumeStatus(database_data_t::event_resume_status_resuming);
             setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEOUT, false, false);
             returnResult(sData, false);
             reset(sData, true);
@@ -1701,16 +1703,19 @@ public:
 
     void setETag(const String &etag) { reqEtag = etag; }
 
-    async_data_item_t *newSlot(std::vector<uint32_t> &clientList, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t options, const String &uid)
+    async_data_item_t *createSlot(slot_options_t &options)
     {
         int slot_index = sIndex(options);
-
         // Only one SSE mode is allowed
         if (slot_index == -2)
             return nullptr;
-
         async_data_item_t *sData = addSlot(slot_index);
         sData->reset();
+        return sData;
+    }
+
+    void newRequest(async_data_item_t *sData, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t &options, const String &uid)
+    {
 
         sData->async = options.async;
         sData->request.url = url;
@@ -1718,6 +1723,7 @@ public:
         sData->request.method = method;
         sData->sse = options.sse;
         sData->request.etag = reqEtag;
+
         clear(reqEtag);
         sData->aResult.result_uid = uid;
         clear(sData->request.header);
@@ -1768,8 +1774,6 @@ public:
 
         if (method == async_request_handler_t::http_get || method == async_request_handler_t::http_delete)
             sData->request.addNewLine();
-
-        return sData;
     }
 
     void setContentLength(async_data_item_t *sData, size_t len)

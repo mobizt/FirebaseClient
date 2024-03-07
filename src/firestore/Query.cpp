@@ -1,6 +1,6 @@
 
 /**
- * Created February 21, 2024
+ * Created March 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -32,7 +32,6 @@
 #if defined(ENABLE_FIRESTORE) && defined(ENABLE_FIRESTORE_QUERY)
 
 #include "./firestore/Query.h"
-
 
 namespace FirestoreQuery
 {
@@ -114,6 +113,20 @@ namespace FirestoreQuery
 
     const char *StructuredQuery::c_str() { return buf.c_str(); }
     size_t StructuredQuery::printTo(Print &p) const { return p.print(buf.c_str()); }
+    void StructuredQuery::clear()
+    {
+        buf.remove(0, buf.length());
+        sel.remove(0, sel.length());
+        frm.remove(0, frm.length());
+        frm_ar.remove(0, frm_ar.length());
+        where_str.remove(0, where_str.length());
+        ordby.remove(0, ordby.length());
+        ordby_ar.remove(0, ordby_ar.length());
+        sta.remove(0, sta.length());
+        ea.remove(0, ea.length());
+        ofs.remove(0, ofs.length());
+        lim.remove(0, lim.length());
+    }
 
     void StructuredQuery::set()
     {
@@ -204,6 +217,13 @@ namespace FirestoreQuery
     }
     const char *CompositeFilter::c_str() { return buf.c_str(); }
     size_t CompositeFilter::printTo(Print &p) const { return p.print(buf.c_str()); }
+    void CompositeFilter::clear()
+    {
+        buf.remove(0, buf.length());
+        filter_str.remove(0, filter_str.length());
+        op_str.remove(0, op_str.length());
+        filter_arr.remove(0, filter_arr.length());
+    }
 
     FieldFilter::FieldFilter() {}
 
@@ -249,6 +269,10 @@ namespace FirestoreQuery
 
     const char *FieldFilter::c_str() { return buf.c_str(); }
     size_t FieldFilter::printTo(Print &p) const { return p.print(buf.c_str()); }
+    void FieldFilter::clear()
+    {
+        buf.remove(0, buf.length());
+    }
 
     UnaryFilter::UnaryFilter() {}
     UnaryFilter &UnaryFilter::op(UnaryFilterOperator::OPERATOR_TYPE filterOp)
@@ -277,6 +301,12 @@ namespace FirestoreQuery
     }
     const char *UnaryFilter::c_str() { return buf.c_str(); }
     size_t UnaryFilter::printTo(Print &p) const { return p.print(buf.c_str()); }
+    void UnaryFilter::clear()
+    {
+        buf.remove(0, buf.length());
+        op_str.remove(0, op_str.length());
+        field_str.remove(0, field_str.length());
+    }
     void UnaryFilter::set()
     {
         buf.remove(0, buf.length());
@@ -324,6 +354,12 @@ namespace FirestoreQuery
 
     const char *Order::c_str() { return buf.c_str(); }
     size_t Order::printTo(Print &p) const { return p.print(buf.c_str()); }
+    void Order::clear()
+    {
+        buf.remove(0, buf.length());
+        field_str.remove(0, field_str.length());
+        direction_str.remove(0, direction_str.length());
+    }
     void Order::set()
     {
         buf.remove(0, buf.length());
@@ -344,20 +380,63 @@ namespace FirestoreQuery
         }
     }
 
-    Cursor::Cursor() {}
+    Cursor::Cursor()
+    {
+        jh.addArray(value_ar_str, "", true);
+        value_str.remove(0, value_str.length());
+        jh.addObject(value_str, "values", value_ar_str, true);
+        value_ar_str.remove(0, value_ar_str.length());
+        set();
+    }
 
     Cursor &Cursor::before(bool value)
     {
+        before_str.remove(0, before_str.length());
+        jh.addObject(before_str, "before", owriter.getBoolStr(value), true);
+        set();
         return *this;
     }
 
     Cursor &Cursor::addValue(Values::Value value)
     {
+        if (value_ar_str.length() == 0)
+            jh.addArray(value_ar_str, value.c_str(), true);
+        else
+            owriter.addMember(value_ar_str, value.c_str(), false, "]");
+
+        value_str.remove(0, value_str.length());
+        jh.addObject(value_str, "values", value_ar_str, true);
+
+        set();
+
         return *this;
+    }
+
+    void Cursor::set()
+    {
+        buf.remove(0, buf.length());
+
+        if (value_str.length())
+            buf = value_str;
+
+        if (before_str.length())
+        {
+            if (buf.length() == 0)
+                buf = before_str;
+            else
+                owriter.addMember(buf, before_str, true, "}");
+        }
     }
 
     const char *Cursor::c_str() { return buf.c_str(); }
     size_t Cursor::printTo(Print &p) const { return p.print(buf.c_str()); }
+    void Cursor::clear()
+    {
+        buf.remove(0, buf.length());
+        before_str.remove(0, before_str.length());
+        value_str.remove(0, value_str.length());
+        value_ar_str.remove(0, value_ar_str.length());
+    }
 
     Filter::Filter() {}
     Filter::Filter(CompositeFilter compositeFilter)
@@ -374,6 +453,10 @@ namespace FirestoreQuery
     }
     const char *Filter::c_str() { return buf.c_str(); }
     size_t Filter::printTo(Print &p) const { return p.print(buf.c_str()); }
+    void Filter::clear()
+    {
+        buf.remove(0, buf.length());
+    }
 
 }
 

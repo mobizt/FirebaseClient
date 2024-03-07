@@ -312,7 +312,7 @@ void loop()
         mapV.add("random", Values::IntegerValue(rand()));
         mapV.add("status", Values::BooleanValue(counter % 2 == 0));
 
-        Document updateDoc;
+        Document<Values::Value> updateDoc;
         updateDoc.setName(documentPath);
         updateDoc.add("myMap", Values::Value(mapV));
 
