@@ -40,7 +40,7 @@ public:
     JsonHelper(){};
     ~JsonHelper(){};
 
-    void addObject(String &buf, const String &name, const String &value, bool last = false)
+    void addObject(String &buf, const String &name, const String &value, bool stringValue, bool last = false)
     {
         if (name.length() == 0)
             return;
@@ -55,18 +55,26 @@ public:
         if (name[name.length() - 1] != '"')
             buf += '"';
         buf += ':';
+        if (stringValue && value[0] != '"')
+            buf += '"';
         buf += value;
+        if (stringValue && value[value.length() - 1] != '"')
+            buf += '"';
         if (last)
             buf += '}';
     }
 
-    void addArray(String &buf, const String &value, bool last = false)
+    void addArray(String &buf, const String &value, bool stringValue, bool last = false)
     {
         if (buf.length() == 0)
             buf += '[';
         else
             buf += ',';
+        if (stringValue && value[0] != '"')
+            buf += '"';
         buf += value;
+        if (stringValue && value[value.length() - 1] != '"')
+            buf += '"';
         if (last)
             buf += ']';
     }
@@ -88,12 +96,12 @@ public:
             sh.strsepImpl(&end, ",");
             if (strlen(pp) > 0)
             {
-                addArray(tmp, toString(pp));
+                addArray(tmp, pp, true);
             }
             pp = end;
         }
         tmp += ']';
-        addObject(buf, name, tmp, last);
+        addObject(buf, name, tmp, false, last);
         delete p;
     }
 

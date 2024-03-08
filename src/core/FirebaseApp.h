@@ -369,8 +369,8 @@ namespace firebase
                     if (auth_data.user_auth.auth_type == auth_sa_access_token)
                     {
 #if defined(ENABLE_SERVICE_AUTH)
-                        json.addObject(sData->request.payload, json.toString("grant_type"), json.toString("urn:ietf:params:oauth:grant-type:jwt-bearer"));
-                        json.addObject(sData->request.payload, json.toString("assertion"), json.toString(JWT.token()), true);
+                        json.addObject(sData->request.payload, "grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer", true);
+                        json.addObject(sData->request.payload, "assertion", JWT.token(), true, true);
                         JWT.clear();
 #endif
                     }
@@ -379,24 +379,24 @@ namespace firebase
 #if defined(ENABLE_CUSTOM_AUTH)
                         if (auth_data.user_auth.auth_type == auth_sa_custom_token)
                         {
-                            json.addObject(sData->request.payload, json.toString("token"), json.toString(JWT.token()));
+                            json.addObject(sData->request.payload, "token", JWT.token(), true);
                             JWT.clear();
                         }
 #endif
 #if defined(ENABLE_CUSTOM_TOKEN)
                         if (auth_data.user_auth.auth_type == auth_custom_token)
-                            json.addObject(sData->request.payload, json.toString("token"), json.toString(auth_data.user_auth.custom_token.token));
+                            json.addObject(sData->request.payload, "token", auth_data.user_auth.custom_token.token, true);
 #endif
 
-                        json.addObject(sData->request.payload, json.toString("returnSecureToken"), "true", true);
+                        json.addObject(sData->request.payload, "returnSecureToken", "true", false, true);
                     }
                     else if (auth_data.user_auth.auth_type == auth_access_token && auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
                     {
 #if defined(ENABLE_ACCESS_TOKEN)
-                        json.addObject(sData->request.payload, json.toString("client_id"), json.toString(auth_data.user_auth.access_token.client_id));
-                        json.addObject(sData->request.payload, json.toString("client_secret"), json.toString(auth_data.user_auth.access_token.client_secret));
-                        json.addObject(sData->request.payload, json.toString("grant_type"), json.toString("refresh_token"));
-                        json.addObject(sData->request.payload, json.toString("refresh_token"), json.toString(auth_data.user_auth.access_token.refresh), true);
+                        json.addObject(sData->request.payload, "client_id", auth_data.user_auth.access_token.client_id, true);
+                        json.addObject(sData->request.payload, "client_secret", auth_data.user_auth.access_token.client_secret, true);
+                        json.addObject(sData->request.payload, "grant_type", "refresh_token", true);
+                        json.addObject(sData->request.payload, "refresh_token", auth_data.user_auth.access_token.refresh, true, true);
 #endif
                     }
 
@@ -442,36 +442,36 @@ namespace firebase
                     {
                         if (auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email)
                         {
-                            json.addObject(sData->request.payload, json.toString("requestType"), json.toString("VERIFY_EMAIL"));
-                            json.addObject(sData->request.payload, json.toString("idToken"), json.toString(auth_data.user_auth.user.id_token.length() > 0 ? auth_data.user_auth.user.id_token : auth_data.app_token.token), true);
+                            json.addObject(sData->request.payload, "requestType", "VERIFY_EMAIL", true);
+                            json.addObject(sData->request.payload, "idToken", auth_data.user_auth.user.id_token.length() > 0 ? auth_data.user_auth.user.id_token : auth_data.app_token.token, true, true);
                         }
                         else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
                         {
-                            json.addObject(sData->request.payload, json.toString("requestType"), json.toString("PASSWORD_RESET"));
-                            json.addObject(sData->request.payload, json.toString("email"), json.toString(auth_data.user_auth.user.email), true);
+                            json.addObject(sData->request.payload, "requestType", "PASSWORD_RESET", true);
+                            json.addObject(sData->request.payload, "email", auth_data.user_auth.user.email, true, true);
                         }
 
                         extras = FPSTR("/v1/accounts:sendOobCode?key=");
                     }
                     else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user)
                     {
-                        json.addObject(sData->request.payload, json.toString("idToken"), json.toString(auth_data.user_auth.user.id_token.length() ? auth_data.user_auth.user.id_token : auth_data.app_token.token), true);
+                        json.addObject(sData->request.payload, "idToken", auth_data.user_auth.user.id_token.length() ? auth_data.user_auth.user.id_token : auth_data.app_token.token, true, true);
                         extras = FPSTR("/v1/accounts:delete?key=");
                     }
                     else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
                     {
-                        json.addObject(sData->request.payload, json.toString("grantType"), json.toString("refresh_token"));
-                        json.addObject(sData->request.payload, json.toString("refreshToken"), json.toString(auth_data.app_token.refresh), true);
+                        json.addObject(sData->request.payload, "grantType", "refresh_token", true);
+                        json.addObject(sData->request.payload, "refreshToken", auth_data.app_token.refresh, true, true);
                         extras = FPSTR("/v1/token?key=");
                     }
                     else
                     {
                         if (auth_data.user_auth.user.email.length() && auth_data.user_auth.user.password.length())
                         {
-                            json.addObject(sData->request.payload, json.toString("email"), json.toString(auth_data.user_auth.user.email));
-                            json.addObject(sData->request.payload, json.toString("password"), json.toString(auth_data.user_auth.user.password));
+                            json.addObject(sData->request.payload, "email", auth_data.user_auth.user.email, true);
+                            json.addObject(sData->request.payload, "password", auth_data.user_auth.user.password, true);
                         }
-                        json.addObject(sData->request.payload, json.toString("returnSecureToken"), "true", true);
+                        json.addObject(sData->request.payload, "returnSecureToken", "true", false, true);
                         extras = auth_data.user_auth.task_type == firebase_core_auth_task_type_signup ? FPSTR("/v1/accounts:signUp?key=") : FPSTR("/v1/accounts:signInWithPassword?key=");
                     }
 

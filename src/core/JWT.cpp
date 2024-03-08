@@ -33,6 +33,7 @@
 #include "./core/URL.h"
 #include "./core/JSON.h"
 #include "./core/Error.h"
+#include "./core/Core.h"
 
 #if defined(ENABLE_JWT)
 
@@ -120,8 +121,8 @@ bool JWTClass::create()
         // {"iss":"<email>","sub":"<email>","aud":"<audience>","iat":<timstamp>,"exp":<expire>,"scope":"<scope>"}
         // {"iss":"<email>","sub":"<email>","aud":"<audience>","iat":<timstamp>,"exp":<expire>,"uid":"<uid>","claims":"<claims>"}
 
-        json.addObject(payload, json.toString("iss"), json.toString(auth_data->user_auth.sa.client_email));
-        json.addObject(payload, json.toString("sub"), json.toString(auth_data->user_auth.sa.client_email));
+        json.addObject(payload, "iss", auth_data->user_auth.sa.client_email, true);
+        json.addObject(payload, "sub", auth_data->user_auth.sa.client_email, true);
 
         String t = FPSTR("https://");
         if (auth_data->user_auth.auth_type == auth_sa_custom_token)
@@ -135,10 +136,10 @@ bool JWTClass::create()
             t += FPSTR("/token");
         }
 
-        json.addObject(payload, json.toString("aud"), json.toString(t));
+        json.addObject(payload, "aud", t, true);
         t.remove(0, t.length());
-        json.addObject(payload, json.toString("iat"), String(now));
-        json.addObject(payload, json.toString("exp"), String((int)(now + 3600)));
+        json.addObject(payload, "iat", String(now), false);
+        json.addObject(payload, "exp", String((int)(now + 3600)), false);
 
         if (auth_data->user_auth.auth_type == auth_sa_access_token)
         {
@@ -191,15 +192,15 @@ bool JWTClass::create()
                 mem.release(&p);
             }
 
-            json.addObject(payload, json.toString("scope"), json.toString(s), true);
+            json.addObject(payload, "scope", s, true, true);
         }
         else if (auth_data->user_auth.auth_type == auth_sa_custom_token)
         {
-            json.addObject(payload, json.toString("uid"), json.toString(auth_data->user_auth.cust.uid), auth_data->user_auth.cust.claims.length() <= 2);
+            json.addObject(payload, "uid", auth_data->user_auth.cust.uid, true, auth_data->user_auth.cust.claims.length() <= 2);
 
             if (auth_data->user_auth.cust.claims.length() > 2)
             {
-                json.addObject(payload, json.toString("claims"), json.toString(auth_data->user_auth.cust.claims), true);
+                json.addObject(payload, "claims", auth_data->user_auth.cust.claims, true, true);
             }
         }
 
@@ -226,7 +227,7 @@ bool JWTClass::create()
     {
         // RSA private key
         PrivateKey *pk = nullptr;
-        jwt_idle();
+        sys_idle();
         // parse priv key
         if (jwt_data.pk.length() > 0)
             pk = new PrivateKey(jwt_data.pk.c_str());
@@ -256,11 +257,11 @@ bool JWTClass::create()
         const br_rsa_private_key *br_rsa_key = pk->getRSA();
 
         // generate RSA signature from private key and message digest
-        jwt_idle();
+        sys_idle();
         if (!jwt_data.signature)
             jwt_data.signature = reinterpret_cast<unsigned char *>(mem.alloc(256));
         int ret = br_rsa_i15_pkcs1_sign(BR_HASH_OID_SHA256, (const unsigned char *)jwt_data.hash, br_sha256_SIZE, br_rsa_key, jwt_data.signature);
-        jwt_idle();
+        sys_idle();
 
         if (jwt_data.hash)
             mem.release(&jwt_data.hash);

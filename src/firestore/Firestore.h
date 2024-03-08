@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -1611,7 +1611,7 @@ public:
         options.requestType = firebase_firestore_request_type_begin_transaction;
         options.parent = parent;
         JsonHelper jh;
-        jh.addObject(options.payload, "options", transOptions.c_str(), true);
+        jh.addObject(options.payload, "options", transOptions.c_str(), false, true);
         addDocsPath(options.extras);
         options.extras += FPSTR(":beginTransaction");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
@@ -1624,7 +1624,7 @@ public:
         options.requestType = firebase_firestore_request_type_rollback;
         options.parent = parent;
         JsonHelper jh;
-        jh.addObject(options.payload, "transaction", jh.toString(transaction), true);
+        jh.addObject(options.payload, "transaction", transaction, true, true);
         addDocsPath(options.extras);
         options.extras += FPSTR(":rollback");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);

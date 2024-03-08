@@ -1,5 +1,5 @@
-#ifndef FIREBASE_CORE_H
-#define FIREBASE_CORE_H
+#ifndef CORE_H_
+#define CORE_H_
 
 #include <Arduino.h>
 

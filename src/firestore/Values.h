@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -270,8 +270,8 @@ namespace Values
          */
         GeoPointValue(double lat, double lng)
         {
-            jh.addObject(buf, FPSTR("latitude"), String(lat));
-            jh.addObject(buf, FPSTR("longitude"), String(lng), true);
+            jh.addObject(buf, FPSTR("latitude"), String(lat), false);
+            jh.addObject(buf, FPSTR("longitude"), String(lng), false, true);
         }
         const char *c_str() { return buf.c_str(); }
         const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_geoPointValue].text, buf); }

@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -114,7 +114,7 @@ namespace FirestoreQuery
          */
         FieldReference(const String &fieldPath)
         {
-            jh.addObject(buf, "fieldPath", jh.toString(fieldPath), true);
+            jh.addObject(buf, "fieldPath", fieldPath, true, true);
         }
 
         const char *c_str() { return buf.c_str(); }
@@ -133,11 +133,11 @@ namespace FirestoreQuery
         void set(FieldReference &field)
         {
             if (str.length() == 0)
-                jh.addArray(str, field.c_str(), true);
+                jh.addArray(str, field.c_str(), false, true);
             else
                 owriter.addMember(str, field.c_str(), false, "]");
             buf.remove(0, buf.length());
-            jh.addObject(buf, "fields", str, true);
+            jh.addObject(buf, "fields", str, false, true);
         }
 
     public:
@@ -221,14 +221,14 @@ namespace FirestoreQuery
         CollectionSelector &collectionId(const String &collectionId)
         {
             collId.remove(0, collId.length());
-            jh.addObject(collId, "collectionId", jh.toString(collectionId), true);
+            jh.addObject(collId, "collectionId", collectionId, true, true);
             setBuf();
             return *this;
         }
         CollectionSelector &allDescendants(bool value)
         {
             allDes.remove(0, allDes.length());
-            jh.addObject(allDes, "allDescendants", owriter.getBoolStr(value), true);
+            jh.addObject(allDes, "allDescendants", owriter.getBoolStr(value), false, true);
             setBuf();
             return *this;
         }

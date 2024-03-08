@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -288,7 +288,7 @@ namespace FieldTransform
         template <typename T>
         void set(const String &fieldPath, T v)
         {
-            jh.addObject(buf, FPSTR("fieldPath"), jh.toString(fieldPath));
+            jh.addObject(buf, FPSTR("fieldPath"), fieldPath, true);
             buf += ',';
             String str = v.c_str();
             buf += str.substring(1, str.length() - 1);
@@ -435,7 +435,7 @@ private:
         map_obj = mv.c_str();
         name_obj.remove(0, name_obj.length());
         if (name.length())
-            jh.addObject(name_obj, FPSTR("name"), jh.toString(owriter.getDocPath(name)), true);
+            jh.addObject(name_obj, FPSTR("name"), owriter.getDocPath(name), true, true);
         else
         {
             buf = map_obj;
@@ -521,8 +521,8 @@ public:
      */
     DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
     {
-        jh.addObject(buf, FPSTR("document"), jh.toString(owriter.getDocPath(document)));
-        jh.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), true);
+        jh.addObject(buf, FPSTR("document"), owriter.getDocPath(document), true);
+        jh.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), false, true);
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -563,11 +563,11 @@ public:
         bool curdoc = strlen(currentDocument.c_str());
         bool updatemask = strlen(updateMask.c_str());
         write_type = firestore_write_type_update;
-        jh.addObject(buf, FPSTR("update"), update.c_str(), !updatemask && !curdoc);
+        jh.addObject(buf, FPSTR("update"), update.c_str(), false, !updatemask && !curdoc);
         if (updatemask)
-            jh.addObject(buf, FPSTR("updateMask"), updateMask.c_str(), !curdoc);
+            jh.addObject(buf, FPSTR("updateMask"), updateMask.c_str(), false, !curdoc);
         if (curdoc)
-            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), true);
+            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false, true);
     }
     /**
      * A write on a document.
@@ -577,8 +577,8 @@ public:
     {
         write_type = firestore_write_type_delete;
         if (strlen(currentDocument.c_str()))
-            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str());
-        jh.addObject(buf, FPSTR("delete"), jh.toString(owriter.getDocPath(deletePath)), true);
+            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
+        jh.addObject(buf, FPSTR("delete"), owriter.getDocPath(deletePath), true, true);
     }
 
     /**
@@ -590,8 +590,8 @@ public:
     {
         write_type = firestore_write_type_transform;
         if (strlen(currentDocument.c_str()))
-            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str());
-        jh.addObject(buf, FPSTR("transform"), transform.c_str(), true);
+            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
+        jh.addObject(buf, FPSTR("transform"), transform.c_str(), false, true);
     }
     /**
      * Add the update transform.
@@ -607,7 +607,7 @@ public:
             if (!updateTrans)
             {
                 buf[buf.length() - 1] = '\0';
-                jh.addObject(buf, FPSTR("updateTransforms"), owriter.getArrayStr(updateTransforms.c_str()), true);
+                jh.addObject(buf, FPSTR("updateTransforms"), owriter.getArrayStr(updateTransforms.c_str()), false, true);
             }
             else
                 owriter.addMember(buf, updateTransforms.c_str(), true, "]}");
@@ -639,8 +639,8 @@ public:
     Writes(Write write, const String &transaction = "")
     {
         if (transaction.length())
-            jh.addObject(buf, FPSTR("transaction"), jh.toString(transaction));
-        jh.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), true);
+            jh.addObject(buf, FPSTR("transaction"), transaction, true);
+        jh.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), false, true);
     }
 
     /**
@@ -652,8 +652,8 @@ public:
     Writes(Write write, Values::MapValue labels)
     {
         if (strlen(labels.c_str()))
-            jh.addObject(buf, FPSTR("labels"), labels.c_str());
-        jh.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), true);
+            jh.addObject(buf, FPSTR("labels"), labels.c_str(), false);
+        jh.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), false, true);
     }
 
     /**
@@ -689,7 +689,7 @@ public:
     ReadWrite(const String &retryTransaction)
     {
         if (retryTransaction.length())
-            jh.addObject(buf, "retryTransaction", jh.toString(retryTransaction), true);
+            jh.addObject(buf, FPSTR("retryTransaction"), retryTransaction, true, true);
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -713,7 +713,7 @@ public:
     ReadOnly(const String &readTime)
     {
         if (readTime.length())
-            jh.addObject(buf, "readTime", jh.toString(readTime), true);
+            jh.addObject(buf, "readTime", readTime, true, true);
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -737,7 +737,7 @@ public:
     TransactionOptions(ReadOnly readOnly)
     {
         if (strlen(readOnly.c_str()))
-            jh.addObject(buf, "readOnly", readOnly.c_str(), true);
+            jh.addObject(buf, "readOnly", readOnly.c_str(), false, true);
     }
     /**
      * @param readWrite The transaction can be used for both read and write operations.
@@ -745,7 +745,7 @@ public:
     TransactionOptions(ReadWrite readWrite)
     {
         if (strlen(readWrite.c_str()))
-            jh.addObject(buf, "readWrite", readWrite.c_str(), true);
+            jh.addObject(buf, "readWrite", readWrite.c_str(), false, true);
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -764,8 +764,8 @@ public:
     {
         String uriPrefix;
         uh.addGStorageURL(uriPrefix, bucketID, storagePath);
-        json.addObject(buf, json.toString("inputUriPrefix"), json.toString(uriPrefix));
-        json.addTokens(buf, json.toString("collectionIds"), collectionIds, true);
+        json.addObject(buf, "inputUriPrefix", uriPrefix, true);
+        json.addTokens(buf, "collectionIds", collectionIds, true);
     }
     const char *c_str() { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -855,8 +855,8 @@ public:
         if (doc.length() == 0)
         {
             String str;
-            jh.addArray(str, jh.toString(owriter.getDocPath(document)), true);
-            jh.addObject(doc, "documents", str, true);
+            jh.addArray(str, owriter.getDocPath(document), true, true);
+            jh.addObject(doc, "documents", str, false, true);
         }
         else
             owriter.addMember(doc, jh.toString(owriter.getDocPath(document)), false, "]}");
@@ -867,7 +867,7 @@ public:
      */
     void mask(DocumentMask mask)
     {
-        jh.addObject(msk, "mask", mask.c_str(), true);
+        jh.addObject(msk, "mask", mask.c_str(), false, true);
         setbuf();
     }
     /**
@@ -877,7 +877,7 @@ public:
     {
         if (transaction.length() && newtrans.length() == 0 && rt.length() == 0)
         {
-            jh.addObject(trans, "transaction", jh.toString(transaction), true);
+            jh.addObject(trans, "transaction", transaction, true, true);
             setbuf();
         }
     }
@@ -889,7 +889,7 @@ public:
     {
         if (strlen(transOptions.c_str()) && trans.length() == 0 && rt.length() == 0)
         {
-            jh.addObject(newtrans, "newTransaction", transOptions.c_str(), true);
+            jh.addObject(newtrans, "newTransaction", transOptions.c_str(), false, true);
             setbuf();
         }
     }
@@ -900,7 +900,7 @@ public:
     {
         if (readTime.length() && trans.length() == 0 && newtrans.length() == 0)
         {
-            jh.addObject(rt, "readTime", jh.toString(readTime), true);
+            jh.addObject(rt, "readTime", readTime, true, true);
             setbuf();
         }
     }
@@ -994,7 +994,7 @@ public:
      */
     void structuredQuery(StructuredQuery structuredQuery)
     {
-        jh.addObject(query, "structuredQuery", structuredQuery.c_str(), true);
+        jh.addObject(query, "structuredQuery", structuredQuery.c_str(), false, true);
         setbuf();
     }
     /**
@@ -1004,7 +1004,7 @@ public:
     {
         if (transaction.length() && newtrans.length() == 0 && rt.length() == 0)
         {
-            jh.addObject(trans, "transaction", jh.toString(transaction), true);
+            jh.addObject(trans, "transaction", transaction, true, true);
             setbuf();
         }
     }
@@ -1016,7 +1016,7 @@ public:
     {
         if (strlen(transOptions.c_str()) && trans.length() == 0 && rt.length() == 0)
         {
-            jh.addObject(newtrans, "newTransaction", transOptions.c_str(), true);
+            jh.addObject(newtrans, "newTransaction", transOptions.c_str(), false, true);
             setbuf();
         }
     }
@@ -1029,7 +1029,7 @@ public:
     {
         if (readTime.length() && trans.length() == 0 && newtrans.length() == 0)
         {
-            jh.addObject(rt, "readTime", jh.toString(readTime), true);
+            jh.addObject(rt, "readTime", readTime, true, true);
             setbuf();
         }
     }
@@ -1215,7 +1215,7 @@ public:
      */
     ListCollectionIdsOptions &pageSize(int pageSize)
     {
-        jh.addObject(pz, FPSTR("pageSize"), String(pageSize), true);
+        jh.addObject(pz, FPSTR("pageSize"), String(pageSize), false, true);
         set();
         return *this;
     }
@@ -1225,7 +1225,7 @@ public:
      */
     ListCollectionIdsOptions &pageToken(const String &pageToken)
     {
-        jh.addObject(ptk, FPSTR("pageToken"), jh.toString(pageToken), true);
+        jh.addObject(ptk, FPSTR("pageToken"), pageToken, true, true);
         set();
         return *this;
     }
@@ -1237,7 +1237,7 @@ public:
      */
     ListCollectionIdsOptions &readTime(const String readTime)
     {
-        jh.addObject(rt, FPSTR("readTime"), jh.toString(readTime), true);
+        jh.addObject(rt, FPSTR("readTime"), readTime, true, true);
         set();
         return *this;
     }
@@ -1309,7 +1309,7 @@ public:
      */
     IndexField &fieldPath(const String &fieldPath)
     {
-        jh.addObject(fp, "fieldPath", jh.toString(fieldPath), true);
+        jh.addObject(fp, "fieldPath", fieldPath, true, true);
         set();
         return *this;
     }
@@ -1320,11 +1320,11 @@ public:
     IndexField &mode(Index::Mode mode)
     {
         if (mode == Index::ASCENDING)
-            jh.addObject(md, "mode", jh.toString("ASCENDING"), true);
+            jh.addObject(md, "mode", "ASCENDING", true, true);
         else if (mode == Index::DESCENDING)
-            jh.addObject(md, "mode", jh.toString("DESCENDING"), true);
+            jh.addObject(md, "mode", "DESCENDING", true, true);
         else if (mode == Index::ARRAY_CONTAINS)
-            jh.addObject(md, "mode", jh.toString("ARRAY_CONTAINS"), true);
+            jh.addObject(md, "mode", "ARRAY_CONTAINS", true, true);
         set();
         return *this;
     }
@@ -1379,7 +1379,7 @@ public:
      */
     Indexes &collectionId(const String &collectionId)
     {
-        jh.addObject(collid, FPSTR("collectionId"), jh.toString(collectionId), true);
+        jh.addObject(collid, FPSTR("collectionId"), collectionId, true, true);
         set();
         return *this;
     }
@@ -1391,10 +1391,10 @@ public:
     {
         flds.remove(0, flds.length());
         if (flds_ar.length() == 0)
-            jh.addArray(flds_ar, field.c_str(), true);
+            jh.addArray(flds_ar, field.c_str(), false, true);
         else
             owriter.addMember(flds_ar, field.c_str(), false, "]");
-        jh.addObject(flds, FPSTR("fields"), flds_ar, true);
+        jh.addObject(flds, FPSTR("fields"), flds_ar, false, true);
         set();
         return *this;
     }

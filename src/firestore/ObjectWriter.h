@@ -1,5 +1,5 @@
 /**
- * Created February 17, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -58,7 +58,7 @@ public:
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
         buf.remove(0, buf.length());
-        jh.addObject(buf, key, isArrayValue ? getArrayStr(value) : value, true);
+        jh.addObject(buf, key, isArrayValue ? getArrayStr(value) : value, false, true);
         return buf.c_str();
     }
     void setBool(String &buf, bool value) { buf = getBoolStr(value); }

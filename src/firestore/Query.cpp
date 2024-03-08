@@ -1,6 +1,6 @@
 
 /**
- * Created March 7, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -41,7 +41,7 @@ namespace FirestoreQuery
     StructuredQuery &StructuredQuery::select(Projection projection)
     {
         sel.remove(0, sel.length());
-        jh.addObject(sel, "select", projection.c_str(), true);
+        jh.addObject(sel, "select", projection.c_str(), false, true);
         set();
         return *this;
     }
@@ -49,11 +49,11 @@ namespace FirestoreQuery
     StructuredQuery &StructuredQuery::from(CollectionSelector collSelector)
     {
         if (frm_ar.length() == 0)
-            jh.addArray(frm_ar, collSelector.c_str(), true);
+            jh.addArray(frm_ar, collSelector.c_str(), false, true);
         else
             owriter.addMember(frm_ar, collSelector.c_str(), true, "]");
         frm.remove(0, frm.length());
-        jh.addObject(frm, "from", frm_ar, true);
+        jh.addObject(frm, "from", frm_ar, false, true);
         set();
         return *this;
     }
@@ -61,7 +61,7 @@ namespace FirestoreQuery
     StructuredQuery &StructuredQuery::where(Filter filter)
     {
         where_str.remove(0, where_str.length());
-        jh.addObject(where_str, "where", filter.c_str(), true);
+        jh.addObject(where_str, "where", filter.c_str(), false, true);
         set();
         return *this;
     }
@@ -69,12 +69,12 @@ namespace FirestoreQuery
     StructuredQuery &StructuredQuery::orderBy(Order orderBy)
     {
         if (ordby_ar.length() == 0)
-            jh.addArray(ordby_ar, orderBy.c_str(), true);
+            jh.addArray(ordby_ar, orderBy.c_str(), false, true);
         else
             owriter.addMember(ordby_ar, orderBy.c_str(), true, "]");
 
         ordby.remove(0, ordby.length());
-        jh.addObject(ordby, "orderBy", ordby_ar, true);
+        jh.addObject(ordby, "orderBy", ordby_ar, false, true);
         set();
         return *this;
     }
@@ -82,7 +82,7 @@ namespace FirestoreQuery
     StructuredQuery &StructuredQuery::startAt(Cursor startAt)
     {
         sta.remove(0, sta.length());
-        jh.addObject(sta, "startAt", startAt.c_str(), true);
+        jh.addObject(sta, "startAt", startAt.c_str(), false, true);
         set();
         return *this;
     }
@@ -90,7 +90,7 @@ namespace FirestoreQuery
     StructuredQuery &StructuredQuery::endAt(Cursor endAt)
     {
         ea.remove(0, ea.length());
-        jh.addObject(ea, "endAt", endAt.c_str(), true);
+        jh.addObject(ea, "endAt", endAt.c_str(), false, true);
         set();
         return *this;
     }
@@ -98,7 +98,7 @@ namespace FirestoreQuery
     StructuredQuery &StructuredQuery::offset(int value)
     {
         ofs.remove(0, ofs.length());
-        jh.addObject(ofs, "offset", String(value), true);
+        jh.addObject(ofs, "offset", String(value), false, true);
         set();
         return *this;
     }
@@ -106,7 +106,7 @@ namespace FirestoreQuery
     StructuredQuery &StructuredQuery::limit(int value)
     {
         lim.remove(0, lim.length());
-        jh.addObject(lim, "limit", String(value), true);
+        jh.addObject(lim, "limit", String(value), false, true);
         set();
         return *this;
     }
@@ -199,9 +199,9 @@ namespace FirestoreQuery
 
         op_str.remove(0, op_str.length());
         if (filterOp == AND)
-            jh.addObject(op_str, "op", jh.toString("AND"), true);
+            jh.addObject(op_str, "op", "AND", true, true);
         else if (filterOp == OR)
-            jh.addObject(op_str, "op", jh.toString("OR"), true);
+            jh.addObject(op_str, "op", "OR", true, true);
         return *this;
     }
 
@@ -209,7 +209,7 @@ namespace FirestoreQuery
     {
         filter_str.remove(0, filter_str.length());
         if (filter_arr.length() == 0)
-            jh.addArray(filter_arr, filter.c_str(), true);
+            jh.addArray(filter_arr, filter.c_str(), false, true);
         else
             owriter.addMember(filter_arr, filter.c_str(), false, "]");
 
@@ -229,7 +229,7 @@ namespace FirestoreQuery
 
     FieldFilter &FieldFilter::field(FieldReference field)
     {
-        jh.addObject(buf, "field", field.c_str(), true);
+        jh.addObject(buf, "field", field.c_str(), false, true);
         return *this;
     }
 
@@ -238,32 +238,32 @@ namespace FirestoreQuery
         using namespace FieldFilterOperator;
 
         if (filterOp == LESS_THAN)
-            jh.addObject(buf, "op", jh.toString("LESS_THAN"), true);
+            jh.addObject(buf, "op", "LESS_THAN", true, true);
         else if (filterOp == LESS_THAN_OR_EQUAL)
-            jh.addObject(buf, "op", jh.toString("LESS_THAN_OR_EQUAL"), true);
+            jh.addObject(buf, "op", "LESS_THAN_OR_EQUAL", true, true);
         else if (filterOp == GREATER_THAN)
-            jh.addObject(buf, "op", jh.toString("GREATER_THAN"), true);
+            jh.addObject(buf, "op", "GREATER_THAN", true, true);
         else if (filterOp == GREATER_THAN_OR_EQUAL)
-            jh.addObject(buf, "op", jh.toString("GREATER_THAN_OR_EQUAL"), true);
+            jh.addObject(buf, "op", "GREATER_THAN_OR_EQUAL", true, true);
         else if (filterOp == EQUAL)
-            jh.addObject(buf, "op", jh.toString("EQUAL"), true);
+            jh.addObject(buf, "op", "EQUAL", true, true);
         else if (filterOp == NOT_EQUAL)
-            jh.addObject(buf, "op", jh.toString("NOT_EQUAL"), true);
+            jh.addObject(buf, "op", "NOT_EQUAL", true, true);
         else if (filterOp == ARRAY_CONTAINS)
-            jh.addObject(buf, "op", jh.toString("ARRAY_CONTAINS"), true);
+            jh.addObject(buf, "op", "ARRAY_CONTAINS", true, true);
         else if (filterOp == IN)
-            jh.addObject(buf, "op", jh.toString("IN"), true);
+            jh.addObject(buf, "op", "IN", true, true);
         else if (filterOp == ARRAY_CONTAINS_ANY)
-            jh.addObject(buf, "op", jh.toString("ARRAY_CONTAINS_ANY"), true);
+            jh.addObject(buf, "op", "ARRAY_CONTAINS_ANY", true, true);
         else if (filterOp == NOT_IN)
-            jh.addObject(buf, "op", jh.toString("NOT_IN"), true);
+            jh.addObject(buf, "op", "NOT_IN", true, true);
 
         return *this;
     }
 
     FieldFilter &FieldFilter::value(Values::Value value)
     {
-        jh.addObject(buf, "value", value.c_str(), true);
+        jh.addObject(buf, "value", value.c_str(), false, true);
         return *this;
     }
 
@@ -281,13 +281,13 @@ namespace FirestoreQuery
 
         op_str.remove(0, op_str.length());
         if (filterOp == IS_NAN)
-            jh.addObject(op_str, "op", jh.toString("IS_NAN"), true);
+            jh.addObject(op_str, "op", "IS_NAN", true, true);
         else if (filterOp == IS_NULL)
-            jh.addObject(op_str, "op", jh.toString("IS_NULL"), true);
+            jh.addObject(op_str, "op", "IS_NULL", true, true);
         else if (filterOp == IS_NOT_NAN)
-            jh.addObject(op_str, "op", jh.toString("IS_NOT_NAN"), true);
+            jh.addObject(op_str, "op", "IS_NOT_NAN", true, true);
         else if (filterOp == IS_NOT_NULL)
-            jh.addObject(op_str, "op", jh.toString("IS_NOT_NULL"), true);
+            jh.addObject(op_str, "op", "IS_NOT_NULL", true, true);
 
         set();
         return *this;
@@ -295,7 +295,7 @@ namespace FirestoreQuery
     UnaryFilter &UnaryFilter::field(FieldReference field)
     {
         field_str.remove(0, field_str.length());
-        jh.addObject(field_str, "field", field.c_str(), true);
+        jh.addObject(field_str, "field", field.c_str(), false, true);
         set();
         return *this;
     }
@@ -337,7 +337,7 @@ namespace FirestoreQuery
     Order &Order::field(FieldReference field)
     {
         field_str.remove(0, field_str.length());
-        jh.addObject(field_str, "field", field.c_str(), true);
+        jh.addObject(field_str, "field", field.c_str(), false, true);
         set();
         return *this;
     }
@@ -345,9 +345,9 @@ namespace FirestoreQuery
     {
         direction_str.remove(0, direction_str.length());
         if (direction == FilterSort::ASCENDING)
-            jh.addObject(direction_str, "direction", jh.toString("ASCENDING"), true);
+            jh.addObject(direction_str, "direction", "ASCENDING", true, true);
         else if (direction == FilterSort::DESCENDING)
-            jh.addObject(direction_str, "direction", jh.toString("DESCENDING"), true);
+            jh.addObject(direction_str, "direction", "DESCENDING", true, true);
         set();
         return *this;
     }
@@ -382,9 +382,9 @@ namespace FirestoreQuery
 
     Cursor::Cursor()
     {
-        jh.addArray(value_ar_str, "", true);
+        jh.addArray(value_ar_str, "", false, true);
         value_str.remove(0, value_str.length());
-        jh.addObject(value_str, "values", value_ar_str, true);
+        jh.addObject(value_str, "values", value_ar_str, false, true);
         value_ar_str.remove(0, value_ar_str.length());
         set();
     }
@@ -392,7 +392,7 @@ namespace FirestoreQuery
     Cursor &Cursor::before(bool value)
     {
         before_str.remove(0, before_str.length());
-        jh.addObject(before_str, "before", owriter.getBoolStr(value), true);
+        jh.addObject(before_str, "before", owriter.getBoolStr(value), false, true);
         set();
         return *this;
     }
@@ -400,12 +400,12 @@ namespace FirestoreQuery
     Cursor &Cursor::addValue(Values::Value value)
     {
         if (value_ar_str.length() == 0)
-            jh.addArray(value_ar_str, value.c_str(), true);
+            jh.addArray(value_ar_str, value.c_str(), false, true);
         else
             owriter.addMember(value_ar_str, value.c_str(), false, "]");
 
         value_str.remove(0, value_str.length());
-        jh.addObject(value_str, "values", value_ar_str, true);
+        jh.addObject(value_str, "values", value_ar_str, false, true);
 
         set();
 
@@ -441,15 +441,15 @@ namespace FirestoreQuery
     Filter::Filter() {}
     Filter::Filter(CompositeFilter compositeFilter)
     {
-        jh.addObject(buf, "compositeFilter", compositeFilter.c_str(), true);
+        jh.addObject(buf, "compositeFilter", compositeFilter.c_str(), false, true);
     }
     Filter::Filter(FieldFilter fieldFilter)
     {
-        jh.addObject(buf, "fieldFilter", fieldFilter.c_str(), true);
+        jh.addObject(buf, "fieldFilter", fieldFilter.c_str(), false, true);
     }
     Filter::Filter(UnaryFilter unaryFilter)
     {
-        jh.addObject(buf, "unaryFilter", unaryFilter.c_str(), true);
+        jh.addObject(buf, "unaryFilter", unaryFilter.c_str(), false, true);
     }
     const char *Filter::c_str() { return buf.c_str(); }
     size_t Filter::printTo(Print &p) const { return p.print(buf.c_str()); }
