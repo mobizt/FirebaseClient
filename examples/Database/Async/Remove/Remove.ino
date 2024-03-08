@@ -207,6 +207,6 @@ void asyncCB(AsyncResult &aResult)
     if (aResult.available())
     {
         Serial.println("**************");
-        Serial.printf("payload: %s\n", aResult.payload().c_str());
+        Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

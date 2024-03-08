@@ -323,6 +323,6 @@ void asyncCB(AsyncResult &aResult)
         Serial.println("**************");
         if (aResult.database.name().length())
             Serial.printf("name: %s\n", aResult.database.name().c_str());
-        Serial.printf("payload: %s\n", aResult.payload().c_str());
+        Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

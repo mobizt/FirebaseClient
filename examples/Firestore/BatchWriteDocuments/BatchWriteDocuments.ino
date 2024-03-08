@@ -213,10 +213,6 @@ const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----
 
 void timeStatusCB(uint32_t &ts);
 
-void jwtCB(bool able_to_run);
-
-void processJWT(const char *str = __builtin_FUNCTION());
-
 void asyncCB(AsyncResult &aResult);
 
 void printResult(AsyncResult &aResult);
@@ -226,7 +222,7 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode);
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 // ServiceAuth is required for batch write.
-ServiceAuth sa_auth(timeStatusCB, jwtCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
+ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
 
 // FileConfig sa_file("/sa_file.json", fileCallback);
 
@@ -235,8 +231,6 @@ ServiceAuth sa_auth(timeStatusCB, jwtCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT
 FirebaseApp app;
 
 WiFiClientSecure ssl_client;
-
-bool jwt_loop_process = false;
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
@@ -288,13 +282,21 @@ void setup()
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-        ;
+    {
+        // This JWT token process required for ServiceAuth and CustomAuth authentications
+        if (app.isJWT())
+            JWT.process(app.getAuth());
+    }
 
     app.getApp<Firestore>(firestore);
 }
 
 void loop()
 {
+    // This JWT token process required for ServiceAuth and CustomAuth authentications
+    if (app.isJWT())
+        JWT.process(app.getAuth());
+
     // This function is required for handling async operations and maintaining the authentication tasks.
     app.loop();
 
@@ -362,23 +364,6 @@ void timeStatusCB(uint32_t &ts)
     ts = time(nullptr);
 }
 
-void jwtCB(bool able_to_run)
-{
-    jwt_loop_process = !able_to_run;
-    processJWT();
-}
-
-void processJWT(const char *str)
-{
-    // This prevents the stack overflow in ESP8266
-    // Exit the function when it was called from jwt callback while it was unable to run from there.
-    if (jwt_loop_process && strcmp(str, "jwtCB") == 0)
-        return;
-    jwt_loop_process = false;
-    JWT.begin(app.getAuth());
-    JWT.create();
-}
-
 void asyncCB(AsyncResult &aResult)
 {
 
@@ -411,6 +396,6 @@ void printResult(AsyncResult &aResult)
     if (aResult.available())
     {
         Serial.println("**************");
-        Serial.printf("payload: %s\n", aResult.payload().c_str());
+        Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

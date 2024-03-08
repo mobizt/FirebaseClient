@@ -78,29 +78,24 @@ namespace firebase
         template <typename T>
         T to()
         {
-            return vcon.to<T>(data().c_str());
+            return vcon.to<T>(data());
         }
         bool isStream() const { return sse; }
-        String name() const { return node_name; }
-        String ETag() const { return etag; }
-        String dataPath() { return ref_payload ? ref_payload->substring(data_path_p1, data_path_p2) : ""; }
-        String event() { return ref_payload ? ref_payload->substring(event_p1, event_p2) : ""; }
+        String name() const { return node_name.c_str(); }
+        String ETag() const { return etag.c_str(); }
+        String dataPath() const { return ref_payload ? ref_payload->substring(data_path_p1, data_path_p2).c_str() : ""; }
+        String event() { return ref_payload ? ref_payload->substring(event_p1, event_p2).c_str() : ""; }
         String data()
         {
             if (data_p1 > 0)
-                return ref_payload->substring(data_p1, data_p2);
-            return ref_payload ? *ref_payload : "";
+                return ref_payload->substring(data_p1, data_p2).c_str();
+            return ref_payload ? ref_payload->c_str() : "";
         }
 
-        bool eventTimeout()
-        {
-            return sse && sse_timer.remaining() == 0;
-        }
+        bool eventTimeout() { return sse && sse_timer.remaining() == 0; }
 
-        database_data_type type()
-        {
-            return vcon.getType(data().c_str());
-        }
+        database_data_type type() { return vcon.getType(data().c_str()); }
+        
         void clearSSE()
         {
             data_path_p1 = 0;
@@ -114,7 +109,6 @@ namespace firebase
         }
         void parseNodeName()
         {
-            StringHelper sh;
             int p1 = 0, p2 = 0;
             sh.parse(*ref_payload, "\"name\"", "}", p1, p2);
             if (p1 > -1 && p2 > -1)
@@ -125,8 +119,6 @@ namespace firebase
         void parseSSE()
         {
             clearSSE();
-
-            StringHelper sh;
             int p1 = 0, p2 = 0;
             sh.parse(*ref_payload, "event", "\n", p1, p2);
             if (p1 > -1 && p2 > -1)
@@ -135,7 +127,7 @@ namespace firebase
                 event_p2 = p2;
                 p1 = p2;
                 setEventResumeStatus(event_resume_status_undefined);
-                sse_timer.feed(event().indexOf("cancel") > -1 || event().indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT);
+                sse_timer.feed(String(event()).indexOf("cancel") > -1 || String(event()).indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT);
                 sse = true;
             }
 
@@ -189,15 +181,12 @@ namespace firebase
 
     private:
         ValueConverter vcon;
-
+        StringHelper sh;
+        Timer sse_timer;
         bool sse = false;
         event_resume_status_t event_resume_status = event_resume_status_undefined;
-        String node_name; // database node name that value was pushed
-        String etag;
-        uint16_t data_path_p1 = 0, data_path_p2 = 0;
-        uint16_t event_p1 = 0, event_p2 = 0;
-        uint16_t data_p1 = 0, data_p2 = 0;
-        Timer sse_timer;
+        String node_name, etag;
+        uint16_t data_path_p1 = 0, data_path_p2 = 0, event_p1 = 0, event_p2 = 0, data_p1 = 0, data_p2 = 0;
     };
 #endif
 }
@@ -219,8 +208,7 @@ class AsyncResult
     struct download_data_t
     {
     public:
-        size_t total = 0;
-        size_t downloaded = 0;
+        size_t total = 0, downloaded = 0;
         bool progress_available = false;
         int progress = -1;
         void reset()
@@ -235,8 +223,7 @@ class AsyncResult
     struct upload_data_t
     {
     public:
-        size_t total = 0;
-        size_t uploaded = 0;
+        size_t total = 0, uploaded = 0;
         bool progress_available = false;
         int progress = -1;
         void reset()
@@ -250,12 +237,7 @@ class AsyncResult
 
 private:
     uint32_t addr = 0;
-    String result_uid;
-
-    String data_path;
-    String data_payload;
-    String res_etag;
-    String debug_info;
+    String result_uid, data_path, data_payload, res_etag, debug_info;
     bool debug_info_available = false;
     download_data_t download_data;
     upload_data_t upload_data;
@@ -283,8 +265,7 @@ private:
     }
 
 public:
-    bool data_available = false;
-    bool error_available = false;
+    bool data_available = false, error_available = false;
     app_event_t app_event;
     FirebaseError lastError;
 

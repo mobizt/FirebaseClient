@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -783,7 +783,7 @@ public:
         AsyncResult result;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(), nullptr, nullptr, &result, nullptr);
         asyncRequest(aReq);
-        return result.database.null_etag && result.database.data().indexOf("null") > -1;
+        return result.database.null_etag && String(result.database.data()).indexOf("null") > -1;
     }
 
     /**

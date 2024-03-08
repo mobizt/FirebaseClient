@@ -377,7 +377,7 @@ void printResult(AsyncResult &aResult)
         }
         else
         {
-            Serial.printf("payload: %s\n", aResult.payload().c_str());
+            Serial.printf("payload: %s\n", aResult.c_str());
         }
     }
 }

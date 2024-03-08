@@ -138,11 +138,19 @@ void setup()
 
     initializeApp(aClient, app, getAuth(legacy_token));
 
+    unsigned long ms = millis();
+    while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
+        ;
+
     /** If access token or ServiceAuth used
 
         unsigned long ms = millis();
         while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-        ;
+        {
+            // This JWT token process required for ServiceAuth and CustomAuth authentications
+            if (app.isJWT())
+                JWT.process(app.getAuth());
+        }
 
     */
 
@@ -192,6 +200,10 @@ void setup()
 
 void loop()
 {
+    // This JWT token process required for ServiceAuth and CustomAuth authentications
+    // if (app.isJWT())
+    //    JWT.process(app.getAuth());
+
     // This function is required for handling async operations and maintaining the authentication tasks.
     app.loop();
 
@@ -222,7 +234,7 @@ void asyncCB(AsyncResult &aResult)
     if (aResult.available())
     {
         Serial.println("**************");
-        Serial.printf("payload: %s\n", aResult.payload().c_str());
+        Serial.printf("payload: %s\n", aResult.c_str());
     }
 }
 

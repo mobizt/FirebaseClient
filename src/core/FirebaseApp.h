@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -296,6 +296,7 @@ namespace firebase
 
         bool processAuth()
         {
+
             sys_idle();
 
             process(aClient, sData ? &sData->aResult : nullptr, resultCb);
@@ -341,18 +342,14 @@ namespace firebase
 #if defined(ENABLE_JWT)
                     if (auth_data.user_auth.sa.step == jwt_step_begin || auth_data.user_auth.sa.step == jwt_step_encode_header_payload)
                     {
-                        jwt_step step = auth_data.user_auth.sa.step;
                         auth_data.user_auth.sa.step = jwt_step_sign;
                         stop(aClient);
-
                         setEvent(auth_event_token_signing);
-
-                        if (auth_data.user_auth.jwt_cb)
-                            auth_data.user_auth.jwt_cb(step == jwt_step_begin);
+                        auth_data.user_auth.jwt_signing = true;
                     }
                     else if (auth_data.user_auth.sa.step == jwt_step_sign || auth_data.user_auth.sa.step == jwt_step_ready)
                     {
-                        if (strlen(JWT.token()))
+                        if (JWT.ready())
                         {
                             setEvent(auth_event_authenticating);
                             auth_data.user_auth.sa.step = jwt_step_begin;
@@ -551,7 +548,14 @@ namespace firebase
 
         bool isInitialized() const { return auth_data.user_auth.initialized; }
 
-        void loop() { processAuth(); }
+        void loop()
+        {
+            auth_data.user_auth.jwt_loop = true;
+            processAuth();
+            auth_data.user_auth.jwt_loop = false;
+        }
+
+        bool isJWT() { return auth_data.user_auth.jwt_signing; }
 
         bool ready() { return processAuth() && auth_data.app_token.authenticated; }
 

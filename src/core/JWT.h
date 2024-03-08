@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -99,14 +99,17 @@ namespace firebase
             return ret;
         }
 
+        bool begin(auth_data_t *auth_data);
+        bool create();
+
     public:
         JWTClass();
         ~JWTClass();
         const char *token();
         bool ready();
         void clear();
-        bool begin(auth_data_t *auth_data);
-        bool create();
+        bool process(auth_data_t *auth_data);
+        
     };
 
 }

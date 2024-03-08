@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 8, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -75,12 +75,20 @@ bool JWTClass::ready()
 {
     return this->auth_data && this->auth_data->user_auth.sa.step == jwt_step_ready;
 }
+bool JWTClass::process(auth_data_t *auth_data)
+{
+    bool ret = begin(auth_data);
+    if (ret)
+        ret = create();
+    return ret;
+}
 
 bool JWTClass::begin(auth_data_t *auth_data)
 {
     if (processing || !auth_data)
         return false;
     processing = true;
+    auth_data->user_auth.jwt_signing = false;
     this->auth_data = auth_data;
     this->auth_data->app_token.clear();
     this->auth_data->user_auth.sa.step = jwt_step_encode_header_payload;
@@ -161,7 +169,7 @@ bool JWTClass::create()
 
             if (auth_data->user_auth.cust.scope.length() > 0)
             {
-                char *p =reinterpret_cast<char *>(mem.alloc(auth_data->user_auth.cust.scope.length()));
+                char *p = reinterpret_cast<char *>(mem.alloc(auth_data->user_auth.cust.scope.length()));
                 strcpy(p, auth_data->user_auth.cust.scope.c_str());
                 char *pp = p;
                 char *end = p;

@@ -34,10 +34,9 @@
  *
  * SYNTAX:
  *
- * ServiceAuth service_auth(<TimeStatusCallback>, <JWTCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
+ * ServiceAuth service_auth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
  *
  * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
- * <JWTCallback> - The JWT token process callback. This callback was required for JWT token processing inside or outside the callback.
  * <client_email> - The service account client Email.
  * <project_id> - The service account project ID.
  * <private_key> - The service account private key.
@@ -56,6 +55,16 @@
  * Please see examples/App/NetworkInterfaces for the usage guidelines.
  *
  * The auth data can be set to Services App e.g. Database to initialize via function getApp.
+ * 
+ * NOTE:
+ * 
+ * To reduce the stack usage of BearSSL engine crpto function, the JWT token creation process 
+ * will be performed outside the FirebaseApp.
+ * 
+ * For ServiceAuth and CustomAuth authentications, you need to check for JWT token geration process requirement, 
+ * before running the JWT process function in the main loop as the following.
+ * if (app.isJWT())
+ *   JWT.process(app.getAuth());
  *
  * SYNTAX:
  *
@@ -79,42 +88,42 @@
  * the async SSE (HTTP Streaming) slot.
  *
  * When the async operation queue is full, the new sync and async operations will be cancelled.
- * 
+ *
  * The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
- * 
- * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app 
+ *
+ * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app
  * (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
- * 
+ *
  * STOP QUEUE
  * ===========
- * 
+ *
  * SYNTAX:
- * 
+ *
  * The async operation will be cancelled and remove from the queue by calling thes functions.
- * 
+ *
  * asyncClient.stopAsync() - stop the last async operation in the queue.
- * 
+ *
  * asyncClient.stopAsync(true) - stop all async operation in the queue.
- * 
+ *
  * asyncClient.stopAsync("xxxx") - stop the async operation in the queue that has the async result UID xxxx.
- * 
+ *
  * ASYNC CLIENT
  * ============
- * 
+ *
  * The async client stores the async operating data in its queue and holds the pointer of SSL Client that assigned with it.
- * 
+ *
  * The SSL Client should be existed in the AsyncClient usage scope in case of sync or should defined as global object for async usage.
- * 
+ *
  * The SSL Client should not be shared among various AsyncClients because of interferences in async operations.
  *
  * Only one SSL Client should be assigned to or used with only one AsyncClient.
- * 
+ *
  * SSL Client can force to stop by user or calling stop() from asyncClient.
- * 
+ *
  * SYNTAX:
- * 
+ *
  * asyncClient.stop() - stop the SSL Client to terminate the server connection.
- * 
+ *
  */
 
 #include <Arduino.h>
@@ -158,17 +167,13 @@ const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----
 
 void timeStatusCB(uint32_t &ts);
 
-void jwtCB(bool able_to_run);
-
-void processJWT(const char *str = __builtin_FUNCTION());
-
 void asyncCB(AsyncResult &aResult);
 
 void fileCallback(File &file, const char *filename, file_operating_mode mode);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-ServiceAuth sa_auth(timeStatusCB, jwtCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
+ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
 
 // FileConfig sa_file("/sa_file.json", fileCallback);
 
@@ -177,8 +182,6 @@ ServiceAuth sa_auth(timeStatusCB, jwtCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT
 FirebaseApp app;
 
 WiFiClientSecure ssl_client;
-
-bool jwt_loop_process = false;
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
@@ -227,15 +230,17 @@ void setup()
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-        ;
+    { // This JWT token process required for ServiceAuth and CustomAuth authentications
+        if (app.isJWT())
+            JWT.process(app.getAuth());
+    }
 }
 
 void loop()
 {
-    if (jwt_loop_process)
-    {
-        processJWT();
-    }
+    // This JWT token process required for ServiceAuth and CustomAuth authentications
+    if (app.isJWT())
+        JWT.process(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
@@ -256,23 +261,6 @@ void timeStatusCB(uint32_t &ts)
     }
 
     ts = time(nullptr);
-}
-
-void jwtCB(bool able_to_run)
-{
-    jwt_loop_process = !able_to_run;
-    processJWT();
-}
-
-void processJWT(const char *str)
-{
-    // This prevents the stack overflow in ESP8266
-    // Exit the function when it was called from jwt callback while it was unable to run from there.
-    if (jwt_loop_process && strcmp(str, "jwtCB") == 0)
-        return;
-    jwt_loop_process = false;
-    JWT.begin(app.getAuth());
-    JWT.create();
 }
 
 void asyncCB(AsyncResult &aResult)
