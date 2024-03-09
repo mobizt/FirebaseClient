@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,6 +27,14 @@
 
 #include <Arduino.h>
 #include "./Config.h"
+
+#if defined(ESP8266) && defined(MMU_EXTERNAL_HEAP)
+#include <umm_malloc/umm_malloc.h>
+#include <umm_malloc/umm_heap_select.h>
+#if !defined(ESP8266_USE_EXTERNAL_HEAP)
+#define ESP8266_USE_EXTERNAL_HEAP
+#endif
+#endif
 
 class Memory
 {
