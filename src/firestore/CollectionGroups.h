@@ -55,7 +55,7 @@ public:
          *
          * @return Boolean value, indicates the success of the operation.
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/create
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
          *
          * This function requires ServiceAuth authentication.
          *
@@ -77,7 +77,7 @@ public:
          * @param index The Cloud Firestore indexes enable simple and complex queries against documents in a database.
          * @param aResult The async result (AsyncResult).
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/create
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
          *
          * This function requires ServiceAuth authentication.
          *
@@ -98,7 +98,7 @@ public:
          * @param cb The async result callback (AsyncResultCallback).
          * @param uid The user specified UID of async result (optional).
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/create
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
          *
          * This function requires ServiceAuth authentication.
          *
@@ -119,7 +119,7 @@ public:
          *
          * @return Boolean value, indicates the success of the operation.
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/delete
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
          *
          * This function requires ServiceAuth authentication.
          *
@@ -142,7 +142,7 @@ public:
          * @param indexId The index to delete.
          * @param aResult The async result (AsyncResult).
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/delete
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
          *
          * This function requires ServiceAuth authentication.
          *
@@ -164,7 +164,7 @@ public:
          * @param cb The async result callback (AsyncResultCallback).
          * @param uid The user specified UID of async result (optional).
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/delete
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
          *
          * This function requires ServiceAuth authentication.
          *
@@ -186,7 +186,7 @@ public:
          *
          * @return Boolean value, indicates the success of the operation.
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/get
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
          *
          * This function requires ServiceAuth authentication.
          *
@@ -209,7 +209,7 @@ public:
          * @param indexId The index to get.
          * @param aResult The async result (AsyncResult).
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/get
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
          *
          * This function requires ServiceAuth authentication.
          *
@@ -231,7 +231,7 @@ public:
          * @param cb The async result callback (AsyncResultCallback).
          * @param uid The user specified UID of async result (optional).
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/get
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
          *
          * This function requires ServiceAuth authentication.
          *
@@ -251,7 +251,7 @@ public:
          *
          * @return Boolean value, indicates the success of the operation.
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/list
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
          *
          * This function requires ServiceAuth authentication.
          *
@@ -273,7 +273,7 @@ public:
          * @param indexId The index to get.
          * @param aResult The async result (AsyncResult).
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/list
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
          *
          * This function requires ServiceAuth authentication.
          *
@@ -293,7 +293,7 @@ public:
          * @param cb The async result callback (AsyncResultCallback).
          * @param uid The user specified UID of async result (optional).
          *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/list
+         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
          *
          * This function requires ServiceAuth authentication.
          *
