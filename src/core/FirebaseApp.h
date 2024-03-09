@@ -1,5 +1,5 @@
 /**
- * Created March 8, 2024
+ * Created March 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -363,6 +363,10 @@ namespace firebase
                     subdomain = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? FPSTR("oauth2") : FPSTR("identitytoolkit");
                     sop.async = true;
                     sop.auth_used = true;
+
+                    // Remove all slots except sse in case ServiceAuth and CustomAuth to free up memory.
+                    for (size_t i = aClient->slotCount() - 1; i == 0; i--)
+                        aClient->removeSlot(i, false);
 
                     createSlot(aClient, sop);
 

@@ -56,7 +56,7 @@ namespace firebase
         }
     };
 #if defined(ENABLE_DATABASE)
-    struct database_data_t
+    struct RealtimeDatabaseResult
     {
         friend class AsyncResult;
         friend class AsyncClientClass;
@@ -78,7 +78,7 @@ namespace firebase
         template <typename T>
         T to()
         {
-            return vcon.to<T>(data());
+            return vcon.to<T>(data().c_str());
         }
         bool isStream() const { return sse; }
         String name() const { return node_name.c_str(); }
@@ -94,8 +94,8 @@ namespace firebase
 
         bool eventTimeout() { return sse && sse_timer.remaining() == 0; }
 
-        database_data_type type() { return vcon.getType(data().c_str()); }
-        
+        realtime_database_data_type type() { return vcon.getType(data().c_str()); }
+
         void clearSSE()
         {
             data_path_p1 = 0;
@@ -196,7 +196,7 @@ class AsyncResult
     friend class AsyncClientClass;
     friend class FirebaseApp;
     friend class AuthRequest;
-    friend class Database;
+    friend class RealtimeDatabase;
     friend class Firestore;
     friend class Messaging;
     friend class Functions;
@@ -241,6 +241,9 @@ private:
     bool debug_info_available = false;
     download_data_t download_data;
     upload_data_t upload_data;
+#if defined(ENABLE_DATABASE)
+    RealtimeDatabaseResult rtdbResult;
+#endif
 
     void setPayload(const String &data)
     {
@@ -250,7 +253,7 @@ private:
             data_payload = data;
         }
 #if defined(ENABLE_DATABASE)
-        database.ref_payload = &data_payload;
+        rtdbResult.ref_payload = &data_payload;
 #endif
     }
 
@@ -279,7 +282,7 @@ public:
     AsyncResult()
     {
 #if defined(ENABLE_DATABASE)
-        database.ref_payload = &data_payload;
+        rtdbResult.ref_payload = &data_payload;
 #endif
         addr = reinterpret_cast<uint32_t>(this);
         List vec;
@@ -296,6 +299,17 @@ public:
     String etag() const { return res_etag.c_str(); }
     String uid() const { return result_uid.c_str(); }
     String debug() const { return debug_info.c_str(); }
+    template <typename T>
+    T &to()
+    {
+        static T o;
+        if (std::is_same<T, RealtimeDatabaseResult>::value)
+        {
+            return rtdbResult;
+        }
+
+        return o;
+    }
     int available()
     {
         bool ret = data_available;
@@ -360,9 +374,6 @@ public:
     }
 
     FirebaseError error() const { return lastError; }
-#if defined(ENABLE_DATABASE)
-    database_data_t database;
-#endif
 };
 
 typedef void (*AsyncResultCallback)(AsyncResult &aResult);

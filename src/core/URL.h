@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created March 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -139,6 +139,11 @@ public:
     void addGAPIv1beta1Path(String &uri)
     {
         uri += FPSTR("/v1beta1/projects/");
+    }
+
+    void addGAPIv1beta2Path(String &uri)
+    {
+        uri += FPSTR("/v1beta2/projects/");
     }
 
     void host2Url(String &url, String &host)

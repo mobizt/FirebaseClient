@@ -1,5 +1,5 @@
 /**
- * Created March 8, 2024
+ * Created March 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -68,7 +68,7 @@ enum firebase_firestore_request_type
 
 class ParentResource
 {
-    friend class Firestore;
+    friend class FirestoreBase;
     friend class FirestoreDocuments;
 
 private:
@@ -104,7 +104,7 @@ public:
 
 class DocumentMask : public Printable
 {
-    friend class Firestore;
+    friend class FirestoreBase;
     friend class GetDocumentOptions;
     friend class patchDocumentOptions;
     friend class ListDocumentsOptions;
@@ -324,7 +324,7 @@ namespace FieldTransform
  */
 class Precondition : public Printable
 {
-    friend class Firestore;
+    friend class FirestoreBase;
     friend class FirestoreDocuments;
 
 private:
@@ -422,7 +422,7 @@ public:
 template <typename T = Values::Value>
 class Document : public Printable
 {
-    friend class Firestore;
+    friend class FirestoreBase;
 
 private:
     Values::MapValue mv;
@@ -505,7 +505,7 @@ public:
 
 class DocumentTransform : public Printable
 {
-    friend class Firestore;
+    friend class FirestoreBase;
     friend class Write;
 
 private:
@@ -531,7 +531,7 @@ public:
 
 class Write : public Printable
 {
-    friend class Firestore;
+    friend class FirestoreBase;
     friend class Writes;
 
 private:
@@ -1252,166 +1252,471 @@ public:
     }
 };
 
-namespace Index
+namespace DatabaseIndex
 {
-    /**
-     * The mode determines how a field is indexed.
-     */
-    enum Mode
+    namespace IndexMode
     {
-        MODE_UNSPECIFIED, // The mode is unspecified.
-        ASCENDING,        // The field's values are indexed so as to support sequencing in ascending order
-        // and also query by <, >, <=, >=, and =.
-        DESCENDING, // The field's values are indexed so as to support sequencing in descending
-        // order and also query by <, >, <=, >=, and =.
-        ARRAY_CONTAINS // The field's array values are indexed so as to support membership using ARRAY_CONTAINS queries.
+        /**
+         * The mode determines how a field is indexed.
+         */
+        enum Mode
+        {
+            MODE_UNSPECIFIED, // The mode is unspecified.
+            ASCENDING,        // The field's values are indexed so as to support sequencing in ascending order
+            // and also query by <, >, <=, >=, and =.
+            DESCENDING, // The field's values are indexed so as to support sequencing in descending
+            // order and also query by <, >, <=, >=, and =.
+            ARRAY_CONTAINS // The field's array values are indexed so as to support membership using ARRAY_CONTAINS queries.
+        };
+
+    }
+
+    /**
+     * A field of an index.
+     */
+    class IndexField : public Printable
+    {
+    private:
+        String buf;
+        String fp, md;
+        ObjectWriter owriter;
+        JsonHelper jh;
+
+        void set()
+        {
+            buf.remove(0, buf.length());
+            if (fp.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = fp;
+                else
+                    owriter.addMember(buf, fp, true, "}");
+            }
+            if (md.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = md;
+                else
+                    owriter.addMember(buf, md, true, "}");
+            }
+        }
+
+    public:
+        IndexField() {}
+        /**
+         * The path of the field. Must match the field path specification described by
+         * [google.firestore.v1beta1.Document.fields][fields]. Special field path __name__
+         * may be used by itself or at the end of a path. __type__ may be used only at the end of path.
+         * @param fieldPath
+         */
+        IndexField &fieldPath(const String &fieldPath)
+        {
+            jh.addObject(fp, "fieldPath", fieldPath, true, true);
+            set();
+            return *this;
+        }
+        /**
+         * The field's mode.
+         * @param mode
+         */
+        IndexField &mode(IndexMode::Mode mode)
+        {
+            if (mode == IndexMode::ASCENDING)
+                jh.addObject(md, "mode", "ASCENDING", true, true);
+            else if (mode == IndexMode::DESCENDING)
+                jh.addObject(md, "mode", "DESCENDING", true, true);
+            else if (mode == IndexMode::ARRAY_CONTAINS)
+                jh.addObject(md, "mode", "ARRAY_CONTAINS", true, true);
+            set();
+            return *this;
+        }
+        const char *c_str() { return buf.c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            fp.remove(0, fp.length());
+            md.remove(0, md.length());
+        }
+    };
+
+    /**
+     * An index definition.
+     */
+    class Index : public Printable
+    {
+    private:
+        String buf;
+        String collid, flds, flds_ar;
+        ObjectWriter owriter;
+        JsonHelper jh;
+
+        void set()
+        {
+            buf.remove(0, buf.length());
+            if (collid.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = collid;
+                else
+                    owriter.addMember(buf, collid, true, "}");
+            }
+            if (flds.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = flds;
+                else
+                    owriter.addMember(buf, flds, true, "}");
+            }
+        }
+
+    public:
+        Index(const String &collId)
+        {
+            if (collId.length())
+                collectionId(collId);
+        }
+        /**
+         * The collection ID to which this index applies. Required.
+         * @param collectionId The collection ID to which this index applies. Required.
+         */
+        Index &collectionId(const String &collectionId)
+        {
+            jh.addObject(collid, FPSTR("collectionId"), collectionId, true, true);
+            set();
+            return *this;
+        }
+        /**
+         * Add the field to index.
+         * @param field the field to index.
+         */
+        Index &addField(IndexField field)
+        {
+            flds.remove(0, flds.length());
+            if (flds_ar.length() == 0)
+                jh.addArray(flds_ar, field.c_str(), false, true);
+            else
+                owriter.addMember(flds_ar, field.c_str(), false, "]");
+            jh.addObject(flds, FPSTR("fields"), flds_ar, false, true);
+            set();
+            return *this;
+        }
+        const char *c_str() { return buf.c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            collid.remove(0, collid.length());
+            flds.remove(0, flds.length());
+            flds_ar.remove(0, flds_ar.length());
+        }
     };
 
 }
 
-/**
- * A field of an index.
- */
-class IndexField : public Printable
+namespace CollectionGroupsIndex
 {
-private:
-    String buf;
-    String fp, md;
-    ObjectWriter owriter;
-    JsonHelper jh;
-
-    void set()
+    // Query Scope defines the scope at which a query is run.
+    enum QueryScope
     {
-        buf.remove(0, buf.length());
-        if (fp.length() > 0)
+        QUERY_SCOPE_UNSPECIFIED, // The query scope is unspecified. Not a valid option.
+        COLLECTION,              // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the collection id specified by the index.
+        COLLECTION_GROUP,        // Indexes with a collection group query scope specified allow queries against all collections that has the collection id specified by the index.
+        COLLECTION_RECURSIVE     // Include all the collections's ancestor in the index. Only available for Datastore Mode databases.
+    };
+
+    // API Scope defines the APIs (Firestore Native, or Firestore in Datastore Mode) that are supported for queries.
+    enum ApiScope
+    {
+        ANY_API,           // The index can only be used by the Firestore Native query API. This is the default.
+        DATASTORE_MODE_API // The index can only be used by the Firestore in Datastore Mode query API.
+    };
+
+    // The supported orderings.
+    enum Order
+    {
+        ORDER_UNSPECIFIED, // The ordering is unspecified. Not a valid option.
+        ASCENDING,         // The field is ordered by ascending field value.
+        DESCENDING         // The field is ordered by descending field value.
+    };
+
+    // The supported array value configurations.
+    enum ArrayConfig
+    {
+        ARRAY_CONFIG_UNSPECIFIED, // The index does not support additional array queries.
+        CONTAINS                  // The index supports array containment queries.
+    };
+
+    class VectorConfig : public Printable
+    {
+    private:
+        String buf;
+        String dim, flat_str;
+        ObjectWriter owriter;
+        JsonHelper jh;
+
+        void set()
         {
-            if (buf.length() == 0)
-                buf = fp;
-            else
-                owriter.addMember(buf, fp, true, "}");
+            buf.remove(0, buf.length());
+            if (dim.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = dim;
+                else
+                    owriter.addMember(buf, dim, true, "}");
+            }
+            if (flat_str.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = flat_str;
+                else
+                    owriter.addMember(buf, flat_str, true, "}");
+            }
         }
-        if (md.length() > 0)
+
+    public:
+        /**
+         * Required. The vector dimension this configuration applies to.
+         * The resulting index will only include vectors of this dimension, and can be used for vector search with the same dimension.
+         * @param value the field to index.
+         */
+        void dimenrion(int value)
         {
-            if (buf.length() == 0)
-                buf = md;
-            else
-                owriter.addMember(buf, md, true, "}");
+            dim.remove(0, dim.length());
+            jh.addObject(dim, "dimenrion", String(value), false, true);
+            set();
         }
-    }
-
-public:
-    IndexField() {}
-    /**
-     * The path of the field. Must match the field path specification described by
-     * [google.firestore.v1beta1.Document.fields][fields]. Special field path __name__
-     * may be used by itself or at the end of a path. __type__ may be used only at the end of path.
-     * @param fieldPath
-     */
-    IndexField &fieldPath(const String &fieldPath)
-    {
-        jh.addObject(fp, "fieldPath", fieldPath, true, true);
-        set();
-        return *this;
-    }
-    /**
-     * The field's mode.
-     * @param mode
-     */
-    IndexField &mode(Index::Mode mode)
-    {
-        if (mode == Index::ASCENDING)
-            jh.addObject(md, "mode", "ASCENDING", true, true);
-        else if (mode == Index::DESCENDING)
-            jh.addObject(md, "mode", "DESCENDING", true, true);
-        else if (mode == Index::ARRAY_CONTAINS)
-            jh.addObject(md, "mode", "ARRAY_CONTAINS", true, true);
-        set();
-        return *this;
-    }
-    const char *c_str() { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear()
-    {
-        buf.remove(0, buf.length());
-        fp.remove(0, fp.length());
-        md.remove(0, md.length());
-    }
-};
-
-/**
- * An index definition.
- */
-class Indexes : public Printable
-{
-private:
-    String buf;
-    String collid, flds, flds_ar;
-    ObjectWriter owriter;
-    JsonHelper jh;
-
-    void set()
-    {
-        buf.remove(0, buf.length());
-        if (collid.length() > 0)
+        /**
+         * Indicates the vector index is a flat index.
+         */
+        void flat()
         {
-            if (buf.length() == 0)
-                buf = collid;
-            else
-                owriter.addMember(buf, collid, true, "}");
+            flat_str = "{\"flat\":{}}";
+            set();
         }
-        if (flds.length() > 0)
+        const char *c_str() { return buf.c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        void clear()
         {
-            if (buf.length() == 0)
-                buf = flds;
-            else
-                owriter.addMember(buf, flds, true, "}");
+            buf.remove(0, buf.length());
+            dim.remove(0, dim.length());
+            flat_str.remove(0, flat_str.length());
         }
-    }
+    };
 
-public:
-    Indexes(const String &collId)
-    {
-        collectionId(collId);
-    }
     /**
-     * The collection ID to which this index applies. Required.
-     * @param collectionId The collection ID to which this index applies. Required.
+     * A field in an index. The fieldPath describes which field is indexed, the value_mode describes how the field value is indexed.
      */
-    Indexes &collectionId(const String &collectionId)
+    class IndexField : public Printable
     {
-        jh.addObject(collid, FPSTR("collectionId"), collectionId, true, true);
-        set();
-        return *this;
-    }
+    private:
+        String buf;
+        String fp, ordr, arcfg, vcfg;
+        ObjectWriter owriter;
+        JsonHelper jh;
+
+        void set()
+        {
+            buf.remove(0, buf.length());
+            if (fp.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = fp;
+                else
+                    owriter.addMember(buf, fp, true, "}");
+            }
+            if (ordr.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = ordr;
+                else
+                    owriter.addMember(buf, ordr, true, "}");
+            }
+            else if (arcfg.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = arcfg;
+                else
+                    owriter.addMember(buf, arcfg, true, "}");
+            }
+            else if (vcfg.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = vcfg;
+                else
+                    owriter.addMember(buf, vcfg, true, "}");
+            }
+        }
+
+    public:
+        IndexField() {}
+        /**
+         * Can be name. For single field indexes, this must match the name of the field or may be omitted.
+         * @param fieldPath
+         */
+        IndexField &fieldPath(const String &fieldPath)
+        {
+            jh.addObject(fp, "fieldPath", fieldPath, true, true);
+            set();
+            return *this;
+        }
+        /**
+         * Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
+         * @param order
+         */
+        IndexField &order(Order order)
+        {
+            if (order == Order::ORDER_UNSPECIFIED)
+                jh.addObject(ordr, "order", "ORDER_UNSPECIFIED", true, true);
+            else if (order == Order::DESCENDING)
+                jh.addObject(ordr, "order", "DESCENDING", true, true);
+            else if (order == Order::ASCENDING)
+                jh.addObject(ordr, "order", "ASCENDING", true, true);
+            set();
+            return *this;
+        }
+
+        /**
+         * Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
+         * @param arrayConfig
+         */
+        IndexField &arrayConfig(ArrayConfig arrayConfig)
+        {
+            if (arrayConfig == ArrayConfig::ARRAY_CONFIG_UNSPECIFIED)
+                jh.addObject(arcfg, "arrayConfig", "ARRAY_CONFIG_UNSPECIFIED", true, true);
+            else if (arrayConfig == ArrayConfig::CONTAINS)
+                jh.addObject(arcfg, "arrayConfig", "CONTAINS", true, true);
+            set();
+            return *this;
+        }
+
+        /**
+         * Indicates that this field supports nearest neighbors and distance operations on vector.
+         * @param vectorConfig
+         */
+        IndexField &vectorConfig(VectorConfig vectorConfig)
+        {
+            jh.addObject(vcfg, "vectorConfig", vectorConfig.c_str(), false, true);
+            set();
+            return *this;
+        }
+
+        const char *c_str() { return buf.c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            fp.remove(0, fp.length());
+            arcfg.remove(0, arcfg.length());
+            vcfg.remove(0, vcfg.length());
+            ordr.remove(0, ordr.length());
+        }
+    };
+
     /**
-     * Add the field to index.
-     * @param field the field to index.
+     * Cloud Firestore indexes enable simple and complex queries against documents in a database.
      */
-    Indexes &addField(IndexField field)
+    class Index : public Printable
     {
-        flds.remove(0, flds.length());
-        if (flds_ar.length() == 0)
-            jh.addArray(flds_ar, field.c_str(), false, true);
-        else
-            owriter.addMember(flds_ar, field.c_str(), false, "]");
-        jh.addObject(flds, FPSTR("fields"), flds_ar, false, true);
-        set();
-        return *this;
-    }
-    const char *c_str() { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear()
-    {
-        buf.remove(0, buf.length());
-        collid.remove(0, collid.length());
-        flds.remove(0, flds.length());
-        flds_ar.remove(0, flds_ar.length());
-    }
-};
+    private:
+        String buf;
+        String qrscope, apiscope, flds, flds_ar;
+        ObjectWriter owriter;
+        JsonHelper jh;
+
+        void set()
+        {
+            buf.remove(0, buf.length());
+            if (qrscope.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = qrscope;
+                else
+                    owriter.addMember(buf, qrscope, true, "}");
+            }
+            if (apiscope.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = apiscope;
+                else
+                    owriter.addMember(buf, apiscope, true, "}");
+            }
+            if (flds.length() > 0)
+            {
+                if (buf.length() == 0)
+                    buf = flds;
+                else
+                    owriter.addMember(buf, flds, true, "}");
+            }
+        }
+
+    public:
+        Index() {}
+
+        /**
+         * Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
+         * @param queryScope The query scope enum.
+         */
+        Index &queryScope(QueryScope queryScope)
+        {
+            if (queryScope == QueryScope::QUERY_SCOPE_UNSPECIFIED)
+                jh.addObject(qrscope, "queryScope", "QUERY_SCOPE_UNSPECIFIED", true, true);
+            else if (queryScope == QueryScope::COLLECTION)
+                jh.addObject(qrscope, "queryScope", "COLLECTION", true, true);
+            else if (queryScope == QueryScope::COLLECTION_GROUP)
+                jh.addObject(qrscope, "queryScope", "COLLECTION_GROUP", true, true);
+            else if (queryScope == QueryScope::COLLECTION_RECURSIVE)
+                jh.addObject(qrscope, "queryScope", "COLLECTION_RECURSIVE", true, true);
+            set();
+            return *this;
+        }
+
+        /**
+         * Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
+         * @param apiScope The query scope enum.
+         */
+        Index &apiScope(ApiScope apiScope)
+        {
+            if (apiScope == ApiScope::ANY_API)
+                jh.addObject(apiscope, "apiScope", "ANY_API", true, true);
+            else if (apiScope == ApiScope::DATASTORE_MODE_API)
+                jh.addObject(apiscope, "apiScope", "DATASTORE_MODE_API", true, true);
+            set();
+            return *this;
+        }
+
+        /**
+         * Add the field that supported by this index.
+         * @param field the field to add.
+         */
+        Index &addField(IndexField field)
+        {
+            flds.remove(0, flds.length());
+            if (flds_ar.length() == 0)
+                jh.addArray(flds_ar, field.c_str(), false, true);
+            else
+                owriter.addMember(flds_ar, field.c_str(), false, "]");
+            jh.addObject(flds, FPSTR("fields"), flds_ar, false, true);
+            set();
+            return *this;
+        }
+        const char *c_str() { return buf.c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        void clear()
+        {
+            buf.remove(0, buf.length());
+            qrscope.remove(0, qrscope.length());
+            apiscope.remove(0, apiscope.length());
+            flds.remove(0, flds.length());
+            flds_ar.remove(0, flds_ar.length());
+        }
+    };
+
+}
 
 class FirestoreOptions
 {
-    friend class Firestore;
+    friend class FirestoreBase;
 
 public:
     ParentResource parent;

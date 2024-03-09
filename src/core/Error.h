@@ -99,13 +99,15 @@ class FirebaseError
 {
     friend class AsyncClientClass;
     friend class AuthRequest;
-    friend class Database;
-    friend class Firestore;
+    friend class RealtimeDatabase;
+    friend class FirestoreBase;
+    friend class FirestoreDocuments;
+    friend class FirestoreDatabase;
     friend class Messaging;
     friend class Functions;
     friend class Storage;
     friend class CloudStorage;
-    friend class FirestoreDocuments;
+    
 
 private:
     struct firebase_error_info_t

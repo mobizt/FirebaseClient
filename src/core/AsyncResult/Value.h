@@ -27,17 +27,17 @@
 #include <Arduino.h>
 #include <string>
 
-enum database_data_type
+enum realtime_database_data_type
 {
-    database_data_type_undefined = -1,
-    database_data_type_null = 0,
-    database_data_type_integer = 1,
-    database_data_type_float = 2,
-    database_data_type_double = 3,
-    database_data_type_boolean = 4,
-    database_data_type_string = 5,
-    database_data_type_json = 6,
-    database_data_type_array = 7
+    realtime_database_data_type_undefined = -1,
+    realtime_database_data_type_null = 0,
+    realtime_database_data_type_integer = 1,
+    realtime_database_data_type_float = 2,
+    realtime_database_data_type_double = 3,
+    realtime_database_data_type_boolean = 4,
+    realtime_database_data_type_string = 5,
+    realtime_database_data_type_json = 6,
+    realtime_database_data_type_array = 7
 };
 
 struct boolean_t : public Printable
@@ -225,7 +225,7 @@ public:
     {
         if (!useLength && strlen(payload) > 0)
         {
-            if (getType(payload) == database_data_type_boolean)
+            if (getType(payload) == realtime_database_data_type_boolean)
                 setBool(strcmp(payload, "true") == 0);
             else
             {
@@ -276,37 +276,37 @@ public:
         return buf.c_str();
     }
 
-    database_data_type getType(const char *payload)
+    realtime_database_data_type getType(const char *payload)
     {
         if (strlen(payload) > 0)
         {
             size_t p1 = 0, p2 = strlen(payload) - 1;
 
             if (payload[p1] == '"')
-                return database_data_type_string;
+                return realtime_database_data_type_string;
             else if (payload[p1] == '{')
-                return database_data_type_json;
+                return realtime_database_data_type_json;
             else if (payload[p1] == '[')
-                return database_data_type_array;
+                return realtime_database_data_type_array;
             // valid database response of none numeric except for ", { and [ character should be only true, false or null.
             else if (p2 > 0 && ((payload[p1] == 'f' && payload[p1 + 1] == 'a') || (payload[p1] == 't' && payload[p1 + 1] == 'r')))
-                return database_data_type_boolean;
+                return realtime_database_data_type_boolean;
             else if (p2 > 0 && payload[p1] == 'n' && payload[p1 + 1] == 'u')
-                return database_data_type_null;
+                return realtime_database_data_type_null;
             else
             {
                 // response here should be numberic value
                 double d = atof(payload);
                 // find the dot and check its length to determine the type
                 if (String(payload).indexOf('.') != -1)
-                    return p2 <= 7 ? database_data_type_float : database_data_type_double;
+                    return p2 <= 7 ? realtime_database_data_type_float : realtime_database_data_type_double;
                 else
                     // no dot, determine the type from its value
-                    return d > 0x7fffffff ? database_data_type_double : database_data_type_integer;
+                    return d > 0x7fffffff ? realtime_database_data_type_double : realtime_database_data_type_integer;
             }
         }
 
-        return database_data_type_undefined;
+        return realtime_database_data_type_undefined;
     }
 
 private:

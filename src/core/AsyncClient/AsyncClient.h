@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -160,13 +160,13 @@ class AsyncClientClass
 {
     friend class FirebaseApp;
     friend class AuthRequest;
-    friend class Database;
-    friend class Firestore;
+    friend class RealtimeDatabase;
+    friend class FirestoreDatabase;
+    friend class FirestoreDocuments;
     friend class Functions;
     friend class Messaging;
     friend class Storage;
     friend class CloudStorage;
-    friend class FirestoreDocuments;
 
 private:
     FirebaseError lastErr;
@@ -575,29 +575,6 @@ private:
         }
     }
 
-    void removeSlot(uint8_t slot)
-    {
-        async_data_item_t *sData = getData(slot);
-
-        if (!sData)
-            return;
-
-#if defined(ENABLE_DATABASE)
-        sData->aResult.database.clearSSE();
-#endif
-        closeFile(sData);
-        setLastError(sData);
-        // data available from sync and asyn request except for sse
-        returnResult(sData, true);
-        reset(sData, sData->auth_used);
-        if (!sData->auth_used)
-        {
-            delete sData;
-        }
-        sData = nullptr;
-        sVec.erase(sVec.begin() + slot);
-    }
-
     int readLine(async_data_item_t *sData, String &buf)
     {
         int p = 0;
@@ -671,7 +648,7 @@ private:
 #if defined(ENABLE_DATABASE)
 
                             if (sData->request.method == async_request_handler_t::http_post)
-                                sData->aResult.database.parseNodeName();
+                                sData->aResult.rtdbResult.parseNodeName();
 
                             // data available from sse event
                             if (sData->response.flags.sse && sData->response.payload.length())
@@ -682,7 +659,7 @@ private:
                                     // save payload to slot result
                                     sData->aResult.setPayload(sData->response.payload);
                                     clear(sData->response.payload);
-                                    sData->aResult.database.parseSSE();
+                                    sData->aResult.rtdbResult.parseSSE();
                                     sData->response.flags.payload_available = true;
                                     returnResult(sData, true);
                                 }
@@ -746,7 +723,7 @@ private:
                 sData->aResult.res_etag = sData->response.etag;
                 sData->aResult.data_path = sData->request.path;
 #if defined(ENABLE_DATABASE)
-                sData->aResult.database.null_etag = sData->response.etag.indexOf("null_etag") > -1;
+                sData->aResult.rtdbResult.null_etag = sData->response.etag.indexOf("null_etag") > -1;
 #endif
 
                 parseRespHeader(sData, sData->response.header, cl, "Content-Length");
@@ -1543,9 +1520,9 @@ private:
 #if defined(ENABLE_DATABASE)
     void handleEventTimeout(async_data_item_t *sData)
     {
-        if (sData->sse && sData->aResult.database.eventTimeout() && sData->aResult.database.eventResumeStatus() == database_data_t::event_resume_status_undefined)
+        if (sData->sse && sData->aResult.rtdbResult.eventTimeout() && sData->aResult.rtdbResult.eventResumeStatus() == RealtimeDatabaseResult::event_resume_status_undefined)
         {
-            sData->aResult.database.setEventResumeStatus(database_data_t::event_resume_status_resuming);
+            sData->aResult.rtdbResult.setEventResumeStatus(RealtimeDatabaseResult::event_resume_status_resuming);
             setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEOUT, false, false);
             returnResult(sData, false);
             reset(sData, true);
@@ -1894,7 +1871,7 @@ public:
                         {
                             sData->aResult.data_available = false;
 #if defined(ENABLE_DATABASE)
-                            sData->aResult.database.clearSSE();
+                            sData->aResult.rtdbResult.clearSSE();
 #endif
                         }
                         sData->return_type = function_return_type_failure;
@@ -1932,6 +1909,32 @@ public:
     size_t slotCount()
     {
         return sVec.size();
+    }
+
+    void removeSlot(uint8_t slot, bool sse = true)
+    {
+        async_data_item_t *sData = getData(slot);
+
+        if (!sData)
+            return;
+
+        if (sData->sse && !sse)
+            return;
+
+#if defined(ENABLE_DATABASE)
+        sData->aResult.rtdbResult.clearSSE();
+#endif
+        closeFile(sData);
+        setLastError(sData);
+        // data available from sync and asyn request except for sse
+        returnResult(sData, true);
+        reset(sData, sData->auth_used);
+        if (!sData->auth_used)
+        {
+            delete sData;
+        }
+        sData = nullptr;
+        sVec.erase(sVec.begin() + slot);
     }
 };
 
