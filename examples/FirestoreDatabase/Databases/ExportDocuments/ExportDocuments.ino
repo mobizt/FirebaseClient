@@ -78,9 +78,9 @@
  *
  * SYNTAXES:
  *
- * Database.exportDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>);
- * Database.exportDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
- * Database.exportDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
+ * Databases.exportDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>);
+ * Databases.exportDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
+ * Databases.exportDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
  *
  * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
@@ -92,6 +92,8 @@
  *
  * The <bucketID> is the Firebase storage bucket ID in the project.
  * The <storagePath> is the path in the Firebase Storage data bucket to store the exported database.
+ * 
+ * The Databases is Firestore::Databases object that provide the main working functions.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
@@ -214,7 +216,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-FirestoreDatabase Database;
+Firestore::Databases Databases;
 
 AsyncResult aResult_no_callback;
 
@@ -261,7 +263,7 @@ void setup()
             JWT.process(app.getAuth());
     }
 
-    app.getApp<FirestoreDatabase>(Database);
+    app.getApp<Firestore::Databases>(Databases);
 }
 
 void loop()
@@ -277,7 +279,7 @@ void loop()
     // app.ttl();
 
     // This required when different AsyncClients than used in FirebaseApp assigned to the Firestore functions.
-    Database.loop();
+    Databases.loop();
 
     // To get anyc result without callback
     // printResult(aResult_no_callback);
@@ -293,7 +295,7 @@ void loop()
 
         EximDocumentOptions exportOptions("" /* Which collection ids to export. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket to store the data */);
 
-        Database.exportDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), exportOptions, asyncCB);
+        Databases.exportDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), exportOptions, asyncCB);
 
         // To assign UID for async result
         // Database.exportDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), exportOptions, asyncCB, "myUID");

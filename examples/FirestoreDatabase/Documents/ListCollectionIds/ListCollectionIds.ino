@@ -244,7 +244,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-FirestoreDocuments Docs;
+Firestore::Documents Docs;
 
 AsyncResult aResult_no_callback;
 
@@ -291,7 +291,7 @@ void setup()
             JWT.process(app.getAuth());
     }
 
-    app.getApp<FirestoreDocuments>(Docs);
+    app.getApp<Firestore::Documents>(Docs);
 }
 
 void loop()

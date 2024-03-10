@@ -115,17 +115,17 @@ namespace FirestoreQuery
     size_t StructuredQuery::printTo(Print &p) const { return p.print(buf.c_str()); }
     void StructuredQuery::clear()
     {
-        buf.remove(0, buf.length());
-        sel.remove(0, sel.length());
-        frm.remove(0, frm.length());
-        frm_ar.remove(0, frm_ar.length());
-        where_str.remove(0, where_str.length());
-        ordby.remove(0, ordby.length());
-        ordby_ar.remove(0, ordby_ar.length());
-        sta.remove(0, sta.length());
-        ea.remove(0, ea.length());
-        ofs.remove(0, ofs.length());
-        lim.remove(0, lim.length());
+        owriter.clear(buf);
+        owriter.clear(sel);
+        owriter.clear(frm);
+        owriter.clear(frm_ar);
+        owriter.clear(where_str);
+        owriter.clear(ordby);
+        owriter.clear(ordby_ar);
+        owriter.clear(sta);
+        owriter.clear(ea);
+        owriter.clear(ofs);
+        owriter.clear(lim);
     }
 
     void StructuredQuery::set()
@@ -134,61 +134,13 @@ namespace FirestoreQuery
         if (sel.length())
             buf = sel;
 
-        if (frm.length())
-        {
-            if (buf.length() == 0)
-                buf = frm;
-            else
-                owriter.addMember(buf, frm, "}");
-        }
-
-        if (where_str.length())
-        {
-            if (buf.length() == 0)
-                buf = where_str;
-            else
-                owriter.addMember(buf, where_str, "}");
-        }
-
-        if (ordby.length())
-        {
-            if (buf.length() == 0)
-                buf = ordby;
-            else
-                owriter.addMember(buf, ordby, "}");
-        }
-
-        if (sta.length())
-        {
-            if (buf.length() == 0)
-                buf = sta;
-            else
-                owriter.addMember(buf, sta, "}");
-        }
-
-        if (ea.length())
-        {
-            if (buf.length() == 0)
-                buf = ea;
-            else
-                owriter.addMember(buf, ea, "}");
-        }
-
-        if (ofs.length())
-        {
-            if (buf.length() == 0)
-                buf = ofs;
-            else
-                owriter.addMember(buf, ofs, "}");
-        }
-
-        if (lim.length())
-        {
-            if (buf.length() == 0)
-                buf = lim;
-            else
-                owriter.addMember(buf, lim, "}");
-        }
+        owriter.addObject(buf, frm, "}");
+        owriter.addObject(buf, where_str, "}");
+        owriter.addObject(buf, ordby, "}");
+        owriter.addObject(buf, sta, "}");
+        owriter.addObject(buf, ea, "}");
+        owriter.addObject(buf, ofs, "}");
+        owriter.addObject(buf, lim, "}");
     }
 
     CompositeFilter::CompositeFilter() {}
@@ -303,29 +255,14 @@ namespace FirestoreQuery
     size_t UnaryFilter::printTo(Print &p) const { return p.print(buf.c_str()); }
     void UnaryFilter::clear()
     {
-        buf.remove(0, buf.length());
-        op_str.remove(0, op_str.length());
-        field_str.remove(0, field_str.length());
+        owriter.clear(buf);
+        owriter.clear(op_str);
+        owriter.clear(field_str);
     }
     void UnaryFilter::set()
     {
-        buf.remove(0, buf.length());
-
-        if (op_str.length())
-        {
-            if (buf.length() == 0)
-                buf = op_str;
-            else
-                owriter.addMember(buf, op_str, "}");
-        }
-
-        if (field_str.length())
-        {
-            if (buf.length() == 0)
-                buf = field_str;
-            else
-                owriter.addMember(buf, field_str, "}");
-        }
+        owriter.addObject(buf, op_str, "}", true);
+        owriter.addObject(buf, field_str, "}");
     }
 
     Order::Order(){};
@@ -356,28 +293,14 @@ namespace FirestoreQuery
     size_t Order::printTo(Print &p) const { return p.print(buf.c_str()); }
     void Order::clear()
     {
-        buf.remove(0, buf.length());
-        field_str.remove(0, field_str.length());
-        direction_str.remove(0, direction_str.length());
+        owriter.clear(buf);
+        owriter.clear(field_str);
+        owriter.clear(direction_str);
     }
     void Order::set()
     {
-        buf.remove(0, buf.length());
-        if (field_str.length())
-        {
-            if (buf.length() == 0)
-                buf = field_str;
-            else
-                owriter.addMember(buf, field_str, "}");
-        }
-
-        if (direction_str.length())
-        {
-            if (buf.length() == 0)
-                buf = direction_str;
-            else
-                owriter.addMember(buf, direction_str, "}");
-        }
+        owriter.addObject(buf, field_str, "}", true);
+        owriter.addObject(buf, direction_str, "}");
     }
 
     Cursor::Cursor()
@@ -419,23 +342,17 @@ namespace FirestoreQuery
         if (value_str.length())
             buf = value_str;
 
-        if (before_str.length())
-        {
-            if (buf.length() == 0)
-                buf = before_str;
-            else
-                owriter.addMember(buf, before_str, "}");
-        }
+        owriter.addObject(buf, before_str, "}");
     }
 
     const char *Cursor::c_str() { return buf.c_str(); }
     size_t Cursor::printTo(Print &p) const { return p.print(buf.c_str()); }
     void Cursor::clear()
     {
-        buf.remove(0, buf.length());
-        before_str.remove(0, before_str.length());
-        value_str.remove(0, value_str.length());
-        value_ar_str.remove(0, value_ar_str.length());
+        owriter.clear(buf);
+        owriter.clear(before_str);
+        owriter.clear(value_str);
+        owriter.clear(value_ar_str);
     }
 
     Filter::Filter() {}

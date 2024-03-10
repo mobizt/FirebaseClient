@@ -1,8 +1,15 @@
-
 // Created by K. Suwatchai (Mobizt)
 // Email: k_suwatchai@hotmail.com
 // Github: https://github.com/mobizt/FirebaseClient
 // Copyright (c) 2024 mobizt
+
+/**
+ * PRE REQUISITE
+ * =============
+ *
+ * IAM owner permission required for service account,
+ * https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
+ */
 
 /**
  * APP INITIALIZATION
@@ -15,9 +22,6 @@
  *
  * The Database, Firestore, Functions, Messaging, Storage and Cloud Storage apps provided the functions based on
  * the specific Firebase services which take the auth credentials data from FirebaseApp.
- *
- * Multiples instances of FirebaseApp (auth provider) and services apps (Database, Firestore...) can be available
- * which depends on the device memory.
  *
  * The FirebaseApp should be initialized first before use via static function initializeApp.
  *
@@ -36,7 +40,18 @@
  * The user_auth_data store the user credentials which can be obtained from one of following Auth classes.
  * UserAuth, ServiceAuth, CustomAuth, IDToken, AccessToken, CustomToken, LegacyToken and NoAuth via static function getAuth.
  *
- * Please see examples/App/AppInitialization for usage guidelines.
+ * SYNTAX:
+ *
+ * ServiceAuth service_auth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
+ *
+ * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
+ * <client_email> - The service account client Email.
+ * <project_id> - The service account project ID.
+ * <private_key> - The service account private key.
+ * <expire> - The expiry period in seconds (less than or equal to 3600).
+ *
+ * The default network (built-in WiFi) configuration was used by default when
+ * it was not assign to the function.
  *
  * To use other network interfaces, network data from one of the following Network classes
  * can be assigned.
@@ -47,7 +62,7 @@
  *
  * Please see examples/App/NetworkInterfaces for the usage guidelines.
  *
- * The auth credential data can be set to Services App e.g. Database to initialize via function getApp.
+ * The auth data can be set to Services App e.g. Database to initialize via function getApp.
  *
  * SYNTAX:
  *
@@ -58,70 +73,34 @@
  */
 
 /**
- * COMMIT DOCUMENTS FUNCTIONS
- * ==========================
+ * DELETE A DATABASE FUNCTIONS
+ * ===========================
  *
  * SYNTAXES:
  *
- * Docs.commit(<AsyncClient>, <ParentResource>, <Writes>);
- * Docs.commit(<AsyncClient>, <ParentResource>, <Writes>, <AsyncResult>);
- * Docs.commit(<AsyncClient>, <ParentResource>, <Writes>, <AsyncResultCallback>, <uid>);
+ * Databases.delete(<AsyncClient>, <ParentResource>, <etag>);
+ * Databases.delete(<AsyncClient>, <ParentResource>, <etag>, <AsyncResult>);
+ * Databases.delete(<AsyncClient>, <ParentResource>, <etag>, <AsyncResultCallback>, <uid>);
  *
  * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
+ * The Firestore database id is the id of database to delete.
+ * 
+ * The <etag> is the current etag of the Database. 
+ * If an etag is provided and does not match the current etag of the database, 
+ * deletion will be blocked and a FAILED_PRECONDITION error will be returned.
  *
- * The <Writes> is the writes to apply.
+ * The Databases is Firestore::Databases object that provide the main working functions.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
  * The uid is user specified UID of async result (optional) which used as async task identifier.
  *
  * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ *
  */
 
 /**
- * The AsyncResult object in the AsyncResultCallback function provides the result of async and non-async operations.
- *
- * APP EVENT
- * =========
- *
- * The event information can be obtained from aResult.appEvent().code() and aResult.appEvent().message() respectively.
- *
- * The following event code (firebase_auth_event_type), auth_event_uninitialized, auth_event_initializing, auth_event_signup, auth_event_send_verify_email,
- * auth_event_delete_user, auth_event_reset_password, auth_event_token_signing, auth_event_authenticating, auth_event_auth_request_sent
- * auth_event_auth_response_received, auth_event_ready and auth_event_error are available.
- *
- *
- * The following event strings "undefined", "initializing", "sign up", "send verification email", "delete user", "reset password",
- * "token signing", "authenticating", "auth request sent", "auth response received", "ready" and "error" are available.
- *
- * RESULT DATA
- * ===========
- *
- * The result data can be obtained from AsyncResult object via aResult.payload(), aResult.available(), aResult.path(), aResult.etag()
- * aResult.database.isStream(), aResult.database.event(), aResult.database.dataPath(), aResult.database.type() and result.database.name().
- *
- * The function aResult.payload() returns server serponse payload.
- *
- * The function aResult.available() returns the size of data that is ready to read.
- *
- * The function aResult.path() returns the resource path that the request was sent.
- *
- * The function aResult.etag() returns the ETag from server response header.
- *
- * The function aResult.database.name() returns the name (random UID) of node that will be creaated after calling push.
- *
- * The function aResult.database.type() returns the following database data type enum.
- * database_data_type_undefined (-1), database_data_type_null (0), database_data_type_integer(1), database_data_type_float (2),
- * database_data_type_double (3), database_data_type_boolean (4), database_data_type_string (5), database_data_type_json (6),
- * and database_data_type_array (7).
- *
- * The aResult.database.dataPath() and aResult.database.event() are the database node path that data has changed and type of event in server-sent events (stream) mode.
- *
- * The server response payload in AsyncResult can be converted to the the values e.g. boolean, integer,
- * float, double and string via aResult.database.to<T>() or result.database.to<T>().
- *
  * ASYNC QUEUE
  * ===========
  *
@@ -201,20 +180,27 @@
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
 
-// User Email and password that already registerd or added in your project.
-#define USER_EMAIL "USER_EMAIL"
-#define USER_PASSWORD "USER_PASSWORD"
-#define DATABASE_URL "URL"
-
+/**
+ * This information can be taken from the service account JSON file.
+ *
+ * To download service account file, from the Firebase console, goto project settings,
+ * select "Service accounts" tab and click at "Generate new private key" button
+ */
 #define FIREBASE_PROJECT_ID "PROJECT_ID"
+#define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
+const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
+
+/* Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
+#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
+
+void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
 
-void printResult(AsyncResult &aResult);
-
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
+// ServiceAuth is required for import and export documents.
+ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
 
 FirebaseApp app;
 
@@ -227,13 +213,11 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-Firestore::Documents Docs;
+Firestore::Databases Databases;
 
 AsyncResult aResult_no_callback;
 
-int counter = 0;
-
-unsigned long dataMillis = 0;
+bool taskCompleted = false;
 
 void setup()
 {
@@ -264,86 +248,72 @@ void setup()
 
     app.setCallback(asyncCB);
 
-    initializeApp(aClient, app, getAuth(user_auth));
+    initializeApp(aClient, app, getAuth(sa_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-        ;
+    {
+        // This JWT token process required for ServiceAuth and CustomAuth authentications
+        if (app.isJWT())
+            JWT.process(app.getAuth());
+    }
 
-    app.getApp<Firestore::Documents>(Docs);
+    app.getApp<Firestore::Databases>(Databases);
 }
 
 void loop()
 {
-    // This function is required for handling async operations and maintaining the authentication tasks.
+    // This JWT token process required for ServiceAuth and CustomAuth authentications
+    if (app.isJWT())
+        JWT.process(app.getAuth());
+
+    // This function is required for handling and maintaining the authentication tasks.
     app.loop();
 
+    // To get the authentication time to live in seconds before expired.
+    // app.ttl();
+
     // This required when different AsyncClients than used in FirebaseApp assigned to the Firestore functions.
-    Docs.loop();
+    Databases.loop();
 
     // To get anyc result without callback
     // printResult(aResult_no_callback);
 
-    if (app.ready() && (millis() - dataMillis > 60000 || dataMillis == 0))
+    if (app.ready() && !taskCompleted)
     {
-        dataMillis = millis();
-        counter++;
+        taskCompleted = true;
 
-        Serial.println("[+] Commit a document (append array)... ");
+        Serial.println("[+] Deletes a database... ");
 
-        // test_collection is the collection id, test_document is the document id.
-        String documentPath = "test_collection/test_document";
-        String fieldPath = "appended_data";
+        String etag;
 
-        // If the document path contains space e.g. "a b c/d e f"
-        // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
-
-        // array value to append
-        Values::ArrayValue arrV(Values::IntegerValue((int)rand()));
-        arrV.add(Values::StringValue("word don't come easy " + String(counter)));
-
-        FieldTransform::AppendMissingElements<Values::ArrayValue> appendValue(arrV);
-        FieldTransform::FieldTransform fieldTransforms(fieldPath, appendValue);
-        DocumentTransform transform(documentPath, fieldTransforms);
-
-        Writes writes(Write(transform, Precondition() /* currentDocument precondition */));
-
-        // Another array value to append
-        Values::ArrayValue arrV2(Values::DoubleValue((int)rand() * 1.234));
-        arrV2.add(Values::StringValue("never gonna give you up " + String(counter)));
-        // Another append array object
-        FieldTransform::AppendMissingElements<Values::ArrayValue> appendValue2(arrV2);
-        // Another field transform
-        FieldTransform::FieldTransform fieldTransforms2(fieldPath, appendValue2);
-        // Another doc transform
-        DocumentTransform transform2(documentPath, fieldTransforms2);
-        // Add another Write object of another transform to the Writes object
-        writes.add(Write(transform2, Precondition()));
-
-        // All Writes, Write, DocumentTransform FieldTransform::xxx, and Values::xxxx objects can be printed on Serial port
-
-        Docs.commit(aClient, ParentResource(FIREBASE_PROJECT_ID), writes, asyncCB);
+        Databases.deleteDatabase(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb" /* database Id */), etag, asyncCB);
 
         // To assign UID for async result
-        // Docs.commit(aClient, ParentResource(FIREBASE_PROJECT_ID), writes, asyncCB, "myUID");
+        // Databases.deleteDatabase(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), etag, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Docs.commit(aClient, ParentResource(FIREBASE_PROJECT_ID), writes, aResult_no_callback);
+        // Databases.deleteDatabase(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), etag, aResult_no_callback);
     }
 }
 
-void asyncCB(AsyncResult &aResult)
+void timeStatusCB(uint32_t &ts)
 {
+    if (time(nullptr) < FIREBASE_DEFAULT_TS)
+    {
+        configTime(3 * 3600, 0, "pool.ntp.org");
+        while (time(nullptr) < FIREBASE_DEFAULT_TS)
+        {
+            delay(100);
+        }
+    }
 
-    // To get the UID (string) from async result
-    // aResult.uid();
-
-    printResult(aResult);
+    ts = time(nullptr);
 }
 
-void printResult(AsyncResult &aResult)
+void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
@@ -365,6 +335,9 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.available())
     {
+        // To get the UID (string) from async result
+        // aResult.uid();
+
         Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }

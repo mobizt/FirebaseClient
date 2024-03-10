@@ -1,5 +1,5 @@
 /**
- * Created March 9, 2024
+ * Created March 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -139,9 +139,12 @@ public:
         else
             uh.addGAPIv1Path(request.path);
         request.path += request.options->parent.projectId.length() == 0 ? app_token->project_id : request.options->parent.projectId;
-        request.path += FPSTR("/databases/");
-        request.path += request.options->parent.databaseId.length() > 0 ? request.options->parent.databaseId : FPSTR("(default)");
-
+        request.path += FPSTR("/databases");
+        if (!request.options->parent.isDatabaseIdParam())
+        {
+            request.path += '/';
+            request.path += request.options->parent.databaseId.length() > 0 ? request.options->parent.databaseId : FPSTR("(default)");
+        }
         addParams(request, extras);
 
         url(FPSTR("firestore.googleapis.com"));
@@ -173,6 +176,7 @@ public:
     {
         extras += request.options->extras;
         extras.replace(" ", "%20");
+        extras.replace(",", "%2C");
     }
 
     void setClientError(async_request_data_t &request, int code)
@@ -202,6 +206,50 @@ public:
             options.payload.replace("inputUriPrefix", "outputUriPrefix");
         options.extras += isImport ? FPSTR(":importDocuments") : FPSTR(":exportDocuments");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        asyncRequest(aReq);
+    }
+
+    void manageDatabase(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &database, const String &key, Firestore::firestore_database_mode mode, bool async)
+    {
+        FirestoreOptions options;
+        options.requestType = firebase_firestore_request_type_manage_database;
+        options.parent = parent;
+
+        if (strlen(database.c_str()))
+        {
+            options.payload = database.c_str();
+            if (mode == Firestore::firestore_database_mode_create)
+            {
+                options.parent.setDatabaseIdParam(true);
+                options.extras += FPSTR("?databaseId=");
+                options.extras += options.parent.databaseId;
+            }
+        }
+
+        if (key.length())
+        {
+            if (mode == Firestore::firestore_database_mode_delete)
+                options.extras += FPSTR("?etag=");
+            else if (mode == Firestore::firestore_database_mode_patch)
+                options.extras += FPSTR("?updateMask=");
+            options.extras += key;
+        }
+
+        if (mode == Firestore::firestore_database_mode_list)
+            options.parent.setDatabaseIdParam(true);
+
+        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
+
+        if (strlen(database.c_str()) > 0 && mode == Firestore::firestore_database_mode_create)
+            method = async_request_handler_t::http_post; // create
+        else if (options.parent.databaseId.length() > 0 && (mode == Firestore::firestore_database_mode_delete || mode == Firestore::firestore_database_mode_get))
+            method = mode == Firestore::firestore_database_mode_delete ? async_request_handler_t::http_delete : async_request_handler_t::http_get; // get index or delete by id
+        else if (strlen(database.c_str()) == 0 && mode == Firestore::firestore_database_mode_list)
+            method = async_request_handler_t::http_get; // list
+        else if (strlen(database.c_str()) > 0 && mode == Firestore::firestore_database_mode_patch)
+            method = async_request_handler_t::http_patch; // patch
+
+        async_request_data_t aReq(&aClient, path, method, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 

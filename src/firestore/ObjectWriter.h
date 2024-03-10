@@ -58,6 +58,21 @@ public:
         buf = str;
     }
 
+    void addObject(String &buf, const String &object, const String &token, bool clear = false)
+    {
+        if (clear)
+            buf.remove(0, buf.length());
+        if (object.length() > 0)
+        {
+            if (buf.length() == 0)
+                buf = object;
+            else
+                addMember(buf, object, token);
+        }
+    }
+
+    void clear(String &buf) { buf.remove(0, buf.length()); }
+
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
         buf.remove(0, buf.length());

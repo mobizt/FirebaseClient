@@ -193,22 +193,8 @@ namespace FirestoreQuery
 
         void setBuf()
         {
-            buf.remove(0, buf.length());
-            if (collId.length())
-            {
-                if (buf.length() == 0)
-                    buf = collId;
-                else
-                    owriter.addMember(buf, collId, "}");
-            }
-
-            if (allDes.length())
-            {
-                if (buf.length() == 0)
-                    buf = allDes;
-                else
-                    owriter.addMember(buf, allDes, "}");
-            }
+            owriter.addObject(buf, collId, "}", true);
+            owriter.addObject(buf, allDes, "}");
         }
 
     public:
@@ -231,6 +217,12 @@ namespace FirestoreQuery
             jh.addObject(allDes, "allDescendants", owriter.getBoolStr(value), false, true);
             setBuf();
             return *this;
+        }
+        void clear()
+        {
+            owriter.clear(buf);
+            owriter.clear(collId);
+            owriter.clear(allDes);
         }
         const char *c_str() { return buf.c_str(); }
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }

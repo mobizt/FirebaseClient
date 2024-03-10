@@ -1,5 +1,5 @@
 /**
- * Created March 9, 2024
+ * Created March 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,7 +30,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.1.3"
+#define FIREBASE_CLIENT_VERSION "0.1.4"
 
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
@@ -43,8 +43,8 @@
 #endif
 
 #if defined(ENABLE_FIRESTORE)
-#if __has_include("firestore/FirestoreDatabase.h")
-#include "firestore/FirestoreDatabase.h"
+#if __has_include("firestore/Databases.h")
+#include "firestore/Databases.h"
 #endif
 #if __has_include("firestore/Documents.h")
 #include "firestore/Documents.h"

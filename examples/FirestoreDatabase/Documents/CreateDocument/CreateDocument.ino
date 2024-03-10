@@ -235,7 +235,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-FirestoreDocuments Docs;
+Firestore::Documents Docs;
 
 AsyncResult aResult_no_callback;
 
@@ -280,7 +280,7 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
 
-    app.getApp<FirestoreDocuments>(Docs);
+    app.getApp<Firestore::Documents>(Docs);
 }
 
 void loop()

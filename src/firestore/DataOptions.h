@@ -54,6 +54,7 @@ enum firebase_firestore_request_type
     firebase_firestore_request_type_batch_get_doc,
     firebase_firestore_request_type_create_composite_index,
     firebase_firestore_request_type_create_field_index,
+    firebase_firestore_request_type_manage_database,
 
     firebase_firestore_request_type_get_doc = 300,
     firebase_firestore_request_type_list_doc,
@@ -69,12 +70,21 @@ enum firebase_firestore_request_type
 class ParentResource
 {
     friend class FirestoreBase;
-    friend class FirestoreDocuments;
+    friend class Documents;
 
 private:
     String projectId;
     String databaseId;
     String documentPath;
+    bool databaseIdParam = false;
+
+public:
+    ParentResource() {}
+    ParentResource(const String &projectId, const String &databaseId = "")
+    {
+        this->projectId = projectId;
+        this->databaseId = databaseId;
+    }
 
     void pathResove(String &collectionId, String &documentId)
     {
@@ -92,14 +102,11 @@ private:
             collectionId = collectionId.substring(0, p);
         }
     }
-
-public:
-    ParentResource() {}
-    ParentResource(const String &projectId, const String &databaseId = "")
-    {
-        this->projectId = projectId;
-        this->databaseId = databaseId;
-    }
+    void setDocPath(const String &docPath) { documentPath = docPath; }
+    String getDatabaseId() { return databaseId.c_str(); }
+    String getProjectId() { return projectId.c_str(); }
+    void setDatabaseIdParam(bool value) { databaseIdParam = value; }
+    bool isDatabaseIdParam(){return databaseIdParam;}
 };
 
 class DocumentMask : public Printable
@@ -108,7 +115,7 @@ class DocumentMask : public Printable
     friend class GetDocumentOptions;
     friend class patchDocumentOptions;
     friend class ListDocumentsOptions;
-    friend class FirestoreDocuments;
+    friend class Documents;
 
 private:
     String mask;
@@ -326,7 +333,7 @@ namespace FieldTransform
 class Precondition : public Printable
 {
     friend class FirestoreBase;
-    friend class FirestoreDocuments;
+    friend class Documents;
 
 private:
     String buf, str;
@@ -503,6 +510,235 @@ public:
         mv.clear();
     }
 };
+
+namespace Firestore
+{
+    // The type of concurrency control mode for transactions.
+    enum ConcurrencyMode
+    {
+        CONCURRENCY_MODE_UNSPECIFIED, // Not used.
+        // Use optimistic concurrency control by default. This mode is available for Cloud Firestore databases.
+        OPTIMISTIC,
+        // This is the default setting for Cloud Firestore.
+        PESSIMISTIC,
+        // Use optimistic concurrency control with entity groups by default. This is the only available mode for Cloud Datastore. This mode is also available for Cloud Firestore with Datastore Mode but is not recommended.
+        OPTIMISTIC_WITH_ENTITY_GROUPS
+    };
+
+    // The type of App Engine integration mode.
+    enum AppEngineIntegrationMode
+    {
+        APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED, // Not used
+        // If an App Engine application exists in the same region as this database, App Engine configuration will impact this database. This includes disabling of the application & database, as well as disabling writes to the database.
+        ENABLED,
+        // App Engine has no effect on the ability of this database to serve requests. This is the default setting for databases created with the Firestore API.
+        DISABLED
+    };
+
+    // The delete protection state of the database.
+    enum DeleteProtectionState
+    {
+        DELETE_PROTECTION_STATE_UNSPECIFIED, // The default value. Delete protection type is not specified
+        DELETE_PROTECTION_DISABLED,          //	Delete protection is disabled
+        DELETE_PROTECTION_ENABLED            // Delete protection is enabled
+    };
+
+    // Point In Time Recovery feature enablement.
+    enum PointInTimeRecoveryEnablement
+    {
+        POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED, //	Not used.
+        // Reads are supported on selected versions of the data from within the past 7 days:
+        // [] Reads against any timestamp within the past hour
+        // [] Reads against 1-minute snapshots beyond 1 hour and within 7 days
+        // versionRetentionPeriod and earliestVersionTime can be used to determine the supported versions.
+        POINT_IN_TIME_RECOVERY_ENABLED,
+        POINT_IN_TIME_RECOVERY_DISABLED // Reads are supported on any version of the data from within the past 1 hour.
+    };
+
+    // The type of the database. See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.
+    enum DatabaseType
+    {
+        DATABASE_TYPE_UNSPECIFIED, //	The default value. This value is used if the database type is omitted.
+        FIRESTORE_NATIVE,          //	Firestore Native Mode
+        DATASTORE_MODE             //	Firestore in Datastore Mode.
+    };
+
+    enum firestore_database_mode
+    {
+        firestore_database_mode_create,
+        firestore_database_mode_get,
+        firestore_database_mode_list,
+        firestore_database_mode_patch,
+        firestore_database_mode_delete
+    };
+
+    class Database : public Printable
+    {
+        friend class Databases;
+
+    private:
+        String buf;
+        String ccmode, aeg, dps, pit, type, location, nm, etg;
+        ObjectWriter owriter;
+        JsonHelper jh;
+
+        void setBuf()
+        {
+            owriter.addObject(buf, ccmode, "}", true);
+            owriter.addObject(buf, aeg, "}");
+            owriter.addObject(buf, dps, "}");
+            owriter.addObject(buf, pit, "}");
+            owriter.addObject(buf, type, "}");
+            owriter.addObject(buf, location, "}");
+            owriter.addObject(buf, nm, "}");
+            owriter.addObject(buf, etg, "}");
+        }
+
+        const char *getBuf() { return buf.c_str(); }
+
+    public:
+        const char *c_str() { return buf.c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+
+        void clear()
+        {
+            owriter.clear(buf);
+            owriter.clear(ccmode);
+            owriter.clear(aeg);
+            owriter.clear(dps);
+            owriter.clear(pit);
+            owriter.clear(type);
+            owriter.clear(location);
+            owriter.clear(nm);
+            owriter.clear(etg);
+        }
+
+        /**
+         * Set the concurrency control mode to use for this database (used in database creation).
+         * @param concurrencyMode The ConcurrencyMode enum.
+         */
+        Database &concurrencyMode(ConcurrencyMode concurrencyMode)
+        {
+            owriter.clear(ccmode);
+            if (concurrencyMode == ConcurrencyMode::CONCURRENCY_MODE_UNSPECIFIED)
+                jh.addObject(ccmode, "concurrencyMode", "CONCURRENCY_MODE_UNSPECIFIED", true, true);
+            else if (concurrencyMode == ConcurrencyMode::OPTIMISTIC)
+                jh.addObject(ccmode, "concurrencyMode", "OPTIMISTIC", true, true);
+            else if (concurrencyMode == ConcurrencyMode::PESSIMISTIC)
+                jh.addObject(ccmode, "concurrencyMode", "PESSIMISTIC", true, true);
+            else if (concurrencyMode == ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS)
+                jh.addObject(ccmode, "concurrencyMode", "OPTIMISTIC_WITH_ENTITY_GROUPS", true, true);
+            setBuf();
+            return *this;
+        }
+
+        /**
+         * Set the App Engine integration mode to use for this database (used in database creation).
+         * @param appEngineIntegrationMode The AppEngineIntegrationMode enum.
+         */
+        Database &appEngineIntegrationMode(AppEngineIntegrationMode appEngineIntegrationMode)
+        {
+            owriter.clear(aeg);
+            if (appEngineIntegrationMode == AppEngineIntegrationMode::APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED)
+                jh.addObject(aeg, "appEngineIntegrationMode", "APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", true, true);
+            else if (appEngineIntegrationMode == AppEngineIntegrationMode::ENABLED)
+                jh.addObject(aeg, "appEngineIntegrationMode", "ENABLED", true, true);
+            else if (appEngineIntegrationMode == AppEngineIntegrationMode::DISABLED)
+                jh.addObject(aeg, "appEngineIntegrationMode", "DISABLED", true, true);
+            setBuf();
+            return *this;
+        }
+        /**
+         * Set the state of delete protection for the database (used in database creation).
+         * @param deleteProtectionState The DeleteProtectionState enum.
+         */
+        Database &deleteProtectionState(DeleteProtectionState deleteProtectionState)
+        {
+            owriter.clear(dps);
+            if (deleteProtectionState == DeleteProtectionState::DELETE_PROTECTION_STATE_UNSPECIFIED)
+                jh.addObject(dps, "deleteProtectionState", "DELETE_PROTECTION_STATE_UNSPECIFIED", true, true);
+            else if (deleteProtectionState == DeleteProtectionState::DELETE_PROTECTION_ENABLED)
+                jh.addObject(dps, "deleteProtectionState", "DELETE_PROTECTION_ENABLED", true, true);
+            else if (deleteProtectionState == DeleteProtectionState::DELETE_PROTECTION_DISABLED)
+                jh.addObject(dps, "deleteProtectionState", "DELETE_PROTECTION_DISABLED", true, true);
+            setBuf();
+            return *this;
+        }
+        /**
+         * Set to enable the PITR feature on this database (used in database creation).
+         * @param pointInTimeRecoveryEnablement The PointInTimeRecoveryEnablement enum.
+         */
+        Database &pointInTimeRecoveryEnablement(PointInTimeRecoveryEnablement pointInTimeRecoveryEnablement)
+        {
+            owriter.clear(pit);
+            if (pointInTimeRecoveryEnablement == PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED)
+                jh.addObject(pit, "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", true, true);
+            else if (pointInTimeRecoveryEnablement == PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_ENABLED)
+                jh.addObject(pit, "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_ENABLED", true, true);
+            else if (pointInTimeRecoveryEnablement == PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED)
+                jh.addObject(pit, "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_DISABLED", true, true);
+            setBuf();
+            return *this;
+        }
+
+        /**
+         * Set the type of the database (used in database creation). See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.
+         * @param databaseType The DatabaseType enum.
+         */
+        Database &databaseType(DatabaseType databaseType)
+        {
+            owriter.clear(type);
+            if (databaseType == DatabaseType::DATABASE_TYPE_UNSPECIFIED)
+                jh.addObject(type, "type", "DATABASE_TYPE_UNSPECIFIED", true, true);
+            else if (databaseType == DatabaseType::FIRESTORE_NATIVE)
+                jh.addObject(type, "type", "FIRESTORE_NATIVE", true, true);
+            else if (databaseType == DatabaseType::DATASTORE_MODE)
+                jh.addObject(type, "type", "DATASTORE_MODE", true, true);
+            setBuf();
+            return *this;
+        }
+
+        /**
+         * Set the location of the database (used in database creation).
+         * Available locations are listed at https://cloud.google.com/firestore/docs/locations.
+         * @param value The location Id.
+         */
+        Database &locationId(const String &value)
+        {
+            owriter.clear(location);
+            jh.addObject(location, "locationId", value, true, true);
+            setBuf();
+            return *this;
+        }
+
+        /**
+         * Set the resource name of the Database (used in database creation).
+         * Format: projects/{project}/databases/{database}
+         * @param value The resource name.
+         */
+        Database &name(const String &value)
+        {
+            owriter.clear(nm);
+            jh.addObject(nm, "name", value, true, true);
+            setBuf();
+            return *this;
+        }
+
+        /**
+         * Set the ETag (used in database update and deletion)
+         * This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
+         * @param value The ETag.
+         */
+        Database &etag(const String &value)
+        {
+            owriter.clear(etg);
+            jh.addObject(etg, "etag", value, true, true);
+            setBuf();
+            return *this;
+        }
+    };
+
+}
 
 class DocumentTransform : public Printable
 {
@@ -804,46 +1040,11 @@ private:
 
     void setbuf()
     {
-        buf.remove(0, buf.length());
-        if (doc.length())
-        {
-            if (buf.length() == 0)
-                buf = doc.c_str();
-            else
-                owriter.addMember(buf, doc, "}");
-        }
-
-        if (msk.length())
-        {
-            if (buf.length() == 0)
-                buf = msk.c_str();
-            else
-                owriter.addMember(buf, msk, "}");
-        }
-
-        if (trans.length())
-        {
-            if (buf.length() == 0)
-                buf = trans.c_str();
-            else
-                owriter.addMember(buf, trans, "}");
-        }
-
-        if (newtrans.length())
-        {
-            if (buf.length() == 0)
-                buf = newtrans.c_str();
-            else
-                owriter.addMember(buf, newtrans, "}");
-        }
-
-        if (rt.length())
-        {
-            if (buf.length() == 0)
-                buf = rt.c_str();
-            else
-                owriter.addMember(buf, rt, "}");
-        }
+        owriter.addObject(buf, doc, "}", true);
+        owriter.addObject(buf, msk, "}");
+        owriter.addObject(buf, trans, "}");
+        owriter.addObject(buf, newtrans, "}");
+        owriter.addObject(buf, rt, "}");
     }
 
 public:
@@ -909,12 +1110,12 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear()
     {
-        buf.remove(0, buf.length());
-        doc.remove(0, doc.length());
-        msk.remove(0, msk.length());
-        trans.remove(0, trans.length());
-        newtrans.remove(0, newtrans.length());
-        rt.remove(0, rt.length());
+        owriter.clear(buf);
+        owriter.clear(doc);
+        owriter.clear(msk);
+        owriter.clear(trans);
+        owriter.clear(newtrans);
+        owriter.clear(rt);
     }
 };
 
@@ -951,39 +1152,10 @@ private:
 
     void setbuf()
     {
-        buf.remove(0, buf.length());
-
-        if (query.length())
-        {
-            if (buf.length() == 0)
-                buf = query.c_str();
-            else
-                owriter.addMember(buf, query, "}");
-        }
-
-        if (trans.length())
-        {
-            if (buf.length() == 0)
-                buf = trans.c_str();
-            else
-                owriter.addMember(buf, trans, "}");
-        }
-
-        if (newtrans.length())
-        {
-            if (buf.length() == 0)
-                buf = newtrans.c_str();
-            else
-                owriter.addMember(buf, newtrans, "}");
-        }
-
-        if (rt.length())
-        {
-            if (buf.length() == 0)
-                buf = rt.c_str();
-            else
-                owriter.addMember(buf, rt, "}");
-        }
+        owriter.addObject(buf, query, "}", true);
+        owriter.addObject(buf, trans, "}");
+        owriter.addObject(buf, newtrans, "}");
+        owriter.addObject(buf, rt, "}");
     }
 
 public:
@@ -1038,11 +1210,11 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear()
     {
-        buf.remove(0, buf.length());
-        query.remove(0, query.length());
-        trans.remove(0, trans.length());
-        newtrans.remove(0, newtrans.length());
-        rt.remove(0, rt.length());
+        owriter.clear(buf);
+        owriter.clear(query);
+        owriter.clear(trans);
+        owriter.clear(newtrans);
+        owriter.clear(rt);
     }
 };
 
@@ -1163,13 +1335,13 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear()
     {
-        buf.remove(0, buf.length());
+        owriter.clear(buf);
         msk.clear();
-        ptk.remove(0, ptk.length());
-        ordby.remove(0, ordby.length());
-        sms.remove(0, sms.length());
-        tsc.remove(0, tsc.length());
-        rt.remove(0, rt.length());
+        owriter.clear(ptk);
+        owriter.clear(ordby);
+        owriter.clear(sms);
+        owriter.clear(tsc);
+        owriter.clear(rt);
     }
 };
 
@@ -1183,29 +1355,9 @@ private:
 
     void set()
     {
-        buf.remove(0, buf.length());
-
-        if (pz.length() > 0)
-        {
-            if (buf.length() == 0)
-                buf = pz;
-            else
-                owriter.addMember(buf, pz, "}");
-        }
-        if (ptk.length() > 0)
-        {
-            if (buf.length() == 0)
-                buf = ptk;
-            else
-                owriter.addMember(buf, ptk, "}");
-        }
-        if (rt.length() > 0)
-        {
-            if (buf.length() == 0)
-                buf = rt;
-            else
-                owriter.addMember(buf, rt, "}");
-        }
+        owriter.addObject(buf, pz, "}", true);
+        owriter.addObject(buf, ptk, "}");
+        owriter.addObject(buf, rt, "}");
     }
 
 public:
@@ -1246,10 +1398,10 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear()
     {
-        buf.remove(0, buf.length());
-        ptk.remove(0, ptk.length());
-        pz.remove(0, pz.length());
-        rt.remove(0, rt.length());
+        owriter.clear(buf);
+        owriter.clear(ptk);
+        owriter.clear(pz);
+        owriter.clear(rt);
     }
 };
 
@@ -1285,21 +1437,8 @@ namespace DatabaseIndex
 
         void set()
         {
-            buf.remove(0, buf.length());
-            if (fp.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = fp;
-                else
-                    owriter.addMember(buf, fp, "}");
-            }
-            if (md.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = md;
-                else
-                    owriter.addMember(buf, md, "}");
-            }
+            owriter.addObject(buf, fp, "}", true);
+            owriter.addObject(buf, md, "}");
         }
 
     public:
@@ -1335,9 +1474,9 @@ namespace DatabaseIndex
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            fp.remove(0, fp.length());
-            md.remove(0, md.length());
+            owriter.clear(buf);
+            owriter.clear(fp);
+            owriter.clear(md);
         }
     };
 
@@ -1354,21 +1493,8 @@ namespace DatabaseIndex
 
         void set()
         {
-            buf.remove(0, buf.length());
-            if (collid.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = collid;
-                else
-                    owriter.addMember(buf, collid, "}");
-            }
-            if (flds.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = flds;
-                else
-                    owriter.addMember(buf, flds, "}");
-            }
+            owriter.addObject(buf, collid, "}", true);
+            owriter.addObject(buf, flds, "}");
         }
 
     public:
@@ -1406,10 +1532,10 @@ namespace DatabaseIndex
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            collid.remove(0, collid.length());
-            flds.remove(0, flds.length());
-            flds_ar.remove(0, flds_ar.length());
+            owriter.clear(buf);
+            owriter.clear(collid);
+            owriter.clear(flds);
+            owriter.clear(flds_ar);
         }
     };
 
@@ -1458,21 +1584,8 @@ namespace CollectionGroupsIndex
 
         void set()
         {
-            buf.remove(0, buf.length());
-            if (dim.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = dim;
-                else
-                    owriter.addMember(buf, dim, "}");
-            }
-            if (flat_str.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = flat_str;
-                else
-                    owriter.addMember(buf, flat_str, "}");
-            }
+            owriter.addObject(buf, dim, "}", true);
+            owriter.addObject(buf, flat_str, "}");
         }
 
     public:
@@ -1499,9 +1612,9 @@ namespace CollectionGroupsIndex
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            dim.remove(0, dim.length());
-            flat_str.remove(0, flat_str.length());
+            owriter.clear(buf);
+            owriter.clear(dim);
+            owriter.clear(flat_str);
         }
     };
 
@@ -1518,35 +1631,13 @@ namespace CollectionGroupsIndex
 
         void set()
         {
-            buf.remove(0, buf.length());
-            if (fp.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = fp;
-                else
-                    owriter.addMember(buf, fp, "}");
-            }
+            owriter.addObject(buf, fp, "}", true);
             if (ordr.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = ordr;
-                else
-                    owriter.addMember(buf, ordr, "}");
-            }
+                owriter.addObject(buf, ordr, "}");
             else if (arcfg.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = arcfg;
-                else
-                    owriter.addMember(buf, arcfg, "}");
-            }
+                owriter.addObject(buf, arcfg, "}");
             else if (vcfg.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = vcfg;
-                else
-                    owriter.addMember(buf, vcfg, "}");
-            }
+                owriter.addObject(buf, vcfg, "}");
         }
 
     public:
@@ -1606,11 +1697,11 @@ namespace CollectionGroupsIndex
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            fp.remove(0, fp.length());
-            arcfg.remove(0, arcfg.length());
-            vcfg.remove(0, vcfg.length());
-            ordr.remove(0, ordr.length());
+            owriter.clear(buf);
+            owriter.clear(fp);
+            owriter.clear(arcfg);
+            owriter.clear(vcfg);
+            owriter.clear(ordr);
         }
     };
 
@@ -1627,28 +1718,9 @@ namespace CollectionGroupsIndex
 
         void set()
         {
-            buf.remove(0, buf.length());
-            if (qrscope.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = qrscope;
-                else
-                    owriter.addMember(buf, qrscope, "}");
-            }
-            if (apiscope.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = apiscope;
-                else
-                    owriter.addMember(buf, apiscope, "}");
-            }
-            if (flds.length() > 0)
-            {
-                if (buf.length() == 0)
-                    buf = flds;
-                else
-                    owriter.addMember(buf, flds, "}");
-            }
+            owriter.addObject(buf, qrscope, "}", true);
+            owriter.addObject(buf, apiscope, "}");
+            owriter.addObject(buf, flds, "}");
         }
 
     public:
@@ -1705,11 +1777,11 @@ namespace CollectionGroupsIndex
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            qrscope.remove(0, qrscope.length());
-            apiscope.remove(0, apiscope.length());
-            flds.remove(0, flds.length());
-            flds_ar.remove(0, flds_ar.length());
+            owriter.clear(buf);
+            owriter.clear(qrscope);
+            owriter.clear(apiscope);
+            owriter.clear(flds);
+            owriter.clear(flds_ar);
         }
     };
 

@@ -197,7 +197,6 @@ class AsyncResult
     friend class FirebaseApp;
     friend class AuthRequest;
     friend class RealtimeDatabase;
-    friend class Firestore;
     friend class Messaging;
     friend class Functions;
     friend class Storage;
