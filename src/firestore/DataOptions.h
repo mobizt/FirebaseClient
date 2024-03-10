@@ -860,7 +860,7 @@ public:
             jh.addObject(doc, "documents", str, false, true);
         }
         else
-            owriter.addMember(doc, jh.toString(owriter.getDocPath(document)), "]}");
+            owriter.addMember(doc, owriter.getDocPath(document, true), "]}");
         setbuf();
     }
     /**

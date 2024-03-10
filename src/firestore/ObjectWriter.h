@@ -46,7 +46,7 @@ public:
         String str = buf.substring(0, p);
         str += ',';
         // Add to object
-        if (token[0]=='}')
+        if (token[0] == '}')
         {
             String tmp = v;
             str += tmp.substring(1, tmp.length() - 1);
@@ -57,7 +57,7 @@ public:
         str += token;
         buf = str;
     }
-    
+
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
         buf.remove(0, buf.length());
@@ -83,15 +83,20 @@ public:
         buf += '"';
     }
 
-    String getDocPath(const String &document)
+    String getDocPath(const String &document, bool toString = false)
     {
-        String doc_path = FIRESTORE_RESOURCE_PATH_BASE;
+        String doc_path;
+        if (toString)
+            doc_path += '"';
+        doc_path += FIRESTORE_RESOURCE_PATH_BASE;
         if (document.length())
         {
             if (document.length() && document[0] != '/')
                 doc_path += '/';
             doc_path += document;
         }
+        if (toString)
+            doc_path += '"';
         return doc_path;
     }
 };
