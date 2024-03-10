@@ -78,9 +78,9 @@
  *
  * SYNTAXES:
  *
- * Databases.delete(<AsyncClient>, <ParentResource>, <etag>);
- * Databases.delete(<AsyncClient>, <ParentResource>, <etag>, <AsyncResult>);
- * Databases.delete(<AsyncClient>, <ParentResource>, <etag>, <AsyncResultCallback>, <uid>);
+ * Databases.deleteDatabase(<AsyncClient>, <ParentResource>, <etag>);
+ * Databases.deleteDatabase(<AsyncClient>, <ParentResource>, <etag>, <AsyncResult>);
+ * Databases.deleteDatabase(<AsyncClient>, <ParentResource>, <etag>, <AsyncResultCallback>, <uid>);
  *
  * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
