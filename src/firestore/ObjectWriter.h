@@ -1,5 +1,5 @@
 /**
- * Created March 8, 2024
+ * Created March 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -40,21 +40,24 @@ private:
     JsonHelper jh;
 
 public:
-    void addMember(String &buf, const String &v, bool isObjValue, const String &token = "}}")
+    void addMember(String &buf, const String &v, const String &token = "}}")
     {
         int p = buf.lastIndexOf(token);
         String str = buf.substring(0, p);
         str += ',';
-        if (isObjValue)
+        // Add to object
+        if (token[0]=='}')
         {
             String tmp = v;
             str += tmp.substring(1, tmp.length() - 1);
         }
+        // Add to array
         else
             str += v;
         str += token;
         buf = str;
     }
+    
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
         buf.remove(0, buf.length());

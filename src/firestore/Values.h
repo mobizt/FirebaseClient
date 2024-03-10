@@ -1,5 +1,5 @@
 /**
- * Created March 8, 2024
+ * Created March 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -77,14 +77,19 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_nullValue].text, buf); }
 
     public:
         /**
          * A null value.
          */
-        NullValue() { buf = FPSTR("null"); }
+        NullValue()
+        {
+            buf = FPSTR("null");
+            getVal();
+        }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_nullValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -99,15 +104,20 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_stringValue].text, buf); }
 
     public:
         /**
          * A string value.
          *  @param value The string vakue
          */
-        StringValue(const String &value) { owriter.setString(buf, value); }
+        StringValue(const String &value)
+        {
+            owriter.setString(buf, value);
+            getVal();
+        }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_stringValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -121,15 +131,20 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_booleanValue].text, buf); }
 
     public:
         /**
          * A boolean value.
          *  @param value The boolean value
          */
-        BooleanValue(bool value) { owriter.setBool(buf, value); }
+        BooleanValue(bool value)
+        {
+            owriter.setBool(buf, value);
+            getVal();
+        }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_booleanValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -144,15 +159,20 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_integerValue].text, buf); }
 
     public:
         /**
          * A integer value.
          *  @param value The integer value
          */
-        IntegerValue(int value) { buf = StringValue(String(value)).c_str(); }
+        IntegerValue(int value)
+        {
+            buf = StringValue(String(value)).c_str();
+            getVal();
+        }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_integerValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -167,15 +187,20 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_doubleValue].text, buf); }
 
     public:
         /**
          * A double value.
          *  @param value The double value
          */
-        DoubleValue(double value) { buf = String(value); }
+        DoubleValue(double value)
+        {
+            buf = String(value);
+            getVal();
+        }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_doubleValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -190,6 +215,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_timestampValue].text, buf); }
 
     public:
         /**
@@ -197,9 +223,13 @@ namespace Values
          * Precise only to microseconds. When stored, any additional precision is rounded down.
          * @param value The timestamp value string
          */
-        TimestampValue(const String &value) { buf = StringValue(value).c_str(); }
+        TimestampValue(const String &value)
+        {
+            buf = StringValue(value).c_str();
+            getVal();
+        }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_timestampValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -213,6 +243,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_bytesValue].text, buf); }
 
     public:
         /**
@@ -221,9 +252,13 @@ namespace Values
          * A base64-encoded string.
          * @param value The bytes value string
          */
-        BytesValue(const String &value) { buf = StringValue(value).c_str(); }
+        BytesValue(const String &value)
+        {
+            buf = StringValue(value).c_str();
+            getVal();
+        }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_bytesValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -238,15 +273,20 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_referenceValue].text, buf); }
 
     public:
         /**
          * A reference to a document.
          * @param value The resource name of document
          */
-        ReferenceValue(const String &value) { buf = StringValue(value).c_str(); }
+        ReferenceValue(const String &value)
+        {
+            buf = StringValue(value).c_str();
+            getVal();
+        }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_referenceValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -262,6 +302,8 @@ namespace Values
         ObjectWriter owriter;
         JsonHelper jh;
 
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_geoPointValue].text, buf); }
+
     public:
         /**
          * A geo point value representing a point on the surface of Earth.
@@ -272,9 +314,10 @@ namespace Values
         {
             jh.addObject(buf, FPSTR("latitude"), String(lat), false);
             jh.addObject(buf, FPSTR("longitude"), String(lng), false, true);
+            getVal();
         }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_geoPointValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -315,6 +358,8 @@ namespace Values
             owriter.setPair(buf, FPSTR("values"), value.val(), true);
         }
 
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_arrayValue].text, buf); }
+
     public:
         /**
          * An array value.
@@ -326,6 +371,7 @@ namespace Values
         {
             memset(flags, 0, 11);
             set(value);
+            getVal();
         }
         /**
          * Add object to array value
@@ -339,12 +385,13 @@ namespace Values
                 if (buf.length() == 0)
                     set(value);
                 else
-                    owriter.addMember(buf, value.val(), true, "]}");
+                    owriter.addMember(buf, value.val(), "]}");
+                getVal();
             }
             return *this;
         }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_arrayValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {
@@ -377,6 +424,7 @@ namespace Values
         ObjectWriter owriter;
         template <typename T>
         void set(const String &key, T value) { owriter.setPair(buf, FPSTR("fields"), MAP(key, value, true).c_str()); }
+        const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_mapValue].text, buf); }
 
     public:
         MapValue() {}
@@ -385,18 +433,23 @@ namespace Values
          * @param value The map value
          */
         template <typename T>
-        MapValue(const String &key, T value) { set(key, value); }
+        MapValue(const String &key, T value)
+        {
+            set(key, value);
+            getVal();
+        }
         template <typename T>
         MapValue &add(const String &key, T value)
         {
             if (buf.length() == 0)
                 set(key, value);
             else
-                owriter.addMember(buf, MAP(key, value, true).c_str(), true);
+                owriter.addMember(buf, MAP(key, value, true).c_str());
+            getVal();
             return *this;
         }
         const char *c_str() { return buf.c_str(); }
-        const char *val() { return owriter.setPair(str, firestore_const_key[firestore_const_key_mapValue].text, buf); }
+        const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
         {

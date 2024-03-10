@@ -1,5 +1,5 @@
 /**
- * Created March 9, 2024
+ * Created March 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -279,7 +279,7 @@ namespace FieldTransform
     /**
      * A transformation of a field of the document.
      */
-    struct FieldTransform
+    struct FieldTransform : public Printable
     {
     private:
         String buf;
@@ -315,6 +315,7 @@ namespace FieldTransform
          */
         FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
         const char *c_str() { return buf.c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
         void clear() { buf.remove(0, buf.length()); }
     };
 
@@ -444,7 +445,7 @@ private:
 
         buf = name_obj;
         if (map_obj.length())
-            owriter.addMember(buf, map_obj, true, "}");
+            owriter.addMember(buf, map_obj, "}");
     }
 
 public:
@@ -610,7 +611,7 @@ public:
                 jh.addObject(buf, FPSTR("updateTransforms"), owriter.getArrayStr(updateTransforms.c_str()), false, true);
             }
             else
-                owriter.addMember(buf, updateTransforms.c_str(), true, "]}");
+                owriter.addMember(buf, updateTransforms.c_str(), "]}");
             updateTrans = true;
         }
 
@@ -663,7 +664,7 @@ public:
     Writes &add(Write write)
     {
         ObjectWriter owriter;
-        owriter.addMember(buf, write.c_str(), true, "]}");
+        owriter.addMember(buf, write.c_str(), "]}");
         return *this;
     }
 
@@ -809,7 +810,7 @@ private:
             if (buf.length() == 0)
                 buf = doc.c_str();
             else
-                owriter.addMember(buf, doc, true, "}");
+                owriter.addMember(buf, doc, "}");
         }
 
         if (msk.length())
@@ -817,7 +818,7 @@ private:
             if (buf.length() == 0)
                 buf = msk.c_str();
             else
-                owriter.addMember(buf, msk, true, "}");
+                owriter.addMember(buf, msk, "}");
         }
 
         if (trans.length())
@@ -825,7 +826,7 @@ private:
             if (buf.length() == 0)
                 buf = trans.c_str();
             else
-                owriter.addMember(buf, trans, true, "}");
+                owriter.addMember(buf, trans, "}");
         }
 
         if (newtrans.length())
@@ -833,7 +834,7 @@ private:
             if (buf.length() == 0)
                 buf = newtrans.c_str();
             else
-                owriter.addMember(buf, newtrans, true, "}");
+                owriter.addMember(buf, newtrans, "}");
         }
 
         if (rt.length())
@@ -841,7 +842,7 @@ private:
             if (buf.length() == 0)
                 buf = rt.c_str();
             else
-                owriter.addMember(buf, rt, true, "}");
+                owriter.addMember(buf, rt, "}");
         }
     }
 
@@ -859,7 +860,7 @@ public:
             jh.addObject(doc, "documents", str, false, true);
         }
         else
-            owriter.addMember(doc, jh.toString(owriter.getDocPath(document)), false, "]}");
+            owriter.addMember(doc, jh.toString(owriter.getDocPath(document)), "]}");
         setbuf();
     }
     /**
@@ -957,7 +958,7 @@ private:
             if (buf.length() == 0)
                 buf = query.c_str();
             else
-                owriter.addMember(buf, query, true, "}");
+                owriter.addMember(buf, query, "}");
         }
 
         if (trans.length())
@@ -965,7 +966,7 @@ private:
             if (buf.length() == 0)
                 buf = trans.c_str();
             else
-                owriter.addMember(buf, trans, true, "}");
+                owriter.addMember(buf, trans, "}");
         }
 
         if (newtrans.length())
@@ -973,7 +974,7 @@ private:
             if (buf.length() == 0)
                 buf = newtrans.c_str();
             else
-                owriter.addMember(buf, newtrans, true, "}");
+                owriter.addMember(buf, newtrans, "}");
         }
 
         if (rt.length())
@@ -981,7 +982,7 @@ private:
             if (buf.length() == 0)
                 buf = rt.c_str();
             else
-                owriter.addMember(buf, rt, true, "}");
+                owriter.addMember(buf, rt, "}");
         }
     }
 
@@ -1189,21 +1190,21 @@ private:
             if (buf.length() == 0)
                 buf = pz;
             else
-                owriter.addMember(buf, pz, true, "}");
+                owriter.addMember(buf, pz, "}");
         }
         if (ptk.length() > 0)
         {
             if (buf.length() == 0)
                 buf = ptk;
             else
-                owriter.addMember(buf, ptk, true, "}");
+                owriter.addMember(buf, ptk, "}");
         }
         if (rt.length() > 0)
         {
             if (buf.length() == 0)
                 buf = rt;
             else
-                owriter.addMember(buf, rt, true, "}");
+                owriter.addMember(buf, rt, "}");
         }
     }
 
@@ -1290,14 +1291,14 @@ namespace DatabaseIndex
                 if (buf.length() == 0)
                     buf = fp;
                 else
-                    owriter.addMember(buf, fp, true, "}");
+                    owriter.addMember(buf, fp, "}");
             }
             if (md.length() > 0)
             {
                 if (buf.length() == 0)
                     buf = md;
                 else
-                    owriter.addMember(buf, md, true, "}");
+                    owriter.addMember(buf, md, "}");
             }
         }
 
@@ -1359,14 +1360,14 @@ namespace DatabaseIndex
                 if (buf.length() == 0)
                     buf = collid;
                 else
-                    owriter.addMember(buf, collid, true, "}");
+                    owriter.addMember(buf, collid, "}");
             }
             if (flds.length() > 0)
             {
                 if (buf.length() == 0)
                     buf = flds;
                 else
-                    owriter.addMember(buf, flds, true, "}");
+                    owriter.addMember(buf, flds, "}");
             }
         }
 
@@ -1396,7 +1397,7 @@ namespace DatabaseIndex
             if (flds_ar.length() == 0)
                 jh.addArray(flds_ar, field.c_str(), false, true);
             else
-                owriter.addMember(flds_ar, field.c_str(), false, "]");
+                owriter.addMember(flds_ar, field.c_str(), "]");
             jh.addObject(flds, FPSTR("fields"), flds_ar, false, true);
             set();
             return *this;
@@ -1463,14 +1464,14 @@ namespace CollectionGroupsIndex
                 if (buf.length() == 0)
                     buf = dim;
                 else
-                    owriter.addMember(buf, dim, true, "}");
+                    owriter.addMember(buf, dim, "}");
             }
             if (flat_str.length() > 0)
             {
                 if (buf.length() == 0)
                     buf = flat_str;
                 else
-                    owriter.addMember(buf, flat_str, true, "}");
+                    owriter.addMember(buf, flat_str, "}");
             }
         }
 
@@ -1523,28 +1524,28 @@ namespace CollectionGroupsIndex
                 if (buf.length() == 0)
                     buf = fp;
                 else
-                    owriter.addMember(buf, fp, true, "}");
+                    owriter.addMember(buf, fp, "}");
             }
             if (ordr.length() > 0)
             {
                 if (buf.length() == 0)
                     buf = ordr;
                 else
-                    owriter.addMember(buf, ordr, true, "}");
+                    owriter.addMember(buf, ordr, "}");
             }
             else if (arcfg.length() > 0)
             {
                 if (buf.length() == 0)
                     buf = arcfg;
                 else
-                    owriter.addMember(buf, arcfg, true, "}");
+                    owriter.addMember(buf, arcfg, "}");
             }
             else if (vcfg.length() > 0)
             {
                 if (buf.length() == 0)
                     buf = vcfg;
                 else
-                    owriter.addMember(buf, vcfg, true, "}");
+                    owriter.addMember(buf, vcfg, "}");
             }
         }
 
@@ -1632,21 +1633,21 @@ namespace CollectionGroupsIndex
                 if (buf.length() == 0)
                     buf = qrscope;
                 else
-                    owriter.addMember(buf, qrscope, true, "}");
+                    owriter.addMember(buf, qrscope, "}");
             }
             if (apiscope.length() > 0)
             {
                 if (buf.length() == 0)
                     buf = apiscope;
                 else
-                    owriter.addMember(buf, apiscope, true, "}");
+                    owriter.addMember(buf, apiscope, "}");
             }
             if (flds.length() > 0)
             {
                 if (buf.length() == 0)
                     buf = flds;
                 else
-                    owriter.addMember(buf, flds, true, "}");
+                    owriter.addMember(buf, flds, "}");
             }
         }
 
@@ -1695,7 +1696,7 @@ namespace CollectionGroupsIndex
             if (flds_ar.length() == 0)
                 jh.addArray(flds_ar, field.c_str(), false, true);
             else
-                owriter.addMember(flds_ar, field.c_str(), false, "]");
+                owriter.addMember(flds_ar, field.c_str(), "]");
             jh.addObject(flds, FPSTR("fields"), flds_ar, false, true);
             set();
             return *this;

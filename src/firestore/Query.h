@@ -1,5 +1,5 @@
 /**
- * Created March 9, 2024
+ * Created March 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -135,7 +135,7 @@ namespace FirestoreQuery
             if (str.length() == 0)
                 jh.addArray(str, field.c_str(), false, true);
             else
-                owriter.addMember(str, field.c_str(), false, "]");
+                owriter.addMember(str, field.c_str(), "]");
             buf.remove(0, buf.length());
             jh.addObject(buf, "fields", str, false, true);
         }
@@ -199,7 +199,7 @@ namespace FirestoreQuery
                 if (buf.length() == 0)
                     buf = collId;
                 else
-                    owriter.addMember(buf, collId, true, "}");
+                    owriter.addMember(buf, collId, "}");
             }
 
             if (allDes.length())
@@ -207,7 +207,7 @@ namespace FirestoreQuery
                 if (buf.length() == 0)
                     buf = allDes;
                 else
-                    owriter.addMember(buf, allDes, true, "}");
+                    owriter.addMember(buf, allDes, "}");
             }
         }
 

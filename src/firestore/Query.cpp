@@ -1,6 +1,6 @@
 
 /**
- * Created March 8, 2024
+ * Created March 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -51,7 +51,7 @@ namespace FirestoreQuery
         if (frm_ar.length() == 0)
             jh.addArray(frm_ar, collSelector.c_str(), false, true);
         else
-            owriter.addMember(frm_ar, collSelector.c_str(), true, "]");
+            owriter.addMember(frm_ar, collSelector.c_str(), "]");
         frm.remove(0, frm.length());
         jh.addObject(frm, "from", frm_ar, false, true);
         set();
@@ -71,7 +71,7 @@ namespace FirestoreQuery
         if (ordby_ar.length() == 0)
             jh.addArray(ordby_ar, orderBy.c_str(), false, true);
         else
-            owriter.addMember(ordby_ar, orderBy.c_str(), true, "]");
+            owriter.addMember(ordby_ar, orderBy.c_str(), "]");
 
         ordby.remove(0, ordby.length());
         jh.addObject(ordby, "orderBy", ordby_ar, false, true);
@@ -139,7 +139,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = frm;
             else
-                owriter.addMember(buf, frm, true, "}");
+                owriter.addMember(buf, frm, "}");
         }
 
         if (where_str.length())
@@ -147,7 +147,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = where_str;
             else
-                owriter.addMember(buf, where_str, true, "}");
+                owriter.addMember(buf, where_str, "}");
         }
 
         if (ordby.length())
@@ -155,7 +155,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = ordby;
             else
-                owriter.addMember(buf, ordby, true, "}");
+                owriter.addMember(buf, ordby, "}");
         }
 
         if (sta.length())
@@ -163,7 +163,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = sta;
             else
-                owriter.addMember(buf, sta, true, "}");
+                owriter.addMember(buf, sta, "}");
         }
 
         if (ea.length())
@@ -171,7 +171,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = ea;
             else
-                owriter.addMember(buf, ea, true, "}");
+                owriter.addMember(buf, ea, "}");
         }
 
         if (ofs.length())
@@ -179,7 +179,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = ofs;
             else
-                owriter.addMember(buf, ofs, true, "}");
+                owriter.addMember(buf, ofs, "}");
         }
 
         if (lim.length())
@@ -187,7 +187,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = lim;
             else
-                owriter.addMember(buf, lim, true, "}");
+                owriter.addMember(buf, lim, "}");
         }
     }
 
@@ -211,7 +211,7 @@ namespace FirestoreQuery
         if (filter_arr.length() == 0)
             jh.addArray(filter_arr, filter.c_str(), false, true);
         else
-            owriter.addMember(filter_arr, filter.c_str(), false, "]");
+            owriter.addMember(filter_arr, filter.c_str(), "]");
 
         return *this;
     }
@@ -316,7 +316,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = op_str;
             else
-                owriter.addMember(buf, op_str, true, "}");
+                owriter.addMember(buf, op_str, "}");
         }
 
         if (field_str.length())
@@ -324,7 +324,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = field_str;
             else
-                owriter.addMember(buf, field_str, true, "}");
+                owriter.addMember(buf, field_str, "}");
         }
     }
 
@@ -368,7 +368,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = field_str;
             else
-                owriter.addMember(buf, field_str, true, "}");
+                owriter.addMember(buf, field_str, "}");
         }
 
         if (direction_str.length())
@@ -376,7 +376,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = direction_str;
             else
-                owriter.addMember(buf, direction_str, true, "}");
+                owriter.addMember(buf, direction_str, "}");
         }
     }
 
@@ -402,7 +402,7 @@ namespace FirestoreQuery
         if (value_ar_str.length() == 0)
             jh.addArray(value_ar_str, value.c_str(), false, true);
         else
-            owriter.addMember(value_ar_str, value.c_str(), false, "]");
+            owriter.addMember(value_ar_str, value.c_str(), "]");
 
         value_str.remove(0, value_str.length());
         jh.addObject(value_str, "values", value_ar_str, false, true);
@@ -424,7 +424,7 @@ namespace FirestoreQuery
             if (buf.length() == 0)
                 buf = before_str;
             else
-                owriter.addMember(buf, before_str, true, "}");
+                owriter.addMember(buf, before_str, "}");
         }
     }
 
