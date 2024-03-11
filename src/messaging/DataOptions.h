@@ -254,6 +254,7 @@ namespace Message
         {
             clear();
             jh.addObject(buf, "analytics_label", value, true, true);
+            return *this;
         }
         const char *c_str() const { return buf.c_str(); }
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
