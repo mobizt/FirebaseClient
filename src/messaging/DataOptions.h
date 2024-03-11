@@ -32,6 +32,18 @@
 
 namespace Message
 {
+    enum firebase_cloud_messaging_request_type
+    {
+        firebase_cloud_messaging_request_type_undefined,
+        firebase_cloud_messaging_request_type_send,
+        firebase_cloud_messaging_request_type_subscribe,
+        firebase_cloud_messaging_request_type_unsubscribe,
+        firebase_cloud_messaging_request_type_app_instance_info,
+        firebase_cloud_messaging_request_type_apn_token_registration
+    };
+
+    // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
+
     enum AndroidMessagePriority
     {
         NORMAL, // Default priority for data messages.
@@ -461,6 +473,49 @@ namespace Message
         const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
+    };
+
+    class FirebaseCloudMessagingOptions
+    {
+        friend class Messaging;
+
+    public:
+        String payload, extras;
+        firebase_cloud_messaging_request_type requestType = firebase_cloud_messaging_request_type_undefined;
+        unsigned long requestTime = 0;
+
+        void copy(FirestoreOptions &rhs)
+        {
+            this->extras = rhs.extras;
+            this->payload = rhs.payload;
+        }
+
+    private:
+    };
+
+    struct async_request_data_t
+    {
+    public:
+        AsyncClientClass *aClient = nullptr;
+        String path;
+        String uid;
+        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
+        slot_options_t opt;
+        FirebaseCloudMessagingOptions *options = nullptr;
+        AsyncResult *aResult = nullptr;
+        AsyncResultCallback cb = NULL;
+        async_request_data_t() {}
+        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, FirebaseCloudMessagingOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        {
+            this->aClient = aClient;
+            this->path = path;
+            this->method = method;
+            this->opt = opt;
+            this->options = options;
+            this->aResult = aResult;
+            this->cb = cb;
+            this->uid = uid;
+        }
     };
 
 }
