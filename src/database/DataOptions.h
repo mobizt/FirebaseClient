@@ -35,7 +35,7 @@
 
 class DatabaseOptions
 {
-    friend class Database;
+    friend class RealtimeDatabase;
 
 public:
     uint32_t readTimeout = 0;

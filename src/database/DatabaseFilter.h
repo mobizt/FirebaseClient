@@ -35,7 +35,7 @@
 class DatabaseFilter
 {
     friend class DatabaseOptions;
-    friend class Database;
+    friend class RealtimeDatabase;
     friend class AsyncClientClass;
 
 private:
