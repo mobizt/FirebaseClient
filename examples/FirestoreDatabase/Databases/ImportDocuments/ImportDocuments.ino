@@ -79,11 +79,11 @@
  *
  * SYNTAXES:
  *
- * Databases.importDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>);
- * Databases.importDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
- * Databases.importDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
+ * Databases.importDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>);
+ * Databases.importDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
+ * Databases.importDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -294,13 +294,13 @@ void loop()
 
         EximDocumentOptions importOptions("" /* Which collection ids to import. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket that store the exported data */);
 
-        Databases.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), importOptions, asyncCB);
+        Databases.importDocuments(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), importOptions, asyncCB);
 
         // To assign UID for async result
-        // Database.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), importOptions, asyncCB, "myUID");
+        // Database.importDocuments(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), importOptions, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Database.importDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), importOptions, aResult_no_callback); }
+        // Database.importDocuments(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), importOptions, aResult_no_callback); }
     }
 }
 

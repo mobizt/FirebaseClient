@@ -78,11 +78,11 @@
  *
  * SYNTAXES:
  *
- * Databases.patch(<AsyncClient>, <ParentResource>, <Database>, <UpdateMask>);
- * Databases.patch(<AsyncClient>, <ParentResource>, <Database>, <UpdateMask>, <AsyncResult>);
- * Databases.patch(<AsyncClient>, <ParentResource>, <Database>, <UpdateMask>, <AsyncResultCallback>, <uid>);
+ * Databases.patch(<AsyncClient>, <Firestore::Parent>, <Database>, <UpdateMask>);
+ * Databases.patch(<AsyncClient>, <Firestore::Parent>, <Database>, <UpdateMask>, <AsyncResult>);
+ * Databases.patch(<AsyncClient>, <Firestore::Parent>, <Database>, <UpdateMask>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id is the id of database to update.
  *
@@ -191,9 +191,6 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
-/* Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
-
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -293,12 +290,12 @@ void loop()
 
         String updateMask;
 
-        Databases.patch(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb" /* database Id */), db, updateMask, asyncCB);
+        Databases.patch(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb" /* database Id */), db, updateMask, asyncCB);
         // To assign UID for async result
-        // Databases.patch(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), db, updateMask, asyncCB, "myUID");
+        // Databases.patch(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb"), db, updateMask, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Databases.patch(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), db, updateMask, aResult_no_callback);
+        // Databases.patch(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb"), db, updateMask, aResult_no_callback);
     }
 }
 

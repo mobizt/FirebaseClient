@@ -63,11 +63,11 @@
  *
  * SYNTAXES:
  *
- * Docs.patch(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>);
- * Docs.patch(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResult>);
- * Docs.patch(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResultCallback>, <uid>);
+ * Docs.patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>);
+ * Docs.patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResult>);
+ * Docs.patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -317,7 +317,7 @@ void loop()
 
             Serial.println("[+] Create a document... ");
 
-            Docs.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
+            Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
         }
 
         cnt++;
@@ -337,13 +337,13 @@ void loop()
 
         patchDocumentOptions patchOptions(DocumentMask("count,status") /* updateMask */, DocumentMask() /* mask */,  Precondition() /* precondition */);
 
-        Docs.patch(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB);
+        Docs.patch(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB);
 
         // To assign UID for async result
-        // Docs.patch(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB, "myUID");
+        // Docs.patch(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Docs.patch(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, aResult_no_callback);
+        // Docs.patch(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, aResult_no_callback);
     }
 }
 

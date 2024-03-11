@@ -78,11 +78,11 @@
  *
  * SYNTAXES:
  *
- * indexes.list(<AsyncClient>, <ParentResource>);
- * indexes.list(<AsyncClient>, <ParentResource>, <AsyncResult>);
- * indexes.list(<AsyncClient>, <ParentResource>, <AsyncResultCallback>, <uid>);
+ * indexes.list(<AsyncClient>, <Firestore::Parent>);
+ * indexes.list(<AsyncClient>, <Firestore::Parent>, <AsyncResult>);
+ * indexes.list(<AsyncClient>, <Firestore::Parent>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  * 
@@ -186,9 +186,6 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
-/* Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
-
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -283,13 +280,13 @@ void loop()
 
         Serial.println("[+] Lists the indexes.... ");
 
-        indexes.list(aClient, ParentResource(FIREBASE_PROJECT_ID), asyncCB);
+        indexes.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), asyncCB);
 
         // To assign UID for async result
-        // indexes.list(aClient, ParentResource(FIREBASE_PROJECT_ID), asyncCB, "myUID");
+        // indexes.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), asyncCB, "myUID");
 
         // To get anyc result without callback
-        // indexes.list(aClient, ParentResource(FIREBASE_PROJECT_ID), aResult_no_callback);
+        // indexes.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), aResult_no_callback);
     }
 }
 

@@ -78,11 +78,11 @@
  *
  * SYNTAXES:
  *
- * Databases.create(<AsyncClient>, <ParentResource>, <Database>);
- * Databases.create(<AsyncClient>, <ParentResource>, <Database>, <AsyncResult>);
- * Databases.create(<AsyncClient>, <ParentResource>, <Database>, <AsyncResultCallback>, <uid>);
+ * Databases.create(<AsyncClient>, <Firestore::Parent>, <Database>);
+ * Databases.create(<AsyncClient>, <Firestore::Parent>, <Database>, <AsyncResult>);
+ * Databases.create(<AsyncClient>, <Firestore::Parent>, <Database>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id is the id of new database to create.
  *
@@ -188,9 +188,6 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
-/* Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
-
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -292,12 +289,12 @@ void loop()
         // See https://cloud.google.com/firestore/docs/locations
         db.locationId("us-east1");
 
-        Databases.create(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb" /* database Id */), db, asyncCB);
+        Databases.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb" /* database Id */), db, asyncCB);
         // To assign UID for async result
-        // Databases.create(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), db, asyncCB, "myUID");
+        // Databases.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb"), db, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Databases.create(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), db, aResult_no_callback);
+        // Databases.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb"), db, aResult_no_callback);
     }
 }
 

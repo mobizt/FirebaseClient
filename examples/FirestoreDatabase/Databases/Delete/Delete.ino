@@ -78,11 +78,11 @@
  *
  * SYNTAXES:
  *
- * Databases.deleteDatabase(<AsyncClient>, <ParentResource>, <etag>);
- * Databases.deleteDatabase(<AsyncClient>, <ParentResource>, <etag>, <AsyncResult>);
- * Databases.deleteDatabase(<AsyncClient>, <ParentResource>, <etag>, <AsyncResultCallback>, <uid>);
+ * Databases.deleteDatabase(<AsyncClient>, <Firestore::Parent>, <etag>);
+ * Databases.deleteDatabase(<AsyncClient>, <Firestore::Parent>, <etag>, <AsyncResult>);
+ * Databases.deleteDatabase(<AsyncClient>, <Firestore::Parent>, <etag>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id is the id of database to delete.
  * 
@@ -190,9 +190,6 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
-/* Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
-
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -289,13 +286,13 @@ void loop()
 
         String etag;
 
-        Databases.deleteDatabase(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb" /* database Id */), etag, asyncCB);
+        Databases.deleteDatabase(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb" /* database Id */), etag, asyncCB);
 
         // To assign UID for async result
-        // Databases.deleteDatabase(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), etag, asyncCB, "myUID");
+        // Databases.deleteDatabase(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb"), etag, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Databases.deleteDatabase(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), etag, aResult_no_callback);
+        // Databases.deleteDatabase(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb"), etag, aResult_no_callback);
     }
 }
 

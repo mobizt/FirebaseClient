@@ -78,11 +78,11 @@
  *
  * SYNTAXES:
  *
- * indexes.create(<AsyncClient>, <ParentResource>, <Index>);
- * indexes.create(<AsyncClient>, <ParentResource>, <Index>, <AsyncResult>);
- * indexes.create(<AsyncClient>, <ParentResource>, <Index>, <AsyncResultCallback>, <uid>);
+ * indexes.create(<AsyncClient>, <Firestore::Parent>, <Index>);
+ * indexes.create(<AsyncClient>, <Firestore::Parent>, <Index>, <AsyncResult>);
+ * indexes.create(<AsyncClient>, <Firestore::Parent>, <Index>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  * 
@@ -187,9 +187,6 @@
 #define FIREBASE_PROJECT_ID "PROJECT_ID"
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
-
-/* Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
 
 void timeStatusCB(uint32_t &ts);
 
@@ -299,13 +296,13 @@ void loop()
         index.addField(indexField1);
         index.addField(indexField2);
 
-        indexes.create(aClient, ParentResource(FIREBASE_PROJECT_ID), index, asyncCB);
+        indexes.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), index, asyncCB);
 
         // To assign UID for async result
-        // indexes.create(aClient, ParentResource(FIREBASE_PROJECT_ID), index, asyncCB, "myUID");
+        // indexes.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), index, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // indexes.create(aClient, ParentResource(FIREBASE_PROJECT_ID), index, aResult_no_callback);
+        // indexes.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), index, aResult_no_callback);
     }
 }
 

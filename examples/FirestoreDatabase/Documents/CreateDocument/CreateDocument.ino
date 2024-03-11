@@ -63,15 +63,15 @@
  *
  * SYNTAXES:
  *
- * Docs.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <Document>);
- * Docs.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <Document>, <AsyncResult>);
- * Docs.createDocument(<AsyncClient>, <ParentResource>, <documentPath>, <DocumentMask>, <Document>, <AsyncResultCallback>, <uid>);
+ * Docs.createDocument(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask>, <Document>);
+ * Docs.createDocument(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask>, <Document>, <AsyncResult>);
+ * Docs.createDocument(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask>, <Document>, <AsyncResultCallback>, <uid>);
  *
- * Docs.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <Document>);
- * Docs.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <Document>, <AsyncResult>);
- * Docs.createDocument(<AsyncClient>, <ParentResource>, <collectionId>, <documentId>, <DocumentMask>, <Document>, <AsyncResultCallback>, <uid>);
+ * Docs.createDocument(<AsyncClient>, <Firestore::Parent>, <collectionId>, <documentId>, <DocumentMask>, <Document>);
+ * Docs.createDocument(<AsyncClient>, <Firestore::Parent>, <collectionId>, <documentId>, <DocumentMask>, <Document>, <AsyncResult>);
+ * Docs.createDocument(<AsyncClient>, <Firestore::Parent>, <collectionId>, <documentId>, <DocumentMask>, <Document>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -358,13 +358,13 @@ void loop()
 
         Serial.println("[+] Create document... ");
 
-        Docs.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
+        Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
 
         // To assign UID for async result
-        // Docs.createDoc(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB, "myUID");
+        // Docs.createDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Docs.createDoc(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, aResult_no_callback);
+        // Docs.createDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, aResult_no_callback);
     }
 }
 

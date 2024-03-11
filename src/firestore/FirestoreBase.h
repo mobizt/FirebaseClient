@@ -1,5 +1,5 @@
 /**
- * Created March 11, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -53,11 +53,11 @@ private:
         String uid;
         async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
         slot_options_t opt;
-        FirestoreOptions *options = nullptr;
+        Firestore::DataOptions *options = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, FirestoreOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, Firestore::DataOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;
@@ -138,12 +138,12 @@ public:
             uh.addGAPIv1beta1Path(request.path);
         else
             uh.addGAPIv1Path(request.path);
-        request.path += request.options->parent.projectId.length() == 0 ? app_token->project_id : request.options->parent.projectId;
+        request.path += request.options->parent.getProjectId().length() == 0 ? app_token->project_id : request.options->parent.getProjectId();
         request.path += FPSTR("/databases");
         if (!request.options->parent.isDatabaseIdParam())
         {
             request.path += '/';
-            request.path += request.options->parent.databaseId.length() > 0 ? request.options->parent.databaseId : FPSTR("(default)");
+            request.path += request.options->parent.getDatabaseId().length() > 0 ? request.options->parent.getDatabaseId() : FPSTR("(default)");
         }
         addParams(request, extras);
 
@@ -196,9 +196,9 @@ public:
             delete aResult;
     }
 
-    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, EximDocumentOptions &eximOptions, bool isImport, bool async)
+    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, EximDocumentOptions &eximOptions, bool isImport, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = isImport ? firebase_firestore_request_type_import_docs : firebase_firestore_request_type_export_docs;
         options.parent = parent;
         options.payload = eximOptions.c_str();
@@ -209,9 +209,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void manageDatabase(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &database, const String &key, Firestore::firestore_database_mode mode, bool async)
+    void manageDatabase(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &database, const String &key, Firestore::firestore_database_mode mode, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_manage_database;
         options.parent = parent;
 
@@ -222,7 +222,7 @@ public:
             {
                 options.parent.setDatabaseIdParam(true);
                 options.extras += FPSTR("?databaseId=");
-                options.extras += options.parent.databaseId;
+                options.extras += options.parent.getDatabaseId();
             }
         }
 
@@ -242,7 +242,7 @@ public:
 
         if (strlen(database.c_str()) > 0 && mode == Firestore::firestore_database_mode_create)
             method = async_request_handler_t::http_post; // create
-        else if (options.parent.databaseId.length() > 0 && (mode == Firestore::firestore_database_mode_delete || mode == Firestore::firestore_database_mode_get))
+        else if (options.parent.getDatabaseId().length() > 0 && (mode == Firestore::firestore_database_mode_delete || mode == Firestore::firestore_database_mode_get))
             method = mode == Firestore::firestore_database_mode_delete ? async_request_handler_t::http_delete : async_request_handler_t::http_get; // get index or delete by id
         else if (strlen(database.c_str()) == 0 && mode == Firestore::firestore_database_mode_list)
             method = async_request_handler_t::http_get; // list
@@ -253,9 +253,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &collectionId, const String &documentId, DocumentMask &mask, Document<Values::Value> &document, bool async)
+    void createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &collectionId, const String &documentId, DocumentMask &mask, Document<Values::Value> &document, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_create_doc;
         options.parent = parent;
         options.collectionId = collectionId;
@@ -272,9 +272,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, bool async)
+    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_patch_doc;
         options.parent = parent;
         options.payload = document.c_str();
@@ -286,9 +286,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void commitDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, Writes &writes, bool async)
+    void commitDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, Writes &writes, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_commit_document;
         options.parent = parent;
         options.payload = writes.c_str();
@@ -299,9 +299,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void batchWriteDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, Writes &writes, bool async)
+    void batchWriteDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, Writes &writes, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_batch_write_doc;
         options.parent = parent;
         options.payload = writes.c_str();
@@ -312,9 +312,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void getDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, GetDocumentOptions getOptions, bool async)
+    void getDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &documentPath, GetDocumentOptions getOptions, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_get_doc;
         options.parent = parent;
         addDocsPath(options.extras);
@@ -325,9 +325,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void batchGetDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, BatchGetDocumentOptions batchOptions, bool async)
+    void batchGetDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_batch_get_doc;
         options.parent = parent;
         options.payload = batchOptions.c_str();
@@ -338,9 +338,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void beginTrans(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, TransactionOptions transOptions, bool async)
+    void beginTrans(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, TransactionOptions transOptions, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_begin_transaction;
         options.parent = parent;
         JsonHelper jh;
@@ -351,9 +351,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void transRollback(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &transaction, bool async)
+    void transRollback(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &transaction, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_rollback;
         options.parent = parent;
         JsonHelper jh;
@@ -365,12 +365,12 @@ public:
     }
 
 #if defined(ENABLE_FIRESTORE_QUERY)
-    void runQueryImpl(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions, bool async)
+    void runQueryImpl(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_run_query;
         options.parent = parent;
-        options.parent.documentPath = documentPath;
+        options.parent.setDocPath(documentPath);
         options.payload = queryOptions.c_str();
 
         addDocsPath(options.extras);
@@ -382,12 +382,12 @@ public:
     }
 #endif
 
-    void deleteDocBase(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, Precondition currentDocument, bool async)
+    void deleteDocBase(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &documentPath, Precondition currentDocument, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_delete_doc;
         options.parent = parent;
-        options.parent.documentPath = documentPath;
+        options.parent.setDocPath(documentPath);
 
         addDocsPath(options.extras);
         URLHelper uh;
@@ -397,9 +397,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void listDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, bool async)
+    void listDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_list_doc;
         options.parent = parent;
 
@@ -412,12 +412,12 @@ public:
         asyncRequest(aReq);
     }
 
-    void listCollIds(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, bool async)
+    void listCollIds(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_list_collection;
         options.parent = parent;
-        options.parent.documentPath = documentPath;
+        options.parent.setDocPath(documentPath);
         options.payload = listCollectionIdsOptions.c_str();
 
         addDocsPath(options.extras);
@@ -429,9 +429,9 @@ public:
         asyncRequest(aReq);
     }
 
-    void databaseIndexManager(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, DatabaseIndex::Index index, const String &indexId, bool deleteMode, bool async)
+    void databaseIndexManager(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, DatabaseIndex::Index index, const String &indexId, bool deleteMode, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_create_field_index;
         options.parent = parent;
         options.payload = index.c_str();
@@ -453,9 +453,9 @@ public:
         asyncRequest(aReq, 1);
     }
 
-    void collectionGroupIndexManager(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const ParentResource &parent, CollectionGroupsIndex::Index index, const String &collectionId, const String &indexId, bool deleteMode, bool async)
+    void collectionGroupIndexManager(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, CollectionGroupsIndex::Index index, const String &collectionId, const String &indexId, bool deleteMode, bool async)
     {
-        FirestoreOptions options;
+        Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_create_composite_index;
         options.parent = parent;
         options.payload = index.c_str();
@@ -484,13 +484,13 @@ public:
         asyncRequest(aReq);
     }
 
-    String makeResourcePath(const ParentResource &parent)
+    String makeResourcePath(const Firestore::Parent &parent)
     {
         String str = FPSTR("projects/");
-        str += parent.projectId;
+        str += parent.getProjectId();
         addDatabasePath(str);
         str += '/';
-        str += parent.databaseId.length() > 0 ? parent.databaseId : FPSTR("(default)");
+        str += parent.getProjectId().length() > 0 ? parent.getProjectId() : FPSTR("(default)");
         addDocsPath(str);
         return str;
     }

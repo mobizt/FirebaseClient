@@ -63,11 +63,11 @@
  *
  * SYNTAXES:
  *
- * Docs.deleteDoc(<AsyncClient>, <ParentResource>, <documentPath>, <Precondition>);
- * Docs.deleteDoc(<AsyncClient>, <ParentResource>, <documentPath>, <Precondition>, <AsyncResult>);
- * Docs.deleteDoc(<AsyncClient>, <ParentResource>, <documentPath>, <Precondition>, <AsyncResultCallback>, <uid>);
+ * Docs.deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>);
+ * Docs.deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>, <AsyncResult>);
+ * Docs.deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -311,17 +311,17 @@ void loop()
 
             Document<Values::Value> doc("myDouble", Values::Value(Values::DoubleValue(123.456)));
 
-            Docs.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
+            Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
 
             Serial.println("[+] Delete a document... ");
 
-            Docs.deleteDoc(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */, asyncCB);
+            Docs.deleteDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */, asyncCB);
 
             // To assign UID for async result
-            // Docs.deleteDoc(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */, asyncCB, "myUID");
+            // Docs.deleteDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */, asyncCB, "myUID");
 
             // To get anyc result without callback
-            // Docs.deleteDoc(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */, aResult_no_callback);
+            // Docs.deleteDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */, aResult_no_callback);
         }
     }
 }

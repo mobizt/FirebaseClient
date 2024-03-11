@@ -1,5 +1,5 @@
 /**
- * Created March 10, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -45,7 +45,7 @@ namespace Firestore
         /** Gets multiple documents.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param batchOptions The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
@@ -72,7 +72,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        bool batchGet(AsyncClientClass &aClient, const ParentResource &parent, BatchGetDocumentOptions batchOptions)
+        bool batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions)
         {
             AsyncResult result;
             batchGetDoc(aClient, &result, NULL, "", parent, batchOptions, false);
@@ -82,7 +82,7 @@ namespace Firestore
         /** Gets multiple documents.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param batchOptions The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
@@ -109,7 +109,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        void batchGet(AsyncClientClass &aClient, const ParentResource &parent, BatchGetDocumentOptions batchOptions, AsyncResult &aResult)
+        void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResult &aResult)
         {
             batchGetDoc(aClient, &aResult, NULL, "", parent, batchOptions, true);
         }
@@ -117,7 +117,7 @@ namespace Firestore
         /** Gets multiple documents.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param batchOptions The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
@@ -145,7 +145,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        void batchGet(AsyncClientClass &aClient, const ParentResource &parent, BatchGetDocumentOptions batchOptions, AsyncResultCallback cb, const String &uid = "")
+        void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResultCallback cb, const String &uid = "")
         {
             batchGetDoc(aClient, nullptr, cb, uid, parent, batchOptions, true);
         }
@@ -153,7 +153,7 @@ namespace Firestore
         /** Applies a batch of write operations.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param writes The writes to apply. This Writes object accepts the Write object and Labels (MapValue) associated with this batch write, in its constructor.
@@ -167,7 +167,7 @@ namespace Firestore
          * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
          *
          */
-        bool batchWrite(AsyncClientClass &aClient, const ParentResource &parent, Writes &writes)
+        bool batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
         {
             AsyncResult result;
             batchWriteDoc(aClient, &result, NULL, "", parent, writes, false);
@@ -177,7 +177,7 @@ namespace Firestore
         /** Applies a batch of write operations.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param writes The writes to apply. This Writes object accepts the Write object and Labels (MapValue) associated with this batch write, in its constructor.
@@ -189,7 +189,7 @@ namespace Firestore
          * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
          *
          */
-        void batchWrite(AsyncClientClass &aClient, const ParentResource &parent, Writes &writes, AsyncResult &aResult)
+        void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
         {
             batchWriteDoc(aClient, &aResult, NULL, "", parent, writes, true);
         }
@@ -197,7 +197,7 @@ namespace Firestore
         /** Applies a batch of write operations.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param writes The writes to apply. This Writes object accepts the Write object and Labels (MapValue) associated with this batch write, in its constructor.
@@ -210,7 +210,7 @@ namespace Firestore
          * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
          *
          */
-        void batchWrite(AsyncClientClass &aClient, const ParentResource &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
+        void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
         {
             batchWriteDoc(aClient, nullptr, cb, uid, parent, writes, true);
         }
@@ -218,7 +218,7 @@ namespace Firestore
         /** Starts a new transaction.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param transOptions Options for creating a new transaction.
@@ -240,7 +240,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        bool beginTransaction(AsyncClientClass &aClient, const ParentResource &parent, const TransactionOptions &transOptions)
+        bool beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions)
         {
             AsyncResult result;
             beginTrans(aClient, &result, NULL, "", parent, transOptions, false);
@@ -250,7 +250,7 @@ namespace Firestore
         /** Starts a new transaction.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param transOptions Options for creating a new transaction.
@@ -272,7 +272,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void beginTransaction(AsyncClientClass &aClient, const ParentResource &parent, const TransactionOptions &transOptions, AsyncResult &aResult)
+        void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResult &aResult)
         {
             beginTrans(aClient, &aResult, NULL, "", parent, transOptions, true);
         }
@@ -280,7 +280,7 @@ namespace Firestore
         /** Starts a new transaction.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param transOptions Options for creating a new transaction.
@@ -303,7 +303,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void beginTransaction(AsyncClientClass &aClient, const ParentResource &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "")
+        void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "")
         {
             beginTrans(aClient, nullptr, cb, uid, parent, transOptions, true);
         }
@@ -311,7 +311,7 @@ namespace Firestore
         /** Commits a transaction, while optionally updating documents.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param writes The writes to apply.
@@ -323,7 +323,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        bool commit(AsyncClientClass &aClient, const ParentResource &parent, Writes &writes)
+        bool commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
         {
             AsyncResult result;
             commitDoc(aClient, &result, NULL, "", parent, writes, false);
@@ -333,7 +333,7 @@ namespace Firestore
         /** Commits a transaction, while optionally updating documents.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param writes The writes to apply.
@@ -344,7 +344,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void commit(AsyncClientClass &aClient, const ParentResource &parent, Writes &writes, AsyncResult &aResult)
+        void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
         {
             commitDoc(aClient, &aResult, NULL, "", parent, writes, true);
         }
@@ -352,7 +352,7 @@ namespace Firestore
         /** Commits a transaction, while optionally updating documents.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param writes The writes to apply. This Writes object accepts the Write object and transaction string (base64 encoded string) in its constructor.
@@ -364,7 +364,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void commit(AsyncClientClass &aClient, const ParentResource &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
+        void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
         {
             commitDoc(aClient, nullptr, cb, uid, parent, writes, true);
         }
@@ -372,7 +372,7 @@ namespace Firestore
         /** Create a document at the defined document path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to create in the collection.
@@ -385,7 +385,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
+        bool createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
         {
             AsyncResult result;
             parent.setDocPath(documentPath);
@@ -398,7 +398,7 @@ namespace Firestore
         /** Create a document at the defined document path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to create in the collection.
@@ -410,7 +410,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
+        void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
         {
             parent.setDocPath(documentPath);
             String collectionId, documentId;
@@ -421,7 +421,7 @@ namespace Firestore
         /** Create a document at the defined document path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to create in the collection.
@@ -434,7 +434,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
+        void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
         {
             parent.setDocPath(documentPath);
             String collectionId, documentId;
@@ -445,7 +445,7 @@ namespace Firestore
         /** Create a document in the defined collection id.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param collectionId The relative path of document collection id to create the document.
@@ -459,7 +459,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        bool createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
+        bool createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
         {
             AsyncResult result;
             createDoc(aClient, &result, NULL, "", parent, collectionId, documentId, mask, document, false);
@@ -469,7 +469,7 @@ namespace Firestore
         /** Create a document in the defined collection id.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param collectionId The relative path of document collection id to create the document.
@@ -483,7 +483,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
+        void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
         {
             createDoc(aClient, &aResult, NULL, "", parent, collectionId, documentId, mask, document, true);
         }
@@ -491,7 +491,7 @@ namespace Firestore
         /** Create a document in the defined collection id.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param collectionId The relative path of document collection id to create the document.
@@ -506,7 +506,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void createDocument(AsyncClientClass &aClient, ParentResource parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
+        void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
         {
             createDoc(aClient, nullptr, cb, uid, parent, collectionId, documentId, mask, document, true);
         }
@@ -514,7 +514,7 @@ namespace Firestore
         /** Delete a document at the defined path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to delete.
@@ -533,7 +533,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        bool deleteDoc(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const Precondition &currentDocument)
+        bool deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument)
         {
             AsyncResult result;
             deleteDocBase(aClient, &result, NULL, "", parent, documentPath, currentDocument, false);
@@ -543,7 +543,7 @@ namespace Firestore
         /** Delete a document at the defined path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to delete.
@@ -562,7 +562,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void deleteDoc(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult)
+        void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult)
         {
             deleteDocBase(aClient, &aResult, NULL, "", parent, documentPath, currentDocument, true);
         }
@@ -570,7 +570,7 @@ namespace Firestore
         /** Delete a document at the defined path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to delete.
@@ -590,7 +590,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void deleteDoc(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "")
+        void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "")
         {
             deleteDocBase(aClient, nullptr, cb, uid, parent, documentPath, currentDocument, true);
         }
@@ -598,7 +598,7 @@ namespace Firestore
         /** Get a document at the defined path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to get.
@@ -615,7 +615,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        bool get(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const GetDocumentOptions &options)
+        bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options)
         {
             AsyncResult result;
             getDoc(aClient, &result, NULL, "", parent, documentPath, options, false);
@@ -625,7 +625,7 @@ namespace Firestore
         /** Get a document at the defined path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to get.
@@ -641,7 +641,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult)
+        void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult)
         {
             getDoc(aClient, &aResult, NULL, "", parent, documentPath, options, true);
         }
@@ -649,7 +649,7 @@ namespace Firestore
         /** Get a document at the defined path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to get.
@@ -666,7 +666,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "")
+        void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "")
         {
             getDoc(aClient, nullptr, cb, uid, parent, documentPath, options, true);
         }
@@ -674,7 +674,7 @@ namespace Firestore
         /** List the documents in the defined documents collection.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param collectionId The relative path of document colection.
@@ -693,7 +693,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        bool list(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
+        bool list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
         {
             AsyncResult result;
             listDocs(aClient, &result, NULL, "", parent, collectionId, listDocsOptions, false);
@@ -703,7 +703,7 @@ namespace Firestore
         /** List the documents in the defined documents collection.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param collectionId The relative path of document colection.
@@ -722,7 +722,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult)
+        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult)
         {
             listDocs(aClient, &aResult, NULL, "", parent, collectionId, listDocsOptions, true);
         }
@@ -730,7 +730,7 @@ namespace Firestore
         /** List the documents in the defined documents collection.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param collectionId The relative path of document colection.
@@ -750,7 +750,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResultCallback cb, const String &uid = "")
+        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResultCallback cb, const String &uid = "")
         {
             listDocs(aClient, nullptr, cb, uid, parent, collectionId, listDocsOptions, true);
         }
@@ -758,7 +758,7 @@ namespace Firestore
         /** List the document collection ids in the defined document path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to get its collections' id.
@@ -775,7 +775,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        bool listCollectionIds(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
+        bool listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
         {
             AsyncResult result;
             listCollIds(aClient, &result, NULL, "", parent, documentPath, listCollectionIdsOptions, false);
@@ -785,7 +785,7 @@ namespace Firestore
         /** List the document collection ids in the defined document path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to get its collections' id.
@@ -802,7 +802,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        void listCollectionIds(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult)
+        void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult)
         {
             listCollIds(aClient, &aResult, NULL, "", parent, documentPath, listCollectionIdsOptions, true);
         }
@@ -810,7 +810,7 @@ namespace Firestore
         /** List the document collection ids in the defined document path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to get its collections' id.
@@ -828,7 +828,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        void listCollectionIds(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
+        void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
         {
             listCollIds(aClient, nullptr, cb, uid, parent, documentPath, listCollectionIdsOptions, true);
         }
@@ -836,7 +836,7 @@ namespace Firestore
         /** Patch or update a document at the defined path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
@@ -864,7 +864,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        bool patch(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
+        bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
         {
             AsyncResult result;
             patchDoc(aClient, &result, NULL, "", parent, documentPath, patchOptions, document, false);
@@ -874,7 +874,7 @@ namespace Firestore
         /** Patch or update a document at the defined path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
@@ -902,7 +902,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
+        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
         {
             patchDoc(aClient, &aResult, NULL, "", parent, documentPath, patchOptions, document, true);
         }
@@ -910,7 +910,7 @@ namespace Firestore
         /** Patch or update a document at the defined path.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
@@ -939,7 +939,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
+        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
         {
             patchDoc(aClient, nullptr, cb, uid, parent, documentPath, patchOptions, document, true);
         }
@@ -947,7 +947,7 @@ namespace Firestore
         /** Rolls back a transaction.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param transaction Required. A base64-encoded string of the transaction to roll back.
@@ -956,7 +956,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        bool rollback(AsyncClientClass &aClient, const ParentResource &parent, const String &transaction)
+        bool rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction)
         {
             AsyncResult result;
             transRollback(aClient, &result, NULL, "", parent, transaction, false);
@@ -966,7 +966,7 @@ namespace Firestore
         /** Rolls back a transaction.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param transaction Required. A base64-encoded string of the transaction to roll back.
@@ -975,7 +975,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void rollback(AsyncClientClass &aClient, const ParentResource &parent, const String &transaction, AsyncResult &aResult)
+        void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResult &aResult)
         {
             transRollback(aClient, &aResult, NULL, "", parent, transaction, true);
         }
@@ -983,7 +983,7 @@ namespace Firestore
         /** Rolls back a transaction.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param transaction Required. A base64-encoded string of the transaction to roll back.
@@ -993,7 +993,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void rollback(AsyncClientClass &aClient, const ParentResource &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "")
+        void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "")
         {
             transRollback(aClient, nullptr, cb, uid, parent, transaction, true);
         }
@@ -1003,7 +1003,7 @@ namespace Firestore
         /** Runs a query.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to get.
@@ -1026,7 +1026,7 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        bool runQuery(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions)
+        bool runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions)
         {
             AsyncResult result;
             runQueryImpl(aClient, &result, NULL, "", parent, documentPath, queryOptions, false);
@@ -1036,7 +1036,7 @@ namespace Firestore
         /** Runs a query.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to get.
@@ -1058,7 +1058,7 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        void runQuery(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult)
+        void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult)
         {
             runQueryImpl(aClient, &aResult, NULL, "", parent, documentPath, queryOptions, true);
         }
@@ -1066,7 +1066,7 @@ namespace Firestore
         /** Runs a query.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to get.
@@ -1089,7 +1089,7 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        void runQuery(AsyncClientClass &aClient, const ParentResource &parent, const String &documentPath, QueryOptions queryOptions, AsyncResultCallback cb, const String &uid = "")
+        void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResultCallback cb, const String &uid = "")
         {
             runQueryImpl(aClient, nullptr, cb, uid, parent, documentPath, queryOptions, true);
         }

@@ -1,5 +1,5 @@
 /**
- * Created March 9, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -34,277 +34,281 @@
 
 using namespace firebase;
 
-class CollectionGroups : public FirestoreBase
+namespace Firestore
 {
-public:
-    CollectionGroups() {}
-
-    class Indexes : public FirestoreBase
+    class CollectionGroups : public FirestoreBase
     {
     public:
-        Indexes() {}
+        CollectionGroups() {}
 
-        /** Creates a composite index.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param collectionId The collection Id.
-         * @param index The Cloud Firestore indexes enable simple and complex queries against documents in a database.
-         *
-         * @return Boolean value, indicates the success of the operation.
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        bool create(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, CollectionGroupsIndex::Index index)
+        class Indexes : public FirestoreBase
         {
-            AsyncResult result;
-            collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, "", false, false);
-            return result.lastError.code() == 0;
-        }
+        public:
+            Indexes() {}
 
-        /** Creates a composite index.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param collectionId The collection Id.
-         * @param index The Cloud Firestore indexes enable simple and complex queries against documents in a database.
-         * @param aResult The async result (AsyncResult).
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        void create(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResult &aResult)
-        {
-            collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, index, collectionId, "", false, true);
-        }
+            /** Creates a composite index.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param collectionId The collection Id.
+             * @param index The Cloud Firestore indexes enable simple and complex queries against documents in a database.
+             *
+             * @return Boolean value, indicates the success of the operation.
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
+            {
+                AsyncResult result;
+                collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, "", false, false);
+                return result.lastError.code() == 0;
+            }
 
-        /** Creates a composite index.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param collectionId The collection Id.
-         * @param index The Cloud Firestore indexes enable simple and complex queries against documents in a database.
-         * @param cb The async result callback (AsyncResultCallback).
-         * @param uid The user specified UID of async result (optional).
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        void create(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResultCallback cb, const String &uid = "")
-        {
-            collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, index, collectionId, "", false, true);
-        }
+            /** Creates a composite index.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param collectionId The collection Id.
+             * @param index The Cloud Firestore indexes enable simple and complex queries against documents in a database.
+             * @param aResult The async result (AsyncResult).
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResult &aResult)
+            {
+                collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, index, collectionId, "", false, true);
+            }
 
-        /** Deletes a composite index.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param collectionId The collection Id.
-         * @param indexId The index to delete.
-         *
-         * @return Boolean value, indicates the success of the operation.
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        bool deleteIndex(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, const String &indexId)
-        {
-            AsyncResult result;
-            CollectionGroupsIndex::Index index;
-            collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, indexId, true, false);
-            return result.lastError.code() == 0;
-        }
+            /** Creates a composite index.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param collectionId The collection Id.
+             * @param index The Cloud Firestore indexes enable simple and complex queries against documents in a database.
+             * @param cb The async result callback (AsyncResultCallback).
+             * @param uid The user specified UID of async result (optional).
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResultCallback cb, const String &uid = "")
+            {
+                collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, index, collectionId, "", false, true);
+            }
 
-        /** Deletes a composite index.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param collectionId The collection Id.
-         * @param indexId The index to delete.
-         * @param aResult The async result (AsyncResult).
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        void deleteIndex(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
-        {
-            CollectionGroupsIndex::Index index;
-            collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, index, collectionId, indexId, true, true);
-        }
+            /** Deletes a composite index.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param collectionId The collection Id.
+             * @param indexId The index to delete.
+             *
+             * @return Boolean value, indicates the success of the operation.
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+            {
+                AsyncResult result;
+                CollectionGroupsIndex::Index index;
+                collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, indexId, true, false);
+                return result.lastError.code() == 0;
+            }
 
-        /** Deletes a composite index.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param collectionId The collection Id.
-         * @param indexId The index to delete.
-         * @param cb The async result callback (AsyncResultCallback).
-         * @param uid The user specified UID of async result (optional).
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        void deleteIndex(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
-        {
-            CollectionGroupsIndex::Index index;
-            collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, index, collectionId, indexId, true, true);
-        }
+            /** Deletes a composite index.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param collectionId The collection Id.
+             * @param indexId The index to delete.
+             * @param aResult The async result (AsyncResult).
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
+            {
+                CollectionGroupsIndex::Index index;
+                collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, index, collectionId, indexId, true, true);
+            }
 
-        /** Gets a composite index.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param collectionId The collection Id.
-         * @param indexId The index to get.
-         *
-         * @return Boolean value, indicates the success of the operation.
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        bool get(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, const String &indexId)
-        {
-            AsyncResult result;
-            CollectionGroupsIndex::Index index;
-            collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, indexId, false, false);
-            return result.lastError.code() == 0;
-        }
+            /** Deletes a composite index.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param collectionId The collection Id.
+             * @param indexId The index to delete.
+             * @param cb The async result callback (AsyncResultCallback).
+             * @param uid The user specified UID of async result (optional).
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+            {
+                CollectionGroupsIndex::Index index;
+                collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, index, collectionId, indexId, true, true);
+            }
 
-        /** Gets a composite index.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param collectionId The collection Id.
-         * @param indexId The index to get.
-         * @param aResult The async result (AsyncResult).
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        void get(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
-        {
-            CollectionGroupsIndex::Index index;
-            collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, index, collectionId, indexId, false, true);
-        }
+            /** Gets a composite index.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param collectionId The collection Id.
+             * @param indexId The index to get.
+             *
+             * @return Boolean value, indicates the success of the operation.
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+            {
+                AsyncResult result;
+                CollectionGroupsIndex::Index index;
+                collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, indexId, false, false);
+                return result.lastError.code() == 0;
+            }
 
-        /** Gets a composite index.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param collectionId The collection Id.
-         * @param indexId The index to get.
-         * @param cb The async result callback (AsyncResultCallback).
-         * @param uid The user specified UID of async result (optional).
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        void get(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
-        {
-            CollectionGroupsIndex::Index index;
-            collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, index, collectionId, indexId, false, true);
-        }
+            /** Gets a composite index.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param collectionId The collection Id.
+             * @param indexId The index to get.
+             * @param aResult The async result (AsyncResult).
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
+            {
+                CollectionGroupsIndex::Index index;
+                collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, index, collectionId, indexId, false, true);
+            }
 
-        /** Lists composite indexes.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         *
-         * @return Boolean value, indicates the success of the operation.
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        bool list(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId)
-        {
-            AsyncResult result;
-            CollectionGroupsIndex::Index index;
-            collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, "", false, false);
-            return result.lastError.code() == 0;
-        }
+            /** Gets a composite index.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param collectionId The collection Id.
+             * @param indexId The index to get.
+             * @param cb The async result callback (AsyncResultCallback).
+             * @param uid The user specified UID of async result (optional).
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+            {
+                CollectionGroupsIndex::Index index;
+                collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, index, collectionId, indexId, false, true);
+            }
 
-        /** Lists composite indexes.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param indexId The index to get.
-         * @param aResult The async result (AsyncResult).
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        void list(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, AsyncResult &aResult)
-        {
-            CollectionGroupsIndex::Index index;
-            collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, index, collectionId, "", false, true);
-        }
+            /** Lists composite indexes.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             *
+             * @return Boolean value, indicates the success of the operation.
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            bool list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
+            {
+                AsyncResult result;
+                CollectionGroupsIndex::Index index;
+                collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, "", false, false);
+                return result.lastError.code() == 0;
+            }
 
-        /** Lists composite indexes.
-         *
-         * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
-         * The Firebase project Id should be only the name without the firebaseio.com.
-         * The Firestore database id should be (default) or empty "".
-         * @param cb The async result callback (AsyncResultCallback).
-         * @param uid The user specified UID of async result (optional).
-         *
-         * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
-         *
-         * This function requires ServiceAuth authentication.
-         *
-         */
-        void list(AsyncClientClass &aClient, const ParentResource &parent, const String &collectionId, AsyncResultCallback cb, const String &uid = "")
-        {
-            CollectionGroupsIndex::Index index;
-            collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, index, collectionId, "", false, true);
-        }
+            /** Lists composite indexes.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param indexId The index to get.
+             * @param aResult The async result (AsyncResult).
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResult &aResult)
+            {
+                CollectionGroupsIndex::Index index;
+                collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, index, collectionId, "", false, true);
+            }
+
+            /** Lists composite indexes.
+             *
+             * @param aClient The async client.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
+             * The Firebase project Id should be only the name without the firebaseio.com.
+             * The Firestore database id should be (default) or empty "".
+             * @param cb The async result callback (AsyncResultCallback).
+             * @param uid The user specified UID of async result (optional).
+             *
+             * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
+             *
+             * This function requires ServiceAuth authentication.
+             *
+             */
+            void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResultCallback cb, const String &uid = "")
+            {
+                CollectionGroupsIndex::Index index;
+                collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, index, collectionId, "", false, true);
+            }
+        };
     };
-};
+
+}
 
 #endif
 

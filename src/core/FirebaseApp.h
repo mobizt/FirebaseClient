@@ -1,5 +1,5 @@
 /**
- * Created March 9, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -174,6 +174,13 @@ namespace firebase
                     parseItem(sh, payload, auth_data.app_token.token_type, "\"token_type\"", "}", p1, p2);
                 }
             }
+
+            if (token.length() > 0 && token[token.length() - 1] == '"')
+                token.remove(token.length() - 1, 1);
+
+            if (refresh.length() > 0 && refresh[refresh.length() - 1] == '"')
+                refresh.remove(refresh.length() - 1, 1);
+
             auth_data.app_token.token = token;
             auth_data.app_token.refresh = refresh;
             auth_data.app_token.project_id = auth_data.user_auth.sa.project_id;

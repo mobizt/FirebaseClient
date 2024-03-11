@@ -78,11 +78,11 @@
  *
  * SYNTAXES:
  *
- * indexes.deleteIndex(<AsyncClient>, <ParentResource>, <indexId>);
- * indexes.deleteIndex(<AsyncClient>, <ParentResource>, <indexId>, <AsyncResult>);
- * indexes.deleteIndex(<AsyncClient>, <ParentResource>, <indexId>, <AsyncResultCallback>, <uid>);
+ * indexes.deleteIndex(<AsyncClient>, <Firestore::Parent>, <indexId>);
+ * indexes.deleteIndex(<AsyncClient>, <Firestore::Parent>, <indexId>, <AsyncResult>);
+ * indexes.deleteIndex(<AsyncClient>, <Firestore::Parent>, <indexId>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -188,9 +188,6 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
-/* Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
-
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -288,13 +285,13 @@ void loop()
         // e.g. projects/xxxxxxxx/databases/(default)/indexes/yyyyy
         String indexId = "yyyyy";
 
-        indexes.deleteIndex(aClient, ParentResource(FIREBASE_PROJECT_ID), indexId, asyncCB);
+        indexes.deleteIndex(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), indexId, asyncCB);
 
         // To assign UID for async result
-        // indexes.deleteIndex(aClient, ParentResource(FIREBASE_PROJECT_ID), indexId, asyncCB, "myUID");
+        // indexes.deleteIndex(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), indexId, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // indexes.deleteIndex(aClient, ParentResource(FIREBASE_PROJECT_ID), indexId, aResult_no_callback);
+        // indexes.deleteIndex(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), indexId, aResult_no_callback);
     }
 }
 

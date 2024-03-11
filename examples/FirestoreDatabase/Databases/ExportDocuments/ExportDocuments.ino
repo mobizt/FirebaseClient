@@ -78,11 +78,11 @@
  *
  * SYNTAXES:
  *
- * Databases.exportDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>);
- * Databases.exportDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
- * Databases.exportDocuments(<AsyncClient>, <ParentResource>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
+ * Databases.exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>);
+ * Databases.exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
+ * Databases.exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -295,13 +295,13 @@ void loop()
 
         EximDocumentOptions exportOptions("" /* Which collection ids to export. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket to store the data */);
 
-        Databases.exportDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), exportOptions, asyncCB);
+        Databases.exportDocuments(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), exportOptions, asyncCB);
 
         // To assign UID for async result
-        // Database.exportDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), exportOptions, asyncCB, "myUID");
+        // Database.exportDocuments(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), exportOptions, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Database.exportDocuments(aClient, ParentResource(FIREBASE_PROJECT_ID), exportOptions, aResult_no_callback);
+        // Database.exportDocuments(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), exportOptions, aResult_no_callback);
     }
 }
 

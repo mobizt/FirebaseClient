@@ -63,11 +63,11 @@
  *
  * SYNTAXES:
  *
- * Docs.batchGet(<AsyncClient>, <ParentResource>, <BatchGetDocumentOptions>);
- * Docs.batchGet(<AsyncClient>, <ParentResource>, <BatchGetDocumentOptions>, <AsyncResult>);
- * Docs.batchGet(<AsyncClient>, <ParentResource>, <BatchGetDocumentOptions>, <AsyncResultCallback>, <uid>);
+ * Docs.batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>);
+ * Docs.batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>, <AsyncResult>);
+ * Docs.batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -329,13 +329,13 @@ void loop()
         options.addDocument("test_collection/test_document");
         options.mask(DocumentMask("Singapore.population,key1"));
 
-        Docs.batchGet(aClient, ParentResource(FIREBASE_PROJECT_ID), options, asyncCB);
+        Docs.batchGet(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), options, asyncCB);
 
         // To assign UID for async result
-        // Docs.batchGet(aClient, ParentResource(FIREBASE_PROJECT_ID), options, asyncCB, "myUID");
+        // Docs.batchGet(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), options, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Docs.batchGet(aClient, ParentResource(FIREBASE_PROJECT_ID), options, aResult_no_callback);
+        // Docs.batchGet(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), options, aResult_no_callback);
     }
 }
 

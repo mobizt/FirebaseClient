@@ -201,6 +201,7 @@ class AsyncResult
     friend class Functions;
     friend class Storage;
     friend class CloudStorage;
+     friend class FirestoreBase;
     friend class FirestoreDocuments;
     friend class async_data_item_t;
 

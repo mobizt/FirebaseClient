@@ -1,5 +1,5 @@
 /**
- * Created March 10, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -56,7 +56,7 @@ namespace Firestore
         /** Export the documents in the database to the Firebase Storage data bucket.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param exportOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
@@ -71,7 +71,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions exportOptions)
+        bool exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
         {
             AsyncResult result;
             eximDocs(aClient, &result, NULL, "", parent, exportOptions, false, false);
@@ -81,7 +81,7 @@ namespace Firestore
         /** Export the documents in the database to the Firebase Storage data bucket.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param exportOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
@@ -95,7 +95,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions exportOptions, AsyncResult &aResult)
+        void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions, AsyncResult &aResult)
         {
             eximDocs(aClient, &aResult, NULL, "", parent, exportOptions, false, true);
         }
@@ -103,7 +103,7 @@ namespace Firestore
         /** Export the documents in the database to the Firebase Storage data bucket.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param exportOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
@@ -118,7 +118,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void exportDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions exportOptions, AsyncResultCallback cb, const String &uid = "")
+        void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions, AsyncResultCallback cb, const String &uid = "")
         {
             eximDocs(aClient, nullptr, cb, uid, parent, exportOptions, false, true);
         }
@@ -126,7 +126,7 @@ namespace Firestore
         /** Import the exported documents stored in the Firebase Storage data bucket.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param importOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
@@ -141,7 +141,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool importDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions importOptions)
+        bool importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
         {
             AsyncResult result;
             eximDocs(aClient, &result, NULL, "", parent, importOptions, true, false);
@@ -151,7 +151,7 @@ namespace Firestore
         /** Import the exported documents stored in the Firebase Storage data bucket.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param importOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
@@ -165,7 +165,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions importOptions, AsyncResult &aResult)
+        void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions, AsyncResult &aResult)
         {
             eximDocs(aClient, &aResult, NULL, "", parent, importOptions, true, true);
         }
@@ -173,7 +173,7 @@ namespace Firestore
         /** Import the exported documents stored in the Firebase Storage data bucket.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param importOptions The EximDocumentOptions object included collectionIds, bucketID and storagePath in its constructor.
@@ -188,7 +188,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void importDocuments(AsyncClientClass &aClient, const ParentResource &parent, EximDocumentOptions importOptions, AsyncResultCallback cb, const String &uid = "")
+        void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions, AsyncResultCallback cb, const String &uid = "")
         {
             eximDocs(aClient, nullptr, cb, uid, parent, importOptions, true, true);
         }
@@ -196,7 +196,7 @@ namespace Firestore
         /** Create a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to create.
          * @param database The Firestore::Database object that hold the database information to create.
@@ -209,7 +209,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool create(AsyncClientClass &aClient, const ParentResource &parent, Database &database)
+        bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, database.c_str(), "", Firestore::firestore_database_mode_create, false);
@@ -219,7 +219,7 @@ namespace Firestore
         /** Create a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to create.
          * @param database The Firestore::Database object that hold the database information to create.
@@ -231,7 +231,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void create(AsyncClientClass &aClient, const ParentResource &parent, Database &database, AsyncResult &aResult)
+        void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, AsyncResult &aResult)
         {
             manageDatabase(aClient, &aResult, NULL, "", parent, database.c_str(), "", Firestore::firestore_database_mode_create, true);
         }
@@ -239,7 +239,7 @@ namespace Firestore
         /** Create a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to create.
          * @param database The Firestore::Database object that hold the database information to create.
@@ -252,7 +252,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void create(AsyncClientClass &aClient, const ParentResource &parent, Database &database, AsyncResultCallback cb, const String &uid = "")
+        void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, AsyncResultCallback cb, const String &uid = "")
         {
             manageDatabase(aClient, nullptr, cb, uid, parent, database.c_str(), "", Firestore::firestore_database_mode_create, true);
         }
@@ -260,7 +260,7 @@ namespace Firestore
         /** Deletes a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to delete.
          * @param etag The current etag of the Database.
@@ -271,7 +271,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool deleteDatabase(AsyncClientClass &aClient, const ParentResource &parent, const String &etag)
+        bool deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, "", etag, Firestore::firestore_database_mode_delete, false);
@@ -281,7 +281,7 @@ namespace Firestore
         /** Deletes a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to delete.
          * @param etag The current etag of the Database.
@@ -291,7 +291,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void deleteDatabase(AsyncClientClass &aClient, const ParentResource &parent, const String &etag, AsyncResult &aResult)
+        void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResult &aResult)
         {
             manageDatabase(aClient, &aResult, NULL, "", parent, "", etag, Firestore::firestore_database_mode_delete, true);
         }
@@ -299,7 +299,7 @@ namespace Firestore
         /** Deletes a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to delete.
          * @param etag The current etag of the Database.
@@ -310,7 +310,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void deleteDatabase(AsyncClientClass &aClient, const ParentResource &parent, const String &etag, AsyncResultCallback cb, const String &uid = "")
+        void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResultCallback cb, const String &uid = "")
         {
             manageDatabase(aClient, nullptr, cb, uid, parent, "", etag, Firestore::firestore_database_mode_delete, true);
         }
@@ -318,7 +318,7 @@ namespace Firestore
         /** Gets information about a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to get the infomation.
          *
@@ -327,7 +327,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool get(AsyncClientClass &aClient, const ParentResource &parent)
+        bool get(AsyncClientClass &aClient, const Firestore::Parent &parent)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, "", "", Firestore::firestore_database_mode_get, false);
@@ -337,7 +337,7 @@ namespace Firestore
         /** Gets information about a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to get the infomation.
          * @param aResult The async result (AsyncResult).
@@ -345,7 +345,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const ParentResource &parent, AsyncResult &aResult)
+        void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
         {
             manageDatabase(aClient, &aResult, NULL, "", parent, "", "", Firestore::firestore_database_mode_get, true);
         }
@@ -353,7 +353,7 @@ namespace Firestore
         /** Gets information about a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to get the infomation.
          * @param cb The async result callback (AsyncResultCallback).
@@ -362,7 +362,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const ParentResource &parent, AsyncResultCallback cb, const String &uid = "")
+        void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
         {
             manageDatabase(aClient, nullptr, cb, uid, parent, "", "", Firestore::firestore_database_mode_get, true);
         }
@@ -370,7 +370,7 @@ namespace Firestore
         /** List all the databases in the project.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * Leave the Firestore database Id to be empty for this case.
          *
@@ -379,7 +379,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool list(AsyncClientClass &aClient, const ParentResource &parent)
+        bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, "", "", Firestore::firestore_database_mode_list, false);
@@ -389,7 +389,7 @@ namespace Firestore
         /** List all the databases in the project.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * Leave the Firestore database Id to be empty for this case.
          * @param aResult The async result (AsyncResult).
@@ -397,7 +397,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const ParentResource &parent, AsyncResult &aResult)
+        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
         {
             manageDatabase(aClient, &aResult, NULL, "", parent, "", "", Firestore::firestore_database_mode_list, true);
         }
@@ -405,7 +405,7 @@ namespace Firestore
         /** List all the databases in the project.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * Leave the Firestore database Id to be empty for this case.
          * @param cb The async result callback (AsyncResultCallback).
@@ -414,7 +414,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const ParentResource &parent, AsyncResultCallback cb, const String &uid = "")
+        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
         {
             manageDatabase(aClient, nullptr, cb, uid, parent, "", "", Firestore::firestore_database_mode_list, true);
         }
@@ -422,7 +422,7 @@ namespace Firestore
             /** Updates a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to update.
          * @param database The Firestore::Database object that hold the database information to update.
@@ -437,7 +437,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool patch(AsyncClientClass &aClient, const ParentResource &parent, Database &database, const String &updateMask)
+        bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, database.c_str(), updateMask, Firestore::firestore_database_mode_patch, false);
@@ -447,7 +447,7 @@ namespace Firestore
         /** Updates a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to update.
          * @param database The Firestore::Database object that hold the database information to update.
@@ -461,7 +461,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const ParentResource &parent, Database &database, const String &updateMask, AsyncResult &aResult)
+        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask, AsyncResult &aResult)
         {
             manageDatabase(aClient, &aResult, NULL, "", parent, database.c_str(), updateMask, Firestore::firestore_database_mode_patch, true);
         }
@@ -469,7 +469,7 @@ namespace Firestore
         /** Updates a database.
          *
          * @param aClient The async client.
-         * @param parent The ParentResource object included project Id and database Id in its constructor.
+         * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to update.
          * @param database The Firestore::Database object that hold the database information to update.
@@ -484,7 +484,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const ParentResource &parent, Database &database, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
+        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
         {
             manageDatabase(aClient, nullptr, cb, uid, parent, database.c_str(), updateMask, Firestore::firestore_database_mode_patch, true);
         }
@@ -497,7 +497,7 @@ namespace Firestore
             /** Creates the specified index.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param index The Index object that provides an index definition.
@@ -509,7 +509,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            bool create(AsyncClientClass &aClient, const ParentResource &parent, DatabaseIndex::Index index)
+            bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
             {
                 AsyncResult result;
                 databaseIndexManager(aClient, &result, NULL, "", parent, index, "", false, false);
@@ -519,7 +519,7 @@ namespace Firestore
             /** Creates the specified index.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param index The Index object that provides an index definition.
@@ -530,7 +530,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void create(AsyncClientClass &aClient, const ParentResource &parent, DatabaseIndex::Index index, AsyncResult &aResult)
+            void create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index, AsyncResult &aResult)
             {
                 databaseIndexManager(aClient, &aResult, NULL, "", parent, index, "", false, true);
             }
@@ -538,7 +538,7 @@ namespace Firestore
             /** Creates the specified index.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param index The Index object that provides an index definition.
@@ -550,7 +550,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void create(AsyncClientClass &aClient, const ParentResource &parent, DatabaseIndex::Index index, AsyncResultCallback cb, const String &uid = "")
+            void create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index, AsyncResultCallback cb, const String &uid = "")
             {
                 databaseIndexManager(aClient, nullptr, cb, uid, parent, index, "", false, true);
             }
@@ -558,7 +558,7 @@ namespace Firestore
             /** Deletes an index.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param indexId The index to delete.
@@ -570,7 +570,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            bool deleteIndex(AsyncClientClass &aClient, const ParentResource &parent, const String &indexId)
+            bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
             {
                 AsyncResult result;
                 DatabaseIndex::Index index("");
@@ -581,7 +581,7 @@ namespace Firestore
             /** Deletes an index.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param indexId The index to delete.
@@ -592,7 +592,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void deleteIndex(AsyncClientClass &aClient, const ParentResource &parent, const String &indexId, AsyncResult &aResult)
+            void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
             {
                 DatabaseIndex::Index index("");
                 databaseIndexManager(aClient, &aResult, NULL, "", parent, index, indexId, true, true);
@@ -601,7 +601,7 @@ namespace Firestore
             /** Deletes an index.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param indexId The index to delete.
@@ -613,7 +613,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void deleteIndex(AsyncClientClass &aClient, const ParentResource &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+            void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
             {
                 DatabaseIndex::Index index("");
                 databaseIndexManager(aClient, nullptr, cb, uid, parent, index, indexId, true, true);
@@ -622,7 +622,7 @@ namespace Firestore
             /** Gets an index.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param indexId The index to get.
@@ -634,7 +634,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            bool get(AsyncClientClass &aClient, const ParentResource &parent, const String &indexId)
+            bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
             {
                 AsyncResult result;
                 DatabaseIndex::Index index("");
@@ -645,7 +645,7 @@ namespace Firestore
             /** Gets an index.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param indexId The index to get.
@@ -656,7 +656,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void get(AsyncClientClass &aClient, const ParentResource &parent, const String &indexId, AsyncResult &aResult)
+            void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
             {
                 DatabaseIndex::Index index("");
                 databaseIndexManager(aClient, &aResult, NULL, "", parent, index, indexId, false, true);
@@ -665,7 +665,7 @@ namespace Firestore
             /** Gets an index.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param indexId The index to get.
@@ -677,7 +677,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void get(AsyncClientClass &aClient, const ParentResource &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+            void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
             {
                 DatabaseIndex::Index index("");
                 databaseIndexManager(aClient, nullptr, cb, uid, parent, index, indexId, false, true);
@@ -686,7 +686,7 @@ namespace Firestore
             /** Lists the indexes.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              *
@@ -697,7 +697,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            bool list(AsyncClientClass &aClient, const ParentResource &parent)
+            bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
             {
                 AsyncResult result;
                 DatabaseIndex::Index index("");
@@ -708,7 +708,7 @@ namespace Firestore
             /** Lists the indexes.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param indexId The index to get.
@@ -719,7 +719,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void list(AsyncClientClass &aClient, const ParentResource &parent, AsyncResult &aResult)
+            void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
             {
                 DatabaseIndex::Index index("");
                 databaseIndexManager(aClient, &aResult, NULL, "", parent, index, "", false, true);
@@ -728,7 +728,7 @@ namespace Firestore
             /** Lists the indexes.
              *
              * @param aClient The async client.
-             * @param parent The ParentResource object included project Id and database Id in its constructor.
+             * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              * @param cb The async result callback (AsyncResultCallback).
@@ -739,7 +739,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void list(AsyncClientClass &aClient, const ParentResource &parent, AsyncResultCallback cb, const String &uid = "")
+            void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
             {
                 DatabaseIndex::Index index("");
                 databaseIndexManager(aClient, nullptr, cb, uid, parent, index, "", false, true);

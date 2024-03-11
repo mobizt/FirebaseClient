@@ -1,5 +1,5 @@
 /**
- * Created March 10, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,7 +30,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.1.5"
+#define FIREBASE_CLIENT_VERSION "0.1.6"
 
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"

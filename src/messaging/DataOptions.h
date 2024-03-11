@@ -1,5 +1,5 @@
 /**
- * Created March 11, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,16 +30,12 @@
 #include "./core/JSON.h"
 #include "./core/ObjectWriter.h"
 
-namespace Message
+namespace Messages
 {
     enum firebase_cloud_messaging_request_type
     {
         firebase_cloud_messaging_request_type_undefined,
-        firebase_cloud_messaging_request_type_send,
-        firebase_cloud_messaging_request_type_subscribe,
-        firebase_cloud_messaging_request_type_unsubscribe,
-        firebase_cloud_messaging_request_type_app_instance_info,
-        firebase_cloud_messaging_request_type_apn_token_registration
+        firebase_cloud_messaging_request_type_send
     };
 
     // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
@@ -475,16 +471,33 @@ namespace Message
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
-    class FirebaseCloudMessagingOptions
+    class Parent
+    {
+        friend class Messaging;
+
+    private:
+        String projectId;
+
+    public:
+        Parent() {}
+        Parent(const String &projectId)
+        {
+            this->projectId = projectId;
+        }
+        String getProjectId() { return projectId; }
+    };
+
+    class DataOptions
     {
         friend class Messaging;
 
     public:
         String payload, extras;
+        Messages::Parent parent;
         firebase_cloud_messaging_request_type requestType = firebase_cloud_messaging_request_type_undefined;
         unsigned long requestTime = 0;
 
-        void copy(FirestoreOptions &rhs)
+        void copy(DataOptions &rhs)
         {
             this->extras = rhs.extras;
             this->payload = rhs.payload;
@@ -501,11 +514,11 @@ namespace Message
         String uid;
         async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
         slot_options_t opt;
-        FirebaseCloudMessagingOptions *options = nullptr;
+        DataOptions *options = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, FirebaseCloudMessagingOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DataOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;

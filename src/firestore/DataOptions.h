@@ -1,5 +1,5 @@
 /**
- * Created March 11, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -67,48 +67,6 @@ enum firebase_firestore_request_type
     firebase_firestore_request_type_delete_index
 };
 
-class ParentResource
-{
-    friend class FirestoreBase;
-    friend class Documents;
-
-private:
-    String projectId;
-    String databaseId;
-    String documentPath;
-    bool databaseIdParam = false;
-
-public:
-    ParentResource() {}
-    ParentResource(const String &projectId, const String &databaseId = "")
-    {
-        this->projectId = projectId;
-        this->databaseId = databaseId;
-    }
-
-    void pathResove(String &collectionId, String &documentId)
-    {
-        size_t count = 0;
-        collectionId = this->documentPath;
-        int p = collectionId.lastIndexOf("/");
-        String _documentPath = this->documentPath;
-
-        for (size_t i = 0; i < _documentPath.length(); i++)
-            count += _documentPath[i] == '/' ? 1 : 0;
-
-        if (p > -1 && count % 2 > 0)
-        {
-            documentId = collectionId.substring(p + 1, collectionId.length());
-            collectionId = collectionId.substring(0, p);
-        }
-    }
-    void setDocPath(const String &docPath) { documentPath = docPath; }
-    String getDatabaseId() { return databaseId.c_str(); }
-    String getProjectId() { return projectId.c_str(); }
-    void setDatabaseIdParam(bool value) { databaseIdParam = value; }
-    bool isDatabaseIdParam() { return databaseIdParam; }
-};
-
 class DocumentMask : public Printable
 {
     friend class FirestoreBase;
@@ -127,14 +85,6 @@ private:
         String temp;
         JsonHelper jh;
         jh.addTokens(temp, jh.toString("fieldPaths"), buf[1], true);
-        return temp;
-    }
-
-    String getQuery(const String &mask, bool hasParam)
-    {
-        String temp;
-        URLHelper uh;
-        uh.addParamsTokens(temp, String(mask + ".fieldPaths="), this->buf[1], hasParam);
         return temp;
     }
 
@@ -159,6 +109,13 @@ public:
             JsonHelper jh;
             jh.addTokens(buf[0], "fieldPaths", buf[1], true);
         }
+    }
+    String getQuery(const String &mask, bool hasParam)
+    {
+        String temp;
+        URLHelper uh;
+        uh.addParamsTokens(temp, String(mask + ".fieldPaths="), this->buf[1], hasParam);
+        return temp;
     }
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
@@ -1563,30 +1520,76 @@ namespace CollectionGroupsIndex
 
 }
 
-class FirestoreOptions
+namespace Firestore
 {
-    friend class FirestoreBase;
-
-public:
-    ParentResource parent;
-    String collectionId;
-    String documentId;
-    String extras;
-    String payload;
-    firebase_firestore_request_type requestType = firebase_firestore_request_type_undefined;
-    unsigned long requestTime = 0;
-
-    void copy(FirestoreOptions &rhs)
+    class Parent
     {
-        this->parent = rhs.parent;
-        this->collectionId = rhs.collectionId;
-        this->documentId = rhs.documentId;
-        this->extras = rhs.extras;
-        this->payload = rhs.payload;
-    }
+        friend class FirestoreBase;
+        friend class Documents;
 
-private:
-};
+    private:
+        String projectId;
+        String databaseId;
+        String documentPath;
+        bool databaseIdParam = false;
+
+    public:
+        Parent() {}
+        Parent(const String &projectId, const String &databaseId = "")
+        {
+            this->projectId = projectId;
+            this->databaseId = databaseId;
+        }
+
+        void pathResove(String &collectionId, String &documentId)
+        {
+            size_t count = 0;
+            collectionId = this->documentPath;
+            int p = collectionId.lastIndexOf("/");
+            String _documentPath = this->documentPath;
+
+            for (size_t i = 0; i < _documentPath.length(); i++)
+                count += _documentPath[i] == '/' ? 1 : 0;
+
+            if (p > -1 && count % 2 > 0)
+            {
+                documentId = collectionId.substring(p + 1, collectionId.length());
+                collectionId = collectionId.substring(0, p);
+            }
+        }
+        void setDocPath(const String &docPath) { documentPath = docPath; }
+        String getDatabaseId() const { return databaseId.c_str(); }
+        String getProjectId() const { return projectId.c_str(); }
+        void setDatabaseIdParam(bool value) { databaseIdParam = value; }
+        bool isDatabaseIdParam() { return databaseIdParam; }
+    };
+
+    class DataOptions
+    {
+        friend class FirestoreBase;
+
+    public:
+        Parent parent;
+        String collectionId;
+        String documentId;
+        String extras;
+        String payload;
+        firebase_firestore_request_type requestType = firebase_firestore_request_type_undefined;
+        unsigned long requestTime = 0;
+
+        void copy(DataOptions &rhs)
+        {
+            this->parent = rhs.parent;
+            this->collectionId = rhs.collectionId;
+            this->documentId = rhs.documentId;
+            this->extras = rhs.extras;
+            this->payload = rhs.payload;
+        }
+
+    private:
+    };
+
+}
 
 #endif
 

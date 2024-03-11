@@ -78,11 +78,11 @@
  *
  * SYNTAXES:
  *
- * indexes.list(<AsyncClient>, <ParentResource>, <collectionId>);
- * indexes.list(<AsyncClient>, <ParentResource>, <collectionId>, <AsyncResult>);
- * indexes.list(<AsyncClient>, <ParentResource>, <collectionId>, <AsyncResultCallback>, <uid>);
+ * indexes.list(<AsyncClient>, <Firestore::Parent>, <collectionId>);
+ * indexes.list(<AsyncClient>, <Firestore::Parent>, <collectionId>, <AsyncResult>);
+ * indexes.list(<AsyncClient>, <Firestore::Parent>, <collectionId>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  * 
@@ -188,9 +188,6 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
-/* Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
-
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -211,7 +208,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-CollectionGroups::Indexes indexes;
+Firestore::CollectionGroups::Indexes indexes;
 
 AsyncResult aResult_no_callback;
 
@@ -258,7 +255,7 @@ void setup()
             JWT.process(app.getAuth());
     }
 
-    app.getApp<CollectionGroups::Indexes>(indexes);
+    app.getApp<Firestore::CollectionGroups::Indexes>(indexes);
 }
 
 void loop()
@@ -287,13 +284,13 @@ void loop()
 
         String collectionId = "a0";
 
-        indexes.list(aClient, ParentResource(FIREBASE_PROJECT_ID), collectionId, asyncCB);
+        indexes.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, asyncCB);
 
         // To assign UID for async result
-        // indexes.list(aClient, ParentResource(FIREBASE_PROJECT_ID), collectionId, asyncCB, "myUID");
+        // indexes.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // indexes.list(aClient, ParentResource(FIREBASE_PROJECT_ID), collectionId, aResult_no_callback);
+        // indexes.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, aResult_no_callback);
     }
 }
 

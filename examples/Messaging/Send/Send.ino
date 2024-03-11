@@ -73,24 +73,21 @@
  */
 
 /**
- * CREATE A COMPOSITE INDEX FUNCTIONS
- * ==================================
+ * SEND A MESSAGE FUNCTIONS
+ * ========================
  *
  * SYNTAXES:
  *
- * indexes.create(<AsyncClient>, <Firestore::Parent>, <collectionId>, <Index>);
- * indexes.create(<AsyncClient>, <Firestore::Parent>, <collectionId>, <Index>, <AsyncResult>);
- * indexes.create(<AsyncClient>, <Firestore::Parent>, <collectionId>, <Index>, <AsyncResultCallback>, <uid>);
+ * messaging.send(<AsyncClient>, <Messages::Parent>, <Messages::Message>);
+ * messaging.send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResult>);
+ * messaging.send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
+ * The <Messages::Parent> is the Messages::Parent object included project Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
  *
- * The <collectionId> is the collection Id.
+ * The <Messages::Message> is Messages::Message object that holds the information of message to send.
  *
- * The <index> is CollectionGroupsIndex::Index object.
- * 
- * The indexes is CollectionGroups::Indexes.
+ * The messaging is Messaging service app.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
@@ -210,7 +207,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-Firestore::CollectionGroups::Indexes indexes;
+Messaging messaging;
 
 AsyncResult aResult_no_callback;
 
@@ -257,7 +254,7 @@ void setup()
             JWT.process(app.getAuth());
     }
 
-    app.getApp<Firestore::CollectionGroups::Indexes>(indexes);
+    app.getApp<Messaging>(messaging);
 }
 
 void loop()
@@ -273,7 +270,7 @@ void loop()
     // app.ttl();
 
     // This required when different AsyncClients than used in FirebaseApp assigned to the Firestore functions.
-    indexes.loop();
+    messaging.loop();
 
     // To get anyc result without callback
     // printResult(aResult_no_callback);
@@ -282,47 +279,30 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("[+] Creates a composite index... ");
+        Serial.println("[+] Sending message...");
 
-        String collectionId = "a0", fieldPath1 = "myInt", fieldPath2 = "myDouble";
+        Messages::Message msg;
+        msg.topic("test");
+        // msg.token("DEVICE_TOKEN");
+        // msg.condition("'foo' in topics && 'bar' in topics");
 
-        CollectionGroupsIndex::VectorConfig vectorConfig;
-        vectorConfig.dimension(1);
-        vectorConfig.flat();
+        Messages::Notification notification;
 
-        CollectionGroupsIndex::IndexField indexField;
-        indexField.fieldPath(fieldPath1);
+        notification.body("Notification body").title("Notification title");
 
-        // Union field value_mode can be only one of the following:
-        indexField.order(CollectionGroupsIndex::Order::ASCENDING);
-        // indexField.arrayConfig(CollectionGroupsIndex::ArrayConfig::CONTAINS);
-        // indexField.vectorConfig(vectorConfig);
+        object_t data("{\"name\":\"wrench\",\"mass\":\"1.3kg\",\"count\":\"3\"}");
 
-        CollectionGroupsIndex::IndexField indexField2;
-        indexField2.fieldPath(fieldPath2);
+        msg.data(data);
 
-        // Union field value_mode can be only one of the following:
-        // indexField2.order(CollectionGroupsIndex::Order::DESCENDING);
-        indexField2.arrayConfig(CollectionGroupsIndex::ArrayConfig::CONTAINS);
-        // indexField2.vectorConfig(vectorConfig);
+        msg.notification(notification);
 
-        CollectionGroupsIndex::Index index;
-        index.apiScope(CollectionGroupsIndex::ApiScope::ANY_API);
-        index.queryScope(CollectionGroupsIndex::QueryScope::COLLECTION);
-        index.addField(indexField);
-        index.addField(indexField2);
-
-        Serial.println(indexField);
-
-        Serial.println(index);
-
-        indexes.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, index, asyncCB);
+        messaging.send(aClient, Messages::Parent(FIREBASE_PROJECT_ID), msg, asyncCB);
 
         // To assign UID for async result
-        // indexes.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, index, asyncCB, "myUID");
+        // messaging.send(aClient, Messages::Parent(FIREBASE_PROJECT_ID), msg, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // indexes.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, index, aResult_no_callback);
+        // messaging.send(aClient, Messages::Parent(FIREBASE_PROJECT_ID), msg, aResult_no_callback);
     }
 }
 

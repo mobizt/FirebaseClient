@@ -63,11 +63,11 @@
  *
  * SYNTAXES:
  *
- * Docs.get(<AsyncClient>, <ParentResource>, <documentPath>, <GetDocumentOptions>);
- * Docs.get(<AsyncClient>, <ParentResource>, <documentPath>, <GetDocumentOptions>, <AsyncResult>);
- * Docs.get(<AsyncClient>, <ParentResource>, <documentPath>, <GetDocumentOptions>, <AsyncResultCallback>, <uid>);
+ * Docs.get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>);
+ * Docs.get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>, <AsyncResult>);
+ * Docs.get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -322,7 +322,7 @@ void loop()
 
             Serial.println("[+] Create document... ");
 
-            Docs.createDocument(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
+            Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
         }
 
         String documentPath = "info/countries";
@@ -332,13 +332,13 @@ void loop()
 
         Serial.println("[+] Get a document... ");
 
-        Docs.get(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), asyncCB);
+        Docs.get(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), asyncCB);
 
         // To assign UID for async result
-        // Docs.get(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), asyncCB, "myUID");
+        // Docs.get(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Docs.get(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), aResult_no_callback);
+        // Docs.get(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), aResult_no_callback);
     }
 }
 

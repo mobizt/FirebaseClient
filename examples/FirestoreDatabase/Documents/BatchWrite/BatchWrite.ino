@@ -63,11 +63,11 @@
  *
  * SYNTAXES:
  *
- * Docs.batchWrite(<AsyncClient>, <ParentResource>, <Writes>);
- * Docs.batchWrite(<AsyncClient>, <ParentResource>, <Writes>, <AsyncResult>);
- * Docs.batchWrite(<AsyncClient>, <ParentResource>, <Writes>, <AsyncResultCallback>, <uid>);
+ * Docs.batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>);
+ * Docs.batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResult>);
+ * Docs.batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -340,13 +340,13 @@ void loop()
 
         // All Writes, DocumentTransform and Values::xxxx objects can be printed on Serial port
 
-        Docs.batchWrite(aClient, ParentResource(FIREBASE_PROJECT_ID), writes, asyncCB);
+        Docs.batchWrite(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, asyncCB);
 
         // To assign UID for async result
-        // Docs.batchWrite(aClient, ParentResource(FIREBASE_PROJECT_ID), writes, asyncCB, "myUID");
+        // Docs.batchWrite(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Docs.batchWrite(aClient, ParentResource(FIREBASE_PROJECT_ID), writes, aResult_no_callback);
+        // Docs.batchWrite(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, aResult_no_callback);
     }
 }
 

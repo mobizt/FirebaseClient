@@ -78,11 +78,11 @@
  *
  * SYNTAXES:
  *
- * Databases.get(<AsyncClient>, <ParentResource>);
- * Databases.get(<AsyncClient>, <ParentResource>, <AsyncResult>);
- * Databases.get(<AsyncClient>, <ParentResource>, <AsyncResultCallback>, <uid>);
+ * Databases.get(<AsyncClient>, <Firestore::Parent>);
+ * Databases.get(<AsyncClient>, <Firestore::Parent>, <AsyncResult>);
+ * Databases.get(<AsyncClient>, <Firestore::Parent>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id is the id of database to get the infomation.
  *
@@ -186,9 +186,6 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
-/* Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
-
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -283,13 +280,13 @@ void loop()
 
         Serial.println("[+] Gets information about a database... ");
 
-        Databases.get(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb" /* database Id */), asyncCB);
+        Databases.get(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb" /* database Id */), asyncCB);
 
         // To assign UID for async result
-        // Databases.get(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), asyncCB, "myUID");
+        // Databases.get(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb"), asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Databases.get(aClient, ParentResource(FIREBASE_PROJECT_ID, "myDb"), aResult_no_callback);
+        // Databases.get(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb"), aResult_no_callback);
     }
 }
 

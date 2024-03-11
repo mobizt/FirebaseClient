@@ -62,11 +62,11 @@
  *
  * SYNTAXES:
  *
- * Docs.listCollectionIds(<AsyncClient>, <ParentResource>, <ListCollectionIdsOptions>);
- * Docs.listCollectionIds(<AsyncClient>, <ParentResource>, <ListCollectionIdsOptions>, <AsyncResult>);
- * Docs.listCollectionIds(<AsyncClient>, <ParentResource>, <ListCollectionIdsOptions>, <AsyncResultCallback>, <uid>);
+ * Docs.listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>);
+ * Docs.listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>, <AsyncResult>);
+ * Docs.listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -322,13 +322,13 @@ void loop()
 
         listCollectionIdsOptions.pageSize(3).pageToken("");
 
-        Docs.listCollectionIds(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, listCollectionIdsOptions, asyncCB);
+        Docs.listCollectionIds(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, listCollectionIdsOptions, asyncCB);
 
         // To assign UID for async result
-        // Docs.listCollectionIds(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, listCollectionIdsOption, asyncCB, "myUID");
+        // Docs.listCollectionIds(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, listCollectionIdsOption, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Docs.listCollectionIds(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, listCollectionIdsOption, aResult_no_callback);
+        // Docs.listCollectionIds(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, listCollectionIdsOption, aResult_no_callback);
     }
 }
 

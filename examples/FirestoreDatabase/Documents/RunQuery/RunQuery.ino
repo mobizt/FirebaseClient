@@ -63,11 +63,11 @@
  *
  * SYNTAXES:
  *
- * Docs.runQuery(<AsyncClient>, <ParentResource>, <documentPath>, <QueryOptions>);
- * Docs.runQuery(<AsyncClient>, <ParentResource>, <documentPath>, <QueryOptions>, <AsyncResult>);
- * Docs.runQuery(<AsyncClient>, <ParentResource>, <documentPath>, <QueryOptions>, <AsyncResultCallback>, <uid>);
+ * Docs.runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>);
+ * Docs.runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>, <AsyncResult>);
+ * Docs.runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -333,16 +333,16 @@ void loop()
 
         String documentPath = "/"; // Query from all collections under root
 
-        Docs.runQuery(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, queryOptions, asyncCB);
+        Docs.runQuery(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, queryOptions, asyncCB);
         queryOptions.clear();
 
         // Note that in this case the document path is the root ("/") because the collection a0 is at the root.
 
         // To assign UID for async result
-        // Docs.runQuery(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, queryOptions, asyncCB, "myUID");
+        // Docs.runQuery(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, queryOptions, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // Docs.runQuery(aClient, ParentResource(FIREBASE_PROJECT_ID), documentPath, queryOptions, aResult_no_callback);
+        // Docs.runQuery(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, queryOptions, aResult_no_callback);
     }
 }
 

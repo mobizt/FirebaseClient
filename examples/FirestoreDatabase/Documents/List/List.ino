@@ -64,11 +64,11 @@
  *
  * SYNTAXES:
  *
- * Docs.list(<AsyncClient>, <ParentResource>, <documentPath>, <ListDocumentsOptions>);
- * Docs.list(<AsyncClient>, <ParentResource>, <documentPath>, <ListDocumentsOptions>, <AsyncResult>);
- * Docs.list(<AsyncClient>, <ParentResource>, <documentPath>, <ListDocumentsOptions>, <AsyncResultCallback>, <uid>);
+ * Docs.list(<AsyncClient>, <Firestore::Parent>, <documentPath>, <ListDocumentsOptions>);
+ * Docs.list(<AsyncClient>, <Firestore::Parent>, <documentPath>, <ListDocumentsOptions>, <AsyncResult>);
+ * Docs.list(<AsyncClient>, <Firestore::Parent>, <documentPath>, <ListDocumentsOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
+ * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
@@ -317,13 +317,13 @@ void loop()
             ListDocumentsOptions listDocsOptions;
             listDocsOptions.pageSize(3).mask(DocumentMask("count")).showMissing(false);
 
-            Docs.list(aClient, ParentResource(FIREBASE_PROJECT_ID), collectionId, listDocsOptions, asyncCB);
+            Docs.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, listDocsOptions, asyncCB);
 
             // To assign UID for async result
-            // Docs.list(aClient, ParentResource(FIREBASE_PROJECT_ID), collectionId, listDocsOptions, asyncCB, "myUID");
+            // Docs.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, listDocsOptions, asyncCB, "myUID");
 
             // To get anyc result without callback
-            // Docs.list(aClient, ParentResource(FIREBASE_PROJECT_ID), collectionId, listDocsOptions, aResult_no_callback);
+            // Docs.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, listDocsOptions, aResult_no_callback);
         }
     }
 }

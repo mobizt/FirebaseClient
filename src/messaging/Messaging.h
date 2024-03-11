@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -98,39 +98,45 @@ public:
     /** Send Firebase Cloud Messaging to the devices using the FCM HTTP v1 API.
      *
      * @param aClient The async client.
-     * @param message The Message::Message object that holds the information to send.
+     * @param parent The Messages::Parent object included project Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * @param message The Messages::Message object that holds the information to send.
      * @return Boolean type status indicates the success of the operation.
      *
      * This function requires ServiceAuth authentication.
      *
      * Read more details about HTTP v1 API here https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
      */
-    bool send(AsyncClientClass &aClient, const Message::Message &message)
+    bool send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message)
     {
         AsyncResult result;
-        sendRequest(aClient, &result, NULL, "", message.c_str(), Message::firebase_cloud_messaging_request_type_send, false);
+        sendRequest(aClient, &result, NULL, "", parent, message.c_str(), Messages::firebase_cloud_messaging_request_type_send, false);
         return result.lastError.code() == 0;
     }
 
     /** Send a message to specified target (a registration token, topic or condition) with HTTP v1 API.
      *
      * @param aClient The async client.
-     * @param message The Message::Message object that holds the information to send.
+     * @param parent The Messages::Parent object included project Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * @param message The Messages::Message object that holds the information to send.
      * @param aResult The async result (AsyncResult).
      *
      * This function requires ServiceAuth authentication.
      *
      * Read more details about HTTP v1 API here https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
      */
-    void send(AsyncClientClass &aClient, const Message::Message &message, AsyncResult &aResult)
+    void send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message, AsyncResult &aResult)
     {
-        sendRequest(aClient, &aResult, NULL, "", message.c_str(), Message::firebase_cloud_messaging_request_type_send, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, message.c_str(), Messages::firebase_cloud_messaging_request_type_send, true);
     }
 
     /** Send a message to specified target (a registration token, topic or condition) with HTTP v1 API.
      *
      * @param aClient The async client.
-     * @param message The Message::Message object that holds the information to send.
+     * @param parent The Messages::Parent object included project Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * @param message The Messages::Message object that holds the information to send.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
@@ -138,45 +144,28 @@ public:
      *
      * Read more details about HTTP v1 API here https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
      */
-    void send(AsyncClientClass &aClient, const Message::Message &message, AsyncResultCallback cb, const String &uid = "")
+    void send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message, AsyncResultCallback cb, const String &uid = "")
     {
-        sendRequest(aClient, nullptr, cb, uid, message.c_str(), Message::firebase_cloud_messaging_request_type_send, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, message.c_str(), Messages::firebase_cloud_messaging_request_type_send, true);
     }
 
-    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const String &payload, Message::firebase_cloud_messaging_request_type requestType, bool async)
+    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Messages::Parent &parent, const String &payload, Messages::firebase_cloud_messaging_request_type requestType, bool async)
     {
-        Message::FirebaseCloudMessagingOptions options;
+        Messages::DataOptions options;
         options.requestType = requestType;
-        options.payload = payload;
-
-        if (requestType == Message::firebase_cloud_messaging_request_type_send)
+        options.parent = parent;
+        if (requestType == Messages::firebase_cloud_messaging_request_type_send)
         {
-            options.extras += FPSTR("fcm/send");
-        }
-        else if (requestType == Message::firebase_cloud_messaging_request_type_subscribe)
-        {
-            options.extras += FPSTR("/iid/v1:batchAdd");
-        }
-        else if (requestType == Message::firebase_cloud_messaging_request_type_undefined)
-        {
-            options.extras += FPSTR("/iid/v1:batchRemove");
-        }
-        else if (requestType == Message::firebase_cloud_messaging_request_type_app_instance_info)
-        {
-            options.extras += FPSTR("/iid/info/");
-            options.extras += payload;
-            options.extras += FPSTR("?details=true");
-        }
-        else if (requestType == Message::firebase_cloud_messaging_request_type_apn_token_registration)
-        {
-            options.extras += FPSTR("/iid/v1:batchImport");
+            JsonHelper jh;
+            jh.addObject(options.payload, "message", payload, false, true);
+            options.extras += FPSTR("/messages:send");
         }
 
-        Message::async_request_data_t aReq(&aClient, path, options.requestType == Message::firebase_cloud_messaging_request_type_app_instance_info ? async_request_handler_t::http_get : async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        Messages::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
-    void asyncRequest(Message::async_request_data_t &request, int beta = 0)
+    void asyncRequest(Messages::async_request_data_t &request, int beta = 0)
     {
         URLHelper uh;
         app_token_t *app_token = appToken();
@@ -186,12 +175,15 @@ public:
 
         request.opt.app_token = app_token;
         String extras;
+
         if (beta == 2)
             uh.addGAPIv1beta2Path(request.path);
         else if (beta == 1)
             uh.addGAPIv1beta1Path(request.path);
         else
             uh.addGAPIv1Path(request.path);
+
+        request.path += request.options->parent.getProjectId().length() == 0 ? app_token->project_id : request.options->parent.getProjectId();
 
         addParams(request, extras);
 
@@ -220,7 +212,7 @@ public:
         request.aClient->handleRemove();
     }
 
-    void setClientError(Message::async_request_data_t &request, int code)
+    void setClientError(Messages::async_request_data_t &request, int code)
     {
         AsyncResult *aResult = request.aResult;
 
@@ -237,7 +229,7 @@ public:
             delete aResult;
     }
 
-    void addParams(Message::async_request_data_t &request, String &extras)
+    void addParams(Messages::async_request_data_t &request, String &extras)
     {
         extras += request.options->extras;
         extras.replace(" ", "%20");
