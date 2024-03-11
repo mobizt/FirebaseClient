@@ -290,7 +290,7 @@ void loop()
         String collectionId = "a0", fieldPath1 = "myInt", fieldPath2 = "myDouble";
 
         CollectionGroupsIndex::VectorConfig vectorConfig;
-        vectorConfig.dimenrion(1);
+        vectorConfig.dimension(1);
         vectorConfig.flat();
 
         CollectionGroupsIndex::IndexField indexField;

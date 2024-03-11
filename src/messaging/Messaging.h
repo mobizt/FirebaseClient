@@ -32,6 +32,8 @@ using namespace firebase;
 
 #if defined(ENABLE_MESSAGING)
 
+#include "./messaging/DataOptions.h"
+
 class Messaging
 {
 private:

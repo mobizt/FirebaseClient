@@ -88,7 +88,7 @@
  * 
  * The <Index> is DatabaseIndex::Index object;
  * 
- * The indexes is FirestoreDatabase::Indexes object.
+ * The indexes is Firestore::Databases::Indexes object.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
@@ -211,7 +211,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-FirestoreDatabase::Indexes indexes;
+Firestore::Databases::Indexes indexes;
 
 AsyncResult aResult_no_callback;
 
@@ -258,7 +258,7 @@ void setup()
             JWT.process(app.getAuth());
     }
 
-    app.getApp<FirestoreDatabase::Indexes>(indexes);
+    app.getApp<Firestore::Databases::Indexes>(indexes);
 }
 
 void loop()

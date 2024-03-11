@@ -1,5 +1,5 @@
 /**
- * Created March 10, 2024
+ * Created March 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -294,7 +294,7 @@ public:
         options.payload = writes.c_str();
         addDocsPath(options.extras);
         options.extras += FPSTR(":commit");
-        options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
+        options.payload.replace((const char *)RESOURCE_PATH_BASE, makeResourcePath(parent));
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
@@ -305,7 +305,7 @@ public:
         options.requestType = firebase_firestore_request_type_batch_write_doc;
         options.parent = parent;
         options.payload = writes.c_str();
-        options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
+        options.payload.replace((const char *)RESOURCE_PATH_BASE, makeResourcePath(parent));
         addDocsPath(options.extras);
         options.extras += FPSTR(":batchWrite");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
@@ -331,7 +331,7 @@ public:
         options.requestType = firebase_firestore_request_type_batch_get_doc;
         options.parent = parent;
         options.payload = batchOptions.c_str();
-        options.payload.replace((const char *)FIRESTORE_RESOURCE_PATH_BASE, makeResourcePath(parent));
+        options.payload.replace((const char *)RESOURCE_PATH_BASE, makeResourcePath(parent));
         addDocsPath(options.extras);
         options.extras += FPSTR(":batchGet");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);

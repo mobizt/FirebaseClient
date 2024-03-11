@@ -28,11 +28,9 @@
 #include <Arduino.h>
 #include "./Config.h"
 
-#if defined(ENABLE_FIRESTORE)
-
 #include "./core/JSON.h"
 
-#define FIRESTORE_RESOURCE_PATH_BASE FPSTR("<resource_path>")
+#define RESOURCE_PATH_BASE FPSTR("<resource_path>")
 
 class ObjectWriter
 {
@@ -71,6 +69,43 @@ public:
         }
     }
 
+    void addMapArrayMember(String *buf, size_t size, String &buf_n, const String &key, const String &memberValue, bool isString)
+    {
+        if (buf_n.length() == 0)
+        {
+            String temp;
+            jh.addArray(temp, memberValue, isString, true);
+            jh.addObject(buf_n, key, temp, false, true);
+        }
+        else
+            addMember(buf_n, isString ? jh.toString(memberValue) : memberValue, "]}");
+
+        getBuf(buf, size);
+    }
+
+    void getBuf(String *buf, size_t size)
+    {
+        clear(buf[0]);
+        for (size_t i = 1; i < size; i++)
+            addObject(buf[0], buf[i], "}", i == 0);
+    }
+
+    void setObject(String *buf, size_t size, String &buf_n, const String &key, const String &value, bool isString, bool last)
+    {
+        if (key.length())
+        {
+            clear(buf_n);
+            jh.addObject(buf_n, key, value, isString, last);
+        }
+        getBuf(buf, size);
+    }
+
+    void clearBuf(String *buf, size_t size)
+    {
+        for (size_t i = 0; i < size; i++)
+            clear(buf[i]);
+    }
+
     void clear(String &buf) { buf.remove(0, buf.length()); }
 
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
@@ -98,24 +133,22 @@ public:
         buf += '"';
     }
 
-    String getDocPath(const String &document, bool toString = false)
+    String makeResourcePath(const String &path, bool toString = false)
     {
-        String doc_path;
+        String full_path;
         if (toString)
-            doc_path += '"';
-        doc_path += FIRESTORE_RESOURCE_PATH_BASE;
-        if (document.length())
+            full_path += '"';
+        full_path += RESOURCE_PATH_BASE;
+        if (path.length())
         {
-            if (document.length() && document[0] != '/')
-                doc_path += '/';
-            doc_path += document;
+            if (path.length() && path[0] != '/')
+                full_path += '/';
+            full_path += path;
         }
         if (toString)
-            doc_path += '"';
-        return doc_path;
+            full_path += '"';
+        return full_path;
     }
 };
-
-#endif
 
 #endif

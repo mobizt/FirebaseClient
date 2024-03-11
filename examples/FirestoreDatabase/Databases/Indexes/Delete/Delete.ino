@@ -78,17 +78,17 @@
  *
  * SYNTAXES:
  *
- * indexes.deleteIndex(<AsyncClient>, <ParentResource>, <Index>);
- * indexes.deleteIndex(<AsyncClient>, <ParentResource>, <Index>, <AsyncResult>);
- * indexes.deleteIndex(<AsyncClient>, <ParentResource>, <Index>, <AsyncResultCallback>, <uid>);
+ * indexes.deleteIndex(<AsyncClient>, <ParentResource>, <indexId>);
+ * indexes.deleteIndex(<AsyncClient>, <ParentResource>, <indexId>, <AsyncResult>);
+ * indexes.deleteIndex(<AsyncClient>, <ParentResource>, <indexId>, <AsyncResultCallback>, <uid>);
  *
  * The <ParentResource> is the ParentResource object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
  *
- * The <Index> is DatabaseIndex::Index object;
+ * The <indexId> is the index to delete;
  * 
- * The indexes is FirestoreDatabase::Indexes object.
+ * The indexes is Firestore::Databases::Indexes object.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
@@ -211,7 +211,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-FirestoreDatabase::Indexes indexes;
+Firestore::Databases::Indexes indexes;
 
 AsyncResult aResult_no_callback;
 
@@ -258,7 +258,7 @@ void setup()
             JWT.process(app.getAuth());
     }
 
-    app.getApp<FirestoreDatabase::Indexes>(indexes);
+    app.getApp<Firestore::Databases::Indexes>(indexes);
 }
 
 void loop()

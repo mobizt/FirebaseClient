@@ -1,5 +1,5 @@
 /**
- * Created March 10, 2024
+ * Created March 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -127,18 +127,10 @@ namespace FirestoreQuery
     class Projection : public Printable
     {
     private:
-        String buf, str;
+        size_t bufSize = 2;
+        String buf[2];
         ObjectWriter owriter;
-        JsonHelper jh;
-        void set(FieldReference &field)
-        {
-            if (str.length() == 0)
-                jh.addArray(str, field.c_str(), false, true);
-            else
-                owriter.addMember(str, field.c_str(), "]");
-            buf.remove(0, buf.length());
-            jh.addObject(buf, "fields", str, false, true);
-        }
+        void addField(FieldReference &field) { owriter.addMapArrayMember(buf, bufSize, buf[1], FPSTR("fields"), field.c_str(), false); }
 
     public:
         /**
@@ -146,7 +138,7 @@ namespace FirestoreQuery
          */
         Projection(FieldReference field)
         {
-            set(field);
+            addField(field);
         }
         /**
          *  Add FieldReference to Projection
@@ -154,13 +146,13 @@ namespace FirestoreQuery
          */
         Projection &add(FieldReference field)
         {
-            set(field);
+            addField(field);
             return *this;
         }
 
-        const char *c_str() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-        void clear() { buf.remove(0, buf.length()); }
+        const char *c_str() { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
     /**
@@ -169,10 +161,10 @@ namespace FirestoreQuery
     class Order : public Printable
     {
     private:
-        String buf, field_str, direction_str;
+        size_t bufSize = 3;
+        String buf[3];
         ObjectWriter owriter;
-        JsonHelper jh;
-        void set();
+        Order &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
         Order();
@@ -187,14 +179,15 @@ namespace FirestoreQuery
     class CollectionSelector : public Printable
     {
     private:
-        String buf, collId, allDes;
+        size_t bufSize = 3;
+        String buf[3];
         ObjectWriter owriter;
         JsonHelper jh;
 
-        void setBuf()
+        CollectionSelector &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
-            owriter.addObject(buf, collId, "}", true);
-            owriter.addObject(buf, allDes, "}");
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
         }
 
     public:
@@ -204,28 +197,11 @@ namespace FirestoreQuery
             CollectionSelector::collectionId(collectionId);
             CollectionSelector::allDescendants(allDescendants);
         }
-        CollectionSelector &collectionId(const String &collectionId)
-        {
-            collId.remove(0, collId.length());
-            jh.addObject(collId, "collectionId", collectionId, true, true);
-            setBuf();
-            return *this;
-        }
-        CollectionSelector &allDescendants(bool value)
-        {
-            allDes.remove(0, allDes.length());
-            jh.addObject(allDes, "allDescendants", owriter.getBoolStr(value), false, true);
-            setBuf();
-            return *this;
-        }
-        void clear()
-        {
-            owriter.clear(buf);
-            owriter.clear(collId);
-            owriter.clear(allDes);
-        }
-        const char *c_str() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        CollectionSelector &collectionId(const String &collectionId) { return setObject(buf[1], "collectionId", collectionId, true, true); }
+        CollectionSelector &allDescendants(bool value) { return setObject(buf[2], "allDescendants", owriter.getBoolStr(value), false, true); }
+        const char *c_str() { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
     /**
@@ -234,10 +210,11 @@ namespace FirestoreQuery
     class Cursor : public Printable
     {
     private:
-        String buf, before_str, value_str, value_ar_str;
+        size_t bufSize = 3;
+        String buf[3];
         ObjectWriter owriter;
         JsonHelper jh;
-        void set();
+        Cursor &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
         Cursor();
@@ -263,10 +240,10 @@ namespace FirestoreQuery
     class StructuredQuery : public Printable
     {
     private:
-        String buf, sel, frm, frm_ar, where_str, ordby, ordby_ar, sta, ea, ofs, lim;
+        size_t bufSize = 9;
+        String buf[9];
         ObjectWriter owriter;
-        JsonHelper jh;
-        void set();
+        StructuredQuery &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
         StructuredQuery();
@@ -332,9 +309,11 @@ namespace FirestoreQuery
     class CompositeFilter : public Printable
     {
     private:
-        String buf, op_str, filter_str, filter_arr;
+        size_t bufSize = 4;
+        String buf[4];
         ObjectWriter owriter;
         JsonHelper jh;
+        CompositeFilter &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
         CompositeFilter();
@@ -359,9 +338,12 @@ namespace FirestoreQuery
     class FieldFilter : public Printable
     {
     private:
-        String buf;
+        size_t bufSize = 4;
+        String buf[4];
         ObjectWriter owriter;
         JsonHelper jh;
+
+        FieldFilter &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
         FieldFilter();
@@ -391,11 +373,11 @@ namespace FirestoreQuery
     {
 
     private:
-        String buf, op_str, field_str;
+        size_t bufSize = 3;
+        String buf[3];
         ObjectWriter owriter;
-        JsonHelper jh;
 
-        void set();
+        UnaryFilter &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
         UnaryFilter();

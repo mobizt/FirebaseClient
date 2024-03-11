@@ -1,5 +1,5 @@
 /**
- * Created March 10, 2024
+ * Created March 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,17 +27,17 @@
 
 #include <Arduino.h>
 #include "./Config.h"
-
 #include "./core/JSON.h"
+#include "./core/ObjectWriter.h"
 
 #if defined(ENABLE_FIRESTORE)
-
-#include "./firestore/ObjectWriter.h"
 #include "./firestore/Values.h"
 #if defined(ENABLE_FIRESTORE_QUERY)
 #include "./firestore/Query.h"
 using namespace FirestoreQuery;
 #endif
+
+#define RESOURCE_PATH_BASE FPSTR("<resource_path>")
 
 enum firebase_firestore_request_type
 {
@@ -106,7 +106,7 @@ public:
     String getDatabaseId() { return databaseId.c_str(); }
     String getProjectId() { return projectId.c_str(); }
     void setDatabaseIdParam(bool value) { databaseIdParam = value; }
-    bool isDatabaseIdParam(){return databaseIdParam;}
+    bool isDatabaseIdParam() { return databaseIdParam; }
 };
 
 class DocumentMask : public Printable
@@ -118,23 +118,24 @@ class DocumentMask : public Printable
     friend class Documents;
 
 private:
-    String mask;
-    String str;
+    size_t bufSize = 2;
+    String buf[2];
+    ObjectWriter owriter;
 
     String get()
     {
-        String buf;
+        String temp;
         JsonHelper jh;
-        jh.addTokens(buf, jh.toString("fieldPaths"), mask, true);
-        return buf;
+        jh.addTokens(temp, jh.toString("fieldPaths"), buf[1], true);
+        return temp;
     }
 
     String getQuery(const String &mask, bool hasParam)
     {
-        String buf;
+        String temp;
         URLHelper uh;
-        uh.addParamsTokens(buf, String(mask + ".fieldPaths="), this->mask, hasParam);
-        return buf;
+        uh.addParamsTokens(temp, String(mask + ".fieldPaths="), this->buf[1], hasParam);
+        return temp;
     }
 
 public:
@@ -154,18 +155,14 @@ public:
     {
         if (fieldPaths.length())
         {
-            this->mask = fieldPaths;
+            this->buf[1] = fieldPaths;
             JsonHelper jh;
-            jh.addTokens(str, "fieldPaths", mask, true);
+            jh.addTokens(buf[0], "fieldPaths", buf[1], true);
         }
     }
-    const char *c_str() { return str.c_str(); }
-    size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    void clear()
-    {
-        str.remove(0, str.length());
-        mask.remove(0, mask.length());
-    }
+    const char *c_str() { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { owriter.clearBuf(buf, bufSize); }
 };
 
 namespace FieldTransform
@@ -336,59 +333,60 @@ class Precondition : public Printable
     friend class Documents;
 
 private:
-    String buf, str;
+    size_t bufSize = 4;
+    String buf[4];
     ObjectWriter owriter;
     JsonHelper jh;
-    String estr;
-    String eut;
 
     String getQuery(const String &mask)
     {
-        buf.remove(0, buf.length());
-        if (estr.length())
+        buf[1].remove(0, buf[1].length());
+        if (buf[2].length())
         {
-            buf = FPSTR("?");
-            buf = mask;
-            buf += FPSTR(".exists=");
-            buf += estr;
+            buf[1] = FPSTR("?");
+            buf[1] += mask;
+            buf[1] += FPSTR(".exists=");
+            buf[1] += buf[2];
         }
 
-        if (eut.length())
+        if (buf[3].length())
         {
-            if (buf.length())
-                buf += '&';
+            if (buf[1].length())
+                buf[1] += '&';
             else
-                buf = FPSTR("?");
-            buf = mask;
-            buf += FPSTR(".updateTime=");
-            buf += jh.toString(eut);
+                buf[1] = FPSTR("?");
+            buf[1] += mask;
+            buf[1] += FPSTR(".updateTime=");
+            buf[1] += jh.toString(buf[3]);
         }
-        return buf;
+        return buf[1];
     }
 
-    void setObject()
+    Precondition &setObject()
     {
-        if (estr.length())
+        if (buf[2].length())
         {
-            if (str.length() == 0)
-                owriter.setPair(str, FPSTR("exists"), estr);
+            if (buf[0].length() == 0)
+                owriter.setPair(buf[0], FPSTR("exists"), buf[2]);
             else
             {
-                str[str.length() - 1] = '\0';
-                jh.addObject(str, FPSTR("exists"), estr, true);
+                buf[0][buf[0].length() - 1] = '\0';
+                jh.addObject(buf[0], FPSTR("exists"), buf[2], true);
             }
         }
 
-        if (eut.length())
+        if (buf[3].length())
         {
-            if (str.length() == 0)
-                owriter.setPair(str, FPSTR("updateTime"), eut);
+            if (buf[0].length() == 0)
+                owriter.setPair(buf[0], FPSTR("updateTime"), buf[3]);
             else
             {
-                str[str.length() - 1] = '\0';
-                jh.addObject(str, FPSTR("updateTime"), eut, true);
+                buf[0][buf[0].length() - 1] = '\0';
+                jh.addObject(buf[0], FPSTR("updateTime"), buf[3], true);
             }
         }
+
+        return *this;
     }
 
 public:
@@ -400,9 +398,8 @@ public:
      */
     Precondition &exists(bool value)
     {
-        this->estr = owriter.getBoolStr(value);
-        setObject();
-        return *this;
+        this->buf[2] = owriter.getBoolStr(value);
+        return setObject();
     }
     /**
      * Set the update time condition.
@@ -412,19 +409,12 @@ public:
      */
     Precondition &updateTime(const String &timestamp)
     {
-        this->eut = timestamp;
-        setObject();
-        return *this;
+        this->buf[3] = timestamp;
+        return setObject();
     }
-    const char *c_str() { return str.c_str(); }
-    size_t printTo(Print &p) const { return p.print(str.c_str()); }
-    void clear()
-    {
-        buf.remove(0, buf.length());
-        str.remove(0, str.length());
-        eut.remove(0, eut.length());
-        estr.remove(0, estr.length());
-    }
+    const char *c_str() { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { owriter.clearBuf(buf, bufSize); }
 };
 
 template <typename T = Values::Value>
@@ -434,25 +424,28 @@ class Document : public Printable
 
 private:
     Values::MapValue mv;
-    String buf, map_obj, name_obj, name;
+    size_t bufSize = 4;
+    String buf[4];
     ObjectWriter owriter;
     JsonHelper jh;
 
-    void getBuf()
+    Document &getBuf()
     {
-        map_obj = mv.c_str();
-        name_obj.remove(0, name_obj.length());
-        if (name.length())
-            jh.addObject(name_obj, FPSTR("name"), owriter.getDocPath(name), true, true);
+        buf[2] = mv.c_str();
+        buf[3].remove(0, buf[3].length());
+        if (buf[1].length())
+            jh.addObject(buf[3], FPSTR("name"), owriter.makeResourcePath(buf[1]), true, true);
         else
         {
-            buf = map_obj;
-            return;
+            buf[0] = buf[2];
+            return *this;
         }
 
-        buf = name_obj;
-        if (map_obj.length())
-            owriter.addMember(buf, map_obj, "}");
+        buf[0] = buf[3];
+        if (buf[2].length())
+            owriter.addMember(buf[0], buf[2], "}");
+
+        return *this;
     }
 
 public:
@@ -462,7 +455,7 @@ public:
      */
     Document(const String &name = "")
     {
-        this->name = name;
+        buf[1] = name;
         getBuf();
     }
     /**
@@ -483,8 +476,7 @@ public:
     Document &add(const String &key, T value)
     {
         mv.add(key, value);
-        getBuf();
-        return *this;
+        return getBuf();
     }
     /**
      * Set the document resource name.
@@ -492,21 +484,18 @@ public:
      */
     void setName(const String &name)
     {
-        this->name = name;
+        buf[1] = name;
         getBuf();
     }
     const char *c_str()
     {
         getBuf();
-        return buf.c_str();
+        return buf[0].c_str();
     }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear()
     {
-        buf.remove(0, buf.length());
-        map_obj.remove(0, map_obj.length());
-        name_obj.remove(0, name_obj.length());
-        name.remove(0, name.length());
+        owriter.clearBuf(buf, bufSize);
         mv.clear();
     }
 };
@@ -577,41 +566,21 @@ namespace Firestore
         friend class Databases;
 
     private:
-        String buf;
-        String ccmode, aeg, dps, pit, type, location, nm, etg;
+        size_t bufSize = 9;
+        String buf[9];
         ObjectWriter owriter;
-        JsonHelper jh;
-
-        void setBuf()
+        Database &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
-            owriter.addObject(buf, ccmode, "}", true);
-            owriter.addObject(buf, aeg, "}");
-            owriter.addObject(buf, dps, "}");
-            owriter.addObject(buf, pit, "}");
-            owriter.addObject(buf, type, "}");
-            owriter.addObject(buf, location, "}");
-            owriter.addObject(buf, nm, "}");
-            owriter.addObject(buf, etg, "}");
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
         }
 
-        const char *getBuf() { return buf.c_str(); }
+        const char *getBuf() { return buf[0].c_str(); }
 
     public:
-        const char *c_str() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-
-        void clear()
-        {
-            owriter.clear(buf);
-            owriter.clear(ccmode);
-            owriter.clear(aeg);
-            owriter.clear(dps);
-            owriter.clear(pit);
-            owriter.clear(type);
-            owriter.clear(location);
-            owriter.clear(nm);
-            owriter.clear(etg);
-        }
+        const char *c_str() { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
 
         /**
          * Set the concurrency control mode to use for this database (used in database creation).
@@ -619,16 +588,14 @@ namespace Firestore
          */
         Database &concurrencyMode(ConcurrencyMode concurrencyMode)
         {
-            owriter.clear(ccmode);
             if (concurrencyMode == ConcurrencyMode::CONCURRENCY_MODE_UNSPECIFIED)
-                jh.addObject(ccmode, "concurrencyMode", "CONCURRENCY_MODE_UNSPECIFIED", true, true);
+                return setObject(buf[1], "concurrencyMode", "CONCURRENCY_MODE_UNSPECIFIED", true, true);
             else if (concurrencyMode == ConcurrencyMode::OPTIMISTIC)
-                jh.addObject(ccmode, "concurrencyMode", "OPTIMISTIC", true, true);
+                return setObject(buf[1], "concurrencyMode", "OPTIMISTIC", true, true);
             else if (concurrencyMode == ConcurrencyMode::PESSIMISTIC)
-                jh.addObject(ccmode, "concurrencyMode", "PESSIMISTIC", true, true);
+                return setObject(buf[1], "concurrencyMode", "PESSIMISTIC", true, true);
             else if (concurrencyMode == ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS)
-                jh.addObject(ccmode, "concurrencyMode", "OPTIMISTIC_WITH_ENTITY_GROUPS", true, true);
-            setBuf();
+                return setObject(buf[1], "concurrencyMode", "OPTIMISTIC_WITH_ENTITY_GROUPS", true, true);
             return *this;
         }
 
@@ -638,14 +605,12 @@ namespace Firestore
          */
         Database &appEngineIntegrationMode(AppEngineIntegrationMode appEngineIntegrationMode)
         {
-            owriter.clear(aeg);
             if (appEngineIntegrationMode == AppEngineIntegrationMode::APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED)
-                jh.addObject(aeg, "appEngineIntegrationMode", "APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", true, true);
+                return setObject(buf[2], "appEngineIntegrationMode", "APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", true, true);
             else if (appEngineIntegrationMode == AppEngineIntegrationMode::ENABLED)
-                jh.addObject(aeg, "appEngineIntegrationMode", "ENABLED", true, true);
+                return setObject(buf[2], "appEngineIntegrationMode", "ENABLED", true, true);
             else if (appEngineIntegrationMode == AppEngineIntegrationMode::DISABLED)
-                jh.addObject(aeg, "appEngineIntegrationMode", "DISABLED", true, true);
-            setBuf();
+                return setObject(buf[2], "appEngineIntegrationMode", "DISABLED", true, true);
             return *this;
         }
         /**
@@ -654,14 +619,12 @@ namespace Firestore
          */
         Database &deleteProtectionState(DeleteProtectionState deleteProtectionState)
         {
-            owriter.clear(dps);
             if (deleteProtectionState == DeleteProtectionState::DELETE_PROTECTION_STATE_UNSPECIFIED)
-                jh.addObject(dps, "deleteProtectionState", "DELETE_PROTECTION_STATE_UNSPECIFIED", true, true);
+                return setObject(buf[3], "deleteProtectionState", "DELETE_PROTECTION_STATE_UNSPECIFIED", true, true);
             else if (deleteProtectionState == DeleteProtectionState::DELETE_PROTECTION_ENABLED)
-                jh.addObject(dps, "deleteProtectionState", "DELETE_PROTECTION_ENABLED", true, true);
+                return setObject(buf[3], "deleteProtectionState", "DELETE_PROTECTION_ENABLED", true, true);
             else if (deleteProtectionState == DeleteProtectionState::DELETE_PROTECTION_DISABLED)
-                jh.addObject(dps, "deleteProtectionState", "DELETE_PROTECTION_DISABLED", true, true);
-            setBuf();
+                return setObject(buf[3], "deleteProtectionState", "DELETE_PROTECTION_DISABLED", true, true);
             return *this;
         }
         /**
@@ -670,14 +633,12 @@ namespace Firestore
          */
         Database &pointInTimeRecoveryEnablement(PointInTimeRecoveryEnablement pointInTimeRecoveryEnablement)
         {
-            owriter.clear(pit);
             if (pointInTimeRecoveryEnablement == PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED)
-                jh.addObject(pit, "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", true, true);
+                return setObject(buf[4], "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", true, true);
             else if (pointInTimeRecoveryEnablement == PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_ENABLED)
-                jh.addObject(pit, "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_ENABLED", true, true);
+                return setObject(buf[4], "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_ENABLED", true, true);
             else if (pointInTimeRecoveryEnablement == PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED)
-                jh.addObject(pit, "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_DISABLED", true, true);
-            setBuf();
+                return setObject(buf[4], "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_DISABLED", true, true);
             return *this;
         }
 
@@ -687,14 +648,12 @@ namespace Firestore
          */
         Database &databaseType(DatabaseType databaseType)
         {
-            owriter.clear(type);
             if (databaseType == DatabaseType::DATABASE_TYPE_UNSPECIFIED)
-                jh.addObject(type, "type", "DATABASE_TYPE_UNSPECIFIED", true, true);
+                return setObject(buf[5], "type", "DATABASE_TYPE_UNSPECIFIED", true, true);
             else if (databaseType == DatabaseType::FIRESTORE_NATIVE)
-                jh.addObject(type, "type", "FIRESTORE_NATIVE", true, true);
+                return setObject(buf[5], "type", "FIRESTORE_NATIVE", true, true);
             else if (databaseType == DatabaseType::DATASTORE_MODE)
-                jh.addObject(type, "type", "DATASTORE_MODE", true, true);
-            setBuf();
+                return setObject(buf[5], "type", "DATASTORE_MODE", true, true);
             return *this;
         }
 
@@ -703,39 +662,21 @@ namespace Firestore
          * Available locations are listed at https://cloud.google.com/firestore/docs/locations.
          * @param value The location Id.
          */
-        Database &locationId(const String &value)
-        {
-            owriter.clear(location);
-            jh.addObject(location, "locationId", value, true, true);
-            setBuf();
-            return *this;
-        }
+        Database &locationId(const String &value) { return setObject(buf[6], "locationId", value, true, true); }
 
         /**
          * Set the resource name of the Database (used in database creation).
          * Format: projects/{project}/databases/{database}
          * @param value The resource name.
          */
-        Database &name(const String &value)
-        {
-            owriter.clear(nm);
-            jh.addObject(nm, "name", value, true, true);
-            setBuf();
-            return *this;
-        }
+        Database &name(const String &value) { return setObject(buf[7], "name", value, true, true); }
 
         /**
          * Set the ETag (used in database update and deletion)
          * This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
          * @param value The ETag.
          */
-        Database &etag(const String &value)
-        {
-            owriter.clear(etg);
-            jh.addObject(etg, "etag", value, true, true);
-            setBuf();
-            return *this;
-        }
+        Database &etag(const String &value) { return setObject(buf[8], "etag", value, true, true); }
     };
 
 }
@@ -758,7 +699,7 @@ public:
      */
     DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
     {
-        jh.addObject(buf, FPSTR("document"), owriter.getDocPath(document), true);
+        jh.addObject(buf, FPSTR("document"), owriter.makeResourcePath(document), true);
         jh.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), false, true);
     }
     const char *c_str() { return buf.c_str(); }
@@ -815,7 +756,7 @@ public:
         write_type = firestore_write_type_delete;
         if (strlen(currentDocument.c_str()))
             jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
-        jh.addObject(buf, FPSTR("delete"), owriter.getDocPath(deletePath), true, true);
+        jh.addObject(buf, FPSTR("delete"), owriter.makeResourcePath(deletePath), true, true);
     }
 
     /**
@@ -1034,54 +975,30 @@ public:
 class BatchGetDocumentOptions : public Printable
 {
 private:
-    String buf, doc, msk, trans, newtrans, rt;
-    JsonHelper jh;
+    size_t bufSize = 6;
+    String buf[6];
     ObjectWriter owriter;
 
-    void setbuf()
-    {
-        owriter.addObject(buf, doc, "}", true);
-        owriter.addObject(buf, msk, "}");
-        owriter.addObject(buf, trans, "}");
-        owriter.addObject(buf, newtrans, "}");
-        owriter.addObject(buf, rt, "}");
-    }
+    void setObject(String &buf_n, const String &key, const String &value, bool isString, bool last) { owriter.setObject(buf, bufSize, buf_n, key, value, isString, last); }
 
 public:
     BatchGetDocumentOptions() {}
     /**
      * @param document The names of the documents to retrieve.
      */
-    void addDocument(const String &document)
-    {
-        if (doc.length() == 0)
-        {
-            String str;
-            jh.addArray(str, owriter.getDocPath(document), true, true);
-            jh.addObject(doc, "documents", str, false, true);
-        }
-        else
-            owriter.addMember(doc, owriter.getDocPath(document, true), "]}");
-        setbuf();
-    }
+    void addDocument(const String &document) { owriter.addMapArrayMember(buf, bufSize, buf[1], "documents", owriter.makeResourcePath(document, true), false); }
     /**
      * @param mask The fields to return. If not set, returns all fields.
      */
-    void mask(DocumentMask mask)
-    {
-        jh.addObject(msk, "mask", mask.c_str(), false, true);
-        setbuf();
-    }
+    void mask(DocumentMask mask) { setObject(buf[2], "mask", mask.c_str(), false, true); }
     /**
      * @param transaction Timestamp Reads documents in a transaction.
      */
     void transaction(const String &transaction)
     {
-        if (transaction.length() && newtrans.length() == 0 && rt.length() == 0)
-        {
-            jh.addObject(trans, "transaction", transaction, true, true);
-            setbuf();
-        }
+        // Union field
+        if (transaction.length() && buf[4].length() == 0 && buf[5].length() == 0)
+            setObject(buf[3], "transaction", transaction, true, true);
     }
     /**
      * @param transOptions Starts a new transaction and reads the documents. Defaults to a read-only transaction.
@@ -1089,34 +1006,22 @@ public:
      */
     void newTransaction(TransactionOptions transOptions)
     {
-        if (strlen(transOptions.c_str()) && trans.length() == 0 && rt.length() == 0)
-        {
-            jh.addObject(newtrans, "newTransaction", transOptions.c_str(), false, true);
-            setbuf();
-        }
+        // Union field
+        if (strlen(transOptions.c_str()) && buf[3].length() == 0 && buf[5].length() == 0)
+            setObject(buf[4], "newTransaction", transOptions.c_str(), false, true);
     }
     /**
      * @param readTime Timestamp. Reads documents as they were at the given time.
      */
     void readTime(const String &readTime)
     {
-        if (readTime.length() && trans.length() == 0 && newtrans.length() == 0)
-        {
-            jh.addObject(rt, "readTime", readTime, true, true);
-            setbuf();
-        }
+        // Union field
+        if (readTime.length() && buf[3].length() == 0 && buf[4].length() == 0)
+            setObject(buf[5], "readTime", readTime, true, true);
     }
-    const char *c_str() { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear()
-    {
-        owriter.clear(buf);
-        owriter.clear(doc);
-        owriter.clear(msk);
-        owriter.clear(trans);
-        owriter.clear(newtrans);
-        owriter.clear(rt);
-    }
+    const char *c_str() { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { owriter.clearBuf(buf, bufSize); }
 };
 
 class patchDocumentOptions : public Printable
@@ -1146,17 +1051,11 @@ public:
 class QueryOptions : public Printable
 {
 private:
-    String buf, query, trans, newtrans, rt;
-    JsonHelper jh;
+    size_t bufSize = 5;
+    String buf[5];
     ObjectWriter owriter;
 
-    void setbuf()
-    {
-        owriter.addObject(buf, query, "}", true);
-        owriter.addObject(buf, trans, "}");
-        owriter.addObject(buf, newtrans, "}");
-        owriter.addObject(buf, rt, "}");
-    }
+    void setObject(String &buf_n, const String &key, const String &value, bool isString, bool last) { owriter.setObject(buf, bufSize, buf_n, key, value, isString, last); }
 
 public:
     QueryOptions() {}
@@ -1165,21 +1064,15 @@ public:
      * A structured query.
      * @param structuredQuery A structured query.
      */
-    void structuredQuery(StructuredQuery structuredQuery)
-    {
-        jh.addObject(query, "structuredQuery", structuredQuery.c_str(), false, true);
-        setbuf();
-    }
+    void structuredQuery(StructuredQuery structuredQuery) { setObject(buf[1], "newTransaction", structuredQuery.c_str(), false, true); }
     /**
      * @param transaction Run the query within an already active transaction.
      */
     void transaction(const String &transaction)
     {
-        if (transaction.length() && newtrans.length() == 0 && rt.length() == 0)
-        {
-            jh.addObject(trans, "transaction", transaction, true, true);
-            setbuf();
-        }
+        // Union field
+        if (transaction.length() && buf[3].length() == 0 && buf[4].length() == 0)
+            setObject(buf[2], "transaction", transaction, true, true);
     }
     /**
      * @param transOptions Starts a new transaction and reads the documents. Defaults to a read-only transaction.
@@ -1187,11 +1080,9 @@ public:
      */
     void newTransaction(TransactionOptions transOptions)
     {
-        if (strlen(transOptions.c_str()) && trans.length() == 0 && rt.length() == 0)
-        {
-            jh.addObject(newtrans, "newTransaction", transOptions.c_str(), false, true);
-            setbuf();
-        }
+        // Union field
+        if (strlen(transOptions.c_str()) && buf[2].length() == 0 && buf[4].length() == 0)
+            setObject(buf[3], "newTransaction", transOptions.c_str(), false, true);
     }
     /**
      * @param readTime Timestamp. Reads documents as they were at the given time.
@@ -1200,22 +1091,13 @@ public:
      */
     void readTime(const String &readTime)
     {
-        if (readTime.length() && trans.length() == 0 && newtrans.length() == 0)
-        {
-            jh.addObject(rt, "readTime", readTime, true, true);
-            setbuf();
-        }
+        // Union field
+        if (readTime.length() && buf[2].length() == 0 && buf[3].length() == 0)
+            setObject(buf[4], "readTime", readTime, true, true);
     }
-    const char *c_str() { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear()
-    {
-        owriter.clear(buf);
-        owriter.clear(query);
-        owriter.clear(trans);
-        owriter.clear(newtrans);
-        owriter.clear(rt);
-    }
+    const char *c_str() { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { owriter.clearBuf(buf, bufSize); }
 };
 
 #endif
@@ -1223,32 +1105,34 @@ public:
 class ListDocumentsOptions : public Printable
 {
 private:
-    String buf;
-    int pz = 0;
-    String ptk, ordby, sms, tsc, rt;
+    size_t bufSize = 6;
+    String buf[6];
+    int pagesize = 0;
     DocumentMask msk;
     ObjectWriter owriter;
     URLHelper uh;
 
-    void set()
+    ListDocumentsOptions &set()
     {
         bool hasParam = false;
-        buf.remove(0, buf.length());
+        owriter.clear(buf[0]);
 
-        if (pz > 0)
-            uh.addParam(buf, FPSTR("pageSize"), String(pz), hasParam);
-        if (ptk.length() > 0)
-            uh.addParam(buf, FPSTR("pageToken"), ptk, hasParam);
-        if (ordby.length() > 0)
-            uh.addParam(buf, FPSTR("orderBy"), ordby, hasParam);
+        if (pagesize > 0)
+            uh.addParam(buf[0], FPSTR("pageSize"), String(pagesize), hasParam);
+        if (buf[1].length() > 0)
+            uh.addParam(buf[0], FPSTR("pageToken"), buf[1], hasParam);
+        if (buf[2].length() > 0)
+            uh.addParam(buf[0], FPSTR("orderBy"), buf[2], hasParam);
         if (strlen(msk.c_str()) > 0)
-            buf += msk.getQuery("mask", hasParam);
-        if (sms.length() > 0)
-            uh.addParam(buf, FPSTR("showMissing"), sms, hasParam);
-        if (tsc.length() > 0)
-            uh.addParam(buf, FPSTR("transaction"), tsc, hasParam);
-        if (rt.length() > 0)
-            uh.addParam(buf, FPSTR("readTime"), rt, hasParam);
+            buf[0] += msk.getQuery("mask", hasParam);
+        if (buf[3].length() > 0)
+            uh.addParam(buf[0], FPSTR("showMissing"), buf[3], hasParam);
+        if (buf[4].length() > 0)
+            uh.addParam(buf[0], FPSTR("transaction"), buf[4], hasParam);
+        if (buf[5].length() > 0)
+            uh.addParam(buf[0], FPSTR("readTime"), buf[5], hasParam);
+
+        return *this;
     }
 
 public:
@@ -1256,13 +1140,12 @@ public:
     /**
      * Optional. The maximum number of documents to return in a single response.
      * Firestore may return fewer than this value.
-     * @param pageSize The maximum number of documents to return in a single response.
+     * @param size The maximum number of documents to return in a single response.
      */
-    ListDocumentsOptions &pageSize(int pageSize)
+    ListDocumentsOptions &pageSize(int size)
     {
-        pz = pageSize;
-        set();
-        return *this;
+        pagesize = size;
+        return set();
     }
     /**
      * Optional. A page token, received from a previous documents.list response.
@@ -1270,9 +1153,8 @@ public:
      */
     ListDocumentsOptions &pageToken(const String &pageToken)
     {
-        ptk = pageToken;
-        set();
-        return *this;
+        buf[1] = pageToken;
+        return set();
     }
     /**
      * Optional. The optional ordering of the documents to return.
@@ -1281,9 +1163,8 @@ public:
      */
     ListDocumentsOptions &orderBy(const String orderBy)
     {
-        ordby = orderBy;
-        set();
-        return *this;
+        buf[2] = orderBy;
+        return set();
     }
     /**
      * Optional. The fields to return. If not set, returns all fields.
@@ -1293,8 +1174,7 @@ public:
     ListDocumentsOptions &mask(DocumentMask mask)
     {
         msk = mask;
-        set();
-        return *this;
+        return set();
     }
     /**
      * If the list should show missing documents.
@@ -1304,9 +1184,8 @@ public:
      */
     ListDocumentsOptions &showMissing(bool value)
     {
-        sms = owriter.getBoolStr(value);
-        set();
-        return *this;
+        buf[3] = owriter.getBoolStr(value);
+        return set();
     }
     /**
      * Perform the read as part of an already active transaction.
@@ -1315,9 +1194,8 @@ public:
      */
     ListDocumentsOptions &transaction(const String transaction)
     {
-        tsc = transaction;
-        set();
-        return *this;
+        buf[4] = transaction;
+        return set();
     }
     /**
      * Perform the read at the provided time.
@@ -1327,37 +1205,29 @@ public:
      */
     ListDocumentsOptions &readTime(const String readTime)
     {
-        rt = readTime;
-        set();
-        return *this;
+        buf[5] = readTime;
+        return set();
     }
-    const char *c_str() { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    const char *c_str() { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear()
     {
-        owriter.clear(buf);
+        owriter.clearBuf(buf, bufSize);
         msk.clear();
-        owriter.clear(ptk);
-        owriter.clear(ordby);
-        owriter.clear(sms);
-        owriter.clear(tsc);
-        owriter.clear(rt);
     }
 };
 
 class ListCollectionIdsOptions : public Printable
 {
 private:
-    String buf;
-    String pz, ptk, rt;
+    size_t bufSize = 4;
+    String buf[4];
     ObjectWriter owriter;
-    JsonHelper jh;
 
-    void set()
+    ListCollectionIdsOptions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
     {
-        owriter.addObject(buf, pz, "}", true);
-        owriter.addObject(buf, ptk, "}");
-        owriter.addObject(buf, rt, "}");
+        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+        return *this;
     }
 
 public:
@@ -1366,43 +1236,22 @@ public:
      * The maximum number of results to return.
      * @param pageSize The maximum number of results to return.
      */
-    ListCollectionIdsOptions &pageSize(int pageSize)
-    {
-        jh.addObject(pz, FPSTR("pageSize"), String(pageSize), false, true);
-        set();
-        return *this;
-    }
+    ListCollectionIdsOptions &pageSize(int pageSize) { return setObject(buf[1], FPSTR("pageSize"), String(pageSize), false, true); }
     /**
      * A page token. Must be a value from ListCollectionIdsResponse.
      * @param pageToken A page token. Must be a value from ListCollectionIdsResponse.
      */
-    ListCollectionIdsOptions &pageToken(const String &pageToken)
-    {
-        jh.addObject(ptk, FPSTR("pageToken"), pageToken, true, true);
-        set();
-        return *this;
-    }
+    ListCollectionIdsOptions &pageToken(const String &pageToken) { return setObject(buf[2], FPSTR("pageToken"), pageToken, true, true); }
     /**
      * Reads documents as they were at the given time.
      * This must be a microsecond precision timestamp within the past one hour,
      * or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
      * @param readTime Timestamp
      */
-    ListCollectionIdsOptions &readTime(const String readTime)
-    {
-        jh.addObject(rt, FPSTR("readTime"), readTime, true, true);
-        set();
-        return *this;
-    }
-    const char *c_str() { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear()
-    {
-        owriter.clear(buf);
-        owriter.clear(ptk);
-        owriter.clear(pz);
-        owriter.clear(rt);
-    }
+    ListCollectionIdsOptions &readTime(const String readTime) { return setObject(buf[3], FPSTR("readTime"), readTime, true, true); }
+    const char *c_str() { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { owriter.clearBuf(buf, bufSize); }
 };
 
 namespace DatabaseIndex
@@ -1430,15 +1279,14 @@ namespace DatabaseIndex
     class IndexField : public Printable
     {
     private:
-        String buf;
-        String fp, md;
+        size_t bufSize = 3;
+        String buf[3];
         ObjectWriter owriter;
-        JsonHelper jh;
 
-        void set()
+        IndexField &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
-            owriter.addObject(buf, fp, "}", true);
-            owriter.addObject(buf, md, "}");
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
         }
 
     public:
@@ -1449,12 +1297,7 @@ namespace DatabaseIndex
          * may be used by itself or at the end of a path. __type__ may be used only at the end of path.
          * @param fieldPath
          */
-        IndexField &fieldPath(const String &fieldPath)
-        {
-            jh.addObject(fp, "fieldPath", fieldPath, true, true);
-            set();
-            return *this;
-        }
+        IndexField &fieldPath(const String &fieldPath) { return setObject(buf[1], "fieldPath", fieldPath, true, true); }
         /**
          * The field's mode.
          * @param mode
@@ -1462,22 +1305,16 @@ namespace DatabaseIndex
         IndexField &mode(IndexMode::Mode mode)
         {
             if (mode == IndexMode::ASCENDING)
-                jh.addObject(md, "mode", "ASCENDING", true, true);
+                return setObject(buf[2], "mode", "ASCENDING", true, true);
             else if (mode == IndexMode::DESCENDING)
-                jh.addObject(md, "mode", "DESCENDING", true, true);
+                return setObject(buf[2], "mode", "DESCENDING", true, true);
             else if (mode == IndexMode::ARRAY_CONTAINS)
-                jh.addObject(md, "mode", "ARRAY_CONTAINS", true, true);
-            set();
+                return setObject(buf[2], "mode", "ARRAY_CONTAINS", true, true);
             return *this;
         }
-        const char *c_str() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-        void clear()
-        {
-            owriter.clear(buf);
-            owriter.clear(fp);
-            owriter.clear(md);
-        }
+        const char *c_str() { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
     /**
@@ -1486,15 +1323,14 @@ namespace DatabaseIndex
     class Index : public Printable
     {
     private:
-        String buf;
-        String collid, flds, flds_ar;
+        size_t bufSize = 3;
+        String buf[3];
         ObjectWriter owriter;
-        JsonHelper jh;
 
-        void set()
+        Index &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
-            owriter.addObject(buf, collid, "}", true);
-            owriter.addObject(buf, flds, "}");
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
         }
 
     public:
@@ -1507,36 +1343,19 @@ namespace DatabaseIndex
          * The collection ID to which this index applies. Required.
          * @param collectionId The collection ID to which this index applies. Required.
          */
-        Index &collectionId(const String &collectionId)
-        {
-            jh.addObject(collid, FPSTR("collectionId"), collectionId, true, true);
-            set();
-            return *this;
-        }
+        Index &collectionId(const String &collectionId) { return setObject(buf[1], FPSTR("collectionId"), collectionId, true, true); }
         /**
          * Add the field to index.
          * @param field the field to index.
          */
         Index &addField(IndexField field)
         {
-            flds.remove(0, flds.length());
-            if (flds_ar.length() == 0)
-                jh.addArray(flds_ar, field.c_str(), false, true);
-            else
-                owriter.addMember(flds_ar, field.c_str(), "]");
-            jh.addObject(flds, FPSTR("fields"), flds_ar, false, true);
-            set();
+            owriter.addMapArrayMember(buf, bufSize, buf[2], FPSTR("fields"), field.c_str(), false);
             return *this;
         }
-        const char *c_str() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-        void clear()
-        {
-            owriter.clear(buf);
-            owriter.clear(collid);
-            owriter.clear(flds);
-            owriter.clear(flds_ar);
-        }
+        const char *c_str() { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
 }
@@ -1577,15 +1396,14 @@ namespace CollectionGroupsIndex
     class VectorConfig : public Printable
     {
     private:
-        String buf;
-        String dim, flat_str;
+        size_t bufSize = 3;
+        String buf[3];
         ObjectWriter owriter;
-        JsonHelper jh;
 
-        void set()
+        VectorConfig &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
-            owriter.addObject(buf, dim, "}", true);
-            owriter.addObject(buf, flat_str, "}");
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
         }
 
     public:
@@ -1594,28 +1412,14 @@ namespace CollectionGroupsIndex
          * The resulting index will only include vectors of this dimension, and can be used for vector search with the same dimension.
          * @param value the field to index.
          */
-        void dimenrion(int value)
-        {
-            dim.remove(0, dim.length());
-            jh.addObject(dim, "dimenrion", String(value), false, true);
-            set();
-        }
+        VectorConfig &dimension(int value) { return setObject(buf[1], "dimension", String(value), false, true); }
         /**
          * Indicates the vector index is a flat index.
          */
-        void flat()
-        {
-            flat_str = "{\"flat\":{}}";
-            set();
-        }
-        const char *c_str() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-        void clear()
-        {
-            owriter.clear(buf);
-            owriter.clear(dim);
-            owriter.clear(flat_str);
-        }
+        VectorConfig &flat() { return setObject(buf[2], "flat", "{}", false, true); }
+        const char *c_str() { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
     /**
@@ -1624,20 +1428,14 @@ namespace CollectionGroupsIndex
     class IndexField : public Printable
     {
     private:
-        String buf;
-        String fp, ordr, arcfg, vcfg;
+        size_t bufSize = 5;
+        String buf[5];
         ObjectWriter owriter;
-        JsonHelper jh;
 
-        void set()
+        IndexField &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
-            owriter.addObject(buf, fp, "}", true);
-            if (ordr.length() > 0)
-                owriter.addObject(buf, ordr, "}");
-            else if (arcfg.length() > 0)
-                owriter.addObject(buf, arcfg, "}");
-            else if (vcfg.length() > 0)
-                owriter.addObject(buf, vcfg, "}");
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
         }
 
     public:
@@ -1646,25 +1444,23 @@ namespace CollectionGroupsIndex
          * Can be name. For single field indexes, this must match the name of the field or may be omitted.
          * @param fieldPath
          */
-        IndexField &fieldPath(const String &fieldPath)
-        {
-            jh.addObject(fp, "fieldPath", fieldPath, true, true);
-            set();
-            return *this;
-        }
+        IndexField &fieldPath(const String &fieldPath) { return setObject(buf[1], "fieldPath", fieldPath, true, true); }
         /**
          * Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
          * @param order
          */
         IndexField &order(Order order)
         {
-            if (order == Order::ORDER_UNSPECIFIED)
-                jh.addObject(ordr, "order", "ORDER_UNSPECIFIED", true, true);
-            else if (order == Order::DESCENDING)
-                jh.addObject(ordr, "order", "DESCENDING", true, true);
-            else if (order == Order::ASCENDING)
-                jh.addObject(ordr, "order", "ASCENDING", true, true);
-            set();
+            // Union field
+            if (buf[3].length() == 0 && buf[4].length() == 0)
+            {
+                if (order == Order::ORDER_UNSPECIFIED)
+                    return setObject(buf[2], "order", "ORDER_UNSPECIFIED", true, true);
+                else if (order == Order::DESCENDING)
+                    return setObject(buf[2], "order", "DESCENDING", true, true);
+                else if (order == Order::ASCENDING)
+                    return setObject(buf[2], "order", "ASCENDING", true, true);
+            }
             return *this;
         }
 
@@ -1674,11 +1470,14 @@ namespace CollectionGroupsIndex
          */
         IndexField &arrayConfig(ArrayConfig arrayConfig)
         {
-            if (arrayConfig == ArrayConfig::ARRAY_CONFIG_UNSPECIFIED)
-                jh.addObject(arcfg, "arrayConfig", "ARRAY_CONFIG_UNSPECIFIED", true, true);
-            else if (arrayConfig == ArrayConfig::CONTAINS)
-                jh.addObject(arcfg, "arrayConfig", "CONTAINS", true, true);
-            set();
+            // Union field
+            if (buf[2].length() == 0 && buf[4].length() == 0)
+            {
+                if (arrayConfig == ArrayConfig::ARRAY_CONFIG_UNSPECIFIED)
+                    return setObject(buf[3], "arrayConfig", "ARRAY_CONFIG_UNSPECIFIED", true, true);
+                else if (arrayConfig == ArrayConfig::CONTAINS)
+                    return setObject(buf[3], "arrayConfig", "CONTAINS", true, true);
+            }
             return *this;
         }
 
@@ -1688,21 +1487,15 @@ namespace CollectionGroupsIndex
          */
         IndexField &vectorConfig(VectorConfig vectorConfig)
         {
-            jh.addObject(vcfg, "vectorConfig", vectorConfig.c_str(), false, true);
-            set();
+            // Union field
+            if (buf[2].length() == 0 && buf[3].length() == 0)
+                return setObject(buf[4], "vectorConfig", vectorConfig.c_str(), false, true);
             return *this;
         }
 
-        const char *c_str() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-        void clear()
-        {
-            owriter.clear(buf);
-            owriter.clear(fp);
-            owriter.clear(arcfg);
-            owriter.clear(vcfg);
-            owriter.clear(ordr);
-        }
+        const char *c_str() { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
     /**
@@ -1711,16 +1504,14 @@ namespace CollectionGroupsIndex
     class Index : public Printable
     {
     private:
-        String buf;
-        String qrscope, apiscope, flds, flds_ar;
+        size_t bufSize = 4;
+        String buf[4];
         ObjectWriter owriter;
-        JsonHelper jh;
 
-        void set()
+        Index &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
-            owriter.addObject(buf, qrscope, "}", true);
-            owriter.addObject(buf, apiscope, "}");
-            owriter.addObject(buf, flds, "}");
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
         }
 
     public:
@@ -1733,14 +1524,13 @@ namespace CollectionGroupsIndex
         Index &queryScope(QueryScope queryScope)
         {
             if (queryScope == QueryScope::QUERY_SCOPE_UNSPECIFIED)
-                jh.addObject(qrscope, "queryScope", "QUERY_SCOPE_UNSPECIFIED", true, true);
+                return setObject(buf[1], "queryScope", "QUERY_SCOPE_UNSPECIFIED", true, true);
             else if (queryScope == QueryScope::COLLECTION)
-                jh.addObject(qrscope, "queryScope", "COLLECTION", true, true);
+                return setObject(buf[1], "queryScope", "COLLECTION", true, true);
             else if (queryScope == QueryScope::COLLECTION_GROUP)
-                jh.addObject(qrscope, "queryScope", "COLLECTION_GROUP", true, true);
+                return setObject(buf[1], "queryScope", "COLLECTION_GROUP", true, true);
             else if (queryScope == QueryScope::COLLECTION_RECURSIVE)
-                jh.addObject(qrscope, "queryScope", "COLLECTION_RECURSIVE", true, true);
-            set();
+                return setObject(buf[1], "queryScope", "COLLECTION_RECURSIVE", true, true);
             return *this;
         }
 
@@ -1751,10 +1541,9 @@ namespace CollectionGroupsIndex
         Index &apiScope(ApiScope apiScope)
         {
             if (apiScope == ApiScope::ANY_API)
-                jh.addObject(apiscope, "apiScope", "ANY_API", true, true);
+                return setObject(buf[2], "apiScope", "ANY_API", true, true);
             else if (apiScope == ApiScope::DATASTORE_MODE_API)
-                jh.addObject(apiscope, "apiScope", "DATASTORE_MODE_API", true, true);
-            set();
+                return setObject(buf[2], "apiScope", "DATASTORE_MODE_API", true, true);
             return *this;
         }
 
@@ -1764,25 +1553,12 @@ namespace CollectionGroupsIndex
          */
         Index &addField(IndexField field)
         {
-            flds.remove(0, flds.length());
-            if (flds_ar.length() == 0)
-                jh.addArray(flds_ar, field.c_str(), false, true);
-            else
-                owriter.addMember(flds_ar, field.c_str(), "]");
-            jh.addObject(flds, FPSTR("fields"), flds_ar, false, true);
-            set();
+            owriter.addMapArrayMember(buf, bufSize, buf[3], FPSTR("fields"), field.c_str(), false);
             return *this;
         }
-        const char *c_str() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-        void clear()
-        {
-            owriter.clear(buf);
-            owriter.clear(qrscope);
-            owriter.clear(apiscope);
-            owriter.clear(flds);
-            owriter.clear(flds_ar);
-        }
+        const char *c_str() { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
 }
