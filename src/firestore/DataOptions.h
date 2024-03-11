@@ -160,7 +160,7 @@ public:
             jh.addTokens(buf[0], "fieldPaths", buf[1], true);
         }
     }
-    const char *c_str() { return buf[0].c_str(); }
+    const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { owriter.clearBuf(buf, bufSize); }
 };
@@ -190,7 +190,7 @@ namespace FieldTransform
          */
         template <typename T>
         Increment(T value) { owriter.setPair(buf, FPSTR("increment"), value.val()); }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         void clear() { buf.remove(0, buf.length()); }
     };
 
@@ -207,7 +207,7 @@ namespace FieldTransform
          */
         template <typename T>
         Maximum(T value) { owriter.setPair(buf, FPSTR("maximum"), value.c_str()); }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         void clear() { buf.remove(0, buf.length()); }
     };
 
@@ -224,7 +224,7 @@ namespace FieldTransform
          */
         template <typename T>
         Minimum(T value) { owriter.setPair(buf, FPSTR("minimum"), value.c_str()); }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
     };
 
     template <typename T = Values::ArrayValue>
@@ -241,7 +241,7 @@ namespace FieldTransform
          * @param arrayValue The array value object to append.
          */
         AppendMissingElements(T arrayValue) { owriter.setPair(buf, FPSTR("appendMissingElements"), arrayValue.c_str()); }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         void clear() { buf.remove(0, buf.length()); }
     };
 
@@ -259,7 +259,7 @@ namespace FieldTransform
          * @param arrayValue The array value object to remove.
          */
         RemoveAllFromArray(T arrayValue) { owriter.setPair(buf, FPSTR("removeAllFromArray"), arrayValue.c_str()); }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
     };
     /**
      *  Sets the field to the given server value.
@@ -278,7 +278,7 @@ namespace FieldTransform
          *
          */
         SetToServerValue(ServerValue enumValue) { owriter.setPair(buf, FPSTR("setToServerValue"), jh.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
     };
     /**
      * A transformation of a field of the document.
@@ -318,7 +318,7 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
          */
         FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
         void clear() { buf.remove(0, buf.length()); }
     };
@@ -412,7 +412,7 @@ public:
         this->buf[3] = timestamp;
         return setObject();
     }
-    const char *c_str() { return buf[0].c_str(); }
+    const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { owriter.clearBuf(buf, bufSize); }
 };
@@ -578,7 +578,7 @@ namespace Firestore
         const char *getBuf() { return buf[0].c_str(); }
 
     public:
-        const char *c_str() { return buf[0].c_str(); }
+        const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
 
@@ -702,7 +702,7 @@ public:
         jh.addObject(buf, FPSTR("document"), owriter.makeResourcePath(document), true);
         jh.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), false, true);
     }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
@@ -795,7 +795,7 @@ public:
         return *this;
     }
 
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
@@ -845,7 +845,7 @@ public:
         return *this;
     }
 
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
@@ -869,7 +869,7 @@ public:
         if (retryTransaction.length())
             jh.addObject(buf, FPSTR("retryTransaction"), retryTransaction, true, true);
     }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
@@ -893,7 +893,7 @@ public:
         if (readTime.length())
             jh.addObject(buf, "readTime", readTime, true, true);
     }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
@@ -925,7 +925,7 @@ public:
         if (strlen(readWrite.c_str()))
             jh.addObject(buf, "readWrite", readWrite.c_str(), false, true);
     }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
@@ -945,7 +945,7 @@ public:
         json.addObject(buf, "inputUriPrefix", uriPrefix, true);
         json.addTokens(buf, "collectionIds", collectionIds, true);
     }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
@@ -968,7 +968,7 @@ public:
         if (readTime.length())
             uh.addParam(buf, FPSTR("readTime"), readTime, hasParam);
     }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
@@ -1019,7 +1019,7 @@ public:
         if (readTime.length() && buf[3].length() == 0 && buf[4].length() == 0)
             setObject(buf[5], "readTime", readTime, true, true);
     }
-    const char *c_str() { return buf[0].c_str(); }
+    const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { owriter.clearBuf(buf, bufSize); }
 };
@@ -1041,7 +1041,7 @@ public:
         if (strlen(currentDocument.c_str()))
             uh.addParam(buf, FPSTR("currentDocument"), currentDocument.c_str(), hasParam);
     }
-    const char *c_str() { return buf.c_str(); }
+    const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
@@ -1095,7 +1095,7 @@ public:
         if (readTime.length() && buf[2].length() == 0 && buf[3].length() == 0)
             setObject(buf[4], "readTime", readTime, true, true);
     }
-    const char *c_str() { return buf[0].c_str(); }
+    const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { owriter.clearBuf(buf, bufSize); }
 };
@@ -1208,7 +1208,7 @@ public:
         buf[5] = readTime;
         return set();
     }
-    const char *c_str() { return buf[0].c_str(); }
+    const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear()
     {
@@ -1249,7 +1249,7 @@ public:
      * @param readTime Timestamp
      */
     ListCollectionIdsOptions &readTime(const String readTime) { return setObject(buf[3], FPSTR("readTime"), readTime, true, true); }
-    const char *c_str() { return buf[0].c_str(); }
+    const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { owriter.clearBuf(buf, bufSize); }
 };
@@ -1312,7 +1312,7 @@ namespace DatabaseIndex
                 return setObject(buf[2], "mode", "ARRAY_CONTAINS", true, true);
             return *this;
         }
-        const char *c_str() { return buf[0].c_str(); }
+        const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
@@ -1353,7 +1353,7 @@ namespace DatabaseIndex
             owriter.addMapArrayMember(buf, bufSize, buf[2], FPSTR("fields"), field.c_str(), false);
             return *this;
         }
-        const char *c_str() { return buf[0].c_str(); }
+        const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
@@ -1417,7 +1417,7 @@ namespace CollectionGroupsIndex
          * Indicates the vector index is a flat index.
          */
         VectorConfig &flat() { return setObject(buf[2], "flat", "{}", false, true); }
-        const char *c_str() { return buf[0].c_str(); }
+        const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
@@ -1493,7 +1493,7 @@ namespace CollectionGroupsIndex
             return *this;
         }
 
-        const char *c_str() { return buf[0].c_str(); }
+        const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
@@ -1556,7 +1556,7 @@ namespace CollectionGroupsIndex
             owriter.addMapArrayMember(buf, bufSize, buf[3], FPSTR("fields"), field.c_str(), false);
             return *this;
         }
-        const char *c_str() { return buf[0].c_str(); }
+        const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
     };

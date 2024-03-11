@@ -87,7 +87,7 @@ namespace Values
             buf = FPSTR("null");
             getVal();
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -115,7 +115,7 @@ namespace Values
             owriter.setString(buf, value);
             getVal();
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -142,7 +142,7 @@ namespace Values
             owriter.setBool(buf, value);
             getVal();
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const{ return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -170,7 +170,7 @@ namespace Values
             buf = StringValue(String(value)).c_str();
             getVal();
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const{ return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -198,7 +198,7 @@ namespace Values
             buf = String(value);
             getVal();
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -227,7 +227,7 @@ namespace Values
             buf = StringValue(value).c_str();
             getVal();
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -256,7 +256,7 @@ namespace Values
             buf = StringValue(value).c_str();
             getVal();
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -284,7 +284,7 @@ namespace Values
             buf = StringValue(value).c_str();
             getVal();
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -315,7 +315,7 @@ namespace Values
             jh.addObject(buf, FPSTR("longitude"), String(lng), false, true);
             getVal();
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -389,7 +389,7 @@ namespace Values
             }
             return *this;
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -408,7 +408,7 @@ namespace Values
     public:
         template <typename T>
         MAP(const String &key, T value, bool val) { owriter.setPair(buf, key, val ? value.val() : value.c_str()); }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         void clear() { buf.remove(0, buf.length()); }
     };
 
@@ -447,7 +447,7 @@ namespace Values
             getVal();
             return *this;
         }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const { return p.print(str.c_str()); }
         void clear()
@@ -471,7 +471,7 @@ namespace Values
          */
         template <typename T>
         Value(T value) { buf = value.val(); }
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         const char *val() { return buf.c_str(); }
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
         void clear() { buf.remove(0, buf.length()); }

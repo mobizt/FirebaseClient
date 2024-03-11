@@ -117,7 +117,7 @@ namespace FirestoreQuery
             jh.addObject(buf, "fieldPath", fieldPath, true, true);
         }
 
-        const char *c_str() { return buf.c_str(); }
+        const char *c_str() const { return buf.c_str(); }
         size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     };
 
@@ -150,7 +150,7 @@ namespace FirestoreQuery
             return *this;
         }
 
-        const char *c_str() { return buf[0].c_str(); }
+        const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
@@ -199,7 +199,7 @@ namespace FirestoreQuery
         }
         CollectionSelector &collectionId(const String &collectionId) { return setObject(buf[1], "collectionId", collectionId, true, true); }
         CollectionSelector &allDescendants(bool value) { return setObject(buf[2], "allDescendants", owriter.getBoolStr(value), false, true); }
-        const char *c_str() { return buf[0].c_str(); }
+        const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
