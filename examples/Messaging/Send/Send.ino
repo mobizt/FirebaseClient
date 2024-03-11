@@ -290,7 +290,18 @@ void loop()
 
         notification.body("Notification body").title("Notification title");
 
-        object_t data("{\"name\":\"wrench\",\"mass\":\"1.3kg\",\"count\":\"3\"}");
+        // Library does not provide JSON parser library, the following JSON writer class will be used with
+        // object_t for simple demonstration.
+
+        object_t data, obj1, obj2, obj3, obj4;
+        JsonWriter writer;
+
+        writer.create(obj1, "name", string_t("wrench"));
+        writer.create(obj2, "mass", string_t("1.3kg"));
+        writer.create(obj3, "count", string_t("3"));
+        writer.join(data, 3 /* no. of object_t (s) to join */, obj1, obj2, obj3);
+
+        // object_t data2("{\"name\":\"wrench\",\"mass\":\"1.3kg\",\"count\":\"3\"}");
 
         msg.data(data);
 
