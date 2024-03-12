@@ -42,28 +42,20 @@ private:
 public:
     Timer(unsigned long sec = 60) { setInterval(sec); }
     ~Timer(){};
-
-    void reset()
-    {
-        end = ts + period;
-    }
-
+    void reset() { end = ts + period; }
     void start()
     {
         enable = true;
         loop();
         reset();
     }
-
     void stop() { enable = false; }
-
     void setInterval(unsigned long sec)
     {
         loop();
         period = sec;
         reset();
     }
-
     void feed(unsigned long sec)
     {
         feed_count++;
@@ -73,13 +65,11 @@ public:
         setInterval(sec);
         start();
     }
-
     void loop()
     {
         if (enable && (unsigned long)(millis() - now) > 100)
         {
             now = millis();
-
             if (now / 1000 >= ts)
             {
                 ts = now / 1000;
@@ -90,15 +80,9 @@ public:
         }
     }
 
-    unsigned long remaining()
-    {
-        return ready() ? 0 : end - ts;
-    }
-
+    unsigned long remaining() { return ready() ? 0 : end - ts; }
     uint8_t feedCount() const { return feed_count; }
-
     bool isRunning() const { return enable; };
-
     bool ready()
     {
         loop();

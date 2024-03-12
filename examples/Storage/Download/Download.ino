@@ -42,16 +42,12 @@
  *
  * SYNTAX:
  *
- * ServiceAuth service_auth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
+ * UserAuth user_auth(<api_key>, <user_email>, <user_password>, <expire>);
  *
- * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
- * <client_email> - The service account client Email.
- * <project_id> - The service account project ID.
- * <private_key> - The service account private key.
+ * <api_key> - API key can be obtained from Firebase console > Project Overview > Project settings.
+ * <user_email> - The user Email that in the project.
+ * <user_password> - The user password in the project.
  * <expire> - The expiry period in seconds (less than or equal to 3600).
- *
- * The default network (built-in WiFi) configuration was used by default when
- * it was not assign to the function.
  *
  * To use other network interfaces, network data from one of the following Network classes
  * can be assigned.
@@ -62,7 +58,7 @@
  *
  * Please see examples/App/NetworkInterfaces for the usage guidelines.
  *
- * The auth data can be set to Services App e.g. Database to initialize via function getApp.
+ * The auth credential data can be set to Services App e.g. Database to initialize via function getApp.
  *
  * SYNTAX:
  *
@@ -73,21 +69,22 @@
  */
 
 /**
- * SEND A MESSAGE FUNCTIONS
- * ========================
+ * DOWNLOAD OBJECT FUNCTIONS
+ * =========================
  *
  * SYNTAXES:
  *
- * messaging.send(<AsyncClient>, <Messages::Parent>, <Messages::Message>);
- * messaging.send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResult>);
- * messaging.send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResultCallback>, <uid>);
+ * storage.download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>);
+ * storage.download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <AsyncResult>);
+ * storage.download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <AsyncResultCallback>, <uid>);
  *
- * The <Messages::Parent> is the Messages::Parent object included project Id in its constructor.
- * The Firebase project Id should be only the name without the firebaseio.com.
+ * The <FirebaseStorage::Parent> is the FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * The bucketid is the Storage bucket Id of object to download.
+ * The object is the object in Storage bucket to download.
  *
- * The <Messages::Message> is Messages::Message object that holds the information of message to send.
+ * The <file_config_data> is the filesystem data (file_config_data) obtained from FileConfig class object.
  *
- * The messaging is Messaging service app.
+ * The storage is Storage service app.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
@@ -171,30 +168,32 @@
 #include <WiFiClientSecure.h>
 #endif
 
+#if defined(ESP32)
+#include <SPIFFS.h>
+#endif
+
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
 
-/**
- * This information can be taken from the service account JSON file.
- *
- * To download service account file, from the Firebase console, goto project settings,
- * select "Service accounts" tab and click at "Generate new private key" button
- */
-#define FIREBASE_PROJECT_ID "PROJECT_ID"
-#define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
-const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
+// User Email and password that already registerd or added in your project.
+#define USER_EMAIL "USER_EMAIL"
+#define USER_PASSWORD "USER_PASSWORD"
 
-void timeStatusCB(uint32_t &ts);
+// Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
+#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
 
 void asyncCB(AsyncResult &aResult);
 
+void fileCallback(File &file, const char *filename, file_operating_mode mode);
+
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-// ServiceAuth is required for import and export documents.
-ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
+
+FileConfig media_file("/media.mp4", fileCallback);
 
 FirebaseApp app;
 
@@ -207,7 +206,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-Messaging messaging;
+Storage storage;
 
 AsyncResult aResult_no_callback;
 
@@ -237,40 +236,34 @@ void setup()
 
     ssl_client.setInsecure();
 #if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
+    ssl_client.setBufferSizes(8192, 1024);
 #endif
 
     app.setCallback(asyncCB);
 
-    initializeApp(aClient, app, getAuth(sa_auth));
+    initializeApp(aClient, app, getAuth(user_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-    {
-        // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
-    }
+        ;
 
-    app.getApp<Messaging>(messaging);
+    app.getApp<Storage>(storage);
+
+    SPIFFS.begin();
 }
 
 void loop()
 {
-    // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
-
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
 
     // To get the authentication time to live in seconds before expired.
     // app.ttl();
 
-    // This required when different AsyncClients than used in FirebaseApp assigned to the Messaging functions.
-    messaging.loop();
+    // This required when different AsyncClients than used in FirebaseApp assigned to the Firebase Storage functions.
+    storage.loop();
 
     // To get anyc result without callback
     // printResult(aResult_no_callback);
@@ -279,56 +272,16 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("[+] Sending message...");
+        Serial.println("[+] Download file...");
 
-        Messages::Message msg;
-        msg.topic("test");
-        // msg.token("DEVICE_TOKEN");
-        // msg.condition("'foo' in topics && 'bar' in topics");
-
-        Messages::Notification notification;
-
-        notification.body("Notification body").title("Notification title");
-
-        // Library does not provide JSON parser library, the following JSON writer class will be used with
-        // object_t for simple demonstration.
-
-        object_t data, obj1, obj2, obj3, obj4;
-        JsonWriter writer;
-
-        writer.create(obj1, "name", string_t("wrench"));
-        writer.create(obj2, "mass", string_t("1.3kg"));
-        writer.create(obj3, "count", string_t("3"));
-        writer.join(data, 3 /* no. of object_t (s) to join */, obj1, obj2, obj3);
-
-        // object_t data2("{\"name\":\"wrench\",\"mass\":\"1.3kg\",\"count\":\"3\"}");
-
-        msg.data(data);
-
-        msg.notification(notification);
-
-        messaging.send(aClient, Messages::Parent(FIREBASE_PROJECT_ID), msg, asyncCB);
+        storage.download(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), asyncCB);
 
         // To assign UID for async result
-        // messaging.send(aClient, Messages::Parent(FIREBASE_PROJECT_ID), msg, asyncCB, "myUID");
+        //  storage.download(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), asyncCB, "myUID");
 
         // To get anyc result without callback
-        // messaging.send(aClient, Messages::Parent(FIREBASE_PROJECT_ID), msg, aResult_no_callback);
+        //  storage.download(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), aResult_no_callback);
     }
-}
-
-void timeStatusCB(uint32_t &ts)
-{
-    if (time(nullptr) < FIREBASE_DEFAULT_TS)
-    {
-        configTime(3 * 3600, 0, "pool.ntp.org");
-        while (time(nullptr) < FIREBASE_DEFAULT_TS)
-        {
-            delay(100);
-        }
-    }
-
-    ts = time(nullptr);
 }
 
 void asyncCB(AsyncResult &aResult)
@@ -358,5 +311,44 @@ void asyncCB(AsyncResult &aResult)
 
         Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
+    }
+
+    if (aResult.downloadProgress())
+    {
+        Serial.println("**************");
+        Serial.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
+        {
+            Serial.println("Download completed!");
+        }
+    }
+
+    if (aResult.uploadProgress())
+    {
+        Serial.println("**************");
+        Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
+            Serial.println("Upload completed!");
+    }
+}
+
+void fileCallback(File &file, const char *filename, file_operating_mode mode)
+{
+    switch (mode)
+    {
+    case file_mode_open_read:
+        file = SPIFFS.open(filename, "r");
+        break;
+    case file_mode_open_write:
+        file = SPIFFS.open(filename, "w");
+        break;
+    case file_mode_open_append:
+        file = SPIFFS.open(filename, "a");
+        break;
+    case file_mode_remove:
+        SPIFFS.remove(filename);
+        break;
+    default:
+        break;
     }
 }

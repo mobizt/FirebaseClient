@@ -167,15 +167,26 @@ public:
     FileConfig(const String &filename, FileConfigCallback cb)
     {
         clear();
-        if (filename.length() > 0 && filename[0] != '/')
-            data.filename += '/';
-        data.filename += filename;
-
-        data.cb = cb;
+        setFilename(filename);
+        setCallback(cb);
         data.initialized = true;
     }
     ~FileConfig() {}
     void clear() { data.clear(); }
+
+    FileConfig &setFilename(const String &filename)
+    {
+        if (filename.length() > 0 && filename[0] != '/')
+            data.filename += '/';
+        data.filename += filename;
+        return *this;
+    }
+
+    FileConfig &setCallback(FileConfigCallback cb)
+    {
+        data.cb = cb;
+        return *this;
+    }
 
     file_config_data &get() { return data; }
 

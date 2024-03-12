@@ -94,6 +94,8 @@ public:
     bool cancel = false;
     bool sse = false;
     bool path_not_existed = false;
+    bool download = false;
+    bool upload = false;
     uint32_t addr = 0;
     AsyncResult aResult;
     AsyncResult *refResult = nullptr;
@@ -170,7 +172,7 @@ class AsyncClientClass
 
 private:
     FirebaseError lastErr;
-    String reqEtag, resETag;
+    String header, reqEtag, resETag;
     int netErrState = 0;
     Client *client = nullptr;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
@@ -182,11 +184,11 @@ private:
     bool sse = false;
     std::vector<uint32_t> sVec;
     Memory mem;
+    Base64Helper bh;
     network_config_data net;
     uint32_t addr = 0;
     bool inProcess = false;
     bool inStopAsync = false;
-    String header;
 
     void closeFile(async_data_item_t *sData)
     {
@@ -253,13 +255,11 @@ private:
 
         uint8_t *buf = nullptr;
         int toSend = 0;
-        Memory mem;
-
         if (sData->request.file_data.filename.length() > 0 ? sData->request.file_data.file.available() : sData->request.file_data.data_pos < sData->request.file_data.data_size)
         {
             if (sData->request.base64)
             {
-                Base64Helper bh;
+
                 toSend = FIREBASE_BASE64_CHUNK_SIZE;
 
                 if (sData->request.file_data.filename.length() > 0)
@@ -352,7 +352,7 @@ private:
                 sData->request.dataIndex += toSend;
                 sData->request.payloadIndex += toSend;
 
-                if (sData->async && sData->request.file_data.file_size)
+                if (sData->upload && sData->async && sData->request.file_data.file_size)
                 {
                     sData->aResult.upload_data.total = sData->request.file_data.file_size;
                     sData->aResult.upload_data.uploaded = sData->request.payloadIndex;
@@ -421,20 +421,20 @@ private:
 
             if (sData->request.app_token && sData->request.app_token->auth_data_type != user_auth_data_no_token)
             {
-                if (sData->request.app_token->token.length() == 0)
+                if (sData->request.app_token->val[app_tk_ns::token].length() == 0)
                 {
                     setAsyncError(sData, sData->state, FIREBASE_ERROR_UNAUTHENTICATE, !sData->sse, false);
                     return function_return_type_failure;
                 }
 
-                header = sData->request.header;
-                header.replace(FIREBASE_AUTH_PLACEHOLDER, sData->request.app_token->token);
+                header = sData->request.val[req_hndlr_ns::header];
+                header.replace(FIREBASE_AUTH_PLACEHOLDER, sData->request.app_token->val[app_tk_ns::token]);
                 ret = sendHeader(sData, header.c_str());
                 header.remove(0, header.length());
                 return ret;
             }
 
-            return sendHeader(sData, sData->request.header.c_str());
+            return sendHeader(sData, sData->request.val[req_hndlr_ns::header].c_str());
         }
         else if (sData->state == async_state_send_payload)
         {
@@ -442,8 +442,8 @@ private:
                 sData->state = async_state_read_response;
             else
             {
-                if (sData->request.payload.length())
-                    ret = send(sData, sData->request.payload.c_str());
+                if (sData->request.val[req_hndlr_ns::payload].length())
+                    ret = send(sData, sData->request.val[req_hndlr_ns::payload].c_str());
                 else if (sData->request.data && sData->request.dataLen)
                     ret = send(sData, sData->request.data, sData->request.dataLen, sData->request.dataLen);
                 else if (sData->request.file_data.file_size && ((sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size)))
@@ -470,7 +470,7 @@ private:
         if (sData->response.httpCode == 0)
             return function_return_type_continue;
 
-        if (sData->response.location.length())
+        if (sData->response.val[res_hndlr_ns::location].length())
         {
             stop(sData);
             if (connect(sData, getHost(sData, false).c_str(), sData->request.port) > function_return_type_failure)
@@ -543,14 +543,17 @@ private:
                 *sData->refResult = sData->aResult;
 
                 if (setData)
-                    sData->refResult->setPayload(sData->aResult.data_payload);
+                    sData->refResult->setPayload(sData->aResult.val[ares_ns::data_payload]);
 
-                sData->refResult->setETag(sData->aResult.res_etag);
-                sData->refResult->setPath(sData->aResult.data_path);
+                sData->refResult->setETag(sData->aResult.val[ares_ns::res_etag]);
+                sData->refResult->setPath(sData->aResult.val[ares_ns::data_path]);
             }
         }
 
-        if (sData->cb && (setData || error_notify_timeout))
+        bool download_status = sData->download && sData->aResult.setDownloadProgress();
+        bool upload_status = sData->upload && sData->aResult.setUploadProgress();
+
+        if (sData->cb && (setData || error_notify_timeout || download_status || upload_status))
         {
             if (!sData->auth_used)
                 sData->cb(sData->aResult);
@@ -568,8 +571,8 @@ private:
         }
         else if (sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
         {
-            sData->aResult.lastError.setResponseError(sData->response.payload, sData->response.httpCode);
-            lastErr.setResponseError(sData->response.payload, sData->response.httpCode);
+            sData->aResult.lastError.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
+            lastErr.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
             sData->aResult.error_available = true;
             sData->aResult.data_available = false;
         }
@@ -613,10 +616,7 @@ private:
         return val;
     }
 
-    void clear(String &str)
-    {
-        str.remove(0, str.length());
-    }
+    void clear(String &str) { str.remove(0, str.length()); }
 
     bool readResponse(async_data_item_t *sData)
     {
@@ -641,7 +641,7 @@ private:
                     {
                         if (!sData->auth_used)
                         {
-                            sData->aResult.setPayload(sData->response.payload);
+                            sData->aResult.setPayload(sData->response.val[res_hndlr_ns::payload]);
 
                             if (sData->aResult.download_data.total > 0)
                                 sData->aResult.data_available = false;
@@ -651,14 +651,14 @@ private:
                                 sData->aResult.rtdbResult.parseNodeName();
 
                             // data available from sse event
-                            if (sData->response.flags.sse && sData->response.payload.length())
+                            if (sData->response.flags.sse && sData->response.val[res_hndlr_ns::payload].length())
                             {
                                 // order of checking: event, data, newline
-                                if (sData->response.payload.indexOf("event: ") > -1 && sData->response.payload.indexOf("data: ") > -1 && sData->response.payload.indexOf("\n") > -1)
+                                if (sData->response.val[res_hndlr_ns::payload].indexOf("event: ") > -1 && sData->response.val[res_hndlr_ns::payload].indexOf("data: ") > -1 && sData->response.val[res_hndlr_ns::payload].indexOf("\n") > -1)
                                 {
                                     // save payload to slot result
-                                    sData->aResult.setPayload(sData->response.payload);
-                                    clear(sData->response.payload);
+                                    sData->aResult.setPayload(sData->response.val[res_hndlr_ns::payload]);
+                                    clear(sData->response.val[res_hndlr_ns::payload]);
                                     sData->aResult.rtdbResult.parseSSE();
                                     sData->response.flags.payload_available = true;
                                     returnResult(sData, true);
@@ -691,11 +691,11 @@ private:
         if (sData->response.httpCode > 0)
             return false;
 
-        sData->response.header.reserve(1024);
+        sData->response.val[res_hndlr_ns::header].reserve(1024);
 
         // the first chunk (line) can be http response status or already connected stream payload
-        readLine(sData, sData->response.header);
-        int status = getStatusCode(sData->response.header);
+        readLine(sData, sData->response.val[res_hndlr_ns::header]);
+        int status = getStatusCode(sData->response.val[res_hndlr_ns::header]);
         if (status > 0)
         {
             // http response status
@@ -709,37 +709,40 @@ private:
     {
         if (sData->response.flags.header_remaining)
         {
-            int read = readLine(sData, sData->response.header);
-            if ((read == 1 && sData->response.header[sData->response.header.length() - 1] == '\r') ||
-                (read == 2 && sData->response.header[sData->response.header.length() - 2] == '\r' && sData->response.header[sData->response.header.length() - 1] == '\n'))
+            int read = readLine(sData, sData->response.val[res_hndlr_ns::header]);
+            if ((read == 1 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\r') ||
+                (read == 2 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 2] == '\r' && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\n'))
             {
-                clear(sData->response.location);
-                clear(sData->response.etag);
+                clear(sData->response.val[res_hndlr_ns::location]);
+                clear(sData->response.val[res_hndlr_ns::etag]);
 
-                String cl, con, te, ct;
-                parseRespHeader(sData, sData->response.header, sData->response.location, "Location");
-                parseRespHeader(sData, sData->response.header, sData->response.etag, "ETag");
-                resETag = sData->response.etag;
-                sData->aResult.res_etag = sData->response.etag;
-                sData->aResult.data_path = sData->request.path;
+                String temp[4];
+                parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], sData->response.val[res_hndlr_ns::location], "Location");
+                parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], sData->response.val[res_hndlr_ns::etag], "ETag");
+                resETag = sData->response.val[res_hndlr_ns::etag];
+                sData->aResult.val[ares_ns::res_etag] = sData->response.val[res_hndlr_ns::etag];
+                sData->aResult.val[ares_ns::data_path] = sData->request.val[req_hndlr_ns::path];
 #if defined(ENABLE_DATABASE)
-                sData->aResult.rtdbResult.null_etag = sData->response.etag.indexOf("null_etag") > -1;
+                sData->aResult.rtdbResult.null_etag = sData->response.val[res_hndlr_ns::etag].indexOf("null_etag") > -1;
 #endif
 
-                parseRespHeader(sData, sData->response.header, cl, "Content-Length");
+                parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], temp[0], "Content-Length");
 
-                sData->response.payloadLen = atoi(cl.c_str());
+                sData->response.payloadLen = atoi(temp[0].c_str());
 
-                parseRespHeader(sData, sData->response.header, con, "Connection");
-                sData->response.flags.keep_alive = con.length() && con.indexOf("keep-alive") > -1;
+                parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], temp[1], "Connection");
+                sData->response.flags.keep_alive = temp[1].length() && temp[1].indexOf("keep-alive") > -1;
 
-                parseRespHeader(sData, sData->response.header, te, "Transfer-Encoding");
-                sData->response.flags.chunks = te.length() && te.indexOf("chunked") > -1;
+                parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], temp[2], "Transfer-Encoding");
+                sData->response.flags.chunks = temp[2].length() && temp[2].indexOf("chunked") > -1;
 
-                parseRespHeader(sData, sData->response.header, ct, "Content-Type");
-                sData->response.flags.sse = ct.length() && ct.indexOf("text/event-stream") > -1;
+                parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], temp[3], "Content-Type");
+                sData->response.flags.sse = temp[3].length() && temp[3].indexOf("text/event-stream") > -1;
 
                 clear(sData);
+
+                for (size_t i = 0; i < 4; i++)
+                    temp[i].remove(0, temp[i].length());
 
                 if (sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
                     sData->response.flags.payload_remaining = true;
@@ -839,9 +842,10 @@ private:
             // the next chunk data is the payload
             if (sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
             {
+
                 if (sData->response.flags.chunks)
                 {
-                    if (decodeChunks(sData, client, &sData->response.payload) == -1)
+                    if (decodeChunks(sData, client, &sData->response.val[res_hndlr_ns::payload]) == -1)
                         sData->response.flags.payload_remaining = false;
                 }
                 else
@@ -864,6 +868,7 @@ private:
                                 else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                 {
                                     closeFile(sData);
+
                                     if (!openFile(sData, file_mode_open_write))
                                     {
                                         setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_OPEN_FILE, !sData->sse, true);
@@ -980,7 +985,7 @@ private:
                         }
                     }
                     else
-                        sData->response.payloadRead += readLine(sData, sData->response.payload);
+                        sData->response.payloadRead += readLine(sData, sData->response.val[res_hndlr_ns::payload]);
                 }
             }
         }
@@ -994,8 +999,8 @@ private:
             // Async payload and header data collision workaround from session reusage.
             if (!sData->response.flags.chunks && sData->response.payloadRead > sData->response.payloadLen)
             {
-                sData->response.header = sData->response.payload.substring(sData->response.payloadRead - sData->response.payloadLen);
-                sData->response.payload.remove(0, sData->response.payloadLen);
+                sData->response.val[res_hndlr_ns::header] = sData->response.val[res_hndlr_ns::payload].substring(sData->response.payloadRead - sData->response.payloadLen);
+                sData->response.val[res_hndlr_ns::payload].remove(0, sData->response.payloadLen);
                 sData->return_type = function_return_type_continue;
                 sData->state = async_state_read_response;
                 sData->response.flags.header_remaining = true;
@@ -1061,9 +1066,9 @@ private:
 
     void clear(async_data_item_t *sData)
     {
-        clear(sData->response.header);
+        clear(sData->response.val[res_hndlr_ns::header]);
         if (!sData->auth_used)
-            clear(sData->response.payload);
+            clear(sData->response.val[res_hndlr_ns::payload]);
         sData->response.flags.header_remaining = false;
         sData->response.flags.payload_remaining = false;
         sData->response.payloadRead = 0;
@@ -1083,8 +1088,8 @@ private:
         sData->response.flags.reset();
         sData->state = async_state_undefined;
         sData->return_type = function_return_type_undefined;
-        clear(sData->response.location);
-        clear(sData->response.etag);
+        clear(sData->response.val[res_hndlr_ns::location]);
+        clear(sData->response.val[res_hndlr_ns::etag]);
         sData->aResult.download_data.reset();
         sData->aResult.upload_data.reset();
         clear(sData);
@@ -1564,7 +1569,7 @@ private:
 
     String getHost(async_data_item_t *sData, bool fromReq)
     {
-        String url = fromReq ? sData->request.url : sData->response.location;
+        String url = fromReq ? sData->request.val[req_hndlr_ns::url] : sData->response.val[res_hndlr_ns::location];
         int p1 = url.indexOf("http://");
         int p2 = 0;
         if (p1 == -1)
@@ -1693,24 +1698,23 @@ public:
 
     void newRequest(async_data_item_t *sData, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t &options, const String &uid)
     {
-
         sData->async = options.async;
-        sData->request.url = url;
-        sData->request.path = path;
+        sData->request.val[req_hndlr_ns::url] = url;
+        sData->request.val[req_hndlr_ns::path] = path;
         sData->request.method = method;
         sData->sse = options.sse;
-        sData->request.etag = reqEtag;
+        sData->request.val[req_hndlr_ns::etag] = reqEtag;
 
         clear(reqEtag);
-        sData->aResult.result_uid = uid;
-        clear(sData->request.header);
+        sData->aResult.val[ares_ns::res_uid] = uid;
+        clear(sData->request.val[req_hndlr_ns::header]);
         sData->request.addRequestHeaderFirst(method);
         if (path.length() == 0)
-            sData->request.header += '/';
+            sData->request.val[req_hndlr_ns::header] += '/';
         else if (path.length() && path[0] != '/')
-            sData->request.header += '/';
-        sData->request.header += path;
-        sData->request.header += extras;
+            sData->request.val[req_hndlr_ns::header] += '/';
+        sData->request.val[req_hndlr_ns::header] += path;
+        sData->request.val[req_hndlr_ns::header] += extras;
         sData->request.addRequestHeaderLast();
         sData->request.addHostHeader(getHost(sData, true).c_str());
 
@@ -1722,29 +1726,29 @@ public:
             if (options.app_token && !options.auth_param && (options.app_token->auth_type == auth_id_token || options.app_token->auth_type == auth_user_id_token || options.app_token->auth_type == auth_access_token || options.app_token->auth_type == auth_sa_access_token))
             {
                 sData->request.addAuthHeaderFirst(options.app_token->auth_type);
-                sData->request.header += FIREBASE_AUTH_PLACEHOLDER;
+                sData->request.val[req_hndlr_ns::header] += FIREBASE_AUTH_PLACEHOLDER;
                 sData->request.addNewLine();
             }
 
-            sData->request.header += FPSTR("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
+            sData->request.val[req_hndlr_ns::header] += FPSTR("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
             sData->request.addNewLine();
             sData->request.addConnectionHeader(true);
             if (!options.sv && !options.no_etag && method != async_request_handler_t::http_patch && extras.indexOf("orderBy") == -1)
             {
-                sData->request.header += FPSTR("X-Firebase-ETag: true");
+                sData->request.val[req_hndlr_ns::header] += FPSTR("X-Firebase-ETag: true");
                 sData->request.addNewLine();
             }
 
-            if (sData->request.etag.length() > 0 && (method == async_request_handler_t::http_put || method == async_request_handler_t::http_delete))
+            if (sData->request.val[req_hndlr_ns::etag].length() > 0 && (method == async_request_handler_t::http_put || method == async_request_handler_t::http_delete))
             {
-                sData->request.header += FPSTR("if-match: ");
-                sData->request.header += sData->request.etag;
+                sData->request.val[req_hndlr_ns::header] += FPSTR("if-match: ");
+                sData->request.val[req_hndlr_ns::header] += sData->request.val[req_hndlr_ns::etag];
                 sData->request.addNewLine();
             }
 
             if (options.sse)
             {
-                sData->request.header += FPSTR("Accept: text/event-stream");
+                sData->request.val[req_hndlr_ns::header] += FPSTR("Accept: text/event-stream");
                 sData->request.addNewLine();
             }
         }
@@ -1828,7 +1832,9 @@ public:
 
             if (sData->state == async_state_read_response)
             {
-                sData->request.clear();
+                if (!sData->download)
+                    sData->request.clear();
+
                 // it can be complete response from payload sending
                 if (sData->return_type == function_return_type_complete)
                     sData->return_type = function_return_type_continue;
@@ -1906,10 +1912,7 @@ public:
         }
     }
 
-    size_t slotCount()
-    {
-        return sVec.size();
-    }
+    size_t slotCount() { return sVec.size(); }
 
     void removeSlot(uint8_t slot, bool sse = true)
     {
@@ -1930,9 +1933,7 @@ public:
         returnResult(sData, true);
         reset(sData, sData->auth_used);
         if (!sData->auth_used)
-        {
             delete sData;
-        }
         sData = nullptr;
         sVec.erase(sVec.begin() + slot);
     }

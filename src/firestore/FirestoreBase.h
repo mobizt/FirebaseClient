@@ -138,7 +138,7 @@ public:
             uh.addGAPIv1beta1Path(request.path);
         else
             uh.addGAPIv1Path(request.path);
-        request.path += request.options->parent.getProjectId().length() == 0 ? app_token->project_id : request.options->parent.getProjectId();
+        request.path += request.options->parent.getProjectId().length() == 0 ? app_token->val[app_tk_ns::pid] : request.options->parent.getProjectId();
         request.path += FPSTR("/databases");
         if (!request.options->parent.isDatabaseIdParam())
         {
@@ -158,7 +158,7 @@ public:
 
         if (request.options->payload.length())
         {
-            sData->request.payload = request.options->payload;
+            sData->request.val[req_hndlr_ns::payload] = request.options->payload;
             request.aClient->setContentLength(sData, request.options->payload.length());
         }
 
@@ -167,6 +167,8 @@ public:
 
         if (request.aResult)
             sData->setRefResult(request.aResult);
+
+        sData->download = request.method == async_request_handler_t::http_get && sData->request.file_data.filename.length();
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
@@ -193,7 +195,10 @@ public:
             request.cb(*aResult);
 
         if (!request.aResult)
+        {
             delete aResult;
+            aResult = nullptr;
+        }
     }
 
     void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, EximDocumentOptions &eximOptions, bool isImport, bool async)

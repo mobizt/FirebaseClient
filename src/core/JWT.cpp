@@ -68,7 +68,7 @@ void JWTClass::clear()
     jwt_data.pk.remove(0, jwt_data.pk.length());
     payload.remove(0, payload.length());
     if (this->auth_data)
-        this->auth_data->user_auth.sa.step = jwt_step_encode_header_payload;
+        this->auth_data->user_auth.sa.step = jwt_step_begin;
     processing = false;
 }
 
@@ -92,7 +92,7 @@ bool JWTClass::begin(auth_data_t *auth_data)
     auth_data->user_auth.jwt_signing = false;
     this->auth_data = auth_data;
     this->auth_data->app_token.clear();
-    this->auth_data->user_auth.sa.step = jwt_step_encode_header_payload;
+    this->auth_data->user_auth.sa.step = jwt_step_begin;
     return create();
 }
 
@@ -104,7 +104,7 @@ bool JWTClass::create()
     if (!auth_data)
         return exit(false);
 
-    if (auth_data->user_auth.sa.step == jwt_step_encode_header_payload)
+    if (auth_data->user_auth.sa.step == jwt_step_begin)
     {
 
         uint32_t now = 0;
@@ -121,8 +121,8 @@ bool JWTClass::create()
         // {"iss":"<email>","sub":"<email>","aud":"<audience>","iat":<timstamp>,"exp":<expire>,"scope":"<scope>"}
         // {"iss":"<email>","sub":"<email>","aud":"<audience>","iat":<timstamp>,"exp":<expire>,"uid":"<uid>","claims":"<claims>"}
 
-        json.addObject(payload, "iss", auth_data->user_auth.sa.client_email, true);
-        json.addObject(payload, "sub", auth_data->user_auth.sa.client_email, true);
+        json.addObject(payload, "iss", auth_data->user_auth.sa.val[sa_ns::cm], true);
+        json.addObject(payload, "sub", auth_data->user_auth.sa.val[sa_ns::cm], true);
 
         String t = FPSTR("https://");
         if (auth_data->user_auth.auth_type == auth_sa_custom_token)
@@ -168,10 +168,10 @@ bool JWTClass::create()
             s += FPSTR("iam");
             buri.remove(0, buri.length());
 
-            if (auth_data->user_auth.cust.scope.length() > 0)
+            if (auth_data->user_auth.cust.val[cust_ns::scope].length() > 0)
             {
-                char *p = reinterpret_cast<char *>(mem.alloc(auth_data->user_auth.cust.scope.length()));
-                strcpy(p, auth_data->user_auth.cust.scope.c_str());
+                char *p = reinterpret_cast<char *>(mem.alloc(auth_data->user_auth.cust.val[cust_ns::scope].length()));
+                strcpy(p, auth_data->user_auth.cust.val[cust_ns::scope].c_str());
                 char *pp = p;
                 char *end = p;
                 String tmp;
@@ -196,12 +196,9 @@ bool JWTClass::create()
         }
         else if (auth_data->user_auth.auth_type == auth_sa_custom_token)
         {
-            json.addObject(payload, "uid", auth_data->user_auth.cust.uid, true, auth_data->user_auth.cust.claims.length() <= 2);
-
-            if (auth_data->user_auth.cust.claims.length() > 2)
-            {
-                json.addObject(payload, "claims", auth_data->user_auth.cust.claims, true, true);
-            }
+            json.addObject(payload, "uid", auth_data->user_auth.cust.val[cust_ns::uid], true, auth_data->user_auth.cust.val[cust_ns::claims].length() <= 2);
+            if (auth_data->user_auth.cust.val[cust_ns::claims].length() > 2)
+                json.addObject(payload, "claims", auth_data->user_auth.cust.val[cust_ns::claims], true, true);
         }
 
         len = bh.encodedLength(payload.length());
@@ -231,8 +228,8 @@ bool JWTClass::create()
         // parse priv key
         if (jwt_data.pk.length() > 0)
             pk = new PrivateKey(jwt_data.pk.c_str());
-        else if (auth_data->user_auth.sa.private_key.length() > 0)
-            pk = new PrivateKey(auth_data->user_auth.sa.private_key.c_str());
+        else if (auth_data->user_auth.sa.val[sa_ns::pk].length() > 0)
+            pk = new PrivateKey(auth_data->user_auth.sa.val[sa_ns::pk].c_str());
 
         jwt_data.pk.remove(0, jwt_data.pk.length());
 

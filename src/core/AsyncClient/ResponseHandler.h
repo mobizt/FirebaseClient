@@ -30,6 +30,18 @@
 
 #define FIREBASE_TCP_READ_TIMEOUT_SEC 30
 
+namespace res_hndlr_ns
+{
+    enum data_item_type_t
+    {
+        header,
+        payload,
+        location,
+        etag,
+        max_type
+    };
+}
+
 struct async_response_handler_t
 {
 public:
@@ -81,7 +93,7 @@ public:
     uint8_t *toFill = nullptr;
     uint16_t toFillLen = 0;
     uint16_t toFillIndex = 0;
-    String header, payload, location, etag;
+    String val[res_hndlr_ns::max_type];
     chunk_info_t chunkInfo;
     Timer read_timer;
     bool auth_data_available = false;
@@ -112,10 +124,8 @@ public:
         toFill = nullptr;
         toFillLen = 0;
         toFillIndex = 0;
-        location.remove(0, location.length());
-        etag.remove(0, etag.length());
-        header.remove(0, header.length());
-        payload.remove(0, payload.length());
+        for (size_t i = 0; i < res_hndlr_ns::max_type; i++)
+            val[i].remove(0, val[i].length());
         chunkInfo.chunkSize = 0;
         chunkInfo.dataLen = 0;
         chunkInfo.phase = READ_CHUNK_SIZE;

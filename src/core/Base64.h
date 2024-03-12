@@ -375,7 +375,6 @@ public:
 
     char *encodeToChars(Memory &mem, uint8_t *src, size_t len)
     {
-        String str;
         char *encoded = reinterpret_cast<char *>(mem.alloc(encodedLength(len) + 1));
         firebase_base64_io_t<char> out;
         out.outT = encoded;

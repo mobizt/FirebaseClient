@@ -58,7 +58,6 @@ public:
         hasParam = true;
         return true;
     }
-
     /* Append the comma separated tokens as URL parameters */
     void addParamsTokens(String &url, const String &key, String val, bool &hasParam)
     {
@@ -87,7 +86,6 @@ public:
         // release memory
         mem.release(&p);
     }
-
     /* Append the path to URL */
     void addPath(String &url, const String &path)
     {
@@ -101,7 +99,6 @@ public:
 
         url += path;
     }
-
     /* Append the string with google storage URL */
     void addGStorageURL(String &uri, const String &bucketID, const String &storagePath)
     {
@@ -111,10 +108,8 @@ public:
             uri += '/';
         uri += storagePath;
     }
-
     /* Append the string with cloudfunctions project host */
-    void addFunctionsHost(String &uri, const String &locationId, const String &projectId,
-                          const String &path, bool url)
+    void addFunctionsHost(String &uri, const String &locationId, const String &projectId, const String &path, bool url)
     {
 #if defined(ENABLE_FUNCTIONS)
         if (url)
@@ -130,28 +125,14 @@ public:
         }
 #endif
     }
-
-    void addGAPIv1Path(String &uri)
-    {
-        uri += FPSTR("/v1/projects/");
-    }
-
-    void addGAPIv1beta1Path(String &uri)
-    {
-        uri += FPSTR("/v1beta1/projects/");
-    }
-
-    void addGAPIv1beta2Path(String &uri)
-    {
-        uri += FPSTR("/v1beta2/projects/");
-    }
-
+    void addGAPIv1Path(String &uri) { uri += FPSTR("/v1/projects/"); }
+    void addGAPIv1beta1Path(String &uri) { uri += FPSTR("/v1beta1/projects/"); }
+    void addGAPIv1beta2Path(String &uri) { uri += FPSTR("/v1beta2/projects/"); }
     void host2Url(String &url, String &host)
     {
         url = FPSTR("https://");
         url += host;
     }
-
     void hexchar(char c, char &hex1, char &hex2)
     {
         hex1 = c / 16;
@@ -159,7 +140,6 @@ public:
         hex1 += hex1 < 10 ? '0' : 'A' - 10;
         hex2 += hex2 < 10 ? '0' : 'A' - 10;
     }
-
     String encode(const String &s)
     {
         String ret;

@@ -52,6 +52,19 @@ typedef void (*NetworkReconnect)(void);
 
 using namespace firebase;
 
+namespace req_hndlr_ns
+{
+    enum data_item_type_t
+    {
+        url,
+        path,
+        etag,
+        header,
+        payload,
+        max_type
+    };
+}
+
 struct async_request_handler_t
 {
 public:
@@ -71,8 +84,7 @@ public:
         http_delete,
     };
 
-    String url, path, etag;
-    String header, payload;
+    String val[req_hndlr_ns::max_type];
     app_token_t *app_token = nullptr;
     uint16_t port = 443;
     uint8_t *data = nullptr;
@@ -94,11 +106,8 @@ public:
 
     void clear()
     {
-        url.remove(0, url.length());
-        path.remove(0, etag.length());
-        etag.remove(0, path.length());
-        header.remove(0, header.length());
-        payload.remove(0, payload.length());
+        for (size_t i = 0; i < req_hndlr_ns::max_type; i++)
+            val[i].remove(0, val[i].length());
         port = 443;
         if (data)
             delete data;
@@ -117,7 +126,7 @@ public:
 
     void addNewLine()
     {
-        header += "\r\n";
+       val[req_hndlr_ns::header] += "\r\n";
     }
 
     void addGAPIsHost(String &str, PGM_P sub)
@@ -130,41 +139,41 @@ public:
 
     void addGAPIsHostHeader(PGM_P sub)
     {
-        header += FPSTR("Host: ");
-        addGAPIsHost(header, sub);
+        val[req_hndlr_ns::header] += FPSTR("Host: ");
+        addGAPIsHost(val[req_hndlr_ns::header], sub);
         addNewLine();
     }
 
     void addHostHeader(PGM_P host)
     {
-        header += FPSTR("Host: ");
-        header += host;
+        val[req_hndlr_ns::header] += FPSTR("Host: ");
+        val[req_hndlr_ns::header] += host;
         addNewLine();
     }
 
     void addContentTypeHeader(PGM_P v)
     {
-        header += FPSTR("Content-Type: ");
-        header += v;
+        val[req_hndlr_ns::header] += FPSTR("Content-Type: ");
+        val[req_hndlr_ns::header] += v;
         addNewLine();
     }
 
     void addContentLengthHeader(size_t len)
     {
-        header += FPSTR("Content-Length: ");
-        header += len;
+        val[req_hndlr_ns::header] += FPSTR("Content-Length: ");
+        val[req_hndlr_ns::header] += len;
         addNewLine();
     }
 
     void addUAHeader()
     {
-        header += FPSTR("User-Agent: ESP");
+        val[req_hndlr_ns::header] += FPSTR("User-Agent: ESP");
         addNewLine();
     }
 
     void addConnectionHeader(bool keepAlive)
     {
-        header += keepAlive ? FPSTR("Connection: keep-alive") : FPSTR("Connection: close");
+        val[req_hndlr_ns::header] += keepAlive ? FPSTR("Connection: keep-alive") : FPSTR("Connection: close");
         addNewLine();
     }
 
@@ -175,24 +184,24 @@ public:
         switch (method)
         {
         case async_request_handler_t::http_get:
-            header += FPSTR("GET");
+            val[req_hndlr_ns::header] += FPSTR("GET");
             break;
         case async_request_handler_t::http_post:
-            header += FPSTR("POST");
+            val[req_hndlr_ns::header] += FPSTR("POST");
             post = true;
             break;
 
         case async_request_handler_t::http_patch:
-            header += FPSTR("PATCH");
+            val[req_hndlr_ns::header] += FPSTR("PATCH");
             post = true;
             break;
 
         case async_request_handler_t::http_delete:
-            header += FPSTR("DELETE");
+            val[req_hndlr_ns::header] += FPSTR("DELETE");
             break;
 
         case async_request_handler_t::http_put:
-            header += FPSTR("PUT");
+            val[req_hndlr_ns::header] += FPSTR("PUT");
             break;
 
         default:
@@ -200,7 +209,7 @@ public:
         }
 
         if (method == async_request_handler_t::http_get || method == async_request_handler_t::http_post || method == async_request_handler_t::http_patch || method == async_request_handler_t::http_delete || method == async_request_handler_t::http_put)
-            header += FPSTR(" ");
+            val[req_hndlr_ns::header] += FPSTR(" ");
 
         return post;
     }
@@ -208,19 +217,19 @@ public:
     /* Append the string with last request line (HTTP version) */
     void addRequestHeaderLast()
     {
-        header += FPSTR(" HTTP/1.1\r\n");
+        val[req_hndlr_ns::header] += FPSTR(" HTTP/1.1\r\n");
     }
 
     /* Append the string with first part of Authorization header */
     void addAuthHeaderFirst(auth_token_type type)
     {
-        header += FPSTR("Authorization: ");
+        val[req_hndlr_ns::header] += FPSTR("Authorization: ");
         if (type == auth_access_token || type == auth_sa_access_token)
-            header += FPSTR("Bearer ");
+            val[req_hndlr_ns::header] += FPSTR("Bearer ");
         else if (type == auth_user_id_token || type == auth_id_token || type == auth_custom_token)
-            header += FPSTR("Firebase ");
+            val[req_hndlr_ns::header] += FPSTR("Firebase ");
         else
-            header += FPSTR("key=");
+            val[req_hndlr_ns::header] += FPSTR("key=");
     }
 
     void feedTimer(int interval = -1)

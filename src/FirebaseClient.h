@@ -30,7 +30,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.1.6"
+#define FIREBASE_CLIENT_VERSION "0.1.7"
 
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
@@ -121,7 +121,7 @@ namespace firebase
             {
 #if defined(ENABLE_LEGACY_TOKEN)
                 if (app.auth_data.user_auth.auth_data_type == user_auth_data_legacy_token)
-                    app.auth_data.app_token.token = app.auth_data.user_auth.legacy_token.token;
+                    app.auth_data.app_token.val[app_tk_ns::token] = app.auth_data.user_auth.legacy_token.val[legacy_tk_ns::token];
 #endif
                 app.auth_data.app_token.authenticated = true;
 
@@ -132,10 +132,10 @@ namespace firebase
 #if defined(ENABLE_ID_TOKEN)
 
                 app.auth_data.app_token.expire = app.expire;
-                app.auth_data.user_auth.user.api_key = app.auth_data.user_auth.user.api_key;
-                app.auth_data.app_token.token = app.auth_data.user_auth.id_token.token;
-                app.auth_data.app_token.refresh = app.auth_data.user_auth.id_token.refresh;
-                app.auth_data.app_token.authenticated = app.auth_data.user_auth.id_token.token.length() ? app.auth_data.user_auth.initialized : false;
+                app.auth_data.user_auth.user.val[user_ns::api_key] = app.auth_data.user_auth.user.val[user_ns::api_key];
+                app.auth_data.app_token.val[app_tk_ns::token] = app.auth_data.user_auth.id_token.val[id_tk_ns::token];
+                app.auth_data.app_token.val[app_tk_ns::refresh] = app.auth_data.user_auth.id_token.val[id_tk_ns::refresh];
+                app.auth_data.app_token.authenticated = app.auth_data.user_auth.id_token.val[id_tk_ns::token].length() ? app.auth_data.user_auth.initialized : false;
                 resetTimer(app, true, app.auth_data.user_auth.id_token.expire);
 #endif
             }
@@ -147,15 +147,15 @@ namespace firebase
 
                     app.auth_data.app_token.expire = app.auth_data.user_auth.access_token.expire;
 
-                    if (app.auth_data.user_auth.access_token.token.length())
+                    if (app.auth_data.user_auth.access_token.val[access_tk_ns::token].length())
                     {
-                        app.auth_data.app_token.token = app.auth_data.user_auth.access_token.token;
-                        app.auth_data.app_token.refresh = app.auth_data.user_auth.access_token.refresh;
+                        app.auth_data.app_token.val[app_tk_ns::token] = app.auth_data.user_auth.access_token.val[access_tk_ns::token];
+                        app.auth_data.app_token.val[app_tk_ns::refresh] = app.auth_data.user_auth.access_token.val[access_tk_ns::refresh];
                         app.auth_data.app_token.authenticated = app.auth_data.user_auth.initialized;
                     }
                     else
                     {
-                        app.auth_data.app_token.refresh = app.auth_data.user_auth.access_token.refresh;
+                        app.auth_data.app_token.val[app_tk_ns::refresh] = app.auth_data.user_auth.access_token.val[access_tk_ns::refresh];
                         app.auth_data.app_token.authenticated = false;
                     }
 
@@ -169,14 +169,14 @@ namespace firebase
                     app.auth_data.app_token.expire = app.auth_data.user_auth.custom_token.expire;
 
                     int token_part = 0;
-                    for (size_t i = 0; i < app.auth_data.user_auth.custom_token.token.length(); i++)
-                        if (app.auth_data.user_auth.custom_token.token[i] == '.')
+                    for (size_t i = 0; i < app.auth_data.user_auth.custom_token.val[cust_tk_ns::token].length(); i++)
+                        if (app.auth_data.user_auth.custom_token.val[cust_tk_ns::token][i] == '.')
                             token_part++;
 
                     if (token_part == 3)
-                        app.auth_data.app_token.token = app.auth_data.user_auth.custom_token.token;
+                        app.auth_data.app_token.val[app_tk_ns::token] = app.auth_data.user_auth.custom_token.val[cust_tk_ns::token];
                     else // not a valid custom token, treat as a refresh token
-                        app.auth_data.app_token.refresh = app.auth_data.user_auth.custom_token.token;
+                        app.auth_data.app_token.val[app_tk_ns::refresh] = app.auth_data.user_auth.custom_token.val[cust_tk_ns::token];
 
                     app.auth_data.app_token.authenticated = false;
 

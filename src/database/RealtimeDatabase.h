@@ -913,12 +913,6 @@ private:
 
         request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
-        if (request.options && request.options->customHeaders.length() && sData->request.header.indexOf("X-Firebase-") == -1 && sData->request.header.indexOf("-ETag") == -1)
-        {
-            sData->request.header += request.options->customHeaders;
-            sData->request.header += "\r\n";
-        }
-
         if (request.file)
         {
             sData->request.file_data.copy(*request.file);
@@ -927,9 +921,11 @@ private:
         }
         else if (strlen(payload))
         {
-            sData->request.payload = payload;
+            sData->request.val[req_hndlr_ns::payload] = payload;
             request.aClient->setContentLength(sData, strlen(payload));
         }
+
+        setFileStatus(sData, request);
 
         if (request.opt.ota)
         {
@@ -983,7 +979,21 @@ private:
             request.cb(*aResult);
 
         if (!request.aResult)
+        {
             delete aResult;
+            aResult = nullptr;
+        }
+    }
+
+    void setFileStatus(async_data_item_t *sData, async_request_data_t &request)
+    {
+        if (sData->request.file_data.filename.length())
+        {
+            sData->download = request.method == async_request_handler_t::http_get;
+            sData->upload = request.method == async_request_handler_t::http_post ||
+                            request.method == async_request_handler_t::http_put ||
+                            request.method == async_request_handler_t::http_patch;
+        }
     }
 };
 

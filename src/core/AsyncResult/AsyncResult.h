@@ -36,6 +36,19 @@
 
 using namespace firebase;
 
+namespace ares_ns
+{
+    enum data_item_type_t
+    {
+        res_uid,
+        res_etag,
+        data_path,
+        data_payload,
+        debug_info,
+        max_type
+    };
+}
+
 namespace firebase
 {
     struct app_event_t
@@ -76,10 +89,7 @@ namespace firebase
 
     public:
         template <typename T>
-        T to()
-        {
-            return vcon.to<T>(data().c_str());
-        }
+        T to() { return vcon.to<T>(data().c_str()); }
         bool isStream() const { return sse; }
         String name() const { return node_name.c_str(); }
         String ETag() const { return etag.c_str(); }
@@ -166,15 +176,9 @@ namespace firebase
                 }
             }
         }
-        void setEventResumeStatus(event_resume_status_t status)
-        {
-            event_resume_status = status;
-        }
+        void setEventResumeStatus(event_resume_status_t status) { event_resume_status = status; }
 
-        event_resume_status_t eventResumeStatus() const
-        {
-            return event_resume_status;
-        }
+        event_resume_status_t eventResumeStatus() const { return event_resume_status; }
 
         bool null_etag = false;
         String *ref_payload = nullptr;
@@ -201,7 +205,7 @@ class AsyncResult
     friend class Functions;
     friend class Storage;
     friend class CloudStorage;
-     friend class FirestoreBase;
+    friend class FirestoreBase;
     friend class FirestoreDocuments;
     friend class async_data_item_t;
 
@@ -237,7 +241,7 @@ class AsyncResult
 
 private:
     uint32_t addr = 0;
-    String result_uid, data_path, data_payload, res_etag, debug_info;
+    String val[ares_ns::max_type];
     bool debug_info_available = false;
     download_data_t download_data;
     upload_data_t upload_data;
@@ -250,21 +254,46 @@ private:
         if (data.length())
         {
             data_available = true;
-            data_payload = data;
+            val[ares_ns::data_payload] = data;
         }
 #if defined(ENABLE_DATABASE)
-        rtdbResult.ref_payload = &data_payload;
+        rtdbResult.ref_payload = &val[ares_ns::data_payload];
 #endif
     }
 
-    void setETag(const String &etag)
+    void setETag(const String &etag) { val[ares_ns::res_etag] = etag; }
+    void setPath(const String &path) { val[ares_ns::data_path] = path; }
+
+    bool setDownloadProgress()
     {
-        res_etag = etag;
+        download_data.progress_available = false;
+        if (download_data.downloaded > 0)
+        {
+            int progress = (float)download_data.downloaded / download_data.total * 100;
+            if (download_data.progress != progress && (progress == 0 || progress == 100 || download_data.progress + 2 <= progress))
+            {
+                download_data.progress_available = true;
+                download_data.progress = progress;
+                return true;
+            }
+        }
+        return false;
     }
 
-    void setPath(const String &path)
+    bool setUploadProgress()
     {
-        data_path = path;
+        upload_data.progress_available = false;
+        if (upload_data.uploaded > 0)
+        {
+            int progress = (float)upload_data.uploaded / upload_data.total * 100;
+            if (upload_data.progress != progress && (progress == 0 || progress == 100 || upload_data.progress + 2 <= progress))
+            {
+                upload_data.progress_available = true;
+                upload_data.progress = progress;
+                return true;
+            }
+        }
+        return false;
     }
 
 public:
@@ -274,7 +303,7 @@ public:
 
     void setDebug(const String &debug)
     {
-        debug_info = debug;
+        val[ares_ns::debug_info] = debug;
         if (debug.length())
             debug_info_available = true;
     }
@@ -282,7 +311,7 @@ public:
     AsyncResult()
     {
 #if defined(ENABLE_DATABASE)
-        rtdbResult.ref_payload = &data_payload;
+        rtdbResult.ref_payload = &val[ares_ns::data_payload];
 #endif
         addr = reinterpret_cast<uint32_t>(this);
         List vec;
@@ -293,60 +322,57 @@ public:
         List vec;
         vec.addRemoveList(rVec, addr, false);
     };
-    const char *c_str() { return data_payload.c_str(); }
-    String payload() const { return data_payload.c_str(); }
-    String path() const { return data_path.c_str(); }
-    String etag() const { return res_etag.c_str(); }
-    String uid() const { return result_uid.c_str(); }
-    String debug() const { return debug_info.c_str(); }
+    const char *c_str() { return val[ares_ns::data_payload].c_str(); }
+    String payload() const { return val[ares_ns::data_payload].c_str(); }
+    String path() const { return val[ares_ns::data_path].c_str(); }
+    String etag() const { return val[ares_ns::res_etag].c_str(); }
+    String uid() const { return val[ares_ns::res_uid].c_str(); }
+    String debug() const { return val[ares_ns::debug_info].c_str(); }
+    void clear()
+    {
+        for (size_t i = 0; i < ares_ns::max_type; i++)
+            val[i].remove(0, val[i].length());
+        debug_info_available = false;
+        lastError.setLastError(0, "");
+        app_event.setEvent(0, "");
+        data_available = false;
+        download_data.reset();
+        upload_data.reset();
+#if defined(ENABLE_DATABASE)
+        rtdbResult.clearSSE();
+#endif
+    }
     template <typename T>
     T &to()
     {
         static T o;
         if (std::is_same<T, RealtimeDatabaseResult>::value)
-        {
             return rtdbResult;
-        }
-
         return o;
     }
     int available()
     {
         bool ret = data_available;
         data_available = false;
-        return ret ? data_payload.length() : 0;
+        return ret ? val[ares_ns::data_payload].length() : 0;
     }
 
     app_event_t appEvent() const { return app_event; }
 
     bool uploadProgress()
     {
-        if (upload_data.uploaded > 0)
-        {
-            int progress = (float)upload_data.uploaded / upload_data.total * 100;
-            if (upload_data.progress != progress && (progress == 0 || progress == 100 || upload_data.progress + 2 <= progress))
-            {
-                upload_data.progress = progress;
-                return true;
-            }
-        }
-        return false;
+        if (!upload_data.progress_available)
+            setUploadProgress();
+        return upload_data.progress_available;
     }
 
     upload_data_t uploadInfo() const { return upload_data; }
 
     bool downloadProgress()
     {
-        if (download_data.downloaded > 0)
-        {
-            int progress = (float)download_data.downloaded / download_data.total * 100;
-            if (download_data.progress != progress && (progress == 0 || progress == 100 || download_data.progress + 2 <= progress))
-            {
-                download_data.progress = progress;
-                return true;
-            }
-        }
-        return false;
+        if (!download_data.progress_available)
+            setDownloadProgress();
+        return download_data.progress_available;
     }
 
     download_data_t downloadInfo() const { return download_data; }
@@ -364,7 +390,7 @@ public:
 
     bool isDebug()
     {
-        bool dbg = debug_info.length() > 0;
+        bool dbg = val[ares_ns::debug_info].length() > 0;
         if (debug_info_available)
         {
             debug_info_available = false;

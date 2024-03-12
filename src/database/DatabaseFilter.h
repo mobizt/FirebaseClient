@@ -1,5 +1,5 @@
 /**
- * Created February 21, 2024
+ * Created March 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -28,7 +28,6 @@
 #include <Arduino.h>
 #include "./Config.h"
 #include "./core/URL.h"
-
 
 #if defined(ENABLE_DATABASE)
 
@@ -62,26 +61,25 @@ public:
 
     DatabaseFilter &orderBy(const String &val)
     {
-
         complete = true;
         String ob = "\"";
         ob += val;
         ob += "\"";
-        uh.addParam(uri, "orderBy", ob, hasParams);
+        uh.addParam(uri, FPSTR("orderBy"), ob, hasParams);
         return *this;
     }
 
     template <typename T = int>
     DatabaseFilter &limitToFirst(T val)
     {
-        uh.addParam(uri, "limitToFirst", String(val), hasParams);
+        uh.addParam(uri, FPSTR("limitToFirst"), String(val), hasParams);
         return *this;
     }
 
     template <typename T = int>
     DatabaseFilter &limitToLast(T val)
     {
-        uh.addParam(uri, "limitToLast", String(val), hasParams);
+        uh.addParam(uri, FPSTR("limitToLast"), String(val), hasParams);
         return *this;
     }
 
@@ -90,13 +88,13 @@ public:
         String sa = "\"";
         sa += val;
         sa += "\"";
-        uh.addParam(uri, "startAt", sa, hasParams);
+        uh.addParam(uri, FPSTR("startAt"), sa, hasParams);
         return *this;
     }
 
     DatabaseFilter &startAt(int val)
     {
-        uh.addParam(uri, "startAt", String(val), hasParams);
+        uh.addParam(uri, FPSTR("startAt"), String(val), hasParams);
         return *this;
     }
 
@@ -105,13 +103,13 @@ public:
         String sa = "\"";
         sa += val;
         sa += "\"";
-        uh.addParam(uri, "endAt", sa, hasParams);
+        uh.addParam(uri, FPSTR("endAt"), sa, hasParams);
         return *this;
     }
 
     DatabaseFilter &endAt(int val)
     {
-        uh.addParam(uri, "endAt", String(val), hasParams);
+        uh.addParam(uri, FPSTR("endAt"), String(val), hasParams);
         return *this;
     }
 
@@ -120,19 +118,19 @@ public:
         String sa = "\"";
         sa += val;
         sa += "\"";
-        uh.addParam(uri, "equalTo", sa, hasParams);
+        uh.addParam(uri, FPSTR("equalTo"), sa, hasParams);
         return *this;
     }
 
     DatabaseFilter &equalTo(int val)
     {
-        uh.addParam(uri, "equalTo", String(val), hasParams);
+        uh.addParam(uri, FPSTR("equalTo"), String(val), hasParams);
         return *this;
     }
 
     DatabaseFilter &clear()
     {
-        uri.clear();
+        uri.remove(0, uri.length());
         complete = false;
         return *this;
     }

@@ -27,6 +27,98 @@
 #include <Arduino.h>
 #include "./core/FileConfig.h"
 #include "./core/StringHelper.h"
+
+namespace sa_ns
+{
+    enum data_item_type_t
+    {
+        cm,   // client email
+        pid,  // project Id
+        pk,   // private key
+        pkid, // private key Id
+        cid,  // client Id
+        max_type
+    };
+}
+
+namespace access_tk_ns
+{
+    enum data_item_type_t
+    {
+        token,   // access token
+        refresh, // refresh token
+        cid,     // client id
+        csec,    // client secret
+        max_type
+    };
+}
+
+namespace id_tk_ns
+{
+    enum data_item_type_t
+    {
+        token,   // id token
+        refresh, // refresh token
+        max_type
+    };
+}
+
+namespace user_ns
+{
+    enum data_item_type_t
+    {
+        em,       // email
+        psw,      // password
+        api_key,  // API Key
+                  // used with apiKey for current user verification and delete
+        id_token, // Id token
+        max_type
+    };
+}
+
+namespace cust_ns
+{
+    enum data_item_type_t
+    {
+        api_key, // API Key
+        uid,     // UID
+        scope,   // scope
+        claims,  // claims
+        max_type
+    };
+}
+
+namespace cust_tk_ns
+{
+    enum data_item_type_t
+    {
+        token, // id token
+        max_type
+    };
+}
+
+namespace legacy_tk_ns
+{
+    enum data_item_type_t
+    {
+        token, // token
+        max_type
+    };
+}
+
+namespace app_tk_ns
+{
+    enum data_item_type_t
+    {
+        type,    // token type
+        token,   // auth token
+        refresh, // refresh token
+        uid,     // UID
+        pid,     // project Id
+        max_type
+    };
+}
+
 namespace firebase
 {
     enum firebase_core_auth_task_type
@@ -59,7 +151,6 @@ namespace firebase
     enum jwt_step
     {
         jwt_step_begin,
-        jwt_step_encode_header_payload,
         jwt_step_sign,
         jwt_step_ready,
         jwt_step_error
@@ -187,32 +278,24 @@ namespace firebase
             ~service_account() { clear(); }
             void copy(service_account &rhs)
             {
-                this->client_email = rhs.client_email;
-                this->project_id = rhs.project_id;
-                this->private_key = rhs.private_key;
-                this->private_key_id = rhs.private_key_id;
-                this->client_id = rhs.client_id;
+                for (size_t i = 0; i < sa_ns::max_type; i++)
+                    this->val[i] = rhs.val[i];
                 this->timestatus_cb = rhs.timestatus_cb;
                 this->expire = rhs.expire;
+                this->step = rhs.step;
             }
 
             void clear()
             {
-                client_email.clear();
-                project_id.clear();
-                private_key.clear();
-                private_key_id.clear();
-                client_id.clear();
+                for (size_t i = 0; i < sa_ns::max_type; i++)
+                    val[i].remove(0, val[i].length());
                 timestatus_cb = NULL;
                 expire = 3600;
+                step = jwt_step_begin;
             }
 
         protected:
-            String client_email;
-            String project_id;
-            String private_key;
-            String private_key_id;
-            String client_id;
+            String val[sa_ns::max_type];
             jwt_step step = jwt_step_begin;
             TimeStatusCallback timestatus_cb = NULL;
             size_t expire = 3600;
@@ -223,10 +306,7 @@ namespace firebase
         struct custom_data
         {
             // for custom claims
-            String api_key;
-            String uid;
-            String scope;
-            String claims;
+            String val[cust_ns::max_type];
             TimeStatusCallback timestatus_cb = NULL;
 
         public:
@@ -234,19 +314,15 @@ namespace firebase
             ~custom_data() { clear(); }
             void copy(custom_data &rhs)
             {
-                this->api_key = rhs.api_key;
-                this->uid = rhs.uid;
-                this->scope = rhs.scope;
-                this->claims = rhs.claims;
+                for (size_t i = 0; i < cust_ns::max_type; i++)
+                    this->val[i] = rhs.val[i];
                 this->timestatus_cb = rhs.timestatus_cb;
             }
 
             void clear()
             {
-                api_key.clear();
-                uid.clear();
-                scope.clear();
-                claims.clear();
+                for (size_t i = 0; i < cust_ns::max_type; i++)
+                    val[i].remove(0, val[i].length());
                 timestatus_cb = NULL;
             }
         };
@@ -254,11 +330,7 @@ namespace firebase
 
         struct user_data
         {
-            String email;
-            String password;
-            String api_key;
-            // used with apiKey for current user verification and delete
-            String id_token;
+            String val[user_ns::max_type];
             size_t expire = 3600;
 
         public:
@@ -266,25 +338,22 @@ namespace firebase
             ~user_data() { clear(); }
             void copy(user_data &rhs)
             {
-                this->email = rhs.email;
-                this->password = rhs.password;
-                this->api_key = rhs.api_key;
-                this->id_token = rhs.id_token;
+                for (size_t i = 0; i < user_ns::max_type; i++)
+                    this->val[i] = rhs.val[i];
                 this->expire = rhs.expire;
             }
             void clear()
             {
-                email.clear();
-                password.clear();
-                api_key.clear();
+                for (size_t i = 0; i < user_ns::max_type; i++)
+                    val[i].remove(0, val[i].length());
+                expire = 3600;
             }
         };
 
 #if defined(ENABLE_ID_TOKEN)
         struct id_token_data
         {
-            String token;
-            String refresh;
+            String val[id_tk_ns::max_type];
             size_t expire = 3600;
 
         public:
@@ -292,14 +361,14 @@ namespace firebase
             ~id_token_data() { clear(); }
             void copy(id_token_data &rhs)
             {
-                this->token = rhs.token;
-                this->refresh = rhs.refresh;
+                for (size_t i = 0; i < id_tk_ns::max_type; i++)
+                    this->val[i] = rhs.val[i];
                 this->expire = rhs.expire;
             }
             void clear()
             {
-                token.clear();
-                refresh.clear();
+                for (size_t i = 0; i < id_tk_ns::max_type; i++)
+                    val[i].remove(0, val[i].length());
                 expire = 3600;
             }
         };
@@ -308,33 +377,24 @@ namespace firebase
 #if defined(ENABLE_ACCESS_TOKEN)
         struct access_token_data
         {
-            String token;
-            String refresh;
-            String client_id;
-            String client_secret;
+            String val[access_tk_ns::max_type];
             size_t expire = 3600;
             TimeStatusCallback timestatus_cb = NULL;
 
         public:
-            access_token_data()
-            {
-            }
+            access_token_data() {}
             ~access_token_data() { clear(); }
             void copy(access_token_data &rhs)
             {
-                this->token = rhs.token;
-                this->refresh = rhs.refresh;
-                this->client_id = rhs.client_id;
-                this->client_secret = rhs.client_secret;
+                for (size_t i = 0; i < access_tk_ns::max_type; i++)
+                    this->val[i] = rhs.val[i];
                 this->expire = rhs.expire;
                 this->timestatus_cb = rhs.timestatus_cb;
             }
             void clear()
             {
-                token.clear();
-                refresh.clear();
-                client_id.clear();
-                client_secret.clear();
+                for (size_t i = 0; i < access_tk_ns::max_type; i++)
+                    val[i].remove(0, val[i].length());
                 expire = 3600;
                 timestatus_cb = NULL;
             }
@@ -344,7 +404,7 @@ namespace firebase
 #if defined(ENABLE_CUSTOM_TOKEN)
         struct custom_token_data
         {
-            String token;
+            String val[cust_tk_ns::max_type];
             size_t expire = 3600;
             TimeStatusCallback timestatus_cb = NULL;
 
@@ -353,13 +413,13 @@ namespace firebase
             ~custom_token_data() { clear(); }
             void copy(custom_token_data &rhs)
             {
-                this->token = rhs.token;
+                this->val[cust_tk_ns::token] = rhs.val[cust_tk_ns::token];
                 this->expire = rhs.expire;
                 this->timestatus_cb = rhs.timestatus_cb;
             }
             void clear()
             {
-                token.clear();
+                val[cust_tk_ns::token].remove(0, val[cust_tk_ns::token].length());
                 expire = 3600;
                 timestatus_cb = NULL;
             }
@@ -369,13 +429,13 @@ namespace firebase
 #if defined(ENABLE_LEGACY_TOKEN)
         struct legacy_token_data
         {
-            String token;
+            String val[legacy_tk_ns::max_type];
 
         public:
             legacy_token_data() {}
             ~legacy_token_data() { clear(); }
-            void copy(legacy_token_data &rhs) { this->token = rhs.token; }
-            void clear() { token.clear(); }
+            void copy(legacy_token_data &rhs) { this->val[legacy_tk_ns::token] = rhs.val[legacy_tk_ns::token]; }
+            void clear() { val[legacy_tk_ns::token].remove(0, val[legacy_tk_ns::token].length()); }
         };
 #endif
 
@@ -423,6 +483,8 @@ namespace firebase
 
         void clear()
         {
+            user.clear();
+
 #if defined(ENABLE_SERVICE_AUTH)
             sa.clear();
 #endif
@@ -430,8 +492,6 @@ namespace firebase
 #if defined(ENABLE_CUSTOM_AUTH)
             cust.clear();
 #endif
-
-            user.clear();
 
 #if defined(ENABLE_ID_TOKEN)
             id_token.clear();
@@ -455,14 +515,14 @@ namespace firebase
         }
 
     protected:
+        user_data user;
+
 #if defined(ENABLE_SERVICE_AUTH)
         service_account sa;
 #endif
 #if defined(ENABLE_CUSTOM_AUTH)
         custom_data cust;
 #endif
-        user_data user;
-
 #if defined(ENABLE_ID_TOKEN)
         id_token_data id_token;
 #endif
@@ -488,46 +548,12 @@ namespace firebase
         TimeStatusCallback timestatus_cb = NULL;
     };
 
-    struct token_info_t
-    {
-        String jwt_token;
-        String auth_token;
-        String refresh_token;
-        String uid;
-        String header_auth_type;
-        uint32_t expire = 0;
-
-    public:
-        token_info_t() {}
-        ~token_info_t() { clear(); }
-        void clear()
-        {
-            jwt_token.clear();
-            auth_token.clear();
-            refresh_token.clear();
-            uid.clear();
-            header_auth_type.clear();
-            expire = 0;
-        }
-
-        void copy(token_info_t &rhs)
-        {
-            this->jwt_token = rhs.jwt_token;
-            this->auth_token = rhs.auth_token;
-            this->refresh_token = rhs.refresh_token;
-            this->uid = rhs.uid;
-            this->header_auth_type = rhs.header_auth_type;
-            this->expire = rhs.expire;
-        }
-    };
-
 #if defined(ENABLE_FS)
 
 #if defined(ENABLE_USER_AUTH) || defined(ENABLE_ACCESS_TOKEN) || defined(ENABLE_CUSTOM_TOKEN) || defined(ENABLE_ID_TOKEN) || defined(ENABLE_LEGACY_TOKEN)
 
     class UserTokenFileParser
     {
-
     public:
         enum token_type
         {
@@ -537,6 +563,7 @@ namespace firebase
             token_type_custom_token,
             token_type_legacy_token
         };
+        
         static bool parseUserFile(token_type type, FILEOBJ userfile, user_auth_data &auth_data)
         {
             String buff;
@@ -580,18 +607,15 @@ namespace firebase
 
                 if (type == token_type_user_data && tokenSize == 3)
                 {
-                    auth_data.user.api_key = tokens[0];
-                    auth_data.user.email = tokens[1];
-                    auth_data.user.password = tokens[2];
+                    for (size_t i = 0; i < 3; i++)
+                        auth_data.user.val[i] = tokens[i];
                     return true;
                 }
                 else if (type == token_type_access_token && tokenSize == 5)
                 {
 #if defined(ENABLE_ACCESS_TOKEN)
-                    auth_data.access_token.token = tokens[0];
-                    auth_data.access_token.refresh = tokens[1];
-                    auth_data.access_token.client_id = tokens[2];
-                    auth_data.access_token.client_secret = tokens[3];
+                    for (size_t i = 0; i < access_tk_ns::max_type; i++)
+                        auth_data.access_token.val[i] = tokens[i];
                     auth_data.access_token.expire = atoi(tokens[4].c_str());
 #endif
                     return true;
@@ -599,24 +623,24 @@ namespace firebase
                 else if (type == token_type_id_token && tokenSize == 4)
                 {
 #if defined(ENABLE_ID_TOKEN)
-                    auth_data.user.api_key = tokens[0];
-                    auth_data.id_token.token = tokens[1];
-                    auth_data.id_token.refresh = tokens[2];
+                    auth_data.id_token.val[id_tk_ns::token] = tokens[0];
+                    auth_data.id_token.val[id_tk_ns::refresh] = tokens[1];
+                    auth_data.user.val[user_ns::api_key] = tokens[2];
                     auth_data.id_token.expire = atoi(tokens[3].c_str());
 #endif
                 }
                 else if (type == token_type_custom_token && tokenSize == 3)
                 {
-                    auth_data.user.api_key = tokens[0];
 #if defined(ENABLE_CUSTOM_TOKEN)
-                    auth_data.custom_token.token = tokens[1];
+                    auth_data.custom_token.val[cust_tk_ns::token] = tokens[0];
+                    auth_data.user.val[user_ns::api_key] = tokens[1];
                     auth_data.custom_token.expire = atoi(tokens[2].c_str());
 #endif
                 }
                 else if (type == token_type_legacy_token && tokenSize == 1)
                 {
 #if defined(ENABLE_LEGACY_TOKEN)
-                    auth_data.legacy_token.token = tokens[0];
+                    auth_data.legacy_token.val[legacy_tk_ns::token] = tokens[0];
 #endif
                 }
             }
@@ -632,36 +656,35 @@ namespace firebase
             {
                 if (type == token_type_user_data)
                 {
-                    userfile.print(auth_data.user.api_key.c_str());
-                    userfile.print(FPSTR(","));
-                    userfile.print(auth_data.user.email.c_str());
-                    userfile.print(FPSTR(","));
-                    userfile.print(auth_data.user.password.c_str());
+                    for (size_t i = 0; i < 3; i++)
+                    {
+                        userfile.print(auth_data.user.val[i].c_str());
+                        if (i < 2)
+                            userfile.print(FPSTR(","));
+                    }
                     return true;
                 }
                 else if (type == token_type_access_token)
                 {
 #if defined(ENABLE_ACCESS_TOKEN)
-                    userfile.print(auth_data.access_token.token.c_str());
-                    userfile.print(FPSTR(","));
-                    userfile.print(auth_data.access_token.refresh.c_str());
-                    userfile.print(FPSTR(","));
-                    userfile.print(auth_data.access_token.client_id.c_str());
-                    userfile.print(FPSTR(","));
-                    userfile.print(auth_data.access_token.client_secret.c_str());
-                    userfile.print(FPSTR(","));
+                    for (size_t i = 0; i < access_tk_ns::max_type; i++)
+                    {
+                        userfile.print(auth_data.access_token.val[i].c_str());
+                        userfile.print(FPSTR(","));
+                    }
                     userfile.print(String(auth_data.access_token.expire).c_str());
 #endif
                     return true;
                 }
                 else if (type == token_type_id_token)
                 {
-                    userfile.print(auth_data.user.api_key.c_str());
-                    userfile.print(FPSTR(","));
+
 #if defined(ENABLE_ID_TOKEN)
-                    userfile.print(auth_data.id_token.token.c_str());
+                    userfile.print(auth_data.id_token.val[id_tk_ns::token].c_str());
                     userfile.print(FPSTR(","));
-                    userfile.print(auth_data.id_token.refresh.c_str());
+                    userfile.print(auth_data.id_token.val[id_tk_ns::refresh].c_str());
+                    userfile.print(FPSTR(","));
+                    userfile.print(auth_data.user.val[user_ns::api_key].c_str());
                     userfile.print(FPSTR(","));
                     userfile.print(String(auth_data.id_token.expire).c_str());
 #endif
@@ -669,10 +692,10 @@ namespace firebase
                 }
                 else if (type == token_type_custom_token)
                 {
-                    userfile.print(auth_data.user.api_key.c_str());
-                    userfile.print(FPSTR(","));
 #if defined(ENABLE_CUSTOM_TOKEN)
-                    userfile.print(auth_data.custom_token.token.c_str());
+                    userfile.print(auth_data.custom_token.val[cust_tk_ns::token].c_str());
+                    userfile.print(FPSTR(","));
+                    userfile.print(auth_data.user.val[user_ns::api_key].c_str());
                     userfile.print(FPSTR(","));
                     userfile.print(auth_data.custom_token.expire);
 #endif
@@ -681,7 +704,7 @@ namespace firebase
                 else if (type == token_type_legacy_token)
                 {
 #if defined(ENABLE_LEGACY_TOKEN)
-                    userfile.print(auth_data.legacy_token.token.c_str());
+                    userfile.print(auth_data.legacy_token.val[legacy_tk_ns::token].c_str());
 #endif
                     return true;
                 }
@@ -717,19 +740,19 @@ namespace firebase
                 sh.parse(buf, "\"project_id\"", ",", p1, p2);
                 if (p1 > -1 && p2 > -1)
                 {
-                    auth_data.sa.project_id = buf.substring(p1 + 1, p2 - 1);
+                    auth_data.sa.val[sa_ns::pid] = buf.substring(p1 + 1, p2 - 1);
                     p1 = p2;
                 }
                 sh.parse(buf, "\"private_key_id\"", ",", p1, p2);
                 if (p1 > -1 && p2 > -1)
                 {
-                    auth_data.sa.private_key_id = buf.substring(p1 + 1, p2 - 1);
+                    auth_data.sa.val[sa_ns::pkid] = buf.substring(p1 + 1, p2 - 1);
                     p1 = p2;
                 }
                 sh.parse(buf, "\"private_key\"", ",", p1, p2);
                 if (p1 > -1 && p2 > -1)
                 {
-                    auth_data.sa.private_key = buf.substring(p1 + 1, p2 - 1);
+                    auth_data.sa.val[sa_ns::pk] = buf.substring(p1 + 1, p2 - 1);
                     p1 = p2;
                     auth_data.initialized = true;
                     ret = true;
@@ -737,13 +760,13 @@ namespace firebase
                 sh.parse(buf, "\"client_email\"", ",", p1, p2);
                 if (p1 > -1 && p2 > -1)
                 {
-                    auth_data.sa.client_email = buf.substring(p1 + 1, p2 - 1);
+                    auth_data.sa.val[sa_ns::cm] = buf.substring(p1 + 1, p2 - 1);
                     p1 = p2;
                 }
                 sh.parse(buf, "\"client_id\"", ",", p1, p2);
                 if (p1 > -1 && p2 > -1)
                 {
-                    auth_data.sa.client_id = buf.substring(p1 + 1, p2 - 1);
+                    auth_data.sa.val[sa_ns::cid] = buf.substring(p1 + 1, p2 - 1);
                     p1 = p2;
                 }
             }
@@ -765,9 +788,9 @@ namespace firebase
         UserAuth(const String &api_key, const String &email, const String &password, size_t expire = 3600)
         {
             data.clear();
-            data.user.api_key = api_key;
-            data.user.email = email;
-            data.user.password = password;
+            data.user.val[user_ns::api_key] = api_key;
+            data.user.val[user_ns::em] = email;
+            data.user.val[user_ns::psw] = password;
             data.auth_type = auth_user_id_token;
             data.auth_data_type = user_auth_data_user_data;
             data.user.expire = expire;
@@ -783,12 +806,8 @@ namespace firebase
                 userFile.cb(userFile.file, userFile.filename.c_str(), file_mode_open_read);
                 if (userFile.file)
                 {
-
                     if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_user_data, userFile.file, data))
-                    {
-
                         data.initialized = true;
-                    }
                     userFile.file.close();
                 }
             }
@@ -812,13 +831,8 @@ namespace firebase
             return ret;
         }
 
-        void clear()
-        {
-            data.clear();
-        }
-
         ~UserAuth() { data.clear(); };
-
+        void clear() { data.clear(); }
         user_auth_data &get() { return data; }
 
     private:
@@ -836,9 +850,9 @@ namespace firebase
         ServiceAuth(TimeStatusCallback timeCb, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = 3600)
         {
             data.clear();
-            data.sa.client_email = clientEmail;
-            data.sa.project_id = projectId;
-            data.sa.private_key = privateKey;
+            data.sa.val[sa_ns::cm] = clientEmail;
+            data.sa.val[sa_ns::pid] = projectId;
+            data.sa.val[sa_ns::pk] = privateKey;
             data.sa.expire = expire;
             data.initialized = isInitialized();
             data.auth_type = auth_sa_access_token;
@@ -864,10 +878,9 @@ namespace firebase
         }
 
         ~ServiceAuth() { data.clear(); };
-
+        void clear() { data.clear(); }
         user_auth_data &get() { return data; }
-
-        bool isInitialized() { return data.sa.client_email.length() > 0 && data.sa.project_id.length() > 0 && data.sa.private_key.length() > 0; }
+        bool isInitialized() { return data.sa.val[sa_ns::cm].length() > 0 && data.sa.val[sa_ns::pid].length() > 0 && data.sa.val[sa_ns::pk].length() > 0; }
 
     private:
         user_auth_data data;
@@ -884,14 +897,14 @@ namespace firebase
         CustomAuth(TimeStatusCallback timeCb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = 3600)
         {
             data.clear();
-            data.sa.client_email = clientEmail;
-            data.sa.project_id = projectId;
-            data.sa.private_key = privateKey;
+            data.sa.val[sa_ns::cm] = clientEmail;
+            data.sa.val[sa_ns::pid] = projectId;
+            data.sa.val[sa_ns::pk] = privateKey;
             data.sa.expire = expire;
-            data.cust.api_key = apiKey;
-            data.cust.uid = uid;
-            data.cust.scope = scope;
-            data.cust.claims = claims;
+            data.cust.val[cust_ns::api_key] = apiKey;
+            data.cust.val[cust_ns::uid] = uid;
+            data.cust.val[cust_ns::scope] = scope;
+            data.cust.val[cust_ns::claims] = claims;
             data.initialized = isInitialized();
             data.auth_type = auth_sa_custom_token;
             data.auth_data_type = user_auth_data_custom_data;
@@ -909,7 +922,7 @@ namespace firebase
                 {
                     if (SAParser::parseSAFile(safile.file, data))
                     {
-                        data.cust.uid = uid;
+                        data.cust.val[cust_ns::uid] = uid;
                         data.auth_type = auth_sa_custom_token;
                         data.auth_data_type = user_auth_data_custom_data;
                     }
@@ -924,10 +937,7 @@ namespace firebase
 
         user_auth_data &get() { return data; }
 
-        bool isInitialized()
-        {
-            return data.sa.private_key.length() > 0 && data.sa.client_email.length() > 0 && data.sa.project_id.length() > 0 && data.sa.private_key.length() > 0 && data.cust.uid.length() > 0;
-        }
+        bool isInitialized() { return data.sa.val[sa_ns::pk].length() > 0 && data.sa.val[sa_ns::cm].length() > 0 && data.sa.val[sa_ns::pid].length() > 0 && data.sa.val[sa_ns::pk].length() > 0 && data.cust.val[cust_ns::uid].length() > 0; }
 
     private:
         user_auth_data data;
@@ -943,49 +953,38 @@ namespace firebase
     public:
         UserAccount(const String &apiKey)
         {
-            data.user.api_key = apiKey;
-            data.auth_type = auth_user_id_token;
-            data.auth_data_type = user_auth_data_user_data;
-            data.initialized = true;
+            data.user.val[user_ns::api_key] = apiKey;
+            setType(auth_user_id_token, user_auth_data_user_data);
         }
         UserAccount &email(const String &email)
         {
-            data.user.email = email;
-            data.auth_type = auth_user_id_token;
-            data.auth_data_type = user_auth_data_user_data;
-            data.initialized = true;
-            return *this;
+            data.user.val[user_ns::em] = email;
+            return setType(auth_user_id_token, user_auth_data_user_data);
         };
-
         UserAccount &password(const String &password)
         {
-            data.user.password = password;
-            data.auth_type = auth_user_id_token;
-            data.auth_data_type = user_auth_data_user_data;
-            data.initialized = true;
-            return *this;
+            data.user.val[user_ns::psw] = password;
+            return setType(auth_user_id_token, user_auth_data_user_data);
         };
-
         UserAccount &idToken(const String &idToken)
         {
-            data.user.id_token = idToken;
-            data.auth_type = auth_user_id_token;
-            data.auth_data_type = user_auth_data_user_data;
-            data.initialized = true;
-            return *this;
+            data.user.val[user_ns::id_token] = idToken;
+            return setType(auth_user_id_token, user_auth_data_user_data);
         };
 
-        void clear()
-        {
-            data.clear();
-        }
-
         ~UserAccount() { data.clear(); };
-
+        void clear() { data.clear(); }
         user_auth_data &get() { return data; }
 
     private:
         user_auth_data data;
+        UserAccount &setType(auth_token_type auth_type, user_auth_data_type data_type)
+        {
+            data.auth_type = auth_type;
+            data.auth_data_type = data_type;
+            data.initialized = true;
+            return *this;
+        }
     };
 
 #endif
@@ -999,9 +998,9 @@ namespace firebase
         IDToken(const String &api_key, const String &token, size_t expire = 3600, const String &refresh = "")
         {
             this->data.clear();
-            this->data.user.api_key = api_key;
-            this->data.id_token.token = token;
-            this->data.id_token.refresh = refresh;
+            this->data.user.val[user_ns::api_key] = api_key;
+            this->data.id_token.val[id_tk_ns::token] = token;
+            this->data.id_token.val[id_tk_ns::refresh] = refresh;
             this->data.id_token.expire = expire;
             this->data.initialized = true;
             this->data.auth_type = auth_user_id_token;
@@ -1046,11 +1045,7 @@ namespace firebase
             return ret;
         }
 
-        void clear()
-        {
-            data.clear();
-        }
-
+        void clear() { data.clear(); }
         user_auth_data &get() { return data; }
 
     private:
@@ -1069,10 +1064,10 @@ namespace firebase
         AccessToken(const String &token, size_t expire = 3600, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
         {
             this->data.clear();
-            this->data.access_token.token = token;
-            this->data.access_token.refresh = refresh;
-            this->data.access_token.client_id = client_id;
-            this->data.access_token.client_secret = client_secret;
+            this->data.access_token.val[access_tk_ns::token] = token;
+            this->data.access_token.val[access_tk_ns::refresh] = refresh;
+            this->data.access_token.val[access_tk_ns::cid] = client_id;
+            this->data.access_token.val[access_tk_ns::csec] = client_secret;
             this->data.access_token.expire = expire;
             this->data.initialized = true;
             this->data.auth_type = auth_access_token;
@@ -1117,11 +1112,7 @@ namespace firebase
             return ret;
         }
 
-        void clear()
-        {
-            data.clear();
-        }
-
+        void clear() { data.clear(); }
         user_auth_data &get() { return data; }
 
     private:
@@ -1140,10 +1131,10 @@ namespace firebase
         CustomToken(const String &api_key, const String &token, size_t expire = 3600)
         {
             this->data.clear();
-            this->data.custom_token.token = token;
-            this->data.user.api_key = api_key;
+            this->data.custom_token.val[cust_tk_ns::token] = token;
+            this->data.user.val[user_ns::api_key] = api_key;
             this->data.custom_token.expire = expire;
-            this->data.initialized = data.custom_token.token.length() > 0 && data.user.api_key.length() > 0;
+            this->data.initialized = data.custom_token.val[cust_tk_ns::token].length() > 0 && data.user.val[user_ns::api_key].length() > 0;
             this->data.auth_type = auth_custom_token;
             this->data.auth_data_type = user_auth_data_custom_token;
         }
@@ -1159,7 +1150,7 @@ namespace firebase
                 {
                     if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_custom_token, tokenFile.file, data))
                     {
-                        data.initialized = data.custom_token.token.length() > 0 && data.user.api_key.length() > 0;
+                        data.initialized = data.custom_token.val[cust_tk_ns::token].length() > 0 && data.user.val[user_ns::api_key].length() > 0;
                         data.auth_type = auth_custom_token;
                         data.auth_data_type = user_auth_data_custom_token;
                     }
@@ -1187,11 +1178,7 @@ namespace firebase
             return ret;
         }
 
-        void clear()
-        {
-            data.clear();
-        }
-
+        void clear() { data.clear(); }
         user_auth_data &get() { return data; }
 
     private:
@@ -1208,7 +1195,7 @@ namespace firebase
         LegacyToken(const String &token)
         {
             this->data.clear();
-            this->data.legacy_token.token = token;
+            this->data.legacy_token.val[legacy_tk_ns::token] = token;
             this->data.initialized = true;
             this->data.auth_type = auth_unknown_token;
             this->data.auth_data_type = user_auth_data_legacy_token;
@@ -1252,11 +1239,7 @@ namespace firebase
             return ret;
         }
 
-        void clear()
-        {
-            data.clear();
-        }
-
+        void clear() { data.clear(); }
         user_auth_data &get() { return data; }
 
     private:
@@ -1286,29 +1269,21 @@ namespace firebase
     struct app_token_t
     {
     public:
-        String token_type;
-        String token;
-        String refresh;
-        String uid;
-        String project_id;
+        String val[app_tk_ns::max_type];
         uint32_t expire = 0;
         bool authenticated = false;
         auth_token_type auth_type = auth_unknown_token;
         user_auth_data_type auth_data_type = user_auth_data_undefined;
         void clear()
         {
-            token_type.remove(0, token_type.length());
-            token.remove(0, token.length());
-            refresh.remove(0, refresh.length());
-            uid.remove(0, uid.length());
-            expire = 0;
+            for (size_t i = 0; i < app_tk_ns::max_type; i++)
+                val[i].remove(0, val[i].length());
+            expire = 3600;
             authenticated = false;
             auth_type = auth_unknown_token;
             auth_data_type = user_auth_data_undefined;
         }
-        app_token_t()
-        {
-        }
+        app_token_t() {}
     };
 
     struct auth_data_t

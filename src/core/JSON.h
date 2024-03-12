@@ -31,6 +31,7 @@
 #include "./core/Memory.h"
 #include "./core/StringHelper.h"
 #include "./AsyncResult/Value.h"
+#include "./core/Core.h"
 
 class JsonHelper
 {
@@ -192,7 +193,7 @@ public:
             obj += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
         for (int i = 2; i <= nunArgs; i++)
         {
-            idle();
+            sys_idle();
             obj += ',';
             p = va_arg(ap, object_t);
             if (p)
@@ -200,15 +201,6 @@ public:
         }
         va_end(ap);
         obj += !arr ? '}' : ']';
-    }
-
-    void idle()
-    {
-#if defined(ARDUINO_ESP8266_MAJOR) && defined(ARDUINO_ESP8266_MINOR) && defined(ARDUINO_ESP8266_REVISION) && ((ARDUINO_ESP8266_MAJOR == 3 && ARDUINO_ESP8266_MINOR >= 1) || ARDUINO_ESP8266_MAJOR > 3)
-        esp_yield();
-#else
-        delay(0);
-#endif
     }
 };
 
