@@ -1,5 +1,5 @@
 /**
- * Created March 9, 2024
+ * Created March 13, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -284,7 +284,7 @@ private:
                         goto exit;
                     }
                 }
-                else
+                else if (sData->request.file_data.data)
                 {
                     memcpy(buf, sData->request.file_data.data + sData->request.file_data.data_pos, toSend);
                     sData->request.file_data.data_pos += toSend;
@@ -303,15 +303,18 @@ private:
                     toSend = sData->request.file_data.data_size - sData->request.file_data.data_pos < FIREBASE_CHUNK_SIZE ? sData->request.file_data.data_size - sData->request.file_data.data_pos : FIREBASE_CHUNK_SIZE;
 
                 buf = reinterpret_cast<uint8_t *>(mem.alloc(toSend));
+
                 if (sData->request.file_data.filename.length() > 0)
-                    toSend = sData->request.file_data.file.read(buf, toSend);
-                if (toSend == 0)
                 {
-                    setAsyncError(sData, state, FIREBASE_ERROR_FILE_READ, !sData->sse, true);
-                    ret = function_return_type_failure;
-                    goto exit;
+                    toSend = sData->request.file_data.file.read(buf, toSend);
+                    if (toSend == 0)
+                    {
+                        setAsyncError(sData, state, FIREBASE_ERROR_FILE_READ, !sData->sse, true);
+                        ret = function_return_type_failure;
+                        goto exit;
+                    }
                 }
-                else
+                else if (sData->request.file_data.data)
                 {
                     memcpy(buf, sData->request.file_data.data + sData->request.file_data.data_pos, toSend);
                     sData->request.file_data.data_pos += toSend;
@@ -463,7 +466,7 @@ private:
 
         if (!readResponse(sData))
         {
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
+            setAsyncError(sData, sData->state, sData->response.httpCode > 0 ? sData->response.httpCode : FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
             return function_return_type_failure;
         }
 
@@ -536,22 +539,25 @@ private:
             error_notify_timeout = true;
         }
 
+        bool download_status = sData->download && sData->aResult.setDownloadProgress();
+        bool upload_status = sData->upload && sData->aResult.setUploadProgress();
+
         if (sData->refResult)
         {
-            if (setData || error_notify_timeout)
+            if (setData || error_notify_timeout || download_status || upload_status)
             {
                 *sData->refResult = sData->aResult;
 
                 if (setData)
                     sData->refResult->setPayload(sData->aResult.val[ares_ns::data_payload]);
 
-                sData->refResult->setETag(sData->aResult.val[ares_ns::res_etag]);
-                sData->refResult->setPath(sData->aResult.val[ares_ns::data_path]);
+                if (sData->aResult.download_data.downloaded == 0 || sData->aResult.upload_data.uploaded == 0)
+                {
+                    sData->refResult->setETag(sData->aResult.val[ares_ns::res_etag]);
+                    sData->refResult->setPath(sData->aResult.val[ares_ns::data_path]);
+                }
             }
         }
-
-        bool download_status = sData->download && sData->aResult.setDownloadProgress();
-        bool upload_status = sData->upload && sData->aResult.setUploadProgress();
 
         if (sData->cb && (setData || error_notify_timeout || download_status || upload_status))
         {
@@ -562,19 +568,22 @@ private:
 
     void setLastError(async_data_item_t *sData)
     {
-        if (sData->error.code < 0)
+        if (!sData->aResult.error_available)
         {
-            sData->aResult.lastError.setClientError(sData->error.code);
-            lastErr.setClientError(sData->error.code);
-            sData->aResult.error_available = true;
-            sData->aResult.data_available = false;
-        }
-        else if (sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
-        {
-            sData->aResult.lastError.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
-            lastErr.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
-            sData->aResult.error_available = true;
-            sData->aResult.data_available = false;
+            if (sData->error.code < 0)
+            {
+                sData->aResult.lastError.setClientError(sData->error.code);
+                lastErr.setClientError(sData->error.code);
+                sData->aResult.error_available = true;
+                sData->aResult.data_available = false;
+            }
+            else if (sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
+            {
+                sData->aResult.lastError.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
+                lastErr.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
+                sData->aResult.error_available = true;
+                sData->aResult.data_available = false;
+            }
         }
     }
 
@@ -850,6 +859,7 @@ private:
                 }
                 else
                 {
+
                     if (sData->request.ota || (sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size))
                     {
                         if (sData->response.payloadLen)
@@ -1488,6 +1498,11 @@ private:
         }
 
         return slot;
+    }
+
+    void setContentType(async_data_item_t *sData, const String &type)
+    {
+        sData->request.addContentTypeHeader(type.c_str());
     }
 
     void setFileContentLength(async_data_item_t *sData)

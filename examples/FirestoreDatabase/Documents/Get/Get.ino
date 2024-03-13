@@ -259,7 +259,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -320,7 +320,7 @@ void loop()
 
             // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
-            Serial.println("[+] Create document... ");
+            Serial.println("Create document... ");
 
             Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
         }
@@ -330,7 +330,7 @@ void loop()
         // If the document path contains space e.g. "a b c/d e f"
         // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
 
-        Serial.println("[+] Get a document... ");
+        Serial.println("Get a document... ");
 
         Docs.get(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), asyncCB);
 
@@ -355,25 +355,21 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

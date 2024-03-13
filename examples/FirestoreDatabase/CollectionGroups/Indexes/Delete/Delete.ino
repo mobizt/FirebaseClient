@@ -87,9 +87,9 @@
  * The Firestore database id should be (default) or empty "".
  *
  * The <collectionId> is collection Id
- * 
+ *
  * The <indexId> is index.
- * 
+ *
  * The indexes is CollectionGroups::Indexes.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
@@ -234,7 +234,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -282,7 +282,7 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("[+] Deletes a composite index... ");
+        Serial.println("Deletes a composite index... ");
 
         // This index Id is obtained from the index of the result of index creation payload.
         // e.g. projects/xxxxxxxx/databases/(default)/collectionGroups/yyyyy/indexes/zzzzz
@@ -317,28 +317,23 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
         // To get the UID (string) from async result
         // aResult.uid();
-
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

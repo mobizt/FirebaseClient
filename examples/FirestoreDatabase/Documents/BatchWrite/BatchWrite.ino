@@ -265,7 +265,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -311,7 +311,7 @@ void loop()
         dataMillis = millis();
         counter++;
 
-        Serial.println("[+] Batch write documents... ");
+        Serial.println("Batch write documents... ");
 
         String documentPath = "test_collection/test_document_map_value";
 
@@ -377,25 +377,21 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

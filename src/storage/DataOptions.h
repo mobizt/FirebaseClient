@@ -1,5 +1,5 @@
 /**
- * Created March 12, 2024
+ * Created March 13, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -55,13 +55,28 @@ namespace FirebaseStorage
 
     public:
         Parent() {}
-        Parent(const String &bucketId, const String &object)
+        Parent(const String &bucketId, const String &object = "")
         {
             this->object = object;
             this->bucketId = bucketId;
+
+            if (this->bucketId.length() && this->bucketId.indexOf("://") > -1)
+                this->bucketId.remove(0, this->bucketId.indexOf("://") + 3);
+
+            if (this->bucketId.length())
+            {
+                if (this->bucketId.indexOf("://") > -1)
+                    this->bucketId.remove(0, this->bucketId.indexOf("://") + 3);
+
+                if (this->bucketId.length() && this->bucketId[this->bucketId.length() - 1] == '/')
+                    this->bucketId.remove(this->bucketId.length() - 1, 1);
+            }
+
+            if (this->object.length() && this->object[0] == '/')
+                this->object.remove(0, 1);
         }
-        String getObject() { return object; }
-        String getBucketId() { return bucketId; }
+        String getObject() const { return object; }
+        String getBucketId() const { return bucketId; }
     };
 
     class DataOptions
@@ -89,6 +104,7 @@ namespace FirebaseStorage
         AsyncClientClass *aClient = nullptr;
         String path;
         String uid;
+        String mime;
         async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
         slot_options_t opt;
         DataOptions *options = nullptr;

@@ -147,7 +147,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -170,7 +170,7 @@ void setup()
 
     Database.url(DATABASE_URL);
 
-    Serial.println("[+] Synchronous Set... ");
+    Serial.println("Synchronous Set... ");
 
     // Set int
     bool status = Database.set<int>(aClient, "/test/int", 12345);
@@ -250,20 +250,17 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 }
 

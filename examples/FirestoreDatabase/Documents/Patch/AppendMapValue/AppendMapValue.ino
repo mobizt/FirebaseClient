@@ -72,8 +72,8 @@
  * The Firestore database id should be (default) or empty "".
  *
  * The <documentPath> is the relative path of document to patch with the input document.
- * The <DocumentMask(updateMask)> is the fields to update. If the document exists on the server and has fields not referenced in the mask, they are left unchanged. 
- * The <DocumentMask(mask)> is fields to return. If not set, returns all fields. If the document has a field that is not present in this mask, that field will 
+ * The <DocumentMask(updateMask)> is the fields to update. If the document exists on the server and has fields not referenced in the mask, they are left unchanged.
+ * The <DocumentMask(mask)> is fields to return. If not set, returns all fields. If the document has a field that is not present in this mask, that field will
  * not be returned in the response. Use comma (,) to separate between the field names.
  * The <Document> is Firestore document.
  * The <Precondition(currentDocument)> is an optional precondition on the document. The request will fail if this is set and not met by the target document.
@@ -258,7 +258,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -306,9 +306,9 @@ void loop()
 
         // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
-        Serial.println("[+] Update a document... ");
+        Serial.println("Update a document... ");
 
-        patchDocumentOptions patchOptions(DocumentMask("myMap.key" + String(cnt)) /* updateMask */, DocumentMask() /* mask */,  Precondition() /* precondition */);
+        patchDocumentOptions patchOptions(DocumentMask("myMap.key" + String(cnt)) /* updateMask */, DocumentMask() /* mask */, Precondition() /* precondition */);
 
         Docs.patch(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB);
 
@@ -333,25 +333,21 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

@@ -87,7 +87,7 @@
  * The Firestore database id is the id of new database to create.
  *
  * The <Database> is the Firestore::Database object that hold the database information to create.
- * 
+ *
  * The Databases is Firestore::Databases object that provide the main working functions.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
@@ -232,7 +232,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -280,7 +280,7 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("[+] Create a database... ");
+        Serial.println("Create a database... ");
 
         Firestore::Database db;
         db.concurrencyMode(Firestore::ConcurrencyMode::PESSIMISTIC);
@@ -316,28 +316,23 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
         // To get the UID (string) from async result
         // aResult.uid();
-
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

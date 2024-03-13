@@ -155,7 +155,7 @@ void setup()
 
     SPIFFS.begin();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -187,13 +187,13 @@ void setup()
         file.write(i);
     file.close();
 
-    Serial.println("[+] Set file... ");
+    Serial.println("Set file... ");
     Database.set(aClient, "/test/file", getFile(upload_data), asyncCB);
 
     // To assign UID for async result
     // Database.set(aClient, "/test/file", getFile(upload_data), asyncCB, "uploadTask");
 
-    Serial.println("[+] Get file... ");
+    Serial.println("Get file... ");
     Database.get(aClient, "/test/file", getFile(download_data), asyncCB);
 
     // To assign UID for async result
@@ -216,25 +216,21 @@ void asyncCB(AsyncResult &aResult)
 
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.downloadProgress())
     {
-        Serial.println("**************");
         Serial.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
         if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
         {
@@ -245,7 +241,6 @@ void asyncCB(AsyncResult &aResult)
 
     if (aResult.uploadProgress())
     {
-        Serial.println("**************");
         Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
         if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
             Serial.println("Upload completed!");

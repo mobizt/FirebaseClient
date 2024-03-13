@@ -55,13 +55,13 @@
  * Please see examples/App/NetworkInterfaces for the usage guidelines.
  *
  * The auth data can be set to Services App e.g. Database to initialize via function getApp.
- * 
+ *
  * NOTE:
- * 
- * To reduce the stack usage of BearSSL engine crpto function, the JWT token creation process 
+ *
+ * To reduce the stack usage of BearSSL engine crpto function, the JWT token creation process
  * will be performed outside the FirebaseApp.
- * 
- * For ServiceAuth and CustomAuth authentications, you need to check for JWT token geration process requirement, 
+ *
+ * For ServiceAuth and CustomAuth authentications, you need to check for JWT token geration process requirement,
  * before running the JWT process function in the main loop as the following.
  * if (app.isJWT())
  *   JWT.process(app.getAuth());
@@ -210,7 +210,7 @@ void setup()
 
     SPIFFS.begin();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -230,7 +230,7 @@ void setup()
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-    { 
+    {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
         if (app.isJWT())
             JWT.process(app.getAuth());
@@ -268,20 +268,17 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 }
 

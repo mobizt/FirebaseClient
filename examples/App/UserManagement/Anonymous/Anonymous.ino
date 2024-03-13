@@ -66,7 +66,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     UserAccount user(API_KEY);
 
@@ -77,7 +77,7 @@ void setup()
 
     app.setCallback(asyncCB);
 
-    Serial.println("[+] Anonymous signing up...");
+    Serial.println("Anonymous signing up...");
 
     // For anonymous sign up (not recommend).
     signup(aClient, app, getAuth(user));
@@ -103,13 +103,13 @@ void loop()
         ms = millis();
 
         Serial.println("App is authenticated as anonymous...");
-        Serial.printf("User UID: %s\n\n", app.getUid().c_str());
+        Serial.printf("User UID: %s\n", app.getUid().c_str());
 
         app.isAuthenticated();
 
         if (cnt == 3)
         {
-            Serial.println("[+] Deleting anonymous user...");
+            Serial.println("Deleting anonymous user...");
             UserAccount user(API_KEY);
             deleteUser(aClient, app, getAuth(user.idToken(app.getToken())));
         }
@@ -120,19 +120,16 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 }

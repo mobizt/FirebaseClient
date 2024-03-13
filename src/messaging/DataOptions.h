@@ -1,5 +1,5 @@
 /**
- * Created March 12, 2024
+ * Created March 13, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -484,7 +484,7 @@ namespace Messages
         {
             this->projectId = projectId;
         }
-        String getProjectId() { return projectId; }
+        String getProjectId() const { return projectId; }
     };
 
     class DataOptions

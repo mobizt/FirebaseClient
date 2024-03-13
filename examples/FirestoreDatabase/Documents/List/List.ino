@@ -264,7 +264,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -312,7 +312,7 @@ void loop()
             // If the collection Id path contains space e.g. "a b/c d/e f"
             // It should encode the space as %20 then the collection Id will be "a%20b/c%20d/e%20f"
 
-            Serial.println("[+] List the documents in a collection... ");
+            Serial.println("List the documents in a collection... ");
 
             ListDocumentsOptions listDocsOptions;
             listDocsOptions.pageSize(3).mask(DocumentMask("count")).showMissing(false);
@@ -341,25 +341,21 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

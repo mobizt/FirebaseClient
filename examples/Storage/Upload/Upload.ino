@@ -1,8 +1,15 @@
-
 // Created by K. Suwatchai (Mobizt)
 // Email: k_suwatchai@hotmail.com
 // Github: https://github.com/mobizt/FirebaseClient
 // Copyright (c) 2024 mobizt
+
+/**
+ * PRE REQUISITE
+ * =============
+ *
+ * IAM owner permission required for service account,
+ * https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
+ */
 
 /**
  * APP INITIALIZATION
@@ -59,6 +66,37 @@
  *
  * Deallocation of FirebaseApp causes these services apps uninitialized and cannot be used.
  *
+ */
+
+/**
+ * UPLOAD OBJECT FUNCTIONS
+ * =======================
+ *
+ * SYNTAXES:
+ *
+ * storage.upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>);
+ * storage.upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>, <AsyncResult>);
+ * storage.upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>, <AsyncResultCallback>, <uid>);
+ *
+ * The <FirebaseStorage::Parent> is the FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * The bucketid is the Storage bucket Id of object to upload.
+ * The object is the object to be stored in the Storage bucket.
+ *
+ * The <file_config_data> is the filesystem data (file_config_data) obtained from FileConfig class object.
+ *
+ * The <MIME> is the MIME type of file to be upload.
+ *
+ * The storage is Storage service app.
+ *
+ * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ *
+ * The uid is user specified UID of async result (optional) which used as async task identifier.
+ *
+ * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ *
+ */
+
+/**
  * ASYNC QUEUE
  * ===========
  *
@@ -132,6 +170,10 @@
 #include <WiFiClientSecure.h>
 #endif
 
+#if defined(ESP32)
+#include <SPIFFS.h>
+#endif
+
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
@@ -142,11 +184,18 @@
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
 
+// Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
+#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
+
 void asyncCB(AsyncResult &aResult);
+
+void fileCallback(File &file, const char *filename, file_operating_mode mode);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
+
+FileConfig media_file("/media.mp4", fileCallback);
 
 FirebaseApp app;
 
@@ -158,6 +207,12 @@ WiFiClientSecure ssl_client;
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
+
+Storage storage;
+
+AsyncResult aResult_no_callback;
+
+bool taskCompleted = false;
 
 void setup()
 {
@@ -183,20 +238,22 @@ void setup()
 
     ssl_client.setInsecure();
 #if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
+    ssl_client.setBufferSizes(8192, 1024);
 #endif
 
     app.setCallback(asyncCB);
 
     initializeApp(aClient, app, getAuth(user_auth));
 
-    // To re-authenticate manually at any time, just call initializeApp again.
-
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
+
+    app.getApp<Storage>(storage);
+
+    SPIFFS.begin();
 }
 
 void loop()
@@ -206,6 +263,27 @@ void loop()
 
     // To get the authentication time to live in seconds before expired.
     // app.ttl();
+
+    // This required when different AsyncClients than used in FirebaseApp assigned to the Firebase Storage functions.
+    storage.loop();
+
+    // To get anyc result without callback
+    // printResult(aResult_no_callback);
+
+    if (app.ready() && !taskCompleted)
+    {
+        taskCompleted = true;
+
+        Serial.println("Upload file...");
+
+        storage.upload(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), "video/mp4", asyncCB);
+
+        // To assign UID for async result
+        // storage.upload(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), "video/mp4", asyncCB, "myUID");
+
+        // To get anyc result without callback
+        // storage.upload(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), "video/mp4", aResult_no_callback);
+    }
 }
 
 void asyncCB(AsyncResult &aResult)
@@ -223,5 +301,49 @@ void asyncCB(AsyncResult &aResult)
     if (aResult.isError())
     {
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.available())
+    {
+        // To get the UID (string) from async result
+        // aResult.uid();
+        Serial.printf("payload: %s\n", aResult.c_str());
+    }
+
+    if (aResult.downloadProgress())
+    {
+        Serial.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
+        {
+            Serial.println("Download completed!");
+        }
+    }
+
+    if (aResult.uploadProgress())
+    {
+        Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
+            Serial.println("Upload completed!");
+    }
+}
+
+void fileCallback(File &file, const char *filename, file_operating_mode mode)
+{
+    switch (mode)
+    {
+    case file_mode_open_read:
+        file = SPIFFS.open(filename, "r");
+        break;
+    case file_mode_open_write:
+        file = SPIFFS.open(filename, "w");
+        break;
+    case file_mode_open_append:
+        file = SPIFFS.open(filename, "a");
+        break;
+    case file_mode_remove:
+        SPIFFS.remove(filename);
+        break;
+    default:
+        break;
     }
 }

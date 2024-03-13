@@ -76,42 +76,42 @@
  * the async SSE (HTTP Streaming) slot.
  *
  * When the async operation queue is full, the new sync and async operations will be cancelled.
- * 
+ *
  * The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
- * 
- * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app 
+ *
+ * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app
  * (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
- * 
+ *
  * STOP QUEUE
  * ===========
- * 
+ *
  * SYNTAX:
- * 
+ *
  * The async operation will be cancelled and remove from the queue by calling thes functions.
- * 
+ *
  * asyncClient.stopAsync() - stop the last async operation in the queue.
- * 
+ *
  * asyncClient.stopAsync(true) - stop all async operation in the queue.
- * 
+ *
  * asyncClient.stopAsync("xxxx") - stop the async operation in the queue that has the async result UID xxxx.
- * 
+ *
  * ASYNC CLIENT
  * ============
- * 
+ *
  * The async client stores the async operating data in its queue and holds the pointer of SSL Client that assigned with it.
- * 
+ *
  * The SSL Client should be existed in the AsyncClient usage scope in case of sync or should defined as global object for async usage.
- * 
+ *
  * The SSL Client should not be shared among various AsyncClients because of interferences in async operations.
  *
  * Only one SSL Client should be assigned to or used with only one AsyncClient.
- * 
+ *
  * SSL Client can force to stop by user or calling stop() from asyncClient.
- * 
+ *
  * SYNTAX:
- * 
+ *
  * asyncClient.stop() - stop the SSL Client to terminate the server connection.
- * 
+ *
  */
 
 #include <Arduino.h>
@@ -174,7 +174,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -209,19 +209,16 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 }

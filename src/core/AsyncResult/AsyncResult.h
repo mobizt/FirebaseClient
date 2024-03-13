@@ -1,5 +1,5 @@
 /**
- * Created March 7, 2024
+ * Created March 13, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -213,7 +213,7 @@ class AsyncResult
     {
     public:
         size_t total = 0, downloaded = 0;
-        bool progress_available = false;
+        bool progress_available = false, ota = false;
         int progress = -1;
         void reset()
         {
@@ -221,6 +221,7 @@ class AsyncResult
             downloaded = 0;
             progress_available = false;
             progress = -1;
+            ota = false;
         }
     };
 
@@ -376,6 +377,8 @@ public:
     }
 
     download_data_t downloadInfo() const { return download_data; }
+
+    bool isOTA() { return download_data.ota; }
 
     bool isError()
     {

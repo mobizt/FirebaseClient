@@ -1,8 +1,15 @@
-
 // Created by K. Suwatchai (Mobizt)
 // Email: k_suwatchai@hotmail.com
 // Github: https://github.com/mobizt/FirebaseClient
 // Copyright (c) 2024 mobizt
+
+/**
+ * PRE REQUISITE
+ * =============
+ *
+ * IAM owner permission required for service account,
+ * https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
+ */
 
 /**
  * APP INITIALIZATION
@@ -59,6 +66,32 @@
  *
  * Deallocation of FirebaseApp causes these services apps uninitialized and cannot be used.
  *
+ */
+
+/**
+ * LIST ALL OBJECTS FUNCTIONS
+ * ==========================
+ *
+ * SYNTAXES:
+ *
+ * storage.list(<AsyncClient>, <FirebaseStorage::Parent>);
+ * storage.list(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResult>);
+ * storage.list(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResultCallback>, <uid>);
+ *
+ * The <FirebaseStorage::Parent> is the FirebaseStorage::Parent object included Storage bucket Id in its constructor.
+ * The bucketid is the Storage bucket Id to list all objects.
+ *
+ * The storage is Storage service app.
+ *
+ * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ *
+ * The uid is user specified UID of async result (optional) which used as async task identifier.
+ *
+ * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ *
+ */
+
+/**
  * ASYNC QUEUE
  * ===========
  *
@@ -142,6 +175,9 @@
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
 
+// Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
+#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
+
 void asyncCB(AsyncResult &aResult);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
@@ -159,9 +195,14 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
+Storage storage;
+
+AsyncResult aResult_no_callback;
+
+bool taskCompleted = false;
+
 void setup()
 {
-
     Serial.begin(115200);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
@@ -183,20 +224,20 @@ void setup()
 
     ssl_client.setInsecure();
 #if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
+    ssl_client.setBufferSizes(2048, 1024);
 #endif
 
     app.setCallback(asyncCB);
 
     initializeApp(aClient, app, getAuth(user_auth));
 
-    // To re-authenticate manually at any time, just call initializeApp again.
-
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
+
+    app.getApp<Storage>(storage);
 }
 
 void loop()
@@ -206,6 +247,27 @@ void loop()
 
     // To get the authentication time to live in seconds before expired.
     // app.ttl();
+
+    // This required when different AsyncClients than used in FirebaseApp assigned to the Firebase Storage functions.
+    storage.loop();
+
+    // To get anyc result without callback
+    // printResult(aResult_no_callback);
+
+    if (app.ready() && !taskCompleted)
+    {
+        taskCompleted = true;
+
+        Serial.println("List all objects...");
+
+        storage.list(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID), asyncCB);
+
+        // To assign UID for async result
+        // storage.list(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID), asyncCB, "myUID");
+
+        // To get anyc result without callback
+        // storage.list(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID), aResult_no_callback);
+    }
 }
 
 void asyncCB(AsyncResult &aResult)
@@ -223,5 +285,12 @@ void asyncCB(AsyncResult &aResult)
     if (aResult.isError())
     {
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.available())
+    {
+        // To get the UID (string) from async result
+        // aResult.uid();
+        Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

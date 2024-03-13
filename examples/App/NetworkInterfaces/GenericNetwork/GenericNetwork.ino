@@ -73,7 +73,7 @@ void setup()
 
   netconnect();
 
-  Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+  Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
   Serial.println("Initializing app...");
 
@@ -106,20 +106,17 @@ void asyncCB(AsyncResult &aResult)
 {
   if (aResult.appEvent().code() > 0)
   {
-    Serial.println("**************");
     Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-  }
-
-  if (aResult.isError())
-  {
-    Serial.println("**************");
-    Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
   }
 
   if (aResult.isDebug())
   {
-    Serial.println("**************");
     Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+  }
+
+  if (aResult.isError())
+  {
+    Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
   }
 }
 

@@ -92,7 +92,7 @@
  *
  * The <bucketID> is the Firebase storage bucket ID in the project.
  * The <storagePath> is the path in the Firebase Storage data bucket to store the exported database.
- * 
+ *
  * The Databases is Firestore::Databases object that provide the main working functions.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
@@ -240,7 +240,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -288,7 +288,7 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("[+] Export documents to the Storage bucket... ");
+        Serial.println("Export documents to the Storage bucket... ");
 
         // This required the Owner and Editor permissions for the account.
         // See how to add permission here, https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
@@ -323,28 +323,23 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
         // To get the UID (string) from async result
         // aResult.uid();
-
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

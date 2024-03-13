@@ -87,7 +87,7 @@
  * The Firestore database id should be (default) or empty "".
  *
  * The <indexId> is the index to delete;
- * 
+ *
  * The indexes is Firestore::Databases::Indexes object.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
@@ -280,7 +280,7 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("[+] Deletes an index... ");
+        Serial.println("Deletes an index... ");
         // This index Id is obtained from the index of the result of index creation payload.
         // e.g. projects/xxxxxxxx/databases/(default)/indexes/yyyyy
         String indexId = "yyyyy";
@@ -313,28 +313,23 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
         // To get the UID (string) from async result
         // aResult.uid();
-
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

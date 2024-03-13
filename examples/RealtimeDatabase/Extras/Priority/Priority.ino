@@ -126,7 +126,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -151,7 +151,7 @@ void setup()
 
     Serial.println();
 
-    Serial.println("[+] Set data with priority (sync)... ");
+    Serial.println("Set data with priority (sync)... ");
 
     // Library does not provide JSON parser library, the following JSON writer class will be used with
     // object_t for simple demonstration.
@@ -178,7 +178,7 @@ void setup()
 
     // Change priority
     Serial.println();
-    Serial.println("[+] Set value with priority (sync)... ");
+    Serial.println("Set value with priority (sync)... ");
 
     writer.create(obj1, ".value", "item_15");
     // Set priority to primitive value.
@@ -192,7 +192,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     Serial.println();
-    Serial.println("[+] Get priority (sync)... ");
+    Serial.println("Get priority (sync)... ");
     double v = Database.get<double>(aClient, "/test/items/priority_1/.priority");
 
     if (aClient.lastError().code() == 0)
@@ -201,7 +201,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     Serial.println();
-    Serial.println("[+] Filtering data with priority (sync)... ");
+    Serial.println("Filtering data with priority (sync)... ");
     DatabaseOptions options;
     // Now the node priority_1 which its priority changed to 6.0 should include in the filtering result.
     options.filter.orderBy("$priority").startAt(3.0).endAt(8.0);
@@ -221,25 +221,21 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

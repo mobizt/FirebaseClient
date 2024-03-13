@@ -85,9 +85,9 @@
  * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id is the id of database to delete.
- * 
- * The <etag> is the current etag of the Database. 
- * If an etag is provided and does not match the current etag of the database, 
+ *
+ * The <etag> is the current etag of the Database.
+ * If an etag is provided and does not match the current etag of the database,
  * deletion will be blocked and a FAILED_PRECONDITION error will be returned.
  *
  * The Databases is Firestore::Databases object that provide the main working functions.
@@ -234,7 +234,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -282,7 +282,7 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("[+] Deletes a database... ");
+        Serial.println("Deletes a database... ");
 
         String etag;
 
@@ -314,28 +314,23 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
         // To get the UID (string) from async result
         // aResult.uid();
-
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

@@ -253,7 +253,7 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
@@ -292,7 +292,7 @@ void loop()
         dataMillis = millis();
         counter++;
 
-        Serial.println("[+] Commit a document (set server value, update document)... ");
+        Serial.println("Commit a document (set server value, update document)... ");
 
         String documentPath = "test_collection/test_document";
         String fieldPath = "server_time";
@@ -317,7 +317,7 @@ void loop()
         updateDoc.add("myMap", Values::Value(mapV));
 
         writes.add(Write(DocumentMask(), updateDoc, Precondition()));
-        
+
        */
 
         //////////////////////////////
@@ -328,7 +328,6 @@ void loop()
           // set only documentPath to delete in the Write class constructor.
           writes.add(Write(documentPath, Precondition()));
         */
-        
 
         // All Writes, DocumentTransform and Values::xxxx objects can be printed on Serial port
 
@@ -355,25 +354,21 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.println("**************");
         Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isError())
-    {
-        Serial.println("**************");
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.println("**************");
         Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Serial.println("**************");
         Serial.printf("payload: %s\n", aResult.c_str());
     }
 }

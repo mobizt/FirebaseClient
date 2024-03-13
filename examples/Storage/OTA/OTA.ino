@@ -1,8 +1,15 @@
-
 // Created by K. Suwatchai (Mobizt)
 // Email: k_suwatchai@hotmail.com
 // Github: https://github.com/mobizt/FirebaseClient
 // Copyright (c) 2024 mobizt
+
+/**
+ * PRE REQUISITE
+ * =============
+ *
+ * IAM owner permission required for service account,
+ * https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
+ */
 
 /**
  * APP INITIALIZATION
@@ -59,6 +66,33 @@
  *
  * Deallocation of FirebaseApp causes these services apps uninitialized and cannot be used.
  *
+ */
+
+/**
+ * OTA DOWNLOAD FUNCTIONS
+ * ======================
+ *
+ * SYNTAXES:
+ *
+ * storage.ota(<AsyncClient>, <FirebaseStorage::Parent>);
+ * storage.ota(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResult>);
+ * storage.ota(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResultCallback>, <uid>);
+ *
+ * The <FirebaseStorage::Parent> is the FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * The bucketid is the Storage bucket Id of object to download.
+ * The object is the object in Storage bucket to download.
+ *
+ * The storage is Storage service app.
+ *
+ * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ *
+ * The uid is user specified UID of async result (optional) which used as async task identifier.
+ *
+ * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ *
+ */
+
+/**
  * ASYNC QUEUE
  * ===========
  *
@@ -142,7 +176,12 @@
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
 
+// Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
+#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
+
 void asyncCB(AsyncResult &aResult);
+
+void restart();
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
@@ -158,6 +197,12 @@ WiFiClientSecure ssl_client;
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
+
+Storage storage;
+
+AsyncResult aResult_no_callback;
+
+bool taskCompleted = false;
 
 void setup()
 {
@@ -183,20 +228,20 @@ void setup()
 
     ssl_client.setInsecure();
 #if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
+    ssl_client.setBufferSizes(2048, 1024);
 #endif
 
     app.setCallback(asyncCB);
 
     initializeApp(aClient, app, getAuth(user_auth));
 
-    // To re-authenticate manually at any time, just call initializeApp again.
-
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
+
+    app.getApp<Storage>(storage);
 }
 
 void loop()
@@ -206,6 +251,27 @@ void loop()
 
     // To get the authentication time to live in seconds before expired.
     // app.ttl();
+
+    // This required when different AsyncClients than used in FirebaseApp assigned to the Firebase Storage functions.
+    storage.loop();
+
+    // To get anyc result without callback
+    // printResult(aResult_no_callback);
+
+    if (app.ready() && !taskCompleted)
+    {
+        taskCompleted = true;
+
+        Serial.println("OTA update download...");
+
+        storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), asyncCB);
+
+        // To assign UID for async result
+        // storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), asyncCB, "myUID");
+
+        // To get anyc result without callback
+        // storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), aResult_no_callback);
+    }
 }
 
 void asyncCB(AsyncResult &aResult)
@@ -224,4 +290,43 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
+
+    if (aResult.available())
+    {
+        // To get the UID (string) from async result
+        // aResult.uid();
+        Serial.printf("payload: %s\n", aResult.c_str());
+    }
+
+    if (aResult.downloadProgress())
+    {
+        Serial.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
+        {
+            Serial.println("Download completed!");
+
+            if (aResult.isOTA())
+                restart();
+        }
+    }
+
+    if (aResult.uploadProgress())
+    {
+        Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
+            Serial.println("Upload completed!");
+    }
+}
+
+void restart()
+{
+    Serial.println("Update firmware completed.");
+    Serial.println();
+    Serial.println("Restarting...\n\n");
+    delay(2000);
+#if defined(ESP32) || defined(ESP8266)
+    ESP.restart();
+#elif defined(ARDUINO_RASPBERRY_PI_PICO_W)
+    rp2040.restart();
+#endif
 }

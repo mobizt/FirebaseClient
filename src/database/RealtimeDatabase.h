@@ -1,5 +1,5 @@
 /**
- * Created March 8, 2024
+ * Created March 13, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -826,6 +826,14 @@ public:
     void url(const String &url)
     {
         this->service_url = url;
+        if (this->service_url.length())
+        {
+            if (this->service_url.indexOf("://") > -1)
+                this->service_url.remove(0, this->service_url.indexOf("://") + 3);
+
+            if (this->service_url.length() && this->service_url[this->service_url.length() - 1] == '/')
+                this->service_url.remove(this->service_url.length() - 1, 1);
+        }
     }
 
     /**
@@ -931,6 +939,7 @@ private:
         {
             sData->request.ota = true;
             sData->request.base64 = true;
+            sData->aResult.download_data.ota = true;
         }
 
         if (request.cb)
@@ -987,7 +996,7 @@ private:
 
     void setFileStatus(async_data_item_t *sData, async_request_data_t &request)
     {
-        if (sData->request.file_data.filename.length())
+        if (sData->request.file_data.filename.length() || request.opt.ota)
         {
             sData->download = request.method == async_request_handler_t::http_get;
             sData->upload = request.method == async_request_handler_t::http_post ||
