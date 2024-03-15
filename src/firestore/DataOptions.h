@@ -478,7 +478,7 @@ namespace Firestore
         // If an App Engine application exists in the same region as this database, App Engine configuration will impact this database. This includes disabling of the application & database, as well as disabling writes to the database.
         ENABLED,
         // App Engine has no effect on the ability of this database to serve requests. This is the default setting for databases created with the Firestore API.
-        DISABLED
+        _DISABLED
     };
 
     // The delete protection state of the database.
@@ -566,7 +566,7 @@ namespace Firestore
                 return setObject(buf[2], "appEngineIntegrationMode", "APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", true, true);
             else if (appEngineIntegrationMode == AppEngineIntegrationMode::ENABLED)
                 return setObject(buf[2], "appEngineIntegrationMode", "ENABLED", true, true);
-            else if (appEngineIntegrationMode == AppEngineIntegrationMode::DISABLED)
+            else if (appEngineIntegrationMode == AppEngineIntegrationMode::_DISABLED)
                 return setObject(buf[2], "appEngineIntegrationMode", "DISABLED", true, true);
             return *this;
         }
