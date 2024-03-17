@@ -296,7 +296,7 @@ public:
         options_part = "--";
         options_part += getBoundary();
         options_part += "\r\n";
-        options_part += "Content-Type: application/json; charset=UTF-8\r\n\r\n";
+        options_part += FPSTR("Content-Type: application/json; charset=UTF-8\r\n\r\n");
         options_part += options;
         options_part += "\r\n\r\n";
         options_part += "--";
