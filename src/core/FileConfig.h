@@ -36,6 +36,8 @@
 
 #endif
 
+#define FIREBASE_CHUNK_SIZE 2048
+
 enum file_operating_mode
 {
     file_mode_open_read,
@@ -78,6 +80,282 @@ private:
 
 typedef void (*FileConfigCallback)(FILEOBJ &file, const char *filename, file_operating_mode mode);
 
+
+#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+
+struct file_upload_resumable_data
+{
+private:
+    enum resume_state
+    {
+        resume_state_undefined,
+        resume_state_send_header,
+        resume_state_send_payload,
+        resume_state_read_response
+    };
+    int index = 0;
+    int size = 0;
+    int read = 0;
+    bool enable = false;
+    String location;
+    int len = 0;
+    resume_state state = resume_state_undefined;
+
+public:
+    file_upload_resumable_data() {}
+    bool isEnabled() { return enable; }
+    void setSize(size_t size)
+    {
+        this->size = size;
+        enable = size > 0;
+    }
+    void getRange()
+    {
+        int minChunkSize = 256 * 1024; // required by google
+        read = size - index <= minChunkSize ? size - index : minChunkSize;
+    }
+    void updateRange()
+    {
+        index += read;
+        getRange();
+        len = read;
+    }
+    int getChunkSize(int size, int payloadIndex, int dataIndex)
+    {
+        int chunkSize = size - dataIndex < FIREBASE_CHUNK_SIZE ? size - dataIndex : FIREBASE_CHUNK_SIZE;
+
+        if (payloadIndex + chunkSize > index + read)
+            chunkSize = index + read - payloadIndex;
+
+        return chunkSize;
+    }
+    void updateState(uint32_t &payloadIndex)
+    {
+        if (location.length() > 0)
+        {
+            if (state == resume_state_send_header)
+            {
+                state = resume_state_send_payload;
+                payloadIndex = index;
+            }
+            else if (state == resume_state_send_payload)
+            {
+                state = resume_state_undefined;
+                clear();
+            }
+        }
+    }
+    bool const isUpload() { return state == resume_state_send_payload; }
+    void setHeaderState()
+    {
+        if (location.length())
+            state = resume_state_send_header;
+    }
+    int isComplete(int size, int payloadIndex)
+    {
+        if (payloadIndex < index + read)
+            return 1;
+        else if (payloadIndex < size)
+        {
+            state = resume_state_read_response;
+            return 2;
+        }
+        return 0;
+    }
+    void getHeader(String &header, const String &host, const String &ext)
+    {
+        header = FPSTR("PUT ");
+        header += ext;
+        header += FPSTR(" HTTP/1.1\r\nHost: ");
+        header += host;
+        header += FPSTR("\r\nConnection: keep-alive\r\nContent-Length: ");
+        header += len;
+        header += FPSTR("\r\nContent-Range: bytes ");
+        header += index;
+        header += '-';
+        header += index + read - 1;
+        header += '/';
+        header += size;
+        header += FPSTR("\r\n\r\n");
+    }
+    void clear()
+    {
+        location.remove(0, location.length());
+        index = 0;
+        size = 0;
+        read = 0;
+        enable = false;
+        len = 0;
+    }
+    String &getLocationRef() { return location; }
+    String getLocation() { return location.c_str(); }
+};
+
+struct file_upload_multipart_data
+{
+    enum multipart_state
+    {
+        multipart_state_undefined,
+        multipart_state_send_header,
+        multipart_state_send_options_payload,
+        multipart_state_send_data_payload,
+        multipart_state_send_last_payload,
+        multipart_state_read_response
+    };
+
+private:
+    bool enable = false;
+    int index = 0;
+    int size = 0;
+    int read = 0;
+    String boaundary, options_part, last_part;
+    multipart_state state = multipart_state_undefined;
+
+public:
+    file_upload_multipart_data() {}
+    bool isEnabled() { return enable; }
+    void setSize(size_t size)
+    {
+        this->size = size;
+        enable = size > 0;
+    }
+    int getChunkSize(int size, int payloadIndex, int dataIndex)
+    {
+        int chunkSize = size - dataIndex < FIREBASE_CHUNK_SIZE ? size - dataIndex : FIREBASE_CHUNK_SIZE;
+
+        if (state == multipart_state_send_options_payload && options_part.length() && payloadIndex + chunkSize > index + (int)options_part.length())
+        {
+            chunkSize = index + options_part.length() - payloadIndex;
+        }
+        else if (state == multipart_state_send_data_payload && size && payloadIndex + chunkSize > index + size)
+        {
+            chunkSize = index + size - payloadIndex;
+        }
+        else if (state == multipart_state_send_last_payload && last_part.length() && payloadIndex + chunkSize > index + (int)last_part.length())
+        {
+            chunkSize = index + last_part.length() - payloadIndex;
+        }
+
+        return chunkSize;
+    }
+    bool const isUpload() { return state == multipart_state_send_options_payload || state == multipart_state_send_data_payload || state == multipart_state_send_last_payload; }
+    void updateState(uint32_t payloadIndex)
+    {
+        if (enable)
+        {
+            if (state == multipart_state_undefined)
+            {
+                state = multipart_state_send_header;
+            }
+            else if (state == multipart_state_send_header)
+            {
+                state = multipart_state_send_options_payload;
+            }
+            else if (state == multipart_state_send_options_payload)
+            {
+                if (options_part.length() && payloadIndex == index + options_part.length())
+                {
+                    state = multipart_state_send_data_payload;
+                    index += options_part.length();
+                }
+            }
+            else if (state == multipart_state_send_data_payload)
+            {
+                if (size && (int)payloadIndex >= index + size)
+                {
+                    state = multipart_state_send_last_payload;
+                    index += size;
+                }
+            }
+            else if (state == multipart_state_send_last_payload)
+            {
+                if (last_part.length() && payloadIndex == index + last_part.length())
+                {
+                    state = multipart_state_read_response;
+                    index += last_part.length();
+                }
+            }
+        }
+    }
+
+    multipart_state getState() { return state; }
+
+    void clear()
+    {
+        boaundary.remove(0, boaundary.length());
+        options_part.remove(0, options_part.length());
+        last_part.remove(0, last_part.length());
+        enable = false;
+        size = 0;
+        index = 0;
+        state = multipart_state_undefined;
+    }
+
+    void setOptions(const String &options)
+    {
+        options_part = "--";
+        options_part += getBoundary();
+        options_part += "\r\n";
+        options_part += "Content-Type: application/json; charset=UTF-8\r\n\r\n";
+        options_part += options;
+        options_part += "\r\n\r\n";
+        options_part += "--";
+        options_part += getBoundary();
+        options_part += "\r\n\r\n";
+    }
+
+    String getOptions()
+    {
+        return options_part;
+    }
+
+    void setLast()
+    {
+        last_part = "\r\n--";
+        last_part += getBoundary();
+        last_part += "--";
+    }
+
+    String getLast()
+    {
+        setLast();
+        return last_part;
+    }
+
+    String getBoundary(bool newLine = false)
+    {
+        if (boaundary.length() == 0)
+            boaundary = getB(15);
+        if (newLine)
+            return String(boaundary + "\r\n");
+        return boaundary;
+    }
+
+    String getB(size_t len)
+    {
+        Memory mem;
+        String temp = FPSTR("=_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        char *buf = reinterpret_cast<char *>(mem.alloc(len));
+        if (len)
+        {
+            --len;
+            buf[0] = temp[0];
+            buf[1] = temp[1];
+            for (size_t n = 2; n < len; n++)
+            {
+                int key = rand() % (int)(temp.length() - 1);
+                buf[n] = temp[key];
+            }
+            buf[len] = '\0';
+        }
+        String out = buf;
+        mem.release(&buf);
+        return out;
+    }
+};
+
+#endif
+
 struct file_config_data
 {
     enum file_operating_status
@@ -90,6 +368,12 @@ struct file_config_data
 #endif
     String filename;
     size_t file_size = 0;
+
+#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+    file_upload_resumable_data resumable;
+    file_upload_multipart_data multipart;
+#endif
+
     FileConfigCallback cb = NULL;
     file_operating_status file_status = file_status_closed;
     uint8_t *data = nullptr;

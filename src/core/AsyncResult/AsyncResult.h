@@ -231,12 +231,14 @@ class AsyncResult
         size_t total = 0, uploaded = 0;
         bool progress_available = false;
         int progress = -1;
+        String downloadUrl;
         void reset()
         {
             total = 0;
             uploaded = 0;
             progress_available = false;
             progress = -1;
+            downloadUrl.remove(0, downloadUrl.length());
         }
     };
 

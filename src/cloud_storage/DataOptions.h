@@ -136,7 +136,6 @@ namespace GoogleCloudStorage
     {
 
     public:
-       
         BaseOptions &projection(PROJECTION_OPTIONS value)
         {
             buf[6] = "projection=";
@@ -174,7 +173,8 @@ namespace GoogleCloudStorage
             {
                 if (buf[i].length())
                 {
-                    buf[0] += buf[0].length() ? '&' : '?';
+                    if (buf[0].length())
+                        buf[0] += '&';
                     buf[0] += buf[i];
                 }
             }
@@ -244,7 +244,6 @@ namespace GoogleCloudStorage
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
-    
     struct ListOptions : public Printable
     {
 
@@ -261,7 +260,8 @@ namespace GoogleCloudStorage
             {
                 if (buf[i].length())
                 {
-                    buf[0] += buf[0].length() ? '&' : '?';
+                    if (buf[0].length())
+                        buf[0] += '&';
                     buf[0] += buf[i];
                 }
             }
@@ -291,7 +291,7 @@ namespace GoogleCloudStorage
         }
         ListOptions &pageToken(const String &value)
         {
-            buf[5] = "pageToken=" +  value;
+            buf[5] = "pageToken=" + value;
             return setBuf();
         }
         ListOptions &prefix(const String &value)
@@ -299,17 +299,17 @@ namespace GoogleCloudStorage
             buf[6] = "prefix=" + value;
             return setBuf();
         }
-         ListOptions &projection(const String &value)
+        ListOptions &projection(const String &value)
         {
             buf[7] = "projection=" + value;
             return setBuf();
         }
-         ListOptions &startOffset(const String &value)
+        ListOptions &startOffset(const String &value)
         {
             buf[8] = "startOffset=" + value;
             return setBuf();
         }
-         ListOptions &versions(bool value)
+        ListOptions &versions(bool value)
         {
             buf[9] = "versions=" + owriter.getBoolStr(value);
             return setBuf();
@@ -324,8 +324,8 @@ namespace GoogleCloudStorage
     {
 
     private:
-        size_t bufSize = 16;
-        String buf[16];
+        size_t bufSize = 15;
+        String buf[15];
         ObjectWriter owriter;
         JsonHelper jh;
 
@@ -336,7 +336,7 @@ namespace GoogleCloudStorage
         }
 
     public:
-        InsertProperties() { setObject(buf[15], FPSTR("firebaseStorageDownloadTokens"), FPSTR("a82781ce-a115-442f-bac6-a52f7f63b3e8"), true, true); }
+        InsertProperties() { metadata(object_t()); }
 
         // https://cloud.google.com/storage/docs/access-control/lists
         InsertProperties &acl(const String &value)
@@ -353,7 +353,14 @@ namespace GoogleCloudStorage
         InsertProperties &customTime(const String &value) { return setObject(buf[8], FPSTR("customTime"), value, true, true); }
         InsertProperties &eventBasedHold(bool value) { return setObject(buf[9], FPSTR("eventBasedHold"), owriter.getBoolStr(value), false, true); }
         InsertProperties &md5Hash(const String &value) { return setObject(buf[10], FPSTR("md5Hash"), value, true, true); }
-        InsertProperties &metadata(const object_t value) { return setObject(buf[11], FPSTR("metadata"), value.c_str(), false, true); }
+        InsertProperties &metadata(const object_t value)
+        {
+            buf[11] = FPSTR("{\"metadata\":{\"firebaseStorageDownloadTokens\":\"a82781ce-a115-442f-bac6-a52f7f63b3e8\"}}");
+            if (strlen(value.c_str()))
+                owriter.addMember(buf[11], value.c_str());
+            owriter.getBuf(buf, bufSize);
+            return *this;
+        }
         InsertProperties &retention(const object_t value) { return setObject(buf[12], FPSTR("retention"), value.c_str(), false, true); }
         InsertProperties &storageClass(const String &value) { return setObject(buf[13], FPSTR("storageClass"), value, true, true); }
         InsertProperties &temporaryHold(bool value) { return setObject(buf[14], FPSTR("temporaryHold"), owriter.getBoolStr(value), false, true); }
@@ -405,7 +412,6 @@ namespace GoogleCloudStorage
         GoogleCloudStorage::Parent parent;
         google_cloud_storage_request_type requestType = google_cloud_storage_request_type_undefined;
         unsigned long requestTime = 0;
-
         void copy(DataOptions &rhs)
         {
             this->extras = rhs.extras;

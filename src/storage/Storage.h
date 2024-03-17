@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created March 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -459,18 +459,7 @@ public:
         request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
         if (request.file)
-        {
             sData->request.file_data.copy(*request.file);
-            sData->request.base64 = false;
-            if (request.mime.length())
-                request.aClient->setContentType(sData, request.mime);
-            request.aClient->setFileContentLength(sData);
-        }
-        else if (request.options->payload.length())
-        {
-            sData->request.val[req_hndlr_ns::payload] = request.options->payload;
-            request.aClient->setContentLength(sData, request.options->payload.length());
-        }
 
         setFileStatus(sData, request);
 
@@ -479,6 +468,27 @@ public:
             sData->request.ota = true;
             sData->request.base64 = false;
             sData->aResult.download_data.ota = true;
+        }
+
+        if (request.file && sData->upload)
+        {
+            sData->request.base64 = false;
+
+            if (request.mime.length())
+                request.aClient->setContentType(sData, request.mime);
+
+            request.aClient->setFileContentLength(sData, 0);
+
+            if (sData->request.file_data.file_size == 0)
+                return setClientError(request, FIREBASE_ERROR_FILE_READ);
+
+            URLHelper uh;
+            sData->aResult.upload_data.downloadUrl = uh.downloadURL(request.options->parent.getBucketId(), request.options->parent.getObject());
+        }
+        else if (request.options->payload.length())
+        {
+            sData->request.val[req_hndlr_ns::payload] = request.options->payload;
+            request.aClient->setContentLength(sData, request.options->payload.length());
         }
 
         if (request.cb)
@@ -520,7 +530,7 @@ public:
 
     void setFileStatus(async_data_item_t *sData, FirebaseStorage::async_request_data_t &request)
     {
-        if (sData->request.file_data.filename.length() || request.opt.ota)
+        if (request.file->filename.length() || request.opt.ota)
         {
             sData->download = request.method == async_request_handler_t::http_get;
             sData->upload = request.method == async_request_handler_t::http_post ||

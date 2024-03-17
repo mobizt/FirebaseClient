@@ -314,7 +314,11 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
         if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
+        {
             Serial.println("Upload completed!");
+            Serial.print("Download URL: ");
+            Serial.println(aResult.uploadInfo().downloadUrl);
+        }
     }
 }
 

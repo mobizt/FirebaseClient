@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created March 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -922,16 +922,7 @@ private:
         request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
         if (request.file)
-        {
             sData->request.file_data.copy(*request.file);
-            sData->request.base64 = true;
-            request.aClient->setFileContentLength(sData);
-        }
-        else if (strlen(payload))
-        {
-            sData->request.val[req_hndlr_ns::payload] = payload;
-            request.aClient->setContentLength(sData, strlen(payload));
-        }
 
         setFileStatus(sData, request);
 
@@ -940,6 +931,20 @@ private:
             sData->request.ota = true;
             sData->request.base64 = true;
             sData->aResult.download_data.ota = true;
+        }
+
+        if (request.file && sData->upload)
+        {
+            sData->request.base64 = true;
+            request.aClient->setFileContentLength(sData, 0);
+
+            if (sData->request.file_data.file_size == 0)
+                return setClientError(request, FIREBASE_ERROR_FILE_READ);
+        }
+        else if (strlen(payload))
+        {
+            sData->request.val[req_hndlr_ns::payload] = payload;
+            request.aClient->setContentLength(sData, strlen(payload));
         }
 
         if (request.cb)
@@ -996,7 +1001,7 @@ private:
 
     void setFileStatus(async_data_item_t *sData, async_request_data_t &request)
     {
-        if (sData->request.file_data.filename.length() || request.opt.ota)
+        if (request.file->filename.length() || request.opt.ota)
         {
             sData->download = request.method == async_request_handler_t::http_get;
             sData->upload = request.method == async_request_handler_t::http_post ||

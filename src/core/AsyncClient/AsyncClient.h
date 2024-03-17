@@ -37,6 +37,7 @@
 #include "./core/AuthConfig.h"
 #include "./core/List.h"
 #include "./core/Core.h"
+#include "./core/URL.h"
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncTCPConfig.h"
@@ -95,6 +96,7 @@ public:
     bool sse = false;
     bool path_not_existed = false;
     bool download = false;
+    bool upload_progress_enabled = false;
     bool upload = false;
     uint32_t addr = 0;
     AsyncResult aResult;
@@ -231,27 +233,48 @@ private:
     {
         function_return_type ret = function_return_type_continue;
 
-        if (sData->request.payloadIndex == 0)
+#if defined(ENABLE_FS)
+
+        size_t totalLen = sData->request.file_data.file_size;
+        bool fopen = sData->request.payloadIndex == 0;
+
+#if defined(ENABLE_CLOUD_STORAGE)
+
+        if (sData->request.file_data.multipart.isEnabled())
+        {
+            totalLen += sData->request.file_data.multipart.getOptions().length() + sData->request.file_data.multipart.getLast().length();
+            if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.getState() == file_upload_multipart_data::multipart_state_send_options_payload)
+                return send(sData, (uint8_t *)sData->request.file_data.multipart.getOptions().c_str(), sData->request.file_data.multipart.getOptions().length(), totalLen, async_state_send_payload);
+            else if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.getState() == file_upload_multipart_data::multipart_state_send_last_payload)
+                return send(sData, (uint8_t *)sData->request.file_data.multipart.getLast().c_str(), sData->request.file_data.multipart.getLast().length(), totalLen, async_state_send_payload);
+
+            fopen |= sData->request.file_data.multipart.isEnabled() && sData->request.payloadIndex == sData->request.file_data.multipart.getOptions().length();
+        }
+#endif
+        if (sData->upload)
+            sData->upload_progress_enabled = true;
+
+        if (fopen)
         {
             if (sData->request.file_data.filename.length() > 0)
             {
-                closeFile(sData);
-                if (!openFile(sData, file_mode_open_read))
+                if (sData->request.file_data.file_status == file_config_data::file_status_closed)
                 {
-                    setAsyncError(sData, state, FIREBASE_ERROR_OPEN_FILE, !sData->sse, true);
-                    return function_return_type_failure;
+                    if (!openFile(sData, file_mode_open_read))
+                    {
+                        setAsyncError(sData, state, FIREBASE_ERROR_OPEN_FILE, !sData->sse, true);
+                        return function_return_type_failure;
+                    }
                 }
             }
 
             if (sData->request.base64)
             {
-                ret = send(sData, (uint8_t *)"\"", 1, sData->request.file_data.file_size, async_state_send_payload);
+                ret = send(sData, (uint8_t *)"\"", 1, totalLen, async_state_send_payload);
                 if (ret != function_return_type_continue)
                     return ret;
             }
         }
-
-#if defined(ENABLE_FS)
 
         uint8_t *buf = nullptr;
         int toSend = 0;
@@ -297,10 +320,14 @@ private:
             }
             else
             {
-                if (sData->request.file_data.filename.length() > 0)
-                    toSend = sData->request.file_data.file.available() < FIREBASE_CHUNK_SIZE ? sData->request.file_data.file.available() : FIREBASE_CHUNK_SIZE;
+#if defined(ENABLE_CLOUD_STORAGE)
+                if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.isUpload())
+                    toSend = sData->request.file_data.resumable.getChunkSize(totalLen, sData->request.payloadIndex, sData->request.file_data.data_pos);
+                else if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.getState() == file_upload_multipart_data::multipart_state_send_data_payload)
+                    toSend = sData->request.file_data.multipart.getChunkSize(totalLen, sData->request.payloadIndex, sData->request.file_data.data_pos);
                 else
-                    toSend = sData->request.file_data.data_size - sData->request.file_data.data_pos < FIREBASE_CHUNK_SIZE ? sData->request.file_data.data_size - sData->request.file_data.data_pos : FIREBASE_CHUNK_SIZE;
+#endif
+                    toSend = totalLen - sData->request.file_data.data_pos < FIREBASE_CHUNK_SIZE ? totalLen - sData->request.file_data.data_pos : FIREBASE_CHUNK_SIZE;
 
                 buf = reinterpret_cast<uint8_t *>(mem.alloc(toSend));
 
@@ -317,14 +344,15 @@ private:
                 else if (sData->request.file_data.data)
                 {
                     memcpy(buf, sData->request.file_data.data + sData->request.file_data.data_pos, toSend);
-                    sData->request.file_data.data_pos += toSend;
                 }
+
+                sData->request.file_data.data_pos += toSend;
             }
 
-            ret = send(sData, buf, toSend, sData->request.file_data.file_size, async_state_send_payload);
+            ret = send(sData, buf, toSend, totalLen, async_state_send_payload);
         }
         else if (sData->request.base64)
-            ret = send(sData, (uint8_t *)"\"", 1, sData->request.file_data.file_size, async_state_send_payload);
+            ret = send(sData, (uint8_t *)"\"", 1, totalLen, async_state_send_payload);
 
     exit:
 
@@ -347,6 +375,7 @@ private:
         if (data && len && this->client)
         {
             uint16_t toSend = len - sData->request.dataIndex > FIREBASE_CHUNK_SIZE ? FIREBASE_CHUNK_SIZE : len - sData->request.dataIndex;
+
             size_t sent = sData->request.tcpWrite(client_type, client, async_tcp_config, data + sData->request.dataIndex, toSend);
             sys_idle();
 
@@ -355,21 +384,60 @@ private:
                 sData->request.dataIndex += toSend;
                 sData->request.payloadIndex += toSend;
 
-                if (sData->upload && sData->async && sData->request.file_data.file_size)
+#if defined(ENABLE_FS)
+                if (sData->upload && sData->upload_progress_enabled && sData->request.file_data.file_size)
                 {
-                    sData->aResult.upload_data.total = sData->request.file_data.file_size;
+                    sData->aResult.upload_data.total = size;
                     sData->aResult.upload_data.uploaded = sData->request.payloadIndex;
                     returnResult(sData, false);
                 }
+#endif
 
                 if (sData->request.dataIndex == len)
                     sData->request.dataIndex = 0;
 
+#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+
+                if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.isUpload())
+                {
+                    int ret = sData->request.file_data.resumable.isComplete(size, sData->request.payloadIndex);
+                    if (ret == 2)
+                    {
+                        sData->state = async_state_read_response;
+                        sData->return_type = function_return_type_complete;
+                        sData->request.dataIndex = 0;
+                        sData->request.payloadIndex = 0;
+                        sData->response.clear();
+                        return sData->return_type;
+                    }
+                    else if (ret == 1)
+                    {
+                        sData->return_type = function_return_type_continue;
+                        return sData->return_type;
+                    }
+                }
+                else if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.isUpload())
+                {
+                    sData->request.file_data.multipart.updateState(sData->request.payloadIndex);
+                    if (sData->request.file_data.multipart.isUpload())
+                    {
+                        sData->return_type = function_return_type_continue;
+                        return sData->return_type;
+                    }
+                }
+                else if (sData->request.payloadIndex < size)
+                {
+                    sData->return_type = function_return_type_continue;
+                    return sData->return_type;
+                }
+
+#else
                 if (sData->request.payloadIndex < size)
                 {
                     sData->return_type = function_return_type_continue;
                     return sData->return_type;
                 }
+#endif
             }
         }
 
@@ -388,6 +456,19 @@ private:
                 sData->state = async_state_send_payload;
             else if (state == async_state_send_payload)
                 sData->state = async_state_read_response;
+
+#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+            if (sData->upload)
+            {
+                if (sData->request.file_data.resumable.isEnabled())
+                    sData->request.file_data.resumable.updateState(sData->request.payloadIndex);
+                else if (sData->request.file_data.multipart.isEnabled())
+                    sData->request.file_data.multipart.updateState(sData->request.payloadIndex);
+            }
+#endif
+
+            if (sData->state != async_state_read_response)
+                sData->response.clear();
         }
 
         return sData->return_type;
@@ -422,6 +503,9 @@ private:
                 sse = sData->sse;
             }
 
+            if (sData->upload)
+                sData->upload_progress_enabled = false;
+
             if (sData->request.app_token && sData->request.app_token->auth_data_type != user_auth_data_no_token)
             {
                 if (sData->request.app_token->val[app_tk_ns::token].length() == 0)
@@ -436,21 +520,26 @@ private:
                 header.remove(0, header.length());
                 return ret;
             }
-
             return sendHeader(sData, sData->request.val[req_hndlr_ns::header].c_str());
         }
         else if (sData->state == async_state_send_payload)
         {
+            if (sData->upload)
+                sData->upload_progress_enabled = true;
+
             if (sData->request.method == async_request_handler_t::http_get || sData->request.method == async_request_handler_t::http_delete)
                 sData->state = async_state_read_response;
             else
             {
                 if (sData->request.val[req_hndlr_ns::payload].length())
                     ret = send(sData, sData->request.val[req_hndlr_ns::payload].c_str());
-                else if (sData->request.data && sData->request.dataLen)
-                    ret = send(sData, sData->request.data, sData->request.dataLen, sData->request.dataLen);
-                else if (sData->request.file_data.file_size && ((sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size)))
-                    ret = sendBuff(sData);
+                else if (sData->upload)
+                {
+                    if (sData->request.data && sData->request.dataLen)
+                        ret = send(sData, sData->request.data, sData->request.dataLen, sData->request.dataLen);
+                    else
+                        ret = sendBuff(sData);
+                }
             }
         }
         return ret;
@@ -458,6 +547,7 @@ private:
 
     function_return_type receive(async_data_item_t *sData)
     {
+
         if (!sData || !netConnect(sData))
         {
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
@@ -473,14 +563,45 @@ private:
         if (sData->response.httpCode == 0)
             return function_return_type_continue;
 
-        if (sData->response.val[res_hndlr_ns::location].length())
+#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+
+        if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.getLocation().length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
-            stop(sData);
-            if (connect(sData, getHost(sData, false).c_str(), sData->request.port) > function_return_type_failure)
+            String ext;
+            String host = getHost(sData, false, &ext);
+
+            if (connect(sData, host.c_str(), sData->request.port) > function_return_type_failure)
+            {
+                sData->request.val[req_hndlr_ns::payload].remove(0, sData->request.val[req_hndlr_ns::payload].length());
+                sData->request.file_data.resumable.getHeader(sData->request.val[req_hndlr_ns::header], host, ext);
+                sData->state = async_state_send_header;
+                sData->request.file_data.resumable.setHeaderState();
                 return function_return_type_continue;
+            }
 
             return connErrorHandler(sData, sData->state);
         }
+
+#else
+        if (sData->response.val[res_hndlr_ns::location].length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
+        {
+            String ext;
+            String host = getHost(sData, false, &ext);
+            if (client)
+                client->stop();
+            if (connect(sData, host.c_str(), sData->request.port) > function_return_type_failure)
+            {
+                URLHelper uh;
+                uh.relocate(sData->request.val[req_hndlr_ns::header], host, ext);
+                sData->request.val[req_hndlr_ns::payload].remove(0, sData->request.val[req_hndlr_ns::payload].length());
+                sData->state = async_state_send_header;
+                return function_return_type_continue;
+            }
+
+            return connErrorHandler(sData, sData->state);
+        }
+
+#endif
 
         if (!sData->sse && sData->response.httpCode > 0 && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
@@ -540,7 +661,7 @@ private:
         }
 
         bool download_status = sData->download && sData->aResult.setDownloadProgress();
-        bool upload_status = sData->upload && sData->aResult.setUploadProgress();
+        bool upload_status = sData->upload && sData->upload_progress_enabled && sData->aResult.setUploadProgress();
 
         if (sData->refResult)
         {
@@ -722,11 +843,15 @@ private:
             if ((read == 1 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\r') ||
                 (read == 2 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 2] == '\r' && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\n'))
             {
-                clear(sData->response.val[res_hndlr_ns::location]);
                 clear(sData->response.val[res_hndlr_ns::etag]);
-
-                String temp[4];
+                String temp[5];
+#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+                if (sData->upload)
+                    parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], sData->request.file_data.resumable.getLocationRef(), "Location");
+#else
                 parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], sData->response.val[res_hndlr_ns::location], "Location");
+
+#endif
                 parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], sData->response.val[res_hndlr_ns::etag], "ETag");
                 resETag = sData->response.val[res_hndlr_ns::etag];
                 sData->aResult.val[ares_ns::res_etag] = sData->response.val[res_hndlr_ns::etag];
@@ -748,13 +873,27 @@ private:
                 parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], temp[3], "Content-Type");
                 sData->response.flags.sse = temp[3].length() && temp[3].indexOf("text/event-stream") > -1;
 
+                if (sData->upload)
+                    parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], temp[4], "Range");
+
                 clear(sData);
 
-                for (size_t i = 0; i < 4; i++)
+#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+                if (sData->upload && sData->request.file_data.resumable.isEnabled())
+                {
+                    sData->request.file_data.resumable.setHeaderState();
+                    if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && temp[4].indexOf("bytes=") > -1)
+                        sData->request.file_data.resumable.updateRange();
+                }
+#endif
+                for (size_t i = 0; i < 5; i++)
                     temp[i].remove(0, temp[i].length());
 
                 if (sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
                     sData->response.flags.payload_remaining = true;
+
+                if ((sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK || sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT) && !sData->response.flags.chunks && sData->response.payloadLen == 0)
+                    sData->response.flags.payload_remaining = false;
             }
         }
     }
@@ -859,8 +998,7 @@ private:
                 }
                 else
                 {
-
-                    if (sData->request.ota || (sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size))
+                    if (sData->download)
                     {
                         if (sData->response.payloadLen)
                         {
@@ -1016,6 +1154,12 @@ private:
                 sData->response.flags.header_remaining = true;
             }
 
+            if (sData->upload)
+            {
+                URLHelper uh;
+                uh.updateDownloadURL(sData->aResult.upload_data.downloadUrl, sData->response.val[res_hndlr_ns::payload]);
+            }
+
             if (sData->response.flags.chunks && sData->auth_used)
                 stop(sData);
 
@@ -1026,7 +1170,7 @@ private:
                 returnResult(sData, false);
             }
 
-            if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK && (sData->request.ota || (sData->request.file_data.filename.length() && sData->request.file_data.cb) || (sData->request.file_data.data && sData->request.file_data.data_size)))
+            if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK && sData->download)
             {
                 sData->aResult.download_data.total = sData->response.payloadLen;
                 sData->aResult.download_data.downloaded = sData->response.payloadRead;
@@ -1098,7 +1242,6 @@ private:
         sData->response.flags.reset();
         sData->state = async_state_undefined;
         sData->return_type = function_return_type_undefined;
-        clear(sData->response.val[res_hndlr_ns::location]);
         clear(sData->response.val[res_hndlr_ns::etag]);
         sData->aResult.download_data.reset();
         sData->aResult.upload_data.reset();
@@ -1110,7 +1253,8 @@ private:
         sData->aResult.lastError.clearError();
         lastErr.clearError();
 
-        sData->aResult.setDebug(FPSTR("Connecting to server..."));
+        if (client && !client->connected())
+            sData->aResult.setDebug(FPSTR("Connecting to server..."));
 
         if (client && !client->connected() && client_type == async_request_handler_t::tcp_client_type_sync)
             sData->return_type = client->connect(host, port) > 0 ? function_return_type_complete : function_return_type_failure;
@@ -1505,7 +1649,7 @@ private:
         sData->request.addContentTypeHeader(type.c_str());
     }
 
-    void setFileContentLength(async_data_item_t *sData)
+    void setFileContentLength(async_data_item_t *sData, int headerLen, const String &customHeader = "")
     {
 #if defined(ENABLE_FS)
         if ((sData->request.file_data.cb && sData->request.file_data.filename.length()) || (sData->request.file_data.data_size && sData->request.file_data.data))
@@ -1521,8 +1665,17 @@ private:
                 sz = sData->request.file_data.data_size;
 
             sData->request.file_data.file_size = sData->request.base64 ? 2 + bh.getBase64Len(sz) : sz;
-            setContentLength(sData, sData->request.file_data.file_size);
-            sData->request.file_data.file.close();
+            if (customHeader.length())
+            {
+                sData->request.val[req_hndlr_ns::header] += customHeader;
+                sData->request.val[req_hndlr_ns::header] += ":";
+                sData->request.val[req_hndlr_ns::header] += sData->request.file_data.file_size + headerLen;
+                sData->request.val[req_hndlr_ns::header] += "\r\n";
+            }
+            else
+                setContentLength(sData, sData->request.file_data.file_size);
+
+            closeFile(sData);
         }
 #endif
     }
@@ -1582,22 +1735,15 @@ private:
         }
     }
 
-    String getHost(async_data_item_t *sData, bool fromReq)
+    String getHost(async_data_item_t *sData, bool fromReq, String *ext = nullptr)
     {
+#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+        String url = fromReq ? sData->request.val[req_hndlr_ns::url] : sData->request.file_data.resumable.getLocation();
+#else
         String url = fromReq ? sData->request.val[req_hndlr_ns::url] : sData->response.val[res_hndlr_ns::location];
-        int p1 = url.indexOf("http://");
-        int p2 = 0;
-        if (p1 == -1)
-        {
-            p1 = 0;
-            p2 = url.indexOf("/");
-        }
-        else
-            p2 = url.indexOf("/", p1 + 1);
-        if (p2 == -1)
-            p2 = url.length();
-
-        return url.substring(p1, p2);
+#endif
+        URLHelper uh;
+        return uh.getHost(url, ext);
     }
 
     void stopAsyncImpl(bool all = false, const String &uid = "")
@@ -1818,6 +1964,7 @@ public:
             bool sending = false;
             if (sData->state == async_state_undefined || sData->state == async_state_send_header || sData->state == async_state_send_payload)
             {
+
                 sData->response.clear();
                 sData->request.feedTimer();
                 sending = true;
@@ -1847,8 +1994,8 @@ public:
 
             if (sData->state == async_state_read_response)
             {
-                if (!sData->download)
-                    sData->request.clear();
+                // if (!sData->download && !sData->upload)
+                //    sData->request.clear();
 
                 // it can be complete response from payload sending
                 if (sData->return_type == function_return_type_complete)

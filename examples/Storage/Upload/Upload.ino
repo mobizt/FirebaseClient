@@ -323,7 +323,13 @@ void asyncCB(AsyncResult &aResult)
     {
         Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
         if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
+        {
             Serial.println("Upload completed!");
+            // This url will be updated after the payload received,
+            // then you should call aResult.uploadInfo().downloadUrl again to get the real url.
+            Serial.print("Download URL: ");
+            Serial.println(aResult.uploadInfo().downloadUrl);
+        }
     }
 }
 

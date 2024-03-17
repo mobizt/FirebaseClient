@@ -42,16 +42,12 @@
  *
  * SYNTAX:
  *
- * ServiceAuth service_auth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
+ * UserAuth user_auth(<api_key>, <user_email>, <user_password>, <expire>);
  *
- * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
- * <client_email> - The service account client Email.
- * <project_id> - The service account project ID.
- * <private_key> - The service account private key.
+ * <api_key> - API key can be obtained from Firebase console > Project Overview > Project settings.
+ * <user_email> - The user Email that in the project.
+ * <user_password> - The user password in the project.
  * <expire> - The expiry period in seconds (less than or equal to 3600).
- *
- * The default network (built-in WiFi) configuration was used by default when
- * it was not assign to the function.
  *
  * To use other network interfaces, network data from one of the following Network classes
  * can be assigned.
@@ -62,7 +58,7 @@
  *
  * Please see examples/App/NetworkInterfaces for the usage guidelines.
  *
- * The auth data can be set to Services App e.g. Database to initialize via function getApp.
+ * The auth credential data can be set to Services App e.g. Database to initialize via function getApp.
  *
  * SYNTAX:
  *
@@ -73,20 +69,25 @@
  */
 
 /**
- * LIST THE INDEXES FUNCTIONS
- * ==========================
+ * DOWNLOAD OBJECT FUNCTIONS
+ * =========================
  *
  * SYNTAXES:
  *
- * indexes.list(<AsyncClient>, <Firestore::Parent>);
- * indexes.list(<AsyncClient>, <Firestore::Parent>, <AsyncResult>);
- * indexes.list(<AsyncClient>, <Firestore::Parent>, <AsyncResultCallback>, <uid>);
+ * cstorage.download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>);
+ * cstorage.download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>, <AsyncResult>);
+ * cstorage.download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
+ * The <GoogleCloudStorage::Parent> is the GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
+ * The bucketid is the Storage bucket Id of object to download.
+ * The object is the object to be downloaded in the Storage bucket.
  *
- * The indexes is Firestore::Databases::Indexes object.
+ * The <file_config_data> is the filesystem data (file_config_data) obtained from FileConfig class object.
+ *
+ * The <GoogleCloudStorage::GetOptions> is the GoogleCloudStorage::GetOptions that holds the get options.
+ * For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objects/get#optional-parameters
+ * 
+ * The cstorage is Google Cloud Storage service app.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
@@ -170,6 +171,10 @@
 #include <WiFiClientSecure.h>
 #endif
 
+#if defined(ESP32)
+#include <SPIFFS.h>
+#endif
+
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
@@ -186,16 +191,23 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
+// Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
+#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
+
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
 
+void fileCallback(File &file, const char *filename, file_operating_mode mode);
+
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-// ServiceAuth is required for Databases functions.
+// ServiceAuth is required for Google Cloud Storage functions.
 ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<= 3600) */);
 
 FirebaseApp app;
+
+FileConfig media_file("/media.mp4", fileCallback);
 
 WiFiClientSecure ssl_client;
 
@@ -206,7 +218,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-Firestore::Databases::Indexes indexes;
+CloudStorage cstorage;
 
 AsyncResult aResult_no_callback;
 
@@ -236,7 +248,7 @@ void setup()
 
     ssl_client.setInsecure();
 #if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
+    ssl_client.setBufferSizes(8192, 1024);
 #endif
 
     app.setCallback(asyncCB);
@@ -253,7 +265,9 @@ void setup()
             JWT.process(app.getAuth());
     }
 
-    app.getApp<Firestore::Databases::Indexes>(indexes);
+    app.getApp<CloudStorage>(cstorage);
+
+    SPIFFS.begin();
 }
 
 void loop()
@@ -268,8 +282,8 @@ void loop()
     // To get the authentication time to live in seconds before expired.
     // app.ttl();
 
-    // This required when different AsyncClients than used in FirebaseApp assigned to the Firestore functions.
-    indexes.loop();
+    // This required when different AsyncClients than used in FirebaseApp assigned to the Google Cloud Storage functions.
+    cstorage.loop();
 
     // To get anyc result without callback
     // printResult(aResult_no_callback);
@@ -278,20 +292,23 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Lists the indexes.... ");
+        Serial.println("Download object...");
 
-        indexes.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), asyncCB);
+        GoogleCloudStorage::GetOptions options;
+
+        cstorage.download(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options, asyncCB);
 
         // To assign UID for async result
-        // indexes.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), asyncCB, "myUID");
+        // cstorage.download(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // indexes.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), aResult_no_callback);
+        // cstorage.download(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options, aResult_no_callback);
     }
 }
 
 void timeStatusCB(uint32_t &ts)
 {
+    Serial.println("Setting time...");
     if (time(nullptr) < FIREBASE_DEFAULT_TS)
     {
         configTime(3 * 3600, 0, "pool.ntp.org");
@@ -300,7 +317,7 @@ void timeStatusCB(uint32_t &ts)
             delay(100);
         }
     }
-
+    Serial.println("complete.");
     ts = time(nullptr);
 }
 
@@ -326,5 +343,47 @@ void asyncCB(AsyncResult &aResult)
         // To get the UID (string) from async result
         // aResult.uid();
         Serial.printf("payload: %s\n", aResult.c_str());
+    }
+
+    if (aResult.downloadProgress())
+    {
+        Serial.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
+        {
+            Serial.println("Download completed!");
+        }
+    }
+
+    if (aResult.uploadProgress())
+    {
+        Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
+        {
+            Serial.println("Upload completed!");
+            // Not available for simple upload.
+            Serial.print("Download URL: ");
+            Serial.println(aResult.uploadInfo().downloadUrl);
+        }
+    }
+}
+
+void fileCallback(File &file, const char *filename, file_operating_mode mode)
+{
+    switch (mode)
+    {
+    case file_mode_open_read:
+        file = SPIFFS.open(filename, "r");
+        break;
+    case file_mode_open_write:
+        file = SPIFFS.open(filename, "w");
+        break;
+    case file_mode_open_append:
+        file = SPIFFS.open(filename, "a");
+        break;
+    case file_mode_remove:
+        SPIFFS.remove(filename);
+        break;
+    default:
+        break;
     }
 }

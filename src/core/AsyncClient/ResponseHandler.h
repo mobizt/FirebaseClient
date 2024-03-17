@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created March 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -36,8 +36,8 @@ namespace res_hndlr_ns
     {
         header,
         payload,
-        location,
         etag,
+        location,
         max_type
     };
 }

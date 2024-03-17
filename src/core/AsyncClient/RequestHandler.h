@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created March 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -85,6 +85,7 @@ public:
     };
 
     String val[req_hndlr_ns::max_type];
+    String location;
     app_token_t *app_token = nullptr;
     uint16_t port = 443;
     uint8_t *data = nullptr;
@@ -106,6 +107,7 @@ public:
 
     void clear()
     {
+         
         for (size_t i = 0; i < req_hndlr_ns::max_type; i++)
             val[i].remove(0, val[i].length());
         port = 443;

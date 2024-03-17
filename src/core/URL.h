@@ -166,6 +166,60 @@ public:
         }
         return ret;
     }
+
+    void relocate(String &header, const String &host, const String &ext)
+    {
+        int p1 = header.indexOf(" ");
+        if (p1 > -1)
+        {
+            String part1, part2;
+            part1 = header.substring(0, p1);
+            int p2 = header.indexOf(" ", p1 + 1);
+            part2 = header.substring(p2, header.length());
+            header = part1 + ext + part2;
+            p1 = header.indexOf("Host: ");
+            part1 = header.substring(0, p1 + 6);
+            p2 = header.indexOf("\r\n", p1);
+            part2 = header.substring(p2, header.length());
+            header = part1 + host + part2;
+        }
+    }
+
+    String getHost(String &url, String *ext = nullptr)
+    {
+        int p1 = url.indexOf("://");
+        int p2 = -1;
+        p1 = p1 > -1 ? p1 + 3 : 0;
+        p2 = url.indexOf("/", p1);
+        if (p2 == -1)
+            p2 = url.length();
+
+        if (ext)
+            *ext = url.substring(p2, url.length());
+        return url.substring(p1, p2);
+    }
+
+    String downloadURL(const String &bucketId, const String &object)
+    {
+        String url = FPSTR("https://firebasestorage.googleapis.com/v0/b/");
+        url += bucketId;
+        url += FPSTR("/o/");
+        url += object;
+        url += FPSTR("?alt=media&token=a82781ce-a115-442f-bac6-a52f7f63b3e8");
+        return url.c_str();
+    }
+
+    void updateDownloadURL(String &url, const String &payload)
+    {
+        int p1 = payload.indexOf(FPSTR("\"downloadTokens\": \""));
+        if (p1 > -1)
+        {
+            p1 += 19;
+            int p2 = payload.indexOf("\"", p1);
+            if (p2 > -1)
+                url.replace(FPSTR("a82781ce-a115-442f-bac6-a52f7f63b3e8"), payload.substring(p1, p2));
+        }
+    }
 };
 
 #endif

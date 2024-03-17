@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created March 17, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -42,6 +42,7 @@ private:
     String uid;
     uint32_t app_addr = 0;
     app_token_t *app_token = nullptr;
+    Memory mem;
 
 public:
     ~CloudStorage(){};
@@ -426,10 +427,70 @@ public:
 
     void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::BaseOptions *baseOptions, GoogleCloudStorage::uploadOptions *uploadOptions, GoogleCloudStorage::ListOptions *listOptions, GoogleCloudStorage::google_cloud_storage_request_type requestType, bool async)
     {
+
         GoogleCloudStorage::DataOptions options;
         options.requestType = requestType;
         options.parent = parent;
+
+        if (uploadOptions && strlen(uploadOptions->insertProps.c_str()) && (uploadOptions->uploadType == GoogleCloudStorage::upload_type_multipart || uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable))
+            options.payload = uploadOptions->insertProps.c_str();
+
         async_request_handler_t::http_request_method method = async_request_handler_t::http_post;
+
+        if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_download ||
+            requestType == GoogleCloudStorage::google_cloud_storage_request_type_download_ota ||
+            requestType == GoogleCloudStorage::google_cloud_storage_request_type_list ||
+            requestType == GoogleCloudStorage::google_cloud_storage_request_type_get_meta)
+        {
+            method = async_request_handler_t::http_get;
+            if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_download ||
+                requestType == GoogleCloudStorage::google_cloud_storage_request_type_download_ota)
+                options.extras += "?alt=media";
+        }
+        else if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_uploads ||
+                 requestType == GoogleCloudStorage::google_cloud_storage_request_type_delete)
+        {
+            URLHelper uh;
+            options.extras += "?name=";
+            options.extras += uh.encode(parent.getObject());
+
+            if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_uploads)
+            {
+                options.extras += "&uploadType=";
+                if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_simple)
+                    options.extras += "media";
+                else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_multipart)
+                    options.extras += "multipart";
+                else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable)
+                    options.extras += "resumable";
+            }
+
+            if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_delete)
+                method = async_request_handler_t::http_delete;
+        }
+
+        if (baseOptions && strlen(baseOptions->c_str()))
+        {
+            options.extras += options.extras.length() ? '&' : '?';
+            options.extras += baseOptions->c_str();
+        }
+        else if (listOptions && strlen(listOptions->c_str()))
+        {
+            options.extras += options.extras.length() ? '&' : '?';
+            options.extras += listOptions->c_str();
+        }
+        else if (uploadOptions && strlen(uploadOptions->insertOptions.c_str()))
+        {
+            options.extras += options.extras.length() ? '&' : '?';
+            options.extras += uploadOptions->insertOptions.c_str();
+        }
+
+        GoogleCloudStorage::async_request_data_t aReq(&aClient, path, method, slot_options_t(false, false, async, false, requestType == GoogleCloudStorage::google_cloud_storage_request_type_download_ota, false), &options, &file, result, cb, uid);
+
+        if (uploadOptions && uploadOptions->mime.length() && requestType == GoogleCloudStorage::google_cloud_storage_request_type_uploads)
+            aReq.mime = uploadOptions->mime;
+
+        asyncRequest(aReq);
     }
 
     void asyncRequest(GoogleCloudStorage::async_request_data_t &request, int beta = 0)
@@ -442,9 +503,23 @@ public:
         request.opt.app_token = app_token;
         String extras;
 
+        if (request.method == async_request_handler_t::http_post || request.method == async_request_handler_t::http_put)
+            request.path += "/upload";
+
+        request.path += "/storage/v1/b/";
+        request.path += request.options->parent.getBucketId();
+        request.path += "/o";
+
+        if (request.method == async_request_handler_t::http_get)
+        {
+            URLHelper uh;
+            request.path += "/";
+            request.path += uh.encode(request.options->parent.getObject());
+        }
+
         addParams(request, extras);
 
-        url(FPSTR("cloudstorage.googleapis.com"));
+        url(FPSTR("www.googleapis.com"));
 
         async_data_item_t *sData = request.aClient->createSlot(request.opt);
 
@@ -454,18 +529,7 @@ public:
         request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
         if (request.file)
-        {
             sData->request.file_data.copy(*request.file);
-            sData->request.base64 = false;
-            if (request.mime.length())
-                request.aClient->setContentType(sData, request.mime);
-            request.aClient->setFileContentLength(sData);
-        }
-        else if (request.options->payload.length())
-        {
-            sData->request.val[req_hndlr_ns::payload] = request.options->payload;
-            request.aClient->setContentLength(sData, request.options->payload.length());
-        }
 
         setFileStatus(sData, request);
 
@@ -474,6 +538,66 @@ public:
             sData->request.ota = true;
             sData->request.base64 = false;
             sData->aResult.download_data.ota = true;
+        }
+
+        if (request.file && sData->upload)
+        {
+            sData->request.base64 = false;
+
+            if (request.options->payload.length())
+            {
+                if (request.options->extras.indexOf("uploadType=resumable") > -1)
+                {
+                    sData->request.val[req_hndlr_ns::payload] = request.options->payload;
+                    sData->request.val[req_hndlr_ns::header] += "X-Upload-Content-Type: ";
+                    sData->request.val[req_hndlr_ns::header] += request.mime;
+                    sData->request.val[req_hndlr_ns::header] += "\r\n";
+                    request.aClient->setFileContentLength(sData, 0, "X-Upload-Content-Length");
+                    request.aClient->setContentType(sData, "application/json; charset=UTF-8");
+                    request.aClient->setContentLength(sData, request.options->payload.length());
+
+                    sData->request.file_data.resumable.setSize(sData->request.file_data.file_size);
+                    sData->request.file_data.resumable.updateRange();
+                }
+                else if (request.options->extras.indexOf("uploadType=multipart") > -1)
+                {
+                    request.aClient->setContentType(sData, "multipart/related; boundary=" + sData->request.file_data.multipart.getBoundary());
+
+                    ObjectWriter owriter;
+                    JsonHelper jh;
+                    String name, mime;
+                    jh.addObject(name, "name", request.options->parent.getObject(), true, true);
+                    jh.addObject(mime, "contentType", request.mime, true, true);
+                    owriter.addMember(request.options->payload, name, "}");
+                    owriter.addMember(request.options->payload, mime, "}");
+                    sData->request.file_data.multipart.setOptions(request.options->payload);
+                    request.options->payload.remove(0, request.options->payload.length());
+                    request.aClient->setFileContentLength(sData, sData->request.file_data.multipart.getOptions().length() + sData->request.file_data.multipart.getLast().length(), "Content-Length");
+                    sData->request.val[req_hndlr_ns::header] += "\r\n";
+                    sData->request.file_data.multipart.setSize(sData->request.file_data.file_size);
+                    sData->request.file_data.multipart.updateState(0);
+                }
+            }
+            else
+            {
+                if (request.mime.length())
+                    request.aClient->setContentType(sData, request.mime);
+                request.aClient->setFileContentLength(sData, 0);
+            }
+
+            if (sData->request.file_data.file_size == 0)
+                return setClientError(request, FIREBASE_ERROR_FILE_READ);
+
+            if (request.options->extras.indexOf("uploadType=media") == -1)
+            {
+                URLHelper uh;
+                sData->aResult.upload_data.downloadUrl = uh.downloadURL(request.options->parent.getBucketId(), request.options->parent.getObject());
+            }
+        }
+        else if (request.options->payload.length())
+        {
+            sData->request.val[req_hndlr_ns::payload] = request.options->payload;
+            request.aClient->setContentLength(sData, request.options->payload.length());
         }
 
         if (request.cb)
@@ -515,7 +639,7 @@ public:
 
     void setFileStatus(async_data_item_t *sData, GoogleCloudStorage::async_request_data_t &request)
     {
-        if (sData->request.file_data.filename.length() || request.opt.ota)
+        if (request.file->filename.length() || request.opt.ota)
         {
             sData->download = request.method == async_request_handler_t::http_get;
             sData->upload = request.method == async_request_handler_t::http_post ||
