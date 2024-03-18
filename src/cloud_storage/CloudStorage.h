@@ -462,7 +462,15 @@ public:
                 else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_multipart)
                     options.extras += "multipart";
                 else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable)
-                    options.extras += "resumable";
+                {
+                    // resumable upload is only for file bigger than 256k
+                    if (file.cb)
+                    {
+                        file.cb(file.file, file.filename.c_str(), file_mode_open_read);
+                        options.extras += file.file.size() < 256 * 1024 ? "multipart" : "resumable";
+                        file.file.close();
+                    }
+                }
             }
 
             if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_delete)
