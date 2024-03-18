@@ -32,6 +32,8 @@
 #include "./core/AsyncClient/AsyncClient.h"
 #include "./core/URL.h"
 
+// https://cloud.google.com/functions/docs/reference/rest/Shared.Types/Policy
+
 #if defined(ENABLE_FUNCTIONS)
 
 namespace IAMPolicy
