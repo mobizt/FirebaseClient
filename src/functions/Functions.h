@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created March 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -91,6 +91,96 @@ public:
                 aClient->handleRemove();
             }
         }
+    }
+
+    /** Creates a new function.
+     * If a function with the given name already exists in the specified project,
+     * the long running operation will return ALREADY_EXISTS error.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function to create.
+     * @param function The GoogleCloudFunctions::Function object that holds the information of function to create.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void createFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResult &aResult)
+    {
+    }
+
+    /** Creates a new function.
+     * If a function with the given name already exists in the specified project,
+     * the long running operation will return ALREADY_EXISTS error.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function to create.
+     * @param function The GoogleCloudFunctions::Function object that holds the information of function to create.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void createFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResultCallback cb, const String &uid = "")
+    {
+    }
+
+    /** Creates a new function.
+     * If a function with the given name already exists in the specified project,
+     * the long running operation will return ALREADY_EXISTS error.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param function The GoogleCloudFunctions::Function object that holds the information of function to update.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void patchFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResult &aResult)
+    {
+    }
+
+    /** Creates a new function.
+     * If a function with the given name already exists in the specified project,
+     * the long running operation will return ALREADY_EXISTS error.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param function The GoogleCloudFunctions::Function object that holds the information of function to update.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void patchFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResultCallback cb, const String &uid = "")
+    {
     }
 };
 

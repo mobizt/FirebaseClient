@@ -42,7 +42,13 @@ namespace GoogleCloudFunctions
     {
         google_cloud_functions_request_type_undefined,
         google_cloud_functions_request_type_create,
-        google_cloud_functions_request_type_deploy
+        google_cloud_functions_request_type_delete,
+        google_cloud_functions_request_type_call,
+        google_cloud_functions_request_type_deploy,
+        google_cloud_functions_request_type_download,
+        google_cloud_functions_request_type_list,
+        google_cloud_functions_request_type_patch,
+        google_cloud_functions_request_type_set_iam_policy
     };
     // Severity of the state message.
     enum Severity
@@ -603,16 +609,16 @@ namespace GoogleCloudFunctions
 
     class Parent
     {
-        friend class Storage;
 
     private:
-        String bucketId, object;
+        String projectId, locationId, bucketId;
 
     public:
         Parent() {}
-        Parent(const String &bucketId, const String &object = "")
+        Parent(const String &projectId, const String &locationId, const String &bucketId)
         {
-            this->object = object;
+            this->projectId = projectId;
+            this->locationId = locationId;
             this->bucketId = bucketId;
 
             if (this->bucketId.length() && this->bucketId.indexOf("://") > -1)
@@ -626,11 +632,9 @@ namespace GoogleCloudFunctions
                 if (this->bucketId.length() && this->bucketId[this->bucketId.length() - 1] == '/')
                     this->bucketId.remove(this->bucketId.length() - 1, 1);
             }
-
-            if (this->object.length() && this->object[0] == '/')
-                this->object.remove(0, 1);
         }
-        String getObject() const { return object; }
+        String getProjectId() const { return projectId; }
+        String getLocationId() const { return locationId; }
         String getBucketId() const { return bucketId; }
     };
 
