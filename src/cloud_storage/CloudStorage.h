@@ -1,5 +1,5 @@
 /**
- * Created March 17, 2024
+ * Created March 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -639,7 +639,7 @@ public:
 
     void setFileStatus(async_data_item_t *sData, GoogleCloudStorage::async_request_data_t &request)
     {
-        if (request.file->filename.length() || request.opt.ota)
+        if ((request.file && request.file->filename.length()) || request.opt.ota)
         {
             sData->download = request.method == async_request_handler_t::http_get;
             sData->upload = request.method == async_request_handler_t::http_post ||

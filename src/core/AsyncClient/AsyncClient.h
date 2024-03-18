@@ -1,5 +1,5 @@
 /**
- * Created March 17, 2024
+ * Created March 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -892,7 +892,7 @@ private:
                 if (sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
                     sData->response.flags.payload_remaining = true;
 
-                if ((sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK || sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT) && !sData->response.flags.chunks && sData->response.payloadLen == 0)
+                if (!sData->sse && (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK || sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT) && !sData->response.flags.chunks && sData->response.payloadLen == 0)
                     sData->response.flags.payload_remaining = false;
             }
         }
@@ -1649,7 +1649,7 @@ private:
         sData->request.addContentTypeHeader(type.c_str());
     }
 
-    void setFileContentLength(async_data_item_t *sData, int headerLen, const String &customHeader = "")
+    void setFileContentLength(async_data_item_t *sData, int headerLen = 0, const String &customHeader = "")
     {
 #if defined(ENABLE_FS)
         if ((sData->request.file_data.cb && sData->request.file_data.filename.length()) || (sData->request.file_data.data_size && sData->request.file_data.data))
