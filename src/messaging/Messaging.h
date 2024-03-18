@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created March 19, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -36,13 +36,6 @@ using namespace firebase;
 
 class Messaging
 {
-private:
-    AsyncClientClass *aClient = nullptr;
-    String service_url;
-    String path;
-    String uid;
-    uint32_t app_addr = 0;
-    app_token_t *app_token = nullptr;
 
 public:
     ~Messaging(){};
@@ -148,6 +141,14 @@ public:
     {
         sendRequest(aClient, nullptr, cb, uid, parent, message.c_str(), Messages::firebase_cloud_messaging_request_type_send, true);
     }
+
+private:
+    AsyncClientClass *aClient = nullptr;
+    String service_url;
+    String path;
+    String uid;
+    uint32_t app_addr = 0;
+    app_token_t *app_token = nullptr;
 
     void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Messages::Parent &parent, const String &payload, Messages::firebase_cloud_messaging_request_type requestType, bool async)
     {

@@ -1,5 +1,5 @@
 /**
- * Created March 18, 2024
+ * Created March 19, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -36,13 +36,6 @@ using namespace firebase;
 
 class Storage
 {
-private:
-    AsyncClientClass *aClient = nullptr;
-    String service_url;
-    String path;
-    String uid;
-    uint32_t app_addr = 0;
-    app_token_t *app_token = nullptr;
 
 public:
     ~Storage(){};
@@ -389,6 +382,14 @@ public:
         file_config_data file;
         sendRequest(aClient, nullptr, cb, uid, parent, file, "", FirebaseStorage::firebase_storage_request_type_delete, true);
     }
+
+private:
+    AsyncClientClass *aClient = nullptr;
+    String service_url;
+    String path;
+    String uid;
+    uint32_t app_addr = 0;
+    app_token_t *app_token = nullptr;
 
     void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime, FirebaseStorage::firebase_storage_request_type requestType, bool async)
     {

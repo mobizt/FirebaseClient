@@ -26,6 +26,7 @@
 #define ASYNC_FUNCTIONS_H
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
+#include "./functions/DataOptions.h"
 using namespace std;
 
 using namespace firebase;
@@ -34,13 +35,6 @@ using namespace firebase;
 
 class Functions
 {
-private:
-    AsyncClientClass *aClient = nullptr;
-    String service_url;
-    String path;
-    String uid;
-    uint32_t app_addr = 0;
-    app_token_t *app_token = nullptr;
 
 public:
     ~Functions(){};
@@ -190,6 +184,14 @@ public:
     {
         sendRequest(aClient, nullptr, cb, uid, parent, functionId, &function, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, true);
     }
+
+private:
+    AsyncClientClass *aClient = nullptr;
+    String service_url;
+    String path;
+    String uid;
+    uint32_t app_addr = 0;
+    app_token_t *app_token = nullptr;
 
     void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function *function, const String &updateMask, GoogleCloudFunctions::google_cloud_functions_request_type requestType, bool async)
     {

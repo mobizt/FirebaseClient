@@ -262,7 +262,7 @@ namespace GoogleCloudFunctions
         // The name of the function (as defined in source code) that will be executed. Defaults to the resource name suffix, if not specified. For backward compatibility, if function with given name is not found, then the system will try to use function named "function". For Node.js this is name of a function exported by the module specified in source_location.
         BuildConfig &entryPoint(const String &value) { return setObject(buf[2], FPSTR("entryPoint"), value, true, true); }
         // The location of the function source code.
-        BuildConfig &source(const Source &value) { return setObject(buf[3], FPSTR("source"), value.c_str(), false, true); }
+        BuildConfig &source( Source value) { return setObject(buf[3], FPSTR("source"), value.c_str(), false, true); }
         // Name of the Cloud Build Custom Worker Pool that should be used to build the function. The format of this field is projects/{project}/locations/{region}/workerPools/{workerPool} where {project} and {region} are the project id and region respectively where the worker pool is defined and {workerPool} is the short name of the worker pool.
         BuildConfig &workerPool(const String &value) { return setObject(buf[4], FPSTR("workerPool"), value, true, true); }
         // User-provided build-time environment variables for the function
