@@ -27,7 +27,7 @@ Note that, the APIs are differrent from [Firebase-ESP-Client](https://github.com
 * Messaging - Complete.
 * Firestore - Complete.
 * Storage - Complete.
-* Cloud Storage - In progress.
+* Cloud Storage - Complete.
 * Functions - In progress.
 
 ## License

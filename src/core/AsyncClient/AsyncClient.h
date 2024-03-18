@@ -892,8 +892,11 @@ private:
                 if (sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
                     sData->response.flags.payload_remaining = true;
 
-                if (!sData->sse && (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK || sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT) && !sData->response.flags.chunks && sData->response.payloadLen == 0)
+                if (!sData->sse && (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK || sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT || sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT) && !sData->response.flags.chunks && sData->response.payloadLen == 0)
                     sData->response.flags.payload_remaining = false;
+
+                if (sData->request.method == async_request_handler_t::http_delete && sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
+                    sData->aResult.setDebug(FPSTR("Delete operation complete"));
             }
         }
     }

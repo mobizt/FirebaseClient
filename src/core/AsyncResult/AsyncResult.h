@@ -306,7 +306,14 @@ public:
 
     void setDebug(const String &debug)
     {
-        val[ares_ns::debug_info] = debug;
+        // Keeping old message in case unread.
+        if (debug_info_available && val[ares_ns::debug_info].length() < 200)
+        {
+            val[ares_ns::debug_info] += "\r\n";
+            val[ares_ns::debug_info] += debug;
+        }
+        else
+            val[ares_ns::debug_info] = debug;
         if (debug.length())
             debug_info_available = true;
     }

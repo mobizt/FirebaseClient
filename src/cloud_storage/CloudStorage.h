@@ -427,7 +427,6 @@ public:
 
     void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::BaseOptions *baseOptions, GoogleCloudStorage::uploadOptions *uploadOptions, GoogleCloudStorage::ListOptions *listOptions, GoogleCloudStorage::google_cloud_storage_request_type requestType, bool async)
     {
-
         GoogleCloudStorage::DataOptions options;
         options.requestType = requestType;
         options.parent = parent;
@@ -447,8 +446,7 @@ public:
                 requestType == GoogleCloudStorage::google_cloud_storage_request_type_download_ota)
                 options.extras += "?alt=media";
         }
-        else if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_uploads ||
-                 requestType == GoogleCloudStorage::google_cloud_storage_request_type_delete)
+        else if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_uploads)
         {
             URLHelper uh;
             options.extras += "?name=";
@@ -472,10 +470,9 @@ public:
                     }
                 }
             }
-
-            if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_delete)
-                method = async_request_handler_t::http_delete;
         }
+        else if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_delete)
+            method = async_request_handler_t::http_delete;
 
         if (baseOptions && strlen(baseOptions->c_str()))
         {
@@ -518,7 +515,7 @@ public:
         request.path += request.options->parent.getBucketId();
         request.path += "/o";
 
-        if (request.method == async_request_handler_t::http_get)
+        if ((request.method == async_request_handler_t::http_get || request.method == async_request_handler_t::http_delete) && request.options->parent.getObject().length())
         {
             URLHelper uh;
             request.path += "/";
@@ -527,7 +524,7 @@ public:
 
         addParams(request, extras);
 
-        url(FPSTR("www.googleapis.com"));
+        url(FPSTR("storage.googleapis.com"));
 
         async_data_item_t *sData = request.aClient->createSlot(request.opt);
 
@@ -557,7 +554,7 @@ public:
                 if (request.options->extras.indexOf("uploadType=resumable") > -1)
                 {
                     sData->request.val[req_hndlr_ns::payload] = request.options->payload;
-                    sData->request.val[req_hndlr_ns::header] += "X-Upload-Content-Type: ";
+                    sData->request.val[req_hndlr_ns::header] += FPSTR("X-Upload-Content-Type: ");
                     sData->request.val[req_hndlr_ns::header] += request.mime;
                     sData->request.val[req_hndlr_ns::header] += "\r\n";
                     request.aClient->setFileContentLength(sData, 0, "X-Upload-Content-Length");
