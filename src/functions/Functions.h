@@ -113,6 +113,7 @@ public:
      */
     void createFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResult &aResult)
     {
+        sendRequest(aClient, &aResult, NULL, "", parent, functionId, &function, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, true);
     }
 
     /** Creates a new function.
@@ -136,6 +137,7 @@ public:
      */
     void createFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResultCallback cb, const String &uid = "")
     {
+        sendRequest(aClient, nullptr, cb, uid, parent, functionId, &function, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, true);
     }
 
     /** Creates a new function.
@@ -149,6 +151,8 @@ public:
      * The bucket Id is the Firebase storage bucket Id in the project.
      * @param functionId The name of function.
      * @param function The GoogleCloudFunctions::Function object that holds the information of function to update.
+     * @param updateMask The list of fields to be updated. If no field mask is provided, all provided fields in the request will be updated.
+     * This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
      * @param aResult The async result (AsyncResult).
      *
      * @note Use FirebaseData.payload() to get the returned payload.
@@ -156,8 +160,9 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void patchFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResult &aResult)
+    void patchFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask, AsyncResult &aResult)
     {
+        sendRequest(aClient, &aResult, NULL, "", parent, functionId, &function, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, true);
     }
 
     /** Creates a new function.
@@ -171,6 +176,8 @@ public:
      * The bucket Id is the Firebase storage bucket Id in the project.
      * @param functionId The name of function.
      * @param function The GoogleCloudFunctions::Function object that holds the information of function to update.
+     * @param updateMask The list of fields to be updated. If no field mask is provided, all provided fields in the request will be updated.
+     * This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
@@ -179,8 +186,24 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void patchFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResultCallback cb, const String &uid = "")
+    void patchFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
     {
+        sendRequest(aClient, nullptr, cb, uid, parent, functionId, &function, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, true);
+    }
+
+    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function *function, const String &updateMask, GoogleCloudFunctions::google_cloud_functions_request_type requestType, bool async)
+    {
+        GoogleCloudFunctions::DataOptions options;
+        options.requestType = requestType;
+        options.parent = parent;
+
+        String ext;
+        bool hasParam = false;
+        URLHelper uh;
+        if (updateMask.length())
+            uh.addParamsTokens(ext, "updateMask=", updateMask, hasParam);
+
+        async_request_handler_t::http_request_method method = async_request_handler_t::http_post;
     }
 };
 
