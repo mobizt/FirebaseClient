@@ -462,6 +462,7 @@ private:
                     options.extras += "multipart";
                 else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable)
                 {
+#if defined(ENABLE_FS)
                     // resumable upload is only for file bigger than 256k
                     if (file.cb)
                     {
@@ -469,6 +470,7 @@ private:
                         options.extras += file.file.size() < 256 * 1024 ? "multipart" : "resumable";
                         file.file.close();
                     }
+#endif
                 }
             }
         }
@@ -552,6 +554,7 @@ private:
 
             if (request.options->payload.length())
             {
+#if defined(ENABLE_FS)
                 if (request.options->extras.indexOf("uploadType=resumable") > -1)
                 {
                     sData->request.val[req_hndlr_ns::payload] = request.options->payload;
@@ -583,6 +586,7 @@ private:
                     sData->request.file_data.multipart.setSize(sData->request.file_data.file_size);
                     sData->request.file_data.multipart.updateState(0);
                 }
+#endif
             }
             else
             {

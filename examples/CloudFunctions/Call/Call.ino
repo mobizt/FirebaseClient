@@ -69,26 +69,23 @@
  */
 
 /**
- * UPDATE EXISTING GOOGLE CLOUD FUNCTIONS'S FUNCTIONS
- * ==================================================
+ * CALL A FUNCTION'S FUNCTIONS
+ * ===========================
  *
  * SYNTAXES:
  *
- * cfunctions.patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>);
- * cfunctions.patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>, <AsyncResult>);
- * cfunctions.patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>, <AsyncResultCallback>, <uid>);
+ * cfunctions.call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>);
+ * cfunctions.call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>, <AsyncResult>);
+ * cfunctions.call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>, <AsyncResultCallback>, <uid>);
  *
  * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The location Id is the project location.
  * The bucket Id is the Firebase storage bucket Id in the project.
  *
- * The <functionId> is the name of function to update.
+ * The <functionId> is the function name or Id to call.
  * 
- * The <GoogleCloudFunctions::Function> is the GoogleCloudFunctions::Function object that holds the information of function to update.
- *
- * The <updateMask> is the list of fields to be updated. If no field mask is provided, all provided fields in the request will be updated.
- * This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
+ * The <data> is the data to be passed to the function.
  *
  * The cfunctions is Google Cloud Functions service app.
  *
@@ -297,30 +294,15 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Updates existing function...");
+        Serial.println("Call a function...");
 
-        GoogleCloudFunctions::Function function;
-
-        GoogleCloudFunctions::BuildConfig buildConfig;
-        buildConfig.entryPoint("helloHttp");
-        buildConfig.runtime("nodejs20");
-
-        GoogleCloudFunctions::ServiceConfig serviceConfig;
-        serviceConfig.availableMemory("256M");
-
-        function.serviceConfig(serviceConfig);
-
-        String updateMask = "buildConfig.runtime,buildConfig.entryPoint,serviceConfig.availableMemory";
-
-        // You can set the content of function object directly with function.setContent("your content")
-
-        cfunctions.patch(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "test" /* function name */, function, updateMask, asyncCB);
+        cfunctions.call(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "helloWorld" /* function name */, "test" /* data to pass to function */, asyncCB);
 
         // To assign UID for async result
-        // cfunctions.patch(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "test", function, updateMask, asyncCB, "myUID");
+        // cfunctions.call(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "helloWorld", "test", asyncCB, "myUID");
 
         // To get anyc result without callback
-        // cfunctions.patch(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "test", function, updateMask, aResult_no_callback);
+        // cfunctions.call(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "helloWorld", "test", aResult_no_callback);
     }
 }
 

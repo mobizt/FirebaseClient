@@ -84,6 +84,8 @@
  * The bucket Id is the Firebase storage bucket Id in the project.
  * 
  * The <functionId> is the name of function to create.
+ * 
+ * The <GoogleCloudFunctions::Function> is the GoogleCloudFunctions::Function object that holds the information of function to create.
  *
  * The cfunctions is Google Cloud Functions service app.
  *

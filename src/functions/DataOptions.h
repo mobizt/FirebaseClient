@@ -47,7 +47,10 @@ namespace GoogleCloudFunctions
         google_cloud_functions_request_type_deploy,
         google_cloud_functions_request_type_download,
         google_cloud_functions_request_type_list,
+        google_cloud_functions_request_type_get,
         google_cloud_functions_request_type_patch,
+        google_cloud_functions_request_type_gen_downloadUrl,
+        google_cloud_functions_request_type_gen_uploadUrl,
         google_cloud_functions_request_type_set_iam_policy
     };
     // Severity of the state message.
@@ -613,8 +616,106 @@ namespace GoogleCloudFunctions
         void setContent(const String &content)
         {
             owriter.clearBuf(buf, bufSize);
-            buf[0]=content;
+            buf[0] = content;
         }
+        const char *c_str() const { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
+    };
+
+    struct UploadURLOptions : public Printable
+    {
+
+    protected:
+        size_t bufSize = 3;
+        String buf[3];
+        ObjectWriter owriter;
+        URLHelper uh;
+
+        UploadURLOptions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
+        {
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
+        }
+
+    public:
+        // [Preview] Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function source code objects in intermediate Cloud Storage buckets. When you generate an upload url and upload your source code, it gets copied to an intermediate Cloud Storage bucket. The source code is then copied to a versioned directory in the sources bucket in the consumer project during the function deployment.
+        // It must match the pattern projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}.
+        UploadURLOptions &kmsKeyName(const String &value) { return setObject(buf[1], FPSTR("kmsKeyName"), value, true, true); }
+        // The function environment the generated upload url will be used for. The upload url for 2nd Gen functions can also be used for 1st gen functions, but not vice versa. If not specified, 2nd generation-style upload URLs are generated.
+        UploadURLOptions &environment(Environment value)
+        {
+            if (value == ENVIRONMENT_UNSPECIFIED)
+                return setObject(buf[2], "environment", "ENVIRONMENT_UNSPECIFIED", true, true);
+            else if (value == GEN_1)
+                return setObject(buf[2], "environment", "GEN_1", true, true);
+            else if (value == GEN_2)
+                return setObject(buf[2], "environment", "GEN_2", true, true);
+            return *this;
+        }
+        void setContent(const String &content)
+        {
+            owriter.clearBuf(buf, bufSize);
+            buf[0] = content;
+        }
+        const char *c_str() const { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
+    };
+
+    /**
+     * Cloud Functions List Query parameters
+     */
+    struct ListOptions : public Printable
+    {
+
+    protected:
+        size_t bufSize = 5;
+        String buf[5];
+        ObjectWriter owriter;
+        URLHelper uh;
+
+        ListOptions &setBuf()
+        {
+            owriter.clear(buf[0]);
+            for (size_t i = 1; i < bufSize; i++)
+            {
+                if (buf[i].length())
+                {
+                    if (buf[0].length())
+                        buf[0] += '&';
+                    buf[0] += buf[i];
+                }
+            }
+            return *this;
+        }
+
+    public:
+        // Maximum number of functions to return per call. The largest allowed pageSize is 1,000, if the pageSize is omitted or specified as greater than 1,000 then it will be replaced as 1,000. The size of the list response can be less than specified when used with filters.
+        ListOptions &pageSize(uint64_t value)
+        {
+            buf[1] = "pageSize=" + String(value);
+            return setBuf();
+        }
+        // The value returned by the last ListFunctionsResponse; indicates that this is a continuation of a prior functions.list call, and that the system should return the next page of data.
+        ListOptions &pageToken(const String &value)
+        {
+            buf[2] = "pageToken=" + value;
+            return setBuf();
+        }
+        // The filter for Functions that match the filter expression, following the syntax outlined in https://google.aip.dev/160.
+        ListOptions &filter(const String &value)
+        {
+            buf[3] = "filter=" + value;
+            return setBuf();
+        }
+        // The sorting order of the resources returned. Value should be a comma separated list of fields. The default sorting oder is ascending. See https://google.aip.dev/132#ordering.
+        ListOptions &orderBy(const String &value)
+        {
+            buf[4] = "orderBy=" + value;
+            return setBuf();
+        }
+
         const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
@@ -649,8 +750,8 @@ namespace GoogleCloudFunctions
         String getProjectId() const { return projectId; }
         String getLocationId() const { return locationId; }
         String getBucketId() const { return bucketId; }
-         String getFunctionId() const { return functionId; }
-        void setFunctionId(const String &functionId){this->functionId= functionId;}
+        String getFunctionId() const { return functionId; }
+        void setFunctionId(const String &functionId) { this->functionId = functionId; }
     };
 
     class DataOptions

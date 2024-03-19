@@ -93,7 +93,8 @@ namespace GoogleCloudStorage
             {
                 if (buf[i].length())
                 {
-                    buf[0] += buf[0].length() ? '&' : '?';
+                    if (buf[0].length())
+                        buf[0] += '&';
                     buf[0] += buf[i];
                 }
             }

@@ -109,7 +109,7 @@ public:
     {
         AsyncResult result;
         file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, functionId, &function, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, false);
+        sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, function.c_str(), false);
         return result.lastError.code() == 0;
     }
 
@@ -134,7 +134,7 @@ public:
     void create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResult &aResult)
     {
         file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, &function, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, function.c_str(), true);
     }
 
     /** Creates a new function.
@@ -159,7 +159,7 @@ public:
     void create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResultCallback cb, const String &uid = "")
     {
         file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, &function, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, function.c_str(), true);
     }
 
     /** Creates a new function.
@@ -186,7 +186,7 @@ public:
     {
         AsyncResult result;
         file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, functionId, &function, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, true);
+        sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, function.c_str(), false);
         return result.lastError.code() == 0;
     }
 
@@ -213,7 +213,7 @@ public:
     void patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask, AsyncResult &aResult)
     {
         file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, &function, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, nullptr, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, function.c_str(), true);
     }
 
     /** Creates a new function.
@@ -240,7 +240,409 @@ public:
     void patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
     {
         file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, &function, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, nullptr, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, function.c_str(), true);
+    }
+
+    /** Deletes a function with the given name from the specified project. If the given function is used by some trigger, the trigger will be updated to remove this function.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @return Boolean type status indicates the success of the operation.
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    bool deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+    {
+        AsyncResult result;
+        file_config_data file;
+        sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_delete, "", false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Deletes a function with the given name from the specified project. If the given function is used by some trigger, the trigger will be updated to remove this function.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, AsyncResult &aResult)
+    {
+        file_config_data file;
+        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_delete, "", true);
+    }
+
+    /** Deletes a function with the given name from the specified project. If the given function is used by some trigger, the trigger will be updated to remove this function.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, AsyncResultCallback cb, const String &uid = "")
+    {
+        file_config_data file;
+        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_delete, "", true);
+    }
+
+    /** Returns a list of functions that belong to the requested project.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param listOptions The GoogleCloudFunctions::ListOptions object that holds the query parameters e.g. pageSize, pageToken, filter, and orderBy.
+     * @return Boolean type status indicates the success of the operation.
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    bool list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions)
+    {
+        AsyncResult result;
+        file_config_data file;
+        sendRequest(aClient, &result, NULL, "", parent, file, "", &listOptions, "", GoogleCloudFunctions::google_cloud_functions_request_type_list, "", false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Returns a list of functions that belong to the requested project.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param listOptions The GoogleCloudFunctions::ListOptions object that holds the query parameters e.g. pageSize, pageToken, filter, and orderBy.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions, AsyncResult &aResult)
+    {
+        file_config_data file;
+        sendRequest(aClient, &aResult, NULL, "", parent, file, "", &listOptions, "", GoogleCloudFunctions::google_cloud_functions_request_type_list, "", true);
+    }
+
+    /** Returns a list of functions that belong to the requested project.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param listOptions The GoogleCloudFunctions::ListOptions object that holds the query parameters e.g. pageSize, pageToken, filter, and orderBy.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions, AsyncResultCallback cb, const String &uid = "")
+    {
+        file_config_data file;
+        sendRequest(aClient, nullptr, cb, uid, parent, file, "", &listOptions, "", GoogleCloudFunctions::google_cloud_functions_request_type_list, "", true);
+    }
+
+    /** Returns a function with the given name from the requested project.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @return Boolean type status indicates the success of the operation.
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    bool get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+    {
+        AsyncResult result;
+        file_config_data file;
+        sendRequest(aClient, &result, NULL, "", parent, file, "", nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_get, "", false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Returns a function with the given name from the requested project.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, AsyncResult &aResult)
+    {
+        file_config_data file;
+        sendRequest(aClient, &aResult, NULL, "", parent, file, "", nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_get, "", true);
+    }
+
+    /** Returns a function with the given name from the requested project.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, AsyncResultCallback cb, const String &uid = "")
+    {
+        file_config_data file;
+        sendRequest(aClient, nullptr, cb, uid, parent, file, "", nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_get, "", true);
+    }
+
+    /** Synchronously invokes a deployed Cloud Function. To be used for testing purposes as very limited traffic is allowed. For more information on the actual limits, refer to Rate Limits (https://cloud.google.com/functions/quotas#rate_limits).
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param payload The Input to be passed to the function.
+     * @return Boolean type status indicates the success of the operation.
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    bool call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload)
+    {
+        AsyncResult result;
+        file_config_data file;
+        sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_call, payload, false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Synchronously invokes a deployed Cloud Function. To be used for testing purposes as very limited traffic is allowed. For more information on the actual limits, refer to Rate Limits (https://cloud.google.com/functions/quotas#rate_limits).
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param payload The Input to be passed to the function.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload, AsyncResult &aResult)
+    {
+        file_config_data file;
+        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_call, payload, true);
+    }
+
+    /** Synchronously invokes a deployed Cloud Function. To be used for testing purposes as very limited traffic is allowed. For more information on the actual limits, refer to Rate Limits (https://cloud.google.com/functions/quotas#rate_limits).
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param payload The Input to be passed to the function.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload, AsyncResultCallback cb, const String &uid = "")
+    {
+        file_config_data file;
+        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_call, payload, true);
+    }
+
+    /** Returns a signed URL for downloading deployed function source code. The URL is only valid for a limited period and should be used within 30 minutes of generation. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @return Boolean type status indicates the success of the operation.
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    bool generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+    {
+        AsyncResult result;
+        file_config_data file;
+        sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl, "", false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Returns a signed URL for downloading deployed function source code. The URL is only valid for a limited period and should be used within 30 minutes of generation. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, AsyncResult &aResult)
+    {
+        file_config_data file;
+        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl, "", true);
+    }
+
+    /** Returns a signed URL for downloading deployed function source code. The URL is only valid for a limited period and should be used within 30 minutes of generation. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, AsyncResultCallback cb, const String &uid = "")
+    {
+        file_config_data file;
+        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl, "", true);
+    }
+
+    /** RReturns a signed URL for uploading a function source code. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls. Once the function source code upload is complete, the used signed URL should be provided in functions.create or functions.patch request as a reference to the function source code.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param options The GoogleCloudFunctions::UploadURLOptions object that provides the kmsKeyName and environment options.
+     * @return Boolean type status indicates the success of the operation.
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    bool generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options)
+    {
+        AsyncResult result;
+        file_config_data file;
+        sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl, options.c_str(), false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Returns a signed URL for uploading a function source code. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls. Once the function source code upload is complete, the used signed URL should be provided in functions.create or functions.patch request as a reference to the function source code.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param options The GoogleCloudFunctions::UploadURLOptions object that provides the kmsKeyName and environment options.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options, AsyncResult &aResult)
+    {
+        file_config_data file;
+        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl, options.c_str(), true);
+    }
+
+    /** Returns a signed URL for uploading a function source code. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls. Once the function source code upload is complete, the used signed URL should be provided in functions.create or functions.patch request as a reference to the function source code.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param options The GoogleCloudFunctions::UploadURLOptions object that provides the kmsKeyName and environment options.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options, AsyncResultCallback cb, const String &uid = "")
+    {
+        file_config_data file;
+        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl, options.c_str(), true);
     }
 
 private:
@@ -251,7 +653,7 @@ private:
     uint32_t app_addr = 0;
     app_token_t *app_token = nullptr;
 
-    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudFunctions::Parent &parent, file_config_data &file, const String &functionId, GoogleCloudFunctions::Function *function, const String &updateMask, GoogleCloudFunctions::google_cloud_functions_request_type requestType, bool async)
+    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudFunctions::Parent &parent, file_config_data &file, const String &functionId, GoogleCloudFunctions::ListOptions *listOptions, const String &updateMask, GoogleCloudFunctions::google_cloud_functions_request_type requestType, const String &payload, bool async)
     {
         GoogleCloudFunctions::DataOptions options;
         options.requestType = requestType;
@@ -263,8 +665,13 @@ private:
 
         async_request_handler_t::http_request_method method = async_request_handler_t::http_post;
 
-        if (strlen(function->c_str()))
-            options.payload = function->c_str();
+        if (payload.length())
+        {
+            if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_call)
+                options.payload = "{\"data\":\"" + payload + "\"}";
+            else
+                options.payload = payload;
+        }
 
         if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_create)
         {
@@ -277,16 +684,31 @@ private:
         {
             method = async_request_handler_t::http_patch;
         }
+        else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_delete)
+        {
+            method = async_request_handler_t::http_delete;
+        }
+        else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_get || requestType == GoogleCloudFunctions::google_cloud_functions_request_type_list)
+        {
+            method = async_request_handler_t::http_get;
+        }
+
+        if (listOptions && strlen(listOptions->c_str()))
+        {
+            options.extras += options.extras.length() ? '&' : '?';
+            options.extras += listOptions->c_str();
+            hasParam = true;
+        }
 
         if (updateMask.length())
             uh.addParamsTokens(options.extras, "updateMask=", updateMask, hasParam);
 
         GoogleCloudFunctions::async_request_data_t aReq(&aClient, path, method, slot_options_t(false, false, async, false, false, false), &options, &file, result, cb, uid);
 
-        asyncRequest(aReq);
+        asyncRequest(aReq, requestType);
     }
 
-    void asyncRequest(GoogleCloudFunctions::async_request_data_t &request, int beta = 0)
+    void asyncRequest(GoogleCloudFunctions::async_request_data_t &request, GoogleCloudFunctions::google_cloud_functions_request_type requestType)
     {
         app_token_t *app_token = appToken();
 
@@ -296,18 +718,31 @@ private:
         request.opt.app_token = app_token;
         String extras;
 
-        request.path = "/v2/projects/";
+        request.path = "/v";
+        request.path += requestType == GoogleCloudFunctions::google_cloud_functions_request_type_call ? 1 : 2;
+        request.path += "/projects/";
         request.path += request.options->parent.getProjectId();
         request.path += "/locations/";
         request.path += request.options->parent.getLocationId();
         request.path += "/functions";
 
-        if (request.method == async_request_handler_t::http_patch)
+        if ((request.method == async_request_handler_t::http_get && request.options->parent.getFunctionId().length() > 0) ||
+            requestType == GoogleCloudFunctions::google_cloud_functions_request_type_call ||
+            requestType == GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl ||
+            request.method == async_request_handler_t::http_patch ||
+            request.method == async_request_handler_t::http_delete)
         {
             URLHelper uh;
             request.path += "/";
             request.path += uh.encode(request.options->parent.getFunctionId());
+            if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_call)
+                request.path += ":call";
+            else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl)
+                request.path += ":generateDownloadUrl";
         }
+
+        if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl)
+            request.path += ":generateUploadUrl";
 
         addParams(request, extras);
 
@@ -343,11 +778,18 @@ private:
             request.aClient->setContentLength(sData, request.options->payload.length());
         }
 
+        if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl ||
+            (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl && request.options->payload.length() == 0))
+            request.aClient->setContentLength(sData, 0);
+
         if (request.cb)
             sData->cb = request.cb;
 
         if (request.aResult)
             sData->setRefResult(request.aResult);
+
+        Serial.println(sData->request.val[req_hndlr_ns::header]);
+        Serial.println(sData->request.val[req_hndlr_ns::payload]);
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();

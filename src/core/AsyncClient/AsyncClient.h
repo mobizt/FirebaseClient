@@ -453,7 +453,12 @@ private:
         if (sData->return_type == function_return_type_complete)
         {
             if (state == async_state_send_header)
-                sData->state = async_state_send_payload;
+            {
+                if (sData->request.val[req_hndlr_ns::header].indexOf("Content-Length: 0\r\n") > -1)
+                    sData->state = async_state_read_response;
+                else
+                    sData->state = async_state_send_payload;
+            }
             else if (state == async_state_send_payload)
                 sData->state = async_state_read_response;
 
