@@ -1,5 +1,5 @@
 /**
- * Created March 18, 2024
+ * Created March 19, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -262,7 +262,7 @@ namespace GoogleCloudFunctions
         // The name of the function (as defined in source code) that will be executed. Defaults to the resource name suffix, if not specified. For backward compatibility, if function with given name is not found, then the system will try to use function named "function". For Node.js this is name of a function exported by the module specified in source_location.
         BuildConfig &entryPoint(const String &value) { return setObject(buf[2], FPSTR("entryPoint"), value, true, true); }
         // The location of the function source code.
-        BuildConfig &source( Source value) { return setObject(buf[3], FPSTR("source"), value.c_str(), false, true); }
+        BuildConfig &source(Source value) { return setObject(buf[3], FPSTR("source"), value.c_str(), false, true); }
         // Name of the Cloud Build Custom Worker Pool that should be used to build the function. The format of this field is projects/{project}/locations/{region}/workerPools/{workerPool} where {project} and {region} are the project id and region respectively where the worker pool is defined and {workerPool} is the short name of the worker pool.
         BuildConfig &workerPool(const String &value) { return setObject(buf[4], FPSTR("workerPool"), value, true, true); }
         // User-provided build-time environment variables for the function
@@ -341,6 +341,8 @@ namespace GoogleCloudFunctions
         // Name of the secret in secret manager (not the full resource name).
         SecretVolume &secret(const String &value) { return setObject(buf[3], FPSTR("secret"), value, true, true); }
         // List of secret versions to mount for this secret. If empty, the latest version of the secret will be made available in a file named after the secret under the mount point.
+        // The item or value will be added to the array or list.
+        // To add more items, call this function again.
         SecretVolume &versions(const SecretVersion &value)
         {
             owriter.addMapArrayMember(buf, bufSize, buf[4], FPSTR("versions"), value.c_str(), false);
@@ -446,12 +448,16 @@ namespace GoogleCloudFunctions
         // Whether 100% of traffic is routed to the latest revision. On functions.create and functions.patch, when set to true, the revision being deployed will serve 100% of traffic, ignoring any traffic split settings, if any. On functions.get, true will be returned if the latest revision is serving 100% of traffic.
         ServiceConfig &allTrafficOnLatestRevision(bool value) { return setObject(buf[11], FPSTR("allTrafficOnLatestRevision"), owriter.getBoolStr(value), false, true); }
         // Secret environment variables configuration.
+        // The item or value will be added to the array or list.
+        // To add more items, call this function again.
         ServiceConfig &secretEnvironmentVariables(const SecretEnvVar &value)
         {
             owriter.addMapArrayMember(buf, bufSize, buf[12], FPSTR("secretEnvironmentVariables"), value.c_str(), false);
             return *this;
         }
         // Secret volumes configuration.
+        // The item or value will be added to the array or list.
+        // To add more items, call this function again.
         ServiceConfig &secretVolumes(const SecretVolume &value)
         {
             owriter.addMapArrayMember(buf, bufSize, buf[13], FPSTR("secretVolumes"), value.c_str(), false);
@@ -525,6 +531,8 @@ namespace GoogleCloudFunctions
         // Required. The type of event to observe. For example: google.cloud.audit.log.v1.written or google.cloud.pubsub.topic.v1.messagePublished.
         EventTrigger &eventType(const String &value) { return setObject(buf[2], FPSTR("eventType"), value, true, true); }
         // Criteria used to filter events.
+        // The item or value will be added to the array or list.
+        // To add more items, call this function again.
         EventTrigger &eventFilters(const EventFilter &value)
         {
             owriter.addMapArrayMember(buf, bufSize, buf[3], FPSTR("eventFilters"), value.c_str(), false);

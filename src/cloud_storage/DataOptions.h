@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created March 19, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -339,6 +339,8 @@ namespace GoogleCloudStorage
         InsertProperties() { metadata(object_t()); }
 
         // https://cloud.google.com/storage/docs/access-control/lists
+        // The item or value will be added to the array or list.
+        // To add more items, call this function again.
         InsertProperties &acl(const String &value)
         {
             owriter.addMapArrayMember(buf, bufSize, buf[1], "acl", value, true);

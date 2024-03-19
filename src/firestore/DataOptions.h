@@ -1,5 +1,5 @@
 /**
- * Created March 12, 2024
+ * Created March 19, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -67,6 +67,9 @@ enum firebase_firestore_request_type
     firebase_firestore_request_type_delete_index
 };
 
+/**
+ * A set of field paths on a document. Used to restrict a get or update operation on a document to a subset of its fields. This is different from standard field masks, as this is always scoped to a Document, and takes in account the dynamic nature of Value.
+ */
 class DocumentMask : public Printable
 {
     friend class FirestoreBase;
@@ -95,12 +98,20 @@ public:
      * This is different from standard field masks, as this is always scoped to a Document,
      * and takes in account the dynamic nature of Value.
      *
-     * @param mask The list of field paths in the mask. See Document.fields for a field path syntax reference.
+     * @param fieldPaths The list of field paths in the mask. See Document.fields (https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document.FIELDS.fields) for a field path syntax reference.
      */
     DocumentMask(const String &fieldPaths = "")
     {
         setFieldPaths(fieldPaths);
     }
+    /**
+     * A set of field paths on a document.
+     * Used to restrict a get or update operation on a document to a subset of its fields.
+     * This is different from standard field masks, as this is always scoped to a Document,
+     * and takes in account the dynamic nature of Value.
+     *
+     * @param fieldPaths The list of field paths in the mask. See Document.fields (https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document.FIELDS.fields) for a field path syntax reference.
+     */
     void setFieldPaths(const String &fieldPaths)
     {
         if (fieldPaths.length())
@@ -124,7 +135,7 @@ public:
 
 namespace FieldTransform
 {
-
+    // A value that is calculated by the server.
     enum ServerValue
     {
         SERVER_VALUE_UNSPECIFIED,
@@ -134,6 +145,11 @@ namespace FieldTransform
         REQUEST_TIME
     };
 
+    /**
+     * Adds the given value to the field's current value.
+     * This must be an integer or a double value.
+     *  If the field is not an integer or double, or if the field does not yet exist, the transformation will set the field to the given value. If either of the given value or the current field value are doubles, both values will be interpreted as doubles. Double arithmetic and representation of double values follow IEEE 754 semantics. If there is positive/negative integer overflow, the field is resolved to the largest magnitude positive/negative integer.
+     */
     struct Increment
     {
     private:
@@ -151,6 +167,11 @@ namespace FieldTransform
         void clear() { buf.remove(0, buf.length()); }
     };
 
+    /**
+     * Sets the field to the maximum of its current value and the given value.
+     * This must be an integer or a double value.
+     * If the field is not an integer or double, or if the field does not yet exist, the transformation will set the field to the given value. If a maximum operation is applied where the field and the input value are of mixed types (that is - one is an integer and one is a double) the field takes on the type of the larger operand. If the operands are equivalent (e.g. 3 and 3.0), the field does not change. 0, 0.0, and -0.0 are all zero. The maximum of a zero stored value and zero input value is always the stored value. The maximum of any numeric value x and NaN is NaN.
+     */
     struct Maximum
     {
     private:
@@ -168,6 +189,11 @@ namespace FieldTransform
         void clear() { buf.remove(0, buf.length()); }
     };
 
+    /**
+     * Sets the field to the minimum of its current value and the given value.
+     * This must be an integer or a double value.
+     * If the field is not an integer or double, or if the field does not yet exist, the transformation will set the field to the input value. If a minimum operation is applied where the field and the input value are of mixed types (that is - one is an integer and one is a double) the field takes on the type of the smaller operand. If the operands are equivalent (e.g. 3 and 3.0), the field does not change. 0, 0.0, and -0.0 are all zero. The minimum of a zero stored value and zero input value is always the stored value. The minimum of any numeric value x and NaN is NaN.
+     */
     struct Minimum
     {
     private:
@@ -184,6 +210,11 @@ namespace FieldTransform
         const char *c_str() const { return buf.c_str(); }
     };
 
+    /**
+     * Append the given elements in order if they are not already present in the current field value. If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
+     * Equivalent numbers of different types (e.g. 3L and 3.0) are considered equal when checking if a value is missing. NaN is equal to NaN, and Null is equal to Null. If the input contains multiple equivalent values, only the first will be considered.
+     * The corresponding transform_result will be the null value.
+     */
     template <typename T = Values::ArrayValue>
     struct AppendMissingElements
     {
@@ -202,6 +233,11 @@ namespace FieldTransform
         void clear() { buf.remove(0, buf.length()); }
     };
 
+    /**
+     * Remove all of the given elements from the array in the field. If the field is not an array, or if the field does not yet exist, it is set to the empty array.
+     * Equivalent numbers of the different types (e.g. 3L and 3.0) are considered equal when deciding whether an element should be removed. NaN is equal to NaN, and Null is equal to Null. This will remove all equivalent values if there are duplicates.
+     * The corresponding transform_result will be the null value.
+     */
     template <typename T = Values::ArrayValue>
     struct RemoveAllFromArray
     {
@@ -218,6 +254,7 @@ namespace FieldTransform
         RemoveAllFromArray(T arrayValue) { owriter.setPair(buf, FPSTR("removeAllFromArray"), arrayValue.c_str()); }
         const char *c_str() const { return buf.c_str(); }
     };
+
     /**
      *  Sets the field to the given server value.
      */
@@ -237,6 +274,7 @@ namespace FieldTransform
         SetToServerValue(ServerValue enumValue) { owriter.setPair(buf, FPSTR("setToServerValue"), jh.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
         const char *c_str() const { return buf.c_str(); }
     };
+
     /**
      * A transformation of a field of the document.
      */
@@ -260,6 +298,7 @@ namespace FieldTransform
         /**
          * @param fieldPath The path of the field.
          * @param object The Increment, Maximum and Minimum objects.
+         * object is a union field transform_type from one of setToServerValue, increment, maximum, minimum, appendMissingElements, and removeAllFromArray
          */
         template <typename T>
         FieldTransform(const String &fieldPath, T object) { set(fieldPath, object); }
@@ -373,7 +412,9 @@ public:
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { owriter.clearBuf(buf, bufSize); }
 };
-
+/**
+ * Firestore document
+ */
 template <typename T = Values::Value>
 class Document : public Printable
 {
@@ -518,6 +559,9 @@ namespace Firestore
         firestore_database_mode_delete
     };
 
+    /**
+     * A Cloud Firestore Database.
+     */
     class Database : public Printable
     {
         friend class Databases;
@@ -638,6 +682,9 @@ namespace Firestore
 
 }
 
+/**
+ * A transformation of a document
+ */
 class DocumentTransform : public Printable
 {
     friend class FirestoreBase;
@@ -664,6 +711,9 @@ public:
     void clear() { buf.remove(0, buf.length()); }
 };
 
+/**
+ * A write on a document.
+ */
 class Write : public Printable
 {
     friend class FirestoreBase;
@@ -756,7 +806,9 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
-
+/**
+ * Class that represent the object that contains a write or list of writes, transaction and label.
+*/
 class Writes : public Printable
 {
 private:
@@ -942,6 +994,8 @@ public:
     BatchGetDocumentOptions() {}
     /**
      * @param document The names of the documents to retrieve.
+     * The item or value will be added to the array or list.
+     * To add more items, call this function again.
      */
     void addDocument(const String &document) { owriter.addMapArrayMember(buf, bufSize, buf[1], "documents", owriter.makeResourcePath(document, true), false); }
     /**
@@ -1304,6 +1358,8 @@ namespace DatabaseIndex
         /**
          * Add the field to index.
          * @param field the field to index.
+         * The item or value will be added to the array or list.
+         * To add more items, call this function again.
          */
         Index &addField(IndexField field)
         {
@@ -1507,6 +1563,8 @@ namespace CollectionGroupsIndex
         /**
          * Add the field that supported by this index.
          * @param field the field to add.
+         * The item or value will be added to the array or list.
+         * To add more items, call this function again.
          */
         Index &addField(IndexField field)
         {

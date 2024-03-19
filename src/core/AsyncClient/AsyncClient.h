@@ -1097,8 +1097,6 @@ private:
                                 {
                                     if (sData->request.ota)
                                     {
-                                        Base64Helper bh;
-                                        OtaHelper oh;
                                         bh.updateWrite(buf, read);
 
                                         if (sData->response.payloadRead == sData->response.payloadLen)
