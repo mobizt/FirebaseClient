@@ -45,7 +45,7 @@
 
 using namespace firebase;
 
-static void meminfo(int pos)
+__attribute__((unused)) static void meminfo(int pos)
 {
 #if defined(ESP8266)
     Serial.printf("Pos: %d, Heap: %d, Stack: %d\n", pos, ESP.getFreeHeap(), ESP.getFreeContStack());
