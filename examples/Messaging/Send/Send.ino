@@ -307,6 +307,8 @@ void loop()
 
         msg.notification(notification);
 
+        // You can set the content of msg object directly with msg.setContent("your content")
+
         messaging.send(aClient, Messages::Parent(FIREBASE_PROJECT_ID), msg, asyncCB);
 
         // To assign UID for async result

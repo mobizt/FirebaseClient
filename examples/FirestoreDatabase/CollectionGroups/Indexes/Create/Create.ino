@@ -316,6 +316,8 @@ void loop()
 
         Serial.println(index);
 
+        // You can set the content of index object directly with index.setContent("your content")
+
         indexes.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, index, asyncCB);
 
         // To assign UID for async result

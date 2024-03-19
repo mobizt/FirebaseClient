@@ -485,6 +485,11 @@ public:
         buf[1] = name;
         getBuf();
     }
+    void setContent(const String &content)
+    {
+        owriter.clearBuf(buf, bufSize);
+        buf[0] = content;
+    }
     const char *c_str()
     {
         getBuf();
@@ -579,6 +584,11 @@ namespace Firestore
         const char *getBuf() { return buf[0].c_str(); }
 
     public:
+        void setContent(const String &content)
+        {
+            owriter.clearBuf(buf, bufSize);
+            buf[0] = content;
+        }
         const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
@@ -801,14 +811,14 @@ public:
 
         return *this;
     }
-
+    void setContent(const String &content) { buf = content; }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
 /**
- * Class that represent the object that contains a write or list of writes, transaction and label.
-*/
+ * Class that represent the object that contains a write or list of writes, transaction and label to use with batch write.
+ */
 class Writes : public Printable
 {
 private:
@@ -853,7 +863,7 @@ public:
         owriter.addMember(buf, write.c_str(), "]}");
         return *this;
     }
-
+    void setContent(const String &content) { buf = content; }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
@@ -1030,6 +1040,11 @@ public:
         if (readTime.length() && buf[3].length() == 0 && buf[4].length() == 0)
             setObject(buf[5], "readTime", readTime, true, true);
     }
+    void setContent(const String &content)
+    {
+        owriter.clearBuf(buf, bufSize);
+        buf[0] = content;
+    }
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { owriter.clearBuf(buf, bufSize); }
@@ -1052,6 +1067,7 @@ public:
         if (strlen(currentDocument.c_str()))
             uh.addParam(buf, FPSTR("currentDocument"), currentDocument.c_str(), hasParam);
     }
+    void setContent(const String &content) { buf = content; }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
@@ -1105,6 +1121,11 @@ public:
         // Union field
         if (readTime.length() && buf[2].length() == 0 && buf[3].length() == 0)
             setObject(buf[4], "readTime", readTime, true, true);
+    }
+    void setContent(const String &content)
+    {
+        owriter.clearBuf(buf, bufSize);
+        buf[0] = content;
     }
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
@@ -1219,6 +1240,11 @@ public:
         buf[5] = readTime;
         return set();
     }
+    void setContent(const String &content)
+    {
+        owriter.clearBuf(buf, bufSize);
+        buf[0] = content;
+    }
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear()
@@ -1260,6 +1286,11 @@ public:
      * @param readTime Timestamp
      */
     ListCollectionIdsOptions &readTime(const String readTime) { return setObject(buf[3], FPSTR("readTime"), readTime, true, true); }
+    void setContent(const String &content)
+    {
+        owriter.clearBuf(buf, bufSize);
+        buf[0] = content;
+    }
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { owriter.clearBuf(buf, bufSize); }
@@ -1570,6 +1601,11 @@ namespace CollectionGroupsIndex
         {
             owriter.addMapArrayMember(buf, bufSize, buf[3], FPSTR("fields"), field.c_str(), false);
             return *this;
+        }
+        void setContent(const String &content)
+        {
+            owriter.clearBuf(buf, bufSize);
+            buf[0] = content;
         }
         const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }

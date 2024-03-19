@@ -310,6 +310,8 @@ void loop()
 
         patchDocumentOptions patchOptions(DocumentMask("myMap.key" + String(cnt)) /* updateMask */, DocumentMask() /* mask */, Precondition() /* precondition */);
 
+        // You can set the content of doc object directly with doc.setContent("your content")
+
         Docs.patch(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc, asyncCB);
 
         // To assign UID for async result

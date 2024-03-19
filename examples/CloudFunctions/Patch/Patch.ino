@@ -310,6 +310,8 @@ void loop()
 
         String updateMask = "buildConfig.runtime,buildConfig.entryPoint,serviceConfig.availableMemory";
 
+        // You can set the content of function object directly with function.setContent("your content")
+
         cfunctions.patch(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "test" /* function name */, function, updateMask, asyncCB);
 
         // To assign UID for async result

@@ -289,6 +289,8 @@ void loop()
         // See https://cloud.google.com/firestore/docs/locations
         db.locationId("us-east1");
 
+        // You can set the content of db object directly with db.setContent("your content")
+
         Databases.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb" /* database Id */), db, asyncCB);
         // To assign UID for async result
         // Databases.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb"), db, asyncCB, "myUID");

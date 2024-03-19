@@ -310,6 +310,8 @@ void loop()
 
         // All Writes, Document and Values::xxxx objects can be printed on Serial port
 
+        // You can set the content of write and writes objects directly with write.setContent("your content") and writes.setContent("your content")
+
         Docs.commit(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, asyncCB);
 
         // To assign UID for async result

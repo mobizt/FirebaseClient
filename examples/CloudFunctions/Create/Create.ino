@@ -318,6 +318,8 @@ void loop()
 
         function.environment(GoogleCloudFunctions::Environment::GEN_2);
 
+        // You can set the content of function object directly with function.setContent("your content")
+
         cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "test"/* function name */, function, asyncCB);
 
         // To assign UID for async result

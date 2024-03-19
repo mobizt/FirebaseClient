@@ -333,6 +333,8 @@ void loop()
 
         String documentPath = "/"; // Query from all collections under root
 
+        // You can set the content of queryOptions object directly with queryOptions.setContent("your content")
+
         Docs.runQuery(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, queryOptions, asyncCB);
         queryOptions.clear();
 

@@ -610,6 +610,11 @@ namespace GoogleCloudFunctions
         //[Preview] Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources.
         // It must match the pattern projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}.
         Function &kmsKeyName(const String &value) { return setObject(buf[8], FPSTR("kmsKeyName"), value, true, true); }
+        void setContent(const String &content)
+        {
+            owriter.clearBuf(buf, bufSize);
+            buf[0]=content;
+        }
         const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }

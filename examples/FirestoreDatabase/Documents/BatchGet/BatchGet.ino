@@ -329,6 +329,8 @@ void loop()
         options.addDocument("test_collection/test_document");
         options.mask(DocumentMask("Singapore.population,key1"));
 
+        // You can set the content of options object directly with options.setContent("your content")
+
         Docs.batchGet(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), options, asyncCB);
 
         // To assign UID for async result

@@ -561,6 +561,11 @@ namespace Messages
                 return setObject(buf[9], "condition", value, true, true);
             return *this;
         }
+        void setContent(const String &content)
+        {
+            owriter.clearBuf(buf, bufSize);
+            buf[0]=content;
+        }
         const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }
