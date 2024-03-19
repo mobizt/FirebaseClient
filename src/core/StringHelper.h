@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created March 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -88,7 +88,7 @@ public:
 
     void trim(String &str)
     {
-        size_t i = str.length() - 1;
+        int i = str.length() - 1;
         while (i >= 0 && (str[i] == ' ' || str[i] == '}' || str[i] == '\r' || str[i] == '\n'))
         {
             i--;

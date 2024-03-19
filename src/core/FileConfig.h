@@ -1,5 +1,5 @@
 /**
- * Created February 21, 2024
+ * Created March 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -145,7 +145,7 @@ public:
             }
         }
     }
-    bool const isUpload() { return state == resume_state_send_payload; }
+    bool isUpload() { return state == resume_state_send_payload; }
     void setHeaderState()
     {
         if (location.length())
@@ -238,7 +238,7 @@ public:
 
         return chunkSize;
     }
-    bool const isUpload() { return state == multipart_state_send_options_payload || state == multipart_state_send_data_payload || state == multipart_state_send_last_payload; }
+    bool isUpload() { return state == multipart_state_send_options_payload || state == multipart_state_send_data_payload || state == multipart_state_send_last_payload; }
     void updateState(uint32_t payloadIndex)
     {
         if (enable)

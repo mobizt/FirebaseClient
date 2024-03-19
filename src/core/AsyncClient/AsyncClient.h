@@ -1,5 +1,5 @@
 /**
- * Created March 18, 2024
+ * Created March 19, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -1761,7 +1761,7 @@ private:
         size_t size = slotCount();
         if (size)
         {
-            for (size_t i = size - 1; i >= 0; i--)
+            for (int i = size - 1; i >= 0; i--)
             {
                 sys_idle();
                 async_data_item_t *sData = getData(i);
