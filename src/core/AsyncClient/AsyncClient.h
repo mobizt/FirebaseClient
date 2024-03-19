@@ -167,7 +167,7 @@ class AsyncClientClass
     friend class RealtimeDatabase;
     friend class FirestoreDatabase;
     friend class FirestoreDocuments;
-    friend class Functions;
+    friend class CloudFunctions;
     friend class Messaging;
     friend class Storage;
     friend class CloudStorage;

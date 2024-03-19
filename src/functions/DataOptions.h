@@ -619,7 +619,7 @@ namespace GoogleCloudFunctions
     {
 
     private:
-        String projectId, locationId, bucketId;
+        String projectId, locationId, bucketId, functionId;
 
     public:
         Parent() {}
@@ -644,6 +644,8 @@ namespace GoogleCloudFunctions
         String getProjectId() const { return projectId; }
         String getLocationId() const { return locationId; }
         String getBucketId() const { return bucketId; }
+         String getFunctionId() const { return functionId; }
+        void setFunctionId(const String &functionId){this->functionId= functionId;}
     };
 
     class DataOptions

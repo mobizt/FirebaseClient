@@ -104,7 +104,7 @@ class FirebaseError
     friend class FirestoreDocuments;
     friend class FirestoreDatabase;
     friend class Messaging;
-    friend class Functions;
+    friend class CloudFunctions;
     friend class Storage;
     friend class CloudStorage;
     
