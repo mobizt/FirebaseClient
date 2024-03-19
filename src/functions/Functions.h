@@ -349,9 +349,6 @@ private:
         if (request.aResult)
             sData->setRefResult(request.aResult);
 
-        Serial.println(sData->request.val[req_hndlr_ns::header]);
-        Serial.println(sData->request.val[req_hndlr_ns::payload]);
-
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
     }
