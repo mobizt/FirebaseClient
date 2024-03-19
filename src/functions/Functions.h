@@ -645,6 +645,147 @@ public:
         sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl, options.c_str(), true);
     }
 
+    /** Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param options The GoogleCloudFunctions::GetPolicyOptions options that provides requestedPolicyVersion option.
+     * @return Boolean type status indicates the success of the operation.
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    bool getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options)
+    {
+        AsyncResult result;
+        file_config_data file;
+        sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_get_iam_policy, options.c_str(), false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param options The GoogleCloudFunctions::GetPolicyOptions options that provides requestedPolicyVersion option.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options, AsyncResult &aResult)
+    {
+        file_config_data file;
+        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_get_iam_policy, options.c_str(), true);
+    }
+
+    /** Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param options The GoogleCloudFunctions::GetPolicyOptions options that provides requestedPolicyVersion option.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options, AsyncResultCallback cb, const String &uid = "")
+    {
+        file_config_data file;
+        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_get_iam_policy, options.c_str(), true);
+    }
+
+    /** Sets the access control policy on the specified resource. Replaces any existing policy.
+     * Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param options The GoogleCloudFunctions::SetPolicyOptions options that provides Policy and updateMask settings.
+     * @return Boolean type status indicates the success of the operation.
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    bool setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options)
+    {
+        AsyncResult result;
+        file_config_data file;
+        sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy, options.c_str(), false);
+        return result.lastError.code() == 0;
+    }
+
+    /** Sets the access control policy on the specified resource. Replaces any existing policy.
+     * Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param options The GoogleCloudFunctions::SetPolicyOptions options that provides Policy and updateMask settings.
+     * @param aResult The async result (AsyncResult).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options, AsyncResult &aResult)
+    {
+        file_config_data file;
+        sendRequest(aClient, &aResult, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy, options.c_str(), true);
+    }
+
+    /** Sets the access control policy on the specified resource. Replaces any existing policy.
+     * Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
+     *
+     * @param aClient The async client.
+     * @param parent The GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+     * The Firebase project Id should be only the name without the firebaseio.com.
+     * The location Id is the project location.
+     * The bucket Id is the Firebase storage bucket Id in the project.
+     * @param functionId The name of function.
+     * @param options The GoogleCloudFunctions::SetPolicyOptions options that provides Policy and updateMask settings.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
+     * @note Use FirebaseData.payload() to get the returned payload.
+     *
+     * This function requires OAuth2.0 authentication.
+     *
+     */
+    void setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options, AsyncResultCallback cb, const String &uid = "")
+    {
+        file_config_data file;
+        sendRequest(aClient, nullptr, cb, uid, parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy, options.c_str(), true);
+    }
+
 private:
     AsyncClientClass *aClient = nullptr;
     String service_url;
@@ -669,6 +810,8 @@ private:
         {
             if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_call)
                 options.payload = "{\"data\":\"" + payload + "\"}";
+            else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_get_iam_policy)
+                options.extras = "?" + payload;
             else
                 options.payload = payload;
         }
@@ -688,7 +831,9 @@ private:
         {
             method = async_request_handler_t::http_delete;
         }
-        else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_get || requestType == GoogleCloudFunctions::google_cloud_functions_request_type_list)
+        else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_get ||
+                 requestType == GoogleCloudFunctions::google_cloud_functions_request_type_list ||
+                 requestType == GoogleCloudFunctions::google_cloud_functions_request_type_get_iam_policy)
         {
             method = async_request_handler_t::http_get;
         }
@@ -730,7 +875,9 @@ private:
             requestType == GoogleCloudFunctions::google_cloud_functions_request_type_call ||
             requestType == GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl ||
             request.method == async_request_handler_t::http_patch ||
-            request.method == async_request_handler_t::http_delete)
+            request.method == async_request_handler_t::http_delete ||
+            requestType == GoogleCloudFunctions::google_cloud_functions_request_type_get_iam_policy ||
+            requestType == GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy)
         {
             URLHelper uh;
             request.path += "/";
@@ -739,6 +886,10 @@ private:
                 request.path += ":call";
             else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl)
                 request.path += ":generateDownloadUrl";
+            else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_get_iam_policy)
+                request.path += ":getIamPolicy";
+            else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy)
+                request.path += ":setIamPolicy";
         }
 
         if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl)

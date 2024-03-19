@@ -31,6 +31,7 @@
 #include "./core/ObjectWriter.h"
 #include "./core/AsyncClient/AsyncClient.h"
 #include "./core/URL.h"
+#include "./functions/Policy.h"
 
 // https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions
 
@@ -51,6 +52,7 @@ namespace GoogleCloudFunctions
         google_cloud_functions_request_type_patch,
         google_cloud_functions_request_type_gen_downloadUrl,
         google_cloud_functions_request_type_gen_uploadUrl,
+        google_cloud_functions_request_type_get_iam_policy,
         google_cloud_functions_request_type_set_iam_policy
     };
     // Severity of the state message.
@@ -716,6 +718,66 @@ namespace GoogleCloudFunctions
             return setBuf();
         }
 
+        const char *c_str() const { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
+    };
+
+    /**
+     * Encapsulates settings provided to GetIamPolicy.
+     */
+    struct GetPolicyOptions : public Printable
+    {
+
+    protected:
+        String buf;
+        ObjectWriter owriter;
+
+    public:
+        // Optional. The maximum policy version that will be used to format the policy.
+        // Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected.
+        // Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset.
+        // The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1.
+        GetPolicyOptions &requestedPolicyVersion(uint32_t value)
+        {
+            buf = "options.requestedPolicyVersion=" + String(value);
+            return *this;
+        }
+        const char *c_str() const { return buf.c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        void clear() { owriter.clear(buf); }
+    };
+
+    /**
+     * Class that provides the Policy and updateMask information for use in set IAM policy functiion.
+     */
+    struct SetPolicyOptions : public Printable
+    {
+
+    protected:
+        size_t bufSize = 3;
+        String buf[3];
+        ObjectWriter owriter;
+        URLHelper uh;
+
+        SetPolicyOptions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
+        {
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
+        }
+
+    public:
+        // REQUIRED: The complete policy to be applied to the resource. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Google Cloud services (such as Projects) might reject them.
+        SetPolicyOptions &policy(const IAMPolicy::Policy &value) { return setObject(buf[1], FPSTR("policy"), value.c_str(), false, true); }
+        // OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only the fields in the mask will be modified. If no mask is provided, the following default mask is used:
+        // paths: "bindings, etag"
+        // This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
+        SetPolicyOptions &updateMask(const String &value) { return setObject(buf[2], FPSTR("updateMask"), value, true, true); }
+        void setContent(const String &content)
+        {
+            owriter.clearBuf(buf, bufSize);
+            buf[0] = content;
+        }
         const char *c_str() const { return buf[0].c_str(); }
         size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
         void clear() { owriter.clearBuf(buf, bufSize); }

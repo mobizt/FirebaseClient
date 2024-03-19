@@ -122,7 +122,7 @@ namespace IAMPolicy
          */
         Binding &members(const String &value)
         {
-            owriter.addMapArrayMember(buf, bufSize, buf[2], FPSTR("members"), value.c_str(), false);
+            owriter.addMapArrayMember(buf, bufSize, buf[2], FPSTR("members"), value, true);
             return *this;
         }
         // The condition that is associated with this binding.
@@ -168,7 +168,7 @@ namespace IAMPolicy
         // The configuration for logging of each type of permission.
         AuditLogConfig &exemptedMembers(const String &value)
         {
-            owriter.addMapArrayMember(buf, bufSize, buf[2], FPSTR("exemptedMembers"), value.c_str(), false);
+            owriter.addMapArrayMember(buf, bufSize, buf[2], FPSTR("exemptedMembers"), value, true);
             return *this;
         }
         const char *c_str() const { return buf[0].c_str(); }
