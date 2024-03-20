@@ -358,7 +358,6 @@ void printResult(AsyncResult &aResult)
         // To get the UID (string) from async result
         // aResult.uid();
 
-        
         RealtimeDatabaseResult &RTDB = aResult.to<RealtimeDatabaseResult>();
         if (RTDB.isStream())
         {
@@ -367,7 +366,7 @@ void printResult(AsyncResult &aResult)
             Serial.printf("data: %s\n", RTDB.to<const char *>());
             Serial.printf("type: %d\n", RTDB.type());
 
-            // The stream event from result.realtime.stream can be converted to the the values.
+            // The stream event from RealtimeDatabaseResult can be converted to the the values as following.
             bool v1 = RTDB.to<bool>();
             int v2 = RTDB.to<int>();
             float v3 = RTDB.to<float>();
