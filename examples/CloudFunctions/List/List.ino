@@ -78,9 +78,9 @@
  * cfunctions.list(<AsyncClient>, <GoogleCloudFunctions::Parent>, <GoogleCloudFunctions::ListOptions>, <AsyncResult>);
  * cfunctions.list(<AsyncClient>, <GoogleCloudFunctions::Parent>, <GoogleCloudFunctions::ListOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+ * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
- * The location Id is the project location.
+ * The location name is the project location.
  * The bucket Id is the Firebase storage bucket Id in the project.
  *
  * The <GoogleCloudFunctions::ListOptions> is the The GoogleCloudFunctions::ListOptions object that holds 
@@ -194,9 +194,6 @@ const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----
 // https://firebase.google.com/docs/projects/locations
 #define PROJECT_LOCATION "PROJECT_LOCATION"
 
-// Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
-
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -304,13 +301,13 @@ void loop()
 
         options.filter(filter).pageSize(1);
 
-        cfunctions.list(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), options, asyncCB);
+        cfunctions.list(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), options, asyncCB);
 
         // To assign UID for async result
-        // cfunctions.list(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), options, asyncCB, "myUID");
+        // cfunctions.list(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), options, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // cfunctions.list(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), options, aResult_no_callback);
+        // cfunctions.list(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), options, aResult_no_callback);
     }
 }
 

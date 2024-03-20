@@ -78,9 +78,9 @@
  * cfunctions.create(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <AsyncResult>);
  * cfunctions.create(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <AsyncResultCallback>, <uid>);
  *
- * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+ * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
- * The location Id is the project location.
+ * The location name is the project location.
  * The bucket Id is the Firebase storage bucket Id in the project.
  * 
  * The <functionId> is the name of function to create.
@@ -322,13 +322,13 @@ void loop()
 
         // You can set the content of function object directly with function.setContent("your content")
 
-        cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "test"/* function name */, function, asyncCB);
+        cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test"/* function name */, function, asyncCB);
 
         // To assign UID for async result
-        // cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "test", function, asyncCB, "myUID");
+        // cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test", function, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "test", function, aResult_no_callback);
+        // cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test", function, aResult_no_callback);
     }
 }
 

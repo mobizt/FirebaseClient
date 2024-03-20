@@ -69,14 +69,14 @@
  */
 
 /**
- * SET A ACCESS CONTROL POLICY FUNCTIONS
- * =====================================
+ * TEST PERMISSIONS FUNCTIONS
+ * ==========================
  *
  * SYNTAXES:
  *
- * cfunctions.setIamPolicy(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::SetPolicyOptions>);
- * cfunctions.setIamPolicy(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::SetPolicyOptions>, <AsyncResult>);
- * cfunctions.setIamPolicy(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::SetPolicyOptions>, <AsyncResultCallback>, <uid>);
+ * cfunctions.testIamPermissions(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Permissions>);
+ * cfunctions.testIamPermissions(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Permissions>, <AsyncResult>);
+ * cfunctions.testIamPermissions(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Permissions>, <AsyncResultCallback>, <uid>);
  *
  * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
@@ -84,8 +84,9 @@
  * The bucket Id is the Firebase storage bucket Id in the project.
  *
  * The <functionId> is the function name or Id to get.
- * 
- * The <GoogleCloudFunctions::SetPolicyOptions> options is the GoogleCloudFunctions::SetPolicyOptions object that provides Policy and updateMask settings.
+ *
+ * The <GoogleCloudFunctions::Permissions> options is the GoogleCloudFunctions::Permissions object that that holds the list of permission string.
+ * For the list of permissions, see https://cloud.google.com/functions/docs/reference/iam/permissions
  *
  * The cfunctions is Google Cloud Functions service app.
  *
@@ -291,26 +292,22 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Sets the access control policy on the specified resource...");
+        Serial.println("Test the permissions...");
 
-        GoogleCloudFunctions::SetPolicyOptions options;
+        GoogleCloudFunctions::Permissions permissions;
 
-        IAMPolicy::Policy policy;
+        // For the list of permissions, see https://cloud.google.com/functions/docs/reference/iam/permissions
 
-        IAMPolicy::Binding binding;
-        binding.members("allUsers").role("roles/cloudfunctions.invoker");
-        policy.bindings(binding);
+        permissions.add("cloudfunctions.functions.call").add("cloudfunctions.functions.invoke");
+        permissions.add("cloudfunctions.functions.get").add("cloudfunctions.functions.delete");
 
-        options.policy(policy);
-        options.updateMask("bindings");
-
-        cfunctions.setIamPolicy(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld" /* function name */, options, asyncCB);
+        cfunctions.testIamPermissions(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld" /* function name */, permissions, asyncCB);
 
         // To assign UID for async result
-        // cfunctions.setIamPolicy(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld", options, asyncCB, "myUID");
+        // cfunctions.testIamPermissions(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld", permissions, asyncCB, "myUID");
 
         // To get anyc result without callback
-        // cfunctions.setIamPolicy(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld", options, aResult_no_callback);
+        // cfunctions.testIamPermissions(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld", permissions, aResult_no_callback);
     }
 }
 

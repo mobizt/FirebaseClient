@@ -78,9 +78,9 @@
  * cfunctions.getIamPolicy(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::GetPolicyOptions>, <AsyncResult>);
  * cfunctions.getIamPolicy(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::GetPolicyOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id, location Id and storage bucket Id in its constructor.
+ * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
- * The location Id is the project location.
+ * The location name is the project location.
  * The bucket Id is the Firebase storage bucket Id in the project.
  *
  * The <functionId> is the function name or Id to get.
@@ -195,9 +195,6 @@ const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----
 // https://firebase.google.com/docs/projects/locations
 #define PROJECT_LOCATION "PROJECT_LOCATION"
 
-// Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
-#define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
-
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -296,13 +293,13 @@ void loop()
 
         Serial.println("Gets the access control policy for a resource...");
 
-        cfunctions.getIamPolicy(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "helloWorld" /* function name */, GoogleCloudFunctions::GetPolicyOptions(), asyncCB);
+        cfunctions.getIamPolicy(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld" /* function name */, GoogleCloudFunctions::GetPolicyOptions(), asyncCB);
 
         // To assign UID for async result
-        // cfunctions.getIamPolicy(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "helloWorld", GoogleCloudFunctions::GetPolicyOptions(), asyncCB, "myUID");
+        // cfunctions.getIamPolicy(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld", GoogleCloudFunctions::GetPolicyOptions(), asyncCB, "myUID");
 
         // To get anyc result without callback
-        // cfunctions.getIamPolicy(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION, STORAGE_BUCKET_ID), "helloWorld", GoogleCloudFunctions::GetPolicyOptions(), aResult_no_callback);
+        // cfunctions.getIamPolicy(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld", GoogleCloudFunctions::GetPolicyOptions(), aResult_no_callback);
     }
 }
 

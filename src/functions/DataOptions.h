@@ -1,5 +1,5 @@
 /**
- * Created March 19, 2024
+ * Created March 20, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -53,7 +53,8 @@ namespace GoogleCloudFunctions
         google_cloud_functions_request_type_gen_downloadUrl,
         google_cloud_functions_request_type_gen_uploadUrl,
         google_cloud_functions_request_type_get_iam_policy,
-        google_cloud_functions_request_type_set_iam_policy
+        google_cloud_functions_request_type_set_iam_policy,
+        google_cloud_functions_request_type_test_iam_permission
     };
     // Severity of the state message.
     enum Severity
@@ -783,6 +784,40 @@ namespace GoogleCloudFunctions
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
+    /**
+     * Class that provides the permissions list for testing.
+     */
+    struct Permissions : public Printable
+    {
+
+    protected:
+        size_t bufSize = 2;
+        String buf[2];
+        ObjectWriter owriter;
+        URLHelper uh;
+
+        Permissions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
+        {
+            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+            return *this;
+        }
+
+    public:
+        Permissions &add(const String &value) 
+         {
+            owriter.addMapArrayMember(buf, bufSize, buf[1], FPSTR("permissions"), value, true);
+            return *this;
+        }
+        void setContent(const String &content)
+        {
+            owriter.clearBuf(buf, bufSize);
+            buf[0] = content;
+        }
+        const char *c_str() const { return buf[0].c_str(); }
+        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+        void clear() { owriter.clearBuf(buf, bufSize); }
+    };
+
     class Parent
     {
 
@@ -791,27 +826,13 @@ namespace GoogleCloudFunctions
 
     public:
         Parent() {}
-        Parent(const String &projectId, const String &locationId, const String &bucketId)
+        Parent(const String &projectId, const String &locationId)
         {
             this->projectId = projectId;
             this->locationId = locationId;
-            this->bucketId = bucketId;
-
-            if (this->bucketId.length() && this->bucketId.indexOf("://") > -1)
-                this->bucketId.remove(0, this->bucketId.indexOf("://") + 3);
-
-            if (this->bucketId.length())
-            {
-                if (this->bucketId.indexOf("://") > -1)
-                    this->bucketId.remove(0, this->bucketId.indexOf("://") + 3);
-
-                if (this->bucketId.length() && this->bucketId[this->bucketId.length() - 1] == '/')
-                    this->bucketId.remove(this->bucketId.length() - 1, 1);
-            }
         }
         String getProjectId() const { return projectId; }
         String getLocationId() const { return locationId; }
-        String getBucketId() const { return bucketId; }
         String getFunctionId() const { return functionId; }
         void setFunctionId(const String &functionId) { this->functionId = functionId; }
     };
