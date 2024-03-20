@@ -39,12 +39,14 @@
 
 #define FIREBASE_AUTH_PLACEHOLDER (const char *)FPSTR("<auth_token>")
 
+#if !defined(FIREBASE_ASYNC_QUEUE_LIMIT)
 #if defined(ESP8266)
-#define FIREBASE_ASYNC_QUEUE_LIMIT 3
+#define FIREBASE_ASYNC_QUEUE_LIMIT 5
 #elif defined(ESP32) || defined(ARDUINO_PICO_MODULE)
 #define FIREBASE_ASYNC_QUEUE_LIMIT 5
 #else
 #define FIREBASE_ASYNC_QUEUE_LIMIT 2
+#endif
 #endif
 
 typedef void (*NetworkStatus)(bool &status);

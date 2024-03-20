@@ -114,6 +114,9 @@
  *
  * 🏷️ For Async TCP Client usage.
  * #define ENABLE_ASYNC_TCP_CLIENT
+ * 
+ * 🏷️ For maximum async queue limit setting for an async client
+ * #define FIREBASE_ASYNC_QUEUE_LIMIT 10
  */
 
 #if __has_include("UserConfig.h")
