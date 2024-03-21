@@ -82,9 +82,9 @@
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The location name is the project location.
  * The bucket Id is the Firebase storage bucket Id in the project.
- * 
+ *
  * The <functionId> is the name of function to create.
- * 
+ *
  * The <GoogleCloudFunctions::Function> is the GoogleCloudFunctions::Function object that holds the information of function to create.
  *
  * The cfunctions is Google Cloud Functions service app.
@@ -265,8 +265,7 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
+        JWT.loop(app.getAuth());
     }
 
     app.getApp<CloudFunctions>(cfunctions);
@@ -275,8 +274,7 @@ void setup()
 void loop()
 {
     // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
+    JWT.loop(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
@@ -322,7 +320,7 @@ void loop()
 
         // You can set the content of function object directly with function.setContent("your content")
 
-        cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test"/* function name */, function, asyncCB);
+        cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test" /* function name */, function, asyncCB);
 
         // To assign UID for async result
         // cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test", function, asyncCB, "myUID");

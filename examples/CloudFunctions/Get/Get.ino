@@ -82,9 +82,9 @@
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The location name is the project location.
  * The bucket Id is the Firebase storage bucket Id in the project.
- * 
+ *
  * The <functionId> is the function name or Id to get.
- * 
+ *
  * The cfunctions is Google Cloud Functions service app.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
@@ -260,8 +260,7 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
+        JWT.loop(app.getAuth());
     }
 
     app.getApp<CloudFunctions>(cfunctions);
@@ -270,8 +269,7 @@ void setup()
 void loop()
 {
     // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
+    JWT.loop(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();

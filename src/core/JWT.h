@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created March 22, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -70,6 +70,7 @@ namespace firebase
 
     class JWTClass
     {
+        friend class FirebaseApp;
 
     private:
         Memory mem;
@@ -95,6 +96,7 @@ namespace firebase
 
         bool begin(auth_data_t *auth_data);
         bool create();
+        void sendErrCB(AsyncResultCallback cb, AsyncResult *aResult= nullptr);
 
     public:
         JWTClass();
@@ -102,7 +104,7 @@ namespace firebase
         const char *token();
         bool ready();
         void clear();
-        bool process(auth_data_t *auth_data);
+        bool loop(auth_data_t *auth_data);
     };
 
 }

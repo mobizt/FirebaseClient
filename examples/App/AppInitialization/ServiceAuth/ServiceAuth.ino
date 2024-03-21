@@ -63,8 +63,8 @@
  *
  * For ServiceAuth and CustomAuth authentications, you need to check for JWT token geration process requirement,
  * before running the JWT process function in the main loop as the following.
- * if (app.isJWT())
- *   JWT.process(app.getAuth());
+ * 
+ * JWT.loop(app.getAuth());
  *
  * SYNTAX:
  *
@@ -242,16 +242,14 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
+        JWT.loop(app.getAuth());
     }
 }
 
 void loop()
 {
     // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
+    JWT.loop(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();

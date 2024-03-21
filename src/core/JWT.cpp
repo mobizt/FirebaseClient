@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created March 22, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -69,7 +69,10 @@ void JWTClass::clear()
     jwt_data.pk.remove(0, jwt_data.pk.length());
     payload.remove(0, payload.length());
     if (this->auth_data)
+    {
         this->auth_data->user_auth.sa.step = jwt_step_begin;
+        this->auth_data->user_auth.jwt_ts = 0;
+    }
     processing = false;
 }
 
@@ -77,28 +80,40 @@ bool JWTClass::ready()
 {
     return this->auth_data && this->auth_data->user_auth.sa.step == jwt_step_ready;
 }
-bool JWTClass::process(auth_data_t *auth_data)
+bool JWTClass::loop(auth_data_t *auth_data)
 {
-    bool ret = begin(auth_data);
-    if (ret)
-        ret = create();
-    if (!ret)
+    if (auth_data && auth_data->user_auth.jwt_signing)
     {
-        if (auth_data && auth_data->cb)
+        bool ret = begin(auth_data);
+        if (ret)
+            ret = create();
+        if (!ret)
+            sendErrCB(auth_data ? auth_data->cb : NULL, nullptr);
+        return ret;
+    }
+    return false;
+}
+
+void JWTClass::sendErrCB(AsyncResultCallback cb, AsyncResult *aResult)
+{
+    if (cb)
+    {
+        if (err_timer.remaining() == 0)
         {
-            if (err_timer.remaining() == 0)
+            err_timer.feed(5);
+            bool hasRes = aResult != nullptr;
+            if (!hasRes)
+                aResult = new AsyncResult();
+            aResult->error_available = true;
+            aResult->lastError.setLastError(jwt_data.err_code, jwt_data.msg);
+            cb(*aResult);
+            if (!hasRes)
             {
-                err_timer.feed(5);
-                AsyncResult *aResult = new AsyncResult();
-                aResult->error_available = true;
-                aResult->lastError.setLastError(jwt_data.err_code, jwt_data.msg);
-                auth_data->cb(*aResult);
                 delete aResult;
                 aResult = nullptr;
             }
         }
     }
-    return ret;
 }
 
 bool JWTClass::begin(auth_data_t *auth_data)
@@ -106,9 +121,10 @@ bool JWTClass::begin(auth_data_t *auth_data)
     if (processing || !auth_data)
         return false;
     processing = true;
-    auth_data->user_auth.jwt_signing = false;
     this->auth_data = auth_data;
     this->auth_data->app_token.clear();
+    this->auth_data->user_auth.jwt_ts = millis();
+    this->auth_data->user_auth.jwt_signing = false;
     this->auth_data->user_auth.sa.step = jwt_step_begin;
     return create();
 }
@@ -131,7 +147,7 @@ bool JWTClass::create()
         if (now < FIREBASE_DEFAULT_TS)
         {
             jwt_data.err_code = FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID;
-            jwt_data.msg = (const char *)FPSTR("JWT, time was not set or not valid.");
+            jwt_data.msg = (const char *)FPSTR("JWT, time was not set or not valid");
             return exit(false);
         }
 

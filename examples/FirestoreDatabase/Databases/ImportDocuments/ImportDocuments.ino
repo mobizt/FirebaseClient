@@ -266,8 +266,7 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
+        JWT.loop(app.getAuth());
     }
 
     app.getApp<Firestore::Databases>(Databases);
@@ -276,8 +275,7 @@ void setup()
 void loop()
 {
     // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
+    JWT.loop(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();

@@ -80,10 +80,10 @@
  *
  * The <GoogleCloudStorage::Parent> is the GoogleCloudStorage::Parent object included Storage bucket Id in its constructor.
  * The bucketid is the Storage bucket Id to list all objects.
- * 
+ *
  * The <GoogleCloudStorage::ListOptions> is the GoogleCloudStorage::ListOptions that holds the list options.
  * For the list options, see https://cloud.google.com/storage/docs/json_api/v1/objects/list#optional-parameters
- * 
+ *
  * The cstorage is Google Cloud Storage service app.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
@@ -256,8 +256,7 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
+        JWT.loop(app.getAuth());
     }
 
     app.getApp<CloudStorage>(cstorage);
@@ -266,8 +265,7 @@ void setup()
 void loop()
 {
     // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
+    JWT.loop(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
@@ -289,7 +287,7 @@ void loop()
 
         GoogleCloudStorage::ListOptions options;
 
-        options.maxResults(3); // Return 3 objects information in the result.
+        options.maxResults(3);   // Return 3 objects information in the result.
         options.prefix("media"); // Return the objects that begin with prefix.
 
         cstorage.list(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID), options, asyncCB);

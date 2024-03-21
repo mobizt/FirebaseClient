@@ -83,9 +83,9 @@
  * The location name is the project location.
  * The bucket Id is the Firebase storage bucket Id in the project.
  *
- * The <GoogleCloudFunctions::ListOptions> is the The GoogleCloudFunctions::ListOptions object that holds 
+ * The <GoogleCloudFunctions::ListOptions> is the The GoogleCloudFunctions::ListOptions object that holds
  * the query parameters e.g. pageSize, pageToken, filter, and orderBy.
- * 
+ *
  * The cfunctions is Google Cloud Functions service app.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
@@ -261,8 +261,7 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
+        JWT.loop(app.getAuth());
     }
 
     app.getApp<CloudFunctions>(cfunctions);
@@ -271,8 +270,7 @@ void setup()
 void loop()
 {
     // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
+    JWT.loop(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();

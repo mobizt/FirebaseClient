@@ -82,7 +82,7 @@
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The location name is the project location.
  * The bucket Id is the Firebase storage bucket Id in the project.
- * 
+ *
  * The <functionId> is the name of function to delete.
  *
  * The cfunctions is Google Cloud Functions service app.
@@ -260,18 +260,15 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
+        JWT.loop(app.getAuth());
     }
-
     app.getApp<CloudFunctions>(cfunctions);
 }
 
 void loop()
 {
     // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
+    JWT.loop(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();
@@ -291,7 +288,7 @@ void loop()
 
         Serial.println("Deletes a function...");
 
-        cfunctions.deleteFunction(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test"/* function name */, asyncCB);
+        cfunctions.deleteFunction(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test" /* function name */, asyncCB);
 
         // To assign UID for async result
         // cfunctions.deleteFunction(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test", asyncCB, "myUID");

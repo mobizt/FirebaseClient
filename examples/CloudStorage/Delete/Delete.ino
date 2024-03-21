@@ -84,7 +84,7 @@
  *
  * The <GoogleCloudStorage::DeleteOptions> is the GoogleCloudStorage::DeleteOptions that holds the delete options.
  * For the delete options, see see https://cloud.google.com/storage/docs/json_api/v1/objects/delete#optional-parameters.
- * 
+ *
  * The cstorage is Google Cloud Storage service app.
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
@@ -259,8 +259,7 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
+        JWT.loop(app.getAuth());
     }
 
     app.getApp<CloudStorage>(cstorage);
@@ -269,8 +268,7 @@ void setup()
 void loop()
 {
     // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
+    JWT.loop(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();

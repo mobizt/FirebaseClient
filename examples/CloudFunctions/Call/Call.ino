@@ -84,7 +84,7 @@
  * The bucket Id is the Firebase storage bucket Id in the project.
  *
  * The <functionId> is the function name or Id to call.
- * 
+ *
  * The <data> is the data to be passed to the function.
  *
  * The cfunctions is Google Cloud Functions service app.
@@ -262,8 +262,7 @@ void setup()
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
         // This JWT token process required for ServiceAuth and CustomAuth authentications
-        if (app.isJWT())
-            JWT.process(app.getAuth());
+        JWT.loop(app.getAuth());
     }
 
     app.getApp<CloudFunctions>(cfunctions);
@@ -272,8 +271,7 @@ void setup()
 void loop()
 {
     // This JWT token process required for ServiceAuth and CustomAuth authentications
-    if (app.isJWT())
-        JWT.process(app.getAuth());
+    JWT.loop(app.getAuth());
 
     // This function is required for handling and maintaining the authentication tasks.
     app.loop();

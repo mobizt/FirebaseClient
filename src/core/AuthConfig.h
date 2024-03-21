@@ -543,6 +543,7 @@ namespace firebase
         bool initialized = false;
         bool jwt_signing = false;
         bool jwt_loop = false;
+        uint32_t jwt_ts = 0;
         auth_token_type auth_type = auth_unknown_token;
         user_auth_data_type auth_data_type = user_auth_data_undefined;
         firebase_core_auth_task_type task_type = firebase_core_auth_task_type_undefined;
@@ -565,7 +566,7 @@ namespace firebase
             token_type_custom_token,
             token_type_legacy_token
         };
-        
+
         static bool parseUserFile(token_type type, FILEOBJ userfile, user_auth_data &auth_data)
         {
             String buff;

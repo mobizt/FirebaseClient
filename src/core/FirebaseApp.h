@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created March 22, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -319,6 +319,14 @@ namespace firebase
                 }
             }
 
+            if (auth_data.user_auth.jwt_signing && auth_data.user_auth.jwt_ts == 0 && err_timer.remaining() == 0)
+            {
+                err_timer.feed(3);
+                JWT.jwt_data.err_code = FIREBASE_ERROR_JWT_CREATION_REQUIRED;
+                JWT.jwt_data.msg = "JWT process has not begun";
+                JWT.sendErrCB(auth_data.cb, nullptr);
+            }
+
             if (auth_data.user_auth.status._event == auth_event_uninitialized && err_timer.remaining() > 0)
                 return false;
 
@@ -559,8 +567,6 @@ namespace firebase
             processAuth();
             auth_data.user_auth.jwt_loop = false;
         }
-
-        bool isJWT() { return auth_data.user_auth.jwt_signing; }
 
         bool ready() { return processAuth() && auth_data.app_token.authenticated; }
 
