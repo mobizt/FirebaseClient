@@ -1,5 +1,7 @@
 /**
- * Created March 13, 2024
+ * Created March 21, 2024
+ *
+ * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -80,9 +82,9 @@ public:
     void prepareDownloadOTA(size_t payloadLen, bool base64, int16_t &code)
     {
         code = 0;
-#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(MB_ARDUINO_PICO))
+#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO))
         int size = base64 ? (3 * (payloadLen - 2) / 4) : payloadLen;
-#if defined(ESP32) || defined(MB_ARDUINO_PICO)
+#if defined(ESP32) || defined(CORE_ARDUINO_PICO)
         if (!Update.begin(size))
             code = FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE;
 #elif defined(ESP8266)
@@ -95,10 +97,9 @@ public:
 
     bool endDownloadOTA(int pad, int16_t &code)
     {
+
+#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO))
         Base64Helper bh;
-
-#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(MB_ARDUINO_PICO))
-
         // write extra pad
         if (pad > 0)
         {
@@ -116,6 +117,7 @@ public:
         return code == 0;
 
 #endif
+        return false;
     }
 };
 

@@ -150,6 +150,10 @@
  *
  */
 
+///////////////////////////////////////////////////////////////////
+// THIS EXAMPLE WORKS FOR ESP8266, ESP32 AND RASPBERRY PI PICO ONLY
+///////////////////////////////////////////////////////////////////
+
 #include <Arduino.h>
 #if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFi.h>
@@ -165,12 +169,8 @@
 
 #include <FirebaseClient.h>
 
-#if defined(ESP8266) || defined(ESP32)
+#if __has_include(<WiFiClientSecure.h>)
 #include <WiFiClientSecure.h>
-#endif
-
-#if defined(ESP32)
-#include <SPIFFS.h>
 #endif
 
 #define WIFI_SSID "WIFI_AP"
@@ -205,7 +205,11 @@ ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PR
 
 FirebaseApp app;
 
+#if __has_include(<WiFiClientSecure.h>)
 WiFiClientSecure ssl_client;
+#elif __has_include(<WiFiSSLClient.h>)
+WiFiSSLClient ssl_client;
+#endif
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
@@ -238,13 +242,15 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
+    Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
+#if __has_include(<WiFiClientSecure.h>)
     ssl_client.setInsecure();
 #if defined(ESP8266)
-    ssl_client.setBufferSizes(8192, 1024);
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
 #endif
 
     app.setCallback(asyncCB);
@@ -262,8 +268,6 @@ void setup()
     }
 
     app.getApp<CloudStorage>(cstorage);
-
-    SPIFFS.begin();
 }
 
 void loop()
@@ -304,46 +308,49 @@ void loop()
 
 void timeStatusCB(uint32_t &ts)
 {
-    Serial.println("Setting time...");
+#if defined(ESP8266) || defined(ESP32) || defined(CORE_ARDUINO_PICO)
     if (time(nullptr) < FIREBASE_DEFAULT_TS)
     {
+
         configTime(3 * 3600, 0, "pool.ntp.org");
         while (time(nullptr) < FIREBASE_DEFAULT_TS)
         {
             delay(100);
         }
     }
-    Serial.println("complete.");
     ts = time(nullptr);
+#elif __has_include(<WiFiNINA.h>)
+    ts = WiFi.getTime();
+#endif
 }
 
 void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
         // To get the UID (string) from async result
         // aResult.uid();
-        Serial.printf("payload: %s\n", aResult.c_str());
+        Firebase.printf("payload: %s\n", aResult.c_str());
     }
 
     if (aResult.downloadProgress())
     {
-        Serial.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        Firebase.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
         if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
         {
             Serial.println("Download completed!");
@@ -355,7 +362,7 @@ void asyncCB(AsyncResult &aResult)
 
     if (aResult.uploadProgress())
     {
-        Serial.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        Firebase.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
         if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
         {
             Serial.println("Upload completed!");

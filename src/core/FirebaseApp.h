@@ -1,5 +1,5 @@
 /**
- * Created March 12, 2024
+ * Created March 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -33,8 +33,6 @@
 #include "./core/JWT.h"
 #endif
 #include "./core/Timer.h"
-
-#define FIREBASE_DEFAULT_TS 1618971013
 
 namespace firebase
 {
@@ -530,6 +528,7 @@ namespace firebase
                         sData->response.val[res_hndlr_ns::payload].remove(0, sData->response.val[res_hndlr_ns::payload].length());
                         auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         auth_data.app_token.authenticated = true;
+                        aClient->setAuthTs(millis());
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
                         setEvent(auth_event_ready);
@@ -580,7 +579,11 @@ namespace firebase
 
         unsigned long ttl() { return auth_timer.remaining(); }
 
-        void setCallback(AsyncResultCallback cb) { this->resultCb = cb; }
+        void setCallback(AsyncResultCallback cb)
+        {
+            this->resultCb = cb;
+            auth_data.cb = cb;
+        }
 
         auth_data_t *getAuth() { return &auth_data; }
     };

@@ -90,6 +90,7 @@
 #define FIREBASE_ERROR_STREAM_AUTH_REVOKED -116
 #define FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED -117
 #define FIREBASE_ERROR_OPERATION_CANCELLED -118
+#define FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID -119
 
 #if !defined(FPSTR)
 #define FPSTR
@@ -107,7 +108,6 @@ class FirebaseError
     friend class CloudFunctions;
     friend class Storage;
     friend class CloudStorage;
-    
 
 private:
     struct firebase_error_info_t
@@ -218,6 +218,9 @@ private:
                 break;
             case FIREBASE_ERROR_OPERATION_CANCELLED:
                 err.message = FPSTR("operation was cancelled");
+                break;
+            case FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID:
+                err.message = FPSTR("time was not set or not valid");
                 break;
             default:
                 err.message = FPSTR("undefined");

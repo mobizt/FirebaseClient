@@ -1,5 +1,7 @@
 /**
- * Created March 7, 2024
+ * Created March 21, 2024
+ * 
+ * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -108,7 +110,7 @@ public:
     bool updateWrite(uint8_t *data, size_t len)
     {
 #if defined(OTA_UPDATE_ENABLED) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
-#if defined(ESP32) || defined(ESP8266) || defined(MB_ARDUINO_PICO)
+#if defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO)
         return Update.write(data, len) == len;
 #endif
 #endif

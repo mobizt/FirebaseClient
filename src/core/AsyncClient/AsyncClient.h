@@ -1,5 +1,7 @@
 /**
- * Created March 19, 2024
+ * Created March 21, 2024
+ *
+ * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -98,6 +100,7 @@ public:
     bool download = false;
     bool upload_progress_enabled = false;
     bool upload = false;
+    uint32_t auth_ts = 0;
     uint32_t addr = 0;
     AsyncResult aResult;
     AsyncResult *refResult = nullptr;
@@ -176,6 +179,7 @@ private:
     FirebaseError lastErr;
     String header, reqEtag, resETag;
     int netErrState = 0;
+    uint32_t auth_ts = 0;
     Client *client = nullptr;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
     AsyncTCPConfig *async_tcp_config = nullptr;
@@ -506,6 +510,7 @@ private:
                     return connErrorHandler(sData, sData->state);
 
                 sse = sData->sse;
+                sData->auth_ts = auth_ts;
             }
 
             if (sData->upload)
@@ -1021,6 +1026,7 @@ private:
                                         return false;
                                     }
                                 }
+#if defined(ENABLE_FS)
                                 else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                 {
                                     closeFile(sData);
@@ -1031,6 +1037,7 @@ private:
                                         return false;
                                     }
                                 }
+#endif
                                 else
                                     sData->request.file_data.outB.init(sData->request.file_data.data, sData->request.file_data.data_size);
                             }
@@ -1085,16 +1092,17 @@ private:
                                             }
                                         }
                                     }
+#if defined(ENABLE_FS)
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                     {
-#if defined(ENABLE_FS)
+
                                         if (!bh.decodeToFile(mem, sData->request.file_data.file, (const char *)buf + ofs))
                                         {
                                             setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_FILE_WRITE, !sData->sse, true);
                                             goto exit;
                                         }
-#endif
                                     }
+#endif
                                     else
                                         bh.decodeToBlob(mem, &sData->request.file_data.outB, (const char *)buf + ofs);
                                 }
@@ -1114,17 +1122,17 @@ private:
                                             }
                                         }
                                     }
+#if defined(ENABLE_FS)
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                     {
-#if defined(ENABLE_FS)
                                         int write = sData->request.file_data.file.write(buf, read);
                                         if (write < read)
                                         {
                                             setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_FILE_WRITE, !sData->sse, true);
                                             goto exit;
                                         }
-#endif
                                     }
+#endif
                                     else
                                         sData->request.file_data.outB.write(buf, read);
                                 }
@@ -1309,7 +1317,7 @@ private:
             ETH.linkUp();
             ret = true;
         }
-#elif defined(ESP8266) || defined(MB_ARDUINO_PICO)
+#elif defined(ESP8266) || defined(CORE_ARDUINO_PICO)
 
         if (!net.eth)
             return false;
@@ -1338,7 +1346,7 @@ private:
         }
 #endif
 
-#elif defined(MB_ARDUINO_PICO)
+#elif defined(CORE_ARDUINO_PICO)
 
 #endif
 
@@ -1924,6 +1932,8 @@ public:
             sData->request.addNewLine();
     }
 
+    void setAuthTs(uint32_t ts) { auth_ts = ts; }
+
     void setContentLength(async_data_item_t *sData, size_t len)
     {
         if (sData->request.method == async_request_handler_t::http_post || sData->request.method == async_request_handler_t::http_put || sData->request.method == async_request_handler_t::http_patch)
@@ -1966,11 +1976,17 @@ public:
                 inProcess = false;
                 return;
             }
+            
+            // We have to re-start sse when the authenticate changed 
+            if (sData->sse && sData->auth_ts != auth_ts)
+            {
+                stop(sData);
+                sData->state = async_state_send_header;
+            }
 
             bool sending = false;
             if (sData->state == async_state_undefined || sData->state == async_state_send_header || sData->state == async_state_send_payload)
             {
-
                 sData->response.clear();
                 sData->request.feedTimer();
                 sending = true;

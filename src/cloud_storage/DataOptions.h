@@ -85,6 +85,7 @@ namespace GoogleCloudStorage
         String buf[7];
         ObjectWriter owriter;
         URLHelper uh;
+        StringHelper sh;
 
         BaseOptions &setBuf()
         {
@@ -104,27 +105,27 @@ namespace GoogleCloudStorage
     public:
         BaseOptions &generation(uint64_t value)
         {
-            buf[1] = "generation=" + String(value);
+            buf[1] = "generation=" + sh.u64Str(value);
             return setBuf();
         }
         BaseOptions &ifGenerationMatch(uint64_t value)
         {
-            buf[2] = "ifGenerationMatch=" + String(value);
+            buf[2] = "ifGenerationMatch=" + sh.u64Str(value);
             return setBuf();
         }
         BaseOptions &ifGenerationNotMatch(uint64_t value)
         {
-            buf[3] = "ifGenerationNotMatch=" + String(value);
+            buf[3] = "ifGenerationNotMatch=" + sh.u64Str(value);
             return setBuf();
         }
         BaseOptions &ifMetagenerationMatch(uint64_t value)
         {
-            buf[4] = "ifMetagenerationMatch=" + String(value);
+            buf[4] = "ifMetagenerationMatch=" + sh.u64Str(value);
             return setBuf();
         }
         BaseOptions &ifMetagenerationNotMatch(uint64_t value)
         {
-            buf[5] = "ifMetagenerationNotMatch=" + String(value);
+            buf[5] = "ifMetagenerationNotMatch=" + sh.u64Str(value);
             return setBuf();
         }
 
@@ -165,7 +166,7 @@ namespace GoogleCloudStorage
         size_t bufSize = 9;
         String buf[9];
         ObjectWriter owriter;
-        URLHelper uh;
+        StringHelper sh;
 
         InsertOptions &setBuf()
         {
@@ -190,22 +191,22 @@ namespace GoogleCloudStorage
         }
         InsertOptions &ifGenerationMatch(uint64_t value)
         {
-            buf[2] = "ifGenerationMatch=" + String(value);
+            buf[2] = "ifGenerationMatch=" + sh.u64Str(value);
             return setBuf();
         }
         InsertOptions &ifGenerationNotMatch(uint64_t value)
         {
-            buf[3] = "ifGenerationNotMatch=" + String(value);
+            buf[3] = "ifGenerationNotMatch=" + sh.u64Str(value);
             return setBuf();
         }
         InsertOptions &ifMetagenerationMatch(uint64_t value)
         {
-            buf[4] = "ifMetagenerationMatch=" + String(value);
+            buf[4] = "ifMetagenerationMatch=" + sh.u64Str(value);
             return setBuf();
         }
         InsertOptions &ifMetagenerationNotMatch(uint64_t value)
         {
-            buf[5] = "ifMetagenerationNotMatch=" + String(value);
+            buf[5] = "ifMetagenerationNotMatch=" + sh.u64Str(value);
             return setBuf();
         }
         InsertOptions &kmsKeyName(const String &value)

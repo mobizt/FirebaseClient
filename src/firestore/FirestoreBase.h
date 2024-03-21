@@ -1,5 +1,5 @@
 /**
- * Created March 12, 2024
+ * Created March 19, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -37,38 +37,6 @@ using namespace firebase;
 class FirestoreBase
 {
     friend class FirebaseApp;
-
-private:
-    String service_url;
-    String path;
-    String uid;
-    uint32_t app_addr = 0;
-    app_token_t *app_token = nullptr;
-
-    struct async_request_data_t
-    {
-    public:
-        AsyncClientClass *aClient = nullptr;
-        String path;
-        String uid;
-        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
-        slot_options_t opt;
-        Firestore::DataOptions *options = nullptr;
-        AsyncResult *aResult = nullptr;
-        AsyncResultCallback cb = NULL;
-        async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, Firestore::DataOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
-        {
-            this->aClient = aClient;
-            this->path = path;
-            this->method = method;
-            this->opt = opt;
-            this->options = options;
-            this->aResult = aResult;
-            this->cb = cb;
-            this->uid = uid;
-        }
-    };
 
 public:
     ~FirestoreBase(){};
@@ -121,6 +89,38 @@ public:
             }
         }
     }
+
+protected:
+    String service_url;
+    String path;
+    String uid;
+    uint32_t app_addr = 0;
+    app_token_t *app_token = nullptr;
+
+    struct async_request_data_t
+    {
+    public:
+        AsyncClientClass *aClient = nullptr;
+        String path;
+        String uid;
+        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
+        slot_options_t opt;
+        Firestore::DataOptions *options = nullptr;
+        AsyncResult *aResult = nullptr;
+        AsyncResultCallback cb = NULL;
+        async_request_data_t() {}
+        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, Firestore::DataOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        {
+            this->aClient = aClient;
+            this->path = path;
+            this->method = method;
+            this->opt = opt;
+            this->options = options;
+            this->aResult = aResult;
+            this->cb = cb;
+            this->uid = uid;
+        }
+    };
 
     void asyncRequest(async_request_data_t &request, int beta = 0)
     {

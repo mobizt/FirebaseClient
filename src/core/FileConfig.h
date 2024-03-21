@@ -1,5 +1,5 @@
 /**
- * Created March 18, 2024
+ * Created March 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -78,8 +78,9 @@ private:
     uint32_t index = 0;
 };
 
+#if defined(ENABLE_FS)
 typedef void (*FileConfigCallback)(FILEOBJ &file, const char *filename, file_operating_mode mode);
-
+#endif
 
 #if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
 
@@ -373,8 +374,9 @@ struct file_config_data
     file_upload_resumable_data resumable;
     file_upload_multipart_data multipart;
 #endif
-
+#if defined(ENABLE_FS)
     FileConfigCallback cb = NULL;
+#endif
     file_operating_status file_status = file_status_closed;
     uint8_t *data = nullptr;
     size_t data_pos = 0;
@@ -419,8 +421,9 @@ public:
         this->file = rhs.file;
 #endif
         this->filename = rhs.filename;
+#if defined(ENABLE_FS)
         this->cb = rhs.cb;
-
+#endif
         if (!rhs.internal_data && rhs.data && rhs.data_size > 0)
         {
             clearInternalData();
@@ -436,13 +439,17 @@ public:
     {
         clearInternalData();
         filename.remove(0, filename.length());
+#if defined(ENABLE_FS)
         cb = NULL;
+#endif
         data = nullptr;
         data_size = 0;
         internal_data = false;
         initialized = false;
     }
 };
+
+#if defined(ENABLE_FS)
 
 class FileConfig
 {
@@ -477,6 +484,8 @@ public:
 private:
     file_config_data data;
 };
+
+#endif
 
 class DefaultFileConfig
 {

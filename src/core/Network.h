@@ -1,5 +1,7 @@
 /**
- * Created February 9, 2024
+ * Created March 21, 2024
+ * 
+ * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -39,7 +41,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 #include <IPAddress.h>
 #endif
 
-#if defined(ESP8266) || defined(MB_ARDUINO_PICO)
+#if defined(ESP8266) || defined(CORE_ARDUINO_PICO)
 
 #include <string>
 
@@ -85,7 +87,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 #include <W5500lwIP.h>
 #endif
 
-#if defined(MB_ARDUINO_PICO)
+#if defined(CORE_ARDUINO_PICO)
 
 #endif
 
@@ -163,8 +165,8 @@ typedef void (*NetworkStatusCallback)(bool &);
 #endif
 
 #if !defined(ARDUINO_RASPBERRY_PI_PICO_W) && \
-    !defined(MB_ARDUINO_ARCH_SAMD) &&        \
-    !defined(MB_ARDUINO_MBED_PORTENTA) &&    \
+    !defined(CORE_ARDUINO_ARCH_SAMD) &&        \
+    !defined(CORE_ARDUINO_MBED_PORTENTA) &&    \
     !defined(ARDUINO_UNOWIFIR4) &&           \
     !defined(ARDUINO_PORTENTA_C33) &&        \
     !defined(ARDUINO_NANO_RP2040_CONNECT)
@@ -182,7 +184,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 #define FIREBASE_HAS_WIFI_TIME
 #endif
 
-#if defined(MB_ARDUINO_PICO) && __has_include(<WiFiMulti.h>)
+#if defined(CORE_ARDUINO_PICO) && __has_include(<WiFiMulti.h>)
 #include <WiFiMulti.h>
 #define FIREBASE_HAS_WIFIMULTI
 #endif

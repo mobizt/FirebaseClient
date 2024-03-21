@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created March 20, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -200,7 +200,7 @@ public:
     {
         static bool const value = std::is_same<T, uint64_t>::value || std::is_same<T, int64_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
                                   std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value ||
-                                  std::is_same<T, double>::value || std::is_same<T, float>::value || std::is_same<T, bool>::value;
+                                  std::is_same<T, double>::value || std::is_same<T, float>::value || std::is_same<T, bool>::value || std::is_same<T, int>::value;
     };
 
     template <typename T = object_t>
@@ -236,7 +236,9 @@ public:
         else
             setBool(strlen(payload));
 
-        if (std::is_same<T, bool>::value)
+        if (std::is_same<T, int>::value)
+            return iVal.int32;
+        else if (std::is_same<T, bool>::value)
             return iVal.int32 > 0;
         else if (std::is_same<T, int8_t>::value)
             return iVal.int8;

@@ -676,7 +676,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 5;
         String buf[5];
         ObjectWriter owriter;
-        URLHelper uh;
+        StringHelper sh;
 
         ListOptions &setBuf()
         {
@@ -697,7 +697,7 @@ namespace GoogleCloudFunctions
         // Maximum number of functions to return per call. The largest allowed pageSize is 1,000, if the pageSize is omitted or specified as greater than 1,000 then it will be replaced as 1,000. The size of the list response can be less than specified when used with filters.
         ListOptions &pageSize(uint64_t value)
         {
-            buf[1] = "pageSize=" + String(value);
+            buf[1] = "pageSize=" + sh.u64Str(value);
             return setBuf();
         }
         // The value returned by the last ListFunctionsResponse; indicates that this is a continuation of a prior functions.list call, and that the system should return the next page of data.

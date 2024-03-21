@@ -162,7 +162,7 @@ void setup()
     String modemInfo = modem.getModemInfo();
     DBG("Modem Info:", modemInfo);
 
-    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
+    Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     ssl_client.setInsecure();
 
@@ -198,16 +198,16 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 }

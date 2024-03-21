@@ -1,5 +1,5 @@
 /**
- * Created February 13, 2024
+ * Created March 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -32,6 +32,9 @@
 #include "./core/StringHelper.h"
 #include "./AsyncResult/Value.h"
 #include "./core/Core.h"
+#if __has_include(<stdarg.h>)
+#include <stdarg.h>
+#endif
 
 class JsonHelper
 {

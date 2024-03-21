@@ -28,6 +28,8 @@
 #include "./core/FileConfig.h"
 #include "./core/StringHelper.h"
 
+#include "./core/AsyncResult/AsyncResult.h"
+
 namespace sa_ns
 {
     enum data_item_type_t
@@ -1290,6 +1292,7 @@ namespace firebase
     {
         user_auth_data user_auth;
         app_token_t app_token;
+        AsyncResultCallback cb;
     };
 
 };

@@ -1,5 +1,5 @@
 /**
- * Created March 8, 2024
+ * Created March 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -34,6 +34,7 @@
 #include "./core/JSON.h"
 #include "./core/Error.h"
 #include "./core/Core.h"
+#include "./core/Timer.h"
 
 #if defined(ENABLE_JWT)
 
@@ -58,6 +59,7 @@ namespace firebase
 
     struct jwt_token_data_t
     {
+    public:
         String token;
         int err_code = 0;
         String msg;
@@ -77,6 +79,7 @@ namespace firebase
         String payload;
         JsonHelper json;
         jwt_token_data_t jwt_data;
+        Timer err_timer;
         auth_data_t *auth_data = nullptr;
         bool processing = false;
 
@@ -100,7 +103,6 @@ namespace firebase
         bool ready();
         void clear();
         bool process(auth_data_t *auth_data);
-        
     };
 
 }

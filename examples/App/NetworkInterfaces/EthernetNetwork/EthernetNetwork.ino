@@ -71,7 +71,7 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
-WiFiClientSecure ssl_client;
+ESP_SSLClient ssl_client;
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
@@ -85,9 +85,11 @@ void setup()
 
     Serial.begin(115200);
 
-    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
+    Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
+
+    ssl_client.setClient(eth);
 
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -118,16 +120,16 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Created February 17, 2024
+ * Created March 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -24,6 +24,8 @@
  */
 #ifndef FIREBASE_BUILD_OPTIONS_H
 #define FIREBASE_BUILD_OPTIONS_H
+
+#define FIREBASE_DEFAULT_TS 1618971013
 
 #if defined(ARDUINO_ARCH_RP2040)
 
@@ -136,9 +138,17 @@
 #define MB_STRING_USE_PSRAM
 #endif
 
+#if !defined(FPSTR)
+#define FPSTR
+#endif
+
 #if defined(ENABLE_FS)
+#if __has_include(<FS.h>)
 #include <FS.h>
 #define FILEOBJ File
+#else
+#undef ENABLE_FS
+#endif
 #else
 class dmFile : public Stream
 {
@@ -158,10 +168,54 @@ public:
 #define FILEOBJ dmFile
 #endif
 
+#if __has_include(<time.h>)
+#include <time.h>
+#endif
+
+/// CORE_ARDUINO_XXXX macro for MCU build target.
+
+#if defined(ESP8266) || defined(ESP32)
+#ifndef CORE_ARDUINO_ESP
+#define CORE_ARDUINO_ESP
+#endif
+#endif
+
+#if defined(__arm__)
+#ifndef CORE_ARDUINO_ARM
+#define CORE_ARDUINO_ARM
+#endif
+#endif
+
+#if defined(ARDUINO_ARCH_SAMD)
+#ifndef CORE_ARDUINO_ARCH_SAMD
+#define CORE_ARDUINO_ARCH_SAMD
+#endif
+#endif
+
+#if defined(ARDUINO_ARCH_RP2040)
+
+#if defined(ARDUINO_NANO_RP2040_CONNECT)
+#ifndef CORE_ARDUINO_NANO_RP2040_CONNECT
+#define CORE_ARDUINO_NANO_RP2040_CONNECT
+#endif
+#else
+#ifndef CORE_ARDUINO_PICO
+#define CORE_ARDUINO_PICO
+#endif
+#endif
+
+#endif
+
+#if defined(TEENSYDUINO)
+#ifndef CORE_ARDUINO_TEENSY
+#define CORE_ARDUINO_TEENSY
+#endif
+#endif
+
 #if defined(ENABLE_OTA) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
 #if defined(ESP32)
 #include <Update.h>
-#elif defined(ESP8266) || defined(MB_ARDUINO_PICO)
+#elif defined(ESP8266) || defined(CORE_ARDUINO_PICO)
 #include <Updater.h>
 #endif
 #define OTA_UPDATE_ENABLED

@@ -1,5 +1,5 @@
 /**
- * Created March 20, 2024
+ * Created March 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,7 +30,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "0.1.20"
+#define FIREBASE_CLIENT_VERSION "0.2.0"
 
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
@@ -220,6 +220,21 @@ namespace firebase
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_delete_user);
             resetTimer(app, true, 0);
+        }
+
+        void printf(const char *format, ...)
+        {
+            int size = 2048;
+            char s[size];
+            va_list va;
+            va_start(va, format);
+            vsnprintf(s, size, format, va);
+            va_end(va);
+#if defined(FIREBASE_PRINTF_PORT)
+            FIREBASE_PRINTF_PORT.print(s);
+#else
+            Serial.print(s);
+#endif
         }
     };
 

@@ -1,6 +1,6 @@
 
 /**
- * Created March 11, 2024
+ * Created March 19, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -39,7 +39,10 @@ namespace FirestoreQuery
     StructuredQuery::StructuredQuery() {}
 
     StructuredQuery &StructuredQuery::select(Projection projection) { return setObject(buf[1], "select", projection.c_str(), false, true); }
-
+    /**
+     * The item or value will be added to the array or list.
+     * To add more items, call this function again.
+     */
     StructuredQuery &StructuredQuery::from(CollectionSelector collSelector)
     {
         owriter.addMapArrayMember(buf, bufSize, buf[2], "from", collSelector.c_str(), false);
@@ -47,7 +50,10 @@ namespace FirestoreQuery
     }
 
     StructuredQuery &StructuredQuery::where(Filter filter) { return setObject(buf[3], "where", filter.c_str(), false, true); }
-
+    /**
+     * The item or value will be added to the array or list.
+     * To add more items, call this function again.
+     */
     StructuredQuery &StructuredQuery::orderBy(Order orderBy)
     {
         owriter.addMapArrayMember(buf, bufSize, buf[4], "orderBy", orderBy.c_str(), false);
@@ -84,7 +90,10 @@ namespace FirestoreQuery
             return setObject(buf[1], "op", "OR", true, true);
         return *this;
     }
-
+    /**
+     * The item or value will be added to the array or list.
+     * To add more items, call this function again.
+     */
     CompositeFilter &CompositeFilter::addFilter(Filter filter)
     {
         owriter.addMapArrayMember(buf, bufSize, buf[2], "filters", filter.c_str(), false);
@@ -196,7 +205,10 @@ namespace FirestoreQuery
     Cursor::Cursor() { jh.addObject(buf[2], "values", "[]", false, true); }
 
     Cursor &Cursor::before(bool value) { return setObject(buf[1], "before", owriter.getBoolStr(value), false, true); }
-
+    /**
+     * The item or value will be added to the array or list.
+     * To add more items, call this function again.
+     */
     Cursor &Cursor::addValue(Values::Value value)
     {
         owriter.addMapArrayMember(buf, bufSize, buf[2], FPSTR("values"), value.c_str(), false);

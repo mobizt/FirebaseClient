@@ -193,7 +193,7 @@
 
 #include <FirebaseClient.h>
 
-#if defined(ESP8266) || defined(ESP32)
+#if __has_include(<WiFiClientSecure.h>)
 #include <WiFiClientSecure.h>
 #endif
 
@@ -218,7 +218,11 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
+#if __has_include(<WiFiClientSecure.h>)
 WiFiClientSecure ssl_client;
+#elif __has_include(<WiFiSSLClient.h>)
+WiFiSSLClient ssl_client;
+#endif
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
@@ -227,7 +231,11 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
+#if __has_include(<WiFiClientSecure.h>)
 WiFiClientSecure ssl_client2;
+#elif __has_include(<WiFiSSLClient.h>)
+WiFiSSLClient ssl_client2;
+#endif
 
 AsyncClient aClient2(ssl_client2, getNetwork(network));
 
@@ -255,15 +263,17 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
+    Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
 
+#if __has_include(<WiFiClientSecure.h>)
     ssl_client.setInsecure();
     ssl_client2.setInsecure();
 #if defined(ESP8266)
     ssl_client.setBufferSizes(4096, 1024);
     ssl_client2.setBufferSizes(4096, 1024);
+#endif
 #endif
 
     app.setCallback(asyncCB);
@@ -340,17 +350,17 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Serial.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Serial.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Serial.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
@@ -361,10 +371,10 @@ void printResult(AsyncResult &aResult)
         RealtimeDatabaseResult &RTDB = aResult.to<RealtimeDatabaseResult>();
         if (RTDB.isStream())
         {
-            Serial.printf("event: %s\n", RTDB.event().c_str());
-            Serial.printf("path: %s\n", RTDB.dataPath().c_str());
-            Serial.printf("data: %s\n", RTDB.to<const char *>());
-            Serial.printf("type: %d\n", RTDB.type());
+            Firebase.printf("event: %s\n", RTDB.event().c_str());
+            Firebase.printf("path: %s\n", RTDB.dataPath().c_str());
+            Firebase.printf("data: %s\n", RTDB.to<const char *>());
+            Firebase.printf("type: %d\n", RTDB.type());
 
             // The stream event from RealtimeDatabaseResult can be converted to the the values as following.
             bool v1 = RTDB.to<bool>();
@@ -375,7 +385,7 @@ void printResult(AsyncResult &aResult)
         }
         else
         {
-            Serial.printf("payload: %s\n", aResult.c_str());
+            Firebase.printf("payload: %s\n", aResult.c_str());
         }
     }
 }

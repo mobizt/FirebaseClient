@@ -1,5 +1,5 @@
 /**
- * Created March 18, 2024
+ * Created March 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -97,6 +97,22 @@ public:
     }
 
     void addSp(String &buf) { buf += ' '; }
+
+    String u64Str(uint64_t val)
+    {
+        // Some cores do not provide 64-bit integer to string conversion.
+        String v;
+        char buffer[21];
+        char *ndx = &buffer[sizeof(buffer) - 1];
+        *ndx = '\0';
+        do
+        {
+            *--ndx = val % 10 + '0';
+            val = val / 10;
+        } while (val != 0);
+        v = ndx;
+        return v;
+    }
 };
 
 #endif

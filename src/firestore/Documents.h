@@ -1,5 +1,5 @@
 /**
- * Created March 12, 2024
+ * Created March 19, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -840,16 +840,15 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
-         * @param content A Firestore document.
-         * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
-         * @param updateMask The fields to update. If the document exists on the server and has fields not referenced in the mask,
+         * @param patchOptions The patchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
+         * 
+         * updateMask is he fields to update. If the document exists on the server and has fields not referenced in the mask,
          * they are left unchanged.
          * Fields referenced in the mask, but not present in the input document (content), are deleted from the document on the server.
          * Use comma (,) to separate between the field names.
-         * @param mask The fields to return. If not set, returns all fields. If the document has a field that is not present in
+         * mask is fields to return. If not set, returns all fields. If the document has a field that is not present in
          * this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
-         * @param document A Firestore document.
-         * @param currentDocument An optional precondition on the document. The request will fail if this is set and not met by the target document.
+         * And currentDocument is an optional precondition on the document. The request will fail if this is set and not met by the target document.
          *
          * When currentDocument as defined with true or false as constructor argument, the exists condition will be set.
          * When currentDocument as defined with string(Timestamp format) as constructor argument, the updateTime condition will be set.
@@ -858,6 +857,7 @@ namespace Firestore
          * When updateTime was set, the target document must exist and have been last updated at that time.
          * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
          * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+         *  @param document A Firestore document.
          *
          * @return Boolean value, indicates the success of the operation.
          *
@@ -878,16 +878,15 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
-         * @param content A Firestore document.
-         * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
-         * @param updateMask The fields to update. If the document exists on the server and has fields not referenced in the mask,
+         * @param patchOptions The patchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
+         * 
+         * updateMask is he fields to update. If the document exists on the server and has fields not referenced in the mask,
          * they are left unchanged.
          * Fields referenced in the mask, but not present in the input document (content), are deleted from the document on the server.
          * Use comma (,) to separate between the field names.
-         * @param mask The fields to return. If not set, returns all fields. If the document has a field that is not present in
+         * mask is fields to return. If not set, returns all fields. If the document has a field that is not present in
          * this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
-         * @param document A Firestore document.
-         * @param currentDocument An optional precondition on the document. The request will fail if this is set and not met by the target document.
+         * And currentDocument is an optional precondition on the document. The request will fail if this is set and not met by the target document.
          *
          * When currentDocument as defined with true or false as constructor argument, the exists condition will be set.
          * When currentDocument as defined with string(Timestamp format) as constructor argument, the updateTime condition will be set.
@@ -896,6 +895,7 @@ namespace Firestore
          * When updateTime was set, the target document must exist and have been last updated at that time.
          * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
          * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+         *  @param document A Firestore document.
          *
          * @param aResult The async result (AsyncResult).
          *
@@ -914,16 +914,15 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
-         * @param content A Firestore document.
-         * See https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document
-         * @param updateMask The fields to update. If the document exists on the server and has fields not referenced in the mask,
+         * @param patchOptions The patchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
+         * 
+         * updateMask is he fields to update. If the document exists on the server and has fields not referenced in the mask,
          * they are left unchanged.
          * Fields referenced in the mask, but not present in the input document (content), are deleted from the document on the server.
          * Use comma (,) to separate between the field names.
-         * @param mask The fields to return. If not set, returns all fields. If the document has a field that is not present in
+         * mask is fields to return. If not set, returns all fields. If the document has a field that is not present in
          * this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
-         * @param document A Firestore document.
-         * @param currentDocument An optional precondition on the document. The request will fail if this is set and not met by the target document.
+         * And currentDocument is an optional precondition on the document. The request will fail if this is set and not met by the target document.
          *
          * When currentDocument as defined with true or false as constructor argument, the exists condition will be set.
          * When currentDocument as defined with string(Timestamp format) as constructor argument, the updateTime condition will be set.
@@ -932,6 +931,7 @@ namespace Firestore
          * When updateTime was set, the target document must exist and have been last updated at that time.
          * A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
          * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
+         *  @param document A Firestore document.
          *
          * @param cb The async result callback (AsyncResultCallback).
          * @param uid The user specified UID of async result (optional).

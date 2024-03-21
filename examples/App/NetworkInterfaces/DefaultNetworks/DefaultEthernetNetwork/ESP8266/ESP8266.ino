@@ -44,7 +44,7 @@
 
 #include <FirebaseClient.h>
 
-#if defined(ESP8266) || defined(ESP32)
+#if __has_include(<WiFiClientSecure.h>)
 #include <WiFiClientSecure.h>
 #endif
 
