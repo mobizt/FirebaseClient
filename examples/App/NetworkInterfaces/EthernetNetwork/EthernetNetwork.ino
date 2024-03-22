@@ -89,7 +89,7 @@ void setup()
 
     Serial.println("Initializing app...");
 
-    ssl_client.setClient(eth);
+    ssl_client.setClient(&eth);
 
     ssl_client.setInsecure();
 #if defined(ESP8266)

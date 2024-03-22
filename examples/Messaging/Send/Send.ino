@@ -167,10 +167,6 @@
 
 #include <FirebaseClient.h>
 
-#if __has_include(<WiFiClientSecure.h>)
-#include <WiFiClientSecure.h>
-#endif
-
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
@@ -199,8 +195,10 @@ ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PR
 FirebaseApp app;
 
 #if __has_include(<WiFiClientSecure.h>)
+#include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
 #elif __has_include(<WiFiSSLClient.h>)
+#include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
 
@@ -336,7 +334,7 @@ void timeStatusCB(uint32_t &ts)
         }
     }
     ts = time(nullptr);
-#elif __has_include(<WiFiNINA.h>)
+#elif __has_include(<WiFiNINA.h>) || __has_include(<WiFi101.h>)
     ts = WiFi.getTime();
 #endif
 }

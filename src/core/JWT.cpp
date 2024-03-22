@@ -42,7 +42,9 @@
 #if defined(USE_EMBED_SSL_ENGINE) && !defined(CORE_MOCK)
 extern "C"
 {
+#if defined(ESP8266)
     make_stack_thunk(br_rsa_i15_pkcs1_sign);
+#endif
 };
 #endif
 

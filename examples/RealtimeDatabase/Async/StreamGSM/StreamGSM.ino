@@ -58,33 +58,34 @@
  */
 
 /**
- * COMMIT DOCUMENTS FUNCTIONS
- * ==========================
+ * ASYNC GET SSE (STREAM) FUNCTIONS
+ * ================================
  *
  * SYNTAXES:
  *
- * Docs.commit(<AsyncClient>, <Firestore::Parent>, <Writes>);
- * Docs.commit(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResult>);
- * Docs.commit(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResultCallback>, <uid>);
- *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
- *
- * The <Writes> is the writes to apply.
+ * Database.get(<AsyncClient>, <path>, <AsyncResult>, <SSE>);
+ * Database.get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
  *
  * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
  *
  * The uid is user specified UID of async result (optional) which used as async task identifier.
  *
  * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ *
+ * To stop one (first) async operation,
+ *
+ * aClient.stopAsync(); or
+ *
+ * To stop all async operations
+ *
+ * aClient.stopAsync(true);
  */
 
 /**
  * The AsyncResult object in the AsyncResultCallback function provides the result of async and non-async operations.
  *
  * APP EVENT
- * =========
+ * ===========
  *
  * The event information can be obtained from aResult.appEvent().code() and aResult.appEvent().message() respectively.
  *
@@ -100,7 +101,8 @@
  * ===========
  *
  * The result data can be obtained from AsyncResult object via aResult.payload(), aResult.available(), aResult.path(), aResult.etag()
- * aResult.database.isStream(), aResult.database.event(), aResult.database.dataPath(), aResult.database.type() and result.database.name().
+ * RTDB.isStream(), RTDB.event(), RTDB.dataPath(), RTDB.type() and RTDB.name() where RTDB is the RealtimeDatabaseResult object
+ * that cast from aResult.to<RealtimeDatabaseResult>().
  *
  * The function aResult.payload() returns server serponse payload.
  *
@@ -110,17 +112,17 @@
  *
  * The function aResult.etag() returns the ETag from server response header.
  *
- * The function aResult.database.name() returns the name (random UID) of node that will be creaated after calling push.
+ * The function RTDB.name() returns the name (random UID) of node that will be creaated after calling push.
  *
- * The function aResult.database.type() returns the following database data type enum.
- * database_data_type_undefined (-1), database_data_type_null (0), database_data_type_integer(1), database_data_type_float (2),
- * database_data_type_double (3), database_data_type_boolean (4), database_data_type_string (5), database_data_type_json (6),
- * and database_data_type_array (7).
+ * The function RTDB.type() returns the following realtime data type enum.
+ * realtime_database_data_type_undefined (-1), realtime_database_data_type_null (0), realtime_database_data_type_integer(1), realtime_database_data_type_float (2),
+ * realtime_database_data_type_double (3), realtime_database_data_type_boolean (4), realtime_database_data_type_string (5), realtime_database_data_type_json (6),
+ * and realtime_database_data_type_array (7).
  *
- * The aResult.database.dataPath() and aResult.database.event() are the database node path that data has changed and type of event in server-sent events (stream) mode.
+ * The RTDB.dataPath() and RTDB.event() are the Realtime database node path that data has changed and type of event in server-sent events (stream) mode.
  *
  * The server response payload in AsyncResult can be converted to the the values e.g. boolean, integer,
- * float, double and string via aResult.database.to<T>() or result.database.to<T>().
+ * float, double and string via RTDB.to<T>().
  *
  * ASYNC QUEUE
  * ===========
@@ -142,7 +144,7 @@
  * The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
  *
  * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app
- * (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
+ * (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or Database.loop().
  *
  * STOP QUEUE
  * ===========
@@ -177,22 +179,55 @@
  */
 
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
-#include <WiFi.h>
-#elif defined(ESP8266)
-#include <ESP8266WiFi.h>
-#elif __has_include(<WiFiNINA.h>)
-#include <WiFiNINA.h>
-#elif __has_include(<WiFi101.h>)
-#include <WiFi101.h>
-#elif __has_include(<WiFiS3.h>)
-#include <WiFiS3.h>
-#endif
 
+#define TINY_GSM_MODEM_SIM7600 // SIMA7670 Compatible with SIM7600 AT instructions
+
+// Set serial for debug console (to the Serial Monitor, default speed 115200)
+#define SerialMon Serial
+
+// Set serial for AT commands (to the module)
+// Use Hardware Serial on Mega, Leonardo, Micro
+#define SerialAT Serial1
+
+// See all AT commands, if wanted
+// #define DUMP_AT_COMMANDS
+
+// Define the serial console for debug prints, if needed
+#define TINY_GSM_DEBUG SerialMon
+
+#define TINY_GSM_USE_GPRS true
+#define TINY_GSM_USE_WIFI false
+
+// set GSM PIN, if any
+#define GSM_PIN ""
+
+// Your GPRS credentials, if any
+const char apn[] = "YourAPN";
+const char gprsUser[] = "";
+const char gprsPass[] = "";
+
+#define uS_TO_S_FACTOR 1000000ULL // Conversion factor for micro seconds to seconds
+#define TIME_TO_SLEEP 600         // Time ESP32 will go to sleep (in seconds)
+
+#define UART_BAUD 115200
+#define PIN_DTR 25
+#define PIN_TX 26
+#define PIN_RX 27
+#define PWR_PIN 4
+#define BAT_ADC 35
+#define BAT_EN 12
+#define PIN_RI 33
+#define PIN_DTR 25
+#define RESET 5
+
+#define SD_MISO 2
+#define SD_MOSI 15
+#define SD_SCLK 14
+#define SD_CS 13
+
+// Include TinyGsmClient.h first and followed by FirebaseClient.h
+#include <TinyGsmClient.h>
 #include <FirebaseClient.h>
-
-#define WIFI_SSID "WIFI_AP"
-#define WIFI_PASSWORD "WIFI_PASSWORD"
 
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
@@ -202,81 +237,123 @@
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
 
-#define FIREBASE_PROJECT_ID "PROJECT_ID"
+TinyGsm modem(SerialAT);
 
-void asyncCB(AsyncResult &aResult);
+TinyGsmClient gsm_client1(modem, 0);
+TinyGsmClient gsm_client2(modem, 1);
 
-void printResult(AsyncResult &aResult);
+ESP_SSLClient ssl_client1, ssl_client2;
 
-DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
+GSMNetwork gsm_network(&modem, GSM_PIN, apn, gprsUser, gprsPass);
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
-
-#if __has_include(<WiFiClientSecure.h>)
-#include <WiFiClientSecure.h>
-WiFiClientSecure ssl_client;
-#elif __has_include(<WiFiSSLClient.h>)
-#include <WiFiSSLClient.h>
-WiFiSSLClient ssl_client;
-#endif
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
 
 using AsyncClient = AsyncClientClass;
 
-AsyncClient aClient(ssl_client, getNetwork(network));
+AsyncClient aClient1(ssl_client1, getNetwork(gsm_network));
 
-Firestore::Documents Docs;
+AsyncClient aClient2(ssl_client2, getNetwork(gsm_network));
 
-AsyncResult aResult_no_callback;
+void asyncCB(AsyncResult &aResult);
 
-int counter = 0;
+void printResult(AsyncResult &aResult);
 
-unsigned long dataMillis = 0;
+RealtimeDatabase Database;
+
+unsigned long ms = 0;
 
 void setup()
 {
 
     Serial.begin(115200);
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    Serial.begin(115200);
 
-    Serial.print("Connecting to Wi-Fi");
-    unsigned long ms = millis();
-    while (WiFi.status() != WL_CONNECTED)
+    delay(10);
+    pinMode(BAT_EN, OUTPUT);
+    digitalWrite(BAT_EN, HIGH);
+
+    // A7670 Reset
+    pinMode(RESET, OUTPUT);
+    digitalWrite(RESET, LOW);
+    delay(100);
+    digitalWrite(RESET, HIGH);
+    delay(3000);
+    digitalWrite(RESET, LOW);
+
+    pinMode(PWR_PIN, OUTPUT);
+    digitalWrite(PWR_PIN, LOW);
+    delay(100);
+    digitalWrite(PWR_PIN, HIGH);
+    delay(1000);
+    digitalWrite(PWR_PIN, LOW);
+
+    DBG("Wait...");
+
+    delay(3000);
+
+    SerialAT.begin(UART_BAUD, SERIAL_8N1, PIN_RX, PIN_TX);
+
+    // Restart takes quite some time
+    // To skip it, call init() instead of restart()
+    DBG("Initializing modem...");
+    if (!modem.init())
     {
-        Serial.print(".");
-        delay(300);
+        DBG("Failed to restart modem, delaying 10s and retrying");
+        return;
     }
-    Serial.println();
-    Serial.print("Connected with IP: ");
-    Serial.println(WiFi.localIP());
-    Serial.println();
+
+    /*
+    2 Automatic
+    13 GSM Only
+    14 WCDMA Only
+    38 LTE Only
+    */
+    modem.setNetworkMode(38);
+    if (modem.waitResponse(10000L) != 1)
+    {
+        DBG(" setNetworkMode faill");
+    }
+
+    String name = modem.getModemName();
+    DBG("Modem Name:", name);
+
+    String modemInfo = modem.getModemInfo();
+    DBG("Modem Info:", modemInfo);
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
+    ssl_client1.setInsecure();
+    ssl_client1.setDebugLevel(1);
+    ssl_client1.setBufferSizes(2048 /* rx */, 1024 /* tx */);
+    ssl_client1.setClient(&gsm_client1);
 
-#if __has_include(<WiFiClientSecure.h>)
-    ssl_client.setInsecure();
-#if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
-#endif
-#endif
+    ssl_client2.setInsecure();
+    ssl_client2.setDebugLevel(1);
+    ssl_client2.setBufferSizes(2048 /* rx */, 1024 /* tx */);
+    ssl_client2.setClient(&gsm_client2);
+
+    Serial.println("Initializing app...");
 
     app.setCallback(asyncCB);
 
-    initializeApp(aClient, app, getAuth(user_auth));
+    initializeApp(aClient1, app, getAuth(user_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    ms = millis();
+    unsigned long ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
 
-    app.getApp<Firestore::Documents>(Docs);
+    app.getApp<RealtimeDatabase>(Database);
+
+    Database.url(DATABASE_URL);
+
+    Database.get(aClient2, "/test/stream", asyncCB, true /* SSE mode */);
 }
 
 void loop()
@@ -284,65 +361,36 @@ void loop()
     // This function is required for handling async operations and maintaining the authentication tasks.
     app.loop();
 
-    // This required when different AsyncClients than used in FirebaseApp assigned to the Firestore functions.
-    Docs.loop();
+    // This required when different AsyncClients than used in FirebaseApp assigned to the Realtime database functions.
+    Database.loop();
+
+    if (millis() - ms > 20000 && app.ready())
+    {
+        ms = millis();
+
+        JsonWriter writer;
+
+        object_t json, obj1, obj2;
+
+        writer.create(obj1, "ms", ms);
+        writer.create(obj2, "rand", random(10000, 30000));
+        writer.join(json, 2, obj1, obj2);
+
+        Database.set<object_t>(aClient1, "/test/stream/number", json, asyncCB);
+
+        // When the async operation queue was full, the operation will be cancelled for new sync and async operation.
+        // When the async operation was time out, it will be removed from queue and allow the slot for the new async operation.
+
+        // To assign UID for async result
+        // Database.set<object_t>(aClient2, "/test/stream/number", json, asyncCB, "myUID");
+    }
 
     // To get anyc result without callback
     // printResult(aResult_no_callback);
-
-    if (app.ready() && (millis() - dataMillis > 60000 || dataMillis == 0))
-    {
-        dataMillis = millis();
-        counter++;
-
-        Serial.println("Commit a document (append array)... ");
-
-        // test_collection is the collection id, test_document is the document id.
-        String documentPath = "test_collection/test_document";
-        String fieldPath = "appended_data";
-
-        // If the document path contains space e.g. "a b c/d e f"
-        // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
-
-        // array value to append
-        Values::ArrayValue arrV(Values::IntegerValue((int)rand()));
-        arrV.add(Values::StringValue("word don't come easy " + String(counter)));
-
-        FieldTransform::AppendMissingElements<Values::ArrayValue> appendValue(arrV);
-        FieldTransform::FieldTransform fieldTransforms(fieldPath, appendValue);
-        DocumentTransform transform(documentPath, fieldTransforms);
-
-        Writes writes(Write(transform, Precondition() /* currentDocument precondition */));
-
-        // Another array value to append
-        Values::ArrayValue arrV2(Values::DoubleValue((int)rand() * 1.234));
-        arrV2.add(Values::StringValue("never gonna give you up " + String(counter)));
-        // Another append array object
-        FieldTransform::AppendMissingElements<Values::ArrayValue> appendValue2(arrV2);
-        // Another field transform
-        FieldTransform::FieldTransform fieldTransforms2(fieldPath, appendValue2);
-        // Another doc transform
-        DocumentTransform transform2(documentPath, fieldTransforms2);
-        // Add another Write object of another transform to the Writes object
-        writes.add(Write(transform2, Precondition()));
-
-        // All Writes, Write, DocumentTransform FieldTransform::xxx, and Values::xxxx objects can be printed on Serial port
-
-        // You can set the content of write and writes objects directly with write.setContent("your content") and writes.setContent("your content")
-
-        Docs.commit(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, asyncCB);
-
-        // To assign UID for async result
-        // Docs.commit(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, asyncCB, "myUID");
-
-        // To get anyc result without callback
-        // Docs.commit(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, aResult_no_callback);
-    }
 }
 
 void asyncCB(AsyncResult &aResult)
 {
-
     // To get the UID (string) from async result
     // aResult.uid();
 
@@ -368,6 +416,27 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.available())
     {
-        Firebase.printf("payload: %s\n", aResult.c_str());
+        // To get the UID (string) from async result
+        // aResult.uid();
+
+        RealtimeDatabaseResult &RTDB = aResult.to<RealtimeDatabaseResult>();
+        if (RTDB.isStream())
+        {
+            Firebase.printf("event: %s\n", RTDB.event().c_str());
+            Firebase.printf("path: %s\n", RTDB.dataPath().c_str());
+            Firebase.printf("data: %s\n", RTDB.to<const char *>());
+            Firebase.printf("type: %d\n", RTDB.type());
+
+            // The stream event from RealtimeDatabaseResult can be converted to the the values as following.
+            bool v1 = RTDB.to<bool>();
+            int v2 = RTDB.to<int>();
+            float v3 = RTDB.to<float>();
+            double v4 = RTDB.to<double>();
+            String v5 = RTDB.to<String>();
+        }
+        else
+        {
+            Firebase.printf("payload: %s\n", aResult.c_str());
+        }
     }
 }

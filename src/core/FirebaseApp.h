@@ -223,8 +223,20 @@ namespace firebase
 
         void setEventResult(AsyncResult *aResult, const String &msg, int code)
         {
-            if (aResult)
-                aResult->app_event.setEvent(code, msg);
+            // If aResult was not initiated, create and send temporary result to callback
+            bool isRes = aResult != nullptr;
+
+            if (!isRes)
+                aResult = new AsyncResult();
+            aResult->app_event.setEvent(code, msg);
+            if (!isRes)
+            {
+                if (resultCb)
+                    resultCb(*aResult);
+
+                delete aResult;
+                aResult = nullptr;
+            }
         }
 
         void addGAPIsHost(String &str, PGM_P sub)
@@ -352,7 +364,10 @@ namespace firebase
                     {
                         auth_data.user_auth.sa.step = jwt_step_sign;
                         stop(aClient);
-                        setEvent(auth_event_token_signing);
+
+                        if (auth_data.user_auth.status._event != auth_event_token_signing)
+                            setEvent(auth_event_token_signing);
+
                         auth_data.user_auth.jwt_signing = true;
                     }
                     else if (auth_data.user_auth.sa.step == jwt_step_sign || auth_data.user_auth.sa.step == jwt_step_ready)

@@ -61,7 +61,7 @@ namespace Messages
     };
 
     // Different visibility levels of a notification.
-    enum visibility
+    enum Visibility
     {
         VISIBILITY_UNSPECIFIED, //	If unspecified, default to Visibility.PRIVATE.
         PRIVATE,                //	Show this notification on all lockscreens, but conceal sensitive or private information on secure lockscreens.
@@ -278,15 +278,15 @@ namespace Messages
             return *this;
         }
         // Set the Notification.visibility (https://developer.android.com/reference/android/app/Notification.html#visibility) of the notification.
-        AndroidNotification &visibility(visibility value)
+        AndroidNotification &visibility(Visibility value)
         {
             if (value == VISIBILITY_UNSPECIFIED)
                 return setObject(buf[22], "visibility", "VISIBILITY_UNSPECIFIED", true, true);
-            else if (value == visibility::PRIVATE)
+            else if (value == Visibility::PRIVATE)
                 return setObject(buf[22], "visibility", "PRIVATE", true, true);
-            else if (value == visibility::PUBLIC)
+            else if (value == Visibility::PUBLIC)
                 return setObject(buf[22], "visibility", "PUBLIC", true, true);
-            else if (value == visibility::SECRET)
+            else if (value == Visibility::SECRET)
                 return setObject(buf[22], "visibility", "SECRET", true, true);
             return *this;
         }

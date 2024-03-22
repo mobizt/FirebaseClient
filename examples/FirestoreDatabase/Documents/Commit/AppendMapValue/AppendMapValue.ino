@@ -191,10 +191,6 @@
 
 #include <FirebaseClient.h>
 
-#if __has_include(<WiFiClientSecure.h>)
-#include <WiFiClientSecure.h>
-#endif
-
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
@@ -219,11 +215,12 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 FirebaseApp app;
 
 #if __has_include(<WiFiClientSecure.h>)
+#include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
 #elif __has_include(<WiFiSSLClient.h>)
+#include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
-
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
 

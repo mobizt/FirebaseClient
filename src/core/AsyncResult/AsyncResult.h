@@ -309,8 +309,11 @@ public:
         // Keeping old message in case unread.
         if (debug_info_available && val[ares_ns::debug_info].length() < 200)
         {
-            val[ares_ns::debug_info] += "\r\n";
-            val[ares_ns::debug_info] += debug;
+            if (val[ares_ns::debug_info].indexOf(debug) == -1)
+            {
+                val[ares_ns::debug_info] += " >> ";
+                val[ares_ns::debug_info] += debug;
+            }
         }
         else
             val[ares_ns::debug_info] = debug;

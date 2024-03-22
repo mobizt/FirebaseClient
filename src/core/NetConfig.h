@@ -60,7 +60,7 @@ private:
             net_status_cb = NULL;
         }
     };
-#if defined(ENABLE_GSM_NETWORK)
+#if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(ENABLE_GSM_NETWORK)
     struct gsm_data
     {
         String pin, apn, user, password;
@@ -85,7 +85,7 @@ private:
         }
     };
 #endif
-#if defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
     struct ethernet_data
     {
         int ethernet_reset_pin = -1;
@@ -114,10 +114,10 @@ private:
     firebase_network_data_type network_data_type = firebase_network_data_undefined;
 
     generic_data generic;
-#if defined(ENABLE_GSM_NETWORK)
+#if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(ENABLE_GSM_NETWORK)
     gsm_data gsm;
 #endif
-#if defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
     ethernet_data ethernet;
     SPI_ETH_Module *eth = NULL;
 #endif
@@ -142,11 +142,11 @@ public:
         this->initialized = rhs.initialized;
         this->reconnect = rhs.reconnect;
         generic.copy(rhs.generic);
-#if defined(ENABLE_GSM_NETWORK)
+#if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(ENABLE_GSM_NETWORK)
         gsm.copy(rhs.gsm);
 #endif
 
-#if defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         ethernet.copy(rhs.ethernet);
 #endif
 
@@ -154,7 +154,7 @@ public:
         this->network_status = rhs.network_status;
         this->reconnect = rhs.reconnect;
         this->wifi = rhs.wifi;
-#if defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         this->eth = rhs.eth;
 #endif
         this->net_timer = rhs.net_timer;
@@ -164,10 +164,10 @@ public:
     void clear()
     {
         generic.clear();
-#if defined(ENABLE_GSM_NETWORK)
+#if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(ENABLE_GSM_NETWORK)
         gsm.clear();
 #endif
-#if defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         ethernet.clear();
 #endif
         network_data_type = firebase_network_data_undefined;
@@ -175,7 +175,7 @@ public:
         network_status = false;
         reconnect = true;
         wifi = nullptr;
-#if defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         eth = NULL;
 #endif
         net_timer.stop();
@@ -223,26 +223,25 @@ public:
     ~GenericNetwork() { clear(); }
 };
 
-#if defined(ENABLE_GSM_NETWORK)
+#if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(ENABLE_GSM_NETWORK)
 class GSMNetwork : public DefaultNetwork
 {
 public:
-    template <typename T1 = const char *, typename T2 = const char *, typename T3 = const char *, typename T4 = const char *>
-    GSMNetwork(void *modem, T1 pin, T2 apn, T3 user, T4 password)
+    GSMNetwork(TinyGsm *modem, const String &pin, const String &apn, const String &user, const String &password)
     {
         init();
         network_data.gsm.modem = modem;
-        network_data.gsm.pin = toStringPtr(pin);
-        network_data.gsm.apn = toStringPtr(apn);
-        network_data.gsm.user = toStringPtr(user);
-        network_data.gsm.password = toStringPtr(password);
+        network_data.gsm.pin = pin;
+        network_data.gsm.apn = apn;
+        network_data.gsm.user = user;
+        network_data.gsm.password = password;
         network_data.network_data_type = firebase_network_data_gsm_network;
     }
     ~GSMNetwork() { clear(); }
 };
 #endif
 
-#if defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
 class EthernetNetwork : public DefaultNetwork
 {
 
@@ -268,7 +267,7 @@ public:
     DefaultEthernetNetwork(SPI_ETH_Module &eth)
     {
         init();
-#if defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         network_data.eth = &eth;
 #endif
         network_data.network_data_type = firebase_network_data_default_network;

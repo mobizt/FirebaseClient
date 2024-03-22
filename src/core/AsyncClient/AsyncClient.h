@@ -1267,8 +1267,8 @@ private:
         sData->aResult.lastError.clearError();
         lastErr.clearError();
 
-        if (client && !client->connected())
-            sData->aResult.setDebug(FPSTR("Connecting to server..."));
+        if (client && !client->connected() && !sData->auth_used) // This info is already show in auth task
+            sData->aResult.setDebug(FPSTR("Connecting to server...")); 
 
         if (client && !client->connected() && client_type == async_request_handler_t::tcp_client_type_sync)
             sData->return_type = client->connect(host, port) > 0 ? function_return_type_complete : function_return_type_failure;
@@ -1383,12 +1383,12 @@ private:
     bool gprsConnect(async_data_item_t *sData)
     {
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
-        TinyGsm *gsmModem = (TinyGsm *)_modem;
+        TinyGsm *gsmModem = (TinyGsm *) net.gsm.modem;
         if (gsmModem)
         {
             // Unlock your SIM card with a PIN if needed
-            if (_pin.length() && gsmModem->getSimStatus() != 3)
-                gsmModem->simUnlock(_pin.c_str());
+            if (net.gsm.pin.length() && gsmModem->getSimStatus() != 3)
+                gsmModem->simUnlock(net.gsm.pin.c_str());
 
 #if defined(TINY_GSM_MODEM_XBEE)
             // The XBee must run the gprsConnect function BEFORE waiting for network!
@@ -1414,11 +1414,11 @@ private:
                 if (netErrState == 0 && sData)
                 {
                     String debug = FPSTR("Connecting to ");
-                    debug += _apn.c_str();
+                    debug += net.gsm.apn.c_str();
                     sData->aResult.setDebug(debug);
                 }
 
-                net.network_status = gsmModem->gprsConnect(_apn.c_str(), _user.c_str(), _password.c_str()) &&
+                net.network_status = gsmModem->gprsConnect(net.gsm.apn.c_str(), net.gsm.user.c_str(), net.gsm.password.c_str()) &&
                                      gsmModem->isGprsConnected();
 
                 if (netErrState == 0 && sData)
@@ -1443,7 +1443,7 @@ private:
     bool gprsConnected()
     {
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
-        TinyGsm *gsmModem = (TinyGsm *)_modem;
+        TinyGsm *gsmModem = (TinyGsm *)net.gsm.modem;
         net.network_status = gsmModem && gsmModem->isGprsConnected();
 #endif
         return net.network_status;
@@ -1452,7 +1452,7 @@ private:
     bool gprsDisconnect()
     {
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
-        TinyGsm *gsmModem = (TinyGsm *)_modem;
+        TinyGsm *gsmModem = (TinyGsm *)net.gsm.modem;
         net.network_status = gsmModem && gsmModem->gprsDisconnect();
 #endif
         return !net.network_status;
@@ -1462,7 +1462,7 @@ private:
     {
         bool ret = false;
 
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE)
+#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
 
         if (net.ethernet.ethernet_cs_pin > -1)
             ETH_MODULE_CLASS.init(net.ethernet.ethernet_cs_pin);

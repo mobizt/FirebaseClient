@@ -129,10 +129,6 @@
 
 #include <FirebaseClient.h>
 
-#if __has_include(<WiFiClientSecure.h>)
-#include <WiFiClientSecure.h>
-#endif
-
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
 
@@ -148,8 +144,10 @@ IDToken id_token(API_KEY, "ID token", 3000 /* expire period in seconds (<= 3600)
 FirebaseApp app;
 
 #if __has_include(<WiFiClientSecure.h>)
+#include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
 #elif __has_include(<WiFiSSLClient.h>)
+#include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
 

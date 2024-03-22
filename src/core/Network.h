@@ -359,7 +359,7 @@ typedef enum
 
 typedef struct firebase_client_static_address
 {
-    friend class Firebase_TCP_Client;
+    friend class AsyncClientClass;
 
 public:
     firebase_client_static_address(IPAddress ipAddress, IPAddress netMask, IPAddress defaultGateway, IPAddress dnsServer, bool optional)

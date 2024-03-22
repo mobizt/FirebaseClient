@@ -164,12 +164,17 @@
 
 #include <FirebaseClient.h>
 
-#if __has_include(<WiFiClientSecure.h>)
-#include <WiFiClientSecure.h>
-#endif
-
+#if defined(ENABLE_FS) // Defined in this library
+#if defined(FLASH_SUPPORTS) // Defined in this library
 #if defined(ESP32)
 #include <SPIFFS.h>
+#endif
+#define MY_FS SPIFFS
+#else
+#include <SPI.h>
+#include <SD.h>
+#define MY_FS SD
+#endif
 #endif
 
 #define WIFI_SSID "WIFI_AP"
@@ -202,8 +207,10 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in 
 FirebaseApp app;
 
 #if __has_include(<WiFiClientSecure.h>)
+#include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
 #elif __has_include(<WiFiSSLClient.h>)
+#include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
 
@@ -262,7 +269,7 @@ void setup()
     app.getApp<Storage>(storage);
 
 #if defined(ENABLE_FS)
-    SPIFFS.begin();
+    MY_FS.begin();
 #endif
 }
 
@@ -346,19 +353,21 @@ void asyncCB(AsyncResult &aResult)
 #if defined(ENABLE_FS)
 void fileCallback(File &file, const char *filename, file_operating_mode mode)
 {
+    // FILE_OPEN_MODE_READ, FILE_OPEN_MODE_WRITE and FILE_OPEN_MODE_APPEND are defined in this library
+    // MY_FS is defined in this example
     switch (mode)
     {
     case file_mode_open_read:
-        file = SPIFFS.open(filename, "r");
+        file = MY_FS.open(filename, FILE_OPEN_MODE_READ);
         break;
     case file_mode_open_write:
-        file = SPIFFS.open(filename, "w");
+        file = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
         break;
     case file_mode_open_append:
-        file = SPIFFS.open(filename, "a");
+        file = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
         break;
     case file_mode_remove:
-        SPIFFS.remove(filename);
+        MY_FS.remove(filename);
         break;
     default:
         break;

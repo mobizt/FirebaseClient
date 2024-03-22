@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created March 22, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -135,42 +135,12 @@
 
 #if defined(ENABLE_PSRAM)
 #define FIREBASE_USE_PSRAM
-#define MB_STRING_USE_PSRAM
 #endif
 
 #if !defined(FPSTR)
 #define FPSTR
 #endif
 
-#if defined(ENABLE_FS)
-#if __has_include(<FS.h>)
-#include <FS.h>
-#define FILEOBJ File
-#else
-#undef ENABLE_FS
-#endif
-#else
-class dmFile : public Stream
-{
-public:
-    operator bool() const { return 0; }
-    size_t write(uint8_t) const { return 0; }
-    size_t write(const uint8_t *buf, size_t size) const { return 0; }
-    int available() { return 0; }
-    int read() const { return 0; }
-    int peek() const { return 0; }
-    void flush() {}
-    int read(uint8_t *buf, size_t size) const{ return 0; }
-    void close() {}
-    size_t position() const { return 0; }
-    size_t size() const { return 0; }
-};
-#define FILEOBJ dmFile
-#endif
-
-#if __has_include(<time.h>)
-#include <time.h>
-#endif
 
 /// CORE_ARDUINO_XXXX macro for MCU build target.
 
@@ -211,6 +181,44 @@ public:
 #define CORE_ARDUINO_TEENSY
 #endif
 #endif
+
+#if defined(ENABLE_FS)
+#if __has_include(<FS.h>)
+#include <FS.h>
+#define FILEOBJ File
+#elif __has_include(<SD.h>) && __has_include(<SPI.h>)
+#include <SPI.h>
+#include <SD.h>
+#define FILEOBJ File
+#else
+#undef ENABLE_FS
+#endif
+#endif
+
+#if defined(ENABLE_FS)
+
+#if (defined(ESP8266) || defined(CORE_ARDUINO_PICO)) || (defined(ESP32) && __has_include(<SPIFFS.h>))
+#ifndef FLASH_SUPPORTS
+#define FLASH_SUPPORTS
+#endif
+#define FILE_OPEN_MODE_READ "r"
+#define FILE_OPEN_MODE_WRITE "w"
+#define FILE_OPEN_MODE_APPEND "a"
+
+#elif __has_include(<SD.h>) && __has_include(<SPI.h>)
+
+#define FILE_OPEN_MODE_READ FILE_READ
+#define FILE_OPEN_MODE_WRITE FILE_WRITE
+#define FILE_OPEN_MODE_APPEND FILE_WRITE
+
+#endif
+
+#endif
+
+#if __has_include(<time.h>)
+#include <time.h>
+#endif
+
 
 #if defined(ENABLE_OTA) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
 #if defined(ESP32)

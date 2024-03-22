@@ -495,7 +495,7 @@ protected:
         str += parent.getProjectId();
         addDatabasePath(str);
         str += '/';
-        str += parent.getProjectId().length() > 0 ? parent.getProjectId() : FPSTR("(default)");
+        str += parent.getDatabaseId().length() > 0 ? parent.getDatabaseId() : FPSTR("(default)");
         addDocsPath(str);
         return str;
     }

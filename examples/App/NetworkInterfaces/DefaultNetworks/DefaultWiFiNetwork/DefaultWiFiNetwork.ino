@@ -41,10 +41,6 @@
 
 #include <FirebaseClient.h>
 
-#if __has_include(<WiFiClientSecure.h>)
-#include <WiFiClientSecure.h>
-#endif
-
 #define WIFI_SSID1 "WIFI_AP1"
 #define WIFI_PASSWORD1 "WIFI_PASSWORD1"
 
@@ -72,8 +68,10 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in 
 FirebaseApp app;
 
 #if __has_include(<WiFiClientSecure.h>)
+#include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
 #elif __has_include(<WiFiSSLClient.h>)
+#include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
 

@@ -72,11 +72,9 @@ const char gprsPass[] = "";
 #define SD_SCLK 14
 #define SD_CS 13
 
+// Include TinyGsmClient.h first and followed by FirebaseClient.h
 #include <TinyGsmClient.h>
 #include <FirebaseClient.h>
-
-// https://github.com/mobizt/ESP_SSLClient
-#include <ESP_SSLClient.h>
 
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
@@ -103,6 +101,8 @@ FirebaseApp app;
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(gsm_network));
+
+void asyncCB(AsyncResult &aResult);
 
 void setup()
 {
