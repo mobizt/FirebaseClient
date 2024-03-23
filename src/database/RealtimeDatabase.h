@@ -1,5 +1,5 @@
 /**
- * Created March 18, 2024
+ * Created March 23, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -66,29 +66,27 @@ public:
 
     /**
      * Get value at the node path.
+     *
+     * ### Example
+     * ```cpp
+     * String json = Database.get<String>(aClient, "/path/to/data");
+     * ```
      * @param aClient The async client.
      * @param path The node path to get value.
      * @return value that casts from response payload.
      *
-     * Example:
-     *
-     * String json = Database.get<String>(aClient, "/path/to/data");
      */
-    template <typename T1 = int>
-    auto get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T1, void>::value && !std::is_same<T1, AsyncResult>::value, T1>::type
+    template <typename T = int>
+    auto get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
     {
         AsyncResult result;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, nullptr, &result, NULL);
         asyncRequest(aReq);
-        return result.rtdbResult.to<T1>();
+        return result.rtdbResult.to<T>();
     }
 
     /**
      * Get value at the node path.
-     * @param aClient The async client.
-     * @param path The node path to get value.
-     * @param options The database options (DatabaseOptions).
-     * @return value that casts from response payload.
      *
      * The DatabaseOptions related to the Conditional Requests and Query Parameters supported by
      * Firebase Realtime Database REST API are following.
@@ -110,8 +108,8 @@ public:
      *
      * Filter, the options for complex data filtering which included the properties i.e., orderBy, startAt, endAt, limitToFirst, limitToLast, and equalTo.
      *
-     * Example:
-     *
+     * ### Example
+     * ```cpp
      * DatabaseOptions options;
      * options.filter.orderBy("Data");
      * options.filter.startAt(105);
@@ -119,26 +117,34 @@ public:
      * options.filter.limitToLast(8);
      *
      * String json = Database.get<String>(aClient, "/path/to/data", options);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to get value.
+     * @param options The database options (DatabaseOptions).
+     * @return value that casts from response payload.
+     *
      */
-    template <typename T1 = int>
-    auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T1, void>::value && !std::is_same<T1, AsyncResult>::value, T1>::type
+    template <typename T = int>
+    auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
     {
         AsyncResult result;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, false, false, options.shallow), &options, nullptr, &result, NULL);
         asyncRequest(aReq);
-        return result.rtdbResult.to<T1>();
+        return result.rtdbResult.to<T>();
     }
 
     /**
      * Get value at the node path.
+     *
+     * ### Example
+     * ```cpp
+     * Database.get(aClient, "/path/to/data", aResult);
+     * ```
      * @param aClient The async client.
      * @param path The node path to get value.
      * @param aResult The async result (AsyncResult)
      * @param sse The Server-sent events (Stream) mode
      *
-     * Example:
-     *
-     * Database.get(aClient, "/path/to/data", aResult);
      */
     void get(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, bool sse = false)
     {
@@ -148,15 +154,17 @@ public:
 
     /**
      * Get value at the node path.
+     *
+     * ### Example
+     * ```cpp
+     * Database.get(aClient, "/path/to/data", cb);
+     * ```
      * @param aClient The async client.
      * @param path The node path to get value.
      * @param cb The async result callback (AsyncResultCallback).
      * @param sse The Server-sent events (Stream) mode.
      * @param uid The user specified UID of async result (optional).
      *
-     * Example:
-     *
-     * Database.get(aClient, "/path/to/data", cb);
      */
     void get(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "")
     {
@@ -166,14 +174,9 @@ public:
 
     /**
      * Get value at the node path.
-     * @param aClient The async client.
-     * @param path The node path to get value.
-     * @param options The database options (DatabaseOptions).
-     * @param aResult The async result (AsyncResult)
-     * @return value that casts from response payload.
      *
-     * Example:
-     *
+     * ### Example
+     * ```cpp
      * DatabaseOptions options;
      * options.filter.orderBy("Data");
      * options.filter.startAt(105);
@@ -181,6 +184,13 @@ public:
      * options.filter.limitToLast(8);
      *
      * Database.get<String>(aClient, "/path/to/data", options, aResult);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to get value.
+     * @param options The database options (DatabaseOptions).
+     * @param aResult The async result (AsyncResult)
+     * @return value that casts from response payload.
+     *
      */
     void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult)
     {
@@ -190,14 +200,9 @@ public:
 
     /**
      * Get value at the node path.
-     * @param aClient The async client.
-     * @param path The node path to get value.
-     * @param options The database options (DatabaseOptions).
-     * @param cb The async result callback (AsyncResultCallback).
-     * @param uid The user specified UID of async result (optional).
      *
-     * Example:
-     *
+     * ### Example
+     * ```cpp
      * DatabaseOptions options;
      * options.filter.orderBy("Data");
      * options.filter.startAt(105);
@@ -205,6 +210,14 @@ public:
      * options.filter.limitToLast(8);
      *
      * Database.get<String>(aClient, "/path/to/data", options, cb);
+     * ```
+     *
+     * @param aClient The async client.
+     * @param path The node path to get value.
+     * @param options The database options (DatabaseOptions).
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
+     *
      */
     void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
@@ -214,14 +227,10 @@ public:
 
     /**
      * Get value at the node path.
-     * @param aClient The async client.
-     * @param path The node path to get value.
-     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
      *
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
-     *
-     * Example of FileConfigCallback when SPIFFS used as filesystem.
+     * ### Example
+     * ```cpp
+     * // Example of FileConfigCallback when SPIFFS used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -244,14 +253,17 @@ public:
      *   }
      * }
      *
-     * @param aResult The async result (AsyncResult)
-     *
-     * Example:
-     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
      * Database.get(aClient, "/path/to/data", getFile(fileConfig), aResult);
+     * ```
      *
+     * @param aClient The async client.
+     * @param path The node path to get value.
+     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
+     * The FileConfig object constructor should be included filename and FileConfigCallback.
+     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * @param aResult The async result (AsyncResult)
      */
     void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
     {
@@ -261,14 +273,10 @@ public:
 
     /**
      * Get value at the node path.
-     * @param aClient The async client.
-     * @param path The node path to get value.
-     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
      *
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
-     *
-     * Example of FileConfigCallback when SPIFFS used as filesystem.
+     * ### Example
+     * ```cpp
+     * // Example of FileConfigCallback when SPIFFS used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -291,14 +299,17 @@ public:
      *   }
      * }
      *
-     * @param cb The async result callback (AsyncResultCallback).
-     * @param uid The user specified UID of async result (optional).
-     *
-     * Example:
-     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
      * Database.get(aClient, "/path/to/data", getFile(fileConfig), cb);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to get value.
+     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
+     * The FileConfig object constructor should be included filename and FileConfigCallback.
+     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      *
      */
     void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
@@ -309,13 +320,15 @@ public:
 
     /**
      * Checks if path exists in database
+     *
+     * ### Example
+     * ```cpp
+     * bool status = Database.existed(aClient, "/path/to/data");
+     * ```
      * @param aClient The async client.
      * @param path The node path to check.
      * @return boolean value indicates the operating status.
      *
-     * Example:
-     *
-     * bool status = Database.existed(aClient, "/path/to/data");
      */
     bool existed(AsyncClientClass &aClient, const String &path)
     {
@@ -329,15 +342,17 @@ public:
 
     /**
      * Perform OTA update using a firmware file from the database.
+     *
+     * The data of node to download should be base64 encoded string of the firmware file.
+     *
+     * ### Example
+     * ```cpp
+     * Database.ota(aClient, "/path/to/data", aResult);
+     * ```
      * @param aClient The async client.
      * @param path The node path to download.
      * @param aResult The async result (AsyncResult)
      *
-     * The data of node to download should be base64 encoded string of the firmware file.
-     *
-     * Example:
-     *
-     * Database.ota(aClient, "/path/to/data", aResult);
      */
     void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
     {
@@ -347,6 +362,11 @@ public:
 
     /**
      * Perform OTA update using a firmware file from the database.
+     *
+     * ### Example
+     * ```cpp
+     * Database.ota(aClient, "/path/to/data", aResult);
+     * ```
      * @param aClient The async client.
      * @param path The node path to download.
      * @param cb The async result callback (AsyncResultCallback).
@@ -354,9 +374,6 @@ public:
      *
      * The data of node to download should be base64 encoded string of the firmware file.
      *
-     * Example:
-     *
-     * Database.ota(aClient, "/path/to/data", aResult);
      */
     void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
     {
@@ -378,9 +395,10 @@ public:
      * The boolean_t is for boolean placeholder e.g. boolean_t(true).
      * The object_t is for JSON and JSON Array objects placeholder e.g. object_t("{\"name\":\"Jack\"}") or object_t("[123,true,\"hello\"]").
      *
-     * Example:
-     *
+     * ### Example
+     * ```cpp
      * bool status = Database.set<number_t>(aClient, "/path/to/data", number_t(123.456789, 3));
+     * ```
      */
     template <typename T = const char *>
     bool set(AsyncClientClass &aClient, const String &path, T value)
@@ -403,9 +421,10 @@ public:
      * The boolean_t is for boolean placeholder e.g. boolean_t(true).
      * The object_t is for JSON and JSON Array objects placeholder e.g. object_t("{\"name\":\"Jack\"}") or object_t("[123,true,\"hello\"]").
      *
-     * Example:
-     *
+     * ### Example
+     * ```cpp
      * Database.set<number_t>(aClient, "/path/to/data", number_t(123.456789, 3), aResult);
+     * ```
      */
     template <typename T = const char *>
     void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
@@ -428,9 +447,10 @@ public:
      * The boolean_t is for boolean placeholder e.g. boolean_t(true).
      * The object_t is for JSON and JSON Array objects placeholder e.g. object_t("{\"name\":\"Jack\"}") or object_t("[123,true,\"hello\"]").
      *
-     * Example:
-     *
+     * ### Example
+     * ```cpp
      * Database.set<number_t>(aClient, "/path/to/data", number_t(123.456789, 3), cb);
+     * ```
      */
     template <typename T = const char *>
     void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
@@ -440,14 +460,10 @@ public:
 
     /**
      * Set content from file to database.
-     * @param aClient The async client.
-     * @param path The node path to get value.
-     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
      *
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
-     *
-     * Example of FileConfigCallback when SPIFFS used as filesystem.
+     * ### Example
+     * ```cpp
+     * // Example of FileConfigCallback when SPIFFS used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -469,15 +485,16 @@ public:
      *     break;
      *   }
      * }
-     *
-     * @param aResult The async result (AsyncResult)
-     *
-     * Example:
-     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
      * Database.set(aClient, "/path/to/data", getFile(fileConfig), aResult);
-     *
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to set value.
+     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
+     * The FileConfig object constructor should be included filename and FileConfigCallback.
+     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * @param aResult The async result (AsyncResult)
      */
     void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
     {
@@ -487,14 +504,10 @@ public:
 
     /**
      * Set content from file to database.
-     * @param aClient The async client.
-     * @param path The node path to get value.
-     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
      *
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
-     *
-     * Example of FileConfigCallback when SPIFFS used as filesystem.
+     * ### Example
+     * ```cpp
+     * // Example of FileConfigCallback when SPIFFS used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -516,16 +529,17 @@ public:
      *     break;
      *   }
      * }
-     *
-     * @param cb The async result callback (AsyncResultCallback).
-     * @param uid The user specified UID of async result (optional).
-     *
-     * Example:
-     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
      * Database.set(aClient, "/path/to/data", getFile(fileConfig), cb);
-     *
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to set value.
+     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
+     * The FileConfig object constructor should be included filename and FileConfigCallback.
+     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      */
     void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
     {
@@ -535,10 +549,6 @@ public:
 
     /**
      * Push value to database.
-     * @param aClient The async client.
-     * @param path The node path to set the value.
-     * @param value The value to set.
-     * @return String name of new node that created.
      *
      * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
      *
@@ -547,9 +557,15 @@ public:
      * The boolean_t is for boolean placeholder e.g. boolean_t(true).
      * The object_t is for JSON and JSON Array objects placeholder e.g. object_t("{\"name\":\"Jack\"}") or object_t("[123,true,\"hello\"]").
      *
-     * Example:
-     *
+     * ### Example
+     * ```cpp
      * String name = Database.push<number_t>(aClient, "/path/to/data", number_t(123.456789, 3));
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to push the value.
+     * @param value The value to push.
+     * @return String name of new node that created.
+     *
      */
     template <typename T = const char *>
     String push(AsyncClientClass &aClient, const String &path, T value)
@@ -565,10 +581,6 @@ public:
 
     /**
      * Push value to database.
-     * @param aClient The async client.
-     * @param path The node path to set the value.
-     * @param value The value to set.
-     * @param aResult The async result (AsyncResult).
      *
      * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
      *
@@ -577,9 +589,14 @@ public:
      * The boolean_t is for boolean placeholder e.g. boolean_t(true).
      * The object_t is for JSON and JSON Array objects placeholder e.g. object_t("{\"name\":\"Jack\"}") or object_t("[123,true,\"hello\"]").
      *
-     * Example:
-     *
+     * ### Example
+     * ```cpp
      * Database.push<number_t>(aClient, "/path/to/data", number_t(123.456789, 3), aResult);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to push the value.
+     * @param value The value to push.
+     * @param aResult The async result (AsyncResult).
      */
     template <typename T = const char *>
     void push(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
@@ -593,11 +610,6 @@ public:
 
     /**
      * Push value to database.
-     * @param aClient The async client.
-     * @param path The node path to set the value.
-     * @param value The value to set.
-     * @param cb The async result callback (AsyncResultCallback).
-     * @param uid The user specified UID of async result (optional).
      *
      * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
      *
@@ -606,9 +618,15 @@ public:
      * The boolean_t is for boolean placeholder e.g. boolean_t(true).
      * The object_t is for JSON and JSON Array objects placeholder e.g. object_t("{\"name\":\"Jack\"}") or object_t("[123,true,\"hello\"]").
      *
-     * Example:
-     *
+     * ### Example
+     * ```cpp
      * Database.push<number_t>(aClient, "/path/to/data", number_t(123.456789, 3), cb);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to push the value.
+     * @param value The value to push.
+     * @param cb The async result callback (AsyncResultCallback).
+     * @param uid The user specified UID of async result (optional).
      */
     template <typename T = const char *>
     void push(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
@@ -622,14 +640,10 @@ public:
 
     /**
      * Push content from file to database.
-     * @param aClient The async client.
-     * @param path The node path to get value.
-     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
      *
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
-     *
-     * Example of FileConfigCallback when SPIFFS used as filesystem.
+     * ### Example
+     * ```cpp
+     * // Example of FileConfigCallback when SPIFFS used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -651,14 +665,16 @@ public:
      *     break;
      *   }
      * }
-     *
-     * @param aResult The async result (AsyncResult)
-     *
-     * Example:
-     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
-     * Database.set(aClient, "/path/to/data", getFile(fileConfig), aResult);
+     * Database.push(aClient, "/path/to/data", getFile(fileConfig), aResult);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to push value.
+     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
+     * The FileConfig object constructor should be included filename and FileConfigCallback.
+     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * @param aResult The async result (AsyncResult)
      *
      */
     void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
@@ -669,14 +685,10 @@ public:
 
     /**
      * Push content from file to database.
-     * @param aClient The async client.
-     * @param path The node path to get value.
-     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
      *
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
-     *
-     * Example of FileConfigCallback when SPIFFS used as filesystem.
+     * ### Example
+     * ```cpp
+     * // Example of FileConfigCallback when SPIFFS used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -698,15 +710,15 @@ public:
      *     break;
      *   }
      * }
-     *
-     * @param cb The async result callback (AsyncResultCallback).
-     * @param uid The user specified UID of async result (optional).
-     *
-     * Example:
-     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
-     * Database.set(aClient, "/path/to/data", getFile(fileConfig), cb);
+     * Database.push(aClient, "/path/to/data", getFile(fileConfig), cb);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to push value.
+     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
+     * The FileConfig object constructor should be included filename and FileConfigCallback.
+     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
      *
      */
     void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
@@ -717,14 +729,16 @@ public:
 
     /**
      * Update (patch) JSON object to database.
+     *
+     * ### Example
+     * ```cpp
+     * bool status = Database.update<object_t>(aClient, "/path/to/data", object_t("{\"name\":\"Jack\"}"));
+     * ```
      * @param aClient The async client.
      * @param path The node path to update.
      * @param value The JSON object (object_t) to update.
      * @return boolean value indicates the operating status.
      *
-     * Example:
-     *
-     * bool status = Database.update<object_t>(aClient, "/path/to/data", object_t("{\"name\":\"Jack\"}"));
      */
     template <typename T = object_t>
     bool update(AsyncClientClass &aClient, const String &path, const T &value)
@@ -735,14 +749,15 @@ public:
 
     /**
      * Update (patch) JSON object to database.
+     *
+     * ### Example
+     * ```cpp
+     * Database.update<object_t>(aClient, "/path/to/data", object_t("{\"name\":\"Jack\"}"), aResult);
+     * ```
      * @param aClient The async client.
      * @param path The node path to update.
      * @param value The JSON object (object_t) to update.
      * @param aResult The async result (AsyncResult).
-     *
-     * Example:
-     *
-     * bool status = Database.update<object_t>(aClient, "/path/to/data", object_t("{\"name\":\"Jack\"}"), aResult);
      */
     template <typename T = object_t>
     void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult)
@@ -752,15 +767,16 @@ public:
 
     /**
      * Update (patch) JSON object to database.
+     *
+     * ### Example
+     * ```cpp
+     * Database.update<object_t>(aClient, "/path/to/data", object_t("{\"name\":\"Jack\"}"), cb);
+     * ```
      * @param aClient The async client.
      * @param path The node path to update.
      * @param value The JSON object (object_t) to update.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
-     *
-     * Example:
-     *
-     * bool status = Database.update<object_t>(aClient, "/path/to/data", object_t("{\"name\":\"Jack\"}"), cb);
      */
     template <typename T = object_t>
     void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "")
@@ -770,13 +786,15 @@ public:
 
     /**
      * Remove node from database
+     *
+     * ### Example
+     * ```cpp
+     * bool status = Database.remove(aClient, "/path/to/data");
+     * ```
      * @param aClient The async client.
      * @param path The node path to remove.
      * @return boolean value indicates the operating status.
      *
-     * Example:
-     *
-     * bool status = Database.remove(aClient, "/path/to/data");
      */
     bool remove(AsyncClientClass &aClient, const String &path)
     {
@@ -788,13 +806,15 @@ public:
 
     /**
      * Remove node from database
+     *
+     * ### Example
+     * ```cpp
+     * bool status = Database.remove(aClient, "/path/to/data", aResult);
+     * ```
      * @param aClient The async client.
      * @param path The node path to remove.
      * @param aResult The async result (AsyncResult).
      *
-     * Example:
-     *
-     * Database.remove(aClient, "/path/to/data", aResult);
      */
     void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
     {
@@ -804,14 +824,15 @@ public:
 
     /**
      * Remove node from database
+     *
+     * ### Example
+     * ```cpp
+     * Database.remove(aClient, "/path/to/data", cb);
+     * ```
      * @param aClient The async client.
      * @param path The node path to remove.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
-     *
-     * Example:
-     *
-     * Database.remove(aClient, "/path/to/data", aResult);
      */
     void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
     {
