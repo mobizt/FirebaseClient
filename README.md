@@ -546,7 +546,7 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 
 - [Examples](examples/RealtimeDatabase/).
 
-- [Class and Functions](/resources/docs/realtime_database.MD).
+- [Class and Functions](/resources/docs/realtime_database.md).
 
 - [API Doc](https://firebase.google.com/docs/reference/rest/database).
 
@@ -554,7 +554,7 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 
 - [Examples](examples/FirestoreDatabase/).
 
-- [Class and Functions](/resources/docs/firestore_database.MD).
+- [Class and Functions](/resources/docs/firestore_database.md).
 
 - [API Doc](https://firebase.google.com/docs/firestore/reference/rest).
 
@@ -562,7 +562,7 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 
 - [Examples](examples/Messaging/).
 
-- [Class and Functions](/resources/docs/messaging.MD).
+- [Class and Functions](/resources/docs/messaging.md).
 
 - [API Doc](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages).
 
@@ -571,13 +571,13 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 
 - [Examples](examples/Storage/).
 
-- [Class and Functions](/resources/docs/storage.MD).
+- [Class and Functions](/resources/docs/storage.md).
 
 ## Google Cloud Storage Usage
 
 - [Examples](examples/CloudStorage/).
 
-- [Class and Functions](/resources/docs/cloud_storage.MD).
+- [Class and Functions](/resources/docs/cloud_storage.md).
 
 - [API Doc](https://cloud.google.com/storage/docs/json_api/v1).
 
@@ -585,7 +585,7 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 
 - [Examples](examples/CloudFunctions/).
 
-- [Class and Functions](/resources/docs/cloud_functions.MD).
+- [Class and Functions](/resources/docs/cloud_functions.md).
 
 - [API Doc](https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions).
 
