@@ -78,12 +78,12 @@ class RealtimeDatabase
 
     - `app_token_t*` - FirebaseApp's app token pointer.
 
-4. ### 🔹 T get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
+4. ### 🔹 T get(AsyncClientClass &aClient, const String &path)
 
     Get value at the node path.
 
     ```cpp
-    T get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
+    T get(AsyncClientClass &aClient, const String &path)
     ```
     **Params:**
     - `aClient` - The async client.
@@ -93,7 +93,7 @@ class RealtimeDatabase
 
     - `T` - The value of type T that casts from response payload.
 
-5. ### 🔹 T get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T1, void>::value && !std::is_same<T1, AsyncResult>::value, T1>::type
+5. ### 🔹 T get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options)
 
     Get value at the node path.
 
@@ -108,7 +108,7 @@ class RealtimeDatabase
     `Filter`, the options for complex data filtering which included the properties i.e., orderBy, startAt, endAt,`limitToFirst`, limitToLast, and equalTo.
 
     ```cpp
-    T get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T1, void>::value && !std::is_same<T1, AsyncResult>::value, T1>::type
+    T get(AsyncClientClass &aClient, const String &path)
     ```
     **Params:**
     - `aClient` - The async client.
