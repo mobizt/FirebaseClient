@@ -44,11 +44,11 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
 - [Networking Data](#networking-data)
 
-- [Authentication and Network classes](#authentication-and-network-classes)
+- [Authentication and Network Classes](#authentication-and-network-classes)
 
-- [File config and Blob config classes](#file-config-and-blob-config-classes)
+- [File config and Blob config Classes](#file-config-and-blob-config-classes)
 
-- [Firebase and Google Services classes](#firebase-and-google-services)
+- [Firebase and Google Services Classes](#firebase-and-google-services)
 
 - [Basic Example](#basic-example)
 
@@ -232,7 +232,7 @@ Non-authentication (for testing only) and user management classes and functions 
 
 ### Firebase and Google Services
 
-The Firebase and Google services classes that are available are Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Cloud Functions and Google Cloud Storage classes.
+The Firebase and Google services Classes that are available are Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Cloud Functions and Google Cloud Storage classes.
 
 This library used internal millis timer to handle the token time to live. Then device time setting is not requierd in most authentication types.
 
@@ -297,7 +297,7 @@ The other known networks (Ethernet and GSM) class are also available.
 
 The user defined or generic networks are supported by assigning the ntwork connection and status callacks in its class constructor.
 
-### Authentication and Network classes
+### Authentication and Network Classes
 
 Here is the list of the authentication and network classes that described above.
 
@@ -337,7 +337,7 @@ Here is the list of the authentication and network classes that described above.
 
 [AsyncTCPConfig](examples/AsyncTCP/AsyncTCP.ino) is for async SSL client data.
 
-### File config and Blob config classes
+### File config and Blob config Classes
 
 [FileConfig](examples/App/AppInitialization/SaveAndLoad/) is for aync and sync operations that holds the TCP session, async data queue of http request and response.
 
