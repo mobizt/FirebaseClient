@@ -8,7 +8,7 @@
 
 ## Google Cloud Firestore Database Usage
 
-- [Examples](examples/FirestoreDatabase).
+- [Examples](/examples/FirestoreDatabase).
 
 - [Class and Functions](/resources/docs/firestore_database.md).
 
@@ -16,7 +16,7 @@
 
 ## Google Cloud Messaging Usage
 
-- [Examples](examples/Messaging).
+- [Examples](/examples/Messaging).
 
 - [Class and Functions](/resources/docs/messaging.md).
 
@@ -25,13 +25,13 @@
 
 ## Firebase Storage Usage
 
-- [Examples](examples/Storage).
+- [Examples](/examples/Storage).
 
 - [Class and Functions](/resources/docs/storage.md).
 
 ## Google Cloud Storage Usage
 
-- [Examples](examples/CloudStorage).
+- [Examples](/examples/CloudStorage).
 
 - [Class and Functions](/resources/docs/cloud_storage.md).
 
@@ -39,7 +39,7 @@
 
 ## Google Cloud Functions Usage
 
-- [Examples](examples/CloudFunctions).
+- [Examples](/examples/CloudFunctions).
 
 - [Class and Functions](/resources/docs/cloud_functions.md).
 
