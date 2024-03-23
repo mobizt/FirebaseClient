@@ -74,10 +74,6 @@
 #include <WiFiS3.h>
 #endif
 
-#if defined(ESP32)
-#include <SPIFFS.h>
-#endif
-
 #include <FirebaseClient.h>
 
 #if defined(ENABLE_FS) // Defined in this library
@@ -169,7 +165,7 @@ void setup()
 
 #if defined(ENABLE_FS)
     // Check if auth file exists.
-    if (SPIFFS.exists(getFile(user_auth_file).filename.c_str()))
+    if (MY_FS.exists(getFile(user_auth_file).filename.c_str()))
     {
         // Load auth config from file.
         UserAuth user_auth_file(getFile(user_auth_file));

@@ -6,7 +6,7 @@
  * -D FIREBASE_DISABLE_ALL_OPTIONS
  */
 
-/**📍 For RTDB class compilation
+/**📍 For RTDB compilation
  * ⛔ Use following build flag to disable.
  * -D DISABLE_DATABASE
  */
@@ -42,7 +42,7 @@
  */
 #define ENABLE_CLOUD_STORAGE
 
-/**📍 For Functions for Firebase compilation
+/**📍 For Google Cloud Functions compilation
  * ⛔ Use following build flag to disable.
  * -D DISABLE_FUNCTIONS
  */
@@ -121,7 +121,7 @@
  * 🏷️ For maximum async queue limit setting for an async client
  * #define FIREBASE_ASYNC_QUEUE_LIMIT 10
  * 
- * 🏷️ For Printf debug port
+ * 🏷️ For Firebase.printf debug port
  * #define FIREBASE_PRINTF_PORT Serial
  */
 
