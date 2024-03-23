@@ -1,6 +1,6 @@
 ## Realtime Database Usage
 
-- [Examples](examples/RealtimeDatabase).
+- [Examples](/examples/RealtimeDatabase).
 
 - [Class and Functions](/resources/docs/realtime_database.md).
 
