@@ -10,19 +10,6 @@ This library is the new Firebase Client library that supports both sync and asyn
 
 This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client) library replacement.
 
-
-## Features
-
-* Simple APIs.
-
-* Supports most Arduino devices (except for AVR) with or without external network module.
-
-* Supports most Firebase Services included Google Cloud Storage.
-
-* Supports synchronous and asynchronous operations.
-
-* Faster and more reliable than [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client) library.
-
 ## Contents
 
 [1. Features](#features)
