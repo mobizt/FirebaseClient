@@ -3,7 +3,7 @@
 
 ## Description
 
-Realtime database operating class
+Realtime database class
 
 
 ```cpp
