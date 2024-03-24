@@ -1,4 +1,10 @@
 # FirebaseClient
+
+[![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
+
+![arduino-library-badge](https://www.ardu-badge.com/badge/FirebaseClient.svg) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg)
+
+
 Async Firebase Client library for Arduino.
 
 This library supports Firebase Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Google Cloud Storage and Google Cloud Functions.
@@ -200,7 +206,7 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 
 ### Indroduction
 
-There are classes or objects that used for required operations and data in this library e.g. authentication and auth data, netorking data, Firebase service apps and Firebase service apps data.
+There are classes or objects that used for required operations and data in this library e.g. authentication and auth data, networking data, Firebase service apps and Firebase service apps data.
 
 ### Authentication
 
@@ -325,7 +331,7 @@ Here is the list of the authentication and network classes that described above.
 
 [DefaultEthernetNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultEthernetNetwork) is for core Ethernet enabled networking.
 
-[DefaultWiFiNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultWiFiNetwork/DefaultWiFiNetwork.ino) is for core WiFi Multi enabled networking or non-core WiFi netowking.
+[DefaultWiFiNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultWiFiNetwork/DefaultWiFiNetwork.ino) is for core WiFi Multi enabled networking or non-core WiFi netwowking.
 
 [EthernetNetwork](examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) is for non-core Ethernet networking.
 
@@ -344,7 +350,7 @@ Here is the list of the authentication and network classes that described above.
 [BlobConfig](examples/RealtimeDatabase/Extras/BLOB/BLOB.ino) is for aync and sync operations that holds the TCP session, async data queue of http request and response.
 
 
-### Firebase and Google Services classes
+### Firebase and Google Services Classes
 
 
 [RealtimeDatabase](examples/RealtimeDatabase/) is for Realtime database operation.
