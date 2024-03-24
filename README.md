@@ -1,6 +1,6 @@
 # FirebaseClient
 
-[![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
+![Compile](https://github.com/mobizt/FirebaseClient/actions/workflows/compile_library.yml/badge.svg) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
 ![arduino-library-badge](https://www.ardu-badge.com/badge/FirebaseClient.svg) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg)
 

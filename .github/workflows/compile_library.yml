@@ -1,0 +1,98 @@
+name: Compile Library
+
+on:
+  push:
+    paths-ignore:
+      - '.github/workflows/cpp_lint.yml'
+      - 'examples/**'
+  pull_request:
+    paths-ignore:
+      - '.github/workflows/cpp_lint.yml'
+      - 'examples/**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        board: 
+          - "d1_mini"
+          - "nodemcuv2"
+          - "esp32dev"
+          - "lolin32"
+          - "mkrwifi1010"
+          - "bluepill_f103c8_128k"
+          - "mkr1000USB"
+          - "teensy41"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+    - name: Cache PlatformIO
+      uses: actions/cache@v2
+      with:
+        path: ~/.platformio
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+    - name: Set up Python
+      uses: actions/setup-python@v2
+
+    - name: Install PlatformIO
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade platformio
+
+
+    - name: Create main file
+      run: |
+        echo "#include <Arduino.h>" >> src/main.ino
+        echo "void setup() {}" >> src/main.ino
+        echo "void loop() {}" >> src/main.ino
+
+    - name: Run PlatformIO
+      run: pio ci --board=${{ matrix.board }} src
+
+  picow:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+    - name: Cache PlatformIO
+      uses: actions/cache@v2
+      with:
+        path: ~/.platformio
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+    - name: Set up Python
+      uses: actions/setup-python@v2
+    - name: Install PlatformIO
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade platformio
+
+    - name: Create main file
+      run: |
+        echo "#include <Arduino.h>" >> src/main.ino
+        echo "void setup() {}" >> src/main.ino
+        echo "void loop() {}" >> src/main.ino
+        echo "[env:rpipicow]" >> platformio.ini
+        echo "platform = https://github.com/maxgerhardt/platform-raspberrypi.git" >> platformio.ini
+        echo "board = rpipicow" >> platformio.ini
+        echo "framework = arduino" >> platformio.ini
+        echo "board_build.core = earlephilhower" >> platformio.ini
+
+
+    - name: Run PlatformIO
+      run: pio ci --project-conf="platformio.ini" src
+ 
