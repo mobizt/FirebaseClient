@@ -507,6 +507,9 @@ void loop()
     /////////////////////////////////////
     if (app.ready() && millis() - to > 3000)
     {
+      
+       to = millis();
+    
        // Get int
        Database.get(aClient, "/test/int", asyncCB);
     }
