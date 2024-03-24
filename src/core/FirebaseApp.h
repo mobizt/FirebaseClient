@@ -1,5 +1,5 @@
 /**
- * Created March 22, 2024
+ * Created March 24, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -41,10 +41,12 @@ namespace firebase
 
     class FirebaseApp
     {
+        friend class RealtimeDatabase;
         friend class FirebaseClient;
-        friend class Database;
-        friend class Firestore;
-        friend class Functions;
+        friend class Databases;
+        friend class Documents;
+        friend class CollectionGroups;
+        friend class CloudFunctions;
         friend class Messaging;
         friend class Storage;
         friend class CloudStorage;

@@ -339,7 +339,7 @@ void loop()
          * this field name does not exist in the document (content), that field will be deleted from remote document
          */
 
-        patchDocumentOptions patchOptions(DocumentMask("count,status") /* updateMask */, DocumentMask() /* mask */, Precondition() /* precondition */);
+        PatchDocumentOptions patchOptions(DocumentMask("count,status") /* updateMask */, DocumentMask() /* mask */, Precondition() /* precondition */);
         
         // You can set the content of doc object directly with doc.setContent("your content")
         

@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created March 24, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -326,13 +326,13 @@ public:
     String getBoundary(bool newLine = false)
     {
         if (boaundary.length() == 0)
-            boaundary = getB(15);
+            boaundary = makeBoundary(15);
         if (newLine)
             return String(boaundary + "\r\n");
         return boaundary;
     }
 
-    String getB(size_t len)
+    String makeBoundary(size_t len)
     {
         Memory mem;
         String temp = FPSTR("=_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");

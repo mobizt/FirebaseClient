@@ -1,5 +1,5 @@
 /**
- * Created March 8, 2024
+ * Created March 24, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -254,7 +254,6 @@ namespace firebase
         friend class IDToken;
         friend class AccessToken;
         friend class CustomToken;
-        friend class AuthRequest;
         friend class JWTClass;
         friend class FirebaseApp;
         friend class UserTokenFileParser;

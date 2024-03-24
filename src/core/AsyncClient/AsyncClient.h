@@ -166,10 +166,10 @@ public:
 class AsyncClientClass
 {
     friend class FirebaseApp;
-    friend class AuthRequest;
     friend class RealtimeDatabase;
-    friend class FirestoreDatabase;
-    friend class FirestoreDocuments;
+    friend class Databases;
+    friend class Documents;
+    friend class CollectionGroups;
     friend class CloudFunctions;
     friend class Messaging;
     friend class Storage;

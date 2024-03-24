@@ -1,5 +1,5 @@
 /**
- * Created March 19, 2024
+ * Created March 24, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -277,7 +277,7 @@ protected:
         asyncRequest(aReq);
     }
 
-    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, bool async)
+    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Firestore::Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_patch_doc;

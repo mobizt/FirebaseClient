@@ -1,5 +1,5 @@
 /**
- * Created March 19, 2024
+ * Created March 24, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -74,7 +74,7 @@ class DocumentMask : public Printable
 {
     friend class FirestoreBase;
     friend class GetDocumentOptions;
-    friend class patchDocumentOptions;
+    friend class PatchDocumentOptions;
     friend class ListDocumentsOptions;
     friend class Documents;
 
@@ -1050,14 +1050,14 @@ public:
     void clear() { owriter.clearBuf(buf, bufSize); }
 };
 
-class patchDocumentOptions : public Printable
+class PatchDocumentOptions : public Printable
 {
 private:
     String buf;
     URLHelper uh;
 
 public:
-    patchDocumentOptions(DocumentMask updateMask, DocumentMask mask, Precondition currentDocument)
+    PatchDocumentOptions(DocumentMask updateMask, DocumentMask mask, Precondition currentDocument)
     {
         bool hasParam = false;
         if (strlen(updateMask.c_str()))

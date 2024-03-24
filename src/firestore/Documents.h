@@ -1,5 +1,5 @@
 /**
- * Created March 19, 2024
+ * Created March 24, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -840,7 +840,7 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
-         * @param patchOptions The patchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
+         * @param patchOptions The PatchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
          * 
          * updateMask is he fields to update. If the document exists on the server and has fields not referenced in the mask,
          * they are left unchanged.
@@ -864,7 +864,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
+        bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document)
         {
             AsyncResult result;
             patchDoc(aClient, &result, NULL, "", parent, documentPath, patchOptions, document, false);
@@ -878,7 +878,7 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
-         * @param patchOptions The patchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
+         * @param patchOptions The PatchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
          * 
          * updateMask is he fields to update. If the document exists on the server and has fields not referenced in the mask,
          * they are left unchanged.
@@ -902,7 +902,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
+        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
         {
             patchDoc(aClient, &aResult, NULL, "", parent, documentPath, patchOptions, document, true);
         }
@@ -914,7 +914,7 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
-         * @param patchOptions The patchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
+         * @param patchOptions The PatchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
          * 
          * updateMask is he fields to update. If the document exists on the server and has fields not referenced in the mask,
          * they are left unchanged.
@@ -939,7 +939,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
+        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
         {
             patchDoc(aClient, nullptr, cb, uid, parent, documentPath, patchOptions, document, true);
         }

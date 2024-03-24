@@ -53,7 +53,6 @@ namespace firebase
 {
     struct app_event_t
     {
-        friend class AuthRequest;
 
     private:
         String ev_msg;
@@ -73,13 +72,7 @@ namespace firebase
     {
         friend class AsyncResult;
         friend class AsyncClientClass;
-        friend class Database;
-        friend class Firesrore;
-        friend class Messaging;
-        friend class Functions;
-        friend class Storage;
-        friend class CloudStorage;
-
+        
         enum event_resume_status_t
         {
             event_resume_status_undefined,
@@ -199,7 +192,6 @@ class AsyncResult
 {
     friend class AsyncClientClass;
     friend class FirebaseApp;
-    friend class AuthRequest;
     friend class RealtimeDatabase;
     friend class Messaging;
     friend class Functions;
