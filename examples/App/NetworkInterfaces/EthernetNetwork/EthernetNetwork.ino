@@ -71,6 +71,8 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
+// This is a library internal SSL client.
+// You can use any SSL Client that works with Ethernet library.
 ESP_SSLClient ssl_client;
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change

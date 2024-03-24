@@ -242,6 +242,8 @@ TinyGsm modem(SerialAT);
 TinyGsmClient gsm_client1(modem, 0);
 TinyGsmClient gsm_client2(modem, 1);
 
+// This is the library internal SSL clients.
+// You can use any SSL Client that works with Ethernet library.
 ESP_SSLClient ssl_client1, ssl_client2;
 
 GSMNetwork gsm_network(&modem, GSM_PIN, apn, gprsUser, gprsPass);
