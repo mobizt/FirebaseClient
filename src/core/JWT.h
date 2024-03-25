@@ -1,5 +1,5 @@
 /**
- * Created March 22, 2024
+ * Created March 25, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -41,7 +41,7 @@
 #if __has_include(<ESP_SSLClient.h>)
 #include <ESP_SSLClient.h>
 #else
-#include "./core/SSLClient/ESP_SSLClient.h"
+#include "./client/SSLClient/ESP_SSLClient.h"
 #endif
 
 using namespace firebase;
