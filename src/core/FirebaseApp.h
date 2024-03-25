@@ -62,7 +62,7 @@ namespace firebase
         List vec;
         bool processing = false;
         uint32_t expire = 3600;
-        JsonHelper json;
+        JSONUtil json;
         String extras, subdomain, host;
         slot_options_t sop;
 
@@ -76,9 +76,9 @@ namespace firebase
 
 #endif
 
-        bool parseItem(StringHelper &sh, const String &src, String &dest, const String &name, const String &delim, int &p1, int &p2)
+        bool parseItem(StringUtil &sut, const String &src, String &dest, const String &name, const String &delim, int &p1, int &p2)
         {
-            sh.parse(src, name, delim, p1, p2);
+            sut.parse(src, name, delim, p1, p2);
             if (p1 > -1 && p2 > -1)
             {
                 if (src[p1] == '"')
@@ -95,9 +95,9 @@ namespace firebase
         }
 
         template <typename T = int>
-        bool parseItem(StringHelper &sh, const String &src, T &dest, const String &name, const String &delim, int &p1, int &p2)
+        bool parseItem(StringUtil &sut, const String &src, T &dest, const String &name, const String &delim, int &p1, int &p2)
         {
-            sh.parse(src, name, delim, p1, p2);
+            sut.parse(src, name, delim, p1, p2);
             if (p1 > -1 && p2 > -1)
             {
                 if (src[p1] == '"')
@@ -115,7 +115,7 @@ namespace firebase
 
         bool parseToken(const String &payload)
         {
-            StringHelper sh;
+            StringUtil sut;
             int p1 = 0, p2 = 0;
             auth_data.app_token.clear();
             String token, refresh;
@@ -123,15 +123,15 @@ namespace firebase
             if (payload.indexOf("\"error\"") > -1)
             {
                 String str;
-                if (parseItem(sh, payload, str, "\"error\"", auth_data.user_auth.auth_type == auth_user_id_token || auth_data.user_auth.auth_type == auth_sa_custom_token ? "}" : ",", p1, p2))
+                if (parseItem(sut, payload, str, "\"error\"", auth_data.user_auth.auth_type == auth_user_id_token || auth_data.user_auth.auth_type == auth_sa_custom_token ? "}" : ",", p1, p2))
                 {
                     int code = 0;
                     str = "";
                     p1 = 0;
                     p2 = 0;
-                    parseItem(sh, payload, code, "\"code\"", ",", p1, p2);
-                    parseItem(sh, payload, str, "\"message\"", ",", p1, p2);
-                    parseItem(sh, payload, str, "\"error_description\"", "}", p1, p2);
+                    parseItem(sut, payload, code, "\"code\"", ",", p1, p2);
+                    parseItem(sut, payload, str, "\"message\"", ",", p1, p2);
+                    parseItem(sut, payload, str, "\"error_description\"", "}", p1, p2);
                     if (str[str.length() - 1] == '"')
                         str[str.length() - 1] = '\0';
                     setLastError(sData ? &sData->aResult : nullptr, code, str);
@@ -139,34 +139,34 @@ namespace firebase
             }
             else if (payload.indexOf("\"idToken\"") > -1)
             {
-                parseItem(sh, payload, auth_data.app_token.val[app_tk_ns::uid], "\"localId\"", ",", p1, p2);
+                parseItem(sut, payload, auth_data.app_token.val[app_tk_ns::uid], "\"localId\"", ",", p1, p2);
                 p1 = 0;
                 p2 = 0;
-                sh.trim(auth_data.app_token.val[app_tk_ns::uid]);
-                if (parseItem(sh, payload, token, "\"idToken\"", ",", p1, p2))
+                sut.trim(auth_data.app_token.val[app_tk_ns::uid]);
+                if (parseItem(sut, payload, token, "\"idToken\"", ",", p1, p2))
                 {
-                    sh.trim(token);
-                    parseItem(sh, payload, refresh, "\"refreshToken\"", ",", p1, p2);
-                    sh.trim(refresh);
-                    parseItem(sh, payload, auth_data.app_token.expire, "\"expiresIn\"", "}", p1, p2);
+                    sut.trim(token);
+                    parseItem(sut, payload, refresh, "\"refreshToken\"", ",", p1, p2);
+                    sut.trim(refresh);
+                    parseItem(sut, payload, auth_data.app_token.expire, "\"expiresIn\"", "}", p1, p2);
                 }
             }
             else if (payload.indexOf("\"id_token\"") > -1)
             {
-                parseItem(sh, payload, auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
-                parseItem(sh, payload, refresh, "\"refresh_token\"", ",", p1, p2);
-                parseItem(sh, payload, token, "\"id_token\"", ",", p1, p2);
-                parseItem(sh, payload, auth_data.app_token.val[app_tk_ns::uid], "\"user_id\"", ",", p1, p2);
-                sh.trim(refresh);
-                sh.trim(token);
-                sh.trim(auth_data.app_token.val[app_tk_ns::uid]);
+                parseItem(sut, payload, auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
+                parseItem(sut, payload, refresh, "\"refresh_token\"", ",", p1, p2);
+                parseItem(sut, payload, token, "\"id_token\"", ",", p1, p2);
+                parseItem(sut, payload, auth_data.app_token.val[app_tk_ns::uid], "\"user_id\"", ",", p1, p2);
+                sut.trim(refresh);
+                sut.trim(token);
+                sut.trim(auth_data.app_token.val[app_tk_ns::uid]);
             }
             else if (payload.indexOf("\"access_token\"") > -1)
             {
-                if (parseItem(sh, payload, token, "\"access_token\"", ",", p1, p2))
+                if (parseItem(sut, payload, token, "\"access_token\"", ",", p1, p2))
                 {
-                    parseItem(sh, payload, auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
-                    parseItem(sh, payload, auth_data.app_token.val[app_tk_ns::type], "\"token_type\"", "}", p1, p2);
+                    parseItem(sut, payload, auth_data.app_token.expire, "\"expires_in\"", ",", p1, p2);
+                    parseItem(sut, payload, auth_data.app_token.val[app_tk_ns::type], "\"token_type\"", "}", p1, p2);
                 }
             }
 

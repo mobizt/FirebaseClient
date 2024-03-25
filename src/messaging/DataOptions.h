@@ -192,7 +192,7 @@ namespace Messages
         size_t bufSize = 25;
         String buf[25];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
         AndroidNotification &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
             owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
@@ -308,14 +308,14 @@ namespace Messages
     {
     private:
         String buf;
-        JsonHelper jh;
+        JSONUtil jut;
 
     public:
         // Label associated with the message's analytics data.
         AndroidFcmOptions &analytics_label(const String &value)
         {
             clear();
-            jh.addObject(buf, "analytics_label", value, true, true);
+            jut.addObject(buf, "analytics_label", value, true, true);
             return *this;
         }
         const char *c_str() const { return buf.c_str(); }
@@ -332,7 +332,7 @@ namespace Messages
         size_t bufSize = 3;
         String buf[3];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
         WebpushFcmOptions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
             owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
@@ -356,14 +356,14 @@ namespace Messages
     {
     private:
         String buf;
-        JsonHelper jh;
+        JSONUtil jut;
 
     public:
         // Label associated with the message's analytics data.
         FcmOptions &analytics_label(const String &value)
         {
             clear();
-            jh.addObject(buf, "analytics_label", value, true, true);
+            jut.addObject(buf, "analytics_label", value, true, true);
             return *this;
         }
         const char *c_str() const { return buf.c_str(); }
@@ -380,7 +380,7 @@ namespace Messages
         size_t bufSize = 5;
         String buf[5];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
         WebpushConfig &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
             owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
@@ -412,7 +412,7 @@ namespace Messages
         size_t bufSize = 3;
         String buf[3];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
         ApnsFcmOptions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
             owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
@@ -438,7 +438,7 @@ namespace Messages
         size_t bufSize = 4;
         String buf[4];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
         ApnsConfig &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
             owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);

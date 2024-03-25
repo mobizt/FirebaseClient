@@ -411,9 +411,9 @@ private:
         }
         else if (requestType == FirebaseStorage::firebase_storage_request_type_upload || requestType == FirebaseStorage::firebase_storage_request_type_delete)
         {
-            URLHelper uh;
+            URLUtil uut;
             options.extras += "?name=";
-            options.extras += uh.encode(parent.getObject());
+            options.extras += uut.encode(parent.getObject());
 
             if (requestType == FirebaseStorage::firebase_storage_request_type_delete)
                 method = async_request_handler_t::http_delete;
@@ -443,9 +443,9 @@ private:
 
         if (request.method == async_request_handler_t::http_get)
         {
-            URLHelper uh;
+            URLUtil uut;
             request.path += "/";
-            request.path += uh.encode(request.options->parent.getObject());
+            request.path += uut.encode(request.options->parent.getObject());
         }
 
         addParams(request, extras);
@@ -483,8 +483,8 @@ private:
             if (sData->request.file_data.file_size == 0)
                 return setClientError(request, FIREBASE_ERROR_FILE_READ);
 
-            URLHelper uh;
-            sData->aResult.upload_data.downloadUrl = uh.downloadURL(request.options->parent.getBucketId(), request.options->parent.getObject());
+            URLUtil uut;
+            sData->aResult.upload_data.downloadUrl = uut.downloadURL(request.options->parent.getBucketId(), request.options->parent.getObject());
         }
         else if (request.options->payload.length())
         {

@@ -74,11 +74,11 @@ namespace firebase
 
     private:
         Memory mem;
-        StringHelper sh;
-        Base64Helper bh;
-        URLHelper uh;
+        StringUtil sut;
+        Base64Util but;
+        URLUtil uut;
         String payload;
-        JsonHelper json;
+        JSONUtil json;
         jwt_token_data_t jwt_data;
         Timer err_timer;
         auth_data_t *auth_data = nullptr;

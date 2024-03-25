@@ -36,12 +36,12 @@
 #define FIREBASE_STRSEP strsep
 #endif
 
-class StringHelper
+class StringUtil
 {
 
 public:
-    StringHelper() {}
-    ~StringHelper() {}
+    StringUtil() {}
+    ~StringUtil() {}
 
 #if defined(FIREBASE_USE_STRSEP_IMPL)
     char *strsepImpl(char **stringp, const char *delim)

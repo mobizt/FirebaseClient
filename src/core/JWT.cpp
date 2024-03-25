@@ -188,7 +188,7 @@ bool JWTClass::create()
             String buri;
             String host;
             jwt_add_gapis_host(host, "www");
-            uh.host2Url(buri, host);
+            uut.host2Url(buri, host);
             buri += FPSTR("/auth/");
 
             String s = buri; // https://www.googleapis.com/auth/
@@ -220,7 +220,7 @@ bool JWTClass::create()
                 int i = 0;
                 while (pp != NULL)
                 {
-                    sh.strsepImpl(&end, ",");
+                    sut.strsepImpl(&end, ",");
                     if (strlen(pp) > 0)
                     {
                         tmp = pp;
@@ -243,9 +243,9 @@ bool JWTClass::create()
                 json.addObject(payload, "claims", auth_data->user_auth.cust.val[cust_ns::claims], true, true);
         }
 
-        len = bh.encodedLength(payload.length());
+        len = but.encodedLength(payload.length());
         char *buf = reinterpret_cast<char *>(mem.alloc(len));
-        bh.encodeUrl(mem, buf, (unsigned char *)payload.c_str(), payload.length());
+        but.encodeUrl(mem, buf, (unsigned char *)payload.c_str(), payload.length());
         payload.remove(0, payload.length());
         jwt_data.token += '.';
         jwt_data.token += buf;
@@ -305,9 +305,9 @@ bool JWTClass::create()
         if (jwt_data.hash)
             mem.release(&jwt_data.hash);
 
-        size_t len = bh.encodedLength(256);
+        size_t len = but.encodedLength(256);
         char *buf = reinterpret_cast<char *>(mem.alloc(len));
-        bh.encodeUrl(mem, buf, jwt_data.signature, 256);
+        but.encodeUrl(mem, buf, jwt_data.signature, 256);
 
         delete pk;
         pk = nullptr;

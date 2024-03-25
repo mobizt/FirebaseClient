@@ -449,9 +449,9 @@ private:
         }
         else if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_uploads)
         {
-            URLHelper uh;
+            URLUtil uut;
             options.extras += "?name=";
-            options.extras += uh.encode(parent.getObject());
+            options.extras += uut.encode(parent.getObject());
 
             if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_uploads)
             {
@@ -520,9 +520,9 @@ private:
 
         if ((request.method == async_request_handler_t::http_get || request.method == async_request_handler_t::http_delete) && request.options->parent.getObject().length())
         {
-            URLHelper uh;
+            URLUtil uut;
             request.path += "/";
-            request.path += uh.encode(request.options->parent.getObject());
+            request.path += uut.encode(request.options->parent.getObject());
         }
 
         addParams(request, extras);
@@ -573,10 +573,10 @@ private:
                     request.aClient->setContentType(sData, "multipart/related; boundary=" + sData->request.file_data.multipart.getBoundary());
 
                     ObjectWriter owriter;
-                    JsonHelper jh;
+                    JSONUtil jut;
                     String name, mime;
-                    jh.addObject(name, "name", request.options->parent.getObject(), true, true);
-                    jh.addObject(mime, "contentType", request.mime, true, true);
+                    jut.addObject(name, "name", request.options->parent.getObject(), true, true);
+                    jut.addObject(mime, "contentType", request.mime, true, true);
                     owriter.addMember(request.options->payload, name, "}");
                     owriter.addMember(request.options->payload, mime, "}");
                     sData->request.file_data.multipart.setOptions(request.options->payload);
@@ -600,8 +600,8 @@ private:
 
             if (request.options->extras.indexOf("uploadType=media") == -1)
             {
-                URLHelper uh;
-                sData->aResult.upload_data.downloadUrl = uh.downloadURL(request.options->parent.getBucketId(), request.options->parent.getObject());
+                URLUtil uut;
+                sData->aResult.upload_data.downloadUrl = uut.downloadURL(request.options->parent.getBucketId(), request.options->parent.getObject());
             }
         }
         else if (request.options->payload.length())

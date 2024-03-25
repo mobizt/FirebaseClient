@@ -190,7 +190,7 @@ private:
     bool sse = false;
     std::vector<uint32_t> sVec;
     Memory mem;
-    Base64Helper bh;
+    Base64Util but;
     network_config_data net;
     uint32_t addr = 0;
     bool inProcess = false;
@@ -317,7 +317,7 @@ private:
                     sData->request.file_data.data_pos += toSend;
                 }
 
-                uint8_t *temp = (uint8_t *)bh.encodeToChars(mem, buf, toSend);
+                uint8_t *temp = (uint8_t *)but.encodeToChars(mem, buf, toSend);
                 mem.release(&buf);
                 toSend = strlen((char *)temp);
                 buf = temp;
@@ -601,8 +601,8 @@ private:
                 client->stop();
             if (connect(sData, host.c_str(), sData->request.port) > function_return_type_failure)
             {
-                URLHelper uh;
-                uh.relocate(sData->request.val[req_hndlr_ns::header], host, ext);
+                URLUtil uut;
+                uut.relocate(sData->request.val[req_hndlr_ns::header], host, ext);
                 sData->request.val[req_hndlr_ns::payload].remove(0, sData->request.val[req_hndlr_ns::payload].length());
                 sData->state = async_state_send_header;
                 return function_return_type_continue;
@@ -992,9 +992,9 @@ private:
     bool readPayload(async_data_item_t *sData)
     {
         uint8_t *buf = nullptr;
-        OtaHelper oh;
+        OTAUtil otaut;
         Memory mem;
-        Base64Helper bh;
+        Base64Util but;
 
         if (sData->response.flags.payload_remaining)
         {
@@ -1019,7 +1019,7 @@ private:
                             {
                                 if (sData->request.ota)
                                 {
-                                    oh.prepareDownloadOTA(sData->response.payloadLen, sData->request.base64, sData->request.ota_error);
+                                    otaut.prepareDownloadOTA(sData->response.payloadLen, sData->request.base64, sData->request.ota_error);
                                     if (sData->request.ota_error != 0)
                                     {
                                         setAsyncError(sData, async_state_read_response, sData->request.ota_error, !sData->sse, false);
@@ -1072,10 +1072,10 @@ private:
                                 sData->response.payloadRead += read;
                                 if (sData->request.base64)
                                 {
-                                    oh.getPad(buf + ofs, read, sData->request.b64Pad);
+                                    otaut.getPad(buf + ofs, read, sData->request.b64Pad);
                                     if (sData->request.ota)
                                     {
-                                        oh.decodeBase64OTA(mem, &bh, (const char *)buf, read - ofs, sData->request.ota_error);
+                                        otaut.decodeBase64OTA(mem, &but, (const char *)buf, read - ofs, sData->request.ota_error);
                                         if (sData->request.ota_error != 0)
                                         {
                                             setAsyncError(sData, async_state_read_response, sData->request.ota_error, !sData->sse, false);
@@ -1084,7 +1084,7 @@ private:
 
                                         if (sData->request.b64Pad > -1)
                                         {
-                                            oh.endDownloadOTA(sData->request.b64Pad, sData->request.ota_error);
+                                            otaut.endDownloadOTA(sData->request.b64Pad, sData->request.ota_error);
                                             if (sData->request.ota_error != 0)
                                             {
                                                 setAsyncError(sData, async_state_read_response, sData->request.ota_error, !sData->sse, false);
@@ -1096,7 +1096,7 @@ private:
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                     {
 
-                                        if (!bh.decodeToFile(mem, sData->request.file_data.file, (const char *)buf + ofs))
+                                        if (!but.decodeToFile(mem, sData->request.file_data.file, (const char *)buf + ofs))
                                         {
                                             setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_FILE_WRITE, !sData->sse, true);
                                             goto exit;
@@ -1104,17 +1104,17 @@ private:
                                     }
 #endif
                                     else
-                                        bh.decodeToBlob(mem, &sData->request.file_data.outB, (const char *)buf + ofs);
+                                        but.decodeToBlob(mem, &sData->request.file_data.outB, (const char *)buf + ofs);
                                 }
                                 else
                                 {
                                     if (sData->request.ota)
                                     {
-                                        bh.updateWrite(buf, read);
+                                        but.updateWrite(buf, read);
 
                                         if (sData->response.payloadRead == sData->response.payloadLen)
                                         {
-                                            oh.endDownloadOTA(0, sData->request.ota_error);
+                                            otaut.endDownloadOTA(0, sData->request.ota_error);
                                             if (sData->request.ota_error != 0)
                                             {
                                                 setAsyncError(sData, async_state_read_response, sData->request.ota_error, !sData->sse, false);
@@ -1170,8 +1170,8 @@ private:
 
             if (sData->upload)
             {
-                URLHelper uh;
-                uh.updateDownloadURL(sData->aResult.upload_data.downloadUrl, sData->response.val[res_hndlr_ns::payload]);
+                URLUtil uut;
+                uut.updateDownloadURL(sData->aResult.upload_data.downloadUrl, sData->response.val[res_hndlr_ns::payload]);
             }
 
             if (sData->response.flags.chunks && sData->auth_used)
@@ -1668,7 +1668,7 @@ private:
 #if defined(ENABLE_FS)
         if ((sData->request.file_data.cb && sData->request.file_data.filename.length()) || (sData->request.file_data.data_size && sData->request.file_data.data))
         {
-            Base64Helper bh;
+            Base64Util but;
             size_t sz = 0;
             if (sData->request.file_data.cb)
             {
@@ -1678,7 +1678,7 @@ private:
             else
                 sz = sData->request.file_data.data_size;
 
-            sData->request.file_data.file_size = sData->request.base64 ? 2 + bh.getBase64Len(sz) : sz;
+            sData->request.file_data.file_size = sData->request.base64 ? 2 + but.getBase64Len(sz) : sz;
             if (customHeader.length())
             {
                 sData->request.val[req_hndlr_ns::header] += customHeader;
@@ -1756,8 +1756,8 @@ private:
 #else
         String url = fromReq ? sData->request.val[req_hndlr_ns::url] : sData->response.val[res_hndlr_ns::location];
 #endif
-        URLHelper uh;
-        return uh.getHost(url, ext);
+        URLUtil uut;
+        return uut.getHost(url, ext);
     }
 
     void stopAsyncImpl(bool all = false, const String &uid = "")

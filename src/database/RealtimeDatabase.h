@@ -980,21 +980,21 @@ private:
 
     void addParams(bool hasQueryParams, String &extras, async_request_handler_t::http_request_method method, DatabaseOptions *options, bool isFile)
     {
-        URLHelper uh;
+        URLUtil uut;
 
         if (options)
         {
             if (options->readTimeout > 0)
-                uh.addParam(extras, "timeout", String(options->readTimeout) + "ms", hasQueryParams);
+                uut.addParam(extras, "timeout", String(options->readTimeout) + "ms", hasQueryParams);
 
-            uh.addParam(extras, "writeSizeLimit", options->writeSizeLimit, hasQueryParams);
+            uut.addParam(extras, "writeSizeLimit", options->writeSizeLimit, hasQueryParams);
 
             if (options->shallow)
-                uh.addParam(extras, "shallow", "true", hasQueryParams, true);
+                uut.addParam(extras, "shallow", "true", hasQueryParams, true);
         }
 
         if ((options && options->silent) || ((method == async_request_handler_t::http_put || method == async_request_handler_t::http_post || method == async_request_handler_t::http_patch) && isFile))
-            uh.addParam(extras, "print", "silent", hasQueryParams, true);
+            uut.addParam(extras, "print", "silent", hasQueryParams, true);
 
         if (options && options->filter.complete)
             extras += options->filter.uri;

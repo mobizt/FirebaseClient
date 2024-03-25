@@ -55,7 +55,7 @@ namespace IAMPolicy
         size_t bufSize = 5;
         String buf[5];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         Expr &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -85,7 +85,7 @@ namespace IAMPolicy
         size_t bufSize = 4;
         String buf[4];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         Binding &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -143,7 +143,7 @@ namespace IAMPolicy
         size_t bufSize = 3;
         String buf[3];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         AuditLogConfig &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -184,7 +184,7 @@ namespace IAMPolicy
         size_t bufSize = 5;
         String buf[5];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         AuditConfig &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -215,7 +215,7 @@ namespace IAMPolicy
         size_t bufSize = 5;
         String buf[5];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         Policy &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {

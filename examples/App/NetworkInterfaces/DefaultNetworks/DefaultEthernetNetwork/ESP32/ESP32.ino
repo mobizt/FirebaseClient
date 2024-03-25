@@ -60,9 +60,8 @@
 
 #include <FirebaseClient.h>
 
-#if __has_include(<WiFiClientSecure.h>)
 #include <WiFiClientSecure.h>
-#endif
+
 
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"

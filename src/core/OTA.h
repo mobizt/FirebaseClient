@@ -33,7 +33,7 @@
 #include "./core/Base64.h"
 #include "./core/Error.h"
 
-class OtaHelper
+class OTAUtil
 {
 public:
     void getPad(uint8_t *s, int &len, int8_t &pad)
@@ -60,7 +60,7 @@ public:
         }
     }
 
-    bool decodeBase64OTA(Memory &mem, Base64Helper *bh, const char *src, size_t len, int16_t &code)
+    bool decodeBase64OTA(Memory &mem, Base64Util *but, const char *src, size_t len, int16_t &code)
     {
 
         bool ret = true;
@@ -68,8 +68,8 @@ public:
         uint8_t *buf = reinterpret_cast<uint8_t *>(mem.alloc(out.bufLen));
         out.ota = true;
         out.outT = buf;
-        unsigned char *base64DecBuf = bh->creatBase64DecBuffer(mem);
-        if (!bh->decode<uint8_t>(mem, base64DecBuf, src, strlen(src), out))
+        unsigned char *base64DecBuf = but->creatBase64DecBuffer(mem);
+        if (!but->decode<uint8_t>(mem, base64DecBuf, src, strlen(src), out))
         {
             code = FIREBASE_ERROR_FW_UPDATE_WRITE_FAILED;
             ret = false;
@@ -99,13 +99,13 @@ public:
     {
 
 #if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO))
-        Base64Helper bh;
+        Base64Util but;
         // write extra pad
         if (pad > 0)
         {
             uint8_t buf[pad];
             memset(buf, 0, pad);
-            bh.updateWrite(buf, pad);
+            but.updateWrite(buf, pad);
         }
 
         if (code == 0)

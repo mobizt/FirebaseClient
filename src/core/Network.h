@@ -255,7 +255,7 @@ typedef struct firebase_spi_ethernet_module_t
 
 #endif
 
-} SPI_ETH_Module;
+} Firebase_SPI_ETH_Module;
 
 struct FirebaseWiFi_credential_t
 {

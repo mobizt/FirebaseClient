@@ -61,7 +61,7 @@ struct firebase_base64_io_t
     bool ota = false;
 };
 
-class Base64Helper
+class Base64Util
 {
 public:
     int getBase64Len(int n)

@@ -214,10 +214,10 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif __has_include(<WiFiSSLClient.h>)
+#elif defined(ARDUINO_ARCH_SAMD)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
@@ -229,7 +229,7 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
 WiFiClientSecure ssl_client2;
 #elif __has_include(<WiFiSSLClient.h>)
 WiFiSSLClient ssl_client2;
@@ -265,7 +265,7 @@ void setup()
 
     Serial.println("Initializing app...");
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
     ssl_client2.setInsecure();
 #if defined(ESP8266)

@@ -28,10 +28,10 @@
 #include <Arduino.h>
 #include <Client.h>
 #include "./Config.h"
-#include "./core/StringHelper.h"
+#include "./core/StringUtil.h"
 #include "./core/Memory.h"
 
-class URLHelper
+class URLUtil
 {
 public:
     /* Append a parameter to URL */
@@ -66,7 +66,7 @@ public:
 
         Memory mem;
 
-        StringHelper sh;
+        StringUtil sut;
 
         char *p = reinterpret_cast<char *>(mem.alloc(val.length()));
         strcpy(p, val.c_str());
@@ -75,7 +75,7 @@ public:
         String tmp;
         while (pp != NULL)
         {
-            sh.strsepImpl(&end, ",");
+            sut.strsepImpl(&end, ",");
             if (strlen(pp) > 0)
             {
                 tmp = pp;

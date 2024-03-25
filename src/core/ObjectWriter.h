@@ -35,7 +35,7 @@
 class ObjectWriter
 {
 private:
-    JsonHelper jh;
+    JSONUtil jut;
 
 public:
     void addMember(String &buf, const String &v, const String &token = "}}")
@@ -74,11 +74,11 @@ public:
         if (buf_n.length() == 0)
         {
             String temp;
-            jh.addArray(temp, memberValue, isString, true);
-            jh.addObject(buf_n, key, temp, false, true);
+            jut.addArray(temp, memberValue, isString, true);
+            jut.addObject(buf_n, key, temp, false, true);
         }
         else
-            addMember(buf_n, isString ? jh.toString(memberValue) : memberValue, "]}");
+            addMember(buf_n, isString ? jut.toString(memberValue) : memberValue, "]}");
 
         getBuf(buf, size);
     }
@@ -95,7 +95,7 @@ public:
         if (key.length())
         {
             clear(buf_n);
-            jh.addObject(buf_n, key, value, isString, last);
+            jut.addObject(buf_n, key, value, isString, last);
         }
         getBuf(buf, size);
     }
@@ -111,7 +111,7 @@ public:
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
         buf.remove(0, buf.length());
-        jh.addObject(buf, key, isArrayValue ? getArrayStr(value) : value, false, true);
+        jut.addObject(buf, key, isArrayValue ? getArrayStr(value) : value, false, true);
         return buf.c_str();
     }
     void setBool(String &buf, bool value) { buf = getBoolStr(value); }

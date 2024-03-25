@@ -84,8 +84,8 @@ namespace GoogleCloudStorage
         size_t bufSize = 7;
         String buf[7];
         ObjectWriter owriter;
-        URLHelper uh;
-        StringHelper sh;
+        URLUtil uut;
+        StringUtil sut;
 
         BaseOptions &setBuf()
         {
@@ -105,27 +105,27 @@ namespace GoogleCloudStorage
     public:
         BaseOptions &generation(uint64_t value)
         {
-            buf[1] = "generation=" + sh.u64Str(value);
+            buf[1] = "generation=" + sut.u64Str(value);
             return setBuf();
         }
         BaseOptions &ifGenerationMatch(uint64_t value)
         {
-            buf[2] = "ifGenerationMatch=" + sh.u64Str(value);
+            buf[2] = "ifGenerationMatch=" + sut.u64Str(value);
             return setBuf();
         }
         BaseOptions &ifGenerationNotMatch(uint64_t value)
         {
-            buf[3] = "ifGenerationNotMatch=" + sh.u64Str(value);
+            buf[3] = "ifGenerationNotMatch=" + sut.u64Str(value);
             return setBuf();
         }
         BaseOptions &ifMetagenerationMatch(uint64_t value)
         {
-            buf[4] = "ifMetagenerationMatch=" + sh.u64Str(value);
+            buf[4] = "ifMetagenerationMatch=" + sut.u64Str(value);
             return setBuf();
         }
         BaseOptions &ifMetagenerationNotMatch(uint64_t value)
         {
-            buf[5] = "ifMetagenerationNotMatch=" + sh.u64Str(value);
+            buf[5] = "ifMetagenerationNotMatch=" + sut.u64Str(value);
             return setBuf();
         }
 
@@ -166,7 +166,7 @@ namespace GoogleCloudStorage
         size_t bufSize = 9;
         String buf[9];
         ObjectWriter owriter;
-        StringHelper sh;
+        StringUtil sut;
 
         InsertOptions &setBuf()
         {
@@ -191,22 +191,22 @@ namespace GoogleCloudStorage
         }
         InsertOptions &ifGenerationMatch(uint64_t value)
         {
-            buf[2] = "ifGenerationMatch=" + sh.u64Str(value);
+            buf[2] = "ifGenerationMatch=" + sut.u64Str(value);
             return setBuf();
         }
         InsertOptions &ifGenerationNotMatch(uint64_t value)
         {
-            buf[3] = "ifGenerationNotMatch=" + sh.u64Str(value);
+            buf[3] = "ifGenerationNotMatch=" + sut.u64Str(value);
             return setBuf();
         }
         InsertOptions &ifMetagenerationMatch(uint64_t value)
         {
-            buf[4] = "ifMetagenerationMatch=" + sh.u64Str(value);
+            buf[4] = "ifMetagenerationMatch=" + sut.u64Str(value);
             return setBuf();
         }
         InsertOptions &ifMetagenerationNotMatch(uint64_t value)
         {
-            buf[5] = "ifMetagenerationNotMatch=" + sh.u64Str(value);
+            buf[5] = "ifMetagenerationNotMatch=" + sut.u64Str(value);
             return setBuf();
         }
         InsertOptions &kmsKeyName(const String &value)
@@ -253,7 +253,7 @@ namespace GoogleCloudStorage
         size_t bufSize = 10;
         String buf[10];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         ListOptions &setBuf()
         {
@@ -329,7 +329,7 @@ namespace GoogleCloudStorage
         size_t bufSize = 15;
         String buf[15];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
 
         InsertProperties &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {

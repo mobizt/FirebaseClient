@@ -841,7 +841,7 @@ private:
         options.parent.setFunctionId(functionId);
 
         bool hasParam = false;
-        URLHelper uh;
+        URLUtil uut;
 
         async_request_handler_t::http_request_method method = async_request_handler_t::http_post;
 
@@ -885,7 +885,7 @@ private:
         }
 
         if (updateMask.length())
-            uh.addParamsTokens(options.extras, "updateMask=", updateMask, hasParam);
+            uut.addParamsTokens(options.extras, "updateMask=", updateMask, hasParam);
 
         GoogleCloudFunctions::async_request_data_t aReq(&aClient, path, method, slot_options_t(false, false, async, false, false, false), &options, &file, result, cb, uid);
 
@@ -919,9 +919,9 @@ private:
             requestType == GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy ||
             requestType == GoogleCloudFunctions::google_cloud_functions_request_type_test_iam_permission)
         {
-            URLHelper uh;
+            URLUtil uut;
             request.path += "/";
-            request.path += uh.encode(request.options->parent.getFunctionId());
+            request.path += uut.encode(request.options->parent.getFunctionId());
             if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_call)
                 request.path += ":call";
             else if (requestType == GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl)

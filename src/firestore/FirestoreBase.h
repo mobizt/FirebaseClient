@@ -124,7 +124,7 @@ protected:
 
     void asyncRequest(async_request_data_t &request, int beta = 0)
     {
-        URLHelper uh;
+        URLUtil uut;
         app_token_t *app_token = appToken();
 
         if (!app_token)
@@ -133,11 +133,11 @@ protected:
         request.opt.app_token = app_token;
         String extras;
         if (beta == 2)
-            uh.addGAPIv1beta2Path(request.path);
+            uut.addGAPIv1beta2Path(request.path);
         else if (beta == 1)
-            uh.addGAPIv1beta1Path(request.path);
+            uut.addGAPIv1beta1Path(request.path);
         else
-            uh.addGAPIv1Path(request.path);
+            uut.addGAPIv1Path(request.path);
         request.path += request.options->parent.getProjectId().length() == 0 ? app_token->val[app_tk_ns::pid] : request.options->parent.getProjectId();
         request.path += FPSTR("/databases");
         if (!request.options->parent.isDatabaseIdParam())
@@ -269,9 +269,9 @@ protected:
         addDocsPath(options.extras);
         options.extras += '/';
         options.extras += options.collectionId;
-        URLHelper uh;
+        URLUtil uut;
         bool hasQueryParams = false;
-        uh.addParam(options.extras, "documentId", options.documentId, hasQueryParams);
+        uut.addParam(options.extras, "documentId", options.documentId, hasQueryParams);
         options.extras += mask.getQuery("mask", hasQueryParams);
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
@@ -348,8 +348,8 @@ protected:
         Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_begin_transaction;
         options.parent = parent;
-        JsonHelper jh;
-        jh.addObject(options.payload, "options", transOptions.c_str(), false, true);
+        JSONUtil jut;
+        jut.addObject(options.payload, "options", transOptions.c_str(), false, true);
         addDocsPath(options.extras);
         options.extras += FPSTR(":beginTransaction");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
@@ -361,8 +361,8 @@ protected:
         Firestore::DataOptions options;
         options.requestType = firebase_firestore_request_type_rollback;
         options.parent = parent;
-        JsonHelper jh;
-        jh.addObject(options.payload, "transaction", transaction, true, true);
+        JSONUtil jut;
+        jut.addObject(options.payload, "transaction", transaction, true, true);
         addDocsPath(options.extras);
         options.extras += FPSTR(":rollback");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
@@ -379,8 +379,8 @@ protected:
         options.payload = queryOptions.c_str();
 
         addDocsPath(options.extras);
-        URLHelper uh;
-        uh.addPath(options.extras, documentPath);
+        URLUtil uut;
+        uut.addPath(options.extras, documentPath);
         options.extras += FPSTR(":runQuery");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
@@ -395,8 +395,8 @@ protected:
         options.parent.setDocPath(documentPath);
 
         addDocsPath(options.extras);
-        URLHelper uh;
-        uh.addPath(options.extras, documentPath);
+        URLUtil uut;
+        uut.addPath(options.extras, documentPath);
         options.extras += currentDocument.getQuery("currentDocument");
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
@@ -409,8 +409,8 @@ protected:
         options.parent = parent;
 
         addDocsPath(options.extras);
-        URLHelper uh;
-        uh.addPath(options.extras, collectionId);
+        URLUtil uut;
+        uut.addPath(options.extras, collectionId);
 
         options.extras += listDocsOptions.c_str();
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
@@ -426,8 +426,8 @@ protected:
         options.payload = listCollectionIdsOptions.c_str();
 
         addDocsPath(options.extras);
-        URLHelper uh;
-        uh.addPath(options.extras, documentPath);
+        URLUtil uut;
+        uut.addPath(options.extras, documentPath);
         options.extras += FPSTR(":listCollectionIds");
 
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);

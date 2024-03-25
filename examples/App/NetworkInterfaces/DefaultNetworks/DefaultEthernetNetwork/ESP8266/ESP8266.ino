@@ -11,13 +11,13 @@
  *
  * SYNTAXES:
  *
- * DefaultEthernetNetwork network(<SPI_ETH_Module>);
+ * DefaultEthernetNetwork network(<Firebase_SPI_ETH_Module>);
  *
  * The DefaultEthernetNetwork is the Network class that provides the built-in WiFi network configuarion to work in this library.
  *
  * The DefaultEthernetNetwork class constructor arguments.
  *
- * <SPI_ETH_Module> - The SPI_ETH_Module class object that keeping the pointer to lwip driver for each
+ * <Firebase_SPI_ETH_Module> - The Firebase_SPI_ETH_Module class object that keeping the pointer to lwip driver for each
  *                    SPI Ethernet module (e.g. ENC28J60lwIP, W5100lwIP and W5500lwIP).
  *
  *
@@ -44,9 +44,8 @@
 
 #include <FirebaseClient.h>
 
-#if __has_include(<WiFiClientSecure.h>)
 #include <WiFiClientSecure.h>
-#endif
+
 
 #include <ENC28J60lwIP.h>
 // #include <W5100lwIP.h>
@@ -75,7 +74,7 @@ ENC28J60lwIP eth(ETH_CS_PIN);
 // Wiznet5100lwIP eth(ETH_CS_PIN);
 // Wiznet5500lwIP eth(ETH_CS_PIN);
 
-SPI_ETH_Module spi_eth;
+Firebase_SPI_ETH_Module spi_eth;
 
 DefaultEthernetNetwork default_network(spi_eth);
 

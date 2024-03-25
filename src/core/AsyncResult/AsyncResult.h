@@ -28,7 +28,7 @@
 #include "./core/Error.h"
 #include "./core/List.h"
 #include "./core/Timer.h"
-#include "./core/StringHelper.h"
+#include "./core/StringUtil.h"
 
 #define FIREBASE_CHUNK_SIZE 2048
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
@@ -113,7 +113,7 @@ namespace firebase
         void parseNodeName()
         {
             int p1 = 0, p2 = 0;
-            sh.parse(*ref_payload, "\"name\"", "}", p1, p2);
+            sut.parse(*ref_payload, "\"name\"", "}", p1, p2);
             if (p1 > -1 && p2 > -1)
             {
                 node_name = ref_payload->substring(p1 + 1, p2 - 1);
@@ -123,7 +123,7 @@ namespace firebase
         {
             clearSSE();
             int p1 = 0, p2 = 0;
-            sh.parse(*ref_payload, "event", "\n", p1, p2);
+            sut.parse(*ref_payload, "event", "\n", p1, p2);
             if (p1 > -1 && p2 > -1)
             {
                 event_p1 = p1;
@@ -134,7 +134,7 @@ namespace firebase
                 sse = true;
             }
 
-            sh.parse(*ref_payload, "data", "\n", p1, p2);
+            sut.parse(*ref_payload, "data", "\n", p1, p2);
             if (p1 > -1 && p2 > -1)
             {
                 int p3 = p1, p4 = p2;
@@ -145,7 +145,7 @@ namespace firebase
                     return;
                 }
 
-                sh.parse(*ref_payload, "\"path\"", ",", p1, p2);
+                sut.parse(*ref_payload, "\"path\"", ",", p1, p2);
                 if (p1 > -1 && p2 > -1)
                 {
                     data_path_p1 = p1 + 1;
@@ -153,7 +153,7 @@ namespace firebase
                     p1 = p2;
                 }
 
-                sh.parse(*ref_payload, "\"data\"", "\n", p1, p2);
+                sut.parse(*ref_payload, "\"data\"", "\n", p1, p2);
                 if (p1 > -1 && p2 > -1)
                 {
                     if ((*ref_payload)[p2 - 1] == '}')
@@ -178,7 +178,7 @@ namespace firebase
 
     private:
         ValueConverter vcon;
-        StringHelper sh;
+        StringUtil sut;
         Timer sse_timer;
         bool sse = false;
         event_resume_status_t event_resume_status = event_resume_status_undefined;

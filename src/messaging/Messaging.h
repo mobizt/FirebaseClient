@@ -157,8 +157,8 @@ private:
         options.parent = parent;
         if (requestType == Messages::firebase_cloud_messaging_request_type_send)
         {
-            JsonHelper jh;
-            jh.addObject(options.payload, "message", payload, false, true);
+            JSONUtil jut;
+            jut.addObject(options.payload, "message", payload, false, true);
             options.extras += FPSTR("/messages:send");
         }
 
@@ -168,7 +168,7 @@ private:
 
     void asyncRequest(Messages::async_request_data_t &request, int beta = 0)
     {
-        URLHelper uh;
+        URLUtil uut;
         app_token_t *app_token = appToken();
 
         if (!app_token)
@@ -178,11 +178,11 @@ private:
         String extras;
 
         if (beta == 2)
-            uh.addGAPIv1beta2Path(request.path);
+            uut.addGAPIv1beta2Path(request.path);
         else if (beta == 1)
-            uh.addGAPIv1beta1Path(request.path);
+            uut.addGAPIv1beta1Path(request.path);
         else
-            uh.addGAPIv1Path(request.path);
+            uut.addGAPIv1Path(request.path);
 
         request.path += request.options->parent.getProjectId().length() == 0 ? app_token->val[app_tk_ns::pid] : request.options->parent.getProjectId();
 

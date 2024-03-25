@@ -86,8 +86,8 @@ private:
     String get()
     {
         String temp;
-        JsonHelper jh;
-        jh.addTokens(temp, jh.toString("fieldPaths"), buf[1], true);
+        JSONUtil jut;
+        jut.addTokens(temp, jut.toString("fieldPaths"), buf[1], true);
         return temp;
     }
 
@@ -117,15 +117,15 @@ public:
         if (fieldPaths.length())
         {
             this->buf[1] = fieldPaths;
-            JsonHelper jh;
-            jh.addTokens(buf[0], "fieldPaths", buf[1], true);
+            JSONUtil jut;
+            jut.addTokens(buf[0], "fieldPaths", buf[1], true);
         }
     }
     String getQuery(const String &mask, bool hasParam)
     {
         String temp;
-        URLHelper uh;
-        uh.addParamsTokens(temp, String(mask + ".fieldPaths="), this->buf[1], hasParam);
+        URLUtil uut;
+        uut.addParamsTokens(temp, String(mask + ".fieldPaths="), this->buf[1], hasParam);
         return temp;
     }
     const char *c_str() const { return buf[0].c_str(); }
@@ -263,7 +263,7 @@ namespace FieldTransform
     private:
         String buf;
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
 
     public:
         /**
@@ -271,7 +271,7 @@ namespace FieldTransform
          * @param enumValue The ServerValue enum
          *
          */
-        SetToServerValue(ServerValue enumValue) { owriter.setPair(buf, FPSTR("setToServerValue"), jh.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
+        SetToServerValue(ServerValue enumValue) { owriter.setPair(buf, FPSTR("setToServerValue"), jut.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
         const char *c_str() const { return buf.c_str(); }
     };
 
@@ -282,12 +282,12 @@ namespace FieldTransform
     {
     private:
         String buf;
-        JsonHelper jh;
+        JSONUtil jut;
         ObjectWriter owriter;
         template <typename T>
         void set(const String &fieldPath, T v)
         {
-            jh.addObject(buf, FPSTR("fieldPath"), fieldPath, true);
+            jut.addObject(buf, FPSTR("fieldPath"), fieldPath, true);
             buf += ',';
             String str = v.c_str();
             buf += str.substring(1, str.length() - 1);
@@ -332,7 +332,7 @@ private:
     size_t bufSize = 4;
     String buf[4];
     ObjectWriter owriter;
-    JsonHelper jh;
+    JSONUtil jut;
 
     String getQuery(const String &mask)
     {
@@ -353,7 +353,7 @@ private:
                 buf[1] = FPSTR("?");
             buf[1] += mask;
             buf[1] += FPSTR(".updateTime=");
-            buf[1] += jh.toString(buf[3]);
+            buf[1] += jut.toString(buf[3]);
         }
         return buf[1];
     }
@@ -367,7 +367,7 @@ private:
             else
             {
                 buf[0][buf[0].length() - 1] = '\0';
-                jh.addObject(buf[0], FPSTR("exists"), buf[2], true);
+                jut.addObject(buf[0], FPSTR("exists"), buf[2], true);
             }
         }
 
@@ -378,7 +378,7 @@ private:
             else
             {
                 buf[0][buf[0].length() - 1] = '\0';
-                jh.addObject(buf[0], FPSTR("updateTime"), buf[3], true);
+                jut.addObject(buf[0], FPSTR("updateTime"), buf[3], true);
             }
         }
 
@@ -425,14 +425,14 @@ private:
     size_t bufSize = 4;
     String buf[4];
     ObjectWriter owriter;
-    JsonHelper jh;
+    JSONUtil jut;
 
     Document &getBuf()
     {
         buf[2] = mv.c_str();
         buf[3].remove(0, buf[3].length());
         if (buf[1].length())
-            jh.addObject(buf[3], FPSTR("name"), owriter.makeResourcePath(buf[1]), true, true);
+            jut.addObject(buf[3], FPSTR("name"), owriter.makeResourcePath(buf[1]), true, true);
         else
         {
             buf[0] = buf[2];
@@ -703,7 +703,7 @@ class DocumentTransform : public Printable
 private:
     String buf;
     ObjectWriter owriter;
-    JsonHelper jh;
+    JSONUtil jut;
 
 public:
     /**
@@ -713,8 +713,8 @@ public:
      */
     DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
     {
-        jh.addObject(buf, FPSTR("document"), owriter.makeResourcePath(document), true);
-        jh.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), false, true);
+        jut.addObject(buf, FPSTR("document"), owriter.makeResourcePath(document), true);
+        jut.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), false, true);
     }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -738,7 +738,7 @@ private:
         firestore_write_type_transform
     };
     String buf;
-    JsonHelper jh;
+    JSONUtil jut;
     ObjectWriter owriter;
     firestore_write_type write_type = firestore_write_type_undefined;
     bool updateTrans = false;
@@ -758,11 +758,11 @@ public:
         bool curdoc = strlen(currentDocument.c_str());
         bool updatemask = strlen(updateMask.c_str());
         write_type = firestore_write_type_update;
-        jh.addObject(buf, FPSTR("update"), update.c_str(), false, !updatemask && !curdoc);
+        jut.addObject(buf, FPSTR("update"), update.c_str(), false, !updatemask && !curdoc);
         if (updatemask)
-            jh.addObject(buf, FPSTR("updateMask"), updateMask.c_str(), false, !curdoc);
+            jut.addObject(buf, FPSTR("updateMask"), updateMask.c_str(), false, !curdoc);
         if (curdoc)
-            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false, true);
+            jut.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false, true);
     }
     /**
      * A write on a document.
@@ -772,8 +772,8 @@ public:
     {
         write_type = firestore_write_type_delete;
         if (strlen(currentDocument.c_str()))
-            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
-        jh.addObject(buf, FPSTR("delete"), owriter.makeResourcePath(deletePath), true, true);
+            jut.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
+        jut.addObject(buf, FPSTR("delete"), owriter.makeResourcePath(deletePath), true, true);
     }
 
     /**
@@ -785,8 +785,8 @@ public:
     {
         write_type = firestore_write_type_transform;
         if (strlen(currentDocument.c_str()))
-            jh.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
-        jh.addObject(buf, FPSTR("transform"), transform.c_str(), false, true);
+            jut.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
+        jut.addObject(buf, FPSTR("transform"), transform.c_str(), false, true);
     }
     /**
      * Add the update transform.
@@ -802,7 +802,7 @@ public:
             if (!updateTrans)
             {
                 buf[buf.length() - 1] = '\0';
-                jh.addObject(buf, FPSTR("updateTransforms"), owriter.getArrayStr(updateTransforms.c_str()), false, true);
+                jut.addObject(buf, FPSTR("updateTransforms"), owriter.getArrayStr(updateTransforms.c_str()), false, true);
             }
             else
                 owriter.addMember(buf, updateTransforms.c_str(), "]}");
@@ -823,7 +823,7 @@ class Writes : public Printable
 {
 private:
     String buf;
-    JsonHelper jh;
+    JSONUtil jut;
     ObjectWriter owriter;
 
 public:
@@ -836,8 +836,8 @@ public:
     Writes(Write write, const String &transaction = "")
     {
         if (transaction.length())
-            jh.addObject(buf, FPSTR("transaction"), transaction, true);
-        jh.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), false, true);
+            jut.addObject(buf, FPSTR("transaction"), transaction, true);
+        jut.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), false, true);
     }
 
     /**
@@ -849,8 +849,8 @@ public:
     Writes(Write write, Values::MapValue labels)
     {
         if (strlen(labels.c_str()))
-            jh.addObject(buf, FPSTR("labels"), labels.c_str(), false);
-        jh.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), false, true);
+            jut.addObject(buf, FPSTR("labels"), labels.c_str(), false);
+        jut.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), false, true);
     }
 
     /**
@@ -876,7 +876,7 @@ class ReadWrite : public Printable
 {
 private:
     String buf;
-    JsonHelper jh;
+    JSONUtil jut;
 
 public:
     /**
@@ -886,7 +886,7 @@ public:
     ReadWrite(const String &retryTransaction)
     {
         if (retryTransaction.length())
-            jh.addObject(buf, FPSTR("retryTransaction"), retryTransaction, true, true);
+            jut.addObject(buf, FPSTR("retryTransaction"), retryTransaction, true, true);
     }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -900,7 +900,7 @@ class ReadOnly : public Printable
 {
 private:
     String buf;
-    JsonHelper jh;
+    JSONUtil jut;
 
 public:
     ReadOnly() {}
@@ -910,7 +910,7 @@ public:
     ReadOnly(const String &readTime)
     {
         if (readTime.length())
-            jh.addObject(buf, "readTime", readTime, true, true);
+            jut.addObject(buf, "readTime", readTime, true, true);
     }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -924,7 +924,7 @@ class TransactionOptions : public Printable
 {
 private:
     String buf;
-    JsonHelper jh;
+    JSONUtil jut;
 
 public:
     TransactionOptions() {}
@@ -934,7 +934,7 @@ public:
     TransactionOptions(ReadOnly readOnly)
     {
         if (strlen(readOnly.c_str()))
-            jh.addObject(buf, "readOnly", readOnly.c_str(), false, true);
+            jut.addObject(buf, "readOnly", readOnly.c_str(), false, true);
     }
     /**
      * @param readWrite The transaction can be used for both read and write operations.
@@ -942,7 +942,7 @@ public:
     TransactionOptions(ReadWrite readWrite)
     {
         if (strlen(readWrite.c_str()))
-            jh.addObject(buf, "readWrite", readWrite.c_str(), false, true);
+            jut.addObject(buf, "readWrite", readWrite.c_str(), false, true);
     }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -953,14 +953,14 @@ class EximDocumentOptions : public Printable
 {
 private:
     String buf;
-    URLHelper uh;
-    JsonHelper json;
+    URLUtil uut;
+    JSONUtil json;
 
 public:
     EximDocumentOptions(const String &collectionIds, const String &bucketID, const String &storagePath)
     {
         String uriPrefix;
-        uh.addGStorageURL(uriPrefix, bucketID, storagePath);
+        uut.addGStorageURL(uriPrefix, bucketID, storagePath);
         json.addObject(buf, "inputUriPrefix", uriPrefix, true);
         json.addTokens(buf, "collectionIds", collectionIds, true);
     }
@@ -973,7 +973,7 @@ class GetDocumentOptions : public Printable
 {
 private:
     String buf;
-    URLHelper uh;
+    URLUtil uut;
 
 public:
     GetDocumentOptions() {}
@@ -983,9 +983,9 @@ public:
         if (strlen(mask.c_str()))
             buf = mask.getQuery("mask", hasParam);
         if (transaction.length())
-            uh.addParam(buf, FPSTR("transaction"), transaction, hasParam);
+            uut.addParam(buf, FPSTR("transaction"), transaction, hasParam);
         if (readTime.length())
-            uh.addParam(buf, FPSTR("readTime"), readTime, hasParam);
+            uut.addParam(buf, FPSTR("readTime"), readTime, hasParam);
     }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -1054,7 +1054,7 @@ class PatchDocumentOptions : public Printable
 {
 private:
     String buf;
-    URLHelper uh;
+    URLUtil uut;
 
 public:
     PatchDocumentOptions(DocumentMask updateMask, DocumentMask mask, Precondition currentDocument)
@@ -1065,7 +1065,7 @@ public:
         if (strlen(mask.c_str()))
             buf += mask.getQuery("mask", hasParam);
         if (strlen(currentDocument.c_str()))
-            uh.addParam(buf, FPSTR("currentDocument"), currentDocument.c_str(), hasParam);
+            uut.addParam(buf, FPSTR("currentDocument"), currentDocument.c_str(), hasParam);
     }
     void setContent(const String &content) { buf = content; }
     const char *c_str() const { return buf.c_str(); }
@@ -1142,7 +1142,7 @@ private:
     int pagesize = 0;
     DocumentMask msk;
     ObjectWriter owriter;
-    URLHelper uh;
+    URLUtil uut;
 
     ListDocumentsOptions &set()
     {
@@ -1150,19 +1150,19 @@ private:
         owriter.clear(buf[0]);
 
         if (pagesize > 0)
-            uh.addParam(buf[0], FPSTR("pageSize"), String(pagesize), hasParam);
+            uut.addParam(buf[0], FPSTR("pageSize"), String(pagesize), hasParam);
         if (buf[1].length() > 0)
-            uh.addParam(buf[0], FPSTR("pageToken"), buf[1], hasParam);
+            uut.addParam(buf[0], FPSTR("pageToken"), buf[1], hasParam);
         if (buf[2].length() > 0)
-            uh.addParam(buf[0], FPSTR("orderBy"), buf[2], hasParam);
+            uut.addParam(buf[0], FPSTR("orderBy"), buf[2], hasParam);
         if (strlen(msk.c_str()) > 0)
             buf[0] += msk.getQuery("mask", hasParam);
         if (buf[3].length() > 0)
-            uh.addParam(buf[0], FPSTR("showMissing"), buf[3], hasParam);
+            uut.addParam(buf[0], FPSTR("showMissing"), buf[3], hasParam);
         if (buf[4].length() > 0)
-            uh.addParam(buf[0], FPSTR("transaction"), buf[4], hasParam);
+            uut.addParam(buf[0], FPSTR("transaction"), buf[4], hasParam);
         if (buf[5].length() > 0)
-            uh.addParam(buf[0], FPSTR("readTime"), buf[5], hasParam);
+            uut.addParam(buf[0], FPSTR("readTime"), buf[5], hasParam);
 
         return *this;
     }

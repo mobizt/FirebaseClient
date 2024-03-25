@@ -29,20 +29,20 @@
 #include <Client.h>
 #include "./Config.h"
 #include "./core/Memory.h"
-#include "./core/StringHelper.h"
+#include "./core/StringUtil.h"
 #include "./AsyncResult/Value.h"
 #include "./core/Core.h"
 #if __has_include(<stdarg.h>)
 #include <stdarg.h>
 #endif
 
-class JsonHelper
+class JSONUtil
 {
 
 private:
 public:
-    JsonHelper(){};
-    ~JsonHelper(){};
+    JSONUtil(){};
+    ~JSONUtil(){};
 
     void addObject(String &buf, const String &name, const String &value, bool stringValue, bool last = false)
     {
@@ -86,7 +86,7 @@ public:
     /* convert comma separated tokens into JSON Array and add to JSON object */
     void addTokens(String &buf, const String &name, const String &value, bool last = false)
     {
-        StringHelper sh;
+        StringUtil sut;
         char *p = new char[value.length() + 1];
         memset(p, 0, value.length() + 1);
         strcpy(p, value.c_str());
@@ -97,7 +97,7 @@ public:
             tmp += '[';
         while (pp != NULL)
         {
-            sh.strsepImpl(&end, ",");
+            sut.strsepImpl(&end, ",");
             if (strlen(pp) > 0)
             {
                 addArray(tmp, pp, true);
@@ -125,7 +125,7 @@ class JsonWriter
 private:
     int prek(object_t &obj, const String &path)
     {
-        StringHelper sh;
+        StringUtil sut;
         char *p = new char[path.length() + 1];
         memset(p, 0, path.length() + 1);
         strcpy(p, path.c_str());
@@ -136,7 +136,7 @@ private:
         obj = "{";
         while (pp != NULL)
         {
-            sh.strsepImpl(&end, "/");
+            sut.strsepImpl(&end, "/");
             if (strlen(pp) > 0)
             {
                 tmp = pp;

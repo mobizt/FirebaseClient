@@ -264,7 +264,7 @@ class DefaultEthernetNetwork : public DefaultNetwork
 {
 
 public:
-    DefaultEthernetNetwork(SPI_ETH_Module &eth)
+    DefaultEthernetNetwork(Firebase_SPI_ETH_Module &eth)
     {
         init();
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)

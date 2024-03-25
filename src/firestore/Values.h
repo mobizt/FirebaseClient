@@ -299,7 +299,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
 
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_geoPointValue].text, buf); }
 
@@ -311,8 +311,8 @@ namespace Values
          */
         GeoPointValue(double lat, double lng)
         {
-            jh.addObject(buf, FPSTR("latitude"), String(lat), false);
-            jh.addObject(buf, FPSTR("longitude"), String(lng), false, true);
+            jut.addObject(buf, FPSTR("latitude"), String(lat), false);
+            jut.addObject(buf, FPSTR("longitude"), String(lng), false, true);
             getVal();
         }
         const char *c_str() const { return buf.c_str(); }

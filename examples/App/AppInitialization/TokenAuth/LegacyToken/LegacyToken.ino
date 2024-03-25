@@ -137,10 +137,10 @@ LegacyToken legacy_token(DATABASE_SECRET);
 
 FirebaseApp app;
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif __has_include(<WiFiSSLClient.h>)
+#elif defined(ARDUINO_ARCH_SAMD)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
@@ -172,7 +172,7 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
     ssl_client.setBufferSizes(4096, 1024);

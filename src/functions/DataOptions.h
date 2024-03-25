@@ -121,7 +121,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 7;
         String buf[7];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         RepoSource &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -179,7 +179,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 4;
         String buf[4];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         StorageSource &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -208,7 +208,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 4;
         String buf[4];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         Source &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -254,7 +254,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 10;
         String buf[10];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         BuildConfig &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -305,7 +305,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 3;
         String buf[3];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         SecretVersion &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -331,7 +331,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 5;
         String buf[5];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         SecretVolume &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -367,7 +367,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 5;
         String buf[5];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         SecretEnvVar &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -398,7 +398,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 16;
         String buf[16];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         ServiceConfig &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -495,7 +495,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 4;
         String buf[4];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         EventFilter &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -523,7 +523,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 9;
         String buf[9];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         EventTrigger &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -580,7 +580,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 9;
         String buf[9];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         Function &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -633,7 +633,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 3;
         String buf[3];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         UploadURLOptions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -676,7 +676,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 5;
         String buf[5];
         ObjectWriter owriter;
-        StringHelper sh;
+        StringUtil sut;
 
         ListOptions &setBuf()
         {
@@ -697,7 +697,7 @@ namespace GoogleCloudFunctions
         // Maximum number of functions to return per call. The largest allowed pageSize is 1,000, if the pageSize is omitted or specified as greater than 1,000 then it will be replaced as 1,000. The size of the list response can be less than specified when used with filters.
         ListOptions &pageSize(uint64_t value)
         {
-            buf[1] = "pageSize=" + sh.u64Str(value);
+            buf[1] = "pageSize=" + sut.u64Str(value);
             return setBuf();
         }
         // The value returned by the last ListFunctionsResponse; indicates that this is a continuation of a prior functions.list call, and that the system should return the next page of data.
@@ -759,7 +759,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 3;
         String buf[3];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         SetPolicyOptions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -794,7 +794,7 @@ namespace GoogleCloudFunctions
         size_t bufSize = 2;
         String buf[2];
         ObjectWriter owriter;
-        URLHelper uh;
+        URLUtil uut;
 
         Permissions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {

@@ -52,7 +52,7 @@ private:
     }
     bool hasParams = true;
     bool complete = false;
-    URLHelper uh;
+    URLUtil uut;
     String uri;
 
 public:
@@ -65,21 +65,21 @@ public:
         String ob = "\"";
         ob += val;
         ob += "\"";
-        uh.addParam(uri, FPSTR("orderBy"), ob, hasParams);
+        uut.addParam(uri, FPSTR("orderBy"), ob, hasParams);
         return *this;
     }
 
     template <typename T = int>
     DatabaseFilter &limitToFirst(T val)
     {
-        uh.addParam(uri, FPSTR("limitToFirst"), String(val), hasParams);
+        uut.addParam(uri, FPSTR("limitToFirst"), String(val), hasParams);
         return *this;
     }
 
     template <typename T = int>
     DatabaseFilter &limitToLast(T val)
     {
-        uh.addParam(uri, FPSTR("limitToLast"), String(val), hasParams);
+        uut.addParam(uri, FPSTR("limitToLast"), String(val), hasParams);
         return *this;
     }
 
@@ -88,13 +88,13 @@ public:
         String sa = "\"";
         sa += val;
         sa += "\"";
-        uh.addParam(uri, FPSTR("startAt"), sa, hasParams);
+        uut.addParam(uri, FPSTR("startAt"), sa, hasParams);
         return *this;
     }
 
     DatabaseFilter &startAt(int val)
     {
-        uh.addParam(uri, FPSTR("startAt"), String(val), hasParams);
+        uut.addParam(uri, FPSTR("startAt"), String(val), hasParams);
         return *this;
     }
 
@@ -103,13 +103,13 @@ public:
         String sa = "\"";
         sa += val;
         sa += "\"";
-        uh.addParam(uri, FPSTR("endAt"), sa, hasParams);
+        uut.addParam(uri, FPSTR("endAt"), sa, hasParams);
         return *this;
     }
 
     DatabaseFilter &endAt(int val)
     {
-        uh.addParam(uri, FPSTR("endAt"), String(val), hasParams);
+        uut.addParam(uri, FPSTR("endAt"), String(val), hasParams);
         return *this;
     }
 
@@ -118,13 +118,13 @@ public:
         String sa = "\"";
         sa += val;
         sa += "\"";
-        uh.addParam(uri, FPSTR("equalTo"), sa, hasParams);
+        uut.addParam(uri, FPSTR("equalTo"), sa, hasParams);
         return *this;
     }
 
     DatabaseFilter &equalTo(int val)
     {
-        uh.addParam(uri, FPSTR("equalTo"), String(val), hasParams);
+        uut.addParam(uri, FPSTR("equalTo"), String(val), hasParams);
         return *this;
     }
 

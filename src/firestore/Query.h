@@ -106,7 +106,7 @@ namespace FirestoreQuery
     {
     private:
         String buf;
-        JsonHelper jh;
+        JSONUtil jut;
 
     public:
         /**
@@ -114,7 +114,7 @@ namespace FirestoreQuery
          */
         FieldReference(const String &fieldPath)
         {
-            jh.addObject(buf, "fieldPath", fieldPath, true, true);
+            jut.addObject(buf, "fieldPath", fieldPath, true, true);
         }
 
         const char *c_str() const { return buf.c_str(); }
@@ -182,7 +182,7 @@ namespace FirestoreQuery
         size_t bufSize = 3;
         String buf[3];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
 
         CollectionSelector &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
         {
@@ -213,7 +213,7 @@ namespace FirestoreQuery
         size_t bufSize = 3;
         String buf[3];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
         Cursor &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
@@ -312,7 +312,7 @@ namespace FirestoreQuery
         size_t bufSize = 4;
         String buf[4];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
         CompositeFilter &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
@@ -341,7 +341,7 @@ namespace FirestoreQuery
         size_t bufSize = 4;
         String buf[4];
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
 
         FieldFilter &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
@@ -406,7 +406,7 @@ namespace FirestoreQuery
     private:
         String buf;
         ObjectWriter owriter;
-        JsonHelper jh;
+        JSONUtil jut;
 
     public:
         Filter();

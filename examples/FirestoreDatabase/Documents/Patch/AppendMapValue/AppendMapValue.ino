@@ -222,7 +222,7 @@ FirebaseApp app;
 #if __has_include(<WiFiClientSecure.h>)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif __has_include(<WiFiSSLClient.h>)
+#elif defined(ARDUINO_ARCH_SAMD)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif

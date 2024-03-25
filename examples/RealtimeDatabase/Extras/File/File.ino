@@ -123,10 +123,10 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif __has_include(<WiFiSSLClient.h>)
+#elif defined(ARDUINO_ARCH_SAMD)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
@@ -172,7 +172,7 @@ void setup()
 
     Serial.println("Initializing app...");
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
     ssl_client.setBufferSizes(4096, 1024);
@@ -286,7 +286,7 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode)
         file = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
         break;
     case file_mode_remove:
-        SD.remove(filename);
+        MY_FS.remove(filename);
         break;
     default:
         break;

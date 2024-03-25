@@ -202,7 +202,7 @@ namespace FirestoreQuery
     size_t Order::printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void Order::clear() { owriter.clearBuf(buf, bufSize); }
 
-    Cursor::Cursor() { jh.addObject(buf[2], "values", "[]", false, true); }
+    Cursor::Cursor() { jut.addObject(buf[2], "values", "[]", false, true); }
 
     Cursor &Cursor::before(bool value) { return setObject(buf[1], "before", owriter.getBoolStr(value), false, true); }
     /**
@@ -230,19 +230,19 @@ namespace FirestoreQuery
     Filter::Filter(CompositeFilter compositeFilter)
     {
         clear();
-        jh.addObject(buf, "compositeFilter", compositeFilter.c_str(), false, true);
+        jut.addObject(buf, "compositeFilter", compositeFilter.c_str(), false, true);
     }
 
     Filter::Filter(FieldFilter fieldFilter)
     {
         clear();
-        jh.addObject(buf, "fieldFilter", fieldFilter.c_str(), false, true);
+        jut.addObject(buf, "fieldFilter", fieldFilter.c_str(), false, true);
     }
 
     Filter::Filter(UnaryFilter unaryFilter)
     {
         clear();
-        jh.addObject(buf, "unaryFilter", unaryFilter.c_str(), false, true);
+        jut.addObject(buf, "unaryFilter", unaryFilter.c_str(), false, true);
     }
 
     const char *Filter::c_str() { return buf.c_str(); }
