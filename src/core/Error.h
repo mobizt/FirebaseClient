@@ -100,7 +100,6 @@
 class FirebaseError
 {
     friend class AsyncClientClass;
-    friend class AuthRequest;
     friend class RealtimeDatabase;
     friend class FirestoreBase;
     friend class FirestoreDocuments;

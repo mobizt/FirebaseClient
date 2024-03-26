@@ -1,5 +1,5 @@
 /**
- * Created March 26, 2024
+ * Created March 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -164,13 +164,15 @@ public:
     JsonWriter(){};
     ~JsonWriter(){};
 
+    void create(object_t &obj, const String &path, bool value) { create(obj, path, boolean_t(value)); }
+
     template <typename T>
     auto create(object_t &obj, const String &path, T value) -> typename std::enable_if<!std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, number_t>::value && !std::is_same<T, boolean_t>::value, void>::type
     {
         int i = prek(obj, path);
         if (ValueConverter::v_sring<T>::value)
             obj += "\"";
-        obj += std::is_same<T, bool>::value ? value : boolean_t(value);
+        obj += value;
         if (ValueConverter::v_sring<T>::value)
             obj += "\"";
         ek(obj, i);
