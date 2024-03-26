@@ -201,15 +201,32 @@
 #ifndef FLASH_SUPPORTS
 #define FLASH_SUPPORTS
 #endif
+
+#if !defined(FILE_OPEN_MODE_READ)
 #define FILE_OPEN_MODE_READ "r"
+#endif
+
+#if !defined(FILE_OPEN_MODE_WRITE)
 #define FILE_OPEN_MODE_WRITE "w"
+#endif
+
+#if !defined(FILE_OPEN_MODE_APPEND)
 #define FILE_OPEN_MODE_APPEND "a"
+#endif
 
 #elif __has_include(<SD.h>) && __has_include(<SPI.h>)
 
+#if !defined(FILE_OPEN_MODE_READ)
 #define FILE_OPEN_MODE_READ FILE_READ
+#endif
+
+#if !defined(FILE_OPEN_MODE_WRITE)
 #define FILE_OPEN_MODE_WRITE FILE_WRITE
+#endif
+
+#if !defined(FILE_OPEN_MODE_APPEND)
 #define FILE_OPEN_MODE_APPEND FILE_WRITE
+#endif
 
 #endif
 
