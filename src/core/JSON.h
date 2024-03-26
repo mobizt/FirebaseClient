@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created March 26, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -170,7 +170,7 @@ public:
         int i = prek(obj, path);
         if (ValueConverter::v_sring<T>::value)
             obj += "\"";
-        obj += value;
+        obj += std::is_same<T, bool>::value ? value : boolean_t(value);
         if (ValueConverter::v_sring<T>::value)
             obj += "\"";
         ek(obj, i);
