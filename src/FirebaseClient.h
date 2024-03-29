@@ -1,5 +1,5 @@
 /**
- * Created March 27, 2024
+ * Created March 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,7 +30,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "1.0.4"
+#define FIREBASE_CLIENT_VERSION "1.0.5"
 
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
@@ -179,7 +179,7 @@ namespace firebase
                         if (app.auth_data.user_auth.custom_token.val[cust_tk_ns::token][i] == '.')
                             token_part++;
 
-                    if (token_part == 3)
+                    if (token_part == 2)
                         app.auth_data.app_token.val[app_tk_ns::token] = app.auth_data.user_auth.custom_token.val[cust_tk_ns::token];
                     else // not a valid custom token, treat as a refresh token
                         app.auth_data.app_token.val[app_tk_ns::refresh] = app.auth_data.user_auth.custom_token.val[cust_tk_ns::token];

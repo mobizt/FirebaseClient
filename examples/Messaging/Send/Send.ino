@@ -307,7 +307,24 @@ void loop()
 
         msg.data(data);
 
-        msg.notification(notification);
+        Messages::AndroidConfig androidConfig;
+
+        // Priority of a message to send to Android devices.
+        // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#androidmessagepriority
+        androidConfig.priority(Messages::AndroidMessagePriority::_HIGH);
+
+        Messages::AndroidNotification androidNotification;
+
+        // Set the relative priority for this notification.
+        // Priority is an indication of how much of the user's attention should be consumed by this notification.
+        // Low-priority notifications may be hidden from the user in certain situations,
+        // while the user might be interrupted for a higher-priority notification.
+        // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#NotificationPriority
+        androidNotification.notification_priority(Messages::NotificationPriority::PRIORITY_HIGH);
+
+        androidConfig.notification(androidNotification);
+
+        msg.android(androidConfig);
 
         // You can set the content of msg object directly with msg.setContent("your content")
 
