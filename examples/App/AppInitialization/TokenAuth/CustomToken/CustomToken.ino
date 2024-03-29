@@ -75,42 +75,69 @@
  * the async SSE (HTTP Streaming) slot.
  *
  * When the async operation queue is full, the new sync and async operations will be cancelled.
- * 
+ *
  * The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
- * 
- * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app 
+ *
+ * The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app
  * (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
- * 
+ *
  * STOP QUEUE
  * ===========
- * 
+ *
  * SYNTAX:
- * 
+ *
  * The async operation will be cancelled and remove from the queue by calling thes functions.
- * 
+ *
  * asyncClient.stopAsync() - stop the last async operation in the queue.
- * 
+ *
  * asyncClient.stopAsync(true) - stop all async operation in the queue.
- * 
+ *
  * asyncClient.stopAsync("xxxx") - stop the async operation in the queue that has the async result UID xxxx.
- * 
+ *
  * ASYNC CLIENT
  * ============
- * 
+ *
  * The async client stores the async operating data in its queue and holds the pointer of SSL Client that assigned with it.
- * 
+ *
  * The SSL Client should be existed in the AsyncClient usage scope in case of sync or should defined as global object for async usage.
- * 
+ *
  * The SSL Client should not be shared among various AsyncClients because of interferences in async operations.
  *
  * Only one SSL Client should be assigned to or used with only one AsyncClient.
- * 
+ *
  * SSL Client can force to stop by user or calling stop() from asyncClient.
- * 
+ *
  * SYNTAX:
- * 
+ *
  * asyncClient.stop() - stop the SSL Client to terminate the server connection.
- * 
+ *
+ *
+ * THE STATIC ASYNC RESULT REQUIRED FOR ASYNC OPERATION
+ * ====================================================
+ *
+ * Library provided the class object called AsyncResult that keeps the server response data, debug and error information.
+ *
+ * There are two sources of async result in this library:
+ *
+ * 1. From user provided with async application (function).
+ *
+ * For example:
+ *
+ * `Database.get(aClient, "/test/int", options, aResult);`
+ *
+ * 2. From dynamic allocation in the async client.
+ *
+ * For example:
+ *
+ * `Database.get(aClient, "/test/int", options, asyncCB);`
+ *
+ * From source 1, the async result (`aResult`) shall be defined globally to use in async application because of the static data is needed for use while running the sync task.
+ *
+ * From source 2, the async client (`aClient`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the sync task.
+ *
+ * If async result was destroyed (destructed or not existed) before it was used by async task handler, the danglig pointer problem will be occurred.
+ *
+ * Note that, the async client object used in authentication task shoul be defined globally as it is async task.
  */
 
 #include <Arduino.h>

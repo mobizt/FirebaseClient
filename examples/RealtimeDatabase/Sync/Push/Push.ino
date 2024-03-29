@@ -78,6 +78,13 @@
  * aClient.lastError().code().
  */
 
+/** THE STATIC ASYNC RESULT REQUIRED FOR ASYNC OPERATION
+ * =====================================================
+ *
+ * Due to the authentication process is async operation, the async client object used in authentication task shoul be
+ * defined globally as it keeps the auth token data, debug and error information.
+ */
+
 #include <Arduino.h>
 #if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFi.h>
