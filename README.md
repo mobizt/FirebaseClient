@@ -398,6 +398,8 @@ From source 2, the async client (`aClient`) shall be defined globally to use in 
 
 If async result was destroyed (destructed or not existed) before it was used by async task handler, the danglig pointer problem will be occurred.
 
+Note that, the async client object used in authentication task shoul be defined globally as it is async task.
+
 
 ### Basic Example
 
