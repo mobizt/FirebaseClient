@@ -72,7 +72,7 @@ namespace firebase
     {
         friend class AsyncResult;
         friend class AsyncClientClass;
-        
+
         enum event_resume_status_t
         {
             event_resume_status_undefined,
@@ -236,8 +236,10 @@ class AsyncResult
 
 private:
     uint32_t addr = 0;
+    uint32_t rvec_addr = 0;
     String val[ares_ns::max_type];
     bool debug_info_available = false;
+    uint32_t debug_ms = 0, last_debug_ms = 0;
     download_data_t download_data;
     upload_data_t upload_data;
 #if defined(ENABLE_DATABASE)
@@ -299,6 +301,7 @@ public:
     void setDebug(const String &debug)
     {
         // Keeping old message in case unread.
+        debug_ms = millis();
         if (debug_info_available && val[ares_ns::debug_info].length() < 200)
         {
             if (val[ares_ns::debug_info].indexOf(debug) == -1)
@@ -319,20 +322,30 @@ public:
         rtdbResult.ref_payload = &val[ares_ns::data_payload];
 #endif
         addr = reinterpret_cast<uint32_t>(this);
-        List vec;
-        vec.addRemoveList(rVec, addr, true);
     };
     ~AsyncResult()
     {
-        List vec;
-        vec.addRemoveList(rVec, addr, false);
+        if (rvec_addr > 0)
+        {
+            std::vector<uint32_t> *rVec = reinterpret_cast<std::vector<uint32_t> *>(rvec_addr);
+            if (rVec)
+            {
+                List vec;
+                addr = reinterpret_cast<uint32_t>(this);
+                vec.addRemoveList(*rVec, addr, false);
+            }
+        }
     };
     const char *c_str() { return val[ares_ns::data_payload].c_str(); }
     String payload() const { return val[ares_ns::data_payload].c_str(); }
     String path() const { return val[ares_ns::data_path].c_str(); }
     String etag() const { return val[ares_ns::res_etag].c_str(); }
     String uid() const { return val[ares_ns::res_uid].c_str(); }
-    String debug() const { return val[ares_ns::debug_info].c_str(); }
+    String debug()
+    {
+        last_debug_ms = millis();
+        return val[ares_ns::debug_info].c_str();
+    }
     void clear()
     {
         for (size_t i = 0; i < ares_ns::max_type; i++)
@@ -398,7 +411,7 @@ public:
     bool isDebug()
     {
         bool dbg = val[ares_ns::debug_info].length() > 0;
-        if (debug_info_available)
+        if (debug_info_available && last_debug_ms < debug_ms && debug_ms > 0)
         {
             debug_info_available = false;
             return dbg;

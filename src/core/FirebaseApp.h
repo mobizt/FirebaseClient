@@ -1,5 +1,5 @@
 /**
- * Created March 24, 2024
+ * Created March 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -57,6 +57,8 @@ namespace firebase
         auth_data_t auth_data;
         AsyncClientClass *aClient = nullptr;
         uint32_t aclient_addr = 0, app_addr = 0, ref_ts = 0;
+        std::vector<uint32_t> aVec; // FirebaseApp vector
+        std::vector<uint32_t> cVec; // AsyncClient vector
         AsyncResultCallback resultCb = NULL;
         Timer req_timer, auth_timer, err_timer;
         List vec;
@@ -182,6 +184,12 @@ namespace firebase
             return token.length() > 0;
         }
 
+        AsyncClientClass *getClient()
+        {
+            List vec;
+            return vec.existed(cVec, aclient_addr) ? aClient : nullptr;
+        }
+
         void setEvent(firebase_auth_event_type event)
         {
             auth_data.user_auth.status._event = event;
@@ -203,10 +211,12 @@ namespace firebase
             if (event == auth_event_error || event == auth_event_ready)
             {
                 processing = false;
-                stop(aClient);
+                if (getClient())
+                    stop(aClient);
                 event = auth_event_uninitialized;
                 clearLastError(sData ? &sData->aResult : nullptr);
-                remove(aClient);
+                if (getClient())
+                    remove(aClient);
             }
         }
 
@@ -258,7 +268,8 @@ namespace firebase
 
         void createSlot(AsyncClientClass *aClient, slot_options_t &soption)
         {
-            sData = aClient->createSlot(soption);
+            if (aClient)
+                sData = aClient->createSlot(soption);
         }
 
         void newRequest(AsyncClientClass *aClient, slot_options_t &soption, const String &subdomain, const String &extras, AsyncResultCallback resultCb, const String &uid = "")
@@ -313,6 +324,9 @@ namespace firebase
 
             sys_idle();
 
+            if (!getClient())
+                return false;
+
             process(aClient, sData ? &sData->aResult : nullptr, resultCb);
 
             if (!isExpired())
@@ -365,7 +379,8 @@ namespace firebase
                     if (auth_data.user_auth.sa.step == jwt_step_begin)
                     {
                         auth_data.user_auth.sa.step = jwt_step_sign;
-                        stop(aClient);
+                        if (getClient())
+                            stop(aClient);
 
                         if (auth_data.user_auth.status._event != auth_event_token_signing)
                             setEvent(auth_event_token_signing);
@@ -390,10 +405,13 @@ namespace firebase
                     sop.auth_used = true;
 
                     // Remove all slots except sse in case ServiceAuth and CustomAuth to free up memory.
-                    for (size_t i = aClient->slotCount() - 1; i == 0; i--)
-                        aClient->removeSlot(i, false);
+                    if (getClient())
+                    {
+                        for (size_t i = aClient->slotCount() - 1; i == 0; i--)
+                            aClient->removeSlot(i, false);
 
-                    createSlot(aClient, sop);
+                        createSlot(aClient, sop);
+                    }
 
                     if (auth_data.user_auth.auth_type == auth_sa_access_token)
                     {
@@ -443,8 +461,8 @@ namespace firebase
                         else
                             extras += auth_data.user_auth.user.val[user_ns::api_key];
                     }
-
-                    newRequest(aClient, sop, subdomain, extras, resultCb);
+                    if (getClient())
+                        newRequest(aClient, sop, subdomain, extras, resultCb);
                     extras.remove(0, extras.length());
                     host.remove(0, host.length());
                     setEvent(auth_event_auth_request_sent);
@@ -465,7 +483,9 @@ namespace firebase
                 {
                     sop.async = true;
                     sop.auth_used = true;
-                    createSlot(aClient, sop);
+
+                    if (getClient())
+                        createSlot(aClient, sop);
 
                     if (auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password || auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email)
                     {
@@ -513,7 +533,8 @@ namespace firebase
                     else
                         extras += auth_data.user_auth.user.val[user_ns::api_key];
 
-                    newRequest(aClient, sop, subdomain, extras, resultCb);
+                    if (getClient())
+                        newRequest(aClient, sop, subdomain, extras, resultCb);
                     extras.remove(0, extras.length());
                     host.remove(0, host.length());
                     setEvent(auth_event_auth_request_sent);
@@ -553,7 +574,8 @@ namespace firebase
                         sData->response.val[res_hndlr_ns::payload].remove(0, sData->response.val[res_hndlr_ns::payload].length());
                         auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         auth_data.app_token.authenticated = true;
-                        aClient->setAuthTs(millis());
+                        if (getClient())
+                            aClient->setAuthTs(millis());
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
                         setEvent(auth_event_ready);
@@ -588,7 +610,7 @@ namespace firebase
         bool ready() { return processAuth() && auth_data.app_token.authenticated; }
 
         template <typename T>
-        void getApp(T &app) { app.setApp(app_addr, &auth_data.app_token); }
+        void getApp(T &app) { app.setApp(app_addr, &auth_data.app_token, reinterpret_cast<uint32_t>(&aVec)); }
 
         String getToken() const { return auth_data.app_token.val[app_tk_ns::token]; }
 

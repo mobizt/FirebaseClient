@@ -133,7 +133,10 @@
  * Each sync and async requests data consume memory up to 1k. When many async operations are added to queue (FIFO), the memory usage was increased.
  *
  * Each AsyncClient handles this queue separately. Then in order to limit the memory used for each AsyncClient,
- * this library allows 3-5 async operations (called slots) can be stored in the queue at the same time.
+ * this library allows 10 async operations (called slots) can be stored in the queue at a time.
+ * 
+ * The maximum queue size can be set via the build flag FIREBASE_ASYNC_QUEUE_LIMIT or macro in
+ * src/Config.h or created your own config in src/UserConfig.h.
  *
  * If the authentication async operation was required, it will insert to the first slot of the queue.
  *
@@ -246,7 +249,7 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
 #elif defined(ARDUINO_ARCH_SAMD)
@@ -291,7 +294,7 @@ void setup()
 
     Serial.println("Initializing app...");
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
     ssl_client.setBufferSizes(4096, 1024);

@@ -138,9 +138,7 @@ void setup()
     Serial.println("Initializing app...");
 
     ssl_client.setInsecure();
-#if defined(ESP8266)
     ssl_client.setBufferSizes(4096, 1024);
-#endif
 
     app.setCallback(asyncCB);
 

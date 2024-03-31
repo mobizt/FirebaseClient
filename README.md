@@ -46,6 +46,8 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
 - [Required Operation flows](#required-operation-flows)
 
+- [Async Queue](#async-queue)
+
 - [Async Client](#async-client)
 
 - [Networking Data](#networking-data)
@@ -57,6 +59,8 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 - [Firebase and Google Services Classes](#firebase-and-google-services)
 
 - [The Static Async Result Instances Required for Async Operation](#the-static-async-result-instances-required-for-async-operation)
+
+- [Dangling Pointers Prevention](#dangling-pointers-prevention)
 
 - [Basic Example](#basic-example)
 
@@ -264,6 +268,28 @@ Or
 
 `Network Connection -> Authentication (app intitialize included JWT token creation) -> Apply auth data to Service app -> Waits for App authenticate -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
 
+### Async Queue
+
+All requests for sync and async operations are managed using queue.
+ 
+Each sync and async requests data consume memory up to 1k. When many async operations are added to queue (FIFO), the memory usage was increased.
+ 
+Each async client handles this queue separately. Then in order to limit the memory used for each async client, this library allows 10 async operations (called slots) can be stored in the queue at a time.
+
+The maximum queue size can be set via the build flag `FIREBASE_ASYNC_QUEUE_LIMIT` or macro in [src/Config.h](src/Config.h) or created your own config in [src/UserConfig.h](src/UserConfig.h).
+
+When the authentication async operation was required, it will insert to the first slot of the queue.
+
+If the sync operation was called, it will insert to the first slot in the queue too but after the authentication task slot.
+
+When async Get operation in SSE mode (HTTP Streaming) was currently stored in queue, the new sync and async operations will be inserted before the async SSE (HTTP Streaming) slot.
+
+When the async operation queue is full, the new sync and async operations will be cancelled.
+ 
+The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
+
+The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app
+(Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
 
 ### Async Client
 
@@ -400,6 +426,15 @@ If async result was destroyed (destructed or not existed) before it was used by 
 
 Note that, the async client object used in authentication task shoul be defined globally as it is async task.
 
+### Dangling Pointers Prevention
+
+The async result, async client and Firebase main app are the managed classes that have dangling pointer prevention feature.
+
+The reference to these deleted or destructed objects will be blocked in all Firebase main app (FirebaseApp) and services apps (Realtime database, Firestore database, Cloud Messaging, Cloud Functions, Storage and Google Cloud Storage) to prevent device freeze or crashed due to dangling pointer.
+
+The exception is the deleted or destructed SSL client that assigned to async client still cause the dangling pointer issue.
+
+Then the SSL client should be defined in the same usage scope as async client to avoid the problem.
 
 ### Basic Example
 
@@ -438,10 +473,10 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in 
 
 FirebaseApp app;
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif __has_include(<WiFiSSLClient.h>)
+#elif defined(ARDUINO_ARCH_SAMD)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
@@ -480,7 +515,7 @@ void setup()
 
     Serial.println("Initializing app...");
 
-#if __has_include(<WiFiClientSecure.h>)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
     ssl_client.setBufferSizes(4096, 1024);

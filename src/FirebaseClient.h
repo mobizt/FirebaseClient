@@ -1,5 +1,5 @@
 /**
- * Created March 29, 2024
+ * Created March 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,7 +30,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "1.0.5"
+#define FIREBASE_CLIENT_VERSION "1.0.6"
 
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
@@ -95,6 +95,8 @@ namespace firebase
         {
             app.aClient = &aClient;
             app.aclient_addr = reinterpret_cast<uint32_t>(&aClient);
+
+            app.aClient->addRemoveClientVec(reinterpret_cast<uint32_t>(&(app.cVec)), true);
             app.auth_data.user_auth.copy(auth);
 
             app.auth_data.app_token.clear();

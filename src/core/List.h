@@ -1,5 +1,5 @@
 /**
- * Created February 11, 2024
+ * Created March 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -29,10 +29,6 @@
 
 namespace firebase
 {
-    static std::vector<uint32_t> aVec; // FirebaseApp vector
-    static std::vector<uint32_t> cVec; // AsyncClient vector
-    static std::vector<uint32_t> rVec; // AsyncResult vector
-    
     class List
     {
     private:

@@ -1,5 +1,5 @@
 /**
- * Created March 24, 2024
+ * Created March 31, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -39,6 +39,8 @@ class FirestoreBase
     friend class FirebaseApp;
 
 public:
+    std::vector<uint32_t> cVec; // AsyncClient vector
+
     ~FirestoreBase(){};
 
     FirestoreBase(const String &url = "")
@@ -61,16 +63,23 @@ public:
         this->service_url = url;
     }
 
-    void setApp(uint32_t app_addr, app_token_t *app_token)
+    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
     {
         this->app_addr = app_addr;
         this->app_token = app_token;
+        this->avec_addr = avec_addr; // AsyncClient vector (list) address
     }
 
     app_token_t *appToken()
     {
-        List vec;
-        return vec.existed(aVec, app_addr) ? app_token : nullptr;
+        if (avec_addr > 0)
+        {
+            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
+            List vec;
+            if (cVec)
+                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
+        }
+        return nullptr;
     }
 
     /**
@@ -94,7 +103,8 @@ protected:
     String service_url;
     String path;
     String uid;
-    uint32_t app_addr = 0;
+    //FirebaseApp address and FirebaseApp vector address
+    uint32_t app_addr = 0, avec_addr = 0;
     app_token_t *app_token = nullptr;
 
     struct async_request_data_t
@@ -165,8 +175,10 @@ protected:
         if (request.cb)
             sData->cb = request.cb;
 
+        request.aClient->addRemoveClientVec(reinterpret_cast<uint32_t>(&(cVec)), true);
+
         if (request.aResult)
-            sData->setRefResult(request.aResult);
+            sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->rVec)));
 
         sData->download = request.method == async_request_handler_t::http_get && sData->request.file_data.filename.length();
 

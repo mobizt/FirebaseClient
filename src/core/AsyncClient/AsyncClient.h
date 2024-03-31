@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created March 31, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -113,10 +113,17 @@ public:
         err_timer.feed(0);
     }
 
-    void setRefResult(AsyncResult *refResult)
+    void setRefResult(AsyncResult *refResult, uint32_t rvec_addr)
     {
         this->refResult = refResult;
-        ref_result_addr = refResult->addr;
+        ref_result_addr = reinterpret_cast<uint32_t>(refResult);
+        this->refResult->rvec_addr = rvec_addr;
+        if (rvec_addr > 0)
+        {
+            std::vector<uint32_t> *rVec = reinterpret_cast<std::vector<uint32_t> *>(rvec_addr);
+            List vec;
+            vec.addRemoveList(*rVec, ref_result_addr, true);
+        }
     }
 
     void reset()
@@ -180,6 +187,7 @@ private:
     String header, reqEtag, resETag;
     int netErrState = 0;
     uint32_t auth_ts = 0;
+    uint32_t cvec_addr = 0;
     Client *client = nullptr;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
     AsyncTCPConfig *async_tcp_config = nullptr;
@@ -660,6 +668,12 @@ private:
         return sData;
     }
 
+    AsyncResult *getResult(async_data_item_t *sData)
+    {
+        List vec;
+        return vec.existed(rVec, sData->ref_result_addr) ? sData->refResult : nullptr;
+    }
+
     void returnResult(async_data_item_t *sData, bool setData)
     {
 
@@ -673,11 +687,14 @@ private:
         bool download_status = sData->download && sData->aResult.setDownloadProgress();
         bool upload_status = sData->upload && sData->upload_progress_enabled && sData->aResult.setUploadProgress();
 
-        if (sData->refResult)
+        if (getResult(sData))
         {
             if (setData || error_notify_timeout || download_status || upload_status)
             {
+                uint32_t ms = sData->refResult->last_debug_ms;
                 *sData->refResult = sData->aResult;
+                // Restore last debug ms after.
+                sData->refResult->last_debug_ms = ms;
 
                 if (setData)
                     sData->refResult->setPayload(sData->aResult.val[ares_ns::data_payload]);
@@ -1268,7 +1285,7 @@ private:
         lastErr.clearError();
 
         if (client && !client->connected() && !sData->auth_used) // This info is already show in auth task
-            sData->aResult.setDebug(FPSTR("Connecting to server...")); 
+            sData->aResult.setDebug(FPSTR("Connecting to server..."));
 
         if (client && !client->connected() && client_type == async_request_handler_t::tcp_client_type_sync)
             sData->return_type = client->connect(host, port) > 0 ? function_return_type_complete : function_return_type_failure;
@@ -1383,7 +1400,7 @@ private:
     bool gprsConnect(async_data_item_t *sData)
     {
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
-        TinyGsm *gsmModem = (TinyGsm *) net.gsm.modem;
+        TinyGsm *gsmModem = (TinyGsm *)net.gsm.modem;
         if (gsmModem)
         {
             // Unlock your SIM card with a PIN if needed
@@ -1623,7 +1640,7 @@ private:
         return net.network_status;
     }
 
-    int sIndex(slot_options_t &options)
+    int sMan(slot_options_t &options)
     {
         int slot = -1;
         if (options.auth_used)
@@ -1794,13 +1811,12 @@ private:
     }
 
 public:
+    std::vector<uint32_t> rVec; // AsyncResult vector
     AsyncClientClass(Client &client, network_config_data &net) : client(&client)
     {
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
-        List list;
         client_type = async_request_handler_t::tcp_client_type_sync;
-        list.addRemoveList(cVec, addr, true);
     }
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
@@ -1808,9 +1824,7 @@ public:
     {
         this->net.copy(net);
         this->addr = reinterpret_cast<uint32_t>(this);
-        List list;
         client_type = async_request_handler_t::tcp_client_type_async;
-        list.addRemoveList(cVec, addr, true);
     }
 #endif
 
@@ -1822,13 +1836,12 @@ public:
         {
             reset(getData(i), true);
             async_data_item_t *sData = getData(i);
-            if (!sData->auth_used)
-                delete sData;
+            // if (!sData->auth_used)
+            delete sData;
             sData = nullptr;
         }
 
-        List list;
-        list.addRemoveList(cVec, addr, false);
+        addRemoveClientVec(cvec_addr, false);
     }
 
     bool networkStatus() { return netStatus(nullptr); }
@@ -1862,7 +1875,7 @@ public:
 
     async_data_item_t *createSlot(slot_options_t &options)
     {
-        int slot_index = sIndex(options);
+        int slot_index = sMan(options);
         // Only one SSE mode is allowed
         if (slot_index == -2)
             return nullptr;
@@ -1934,6 +1947,18 @@ public:
 
     void setAuthTs(uint32_t ts) { auth_ts = ts; }
 
+    void addRemoveClientVec(uint32_t cvec_addr, bool add)
+    {
+        this->cvec_addr = cvec_addr;
+        if (cvec_addr > 0)
+        {
+            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(cvec_addr);
+            List vec;
+            if (cVec)
+                vec.addRemoveList(*cVec, this->addr, add);
+        }
+    }
+
     void setContentLength(async_data_item_t *sData, size_t len)
     {
         if (sData->request.method == async_request_handler_t::http_post || sData->request.method == async_request_handler_t::http_put || sData->request.method == async_request_handler_t::http_patch)
@@ -1976,8 +2001,8 @@ public:
                 inProcess = false;
                 return;
             }
-            
-            // We have to re-start sse when the authenticate changed 
+
+            // We have to re-start sse when the authenticate changed
             if (sData->sse && sData->auth_ts != auth_ts)
             {
                 stop(sData);
