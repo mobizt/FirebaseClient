@@ -44,8 +44,6 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
 - [Working with filesystems and BLOB](#working-with-filesystems-and-blob)
 
-- [Required Operation flows](#required-operation-flows)
-
 - [Async Queue](#async-queue)
 
 - [Async Client](#async-client)
@@ -79,6 +77,8 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
   - [ID Token Authorization](#id-token-authorization)
 
   - [Legacy Token Authorization](#legacy-token-authorization)
+
+- [Required Operation flows](#required-operation-flows)
 
 - [Basic Example](#basic-example)
 
@@ -277,15 +277,6 @@ The blob config class will provide the in/out data payload.
 
 When filesystems are not used, remove ENABLE_FS macro or adding DISABLE_FS in compiler flags.
 
-### Required Operation flows
-
-User have to follow the following operation flows otherwise unknown errors can be occurred.
-
-`Network Connection -> Authentication (app intitialize included JWT token creation) -> Waits for App authenticate -> Apply auth data to Service app -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
-
-Or
-
-`Network Connection -> Authentication (app intitialize included JWT token creation) -> Apply auth data to Service app -> Waits for App authenticate -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
 
 ### Async Queue
 
@@ -457,7 +448,7 @@ Then the SSL client should be defined in the same usage scope as async client to
 
 ## App Initialization
 
-The Firebase app (`FirebaseApp`) is the main authentication and access token handler class in this library. All Firebase services Apps will take the authentication data called app token (`app_token_t`) that maintain by Firebase app, and use as the access key or bearer token while processing the request. 
+The Firebase app (`FirebaseApp`) is the main authentication and access token handler class in this library. All Firebase services Apps will take the authentication data called app token (`app_token_t`) that maintains by Firebase app, and use as the access key or bearer token while processing the request. 
 
 The `FirebaseApp` class constructor accepts the user auth data (`user_auth_data`) which is the struct that holding the user input sign-in credentials and token.
 
@@ -658,6 +649,62 @@ LegacyToken legacy_token(<database_secret>);
 ```
 
 `<database_secret>` The Realtime database secret key.
+
+### Required Operation flows
+
+When using this library, user have to follow the following operation flows otherwise unknown errors can be occurred.
+
+`Network Connection -> Authentication (app intitialize included JWT token creation) -> Waits for App authenticate -> Apply auth data to Service app -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
+
+Or
+
+`Network Connection -> Authentication (app intitialize included JWT token creation) -> Apply auth data to Service app -> Waits for App authenticate -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
+
+This library does not run any background process in FreeRTOS task or schedule task and timer ISR.
+
+To maintaining the async tasks, you have to place the code for `Maintain Authentication and Async Operation Queue` in infinite loop e.g. main loop() function, timer or scheduler cyclically event's callback function or infinite loop in FreeRTOS task (as in ESP32).
+
+For ESP32's FreeRTOS task, the CPU Core 1 is recommend for safely operation even the library is async operation but the SSL/TLS handshake in the SSL client was the blocking process during establishing the new server connection which can leeds to wdt reset triggered.
+
+**Example** for Maintain Authentication and Async Operation Queue in ESP32's FreeRTOS task in lambda function usage style.
+
+```cpp
+void setup()
+{
+    /////////////////////////////////////
+    // Network connection code here
+    /////////////////////////////////////
+
+    /////////////////////////////////////
+    // Authentication code here
+    /////////////////////////////////////
+
+    auto loopTask = [](void *pvParameters)
+    {
+        for (;;)
+        {
+            /////////////////////////////////////
+            // Maintain Authentication Queue
+            /////////////////////////////////////
+            app.loop();
+
+            /////////////////////////////////////
+            // Maintain App Async Queue
+            /////////////////////////////////////
+            Database.loop();
+
+            if (app.ready())
+            {
+                // your other code here
+                // For non-callback stream, you can check the information that provided from AsyncResult that assigned with the asyn get function with SSE option (stream) 
+            }
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+        }
+    };
+
+    xTaskCreatePinnedToCore(loopTask, "loopTask", 8000, NULL, 3, NULL, 1 /* must be core 1 for network task */);
+}
+```
 
 ### Basic Example
 
