@@ -1,5 +1,5 @@
 /**
- * Created March 11, 2024
+ * Created April 3, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -47,6 +47,8 @@ namespace FirestoreQuery
             AND,                  // Documents are required to satisfy all of the combined filters.
             OR                    // Documents are required to satisfy at least one of the combined filters.
         };
+
+        const struct firebase::key_str_30 _OPERATOR_TYPE[OPERATOR_TYPE::OR + 1] PROGMEM = {"OPERATOR_UNSPECIFIED", "AND", "OR"};
     }
 
     namespace UnaryFilterOperator
@@ -63,6 +65,9 @@ namespace FirestoreQuery
             IS_NOT_NULL // The given field is not equal to NULL.
 
         };
+
+        const struct firebase::key_str_30 _OPERATOR_TYPE[OPERATOR_TYPE::IS_NOT_NULL + 1] PROGMEM = {"OPERATOR_UNSPECIFIED", "IS_NAN", "IS_NULL", "IS_NOT_NAN", "IS_NOT_NULL"};
+
     }
 
     namespace FieldFilterOperator
@@ -84,6 +89,9 @@ namespace FirestoreQuery
             ARRAY_CONTAINS_ANY,    // The given field is an array that contains any of the values in the given array.
             NOT_IN                 // The value of the field is not in the given array.
         };
+
+        const struct firebase::key_str_30 _OPERATOR_TYPE[OPERATOR_TYPE::NOT_IN + 1] PROGMEM = {"OPERATOR_UNSPECIFIED", "LESS_THAN", "LESS_THAN_OR_EQUAL", "GREATER_THAN", "GREATER_THAN_OR_EQUAL", "EQUAL", "NOT_EQUAL", "ARRAY_CONTAINS", "IN", "ARRAY_CONTAINS_ANY", "NOT_IN"};
+
     }
 
     namespace FilterSort
@@ -97,337 +105,203 @@ namespace FirestoreQuery
             ASCENDING,             // Ascending.
             DESCENDING             // Descending.
         };
+        const struct firebase::key_str_30 _Direction[Direction::DESCENDING + 1] PROGMEM = {"DIRECTION_UNSPECIFIED", "ASCENDING", "DESCENDING"};
+
     }
 
     /**
      * A reference to a field in a document, ex: stats.operations.
      */
-    class FieldReference : public Printable
+    class FieldReference : public BaseO1
     {
-    private:
-        String buf;
-        JSONUtil jut;
 
     public:
-        /**
-         * @param fieldPath A reference to a field in a document.
-         */
-        FieldReference(const String &fieldPath)
-        {
-            jut.addObject(buf, "fieldPath", fieldPath, true, true);
-        }
-
-        const char *c_str() const { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        // A reference to a field in a document.
+        FieldReference(const String &value) { fieldPath(value); }
+        // A reference to a field in a document.
+        FieldReference &fieldPath(const String &value) { return wr.add<FieldReference &, String>(*this, value, buf, FPSTR(__func__)); }
     };
 
     /**
      * The projection of document's fields to return.
      */
-    class Projection : public Printable
+    class Projection : public BaseO2
     {
-    private:
-        size_t bufSize = 2;
-        String buf[2];
-        ObjectWriter owriter;
-        void addField(FieldReference &field) { owriter.addMapArrayMember(buf, bufSize, buf[1], FPSTR("fields"), field.c_str(), false); }
-
     public:
-        /**
-         * @param fieldPath A reference to a field in a document.
-         */
-        Projection(FieldReference field)
-        {
-            addField(field);
-        }
-        /**
-         *  Add FieldReference to Projection
-         * @param fieldPath A reference to a field in a document.
-         */
-        Projection &add(FieldReference field)
-        {
-            addField(field);
-            return *this;
-        }
-
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
+        // A reference to a field in a document.
+        Projection(FieldReference value) { Projection::fields(value); }
+        // This value represents the item to add to an array.
+        //  A reference to a field in a document.
+        Projection &fields(FieldReference value) { return wr.append<Projection &, FieldReference>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        // Obsoleted, use fields instead.
+        Projection &add(FieldReference value) { return fields(value); }
     };
 
     /**
      * An order on a field.
      */
-    class Order : public Printable
+    class Order : public BaseO4
     {
     private:
-        size_t bufSize = 3;
-        String buf[3];
         ObjectWriter owriter;
-        Order &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
         Order();
         Order(FieldReference field, FilterSort::Direction direction);
-        Order &field(FieldReference field);
-        Order &direction(FilterSort::Direction direction);
-        const char *c_str();
-        size_t printTo(Print &p) const;
-        void clear();
+        // The field to order by.
+        Order &field(FieldReference value);
+        // The direction to order by. Defaults to ASCENDING.
+        Order &direction(FilterSort::Direction value);
     };
 
-    class CollectionSelector : public Printable
+    /**
+     * A selection of a collection, such as messages as m1.
+     */
+    class CollectionSelector : public BaseO4
     {
-    private:
-        size_t bufSize = 3;
-        String buf[3];
-        ObjectWriter owriter;
-        JSONUtil jut;
-
-        CollectionSelector &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-        {
-            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-            return *this;
-        }
 
     public:
         CollectionSelector() {}
-        CollectionSelector(const String &collectionId, bool allDescendants)
-        {
-            CollectionSelector::collectionId(collectionId);
-            CollectionSelector::allDescendants(allDescendants);
-        }
-        CollectionSelector &collectionId(const String &collectionId) { return setObject(buf[1], "collectionId", collectionId, true, true); }
-        CollectionSelector &allDescendants(bool value) { return setObject(buf[2], "allDescendants", owriter.getBoolStr(value), false, true); }
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
+        CollectionSelector(const String &collectionId, bool allDescendants) { CollectionSelector::collectionId(collectionId).allDescendants(allDescendants); }
+        // The collection ID. When set, selects only collections with this ID.
+        CollectionSelector &collectionId(const String &value) { return wr.set<CollectionSelector &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        // When false, selects only collections that are immediate children of the parent specified in the containing RunQueryRequest. When true, selects all descendant collections.
+        CollectionSelector &allDescendants(bool value) { return wr.set<CollectionSelector &, bool>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
     };
 
     /**
      * A position in a query result set.
      */
-    class Cursor : public Printable
+    class Cursor : public BaseO4
     {
-    private:
-        size_t bufSize = 3;
-        String buf[3];
-        ObjectWriter owriter;
-        JSONUtil jut;
-        Cursor &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
-
     public:
         Cursor();
-        /**
-         * @param value The befor option value
-         * If the position is just before or just after the given values, relative to the sort order defined by the query.
-         */
+        // The befor option value
+        // If the position is just before or just after the given values, relative to the sort order defined by the query.
         Cursor &before(bool value);
-        /**
-         * Add Value
-         * @param value The value that represent a position, in the order they appear in the order by clause of a query.
-         * Can contain fewer values than specified in the order by clause.
-         */
+        // This value represents the item to add to an array.
+        // The value that represent a position, in the order they appear in the order by clause of a query.
+        // Can contain fewer values than specified in the order by clause.
+        Cursor &values(Values::Value value);
+        // Obsoleted, use values instead.
         Cursor &addValue(Values::Value value);
-        const char *c_str();
-        size_t printTo(Print &p) const;
-        void clear();
     };
 
     /**
      * A Firestore query.
      */
-    class StructuredQuery : public Printable
+    class StructuredQuery : public BaseO12
     {
     private:
-        size_t bufSize = 9;
-        String buf[9];
-        ObjectWriter owriter;
-        StructuredQuery &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
-
     public:
         StructuredQuery();
-        /**
-         * Optional sub-set of the fields to return.
-         * This acts as a DocumentMask over the documents returned from a query.
-         * When not set, assumes that the caller wants all fields returned.
-         * @param projection The projection of document's fields to return.
-         */
-        StructuredQuery &select(Projection projection);
-        /**
-         * The collections to query.
-         * @param collSelector A selection of a collection, such as messages as m1.
-         * Call this multiple times for each collection.
-         */
-        StructuredQuery &from(CollectionSelector collSelector);
 
-        /**
-         * The filter to apply.
-         * @param filter A filter.
-         */
-        StructuredQuery &where(Filter filter);
+        // Optional sub-set of the fields to return.
+        // This acts as a DocumentMask over the documents returned from a query. When not set, assumes that the caller wants all fields returned.
+        StructuredQuery &select(Projection value);
 
-        /**
-         * The order to apply to the query results.
-         * @param orderBy An order on a field.
-         * Call this multiple times for each order.
-         */
-        StructuredQuery &orderBy(Order orderBy);
+        // This value represents the item to add to an array.
+        // The collections to query.
+        StructuredQuery &from(CollectionSelector value);
 
-        /**
-         * A potential prefix of a position in the result set to start the query at.
-         * @param startAt A position in a query result set.
-         */
-        StructuredQuery &startAt(Cursor startAt);
+        // The filter to apply.
+        StructuredQuery &where(Filter value);
 
-        /**
-         * A potential prefix of a position in the result set to end the query at.
-         * @param endAt A position in a query result set.
-         */
+        // This value represents the item to add to an array.
+        // The order to apply to the query results.
+        // Firestore allows callers to provide a full ordering, a partial ordering, or no ordering at all. In all cases, Firestore guarantees a stable ordering through the following rules:
+        //
+        // The orderBy is required to reference all fields used with an inequality filter.
+        // All fields that are required to be in the orderBy but are not already present are appended in lexicographical ordering of the field name.
+        // If an order on __name__ is not specified, it is appended by default.
+        // Fields are appended with the same sort direction as the last order specified, or 'ASCENDING' if no order was specified. For example:
+        //
+        // ORDER BY a becomes ORDER BY a ASC, __name__ ASC
+        // ORDER BY a DESC becomes ORDER BY a DESC, __name__ DESC
+        // WHERE a > 1 becomes WHERE a > 1 ORDER BY a ASC, __name__ ASC
+        // WHERE __name__ > ... AND a > 1 becomes WHERE __name__ > ... AND a > 1 ORDER BY a ASC, __name__ ASC
+        StructuredQuery &orderBy(Order value);
+
+        // A potential prefix of a position in the result set to start the query at.
+        // The ordering of the result set is based on the ORDER BY clause of the original query.
+        // SELECT * FROM k WHERE a = 1 AND b > 2 ORDER BY b ASC, __name__ ASC;
+        StructuredQuery &startAt(Cursor value);
+
+        // A potential prefix of a position in the result set to end the query at.
+        // This is similar to START_AT but with it controlling the end position rather than the start position.
         StructuredQuery &endAt(Cursor endAt);
 
-        /**
-         * The number of documents to skip before returning the first result.
-         * @param value The number of documents to skip before returning the first result.
-         */
+        // The number of documents to skip before returning the first result.
+        // This applies after the constraints specified by the WHERE, START AT, & END AT but before the LIMIT clause.
         StructuredQuery &offset(int value);
 
-        /**
-         * The maximum number of results to return.
-         * @param value The maximum number of results to return.
-         */
+        // The maximum number of results to return.
+        // Applies after all other constraints.
         StructuredQuery &limit(int value);
-
-        const char *c_str();
-        size_t printTo(Print &p) const;
-        void clear();
     };
 
     /**
      * A filter that merges multiple other filters using the given operator.
      */
-    class CompositeFilter : public Printable
+    class CompositeFilter : public BaseO4
     {
-    private:
-        size_t bufSize = 4;
-        String buf[4];
-        ObjectWriter owriter;
-        JSONUtil jut;
-        CompositeFilter &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
 
     public:
         CompositeFilter();
-        /**
-         * The operator for combining multiple filters.
-         * @param op The operator for combining multiple filters.
-         */
-        CompositeFilter &op(CompositFilterOperator::OPERATOR_TYPE filterOp);
-        /**
-         * Add filter.
-         * @param filter The Filter.
-         */
+        // The operator for combining multiple filters.
+        CompositeFilter &op(CompositFilterOperator::OPERATOR_TYPE value);
+
+        // This value represents the item to add to an array.
+        //  The Filter.
+        CompositeFilter &filters(Filter filter);
+        // Obsoleted, use fields instead.
         CompositeFilter &addFilter(Filter filter);
-        const char *c_str();
-        size_t printTo(Print &p) const;
-        void clear();
     };
 
     /**
      * A filter on a specific field.
      */
-    class FieldFilter : public Printable
+    class FieldFilter : public BaseO4
     {
     private:
-        size_t bufSize = 4;
-        String buf[4];
-        ObjectWriter owriter;
-        JSONUtil jut;
-
-        FieldFilter &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
-
     public:
         FieldFilter();
-        /**
-         * The field to filter by.
-         * @param field The field to filter by.
-         */
-        FieldFilter &field(FieldReference field);
-        /**
-         * The operator to filter by.
-         * @param filterOp The operator to filter by.
-         */
-        FieldFilter &op(FieldFilterOperator::OPERATOR_TYPE filterOp);
-        /**
-         * The value to compare to.
-         * @param value The value to compare to.
-         */
+
+        // The field to filter by.
+        FieldFilter &field(FieldReference value);
+
+        // The operator to filter by.
+        FieldFilter &op(FieldFilterOperator::OPERATOR_TYPE value);
+
+        // The value to compare to.
         FieldFilter &value(Values::Value value);
-        const char *c_str();
-        size_t printTo(Print &p) const;
-        void clear();
     };
     /**
      * A filter with a single operand.
      */
-    class UnaryFilter : public Printable
+    class UnaryFilter : public BaseO4
     {
-
-    private:
-        size_t bufSize = 3;
-        String buf[3];
-        ObjectWriter owriter;
-
-        UnaryFilter &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last);
-
     public:
         UnaryFilter();
-        /**
-         * The unary operator to apply.
-         * @param filterOp The unary operator to apply.
-         *
-         */
-        UnaryFilter &op(UnaryFilterOperator::OPERATOR_TYPE filterOp);
-        /**
-         * The field to which to apply the operator.
-         * @param field The field to which to apply the operator.
-         *
-         */
-        UnaryFilter &field(FieldReference field);
-        const char *c_str();
-        size_t printTo(Print &p) const;
-        void clear();
+        // The unary operator to apply.
+        UnaryFilter &op(UnaryFilterOperator::OPERATOR_TYPE value);
+        // The field to which to apply the operator.
+        UnaryFilter &field(FieldReference value);
     };
 
     /**
      * A filter.
      */
-    class Filter : public Printable
+    class Filter : public BaseO1
     {
-    private:
-        String buf;
-        ObjectWriter owriter;
-        JSONUtil jut;
-
     public:
         Filter();
-        /**
-         * A composite filter.
-         * @param compositeFilter A composite filter.
-         */
-        Filter(CompositeFilter compositeFilter);
-        /**
-         * A filter on a document field.
-         * @param fieldFilter A filter on a document field.
-         */
+        // A composite filter.
+        Filter(CompositeFilter value);
+        // A filter on a document field.
         Filter(FieldFilter fieldFilter);
-        /**
-         * A filter that takes exactly one argument.
-         * @param unaryFilter A filter that takes exactly one argument.
-         */
+        // A filter that takes exactly one argument.
         Filter(UnaryFilter unaryFilter);
-        const char *c_str();
-        size_t printTo(Print &p) const;
-        void clear();
     };
 
 }

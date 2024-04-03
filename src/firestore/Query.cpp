@@ -1,6 +1,6 @@
 
 /**
- * Created March 19, 2024
+ * Created April 3, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -37,150 +37,28 @@ namespace FirestoreQuery
 {
 
     StructuredQuery::StructuredQuery() {}
-
-    StructuredQuery &StructuredQuery::select(Projection projection) { return setObject(buf[1], "select", projection.c_str(), false, true); }
-    /**
-     * The item or value will be added to the array or list.
-     * To add more items, call this function again.
-     */
-    StructuredQuery &StructuredQuery::from(CollectionSelector collSelector)
-    {
-        owriter.addMapArrayMember(buf, bufSize, buf[2], "from", collSelector.c_str(), false);
-        return *this;
-    }
-
-    StructuredQuery &StructuredQuery::where(Filter filter) { return setObject(buf[3], "where", filter.c_str(), false, true); }
-    /**
-     * The item or value will be added to the array or list.
-     * To add more items, call this function again.
-     */
-    StructuredQuery &StructuredQuery::orderBy(Order orderBy)
-    {
-        owriter.addMapArrayMember(buf, bufSize, buf[4], "orderBy", orderBy.c_str(), false);
-        return *this;
-    }
-
-    StructuredQuery &StructuredQuery::startAt(Cursor startAt) { return setObject(buf[5], "startAt", startAt.c_str(), false, true); }
-
-    StructuredQuery &StructuredQuery::endAt(Cursor endAt) { return setObject(buf[6], "endAt", endAt.c_str(), false, true); }
-
-    StructuredQuery &StructuredQuery::offset(int value) { return setObject(buf[7], "offset", String(value), false, true); }
-
-    StructuredQuery &StructuredQuery::limit(int value) { return setObject(buf[8], "limit", String(value), false, true); }
-
-    const char *StructuredQuery::c_str() { return buf[0].c_str(); }
-    size_t StructuredQuery::printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void StructuredQuery::clear() { owriter.clearBuf(buf, bufSize); }
-
-    StructuredQuery &StructuredQuery::setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-    {
-        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-        return *this;
-    }
+    StructuredQuery &StructuredQuery::select(Projection value) { return wr.set<StructuredQuery &, Projection>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+    StructuredQuery &StructuredQuery::from(CollectionSelector value) { return wr.append<StructuredQuery &, CollectionSelector>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+    StructuredQuery &StructuredQuery::where(Filter value) { return wr.set<StructuredQuery &, Filter>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+    StructuredQuery &StructuredQuery::orderBy(Order value) { return wr.append<StructuredQuery &, Order>(*this, value, buf, bufSize, buf[4], FPSTR(__func__)); }
+    StructuredQuery &StructuredQuery::startAt(Cursor value) { return wr.set<StructuredQuery &, Cursor>(*this, value, buf, bufSize, buf[5], FPSTR(__func__)); }
+    StructuredQuery &StructuredQuery::endAt(Cursor value) { return wr.set<StructuredQuery &, Cursor>(*this, value, buf, bufSize, buf[6], FPSTR(__func__)); }
+    StructuredQuery &StructuredQuery::offset(int value) { return wr.set<StructuredQuery &, int>(*this, value, buf, bufSize, buf[7], FPSTR(__func__)); }
+    StructuredQuery &StructuredQuery::limit(int value) { return wr.set<StructuredQuery &, int>(*this, value, buf, bufSize, buf[8], FPSTR(__func__)); }
 
     CompositeFilter::CompositeFilter() {}
-
-    CompositeFilter &CompositeFilter::op(CompositFilterOperator::OPERATOR_TYPE filterOp)
-    {
-        using namespace CompositFilterOperator;
-
-        if (filterOp == AND)
-            return setObject(buf[1], "op", "AND", true, true);
-        else if (filterOp == OR)
-            return setObject(buf[1], "op", "OR", true, true);
-        return *this;
-    }
-    /**
-     * The item or value will be added to the array or list.
-     * To add more items, call this function again.
-     */
-    CompositeFilter &CompositeFilter::addFilter(Filter filter)
-    {
-        owriter.addMapArrayMember(buf, bufSize, buf[2], "filters", filter.c_str(), false);
-        return *this;
-    }
-    const char *CompositeFilter::c_str() { return buf[0].c_str(); }
-    size_t CompositeFilter::printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void CompositeFilter::clear() { owriter.clearBuf(buf, bufSize); }
-    CompositeFilter &CompositeFilter::setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-    {
-        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-        return *this;
-    }
+    CompositeFilter &CompositeFilter::op(CompositFilterOperator::OPERATOR_TYPE value) { return wr.set<CompositeFilter &, const char *>(*this, CompositFilterOperator::_OPERATOR_TYPE[value].text, buf, bufSize, buf[1], FPSTR(__func__)); }
+    CompositeFilter &CompositeFilter::filters(Filter value) { return wr.append<CompositeFilter &, Filter>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+    CompositeFilter &CompositeFilter::addFilter(Filter value) { return filters(value); }
 
     FieldFilter::FieldFilter() {}
-
-    FieldFilter &FieldFilter::setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-    {
-        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-        return *this;
-    }
-
-    FieldFilter &FieldFilter::field(FieldReference field) { return setObject(buf[1], "field", field.c_str(), false, true); }
-
-    FieldFilter &FieldFilter::op(FieldFilterOperator::OPERATOR_TYPE filterOp)
-    {
-        using namespace FieldFilterOperator;
-
-        if (filterOp == LESS_THAN)
-            return setObject(buf[2], "op", "LESS_THAN", true, true);
-        else if (filterOp == LESS_THAN_OR_EQUAL)
-            return setObject(buf[2], "op", "LESS_THAN_OR_EQUAL", true, true);
-        else if (filterOp == GREATER_THAN)
-            return setObject(buf[2], "op", "GREATER_THAN", true, true);
-        else if (filterOp == GREATER_THAN_OR_EQUAL)
-            return setObject(buf[2], "op", "GREATER_THAN_OR_EQUAL", true, true);
-        else if (filterOp == EQUAL)
-            return setObject(buf[2], "op", "EQUAL", true, true);
-        else if (filterOp == NOT_EQUAL)
-            return setObject(buf[2], "op", "NOT_EQUAL", true, true);
-        else if (filterOp == ARRAY_CONTAINS)
-            return setObject(buf[2], "op", "ARRAY_CONTAINS", true, true);
-        else if (filterOp == IN)
-            return setObject(buf[2], "op", "IN", true, true);
-        else if (filterOp == ARRAY_CONTAINS_ANY)
-            return setObject(buf[2], "op", "ARRAY_CONTAINS_ANY", true, true);
-        else if (filterOp == NOT_IN)
-            return setObject(buf[2], "op", "NOT_IN", true, true);
-        return *this;
-    }
-
-    FieldFilter &FieldFilter::value(Values::Value value) { return setObject(buf[3], "value", value.c_str(), false, true); }
-
-    const char *FieldFilter::c_str() { return buf[0].c_str(); }
-    size_t FieldFilter::printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void FieldFilter::clear() { owriter.clearBuf(buf, bufSize); }
+    FieldFilter &FieldFilter::field(FieldReference value) { return wr.set<FieldFilter &, FieldReference>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+    FieldFilter &FieldFilter::op(FieldFilterOperator::OPERATOR_TYPE value) { return wr.set<FieldFilter &, const char *>(*this, FieldFilterOperator::_OPERATOR_TYPE[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+    FieldFilter &FieldFilter::value(Values::Value value) { return wr.set<FieldFilter &, Values::Value>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
 
     UnaryFilter::UnaryFilter() {}
-    UnaryFilter &UnaryFilter::op(UnaryFilterOperator::OPERATOR_TYPE filterOp)
-    {
-        using namespace UnaryFilterOperator;
-
-        if (filterOp == IS_NAN)
-            return setObject(buf[1], "op", "IS_NAN", true, true);
-        else if (filterOp == IS_NULL)
-            return setObject(buf[1], "op", "IS_NULL", true, true);
-        else if (filterOp == IS_NOT_NAN)
-            return setObject(buf[1], "op", "IS_NOT_NAN", true, true);
-        else if (filterOp == IS_NOT_NULL)
-            return setObject(buf[1], "op", "IS_NOT_NULL", true, true);
-        return *this;
-    }
-    UnaryFilter &UnaryFilter::field(FieldReference field) { return setObject(buf[2], "field", field.c_str(), false, true); }
-    const char *UnaryFilter::c_str() { return buf[0].c_str(); }
-    size_t UnaryFilter::printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void UnaryFilter::clear() { owriter.clearBuf(buf, bufSize); }
-    UnaryFilter &UnaryFilter::setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-    {
-        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-        return *this;
-    }
-
-    Order &Order::setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-    {
-        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-        return *this;
-    }
+    UnaryFilter &UnaryFilter::op(UnaryFilterOperator::OPERATOR_TYPE value) { return wr.set<UnaryFilter &, const char *>(*this, UnaryFilterOperator::_OPERATOR_TYPE[value].text, buf, bufSize, buf[1], FPSTR(__func__)); }
+    UnaryFilter &UnaryFilter::field(FieldReference value) { return wr.set<UnaryFilter &, FieldReference>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
 
     Order::Order(){};
     Order::Order(FieldReference field, FilterSort::Direction direction)
@@ -188,66 +66,18 @@ namespace FirestoreQuery
         Order::field(field);
         Order::direction(direction);
     }
-    Order &Order::field(FieldReference field) { return setObject(buf[1], "field", field.c_str(), false, true); }
-    Order &Order::direction(FilterSort::Direction direction)
-    {
-        if (direction == FilterSort::ASCENDING)
-            return setObject(buf[2], "direction", "ASCENDING", true, true);
-        else if (direction == FilterSort::DESCENDING)
-            return setObject(buf[2], "direction", "DESCENDING", true, true);
-        return *this;
-    }
+    Order &Order::field(FieldReference value) { return wr.set<Order &, FieldReference>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+    Order &Order::direction(FilterSort::Direction value) { return wr.set<Order &, const char *>(*this, FilterSort::_Direction[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
 
-    const char *Order::c_str() { return buf[0].c_str(); }
-    size_t Order::printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void Order::clear() { owriter.clearBuf(buf, bufSize); }
-
-    Cursor::Cursor() { jut.addObject(buf[2], "values", "[]", false, true); }
-
-    Cursor &Cursor::before(bool value) { return setObject(buf[1], "before", owriter.getBoolStr(value), false, true); }
-    /**
-     * The item or value will be added to the array or list.
-     * To add more items, call this function again.
-     */
-    Cursor &Cursor::addValue(Values::Value value)
-    {
-        owriter.addMapArrayMember(buf, bufSize, buf[2], FPSTR("values"), value.c_str(), false);
-        return *this;
-    }
-
-    Cursor &Cursor::setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-    {
-        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-        return *this;
-    }
-
-    const char *Cursor::c_str() { return buf[0].c_str(); }
-    size_t Cursor::printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void Cursor::clear() { owriter.clearBuf(buf, bufSize); }
+    Cursor::Cursor() { wr.set<Cursor &, const char *>(*this, "[]", buf, bufSize, buf[2], "values"); }
+    Cursor &Cursor::before(bool value) { return wr.set<Cursor &, bool>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+    Cursor &Cursor::values(Values::Value value) { return wr.append<Cursor &, Values::Value>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+    Cursor &Cursor::addValue(Values::Value value) { return values(value); }
 
     Filter::Filter() {}
-
-    Filter::Filter(CompositeFilter compositeFilter)
-    {
-        clear();
-        jut.addObject(buf, "compositeFilter", compositeFilter.c_str(), false, true);
-    }
-
-    Filter::Filter(FieldFilter fieldFilter)
-    {
-        clear();
-        jut.addObject(buf, "fieldFilter", fieldFilter.c_str(), false, true);
-    }
-
-    Filter::Filter(UnaryFilter unaryFilter)
-    {
-        clear();
-        jut.addObject(buf, "unaryFilter", unaryFilter.c_str(), false, true);
-    }
-
-    const char *Filter::c_str() { return buf.c_str(); }
-    size_t Filter::printTo(Print &p) const { return p.print(buf.c_str()); }
-    void Filter::clear() { buf.remove(0, buf.length()); }
+    Filter::Filter(CompositeFilter value) { wr.add<Filter &, CompositeFilter>(*this, value, buf, "compositeFilter"); }
+    Filter::Filter(FieldFilter value) { wr.add<Filter &, FieldFilter>(*this, value, buf, "fieldFilter"); }
+    Filter::Filter(UnaryFilter value) { wr.add<Filter &, UnaryFilter>(*this, value, buf, "unaryFilter"); }
 
 }
 

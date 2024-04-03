@@ -66,7 +66,7 @@
  *
  * Each AsyncClient handles this queue separately. Then in order to limit the memory used for each AsyncClient,
  * this library allows 10 async operations (called slots) can be stored in the queue at a time.
- * 
+ *
  * The maximum queue size can be set via the build flag FIREBASE_ASYNC_QUEUE_LIMIT or macro in
  * src/Config.h or created your own config in src/UserConfig.h.
  *
@@ -231,6 +231,12 @@ void setup()
     ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
         ;
+
+    // Print authentication info
+    Serial.println("Authentication Information");
+    Firebase.printf("User UID: %s\n", app.getUid().c_str());
+    Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
+    Firebase.printf("Refresh Token: %s\n", app.getRefreshToken().c_str());
 }
 
 void loop()

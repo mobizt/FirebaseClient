@@ -1,5 +1,5 @@
 /**
- * Created March 24, 2024
+ * Created April 3, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -323,14 +323,12 @@ namespace FieldTransform
 /**
  * A precondition on a document, used for conditional operations.
  */
-class Precondition : public Printable
+class Precondition : public BaseO4
 {
     friend class FirestoreBase;
     friend class Documents;
 
 private:
-    size_t bufSize = 4;
-    String buf[4];
     ObjectWriter owriter;
     JSONUtil jut;
 
@@ -416,14 +414,12 @@ public:
  * Firestore document
  */
 template <typename T = Values::Value>
-class Document : public Printable
+class Document : public BaseO4
 {
     friend class FirestoreBase;
 
 private:
     Values::MapValue mv;
-    size_t bufSize = 4;
-    String buf[4];
     ObjectWriter owriter;
     JSONUtil jut;
 
@@ -456,6 +452,7 @@ public:
         buf[1] = name;
         getBuf();
     }
+
     /**
      * A Firestore document constructor with object.
      * @param key The key of an object.
@@ -466,6 +463,7 @@ public:
         mv.add(key, value);
         getBuf();
     }
+
     /**
      * Add the object to Firestore document.
      * @param key The key of an object.
@@ -476,6 +474,7 @@ public:
         mv.add(key, value);
         return getBuf();
     }
+
     /**
      * Set the document resource name.
      * @param name The resource name of the document.
@@ -485,17 +484,13 @@ public:
         buf[1] = name;
         getBuf();
     }
-    void setContent(const String &content)
-    {
-        owriter.clearBuf(buf, bufSize);
-        buf[0] = content;
-    }
+
     const char *c_str()
     {
         getBuf();
         return buf[0].c_str();
     }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+
     void clear()
     {
         owriter.clearBuf(buf, bufSize);
@@ -564,130 +559,46 @@ namespace Firestore
         firestore_database_mode_delete
     };
 
+    const struct key_str_30 _ConcurrencyMode[ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS + 1] PROGMEM = {"CONCURRENCY_MODE_UNSPECIFIED", "OPTIMISTIC", "PESSIMISTIC", "OPTIMISTIC_WITH_ENTITY_GROUPS"};
+    const struct key_str_40 _AppEngineIntegrationMode[AppEngineIntegrationMode::_DISABLED + 1] PROGMEM = {"APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", "ENABLED", "DISABLED"};
+    const struct key_str_40 _DeleteProtectionState[DeleteProtectionState::DELETE_PROTECTION_ENABLED + 1] PROGMEM = {"DELETE_PROTECTION_STATE_UNSPECIFIED", "DELETE_PROTECTION_DISABLED", "DELETE_PROTECTION_ENABLED"};
+    const struct key_str_60 _PointInTimeRecoveryEnablement[PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED + 1] PROGMEM = {"POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", "POINT_IN_TIME_RECOVERY_ENABLED", "POINT_IN_TIME_RECOVERY_DISABLED"};
+    const struct key_str_30 _DatabaseType[DatabaseType::DATASTORE_MODE + 1] PROGMEM = {"DATABASE_TYPE_UNSPECIFIED", "FIRESTORE_NATIVE", "DATASTORE_MODE"};
+
     /**
      * A Cloud Firestore Database.
      */
-    class Database : public Printable
+    class Database : public BaseO12
     {
         friend class Databases;
 
-    private:
-        size_t bufSize = 9;
-        String buf[9];
-        ObjectWriter owriter;
-        Database &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-        {
-            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-            return *this;
-        }
-
-        const char *getBuf() { return buf[0].c_str(); }
-
     public:
-        void setContent(const String &content)
-        {
-            owriter.clearBuf(buf, bufSize);
-            buf[0] = content;
-        }
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
+        // Set the concurrency control mode to use for this database (used in database creation).
+        Database &concurrencyMode(ConcurrencyMode value) { return wr.append<Database &, const char *>(*this, _ConcurrencyMode[value].text, buf, bufSize, buf[1], FPSTR(__func__)); }
 
-        /**
-         * Set the concurrency control mode to use for this database (used in database creation).
-         * @param concurrencyMode The ConcurrencyMode enum.
-         */
-        Database &concurrencyMode(ConcurrencyMode concurrencyMode)
-        {
-            if (concurrencyMode == ConcurrencyMode::CONCURRENCY_MODE_UNSPECIFIED)
-                return setObject(buf[1], "concurrencyMode", "CONCURRENCY_MODE_UNSPECIFIED", true, true);
-            else if (concurrencyMode == ConcurrencyMode::OPTIMISTIC)
-                return setObject(buf[1], "concurrencyMode", "OPTIMISTIC", true, true);
-            else if (concurrencyMode == ConcurrencyMode::PESSIMISTIC)
-                return setObject(buf[1], "concurrencyMode", "PESSIMISTIC", true, true);
-            else if (concurrencyMode == ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS)
-                return setObject(buf[1], "concurrencyMode", "OPTIMISTIC_WITH_ENTITY_GROUPS", true, true);
-            return *this;
-        }
+        // Set the App Engine integration mode to use for this database (used in database creation).
+        Database &appEngineIntegrationMode(AppEngineIntegrationMode value) { return wr.append<Database &, const char *>(*this, _AppEngineIntegrationMode[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
 
-        /**
-         * Set the App Engine integration mode to use for this database (used in database creation).
-         * @param appEngineIntegrationMode The AppEngineIntegrationMode enum.
-         */
-        Database &appEngineIntegrationMode(AppEngineIntegrationMode appEngineIntegrationMode)
-        {
-            if (appEngineIntegrationMode == AppEngineIntegrationMode::APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED)
-                return setObject(buf[2], "appEngineIntegrationMode", "APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", true, true);
-            else if (appEngineIntegrationMode == AppEngineIntegrationMode::ENABLED)
-                return setObject(buf[2], "appEngineIntegrationMode", "ENABLED", true, true);
-            else if (appEngineIntegrationMode == AppEngineIntegrationMode::_DISABLED)
-                return setObject(buf[2], "appEngineIntegrationMode", "DISABLED", true, true);
-            return *this;
-        }
-        /**
-         * Set the state of delete protection for the database (used in database creation).
-         * @param deleteProtectionState The DeleteProtectionState enum.
-         */
-        Database &deleteProtectionState(DeleteProtectionState deleteProtectionState)
-        {
-            if (deleteProtectionState == DeleteProtectionState::DELETE_PROTECTION_STATE_UNSPECIFIED)
-                return setObject(buf[3], "deleteProtectionState", "DELETE_PROTECTION_STATE_UNSPECIFIED", true, true);
-            else if (deleteProtectionState == DeleteProtectionState::DELETE_PROTECTION_ENABLED)
-                return setObject(buf[3], "deleteProtectionState", "DELETE_PROTECTION_ENABLED", true, true);
-            else if (deleteProtectionState == DeleteProtectionState::DELETE_PROTECTION_DISABLED)
-                return setObject(buf[3], "deleteProtectionState", "DELETE_PROTECTION_DISABLED", true, true);
-            return *this;
-        }
-        /**
-         * Set to enable the PITR feature on this database (used in database creation).
-         * @param pointInTimeRecoveryEnablement The PointInTimeRecoveryEnablement enum.
-         */
-        Database &pointInTimeRecoveryEnablement(PointInTimeRecoveryEnablement pointInTimeRecoveryEnablement)
-        {
-            if (pointInTimeRecoveryEnablement == PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED)
-                return setObject(buf[4], "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", true, true);
-            else if (pointInTimeRecoveryEnablement == PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_ENABLED)
-                return setObject(buf[4], "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_ENABLED", true, true);
-            else if (pointInTimeRecoveryEnablement == PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED)
-                return setObject(buf[4], "pointInTimeRecoveryEnablement", "POINT_IN_TIME_RECOVERY_DISABLED", true, true);
-            return *this;
-        }
+        // Set the state of delete protection for the database (used in database creation).
+        Database &deleteProtectionState(DeleteProtectionState value) { return wr.append<Database &, const char *>(*this, _DeleteProtectionState[value].text, buf, bufSize, buf[3], FPSTR(__func__)); }
 
-        /**
-         * Set the type of the database (used in database creation). See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.
-         * @param databaseType The DatabaseType enum.
-         */
-        Database &databaseType(DatabaseType databaseType)
-        {
-            if (databaseType == DatabaseType::DATABASE_TYPE_UNSPECIFIED)
-                return setObject(buf[5], "type", "DATABASE_TYPE_UNSPECIFIED", true, true);
-            else if (databaseType == DatabaseType::FIRESTORE_NATIVE)
-                return setObject(buf[5], "type", "FIRESTORE_NATIVE", true, true);
-            else if (databaseType == DatabaseType::DATASTORE_MODE)
-                return setObject(buf[5], "type", "DATASTORE_MODE", true, true);
-            return *this;
-        }
+        // Set to enable the PITR feature on this database (used in database creation).
+        Database &pointInTimeRecoveryEnablement(PointInTimeRecoveryEnablement value) { return wr.append<Database &, const char *>(*this, _PointInTimeRecoveryEnablement[value].text, buf, bufSize, buf[4], FPSTR(__func__)); }
 
-        /**
-         * Set the location of the database (used in database creation).
-         * Available locations are listed at https://cloud.google.com/firestore/docs/locations.
-         * @param value The location Id.
-         */
-        Database &locationId(const String &value) { return setObject(buf[6], "locationId", value, true, true); }
+        // Set the type of the database (used in database creation). See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.
+        Database &databaseType(DatabaseType value) { return wr.append<Database &, const char *>(*this, _DatabaseType[value].text, buf, bufSize, buf[5], FPSTR(__func__)); }
 
-        /**
-         * Set the resource name of the Database (used in database creation).
-         * Format: projects/{project}/databases/{database}
-         * @param value The resource name.
-         */
-        Database &name(const String &value) { return setObject(buf[7], "name", value, true, true); }
+        // Set the location of the database (used in database creation).
+        // Available locations are listed at https://cloud.google.com/firestore/docs/locations.
+        Database &locationId(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, buf[6], FPSTR(__func__)); }
 
-        /**
-         * Set the ETag (used in database update and deletion)
-         * This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
-         * @param value The ETag.
-         */
-        Database &etag(const String &value) { return setObject(buf[8], "etag", value, true, true); }
+        // Set the resource name of the Database (used in database creation).
+        // Format: projects/{project}/databases/{database}
+        Database &name(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, buf[7], FPSTR(__func__)); }
+
+        // Set the ETag (used in database update and deletion)
+        // This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
+        Database &etag(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, buf[8], FPSTR(__func__)); }
     };
 
 }
@@ -764,6 +675,7 @@ public:
         if (curdoc)
             jut.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false, true);
     }
+
     /**
      * A write on a document.
      * @param deletePath A document name to delete.
@@ -781,6 +693,7 @@ public:
      * @param transform Applies a transformation to a document.
      * @param currentDocument An optional precondition on the document. The write will fail if this is set and not met by the target document.
      */
+
     Write(DocumentTransform transform, Precondition currentDocument)
     {
         write_type = firestore_write_type_transform;
@@ -788,6 +701,7 @@ public:
             jut.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
         jut.addObject(buf, FPSTR("transform"), transform.c_str(), false, true);
     }
+
     /**
      * Add the update transform.
      * @param updateTransforms The transforms to perform after update.
@@ -816,6 +730,7 @@ public:
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 };
+
 /**
  * Class that represent the object that contains a write or list of writes, transaction and label to use with batch write.
  */
@@ -896,14 +811,14 @@ public:
 /**
  * Options for a transaction that can only be used to read documents.
  */
-class ReadOnly : public Printable
+class ReadOnly : public BaseO1
 {
 private:
-    String buf;
     JSONUtil jut;
 
 public:
     ReadOnly() {}
+
     /**
      * @param readTime Timestamp. Reads documents at the given time.
      */
@@ -912,22 +827,19 @@ public:
         if (readTime.length())
             jut.addObject(buf, "readTime", readTime, true, true);
     }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
 };
 
 /**
  * Options for creating a new transaction.
  */
-class TransactionOptions : public Printable
+class TransactionOptions : public BaseO1
 {
 private:
-    String buf;
     JSONUtil jut;
 
 public:
     TransactionOptions() {}
+
     /**
      * @param readOnly The transaction can only be used for read operations.
      */
@@ -936,6 +848,7 @@ public:
         if (strlen(readOnly.c_str()))
             jut.addObject(buf, "readOnly", readOnly.c_str(), false, true);
     }
+
     /**
      * @param readWrite The transaction can be used for both read and write operations.
      */
@@ -944,15 +857,11 @@ public:
         if (strlen(readWrite.c_str()))
             jut.addObject(buf, "readWrite", readWrite.c_str(), false, true);
     }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
 };
 
-class EximDocumentOptions : public Printable
+class EximDocumentOptions : public BaseO1
 {
 private:
-    String buf;
     URLUtil uut;
     JSONUtil json;
 
@@ -964,15 +873,14 @@ public:
         json.addObject(buf, "inputUriPrefix", uriPrefix, true);
         json.addTokens(buf, "collectionIds", collectionIds, true);
     }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
 };
 
-class GetDocumentOptions : public Printable
+/**
+ * This class used in Documents.get function represents the query parameters
+ */
+class GetDocumentOptions : public BaseO1
 {
 private:
-    String buf;
     URLUtil uut;
 
 public:
@@ -987,73 +895,43 @@ public:
         if (readTime.length())
             uut.addParam(buf, FPSTR("readTime"), readTime, hasParam);
     }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
 };
 
-class BatchGetDocumentOptions : public Printable
+/**
+ * This class used in Documents.batchGet function represents the JSON representation of request body
+ */
+class BatchGetDocumentOptions : public BaseO4
 {
 private:
-    size_t bufSize = 6;
-    String buf[6];
     ObjectWriter owriter;
-
-    void setObject(String &buf_n, const String &key, const String &value, bool isString, bool last) { owriter.setObject(buf, bufSize, buf_n, key, value, isString, last); }
 
 public:
     BatchGetDocumentOptions() {}
-    /**
-     * @param document The names of the documents to retrieve.
-     * The item or value will be added to the array or list.
-     * To add more items, call this function again.
-     */
-    void addDocument(const String &document) { owriter.addMapArrayMember(buf, bufSize, buf[1], "documents", owriter.makeResourcePath(document, true), false); }
-    /**
-     * @param mask The fields to return. If not set, returns all fields.
-     */
-    void mask(DocumentMask mask) { setObject(buf[2], "mask", mask.c_str(), false, true); }
-    /**
-     * @param transaction Timestamp Reads documents in a transaction.
-     */
-    void transaction(const String &transaction)
-    {
-        // Union field
-        if (transaction.length() && buf[4].length() == 0 && buf[5].length() == 0)
-            setObject(buf[3], "transaction", transaction, true, true);
-    }
-    /**
-     * @param transOptions Starts a new transaction and reads the documents. Defaults to a read-only transaction.
-     * The new transaction ID will be returned as the first response in the stream.
-     */
-    void newTransaction(TransactionOptions transOptions)
-    {
-        // Union field
-        if (strlen(transOptions.c_str()) && buf[3].length() == 0 && buf[5].length() == 0)
-            setObject(buf[4], "newTransaction", transOptions.c_str(), false, true);
-    }
-    /**
-     * @param readTime Timestamp. Reads documents as they were at the given time.
-     */
-    void readTime(const String &readTime)
-    {
-        // Union field
-        if (readTime.length() && buf[3].length() == 0 && buf[4].length() == 0)
-            setObject(buf[5], "readTime", readTime, true, true);
-    }
-    void setContent(const String &content)
-    {
-        owriter.clearBuf(buf, bufSize);
-        buf[0] = content;
-    }
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void clear() { owriter.clearBuf(buf, bufSize); }
+
+    // The names of the documents to retrieve.
+    // The item or value will be added to the array or list.
+    BatchGetDocumentOptions &documents(const String &value) { return wr.append<BatchGetDocumentOptions &, String>(*this, owriter.makeResourcePath(value, true), buf, bufSize, buf[1], FPSTR(__func__)); }
+
+    // The fields to return. If not set, returns all fields.
+    BatchGetDocumentOptions &mask(DocumentMask value) { return wr.set<BatchGetDocumentOptions &, DocumentMask>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+
+    // Union field consistency_selector
+    // Timestamp Reads documents in a transaction.
+    BatchGetDocumentOptions &transaction(const String &value) { return wr.set<BatchGetDocumentOptions &, String>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+
+    // Union field consistency_selector
+    // Starts a new transaction and reads the documents. Defaults to a read-only transaction.
+    // The new transaction ID will be returned as the first response in the stream.
+    BatchGetDocumentOptions &newTransaction(TransactionOptions value) { return wr.set<BatchGetDocumentOptions &, TransactionOptions>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+
+    // Union field consistency_selector
+    // Timestamp. Reads documents as they were at the given time.
+    BatchGetDocumentOptions &readTime(const String &value) { return wr.set<BatchGetDocumentOptions &, String>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
 };
 
-class PatchDocumentOptions : public Printable
+class PatchDocumentOptions : public BaseO1
 {
 private:
-    String buf;
     URLUtil uut;
 
 public:
@@ -1067,78 +945,61 @@ public:
         if (strlen(currentDocument.c_str()))
             uut.addParam(buf, FPSTR("currentDocument"), currentDocument.c_str(), hasParam);
     }
-    void setContent(const String &content) { buf = content; }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
 };
 
 #if defined(ENABLE_FIRESTORE_QUERY)
 
-class QueryOptions : public Printable
+// Ref https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents/runQuery
+
+class ExplainOptions : public BaseO1
 {
-private:
-    size_t bufSize = 5;
-    String buf[5];
-    ObjectWriter owriter;
 
-    void setObject(String &buf_n, const String &key, const String &value, bool isString, bool last) { owriter.setObject(buf, bufSize, buf_n, key, value, isString, last); }
+public:
+    ExplainOptions() {}
+    // Optional. Whether to execute this query.
+    // When false (the default), the query will be planned, returning only metrics from the planning stages.
+    // When true, the query will be planned and executed, returning the full query results along with both planning and execution stage metrics.
+    ExplainOptions &analyze(bool value) { return wr.add<ExplainOptions &, bool>(*this, value, buf, FPSTR(__func__)); }
+};
 
+/**
+ * This class used in Documents.runQuery function represents the JSON representation of the request body.
+ */
+class QueryOptions : public BaseO4
+{
 public:
     QueryOptions() {}
 
-    /**
-     * A structured query.
-     * @param structuredQuery A structured query.
-     */
-    void structuredQuery(StructuredQuery structuredQuery) { setObject(buf[1], "newTransaction", structuredQuery.c_str(), false, true); }
-    /**
-     * @param transaction Run the query within an already active transaction.
-     */
-    void transaction(const String &transaction)
-    {
-        // Union field
-        if (transaction.length() && buf[3].length() == 0 && buf[4].length() == 0)
-            setObject(buf[2], "transaction", transaction, true, true);
-    }
-    /**
-     * @param transOptions Starts a new transaction and reads the documents. Defaults to a read-only transaction.
-     * The new transaction ID will be returned as the first response in the stream.
-     */
-    void newTransaction(TransactionOptions transOptions)
-    {
-        // Union field
-        if (strlen(transOptions.c_str()) && buf[2].length() == 0 && buf[4].length() == 0)
-            setObject(buf[3], "newTransaction", transOptions.c_str(), false, true);
-    }
-    /**
-     * @param readTime Timestamp. Reads documents as they were at the given time.
-     * This must be a microsecond precision timestamp within the past one hour,
-     * or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
-     */
-    void readTime(const String &readTime)
-    {
-        // Union field
-        if (readTime.length() && buf[2].length() == 0 && buf[3].length() == 0)
-            setObject(buf[4], "readTime", readTime, true, true);
-    }
-    void setContent(const String &content)
-    {
-        owriter.clearBuf(buf, bufSize);
-        buf[0] = content;
-    }
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void clear() { owriter.clearBuf(buf, bufSize); }
+    // Optional. Explain options for the query. If set, additional query statistics will be returned. If not, only query results will be returned.
+    QueryOptions &explainOptions(ExplainOptions value) { return wr.set<QueryOptions &, ExplainOptions>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+
+    // A structured query.
+    QueryOptions &structuredQuery(StructuredQuery value) { return wr.set<QueryOptions &, StructuredQuery>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+
+    // Union field consistency_selector
+    // Run the query within an already active transaction.
+    QueryOptions &transaction(const String &value) { return wr.set<QueryOptions &, String>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+
+    // Union field consistency_selector
+    // Starts a new transaction and reads the documents. Defaults to a read-only transaction.
+    // The new transaction ID will be returned as the first response in the stream.
+    QueryOptions &newTransaction(TransactionOptions value) { return wr.set<QueryOptions &, TransactionOptions>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+
+    // Union field consistency_selector
+    // Timestamp. Reads documents as they were at the given time.
+    // This must be a microsecond precision timestamp within the past one hour,or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
+    QueryOptions &readTime(const String &value) { return wr.set<QueryOptions &, TransactionOptions>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
 };
 
 #endif
+// Ref https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents/list
 
-class ListDocumentsOptions : public Printable
+/**
+ * This class used in Documents.list function represents the query parametes.
+ */
+class ListDocumentsOptions : public BaseO6
 {
 private:
-    size_t bufSize = 6;
-    String buf[6];
     int pagesize = 0;
     DocumentMask msk;
     ObjectWriter owriter;
@@ -1169,133 +1030,94 @@ private:
 
 public:
     ListDocumentsOptions() {}
-    /**
-     * Optional. The maximum number of documents to return in a single response.
-     * Firestore may return fewer than this value.
-     * @param size The maximum number of documents to return in a single response.
-     */
-    ListDocumentsOptions &pageSize(int size)
+    // Optional. The maximum number of documents to return in a single response.
+    // Firestore may return fewer than this value.
+    ListDocumentsOptions &pageSize(int value)
     {
-        pagesize = size;
+        pagesize = value;
         return set();
     }
-    /**
-     * Optional. A page token, received from a previous documents.list response.
-     * @param pageToken Optional. A page token, received from a previous documents.list response.
-     */
-    ListDocumentsOptions &pageToken(const String &pageToken)
+    // Optional. A page token, received from a previous documents.list response.
+    ListDocumentsOptions &pageToken(const String &value)
     {
-        buf[1] = pageToken;
+        buf[1] = value;
         return set();
     }
-    /**
-     * Optional. The optional ordering of the documents to return.
-     * For example: priority desc, __name__ desc.
-     * @param orderBy
-     */
-    ListDocumentsOptions &orderBy(const String orderBy)
+
+    // Optional. The optional ordering of the documents to return.
+    // For example: priority desc, __name__ desc.
+    ListDocumentsOptions &orderBy(const String value)
     {
-        buf[2] = orderBy;
+        buf[2] = value;
         return set();
     }
-    /**
-     * Optional. The fields to return. If not set, returns all fields.
-     * If a document has a field that is not present in this mask, that field will not be returned in the response.
-     * @param mask The fields to return.
-     */
-    ListDocumentsOptions &mask(DocumentMask mask)
+
+    // Optional. The fields to return. If not set, returns all fields.
+    // If a document has a field that is not present in this mask, that field will not be returned in the response.
+    ListDocumentsOptions &mask(DocumentMask value)
     {
-        msk = mask;
+        msk = value;
         return set();
     }
-    /**
-     * If the list should show missing documents.
-     * A document is missing if it does not exist, but there are sub-documents nested underneath it. When true, such missing documents will be returned with a key but will not have fields, createTime, or updateTime set.
-     * Requests with showMissing may not specify where or orderBy.
-     * @param value
-     */
+    // If the list should show missing documents.
+    // A document is missing if it does not exist, but there are sub-documents nested underneath it. When true, such missing documents will be returned with a key but will not have fields, createTime, or updateTime set.
+    // Requests with showMissing may not specify where or orderBy.
     ListDocumentsOptions &showMissing(bool value)
     {
         buf[3] = owriter.getBoolStr(value);
         return set();
     }
-    /**
-     * Perform the read as part of an already active transaction.
-     * A base64-encoded string.
-     * @param transaction
-     */
-    ListDocumentsOptions &transaction(const String transaction)
+
+    // Perform the read as part of an already active transaction.
+    // A base64-encoded string.
+    ListDocumentsOptions &transaction(const String value)
     {
-        buf[4] = transaction;
+        buf[4] = value;
         return set();
     }
-    /**
-     * Perform the read at the provided time.
-     * This must be a microsecond precision timestamp within the past one hour,
-     * or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
-     * @param readTime
-     */
-    ListDocumentsOptions &readTime(const String readTime)
+
+    // Perform the read at the provided time.
+    // This must be a microsecond precision timestamp within the past one hour,or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
+    ListDocumentsOptions &readTime(const String value)
     {
-        buf[5] = readTime;
+        buf[5] = value;
         return set();
-    }
-    void setContent(const String &content)
-    {
-        owriter.clearBuf(buf, bufSize);
-        buf[0] = content;
-    }
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void clear()
-    {
-        owriter.clearBuf(buf, bufSize);
-        msk.clear();
     }
 };
 
-class ListCollectionIdsOptions : public Printable
-{
-private:
-    size_t bufSize = 4;
-    String buf[4];
-    ObjectWriter owriter;
+// Ref https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents/listCollectionIds
 
-    ListCollectionIdsOptions &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-    {
-        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-        return *this;
-    }
+/**
+ * This class used in Documents.listCollectionIds function represents the JSON representation of the request body.
+ */
+class ListCollectionIdsOptions : public BaseO4
+{
 
 public:
     ListCollectionIdsOptions() {}
+
     /**
      * The maximum number of results to return.
-     * @param pageSize The maximum number of results to return.
+     * @param value The maximum number of results to return.
      */
-    ListCollectionIdsOptions &pageSize(int pageSize) { return setObject(buf[1], FPSTR("pageSize"), String(pageSize), false, true); }
+    ListCollectionIdsOptions &pageSize(int value) { return wr.set<ListCollectionIdsOptions &, int>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+
     /**
      * A page token. Must be a value from ListCollectionIdsResponse.
-     * @param pageToken A page token. Must be a value from ListCollectionIdsResponse.
+     * @param value A page token. Must be a value from ListCollectionIdsResponse.
      */
-    ListCollectionIdsOptions &pageToken(const String &pageToken) { return setObject(buf[2], FPSTR("pageToken"), pageToken, true, true); }
+    ListCollectionIdsOptions &pageToken(const String &value) { return wr.set<ListCollectionIdsOptions &, String>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+
     /**
      * Reads documents as they were at the given time.
      * This must be a microsecond precision timestamp within the past one hour,
      * or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
-     * @param readTime Timestamp
+     * @param value Timestamp
      */
-    ListCollectionIdsOptions &readTime(const String readTime) { return setObject(buf[3], FPSTR("readTime"), readTime, true, true); }
-    void setContent(const String &content)
-    {
-        owriter.clearBuf(buf, bufSize);
-        buf[0] = content;
-    }
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void clear() { owriter.clearBuf(buf, bufSize); }
+    ListCollectionIdsOptions &readTime(const String value) { return wr.set<ListCollectionIdsOptions &, String>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
 };
 
+// Ref https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes
 namespace DatabaseIndex
 {
     namespace IndexMode
@@ -1313,97 +1135,44 @@ namespace DatabaseIndex
             ARRAY_CONTAINS // The field's array values are indexed so as to support membership using ARRAY_CONTAINS queries.
         };
 
+        const struct key_str_30 _Mode[ARRAY_CONTAINS + 1] PROGMEM = {"MODE_UNSPECIFIED", "ASCENDING", "DESCENDING", "ARRAY_CONTAINS"};
     }
 
     /**
      * A field of an index.
      */
-    class IndexField : public Printable
+    class IndexField : public BaseO4
     {
-    private:
-        size_t bufSize = 3;
-        String buf[3];
-        ObjectWriter owriter;
-
-        IndexField &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-        {
-            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-            return *this;
-        }
 
     public:
         IndexField() {}
-        /**
-         * The path of the field. Must match the field path specification described by
-         * [google.firestore.v1beta1.Document.fields][fields]. Special field path __name__
-         * may be used by itself or at the end of a path. __type__ may be used only at the end of path.
-         * @param fieldPath
-         */
-        IndexField &fieldPath(const String &fieldPath) { return setObject(buf[1], "fieldPath", fieldPath, true, true); }
-        /**
-         * The field's mode.
-         * @param mode
-         */
-        IndexField &mode(IndexMode::Mode mode)
-        {
-            if (mode == IndexMode::ASCENDING)
-                return setObject(buf[2], "mode", "ASCENDING", true, true);
-            else if (mode == IndexMode::DESCENDING)
-                return setObject(buf[2], "mode", "DESCENDING", true, true);
-            else if (mode == IndexMode::ARRAY_CONTAINS)
-                return setObject(buf[2], "mode", "ARRAY_CONTAINS", true, true);
-            return *this;
-        }
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
+        // The path of the field. Must match the field path specification described by [google.firestore.v1beta1.Document.fields][fields]. Special field path __name__ may be used by itself or at the end of a path. __type__ may be used only at the end of path.
+        IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        // The field's mode.
+        IndexField &mode(IndexMode::Mode value) { return wr.set<IndexField &, const char *>(*this, IndexMode::_Mode[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
     };
 
     /**
      * An index definition.
      */
-    class Index : public Printable
+    class Index : public BaseO4
     {
-    private:
-        size_t bufSize = 3;
-        String buf[3];
-        ObjectWriter owriter;
-
-        Index &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-        {
-            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-            return *this;
-        }
-
     public:
         Index(const String &collId)
         {
             if (collId.length())
                 collectionId(collId);
         }
-        /**
-         * The collection ID to which this index applies. Required.
-         * @param collectionId The collection ID to which this index applies. Required.
-         */
-        Index &collectionId(const String &collectionId) { return setObject(buf[1], FPSTR("collectionId"), collectionId, true, true); }
-        /**
-         * Add the field to index.
-         * @param field the field to index.
-         * The item or value will be added to the array or list.
-         * To add more items, call this function again.
-         */
-        Index &addField(IndexField field)
-        {
-            owriter.addMapArrayMember(buf, bufSize, buf[2], FPSTR("fields"), field.c_str(), false);
-            return *this;
-        }
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
+        // The collection ID to which this index applies. Required.
+        Index &collectionId(const String &value) { return wr.set<Index &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        // This value represents the item to add to an array.
+        //  The field to index.
+        Index &fields(IndexField value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
     };
 
 }
 
+// Ref https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes
 namespace CollectionGroupsIndex
 {
     // Query Scope defines the scope at which a query is run.
@@ -1437,179 +1206,62 @@ namespace CollectionGroupsIndex
         CONTAINS                  // The index supports array containment queries.
     };
 
-    class VectorConfig : public Printable
+    const struct key_str_30 _QueryScope[QueryScope::COLLECTION_RECURSIVE + 1] PROGMEM = {"QUERY_SCOPE_UNSPECIFIED", "COLLECTION", "COLLECTION_GROUP", "COLLECTION_RECURSIVE"};
+    const struct key_str_20 _ApiScope[ApiScope::DATASTORE_MODE_API + 1] PROGMEM = {"ANY_API", "DATASTORE_MODE_API"};
+    const struct key_str_30 _Order[Order::DESCENDING + 1] PROGMEM = {"ORDER_UNSPECIFIED", "ASCENDING", "DESCENDING"};
+    const struct key_str_30 _ArrayConfig[ArrayConfig::CONTAINS + 1] PROGMEM = {"ARRAY_CONFIG_UNSPECIFIED", "CONTAINS"};
+
+    // Ref https://firebase.google.com/docs/firestore/reference/rest/Shared.Types/FieldOperationMetadata#VectorConfig
+    /**
+     * The index configuration to support vector search operations
+     */
+    class VectorConfig : public BaseO4
     {
-    private:
-        size_t bufSize = 3;
-        String buf[3];
-        ObjectWriter owriter;
-
-        VectorConfig &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-        {
-            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-            return *this;
-        }
-
     public:
-        /**
-         * Required. The vector dimension this configuration applies to.
-         * The resulting index will only include vectors of this dimension, and can be used for vector search with the same dimension.
-         * @param value the field to index.
-         */
-        VectorConfig &dimension(int value) { return setObject(buf[1], "dimension", String(value), false, true); }
-        /**
-         * Indicates the vector index is a flat index.
-         */
-        VectorConfig &flat() { return setObject(buf[2], "flat", "{}", false, true); }
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
+        // Required. The vector dimension this configuration applies to.
+        // The resulting index will only include vectors of this dimension, and can be used for vector search with the same dimension.
+        VectorConfig &dimension(int value) { return wr.set<VectorConfig &, int>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        // Indicates the vector index is a flat index.
+        VectorConfig &flat() { return wr.set<VectorConfig &, const char *>(*this, "{}", buf, bufSize, buf[2], FPSTR(__func__)); }
     };
 
+    // Ref https://firebase.google.com/docs/firestore/reference/rest/Shared.Types/FieldOperationMetadata#IndexField
     /**
      * A field in an index. The fieldPath describes which field is indexed, the value_mode describes how the field value is indexed.
      */
-    class IndexField : public Printable
+    class IndexField : public BaseO4
     {
-    private:
-        size_t bufSize = 5;
-        String buf[5];
-        ObjectWriter owriter;
-
-        IndexField &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-        {
-            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-            return *this;
-        }
-
     public:
         IndexField() {}
-        /**
-         * Can be name. For single field indexes, this must match the name of the field or may be omitted.
-         * @param fieldPath
-         */
-        IndexField &fieldPath(const String &fieldPath) { return setObject(buf[1], "fieldPath", fieldPath, true, true); }
-        /**
-         * Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
-         * @param order
-         */
-        IndexField &order(Order order)
-        {
-            // Union field
-            if (buf[3].length() == 0 && buf[4].length() == 0)
-            {
-                if (order == Order::ORDER_UNSPECIFIED)
-                    return setObject(buf[2], "order", "ORDER_UNSPECIFIED", true, true);
-                else if (order == Order::DESCENDING)
-                    return setObject(buf[2], "order", "DESCENDING", true, true);
-                else if (order == Order::ASCENDING)
-                    return setObject(buf[2], "order", "ASCENDING", true, true);
-            }
-            return *this;
-        }
-
-        /**
-         * Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
-         * @param arrayConfig
-         */
-        IndexField &arrayConfig(ArrayConfig arrayConfig)
-        {
-            // Union field
-            if (buf[2].length() == 0 && buf[4].length() == 0)
-            {
-                if (arrayConfig == ArrayConfig::ARRAY_CONFIG_UNSPECIFIED)
-                    return setObject(buf[3], "arrayConfig", "ARRAY_CONFIG_UNSPECIFIED", true, true);
-                else if (arrayConfig == ArrayConfig::CONTAINS)
-                    return setObject(buf[3], "arrayConfig", "CONTAINS", true, true);
-            }
-            return *this;
-        }
-
-        /**
-         * Indicates that this field supports nearest neighbors and distance operations on vector.
-         * @param vectorConfig
-         */
-        IndexField &vectorConfig(VectorConfig vectorConfig)
-        {
-            // Union field
-            if (buf[2].length() == 0 && buf[3].length() == 0)
-                return setObject(buf[4], "vectorConfig", vectorConfig.c_str(), false, true);
-            return *this;
-        }
-
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
+        // Can be name. For single field indexes, this must match the name of the field or may be omitted.
+        IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        // Union field value_mode
+        // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
+        IndexField &order(Order value) { return wr.set<IndexField &, const char *>(*this, _Order[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+        // Union field value_mode
+        // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
+        IndexField &arrayConfig(ArrayConfig value) { return wr.set<IndexField &, const char *>(*this, _ArrayConfig[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+        // Union field value_mode
+        // Indicates that this field supports nearest neighbors and distance operations on vector.
+        IndexField &vectorConfig(VectorConfig value) { return wr.set<IndexField &, VectorConfig>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
     };
 
     /**
      * Cloud Firestore indexes enable simple and complex queries against documents in a database.
      */
-    class Index : public Printable
+    class Index : public BaseO4
     {
-    private:
-        size_t bufSize = 4;
-        String buf[4];
-        ObjectWriter owriter;
-
-        Index &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-        {
-            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-            return *this;
-        }
-
     public:
         Index() {}
-
-        /**
-         * Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
-         * @param queryScope The query scope enum.
-         */
-        Index &queryScope(QueryScope queryScope)
-        {
-            if (queryScope == QueryScope::QUERY_SCOPE_UNSPECIFIED)
-                return setObject(buf[1], "queryScope", "QUERY_SCOPE_UNSPECIFIED", true, true);
-            else if (queryScope == QueryScope::COLLECTION)
-                return setObject(buf[1], "queryScope", "COLLECTION", true, true);
-            else if (queryScope == QueryScope::COLLECTION_GROUP)
-                return setObject(buf[1], "queryScope", "COLLECTION_GROUP", true, true);
-            else if (queryScope == QueryScope::COLLECTION_RECURSIVE)
-                return setObject(buf[1], "queryScope", "COLLECTION_RECURSIVE", true, true);
-            return *this;
-        }
-
-        /**
-         * Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
-         * @param apiScope The query scope enum.
-         */
-        Index &apiScope(ApiScope apiScope)
-        {
-            if (apiScope == ApiScope::ANY_API)
-                return setObject(buf[2], "apiScope", "ANY_API", true, true);
-            else if (apiScope == ApiScope::DATASTORE_MODE_API)
-                return setObject(buf[2], "apiScope", "DATASTORE_MODE_API", true, true);
-            return *this;
-        }
-
-        /**
-         * Add the field that supported by this index.
-         * @param field the field to add.
-         * The item or value will be added to the array or list.
-         * To add more items, call this function again.
-         */
-        Index &addField(IndexField field)
-        {
-            owriter.addMapArrayMember(buf, bufSize, buf[3], FPSTR("fields"), field.c_str(), false);
-            return *this;
-        }
-        void setContent(const String &content)
-        {
-            owriter.clearBuf(buf, bufSize);
-            buf[0] = content;
-        }
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
+        // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
+        Index &queryScope(QueryScope value) { return wr.set<Index &, const char *>(*this, _QueryScope[value].text, buf, bufSize, buf[1], FPSTR(__func__)); }
+        // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
+        Index &apiScope(ApiScope value) { return wr.set<Index &, const char *>(*this, _ApiScope[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+        // This value represents the item to add to an array.
+        // Add the field that supported by this index.
+        Index &fields(IndexField value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+        // Obsoleted, use fields instead.
+        Index &addField(IndexField value) { return fields(value); }
     };
 
 }

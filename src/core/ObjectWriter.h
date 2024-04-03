@@ -1,5 +1,5 @@
 /**
- * Created March 10, 2024
+ * Created April 3, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -150,5 +150,287 @@ public:
         return full_path;
     }
 };
+
+class BufWriter
+{
+private:
+    ObjectWriter owriter;
+    JSONUtil jut;
+
+    template <typename T>
+    struct v_number
+    {
+        static bool const value = std::is_same<T, uint64_t>::value || std::is_same<T, int64_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+                                  std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value ||
+                                  std::is_same<T, double>::value || std::is_same<T, float>::value || std::is_same<T, int>::value;
+    };
+
+    template <typename T>
+    struct v_sring
+    {
+        static bool const value = std::is_same<T, const char *>::value || std::is_same<T, std::string>::value || std::is_same<T, String>::value;
+    };
+
+    void setObject(String *buf, size_t bufSize, String &buf_n, const String &key, const String &value, bool isString, bool last)
+    {
+        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+    }
+
+public:
+    BufWriter() {}
+    template <typename T1, typename T2>
+    T1 add(T1 ret, bool value, String &buf, const String &name)
+    {
+        clear(buf);
+        jut.addObject(buf, name, owriter.getBoolStr(value), false, true);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    auto add(T1 ret, const T2 &value, String &buf, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
+    {
+        clear(buf);
+        jut.addObject(buf, name, String(value), false, true);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    auto add(T1 ret, const T2 &value, String &buf, const String &name) -> typename std::enable_if<v_sring<T2>::value, T1>::type
+    {
+        clear(buf);
+        jut.addObject(buf, name, value, true, true);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    auto add(T1 ret, const T2 &value, String &buf, const String &name) -> typename std::enable_if<(!v_sring<T2>::value && !v_number<T2>::value && !std::is_same<T2, bool>::value), T1>::type
+    {
+        clear(buf);
+        jut.addObject(buf, name, value.c_str(), false, true);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    T1 set(T1 ret, bool value, String *buf, size_t bufSize, String &buf_n, const String &name)
+    {
+        setObject(buf, bufSize, buf_n, name, owriter.getBoolStr(value), false, true);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
+    {
+        setObject(buf, bufSize, buf_n, name, String(value), false, true);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<v_sring<T2>::value, T1>::type
+    {
+        setObject(buf, bufSize, buf_n, name, value, true, true);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<(!v_sring<T2>::value && !v_number<T2>::value && !std::is_same<T2, bool>::value), T1>::type
+    {
+        setObject(buf, bufSize, buf_n, name, value.c_str(), false, true);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    T1 append(T1 ret, bool value, String *buf, size_t bufSize, String &buf_n, const String &name)
+    {
+        owriter.addMapArrayMember(buf, bufSize, buf_n, name, owriter.getBoolStr(value), false);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
+    {
+        owriter.addMapArrayMember(buf, bufSize, buf_n, name, String(value), false);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<v_sring<T2>::value, T1>::type
+    {
+        owriter.addMapArrayMember(buf, bufSize, buf_n, name, value, true);
+        return ret;
+    }
+
+    template <typename T1, typename T2>
+    auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<(!v_sring<T2>::value && !v_number<T2>::value && !std::is_same<T2, bool>::value), T1>::type
+    {
+        owriter.addMapArrayMember(buf, bufSize, buf_n, name, value.c_str(), false);
+        return ret;
+    }
+    void clear(String &buf) { buf.remove(0, buf.length()); }
+    void clear(String *buf, size_t bufSize) { owriter.clearBuf(buf, bufSize); }
+};
+
+class BaseO1 : public Printable
+{
+
+protected:
+    String buf;
+    BufWriter wr;
+
+public:
+    BaseO1() {}
+    const char *c_str() const { return buf.c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    void clear() { buf.remove(0, buf.length()); }
+    void setContent(const String &content)
+    {
+        clear();
+        buf = content;
+    }
+};
+
+class BaseO2 : public Printable
+{
+
+protected:
+    static const size_t bufSize = 2;
+    String buf[bufSize];
+    BufWriter wr;
+
+public:
+    BaseO2() {}
+    const char *c_str() const { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { wr.clear(buf, bufSize); }
+    void setContent(const String &content)
+    {
+        clear();
+        buf[0] = content;
+    }
+};
+
+class BaseO4 : public Printable
+{
+
+protected:
+    static const size_t bufSize = 4;
+    String buf[bufSize];
+    BufWriter wr;
+
+public:
+    BaseO4() {}
+    const char *c_str() const { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { wr.clear(buf, bufSize); }
+    void setContent(const String &content)
+    {
+        clear();
+        buf[0] = content;
+    }
+};
+
+class BaseO6 : public Printable
+{
+
+protected:
+    static const size_t bufSize = 6;
+    String buf[bufSize];
+    BufWriter wr;
+
+public:
+    BaseO6() {}
+    const char *c_str() const { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { wr.clear(buf, bufSize); }
+    void setContent(const String &content)
+    {
+        clear();
+        buf[0] = content;
+    }
+};
+
+class BaseO8 : public Printable
+{
+protected:
+    static const size_t bufSize = 8;
+    String buf[bufSize];
+    BufWriter wr;
+
+public:
+    BaseO8() {}
+    const char *c_str() const { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { wr.clear(buf, bufSize); }
+    void setContent(const String &content)
+    {
+        clear();
+        buf[0] = content;
+    }
+};
+
+class BaseO12 : public Printable
+{
+
+protected:
+    static const size_t bufSize = 12;
+    String buf[bufSize];
+    BufWriter wr;
+
+public:
+    BaseO12() {}
+    const char *c_str() const { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { wr.clear(buf, bufSize); }
+    void setContent(const String &content)
+    {
+        clear();
+        buf[0] = content;
+    }
+};
+
+class BaseO16 : public Printable
+{
+protected:
+    static const size_t bufSize = 16;
+    String buf[bufSize];
+    BufWriter wr;
+
+public:
+    BaseO16() {}
+    const char *c_str() const { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { wr.clear(buf, bufSize); }
+    void setContent(const String &content)
+    {
+        clear();
+        buf[0] = content;
+    }
+};
+
+namespace firebase
+{
+    struct key_str_10
+    {
+        char text[10];
+    };
+
+    struct key_str_20
+    {
+        char text[20];
+    };
+
+    struct key_str_30
+    {
+        char text[30];
+    };
+
+    struct key_str_40
+    {
+        char text[40];
+    };
+    struct key_str_60
+    {
+        char text[60];
+    };
+}
 
 #endif

@@ -341,8 +341,9 @@ void loop()
         CollectionGroupsIndex::Index index;
         index.apiScope(CollectionGroupsIndex::ApiScope::ANY_API);
         index.queryScope(CollectionGroupsIndex::QueryScope::COLLECTION);
-        index.addField(indexField);
-        index.addField(indexField2);
+        //This change in v1.0.7 from addField to fields to correspond to the Firestore documentation.
+        index.fields(indexField);
+        index.fields(indexField2);
 
         Serial.println(indexField);
 

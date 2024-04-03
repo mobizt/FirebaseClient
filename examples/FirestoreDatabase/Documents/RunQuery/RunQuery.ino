@@ -341,8 +341,9 @@ void loop()
         StructuredQuery query;
 
         Projection projection(FieldReference("myDouble"));
-        projection.add(FieldReference("myInteger"));
-        projection.add(FieldReference("myTimestamp"));
+         //This change in v1.0.7 from add to fields to correspond to the Firestore documentation.
+        projection.fields(FieldReference("myInteger"));
+        projection.fields(FieldReference("myTimestamp"));
         query.select(projection);
         // Or shorter form
         // query.select(Projection(FieldReference("myDouble")).add(FieldReference("myInteger")).add(FieldReference("myTimestamp")));
