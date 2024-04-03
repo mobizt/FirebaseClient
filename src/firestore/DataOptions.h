@@ -406,9 +406,6 @@ public:
         this->buf[3] = timestamp;
         return setObject();
     }
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void clear() { owriter.clearBuf(buf, bufSize); }
 };
 /**
  * Firestore document
@@ -485,11 +482,7 @@ public:
         getBuf();
     }
 
-    const char *c_str()
-    {
-        getBuf();
-        return buf[0].c_str();
-    }
+    const char *c_str() const { return buf[0].c_str(); }
 
     void clear()
     {
@@ -635,7 +628,7 @@ public:
 /**
  * A write on a document.
  */
-class Write : public Printable
+class Write : public BaseO1
 {
     friend class FirestoreBase;
     friend class Writes;
@@ -648,7 +641,6 @@ private:
         firestore_write_type_delete,
         firestore_write_type_transform
     };
-    String buf;
     JSONUtil jut;
     ObjectWriter owriter;
     firestore_write_type write_type = firestore_write_type_undefined;
@@ -664,7 +656,7 @@ public:
      * @param update A document to write.
      * @param currentDocument An optional precondition on the document. The write will fail if this is set and not met by the target document.
      */
-    Write(DocumentMask updateMask, Document<Values::Value> update, Precondition currentDocument)
+    Write(const DocumentMask &updateMask, const Document<Values::Value> &update, const Precondition &currentDocument)
     {
         bool curdoc = strlen(currentDocument.c_str());
         bool updatemask = strlen(updateMask.c_str());
@@ -680,7 +672,7 @@ public:
      * A write on a document.
      * @param deletePath A document name to delete.
      */
-    Write(const String &deletePath, Precondition currentDocument)
+    Write(const String &deletePath, const Precondition &currentDocument)
     {
         write_type = firestore_write_type_delete;
         if (strlen(currentDocument.c_str()))
@@ -694,7 +686,7 @@ public:
      * @param currentDocument An optional precondition on the document. The write will fail if this is set and not met by the target document.
      */
 
-    Write(DocumentTransform transform, Precondition currentDocument)
+    Write(const DocumentTransform &transform, const Precondition &currentDocument)
     {
         write_type = firestore_write_type_transform;
         if (strlen(currentDocument.c_str()))
@@ -709,7 +701,7 @@ public:
      * If present, this write is equivalent to performing update and transform to
      * the same document atomically and in order.
      */
-    Write &addUpdateTransform(FieldTransform::FieldTransform updateTransforms)
+    Write &addUpdateTransform(const FieldTransform::FieldTransform &updateTransforms)
     {
         if (write_type == firestore_write_type_update)
         {
@@ -725,19 +717,14 @@ public:
 
         return *this;
     }
-    void setContent(const String &content) { buf = content; }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
 };
 
 /**
  * Class that represent the object that contains a write or list of writes, transaction and label to use with batch write.
  */
-class Writes : public Printable
+class Writes : public BaseO1
 {
 private:
-    String buf;
     JSONUtil jut;
     ObjectWriter owriter;
 
@@ -761,7 +748,7 @@ public:
      * @param labels Labels associated with this batch write.
      * An object containing a list of "key": value pairs.
      */
-    Writes(Write write, Values::MapValue labels)
+    Writes(const Write &write, const Values::MapValue &labels)
     {
         if (strlen(labels.c_str()))
             jut.addObject(buf, FPSTR("labels"), labels.c_str(), false);
@@ -772,25 +759,20 @@ public:
      * Add the write.
      * @param write A write on a document.
      */
-    Writes &add(Write write)
+    Writes &add(const Write &write)
     {
         ObjectWriter owriter;
         owriter.addMember(buf, write.c_str(), "]}");
         return *this;
     }
-    void setContent(const String &content) { buf = content; }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
 };
 
 /**
  * Options for a transaction that can be used to read and write documents.
  */
-class ReadWrite : public Printable
+class ReadWrite : public BaseO1
 {
 private:
-    String buf;
     JSONUtil jut;
 
 public:
@@ -803,9 +785,6 @@ public:
         if (retryTransaction.length())
             jut.addObject(buf, FPSTR("retryTransaction"), retryTransaction, true, true);
     }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
 };
 
 /**
@@ -843,7 +822,7 @@ public:
     /**
      * @param readOnly The transaction can only be used for read operations.
      */
-    TransactionOptions(ReadOnly readOnly)
+    TransactionOptions(const ReadOnly &readOnly)
     {
         if (strlen(readOnly.c_str()))
             jut.addObject(buf, "readOnly", readOnly.c_str(), false, true);
@@ -852,7 +831,7 @@ public:
     /**
      * @param readWrite The transaction can be used for both read and write operations.
      */
-    TransactionOptions(ReadWrite readWrite)
+    TransactionOptions(const ReadWrite &readWrite)
     {
         if (strlen(readWrite.c_str()))
             jut.addObject(buf, "readWrite", readWrite.c_str(), false, true);
@@ -913,7 +892,7 @@ public:
     BatchGetDocumentOptions &documents(const String &value) { return wr.append<BatchGetDocumentOptions &, String>(*this, owriter.makeResourcePath(value, true), buf, bufSize, buf[1], FPSTR(__func__)); }
 
     // The fields to return. If not set, returns all fields.
-    BatchGetDocumentOptions &mask(DocumentMask value) { return wr.set<BatchGetDocumentOptions &, DocumentMask>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+    BatchGetDocumentOptions &mask(const DocumentMask &value) { return wr.set<BatchGetDocumentOptions &, DocumentMask>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
 
     // Union field consistency_selector
     // Timestamp Reads documents in a transaction.
@@ -922,7 +901,7 @@ public:
     // Union field consistency_selector
     // Starts a new transaction and reads the documents. Defaults to a read-only transaction.
     // The new transaction ID will be returned as the first response in the stream.
-    BatchGetDocumentOptions &newTransaction(TransactionOptions value) { return wr.set<BatchGetDocumentOptions &, TransactionOptions>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+    BatchGetDocumentOptions &newTransaction(const TransactionOptions &value) { return wr.set<BatchGetDocumentOptions &, TransactionOptions>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
 
     // Union field consistency_selector
     // Timestamp. Reads documents as they were at the given time.
@@ -935,7 +914,7 @@ private:
     URLUtil uut;
 
 public:
-    PatchDocumentOptions(DocumentMask updateMask, DocumentMask mask, Precondition currentDocument)
+    PatchDocumentOptions(DocumentMask updateMask, DocumentMask mask, const Precondition &currentDocument)
     {
         bool hasParam = false;
         if (strlen(updateMask.c_str()))
@@ -971,10 +950,10 @@ public:
     QueryOptions() {}
 
     // Optional. Explain options for the query. If set, additional query statistics will be returned. If not, only query results will be returned.
-    QueryOptions &explainOptions(ExplainOptions value) { return wr.set<QueryOptions &, ExplainOptions>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+    QueryOptions &explainOptions(const ExplainOptions &value) { return wr.set<QueryOptions &, ExplainOptions>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
 
     // A structured query.
-    QueryOptions &structuredQuery(StructuredQuery value) { return wr.set<QueryOptions &, StructuredQuery>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+    QueryOptions &structuredQuery(const StructuredQuery &value) { return wr.set<QueryOptions &, StructuredQuery>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
 
     // Union field consistency_selector
     // Run the query within an already active transaction.
@@ -983,7 +962,7 @@ public:
     // Union field consistency_selector
     // Starts a new transaction and reads the documents. Defaults to a read-only transaction.
     // The new transaction ID will be returned as the first response in the stream.
-    QueryOptions &newTransaction(TransactionOptions value) { return wr.set<QueryOptions &, TransactionOptions>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+    QueryOptions &newTransaction(const TransactionOptions &value) { return wr.set<QueryOptions &, TransactionOptions>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
 
     // Union field consistency_selector
     // Timestamp. Reads documents as they were at the given time.
@@ -1054,7 +1033,7 @@ public:
 
     // Optional. The fields to return. If not set, returns all fields.
     // If a document has a field that is not present in this mask, that field will not be returned in the response.
-    ListDocumentsOptions &mask(DocumentMask value)
+    ListDocumentsOptions &mask(const DocumentMask &value)
     {
         msk = value;
         return set();
@@ -1167,7 +1146,7 @@ namespace DatabaseIndex
         Index &collectionId(const String &value) { return wr.set<Index &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
         // This value represents the item to add to an array.
         //  The field to index.
-        Index &fields(IndexField value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+        Index &fields(const IndexField &value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
     };
 
 }
@@ -1237,13 +1216,13 @@ namespace CollectionGroupsIndex
         IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
         // Union field value_mode
         // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
-        IndexField &order(Order value) { return wr.set<IndexField &, const char *>(*this, _Order[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+        IndexField &order(const Order &value) { return wr.set<IndexField &, const char *>(*this, _Order[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
         // Union field value_mode
         // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
-        IndexField &arrayConfig(ArrayConfig value) { return wr.set<IndexField &, const char *>(*this, _ArrayConfig[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+        IndexField &arrayConfig(const ArrayConfig &value) { return wr.set<IndexField &, const char *>(*this, _ArrayConfig[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
         // Union field value_mode
         // Indicates that this field supports nearest neighbors and distance operations on vector.
-        IndexField &vectorConfig(VectorConfig value) { return wr.set<IndexField &, VectorConfig>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+        IndexField &vectorConfig(const VectorConfig &value) { return wr.set<IndexField &, VectorConfig>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
     };
 
     /**
@@ -1254,14 +1233,14 @@ namespace CollectionGroupsIndex
     public:
         Index() {}
         // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
-        Index &queryScope(QueryScope value) { return wr.set<Index &, const char *>(*this, _QueryScope[value].text, buf, bufSize, buf[1], FPSTR(__func__)); }
+        Index &queryScope(const QueryScope &value) { return wr.set<Index &, const char *>(*this, _QueryScope[value].text, buf, bufSize, buf[1], FPSTR(__func__)); }
         // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
-        Index &apiScope(ApiScope value) { return wr.set<Index &, const char *>(*this, _ApiScope[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+        Index &apiScope(const ApiScope &value) { return wr.set<Index &, const char *>(*this, _ApiScope[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
         // This value represents the item to add to an array.
         // Add the field that supported by this index.
-        Index &fields(IndexField value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+        Index &fields(const IndexField &value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
         // Obsoleted, use fields instead.
-        Index &addField(IndexField value) { return fields(value); }
+        Index &addField(const IndexField &value) { return fields(value); }
     };
 
 }

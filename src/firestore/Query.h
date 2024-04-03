@@ -106,7 +106,6 @@ namespace FirestoreQuery
             DESCENDING             // Descending.
         };
         const struct firebase::key_str_30 _Direction[Direction::DESCENDING + 1] PROGMEM = {"DIRECTION_UNSPECIFIED", "ASCENDING", "DESCENDING"};
-
     }
 
     /**
@@ -129,12 +128,12 @@ namespace FirestoreQuery
     {
     public:
         // A reference to a field in a document.
-        Projection(FieldReference value) { Projection::fields(value); }
+        Projection(const FieldReference &value) { Projection::fields(value); }
         // This value represents the item to add to an array.
-        //  A reference to a field in a document.
-        Projection &fields(FieldReference value) { return wr.append<Projection &, FieldReference>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        // A reference to a field in a document.
+        Projection &fields(const FieldReference &value) { return wr.append<Projection &, FieldReference>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
         // Obsoleted, use fields instead.
-        Projection &add(FieldReference value) { return fields(value); }
+        Projection &add(const FieldReference &value) { return fields(value); }
     };
 
     /**
@@ -147,9 +146,9 @@ namespace FirestoreQuery
 
     public:
         Order();
-        Order(FieldReference field, FilterSort::Direction direction);
+        Order(const FieldReference &field, FilterSort::Direction direction);
         // The field to order by.
-        Order &field(FieldReference value);
+        Order &field(const FieldReference &value);
         // The direction to order by. Defaults to ASCENDING.
         Order &direction(FilterSort::Direction value);
     };
@@ -182,9 +181,9 @@ namespace FirestoreQuery
         // This value represents the item to add to an array.
         // The value that represent a position, in the order they appear in the order by clause of a query.
         // Can contain fewer values than specified in the order by clause.
-        Cursor &values(Values::Value value);
+        Cursor &values(const Values::Value &value);
         // Obsoleted, use values instead.
-        Cursor &addValue(Values::Value value);
+        Cursor &addValue(const Values::Value &value);
     };
 
     /**
@@ -198,14 +197,14 @@ namespace FirestoreQuery
 
         // Optional sub-set of the fields to return.
         // This acts as a DocumentMask over the documents returned from a query. When not set, assumes that the caller wants all fields returned.
-        StructuredQuery &select(Projection value);
+        StructuredQuery &select(const Projection &value);
 
         // This value represents the item to add to an array.
         // The collections to query.
-        StructuredQuery &from(CollectionSelector value);
+        StructuredQuery &from(const CollectionSelector &value);
 
         // The filter to apply.
-        StructuredQuery &where(Filter value);
+        StructuredQuery &where(const Filter &value);
 
         // This value represents the item to add to an array.
         // The order to apply to the query results.
@@ -220,16 +219,16 @@ namespace FirestoreQuery
         // ORDER BY a DESC becomes ORDER BY a DESC, __name__ DESC
         // WHERE a > 1 becomes WHERE a > 1 ORDER BY a ASC, __name__ ASC
         // WHERE __name__ > ... AND a > 1 becomes WHERE __name__ > ... AND a > 1 ORDER BY a ASC, __name__ ASC
-        StructuredQuery &orderBy(Order value);
+        StructuredQuery &orderBy(const Order &value);
 
         // A potential prefix of a position in the result set to start the query at.
         // The ordering of the result set is based on the ORDER BY clause of the original query.
         // SELECT * FROM k WHERE a = 1 AND b > 2 ORDER BY b ASC, __name__ ASC;
-        StructuredQuery &startAt(Cursor value);
+        StructuredQuery &startAt(const Cursor &value);
 
         // A potential prefix of a position in the result set to end the query at.
         // This is similar to START_AT but with it controlling the end position rather than the start position.
-        StructuredQuery &endAt(Cursor endAt);
+        StructuredQuery &endAt(const Cursor &endAt);
 
         // The number of documents to skip before returning the first result.
         // This applies after the constraints specified by the WHERE, START AT, & END AT but before the LIMIT clause.
@@ -253,9 +252,9 @@ namespace FirestoreQuery
 
         // This value represents the item to add to an array.
         //  The Filter.
-        CompositeFilter &filters(Filter filter);
+        CompositeFilter &filters(const Filter &filter);
         // Obsoleted, use fields instead.
-        CompositeFilter &addFilter(Filter filter);
+        CompositeFilter &addFilter(const Filter &filter);
     };
 
     /**
@@ -268,13 +267,13 @@ namespace FirestoreQuery
         FieldFilter();
 
         // The field to filter by.
-        FieldFilter &field(FieldReference value);
+        FieldFilter &field(const FieldReference &value);
 
         // The operator to filter by.
         FieldFilter &op(FieldFilterOperator::OPERATOR_TYPE value);
 
         // The value to compare to.
-        FieldFilter &value(Values::Value value);
+        FieldFilter &value(const Values::Value &value);
     };
     /**
      * A filter with a single operand.
@@ -286,7 +285,7 @@ namespace FirestoreQuery
         // The unary operator to apply.
         UnaryFilter &op(UnaryFilterOperator::OPERATOR_TYPE value);
         // The field to which to apply the operator.
-        UnaryFilter &field(FieldReference value);
+        UnaryFilter &field(const FieldReference &value);
     };
 
     /**
@@ -297,11 +296,11 @@ namespace FirestoreQuery
     public:
         Filter();
         // A composite filter.
-        Filter(CompositeFilter value);
+        Filter(const CompositeFilter &value);
         // A filter on a document field.
-        Filter(FieldFilter fieldFilter);
+        Filter(const FieldFilter &fieldFilter);
         // A filter that takes exactly one argument.
-        Filter(UnaryFilter unaryFilter);
+        Filter(const UnaryFilter &unaryFilter);
     };
 
 }
