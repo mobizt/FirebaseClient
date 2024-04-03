@@ -64,7 +64,7 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
 - [App Initialization](#app-initialization)
  
-  - [App Initialization](#custom-uid-user-authentication)
+  - [Custom UID User Authentication](#custom-uid-user-authentication)
 
   - [Service Account Authentication](#service-account-authentication)
 
