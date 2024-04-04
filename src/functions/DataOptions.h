@@ -114,7 +114,7 @@ namespace GoogleCloudFunctions
     };
 
     const struct firebase::key_str_30 _DockerRegistry[DockerRegistry::ARTIFACT_REGISTRY + 1] PROGMEM = {"DOCKER_REGISTRY_UNSPECIFIED", "CONTAINER_REGISTRY", "RETRY_POLICY_RETRY"};
-    const struct firebase::key_str_60 _VpcConnectorEgressSettings[VpcConnectorEgressSettings::ALL_TRAFFIC + 1] PROGMEM = {"VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED", "PRIVATE_RANGES_ONLY", "ALL_TRAFFIC"};
+    const struct firebase::key_str_50 _VpcConnectorEgressSettings[VpcConnectorEgressSettings::ALL_TRAFFIC + 1] PROGMEM = {"VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED", "PRIVATE_RANGES_ONLY", "ALL_TRAFFIC"};
     const struct firebase::key_str_30 _IngressSettings[IngressSettings::ALLOW_INTERNAL_AND_GCLB + 1] PROGMEM = {"INGRESS_SETTINGS_UNSPECIFIED", "ALLOW_ALL", "ALLOW_INTERNAL_ONLY", "ALLOW_INTERNAL_AND_GCLB"};
     const struct firebase::key_str_30 _SecurityLevel[SecurityLevel::SECURE_OPTIONAL + 1] PROGMEM = {"SECURITY_LEVEL_UNSPECIFIED", "SECURE_ALWAYS", "SECURE_OPTIONAL"};
     const struct firebase::key_str_30 _RetryPolicy[RetryPolicy::RETRY_POLICY_RETRY + 1] PROGMEM = {"RETRY_POLICY_UNSPECIFIED", "RETRY_POLICY_DO_NOT_RETRY", "RETRY_POLICY_RETRY"};
@@ -181,7 +181,7 @@ namespace GoogleCloudFunctions
     /**
      * Describes the Build step of the function that builds a container from the given source.
      */
-    struct BuildConfig : public BaseO12
+    struct BuildConfig : public BaseO10
     {
     public:
         // The runtime in which to run the function. Required when deploying a new function, optional when updating an existing function. For a complete list of possible choices, see the gcloud command reference.
@@ -312,7 +312,7 @@ namespace GoogleCloudFunctions
     /**
      * Describes EventTrigger, used to request events to be sent from another service.
      */
-    struct EventTrigger : public BaseO12
+    struct EventTrigger : public BaseO10
     {
     public:
         // The region that the trigger will be in. The trigger will only receive events originating in this region. It can be the same region as the function, a different region or multi-region, or the global region. If not provided, defaults to the same region as the function.
@@ -340,7 +340,7 @@ namespace GoogleCloudFunctions
     /**
      * Describes a Cloud Function that contains user computation executed in response to an event. It encapsulates function and trigger configurations.
      */
-    struct Function : public BaseO12
+    struct Function : public BaseO10
     {
     public:
         // A user-defined name of the function. Function names must be unique globally and match pattern projects/*/locations/*/functions/*

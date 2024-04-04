@@ -1,5 +1,5 @@
 /**
- * Created March 19, 2024
+ * Created April 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -77,12 +77,10 @@ namespace GoogleCloudStorage
         publicRead
     };
 
-    struct BaseOptions : public Printable
+    struct BaseOptions : public BaseO8
     {
 
     protected:
-        size_t bufSize = 7;
-        String buf[7];
         ObjectWriter owriter;
         URLUtil uut;
         StringUtil sut;
@@ -108,30 +106,30 @@ namespace GoogleCloudStorage
             buf[1] = "generation=" + sut.u64Str(value);
             return setBuf();
         }
+
         BaseOptions &ifGenerationMatch(uint64_t value)
         {
             buf[2] = "ifGenerationMatch=" + sut.u64Str(value);
             return setBuf();
         }
+
         BaseOptions &ifGenerationNotMatch(uint64_t value)
         {
             buf[3] = "ifGenerationNotMatch=" + sut.u64Str(value);
             return setBuf();
         }
+
         BaseOptions &ifMetagenerationMatch(uint64_t value)
         {
             buf[4] = "ifMetagenerationMatch=" + sut.u64Str(value);
             return setBuf();
         }
+
         BaseOptions &ifMetagenerationNotMatch(uint64_t value)
         {
             buf[5] = "ifMetagenerationNotMatch=" + sut.u64Str(value);
             return setBuf();
         }
-
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
     struct GetOptions : public BaseOptions
@@ -147,9 +145,6 @@ namespace GoogleCloudStorage
                 buf[6] += "noAcl";
             return setBuf();
         }
-
-        const char *c_str() const { return buf[0].c_str(); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
     struct DeleteOptions : BaseOptions
@@ -159,12 +154,10 @@ namespace GoogleCloudStorage
         void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
-    struct InsertOptions : public Printable
+    struct InsertOptions : public BaseO10
     {
 
     private:
-        size_t bufSize = 9;
-        String buf[9];
         ObjectWriter owriter;
         StringUtil sut;
 
@@ -189,31 +182,37 @@ namespace GoogleCloudStorage
             buf[1] = "contentEncoding=" + value;
             return setBuf();
         }
+
         InsertOptions &ifGenerationMatch(uint64_t value)
         {
             buf[2] = "ifGenerationMatch=" + sut.u64Str(value);
             return setBuf();
         }
+
         InsertOptions &ifGenerationNotMatch(uint64_t value)
         {
             buf[3] = "ifGenerationNotMatch=" + sut.u64Str(value);
             return setBuf();
         }
+
         InsertOptions &ifMetagenerationMatch(uint64_t value)
         {
             buf[4] = "ifMetagenerationMatch=" + sut.u64Str(value);
             return setBuf();
         }
+
         InsertOptions &ifMetagenerationNotMatch(uint64_t value)
         {
             buf[5] = "ifMetagenerationNotMatch=" + sut.u64Str(value);
             return setBuf();
         }
+
         InsertOptions &kmsKeyName(const String &value)
         {
             buf[6] = "contentEncoding=" + value;
             return setBuf();
         }
+
         InsertOptions &predefinedAcl(ACL_OPTIONS value)
         {
             buf[7] = "predefinedAcl=";
@@ -231,6 +230,7 @@ namespace GoogleCloudStorage
                 buf[7] += "publicRead";
             return setBuf();
         }
+
         InsertOptions &projection(PROJECTION_OPTIONS value)
         {
             buf[8] = "projection=";
@@ -240,18 +240,12 @@ namespace GoogleCloudStorage
                 buf[8] += "noAcl";
             return setBuf();
         }
-
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
-    struct ListOptions : public Printable
+    struct ListOptions : public BaseO10
     {
 
     private:
-        size_t bufSize = 10;
-        String buf[10];
         ObjectWriter owriter;
         URLUtil uut;
 
@@ -276,87 +270,76 @@ namespace GoogleCloudStorage
             buf[1] = "delimiter=" + value;
             return setBuf();
         }
+
         ListOptions &endOffset(const String &value)
         {
             buf[2] = "endOffset=" + value;
             return setBuf();
         }
+
         ListOptions &includeTrailingDelimiter(bool value)
         {
             buf[3] = "includeTrailingDelimiter=" + owriter.getBoolStr(value);
             return setBuf();
         }
+
         ListOptions &maxResults(uint32_t value)
         {
             buf[4] = "maxResults=" + String(value);
             return setBuf();
         }
+
         ListOptions &pageToken(const String &value)
         {
             buf[5] = "pageToken=" + value;
             return setBuf();
         }
+
         ListOptions &prefix(const String &value)
         {
             buf[6] = "prefix=" + value;
             return setBuf();
         }
+
         ListOptions &projection(const String &value)
         {
             buf[7] = "projection=" + value;
             return setBuf();
         }
+
         ListOptions &startOffset(const String &value)
         {
             buf[8] = "startOffset=" + value;
             return setBuf();
         }
+
         ListOptions &versions(bool value)
         {
             buf[9] = "versions=" + owriter.getBoolStr(value);
             return setBuf();
         }
-
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
     };
 
-    struct InsertProperties : public Printable
+    struct InsertProperties : public BaseO16
     {
-
     private:
-        size_t bufSize = 15;
-        String buf[15];
         ObjectWriter owriter;
-        JSONUtil jut;
-
-        InsertProperties &setObject(String &buf_n, const String &key, const String &value, bool isString, bool last)
-        {
-            owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
-            return *this;
-        }
 
     public:
         InsertProperties() { metadata(object_t()); }
 
         // https://cloud.google.com/storage/docs/access-control/lists
-        // The item or value will be added to the array or list.
-        // To add more items, call this function again.
-        InsertProperties &acl(const String &value)
-        {
-            owriter.addMapArrayMember(buf, bufSize, buf[1], "acl", value, true);
-            return *this;
-        }
-        InsertProperties &cacheControl(const String &value) { return setObject(buf[2], FPSTR("cacheControl"), value, true, true); }
-        InsertProperties &contentDisposition(const String &value) { return setObject(buf[3], FPSTR("contentDisposition"), value, true, true); }
-        InsertProperties &contentEncoding(const String &value) { return setObject(buf[4], FPSTR("contentEncoding"), value, true, true); }
-        InsertProperties &contentLanguage(const String &value) { return setObject(buf[5], FPSTR("contentLanguage"), value, true, true); }
-        InsertProperties &contentType(const String &value) { return setObject(buf[6], FPSTR("contentType"), value, true, true); }
-        InsertProperties &crc32c(const String &value) { return setObject(buf[7], FPSTR("crc32c"), value, true, true); }
-        InsertProperties &customTime(const String &value) { return setObject(buf[8], FPSTR("customTime"), value, true, true); }
-        InsertProperties &eventBasedHold(bool value) { return setObject(buf[9], FPSTR("eventBasedHold"), owriter.getBoolStr(value), false, true); }
-        InsertProperties &md5Hash(const String &value) { return setObject(buf[10], FPSTR("md5Hash"), value, true, true); }
+        // This value represents the item to add to an array.
+        InsertProperties &acl(const String &value) { return wr.append<InsertProperties &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        InsertProperties &cacheControl(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
+        InsertProperties &contentDisposition(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+        InsertProperties &contentEncoding(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[4], FPSTR(__func__)); }
+        InsertProperties &contentLanguage(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[5], FPSTR(__func__)); }
+        InsertProperties &contentType(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[6], FPSTR(__func__)); }
+        InsertProperties &crc32c(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[7], FPSTR(__func__)); }
+        InsertProperties &customTime(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[8], FPSTR(__func__)); }
+        InsertProperties &eventBasedHold(bool value) { return wr.set<InsertProperties &, bool>(*this, value, buf, bufSize, buf[9], FPSTR(__func__)); }
+        InsertProperties &md5Hash(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[10], FPSTR(__func__)); }
         InsertProperties &metadata(const object_t value)
         {
             buf[11] = FPSTR("{\"metadata\":{\"firebaseStorageDownloadTokens\":\"a82781ce-a115-442f-bac6-a52f7f63b3e8\"}}");
@@ -365,13 +348,9 @@ namespace GoogleCloudStorage
             owriter.getBuf(buf, bufSize);
             return *this;
         }
-        InsertProperties &retention(const object_t value) { return setObject(buf[12], FPSTR("retention"), value.c_str(), false, true); }
-        InsertProperties &storageClass(const String &value) { return setObject(buf[13], FPSTR("storageClass"), value, true, true); }
-        InsertProperties &temporaryHold(bool value) { return setObject(buf[14], FPSTR("temporaryHold"), owriter.getBoolStr(value), false, true); }
-
-        const char *c_str() const { return buf[0].c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-        void clear() { owriter.clearBuf(buf, bufSize); }
+        InsertProperties &retention(const object_t value) { return wr.set<InsertProperties &, object_t>(*this, value, buf, bufSize, buf[12], FPSTR(__func__)); }
+        InsertProperties &storageClass(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[13], FPSTR(__func__)); }
+        InsertProperties &temporaryHold(bool value) { return wr.set<InsertProperties &, bool>(*this, value, buf, bufSize, buf[14], FPSTR(__func__)); }
     };
 
     class Parent

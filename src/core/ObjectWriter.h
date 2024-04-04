@@ -367,6 +367,26 @@ public:
     }
 };
 
+class BaseO10 : public Printable
+{
+
+protected:
+    static const size_t bufSize = 10;
+    String buf[bufSize];
+    BufWriter wr;
+
+public:
+    BaseO10() {}
+    const char *c_str() const { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { wr.clear(buf, bufSize); }
+    void setContent(const String &content)
+    {
+        clear();
+        buf[0] = content;
+    }
+};
+
 class BaseO12 : public Printable
 {
 
@@ -406,6 +426,25 @@ public:
     }
 };
 
+class BaseO26 : public Printable
+{
+protected:
+    static const size_t bufSize = 26;
+    String buf[bufSize];
+    BufWriter wr;
+
+public:
+    BaseO26() {}
+    const char *c_str() const { return buf[0].c_str(); }
+    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    void clear() { wr.clear(buf, bufSize); }
+    void setContent(const String &content)
+    {
+        clear();
+        buf[0] = content;
+    }
+};
+
 namespace firebase
 {
     struct key_str_10
@@ -427,9 +466,30 @@ namespace firebase
     {
         char text[40];
     };
+
+    struct key_str_50
+    {
+        char text[50];
+    };
+
     struct key_str_60
     {
         char text[60];
+    };
+
+    class UnityRange
+    {
+        public:
+        UnityRange() {}
+
+        float val(float value)
+        {
+            if (value > 1)
+                value = 1;
+            else if (value < 0)
+                value = 0;
+            return value;
+        }
     };
 }
 

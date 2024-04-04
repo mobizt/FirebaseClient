@@ -70,7 +70,7 @@ enum firebase_firestore_request_type
 /**
  * A set of field paths on a document. Used to restrict a get or update operation on a document to a subset of its fields. This is different from standard field masks, as this is always scoped to a Document, and takes in account the dynamic nature of Value.
  */
-class DocumentMask : public Printable
+class DocumentMask : public BaseO2
 {
     friend class FirestoreBase;
     friend class GetDocumentOptions;
@@ -79,8 +79,7 @@ class DocumentMask : public Printable
     friend class Documents;
 
 private:
-    size_t bufSize = 2;
-    String buf[2];
+    
     ObjectWriter owriter;
 
     String get()
@@ -92,6 +91,7 @@ private:
     }
 
 public:
+
     /**
      * A set of field paths on a document.
      * Used to restrict a get or update operation on a document to a subset of its fields.
@@ -104,6 +104,7 @@ public:
     {
         setFieldPaths(fieldPaths);
     }
+
     /**
      * A set of field paths on a document.
      * Used to restrict a get or update operation on a document to a subset of its fields.
@@ -128,9 +129,6 @@ public:
         uut.addParamsTokens(temp, String(mask + ".fieldPaths="), this->buf[1], hasParam);
         return temp;
     }
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
-    void clear() { owriter.clearBuf(buf, bufSize); }
 };
 
 namespace FieldTransform
@@ -157,6 +155,7 @@ namespace FieldTransform
         ObjectWriter owriter;
 
     public:
+        
         /**
          * Increment object to use with FieldTransform object class constructor.
          * @param value Adds the given value to the field's current value.
@@ -179,6 +178,7 @@ namespace FieldTransform
         ObjectWriter owriter;
 
     public:
+        
         /**
          * Maximum object to use with FieldTransform object class constructor.
          * @param value Sets the field to the maximum of its current value and the given value.
@@ -201,6 +201,7 @@ namespace FieldTransform
         ObjectWriter owriter;
 
     public:
+        
         /**
          * Mainimum object to use with FieldTransform object class constructor.
          * @param value Sets the field to the minimum of its current value and the given value.
@@ -223,6 +224,7 @@ namespace FieldTransform
         ObjectWriter owriter;
 
     public:
+        
         /**
          * Append the given elements in order if they are not already present in the current field value.
          * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
@@ -246,6 +248,7 @@ namespace FieldTransform
         ObjectWriter owriter;
 
     public:
+        
         /**
          * Remove all of the given elements from the array in the field.
          * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
@@ -266,6 +269,7 @@ namespace FieldTransform
         JSONUtil jut;
 
     public:
+        
         /**
          * Sets the field to the given server value.
          * @param enumValue The ServerValue enum
@@ -295,6 +299,7 @@ namespace FieldTransform
         }
 
     public:
+        
         /**
          * @param fieldPath The path of the field.
          * @param object The Increment, Maximum and Minimum objects.
@@ -302,12 +307,15 @@ namespace FieldTransform
          */
         template <typename T>
         FieldTransform(const String &fieldPath, T object) { set(fieldPath, object); }
+        
         /**
          * @param fieldPath The path of the field.
          * @param arrayValue Append the given elements in order if they are not already present in the current field value.
          * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
          */
+        
         FieldTransform(const String &fieldPath, AppendMissingElements<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
+        
         /**
          * @param fieldPath The path of the field.
          * @param arrayValue Remove all of the given elements from the array in the field.
@@ -385,6 +393,7 @@ private:
 
 public:
     Precondition() {}
+
     /**
      * Set the exists condition.
      * @param value When set to true, the target document must exist.
@@ -395,6 +404,7 @@ public:
         this->buf[2] = owriter.getBoolStr(value);
         return setObject();
     }
+
     /**
      * Set the update time condition.
      * @param updateTime A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
@@ -407,6 +417,7 @@ public:
         return setObject();
     }
 };
+
 /**
  * Firestore document
  */
@@ -440,6 +451,7 @@ private:
     }
 
 public:
+
     /**
      * A Firestore document constructor with document resource name.
      * @param name The resource name of the document.
@@ -555,40 +567,49 @@ namespace Firestore
     const struct key_str_30 _ConcurrencyMode[ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS + 1] PROGMEM = {"CONCURRENCY_MODE_UNSPECIFIED", "OPTIMISTIC", "PESSIMISTIC", "OPTIMISTIC_WITH_ENTITY_GROUPS"};
     const struct key_str_40 _AppEngineIntegrationMode[AppEngineIntegrationMode::_DISABLED + 1] PROGMEM = {"APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", "ENABLED", "DISABLED"};
     const struct key_str_40 _DeleteProtectionState[DeleteProtectionState::DELETE_PROTECTION_ENABLED + 1] PROGMEM = {"DELETE_PROTECTION_STATE_UNSPECIFIED", "DELETE_PROTECTION_DISABLED", "DELETE_PROTECTION_ENABLED"};
-    const struct key_str_60 _PointInTimeRecoveryEnablement[PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED + 1] PROGMEM = {"POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", "POINT_IN_TIME_RECOVERY_ENABLED", "POINT_IN_TIME_RECOVERY_DISABLED"};
+    const struct key_str_50 _PointInTimeRecoveryEnablement[PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED + 1] PROGMEM = {"POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", "POINT_IN_TIME_RECOVERY_ENABLED", "POINT_IN_TIME_RECOVERY_DISABLED"};
     const struct key_str_30 _DatabaseType[DatabaseType::DATASTORE_MODE + 1] PROGMEM = {"DATABASE_TYPE_UNSPECIFIED", "FIRESTORE_NATIVE", "DATASTORE_MODE"};
 
     /**
      * A Cloud Firestore Database.
      */
-    class Database : public BaseO12
+    class Database : public BaseO10
     {
         friend class Databases;
 
     public:
+
+        // This value represents the item to add to an array.
         // Set the concurrency control mode to use for this database (used in database creation).
         Database &concurrencyMode(ConcurrencyMode value) { return wr.append<Database &, const char *>(*this, _ConcurrencyMode[value].text, buf, bufSize, buf[1], FPSTR(__func__)); }
 
+        // This value represents the item to add to an array.
         // Set the App Engine integration mode to use for this database (used in database creation).
         Database &appEngineIntegrationMode(AppEngineIntegrationMode value) { return wr.append<Database &, const char *>(*this, _AppEngineIntegrationMode[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
 
+        // This value represents the item to add to an array.
         // Set the state of delete protection for the database (used in database creation).
         Database &deleteProtectionState(DeleteProtectionState value) { return wr.append<Database &, const char *>(*this, _DeleteProtectionState[value].text, buf, bufSize, buf[3], FPSTR(__func__)); }
 
+        // This value represents the item to add to an array.
         // Set to enable the PITR feature on this database (used in database creation).
         Database &pointInTimeRecoveryEnablement(PointInTimeRecoveryEnablement value) { return wr.append<Database &, const char *>(*this, _PointInTimeRecoveryEnablement[value].text, buf, bufSize, buf[4], FPSTR(__func__)); }
 
+        // This value represents the item to add to an array.
         // Set the type of the database (used in database creation). See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.
         Database &databaseType(DatabaseType value) { return wr.append<Database &, const char *>(*this, _DatabaseType[value].text, buf, bufSize, buf[5], FPSTR(__func__)); }
 
+        // This value represents the item to add to an array.
         // Set the location of the database (used in database creation).
         // Available locations are listed at https://cloud.google.com/firestore/docs/locations.
         Database &locationId(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, buf[6], FPSTR(__func__)); }
 
+        // This value represents the item to add to an array.
         // Set the resource name of the Database (used in database creation).
         // Format: projects/{project}/databases/{database}
         Database &name(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, buf[7], FPSTR(__func__)); }
 
+        // This value represents the item to add to an array.
         // Set the ETag (used in database update and deletion)
         // This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
         Database &etag(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, buf[8], FPSTR(__func__)); }
@@ -599,17 +620,17 @@ namespace Firestore
 /**
  * A transformation of a document
  */
-class DocumentTransform : public Printable
+class DocumentTransform : public BaseO1
 {
     friend class FirestoreBase;
     friend class Write;
 
 private:
-    String buf;
     ObjectWriter owriter;
     JSONUtil jut;
 
 public:
+
     /**
      * A transformation of a document.
      * @param document The name of the document to transform.
@@ -620,9 +641,6 @@ public:
         jut.addObject(buf, FPSTR("document"), owriter.makeResourcePath(document), true);
         jut.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), false, true);
     }
-    const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
 };
 
 /**
@@ -647,6 +665,7 @@ private:
     bool updateTrans = false;
 
 public:
+
     /**
      * A write on a document.
      * @param updateMask The fields to update in this write. This field can be set only when the operation is update.
@@ -685,7 +704,6 @@ public:
      * @param transform Applies a transformation to a document.
      * @param currentDocument An optional precondition on the document. The write will fail if this is set and not met by the target document.
      */
-
     Write(const DocumentTransform &transform, const Precondition &currentDocument)
     {
         write_type = firestore_write_type_transform;
@@ -729,6 +747,7 @@ private:
     ObjectWriter owriter;
 
 public:
+
     /**
      * The writes to apply.
      * @param write A write on a document.
@@ -776,6 +795,7 @@ private:
     JSONUtil jut;
 
 public:
+
     /**
      * @param retryTransaction An optional transaction to retry.
      * A base64-encoded string.
@@ -887,6 +907,7 @@ private:
 public:
     BatchGetDocumentOptions() {}
 
+    // This value represents the item to add to an array.
     // The names of the documents to retrieve.
     // The item or value will be added to the array or list.
     BatchGetDocumentOptions &documents(const String &value) { return wr.append<BatchGetDocumentOptions &, String>(*this, owriter.makeResourcePath(value, true), buf, bufSize, buf[1], FPSTR(__func__)); }
@@ -935,6 +956,7 @@ class ExplainOptions : public BaseO1
 
 public:
     ExplainOptions() {}
+
     // Optional. Whether to execute this query.
     // When false (the default), the query will be planned, returning only metrics from the planning stages.
     // When true, the query will be planned and executed, returning the full query results along with both planning and execution stage metrics.
@@ -971,6 +993,7 @@ public:
 };
 
 #endif
+
 // Ref https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents/list
 
 /**
@@ -1009,6 +1032,7 @@ private:
 
 public:
     ListDocumentsOptions() {}
+
     // Optional. The maximum number of documents to return in a single response.
     // Firestore may return fewer than this value.
     ListDocumentsOptions &pageSize(int value)
@@ -1016,6 +1040,7 @@ public:
         pagesize = value;
         return set();
     }
+
     // Optional. A page token, received from a previous documents.list response.
     ListDocumentsOptions &pageToken(const String &value)
     {
@@ -1038,6 +1063,7 @@ public:
         msk = value;
         return set();
     }
+
     // If the list should show missing documents.
     // A document is missing if it does not exist, but there are sub-documents nested underneath it. When true, such missing documents will be returned with a key but will not have fields, createTime, or updateTime set.
     // Requests with showMissing may not specify where or orderBy.
@@ -1125,8 +1151,10 @@ namespace DatabaseIndex
 
     public:
         IndexField() {}
+
         // The path of the field. Must match the field path specification described by [google.firestore.v1beta1.Document.fields][fields]. Special field path __name__ may be used by itself or at the end of a path. __type__ may be used only at the end of path.
         IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+
         // The field's mode.
         IndexField &mode(IndexMode::Mode value) { return wr.set<IndexField &, const char *>(*this, IndexMode::_Mode[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
     };
@@ -1137,13 +1165,15 @@ namespace DatabaseIndex
     class Index : public BaseO4
     {
     public:
-        Index(const String &collId)
+        Index(const String &collId = "")
         {
             if (collId.length())
                 collectionId(collId);
         }
+
         // The collection ID to which this index applies. Required.
         Index &collectionId(const String &value) { return wr.set<Index &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+
         // This value represents the item to add to an array.
         //  The field to index.
         Index &fields(const IndexField &value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
@@ -1152,6 +1182,7 @@ namespace DatabaseIndex
 }
 
 // Ref https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes
+
 namespace CollectionGroupsIndex
 {
     // Query Scope defines the scope at which a query is run.
@@ -1191,20 +1222,24 @@ namespace CollectionGroupsIndex
     const struct key_str_30 _ArrayConfig[ArrayConfig::CONTAINS + 1] PROGMEM = {"ARRAY_CONFIG_UNSPECIFIED", "CONTAINS"};
 
     // Ref https://firebase.google.com/docs/firestore/reference/rest/Shared.Types/FieldOperationMetadata#VectorConfig
+
     /**
      * The index configuration to support vector search operations
      */
     class VectorConfig : public BaseO4
     {
     public:
+
         // Required. The vector dimension this configuration applies to.
         // The resulting index will only include vectors of this dimension, and can be used for vector search with the same dimension.
         VectorConfig &dimension(int value) { return wr.set<VectorConfig &, int>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        
         // Indicates the vector index is a flat index.
         VectorConfig &flat() { return wr.set<VectorConfig &, const char *>(*this, "{}", buf, bufSize, buf[2], FPSTR(__func__)); }
     };
 
     // Ref https://firebase.google.com/docs/firestore/reference/rest/Shared.Types/FieldOperationMetadata#IndexField
+    
     /**
      * A field in an index. The fieldPath describes which field is indexed, the value_mode describes how the field value is indexed.
      */
@@ -1212,14 +1247,18 @@ namespace CollectionGroupsIndex
     {
     public:
         IndexField() {}
+
         // Can be name. For single field indexes, this must match the name of the field or may be omitted.
         IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        
         // Union field value_mode
         // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
         IndexField &order(const Order &value) { return wr.set<IndexField &, const char *>(*this, _Order[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+        
         // Union field value_mode
         // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
         IndexField &arrayConfig(const ArrayConfig &value) { return wr.set<IndexField &, const char *>(*this, _ArrayConfig[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+        
         // Union field value_mode
         // Indicates that this field supports nearest neighbors and distance operations on vector.
         IndexField &vectorConfig(const VectorConfig &value) { return wr.set<IndexField &, VectorConfig>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
@@ -1232,13 +1271,17 @@ namespace CollectionGroupsIndex
     {
     public:
         Index() {}
+        
         // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
         Index &queryScope(const QueryScope &value) { return wr.set<Index &, const char *>(*this, _QueryScope[value].text, buf, bufSize, buf[1], FPSTR(__func__)); }
+        
         // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
         Index &apiScope(const ApiScope &value) { return wr.set<Index &, const char *>(*this, _ApiScope[value].text, buf, bufSize, buf[2], FPSTR(__func__)); }
+        
         // This value represents the item to add to an array.
         // Add the field that supported by this index.
         Index &fields(const IndexField &value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
+        
         // Obsoleted, use fields instead.
         Index &addField(const IndexField &value) { return fields(value); }
     };

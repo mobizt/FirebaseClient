@@ -103,7 +103,7 @@ protected:
     String service_url;
     String path;
     String uid;
-    //FirebaseApp address and FirebaseApp vector address
+    // FirebaseApp address and FirebaseApp vector address
     uint32_t app_addr = 0, avec_addr = 0;
     app_token_t *app_token = nullptr;
 

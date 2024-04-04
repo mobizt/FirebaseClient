@@ -115,8 +115,10 @@ namespace FirestoreQuery
     {
 
     public:
+        
         // A reference to a field in a document.
         FieldReference(const String &value) { fieldPath(value); }
+        
         // A reference to a field in a document.
         FieldReference &fieldPath(const String &value) { return wr.add<FieldReference &, String>(*this, value, buf, FPSTR(__func__)); }
     };
@@ -127,11 +129,14 @@ namespace FirestoreQuery
     class Projection : public BaseO2
     {
     public:
+    
         // A reference to a field in a document.
         Projection(const FieldReference &value) { Projection::fields(value); }
+        
         // This value represents the item to add to an array.
         // A reference to a field in a document.
         Projection &fields(const FieldReference &value) { return wr.append<Projection &, FieldReference>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        
         // Obsoleted, use fields instead.
         Projection &add(const FieldReference &value) { return fields(value); }
     };
@@ -147,8 +152,10 @@ namespace FirestoreQuery
     public:
         Order();
         Order(const FieldReference &field, FilterSort::Direction direction);
+        
         // The field to order by.
         Order &field(const FieldReference &value);
+        
         // The direction to order by. Defaults to ASCENDING.
         Order &direction(FilterSort::Direction value);
     };
@@ -162,8 +169,10 @@ namespace FirestoreQuery
     public:
         CollectionSelector() {}
         CollectionSelector(const String &collectionId, bool allDescendants) { CollectionSelector::collectionId(collectionId).allDescendants(allDescendants); }
+        
         // The collection ID. When set, selects only collections with this ID.
         CollectionSelector &collectionId(const String &value) { return wr.set<CollectionSelector &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
+        
         // When false, selects only collections that are immediate children of the parent specified in the containing RunQueryRequest. When true, selects all descendant collections.
         CollectionSelector &allDescendants(bool value) { return wr.set<CollectionSelector &, bool>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
     };
@@ -175,13 +184,16 @@ namespace FirestoreQuery
     {
     public:
         Cursor();
+        
         // The befor option value
         // If the position is just before or just after the given values, relative to the sort order defined by the query.
         Cursor &before(bool value);
+        
         // This value represents the item to add to an array.
         // The value that represent a position, in the order they appear in the order by clause of a query.
         // Can contain fewer values than specified in the order by clause.
         Cursor &values(const Values::Value &value);
+        
         // Obsoleted, use values instead.
         Cursor &addValue(const Values::Value &value);
     };
@@ -253,6 +265,7 @@ namespace FirestoreQuery
         // This value represents the item to add to an array.
         //  The Filter.
         CompositeFilter &filters(const Filter &filter);
+        
         // Obsoleted, use fields instead.
         CompositeFilter &addFilter(const Filter &filter);
     };
@@ -282,8 +295,10 @@ namespace FirestoreQuery
     {
     public:
         UnaryFilter();
+        
         // The unary operator to apply.
         UnaryFilter &op(UnaryFilterOperator::OPERATOR_TYPE value);
+        
         // The field to which to apply the operator.
         UnaryFilter &field(const FieldReference &value);
     };
@@ -295,10 +310,13 @@ namespace FirestoreQuery
     {
     public:
         Filter();
+        
         // A composite filter.
         Filter(const CompositeFilter &value);
+        
         // A filter on a document field.
         Filter(const FieldFilter &fieldFilter);
+        
         // A filter that takes exactly one argument.
         Filter(const UnaryFilter &unaryFilter);
     };
