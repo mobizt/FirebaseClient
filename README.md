@@ -46,8 +46,6 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
 - [Async Client](#async-client)
 
-- [Firebase and Google Services Classes](#firebase-and-google-services)
-
 - [The Static Async Result Instances Required for Async Operation](#the-static-async-result-instances-required-for-async-operation)
 
 - [Dangling Pointers Prevention](#dangling-pointers-prevention)
@@ -77,6 +75,8 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 - [Required Operation flows](#required-operation-flows)
 
 - [Basic Example](#basic-example)
+
+- [Firebase and Google Services Classes](#firebase-and-google-services)
 
 - [Realtime Database Usage](#realtime-database-usage)
 
@@ -310,26 +310,6 @@ The async client that used for authentication task and async task included SSE s
 The SSL Client is a kind of sync or blocking Client that takes time during establishing the SSL server connection (SSL handshake).
 
 The async SSL client can be assigned to the async client class constructor but currently experimental.
-
-
-### Firebase and Google Services Classes
-
-
-- [RealtimeDatabase](examples/RealtimeDatabase/) is for Realtime database operation.
-
-- [Firestore::Databases](examples/FirestoreDatabase/Databases/) is for Cloud Firestore databases operation.
-
-- [Firestore::Documents](examples/FirestoreDatabase/Documents/) is for Cloud Firestore documents operation.
-
-- [Firestore::CollectionGroups::Indexes](examples/FirestoreDatabase/CollectionGroups/Indexes/) is for Cloud Firestore CollectionGroups's Indexes operation.
-
-- [Messaging](examples/Messaging/) is for Cloud Messaging operation.
-
-- [Storage](examples/Storage/) is for Firebase Storage operation.
-
-- [CloudStorage](examples/CloudStorage/) is for Google Cloud Storage operation.
-
-- [CloudFunctions](examples/CloudFunctions/) is for Google Cloud Functions operation.
 
 
 ### The Static Async Result Instances Required for Async Operation
@@ -1098,6 +1078,27 @@ It should be note that, the async result in the async callback can be lived only
 If the size of payload string in async reseut is large, to copy the char array buffer directly, use `aResult.payload().c_str()` instead.
 
 There is no JSON serialization/deserialization utilized or provided in this library.
+
+
+### Firebase and Google Services Classes
+
+
+- [RealtimeDatabase](examples/RealtimeDatabase/) is for Realtime database operation.
+
+- [Firestore::Databases](examples/FirestoreDatabase/Databases/) is for Cloud Firestore databases operation.
+
+- [Firestore::Documents](examples/FirestoreDatabase/Documents/) is for Cloud Firestore documents operation.
+
+- [Firestore::CollectionGroups::Indexes](examples/FirestoreDatabase/CollectionGroups/Indexes/) is for Cloud Firestore CollectionGroups's Indexes operation.
+
+- [Messaging](examples/Messaging/) is for Cloud Messaging operation.
+
+- [Storage](examples/Storage/) is for Firebase Storage operation.
+
+- [CloudStorage](examples/CloudStorage/) is for Google Cloud Storage operation.
+
+- [CloudFunctions](examples/CloudFunctions/) is for Google Cloud Functions operation.
+
 
 ## Realtime Database Usage
 
