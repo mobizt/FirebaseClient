@@ -46,12 +46,6 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
 - [Async Client](#async-client)
 
-- [Networking Data](#networking-data)
-
-- [Authentication and Network Classes](#authentication-and-network-classes)
-
-- [File config and Blob config Classes](#file-config-and-blob-config-classes)
-
 - [Firebase and Google Services Classes](#firebase-and-google-services)
 
 - [The Static Async Result Instances Required for Async Operation](#the-static-async-result-instances-required-for-async-operation)
