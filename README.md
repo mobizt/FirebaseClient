@@ -68,11 +68,11 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
   - [Legacy Token Authorization](#legacy-token-authorization)
 
-- [Working with filesystems and BLOB](#working-with-filesystems-and-blob)
+- [Working with Filesystems and BLOB](#working-with-filesystems-and-blob)
 
-- [Working with Network](#working-with-network)
+- [Working with Networks](#working-with-networks)
 
-- [Required Operation flows](#required-operation-flows)
+- [Required Operation Flows](#required-operation-flows)
 
 - [Basic Example](#basic-example)
 
@@ -554,7 +554,7 @@ LegacyToken legacy_token(<database_secret>);
 
 `<database_secret>` The Realtime database secret key.
 
-### Working with filesystems and BLOB
+### Working with Filesystems and BLOB
 
 The file config class ([FileConfig](examples/App/AppInitialization/SaveAndLoad/)) will be used to hold the SD/Flash file information and the file operation callback when file upload or download is required.
 
@@ -641,7 +641,7 @@ void download()
 When filesystems are not used, remove `ENABLE_FS` macro in [src/Config.h](/src/Config.h) or user defined [src/UserConfig.h](/src) or adding `DISABLE_FS` in compiler build flags.
 
 
-### Working with Network
+### Working with Networks
 
 The `AsyncClientClass` object requires network config data (`network_config_data`) that obtained from one of the following networking classes via static function called `getNetwork`.
 
@@ -842,7 +842,7 @@ In side the `<network_status_callback>` function, the `status` (Boolean variable
 
 See [this example](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.ino) for using WiFi with `GenericNetwork` for demonstation.
 
-### Required Operation flows
+### Required Operation Flows
 
 When using this library, user have to follow the following operation flows otherwise unknown errors can be occurred.
 
