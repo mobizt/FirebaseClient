@@ -566,7 +566,7 @@ The `FileConfig` class constructor parameters that are available are following.
 
 `FileConfig file_config(<filename>, <file_operation_callback>)`
 
-`<filename>` The full file name included it path.
+`<filename>` The full file name included its path.
 
 `<file_operation_callback>` The file callback that required for file open to read, write, append and remove.
 
