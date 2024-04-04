@@ -42,8 +42,6 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
 - [Firebase and Google Services](#firebase-and-google-services)
 
-- [Working with filesystems and BLOB](#working-with-filesystems-and-blob)
-
 - [Async Queue](#async-queue)
 
 - [Async Client](#async-client)
@@ -77,6 +75,10 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
   - [ID Token Authorization](#id-token-authorization)
 
   - [Legacy Token Authorization](#legacy-token-authorization)
+
+- [Working with filesystems and BLOB](#working-with-filesystems-and-blob)
+
+- [Working with Network](#working-with-network)
 
 - [Required Operation flows](#required-operation-flows)
 
@@ -269,14 +271,6 @@ This library used internal millis timer to handle the token time to live. Then d
 
 In access and custom token authentications using service accout file (sa and custom auths), it related to JWT token creation and the token signing using RSA private key.  This process require the valid timestamp, then the time status setting callback will be required in the sa and custom auth class constructor.
 
-### Working with filesystems and BLOB
-
-The file config class will be used to hold the SD/Flash file and the file operation callback when file upload or download is required.
-
-The blob config class will provide the in/out data payload.
-
-When filesystems are not used, remove ENABLE_FS macro or adding DISABLE_FS in compiler flags.
-
 
 ### Async Queue
 
@@ -323,89 +317,25 @@ The SSL Client is a kind of sync or blocking Client that takes time during estab
 
 The async SSL client can be assigned to the async client class constructor but currently experimental.
 
-### Networking Data
-
-The network class object that holds the network interface data need to be assigned to the async client constructor.
-
-The default network class can be used for WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W.
-
-The network (WiFI) reconnection or resume can be done automatically or manually by user can be configurable via the boolean parameter assigned with default network class constructor.
-
-The default WiFi network class provided mean for multiple WiFi's ssid and passworrd connections (WiFi Multi),
-
-This default WiFi network class is suitable for device that provided the built-in WiFi module for non-WiFI capable MCU that the WiFi reconnection requires the ssid and password and device that support WiFi Multi in its core.
-
-The default ethernet network class can be used for Ethernet capable MCUs using core Ethernet drivers e.g. ESP8266 and ESP32.
-
-The other known networks (Ethernet and GSM) class are also available.
-
-The user defined or generic networks are supported by assigning the ntwork connection and status callacks in its class constructor.
-
-### Authentication and Network Classes
-
-Here is the list of the authentication and network classes that described above.
-
-[FirebaseApp](examples/App/AppInitialization) is for authentication.
-
-[CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) is for the custom token authentication using the service account credentials.
-
-[ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) is for the access token authentication using the service account credentials.
-
-[UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) is for ID token authentication using email and password.
-
-[NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino) is for non-authentication.
-
-[CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino) is for custom token authentication using user provided custom token.
-
-[AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino) is for access token authentication using user provided access token.
-
-[IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) is for ID token authentication using user provide ID token.
-
-[LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) is for the secret key or known as database secret for accessing the Realtime database only. 
-
-[UserAccount](examples/App/UserManagement/) is for user management e.g. [create user](examples/App/UserManagement/SignUp/SignUp.ino), [delete user](examples/App/UserManagement/DeleteUser/DeleteUser.ino), [verify](examples/App/UserManagement/Verify/Verify.ino), [reset password](examples/App/UserManagement/ResetPassword/ResetPassword.ino) and [anonymous sign-in](examples/App/UserManagement/Anonymous/Anonymous.ino).
-
-[DefaultNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultNetwork/DefaultNetwork.ino) is for core WiFi enabled networking.
-
-[DefaultEthernetNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultEthernetNetwork) is for core Ethernet enabled networking.
-
-[DefaultWiFiNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultWiFiNetwork/DefaultWiFiNetwork.ino) is for core WiFi Multi enabled networking or non-core WiFi netwowking.
-
-[EthernetNetwork](examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) is for non-core Ethernet networking.
-
-[GSMNetwork](examples/App/NetworkInterfaces/GSMNetwork/GSMNetwork.ino) is for non-core GSM networking.
-
-[GenericNetwork](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.ino) is for non-core or user defined networking.
-
-[AsyncClientClass](#) is for aync and sync operations that holds the TCP session, async data queue of http request and response.
-
-[AsyncTCPConfig](examples/AsyncTCP/AsyncTCP.ino) is for async SSL client data.
-
-### File config and Blob config Classes
-
-[FileConfig](examples/App/AppInitialization/SaveAndLoad/) is for aync and sync operations that holds the TCP session, async data queue of http request and response.
-
-[BlobConfig](examples/RealtimeDatabase/Extras/BLOB/BLOB.ino) is for aync and sync operations that holds the TCP session, async data queue of http request and response.
-
 
 ### Firebase and Google Services Classes
 
 
-[RealtimeDatabase](examples/RealtimeDatabase/) is for Realtime database operation.
+- [RealtimeDatabase](examples/RealtimeDatabase/) is for Realtime database operation.
 
-[Firestore::Databases](examples/FirestoreDatabase/Databases/) is for Cloud Firestore databases operation.
+- [Firestore::Databases](examples/FirestoreDatabase/Databases/) is for Cloud Firestore databases operation.
 
-[Firestore::Documents](examples/FirestoreDatabase/Documents/) is for Cloud Firestore documents operation.
+- [Firestore::Documents](examples/FirestoreDatabase/Documents/) is for Cloud Firestore documents operation.
 
-[Firestore::CollectionGroups::Indexes](examples/FirestoreDatabase/CollectionGroups/Indexes/) is for Cloud Firestore CollectionGroups's Indexes operation.
+- [Firestore::CollectionGroups::Indexes](examples/FirestoreDatabase/CollectionGroups/Indexes/) is for Cloud Firestore CollectionGroups's Indexes operation.
 
-[Messaging](examples/Messaging/) is for Cloud Messaging operation.
+- [Messaging](examples/Messaging/) is for Cloud Messaging operation.
 
-[Storage](examples/Storage/) is for Firebase Storage operation.
+- [Storage](examples/Storage/) is for Firebase Storage operation.
 
-[CloudStorage](examples/CloudStorage/) is for Google Cloud Storage operation.
+- [CloudStorage](examples/CloudStorage/) is for Google Cloud Storage operation.
 
-[CloudFunctions](examples/CloudFunctions/) is for Google Cloud Functions operation.
+- [CloudFunctions](examples/CloudFunctions/) is for Google Cloud Functions operation.
 
 
 ### The Static Async Result Instances Required for Async Operation
@@ -649,6 +579,294 @@ LegacyToken legacy_token(<database_secret>);
 ```
 
 `<database_secret>` The Realtime database secret key.
+
+### Working with filesystems and BLOB
+
+The file config class ([FileConfig](examples/App/AppInitialization/SaveAndLoad/)) will be used to hold the SD/Flash file information and the file operation callback when file upload or download is required.
+
+The function that require file/BLOB for download and upload will accept the file config data (`file_config_data`) in its parameters.
+
+The `file_config_data` can be obtained from static functions called `getFile` and `getBlob`.
+
+The `FileConfig` class constructor parameters that are available are following.
+
+`FileConfig file_config(<filename>, <file_operation_callback>)`
+
+`<filename>` The full file name included it path.
+
+`<file_operation_callback>` The file callback that required for file open to read, write, append and remove.
+
+The example to work with `SPIFFS` filesystem.
+
+```cpp
+
+#define MY_FS SPIFFS
+
+void fileCallback(File &file, const char *filename, file_operating_mode mode)
+{
+    // FILE_OPEN_MODE_READ, FILE_OPEN_MODE_WRITE and FILE_OPEN_MODE_APPEND are defined in this library
+    switch (mode)
+    {
+    case file_mode_open_read:
+        file = MY_FS.open(filename, FILE_OPEN_MODE_READ);
+        break;
+    case file_mode_open_write:
+        file = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
+        break;
+    case file_mode_open_append:
+        file = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
+        break;
+    case file_mode_remove:
+        MY_FS.remove(filename);
+        break;
+    default:
+        break;
+    }
+}
+
+FileConfig media_file("/media.mp4", fileCallback);
+
+void download()
+{
+     storage.download(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), asyncCB);
+}
+
+```
+
+The blob config class ([BlobConfig](examples/RealtimeDatabase/Extras/BLOB/BLOB.ino)) will provide the in/out data payload for the function that required upload and download operations.
+
+The `BlobConfig` class constructor parameters that are available are following.
+
+`BlobConfig blob_config(<blob>, <blob_size>)`
+
+`<blob>` The byte array.
+
+`<blob_size>` The size of byte array.
+
+The example to work with `SPIFFS` filesystem.
+
+```cpp
+uint8_t source[2048];
+uint8_t dest[2048];
+
+BlobConfig upload_data(source, 2048);
+BlobConfig download_data(dest, 2048);
+
+void upload()
+{
+    Database.set(aClient, "/test/blob", getBlob(upload_data), asyncCB);
+}
+
+void download()
+{
+    Database.get(aClient, "/test/blob", getBlob(download_data), asyncCB);
+}
+
+```
+
+When filesystems are not used, remove `ENABLE_FS` macro in [src/Config.h](/src/Config.h) or user defined [src/UserConfig.h](/src) or adding `DISABLE_FS` in compiler build flags.
+
+
+### Working with Network
+
+The `AsyncClientClass` object requires network config data (`network_config_data`) that obtained from one of the following networking classes via static function called `getNetwork`.
+
+- [DefaultNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultNetwork/DefaultNetwork.ino) is for core WiFi enabled networking.
+
+- [DefaultWiFiNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultWiFiNetwork/DefaultWiFiNetwork.ino) is for core WiFi Multi enabled networking or non-core WiFi netwowking.
+
+- [DefaultEthernetNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultEthernetNetwork) is for core Ethernet enabled networking.
+
+- [EthernetNetwork](examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) is for non-core Ethernet networking.
+
+- [GSMNetwork](examples/App/NetworkInterfaces/GSMNetwork/GSMNetwork.ino) is for non-core GSM networking.
+
+- [GenericNetwork](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.ino) is for non-core or user defined networking.
+
+
+The default network class can be used for WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W.
+
+The network (WiFI) reconnection or resume can be done automatically or manually by user can be configurable via the boolean parameter assigned with default network class constructor.
+
+The default WiFi network class provided mean for multiple WiFi's ssid and passworrd connections (WiFi Multi),
+
+This default WiFi network class is suitable for device that provided the built-in WiFi module for non-WiFI capable MCU that the WiFi reconnection requires the ssid and password and device that support WiFi Multi in its core.
+
+The default ethernet network class can be used for Ethernet capable MCUs using core Ethernet drivers e.g. ESP8266 and ESP32.
+
+The other known networks (Ethernet and GSM) class are also available.
+
+The user defined or generic networks are supported by assigning the ntwork connection and status callacks in its class constructor.
+
+- `DefaultNetwork`
+
+The `DefaultNetwork` class constructors are the following.
+
+`DefaultNetwork default_network`
+
+`DefaultNetwork default_network(<re_connect_option>)`
+
+`<re_connect_option>` The Boolean value set for enabling the WiFi reconnection when the WiFi is disconnected.
+
+By define `DefaultNetwork` with no parameter, the WiFi reconnection will be enabled. 
+
+Note that, when the WiFi was manage for connection and reconnection by user code or third party library, the `<re_connect_option>` parameter should be assign with `false` to avoid the WiFi connection/reconnection interferences.
+
+- `DefaultWiFiNetwork`
+
+This `DefaultWiFiNetwork` class required some parameter for reconnection using WiFi credentials.
+
+The parameters for its class constructor are following.
+
+`DefaultWiFiNetwork wifi_network (<FirebaseWiFi>, <re_connect_option>)`
+
+`<FirebaseWiFi>` The FirebaseWiFi class object that used for keeping the network credentials (WiFi APs and WiFi passwords).
+
+`<re_connect_option>`  The bool option for network reconnection.
+
+The `FirebaseWiFi` class holds the WiFi credentials list. The AP and password can be added to list with `addAP`.
+
+The `FirebaseWiFi` object should be defined at the same level of `DefaultWiFiNetwork` and `AsyncClientClass` as it will be used internally by reference.
+
+The example for working with multiple WiFi APs.
+
+```cpp
+FirebaseWiFi wifimulti;
+
+DefaultWiFiNetwork default_network(wifimulti, true /* reconnect network */);
+
+void setup()
+{
+
+    Serial.begin(115200);
+
+    wifimulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
+    wifimulti.addAP(WIFI_SSID2, WIFI_PASSWORD2);
+    wifimulti.addAP(WIFI_SSID3, WIFI_PASSWORD3);
+}
+```
+
+- `DefaultEthernetNetwork`
+
+The DefaultEthernetNetwork class constructors are the following.
+
+`DefaultEthernetNetwork default_network`
+
+`DefaultEthernetNetwork default_network(<Firebase_SPI_ETH_Module>)`
+
+`<Firebase_SPI_ETH_Module>` The ESP8266 core SPI ethernet driver class that work with external SPI Ethernet modules that currently supported e.g. ENC28J60, Wiznet W5100 and Wiznet 5500. This `<Firebase_SPI_ETH_Module>` should be defined at the same level as `AsyncClientCalss` as it will be used internally by reference.
+
+ To use ESP8266 native Ethernet, the one of following macros, `#defined ENABLE_ESP8266_ENC28J60_ETH`, `#definedENABLE_ESP8266_W5500_ETH` and `#defined ENABLE_ESP8266_W5100_ETH` should be defined in [src/Config.h](/src/Config.h) or user defined [src/UserConfig.h](/src) or adding 
+ `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in compiler build flags.
+
+
+The example for using ENC28J60lwIP with ESP8266
+```cpp
+#include <ENC28J60lwIP.h>
+
+#define ETH_CS_PIN 16 // D0
+
+ENC28J60lwIP eth(ETH_CS_PIN);
+
+Firebase_SPI_ETH_Module spi_eth;
+
+DefaultEthernetNetwork default_network(spi_eth);
+
+using AsyncClient = AsyncClientClass;
+
+AsyncClient aClient(ssl_client, getNetwork(default_network));
+
+void setup()
+{
+      spi_eth.enc28j60 = &eth;
+}
+```
+
+See [this example](examples/App/NetworkInterfaces/DefaultNetworks/DefaultEthernetNetwork/ESP8266/ESP8266.ino) for using ESP8266 with its native ethernet library.
+
+For ESP32, to use the native ETH class, define the `DefaultEthernetNetwork` object with no parameter.
+
+See [this example](examples/App/NetworkInterfaces/DefaultNetworks/DefaultEthernetNetwork/ESP32/ESP32.ino) for using ESP32 with its native ethernet library.
+
+- `EthernetNetwork`
+
+By default the external Ethernet module can be use with the library as the macro `ENABLE_ETHERNET_NETWORK` was assigned and Ethernet library was included in the sketch.
+
+The Ethernet library and class other than `Ethernet.h` and `Ethernet` can be assigned (optional), see the [Library Build Options](#library-build-options) section.
+
+The calss constructor parameters are following.
+
+`EthernetNetwork eth_network(<mac>, <cs_pin>, <reset_pin>, <Firebase_StaticIP>)`
+
+`<mac>` The six bytes mac address.
+
+`<cs_pin>` The Ethernet module chip select/enable pin.
+
+`<reset_pin>` The Ethernet module reset pin. Assign -1 if not used.
+
+`<Firebase_StaticIP>` (Optional) The pointer to `Firebase_StaticIP` object that holds the static ip configuration.
+
+The `Firebase_StaticIP` class constructor parameters for static IP are following.
+
+`Firebase_StaticIP static_ip(<local_ip>, <subnet>, <gateway>, <dns_server>, <optional>)`
+
+`<local_ip>` The static IP.
+
+`<subnet>` The subnet IP.
+
+`<gateway>` The default gateway IP.
+
+`<dns_server>` The dns server IP.
+
+`<optional>` The boolean option to force use static IP only (not use DHCP).
+
+See [this example](examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino)  for external Ethernet module usage.
+
+- `GSMNetwork`
+
+This `GSMNetwork` class is used for [TinyGSMClient](https://github.com/vshymanskyy/TinyGSM) library.
+
+As required by the TinyGSMClient library, one of GSM module macro should be defined in the sketch. 
+
+For example for SIM7600 module, the macro `TINY_GSM_MODEM_SIM7600` should be defined.
+
+📍 The additional important requirement to use as this library integration is the macros e.g. `TINY_GSM_MODEM_SIM7600` should be defined in [src/Config.h](/src/Config.h) or user defined [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
+
+The class constructor parameter are following.
+
+`GSMNetwork gsm_network(<modem>, <gsm_pin>, <apn>, <user>, <password>)`
+
+`<modem>` The pointer to TinyGsm modem object. Modem should be initialized and/or set mode before transfering data.
+
+`<gsm_pin>` The SIM pin.
+
+`<apn>` The GPRS APN (Access Point Name).
+
+`<user>` The GPRS user.
+
+`<password>` The GPRS password.
+
+The TinyGsm modem should be defined at the same level of `GSMNetwork` and `AsyncClientClass` as it will be used internally by reference.
+
+See [this example](examples/App/NetworkInterfaces/GSMNetwork/GSMNetwork.ino) for using TinyGSMClient with the library.
+
+- `GenericNetwork`
+
+This type of network class is for all networking interfaces with some specific channels or ports e.g. Ethernet Module, WiFI Module, Bluetooth Module, NB-IoT module, and LoRa Module that have the internet access ability.
+
+Since the interface class APIs are variety, the class constructor parameters are the basic callbacks required for network control and network status as following.
+
+`GenericNetwork generic_network(<net_connect_callback>, <network_status_callback>)`
+
+`<net_connect_callback>` The network connection callback function.
+
+`<network_status_callback>`The network status callback function.
+
+Inside the `<net_connect_callback>`, the complete operation for the carier (network) and internet connection should be perform and waits until the internet connection was established.
+
+In side the `<network_status_callback>` function, the `status` (Boolean variable) that passed by reference in the function, should be set based on the network status.
+
+See [this example](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.ino) for using WiFi with `GenericNetwork` for demonstation.
 
 ### Required Operation flows
 

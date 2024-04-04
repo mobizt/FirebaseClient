@@ -56,6 +56,9 @@
 
 #define TINY_GSM_MODEM_SIM7600 // SIMA7670 Compatible with SIM7600 AT instructions
 
+// 📍######### IMPORTANT ! #########
+// The macro TINY_GSM_MODEM_SIM7600 should be defined in src/Config.h or user sefined config at src/UserConfig.h
+
 // Set serial for debug console (to the Serial Monitor, default speed 115200)
 #define SerialMon Serial
 
