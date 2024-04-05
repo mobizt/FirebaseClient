@@ -168,7 +168,59 @@ This library APIs are not compattible with Firebase-ESP8266, Firebase-ESP32 and 
 
 If you are using those libraries, the code should be rewritten.
 
+### TCP KeepAlive
 
+The TCP session KeepAlive can be done by the network client if it was supportd e.g. WiFiClient in ESP32.
+
+If you use core SSL client e.g. WiFiClientSecre or WiFiSSLClient, this feature is not availabel.
+
+Which in the old library this feature was done with internal SSL client and WiFiClient.
+
+If you want to use this feature and if you use ESP32, you can use ESP_SSLClient library that included in this library and set the WiFiClient as the client.
+
+The following example is for using TCP KeepAlive with WiFiClient in ESP32.
+
+```cpp
+
+int keepAlive = 1000; // Milliseconds
+int keepIdle = 5;
+int keepInterval = 5;
+int keepCount = 1;
+
+WiFiClient basic_client;
+
+ESP_SSLClient ssl_client;
+
+void setup()
+{
+
+    ssl_client.setClient(&basic_client);
+
+    basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPALIVE, (void *)&keepAlive, sizeof(keepAlive));
+    basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keepIdle, sizeof(keepIdle));
+    basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval));
+    basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepCount, sizeof(keepCount));
+
+    //Or simpler functions
+    // basic_client.setOption(TCP_KEEPALIVE, &keepAlive);
+    // basic_client.setOption(TCP_KEEPIDLE, &keepIdle);
+    // basic_client.setOption(TCP_KEEPINTVL, &keepInterval);
+    // basic_client.setOption(TCP_KEEPCNT, &keepCount);
+}
+
+```
+
+### PSRAM
+
+The PSRAM in this library was enabled by default but it was only used partly in tempolary buffer memory allocation.
+
+### Cloud Messaging
+
+The legaycy Firebase Cloud Messaging API was deprecated, only HTTPv1 is supported.
+
+### Cloud Functions
+
+The local flash or filesystem source does not supported for deplying the function.
 
 ## Installation
 
