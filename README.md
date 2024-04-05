@@ -170,13 +170,13 @@ If you are using those libraries, the code should be rewritten.
 
 ### TCP KeepAlive
 
-The TCP session KeepAlive can be done by the network client if it was supportd e.g. WiFiClient in ESP32.
+The TCP session KeepAlive can be done by the network client if it was supportd e.g. `WiFiClient` in ESP32.
 
-If you use core SSL client e.g. WiFiClientSecre or WiFiSSLClient, this feature is not availabel.
+If you use core SSL client e.g. `WiFiClientSecre` or `WiFiSSLClient`, this feature is not availabel.
 
-Which in the old library this feature was done with internal SSL client and WiFiClient.
+Which in the old library, this feature was done with internal SSL client and `WiFiClient` integration.
 
-If you want to use this feature and if you use ESP32, you can use ESP_SSLClient library that included in this library and set the WiFiClient as the client.
+If you want to use this feature and if you use ESP32, you can use `ESP_SSLClient` library that included in this library and set the `WiFiClient` as the client.
 
 The following example is for using TCP KeepAlive with WiFiClient in ESP32.
 
