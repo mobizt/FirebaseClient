@@ -220,7 +220,7 @@ The legaycy Firebase Cloud Messaging API was deprecated, only HTTPv1 is supporte
 
 ### Cloud Functions
 
-The local flash or filesystem source does not supported for deplying the function.
+The local flash or filesystem source does not support for deploying the Cloud Function.
 
 ## Installation
 
