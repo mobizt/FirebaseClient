@@ -35,7 +35,7 @@
 #include "./core/AsyncTCPConfig.h"
 #endif
 
-#define FIREBASE_TCP_WRITE_TIMEOUT_SEC 30
+#define FIREBASE_TCP_WRITE_TIMEOUT_SEC 30 // Do not change
 
 #define FIREBASE_AUTH_PLACEHOLDER (const char *)FPSTR("<auth_token>")
 

@@ -285,6 +285,8 @@ setDebugLevel   KEYWORD2
 setClient   KEYWORD2
 setBufferSizes  KEYWORD2
 setInsecure KEYWORD2
+setSyncSendTimeout  KEYWORD2
+setSyncReadTimeout  KEYWORD2
 
 ###################
 # Struct (KEYWORD3)

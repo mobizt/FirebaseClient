@@ -28,7 +28,7 @@
 #include <Client.h>
 #include "RequestHandler.h"
 
-#define FIREBASE_TCP_READ_TIMEOUT_SEC 30
+#define FIREBASE_TCP_READ_TIMEOUT_SEC 30 // Do not change
 
 namespace res_hndlr_ns
 {

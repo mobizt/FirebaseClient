@@ -1,5 +1,5 @@
 /**
- * Created March 31, 2024
+ * Created April 6, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -188,6 +188,7 @@ private:
     int netErrState = 0;
     uint32_t auth_ts = 0;
     uint32_t cvec_addr = 0;
+    uint32_t sync_send_timeout_sec = 0, sync_read_timeout_sec = 0;
     Client *client = nullptr;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
     AsyncTCPConfig *async_tcp_config = nullptr;
@@ -1015,7 +1016,7 @@ private:
 
         if (sData->response.flags.payload_remaining)
         {
-            sData->response.feedTimer();
+            sData->response.feedTimer(!sData->async && sync_read_timeout_sec > 0 ? sync_read_timeout_sec : -1);
 
             // the next chunk data is the payload
             if (sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
@@ -1873,6 +1874,10 @@ public:
 
     void setETag(const String &etag) { reqEtag = etag; }
 
+    void setSyncSendTimeout(uint32_t timeoutSec) { sync_send_timeout_sec = timeoutSec; }
+
+    void setSyncReadTimeout(uint32_t timeoutSec) { sync_read_timeout_sec = timeoutSec; }
+
     async_data_item_t *createSlot(slot_options_t &options)
     {
         int slot_index = sMan(options);
@@ -2013,14 +2018,14 @@ public:
             if (sData->state == async_state_undefined || sData->state == async_state_send_header || sData->state == async_state_send_payload)
             {
                 sData->response.clear();
-                sData->request.feedTimer();
+                sData->request.feedTimer(!sData->async && sync_send_timeout_sec > 0 ? sync_send_timeout_sec : -1);
                 sending = true;
                 sData->return_type = send(sData);
 
                 while (sData->state == async_state_send_header || sData->state == async_state_send_payload)
                 {
                     sData->return_type = send(sData);
-                    sData->response.feedTimer();
+                    sData->response.feedTimer(!sData->async && sync_read_timeout_sec > 0 ? sync_read_timeout_sec : -1);
                     handleSendTimeout(sData);
                     if (sData->async || sData->return_type == function_return_type_failure)
                         break;
@@ -2074,7 +2079,7 @@ public:
                 sData->error.code = 0;
                 while (sData->return_type == function_return_type_continue && (sData->response.httpCode == 0 || sData->response.flags.header_remaining || sData->response.flags.payload_remaining))
                 {
-                    sData->response.feedTimer();
+                    sData->response.feedTimer(!sData->async && sync_read_timeout_sec > 0 ? sync_read_timeout_sec : -1);
                     sData->return_type = receive(sData);
 
                     handleReadTimeout(sData);
