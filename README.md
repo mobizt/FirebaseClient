@@ -898,19 +898,19 @@ See [this example](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.
 
 When using this library, user have to follow the following operation flows otherwise unknown errors can be occurred.
 
-`Network Connection -> Authentication (app intitialize included JWT token creation) -> Waits for App authenticate -> Apply auth data to Service app -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
+`Network Connection -> Authentication (app initialization included JWT token creation) -> Waits for App authenticate -> Apply auth data to Service app -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
 
 Or
 
-`Network Connection -> Authentication (app intitialize included JWT token creation) -> Apply auth data to Service app -> Waits for App authenticate -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
+`Network Connection -> Authentication (app initialization included JWT token creation) -> Apply auth data to Service app -> Waits for App authenticate -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
 
 This library does not run any background process in FreeRTOS task or schedule task and timer ISR.
 
-To maintaining the async tasks, you have to place the code for `Maintain Authentication and Async Operation Queue` in infinite loop e.g. main loop() function, timer or scheduler cyclically event's callback function or infinite loop in FreeRTOS task (as in ESP32).
+To maintaining the async tasks, you have to place the code for `Maintain Authentication and Async Operation Queue` in the infinite loop e.g. main `loop()` function, timer or scheduler cyclically event's callback function or infinite loop in FreeRTOS task (as in ESP32).
 
-For ESP32's FreeRTOS task, the CPU Core 1 is recommend for safely operation even the library is async operation but the SSL/TLS handshake in the SSL client was the blocking process during establishing the new server connection which can leeds to wdt reset triggered.
+For ESP32's `FreeRTOS` task, the CPU Core 1 is recommend for safely operation even the library is async operation but the SSL/TLS handshake during establishing the new server connection of the SSL client is the blocking process which can leed to wdt reset error.
 
-**Example** for Maintain Authentication and Async Operation Queue in ESP32's FreeRTOS task in lambda function usage style.
+**Example** for `Maintain Authentication and Async Operation Queue` in ESP32's `FreeRTOS` task in lambda function usage style.
 
 ```cpp
 void setup()
