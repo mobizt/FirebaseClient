@@ -183,8 +183,8 @@ The following example is for using TCP KeepAlive with WiFiClient in ESP32.
 ```cpp
 
 int keepAlive = 1000; // Milliseconds
-int keepIdle = 5;
-int keepInterval = 5;
+int keepIdle = 5; // Seconds
+int keepInterval = 5; // Seconds
 int keepCount = 1;
 
 WiFiClient basic_client;
