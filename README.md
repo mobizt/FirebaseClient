@@ -46,7 +46,7 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
 - [Async Client](#async-client)
 
-- [Send and Read timeouts for Sync and Async Tasks](#send-and-read-timeouts-for-sync-and-async-tasks)
+- [Send and Read Timeouts for Sync and Async Tasks](#send-and-read-timeouts-for-sync-and-async-tasks)
 
 - [The Static Async Result Instances Required for Async Operation](#the-static-async-result-instances-required-for-async-operation)
 
@@ -380,7 +380,7 @@ The SSL Client is a kind of sync or blocking Client that takes time during estab
 
 The async SSL client can be assigned to the async client class constructor but currently experimental.
 
-### Send and Read timeouts for Sync and Async Tasks
+### Send and Read Timeouts for Sync and Async Tasks
 
 The default send and read timeouts for async task are 30 seconds and cannot be changed.
 
