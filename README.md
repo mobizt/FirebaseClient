@@ -898,11 +898,9 @@ See [this example](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.
 
 When using this library, user have to follow the following operation flows otherwise unknown errors can be occurred.
 
-`Network Connection -> Authentication (app initialization included JWT token creation) -> Waits for App authenticate -> Apply auth data to Service app -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
+![Operation Flows 1](/resources/images/operation_flows1.png)
 
-Or
-
-`Network Connection -> Authentication (app initialization included JWT token creation) -> Apply auth data to Service app -> Waits for App authenticate -> Call Service App (url may be required) -> Maintain Authentication and Async Operation Queue`
+![Operation Flows 2](/resources/images/operation_flows2.png)
 
 This library does not run any background process in FreeRTOS task or schedule task and timer ISR.
 
