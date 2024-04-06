@@ -129,7 +129,7 @@ void setup()
 
     if (!ethInitDHCP(eth))
     {
-        Serial.println("No hardware found");
+        Serial.println("no hardware found!");
         while (1)
         {
             delay(1000);
