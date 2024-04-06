@@ -20,32 +20,32 @@
  * <Firebase_SPI_ETH_Module> - The Firebase_SPI_ETH_Module class object that keeping the pointer to lwip driver for each
  * SPI Ethernet module (e.g. ENC28J60lwIP, W5100lwIP and W5500lwIP).
  *
- * 
+ *
  * THE STATIC ASYNC RESULT REQUIRED FOR ASYNC OPERATION
  * ====================================================
- * 
+ *
  * Library provided the class object called AsyncResult that keeps the server response data, debug and error information.
- * 
+ *
  * There are two sources of async result in this library:
- * 
+ *
  * 1. From user provided with async application (function).
- * 
+ *
  * For example:
- * 
+ *
  * `Database.get(aClient, "/test/int", options, aResult);`
- * 
+ *
  * 2. From dynamic allocation in the async client.
- * 
+ *
  * For example:
- * 
+ *
  * `Database.get(aClient, "/test/int", options, asyncCB);`
- * 
+ *
  * From source 1, the async result (`aResult`) shall be defined globally to use in async application because of the static data is needed for use while running the sync task.
- * 
+ *
  * From source 2, the async client (`aClient`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the sync task.
- * 
+ *
  * If async result was destroyed (destructed or not existed) before it was used by async task handler, the danglig pointer problem will be occurred.
- * 
+ *
  * Note that, the async client object used in authentication task shoul be defined globally as it is async task.
  */
 
@@ -72,10 +72,11 @@
 
 #include <WiFiClientSecure.h>
 
-
 #include <ENC28J60lwIP.h>
 // #include <W5100lwIP.h>
 // #include <W5500lwIP.h>
+
+#include <LwipEthernet.h>
 
 /** Don't gorget to define this in src/Config.h or src/UserConfig.h
   #define ENABLE_ESP8266_ENC28J60_ETH
@@ -121,6 +122,27 @@ void setup()
 {
 
     Serial.begin(115200);
+
+    //https://github.com/esp8266/Arduino/blob/master/libraries/lwIP_Ethernet/examples/EthClient/EthClient.ino
+
+    Serial.println("Connecting to Ethernet... ");
+
+    if (!ethInitDHCP(eth))
+    {
+        Serial.println("No hardware found");
+        while (1)
+        {
+            delay(1000);
+        }
+    }
+
+    while (!eth.connected())
+    {
+        Serial.printf(".");
+        delay(500);
+    }
+
+    Firebase.printf("Ethernet: IP Address: %s\n", eth.localIP().toString().c_str());
 
     /* Assign the pointer to Ethernet module lwip interface */
 #if defined(ENABLE_ESP8266_ENC28J60_ETH)
