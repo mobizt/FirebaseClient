@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created April 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -85,7 +85,7 @@ private:
         }
     };
 #endif
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
     struct ethernet_data
     {
         int ethernet_reset_pin = -1;
@@ -117,9 +117,9 @@ private:
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(ENABLE_GSM_NETWORK)
     gsm_data gsm;
 #endif
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
     ethernet_data ethernet;
-    SPI_ETH_Module *eth = NULL;
+    Firebase_SPI_ETH_Module *eth = NULL;
 #endif
     bool initialized = false;
     bool network_status = false;
@@ -146,7 +146,7 @@ public:
         gsm.copy(rhs.gsm);
 #endif
 
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         ethernet.copy(rhs.ethernet);
 #endif
 
@@ -154,7 +154,7 @@ public:
         this->network_status = rhs.network_status;
         this->reconnect = rhs.reconnect;
         this->wifi = rhs.wifi;
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         this->eth = rhs.eth;
 #endif
         this->net_timer = rhs.net_timer;
@@ -167,7 +167,7 @@ public:
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(ENABLE_GSM_NETWORK)
         gsm.clear();
 #endif
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         ethernet.clear();
 #endif
         network_data_type = firebase_network_data_undefined;
@@ -175,7 +175,7 @@ public:
         network_status = false;
         reconnect = true;
         wifi = nullptr;
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         eth = NULL;
 #endif
         net_timer.stop();
@@ -241,7 +241,7 @@ public:
 };
 #endif
 
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
 class EthernetNetwork : public DefaultNetwork
 {
 
@@ -267,7 +267,7 @@ public:
     DefaultEthernetNetwork(Firebase_SPI_ETH_Module &eth)
     {
         init();
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
+#if defined(FIREBASE_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         network_data.eth = &eth;
 #endif
         network_data.network_data_type = firebase_network_data_default_network;
