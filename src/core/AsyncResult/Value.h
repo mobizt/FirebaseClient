@@ -1,5 +1,5 @@
 /**
- * Created March 20, 2024
+ * Created April 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -152,7 +152,7 @@ public:
     object_t(const String &o) { buf = o; }
     const char *c_str() const { return buf.c_str(); }
     template <typename T = const char *>
-    object_t(T o) { buf = o; }
+    object_t(T o) { buf = String(o); }
     object_t(boolean_t o) { buf = o.c_str(); }
     object_t(number_t o) { buf = o.c_str(); }
     object_t(string_t o) { buf = o.c_str(); }
@@ -214,7 +214,7 @@ public:
     {
         buf = "";
         if (v_sring<T>::value)
-            buf = '\"';
+            buf += '\"';
         buf += value;
         if (v_sring<T>::value)
             buf += '\"';
