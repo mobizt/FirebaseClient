@@ -1,14 +1,4 @@
-
-// Created by K. Suwatchai (Mobizt)
-// Email: k_suwatchai@hotmail.com
-// Github: https://github.com/mobizt/FirebaseClient
-// Copyright (c) 2024 mobizt
-
 /**
- * DEFAULT NETWORK CLASS INITIALIZATION
- * ====================================
- *
- *
  * SYNTAXES:
  *
  * DefaultEthernetNetwork network(<Firebase_SPI_ETH_Module>);
@@ -19,40 +9,8 @@
  *
  * <Firebase_SPI_ETH_Module> - The Firebase_SPI_ETH_Module class object that keeping the pointer to lwip driver for each
  * SPI Ethernet module (e.g. ENC28J60lwIP, W5100lwIP and W5500lwIP).
- *
- *
- * THE STATIC ASYNC RESULT REQUIRED FOR ASYNC OPERATION
- * ====================================================
- *
- * Library provided the class object called AsyncResult that keeps the server response data, debug and error information.
- *
- * There are two sources of async result in this library:
- *
- * 1. From user provided with async application (function).
- *
- * For example:
- *
- * `Database.get(aClient, "/test/int", options, aResult);`
- *
- * 2. From dynamic allocation in the async client.
- *
- * For example:
- *
- * `Database.get(aClient, "/test/int", options, asyncCB);`
- *
- * From source 1, the async result (`aResult`) shall be defined globally to use in async application because of the static data is needed for use while running the sync task.
- *
- * From source 2, the async client (`aClient`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the sync task.
- *
- * If async result was destroyed (destructed or not existed) before it was used by async task handler, the danglig pointer problem will be occurred.
- *
- * Note that, the async client object used in authentication task shoul be defined globally as it is async task.
- */
-
-#include <Arduino.h>
-
-/**
- *
+ * 
+ * 
  * The ENC28J60 Ethernet module and ESP8266 board, SPI port wiring connection.
  *
  * ESP8266 (Wemos D1 Mini or NodeMCU)        ENC28J60
@@ -64,8 +22,11 @@
  * GND                                       GND
  * 3V3                                       VCC
  *
+ * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
+ * 
  */
 
+#include <Arduino.h>
 #include <ESP8266WiFi.h>
 
 #include <FirebaseClient.h>

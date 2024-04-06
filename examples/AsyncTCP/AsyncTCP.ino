@@ -1,17 +1,10 @@
-
-// Created by K. Suwatchai (Mobizt)
-// Email: k_suwatchai@hotmail.com
-// Github: https://github.com/mobizt/FirebaseClient
-// Copyright (c) 2024 mobizt
-
-/** This example does not include any async TCP client library, you have to include it prior to use and
+/** 
+ * This example does not include any async TCP client library, you have to include it prior to use and
  * async TCP should support SSL.
  *
  * To try the async TCP client, define the following macro in src/Config.h
  * or user created config file in src/UserConfig.h.
-
- #define ENABLE_ASYNC_TCP_CLIENT
-
+ * #define ENABLE_ASYNC_TCP_CLIENT
  */
 
 #include <Arduino.h>

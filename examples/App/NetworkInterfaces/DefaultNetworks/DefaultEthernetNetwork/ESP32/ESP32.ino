@@ -1,61 +1,6 @@
 
-// Created by K. Suwatchai (Mobizt)
-// Email: k_suwatchai@hotmail.com
-// Github: https://github.com/mobizt/FirebaseClient
-// Copyright (c) 2024 mobizt
 
 /**
- * DEFAULT NETWORK CLASS INITIALIZATION
- * ====================================
- *
- *
- * SYNTAXES:
- *
- * DefaultEthernetNetwork network;
- *
- * The DefaultEthernetNetwork is the Network class that provides the built-in WiFi network configuarion to work in this library.
- *
- * For ESP32, defined DefaultEthernetNetwork class constructor with no arguments to allow library to use ESP32 native ethernet.
- *
- *
- * THE STATIC ASYNC RESULT REQUIRED FOR ASYNC OPERATION
- * ====================================================
- *
- * Library provided the class object called AsyncResult that keeps the server response data, debug and error information.
- *
- * There are two sources of async result in this library:
- *
- * 1. From user provided with async application (function).
- *
- * For example:
- *
- * `Database.get(aClient, "/test/int", options, aResult);`
- *
- * 2. From dynamic allocation in the async client.
- *
- * For example:
- *
- * `Database.get(aClient, "/test/int", options, asyncCB);`
- *
- * From source 1, the async result (`aResult`) shall be defined globally to use in async application because of the static data is needed for use while running the sync task.
- *
- * From source 2, the async client (`aClient`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the sync task.
- *
- * If async result was destroyed (destructed or not existed) before it was used by async task handler, the danglig pointer problem will be occurred.
- *
- * Note that, the async client object used in authentication task shoul be defined globally as it is async task.
- */
-
-#include <Arduino.h>
-
-// This example is for ESP32 with LAN8720 Ethernet board.
-
-/**
- * There are may sources for LAN8720 and ESP32 interconnection on the internet which may
- * work for your LAN8720 board.
- *
- * Some methods worked unless no IP is available.
- *
  * This modification and interconnection provided in this example are mostly worked as
  * the 50 MHz clock was created internally in ESP32 which GPIO 17 is set to be output of this clock
  * and feeds to the LAN8720 chip XTAL input.
@@ -80,8 +25,11 @@
  * GND                          GND
  * 3V3                          VCC
  *
+ * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
+ * 
  */
 
+#include <Arduino.h>
 #include <WiFi.h>
 
 #include <FirebaseClient.h>

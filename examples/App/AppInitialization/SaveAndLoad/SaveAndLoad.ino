@@ -1,22 +1,4 @@
-// Created by K. Suwatchai (Mobizt)
-// Email: k_suwatchai@hotmail.com
-// Github: https://github.com/mobizt/FirebaseClient
-// Copyright (c) 2024 mobizt
-
 /**
- * APP INITIALIZATION
- * ==================
- *
- * This library provides the APIs covers the different types of authentication and services.
- *
- * The FirebaseApp class was introduced as user authentication provider which provides the credentials data
- * used for accessing the Firebase services.
- *
- * The Database, Firestore, Functions, Messaging, Storage and Cloud Storage apps provided the functions based on
- * the specific Firebase services which take the auth credentials data from FirebaseApp.
- *
- * The FirebaseApp should be initialized first before use via static function initializeApp.
- *
  * SYNTAXES:
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
@@ -41,51 +23,8 @@
  * <user_password> - The user password in the project.
  * <api_key> - API key can be obtained from Firebase console > Project Overview > Project settings.
  * <expire> - The expiry period in seconds (less than or equal to 3600).
- *
- * To use other network interfaces, network data from one of the following Network classes
- * can be assigned.
- *
- * DefaultNetwork, GenericNetwork, EthernetNetwork and GSMNetwork.
- *
- * The network data (network_config_data) can be obtained from these Network classes via static function getNetwork.
- *
- * Please see examples/App/NetworkInterfaces for the usage guidelines.
- *
- * The auth credential data can be set to Services App e.g. Database to initialize via function getApp.
- *
- * SYNTAX:
- *
- * app.getApp<T>(<services_app>);
- *
- * Deallocation of FirebaseApp causes these services apps uninitialized and cannot be used.
- *
  * 
- * THE STATIC ASYNC RESULT REQUIRED FOR ASYNC OPERATION
- * ====================================================
- *
- * Library provided the class object called AsyncResult that keeps the server response data, debug and error information.
- *
- * There are two sources of async result in this library:
- *
- * 1. From user provided with async application (function).
- *
- * For example:
- *
- * `Database.get(aClient, "/test/int", options, aResult);`
- *
- * 2. From dynamic allocation in the async client.
- *
- * For example:
- *
- * `Database.get(aClient, "/test/int", options, asyncCB);`
- *
- * From source 1, the async result (`aResult`) shall be defined globally to use in async application because of the static data is needed for use while running the sync task.
- *
- * From source 2, the async client (`aClient`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the sync task.
- *
- * If async result was destroyed (destructed or not existed) before it was used by async task handler, the danglig pointer problem will be occurred.
- *
- * Note that, the async client object used in authentication task shoul be defined globally as it is async task.
+ * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
