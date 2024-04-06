@@ -125,7 +125,7 @@ void setup()
 
     //https://github.com/esp8266/Arduino/blob/master/libraries/lwIP_Ethernet/examples/EthClient/EthClient.ino
 
-    Serial.println("Connecting to Ethernet... ");
+    Serial.print("Connecting to Ethernet... ");
 
     if (!ethInitDHCP(eth))
     {
@@ -142,7 +142,7 @@ void setup()
         delay(500);
     }
 
-    Firebase.printf("Ethernet: IP Address: %s\n", eth.localIP().toString().c_str());
+    Firebase.printf("\nEthernet: IP Address: %s\n", eth.localIP().toString().c_str());
 
     /* Assign the pointer to Ethernet module lwip interface */
 #if defined(ENABLE_ESP8266_ENC28J60_ETH)
