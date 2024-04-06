@@ -48,9 +48,11 @@ This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Cli
 
 - [Send and Read Timeouts for Sync and Async Tasks](#send-and-read-timeouts-for-sync-and-async-tasks)
 
-- [The Static Async Result Instances Required for Async Operation](#the-static-async-result-instances-required-for-async-operation)
+- [Async Result](#async-result)
 
-- [Dangling Pointers Prevention](#dangling-pointers-prevention)
+- [App Events](#app-events)
+
+- [Result Data](#result-data)
 
 - [App Initialization](#app-initialization)
  
@@ -380,16 +382,17 @@ The SSL Client is a kind of sync or blocking Client that takes time during estab
 
 The async SSL client can be assigned to the async client class constructor but currently experimental.
 
+The async operation can be cancelled and removed from the queue by calling `AsyncClientClass` member functions, i.e. `stopAsync()` for currently processed task or `stopAsync(true)` for stopping all tasks.
+
 ### Send and Read Timeouts for Sync and Async Tasks
 
 The default send and read timeouts for async task are 30 seconds and cannot be changed.
 
 For sync task, the timeout in seconds can be set via the `AsyncClientClass` member functions, `setSyncSendTimeout` and `setSyncReadTimeout`.
 
+### Async Result
 
-### The Static Async Result Instances Required for Async Operation
-
-Library provided the class object called AsyncResult that keeps the server response data, debug and error information.
+Library provides the class object called `AsyncResult` that keeps the server response data, debug and error information.
 
 There are two sources of async result in this library:
 
@@ -411,19 +414,44 @@ From source 1, the async result (`aResult`) shall be defined globally to use in 
 
 From source 2, the async client (`aClient`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the sync task.
 
-If async result was destroyed (destructed or not existed) before it was used by async task handler, the danglig pointer problem will be occurred.
+The async result from source 2 can be accessed from the async result callback.
 
 Note that, the async client object used in authentication task shoul be defined globally as it is async task.
 
-### Dangling Pointers Prevention
+The aync result provides two types of information, `app events` and `result data`.
 
-The async result, async client and Firebase main app are the managed classes that have dangling pointer prevention feature.
+### App Events
 
-The reference to these deleted or destructed objects will be blocked in all Firebase main app (FirebaseApp) and services apps (Realtime database, Firestore database, Cloud Messaging, Cloud Functions, Storage and Google Cloud Storage) to prevent device freeze or crashed due to dangling pointer.
+The app event information of authentication task handler can be obtained from `aResult.appEvent().code()` and `aResult.appEvent().message()` respectively.
 
-The exception is the deleted or destructed SSL client that assigned to async client still cause the dangling pointer issue.
+Note that `aResult` is the async result object (`AsyncResult`) in this case.
 
-Then the SSL client should be defined in the same usage scope as async client to avoid the problem.
+The following event code (`firebase_auth_event_type`), `auth_event_uninitialized`, `auth_event_initializing`, `auth_event_signup`, `auth_event_send_verify_email`, `auth_event_delete_user`, `auth_event_reset_password`, `auth_event_token_signing`, `auth_event_authenticating`, `auth_event_auth_request_sent`, `auth_event_auth_response_received`, `auth_event_ready` and `auth_event_error` are available.
+
+The following event strings `"undefined"`, `"initializing"`, `"sign up"`, `"send verification email"`, `"delete user"`, `"reset password"`, `"token signing"`, `"authenticating"`, `"auth request sent"`, `"auth response received"`, `"ready"` and `"error"` are available.
+
+### Result Data
+
+The result data can be obtained from `AsyncResult` object via `aResult.payload()`, `aResult.available()`, `aResult.path()`, `aResult.etag()`, `RTDB.isStream()`, `RTDB.event()`, `RTDB.dataPath()`, `RTDB.type()` and `RTDB.name()` where `RTDB` is the `RealtimeDatabaseResult `object that obtained from `aResult.to<RealtimeDatabaseResult>()`.
+
+The function `aResult.payload()` returns server serponse payload.
+
+The function `aResult.available()` returns the size of data that is ready to read.
+
+The function `aResult.path()` returns the resource path that the request was sent.
+
+The function `aResult.etag()` returns the ETag from server response header.
+
+The function `RTDB.name()` returns the name (random UID) of node that will be creaated after calling push.
+
+The function `RTDB.type()` returns the following realtime data type enum.
+
+`realtime_database_data_type_undefined` (-1), `realtime_database_data_type_null` (0), `realtime_database_data_type_integer` (1), `realtime_database_data_type_float` (2), `realtime_database_data_type_double` (3), `realtime_database_data_type_boolean` (4), `realtime_database_data_type_string` (5), `realtime_database_data_type_json` (6), and `realtime_database_data_type_array` (7).
+
+The `RTDB.dataPath()` and `RTDB.event()` are the Realtime database node path that data has changed and type of event in server-sent events (stream) mode.
+
+The server response payload in `AsyncResult` can be converted to the the values e.g. boolean, integer, float, double and string via `RTDB.to<T>()`.
+
 
 ## App Initialization
 
@@ -628,6 +656,7 @@ LegacyToken legacy_token(<database_secret>);
 ```
 
 `<database_secret>` The Realtime database secret key.
+
 
 ### Working with Filesystems and BLOB
 

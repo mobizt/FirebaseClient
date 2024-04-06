@@ -1,5 +1,5 @@
 /**
- * Created March 24, 2024
+ * Created April 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -291,7 +291,7 @@ namespace firebase
                 for (size_t i = 0; i < sa_ns::max_type; i++)
                     val[i].remove(0, val[i].length());
                 timestatus_cb = NULL;
-                expire = 3600;
+                expire = 3300;
                 step = jwt_step_begin;
             }
 
@@ -299,7 +299,7 @@ namespace firebase
             String val[sa_ns::max_type];
             jwt_step step = jwt_step_begin;
             TimeStatusCallback timestatus_cb = NULL;
-            size_t expire = 3600;
+            size_t expire = 3300;
         };
 #endif
 
@@ -332,7 +332,7 @@ namespace firebase
         struct user_data
         {
             String val[user_ns::max_type];
-            size_t expire = 3600;
+            size_t expire = 3300;
 
         public:
             user_data() {}
@@ -347,7 +347,7 @@ namespace firebase
             {
                 for (size_t i = 0; i < user_ns::max_type; i++)
                     val[i].remove(0, val[i].length());
-                expire = 3600;
+                expire = 3300;
             }
         };
 
@@ -355,7 +355,7 @@ namespace firebase
         struct id_token_data
         {
             String val[id_tk_ns::max_type];
-            size_t expire = 3600;
+            size_t expire = 3300;
 
         public:
             id_token_data() {}
@@ -370,7 +370,7 @@ namespace firebase
             {
                 for (size_t i = 0; i < id_tk_ns::max_type; i++)
                     val[i].remove(0, val[i].length());
-                expire = 3600;
+                expire = 3300;
             }
         };
 #endif
@@ -379,7 +379,7 @@ namespace firebase
         struct access_token_data
         {
             String val[access_tk_ns::max_type];
-            size_t expire = 3600;
+            size_t expire = 3300;
             TimeStatusCallback timestatus_cb = NULL;
 
         public:
@@ -396,7 +396,7 @@ namespace firebase
             {
                 for (size_t i = 0; i < access_tk_ns::max_type; i++)
                     val[i].remove(0, val[i].length());
-                expire = 3600;
+                expire = 3300;
                 timestatus_cb = NULL;
             }
         };
@@ -406,7 +406,7 @@ namespace firebase
         struct custom_token_data
         {
             String val[cust_tk_ns::max_type];
-            size_t expire = 3600;
+            size_t expire = 3300;
             TimeStatusCallback timestatus_cb = NULL;
 
         public:
@@ -421,7 +421,7 @@ namespace firebase
             void clear()
             {
                 val[cust_tk_ns::token].remove(0, val[cust_tk_ns::token].length());
-                expire = 3600;
+                expire = 3300;
                 timestatus_cb = NULL;
             }
         };
@@ -787,7 +787,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        UserAuth(const String &api_key, const String &email, const String &password, size_t expire = 3600)
+        UserAuth(const String &api_key, const String &email, const String &password, size_t expire = 3300)
         {
             data.clear();
             data.user.val[user_ns::api_key] = api_key;
@@ -849,7 +849,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        ServiceAuth(TimeStatusCallback timeCb, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = 3600)
+        ServiceAuth(TimeStatusCallback timeCb, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = 3300)
         {
             data.clear();
             data.sa.val[sa_ns::cm] = clientEmail;
@@ -896,7 +896,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        CustomAuth(TimeStatusCallback timeCb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = 3600)
+        CustomAuth(TimeStatusCallback timeCb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = 3300)
         {
             data.clear();
             data.sa.val[sa_ns::cm] = clientEmail;
@@ -997,7 +997,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        IDToken(const String &api_key, const String &token, size_t expire = 3600, const String &refresh = "")
+        IDToken(const String &api_key, const String &token, size_t expire = 3300, const String &refresh = "")
         {
             this->data.clear();
             this->data.user.val[user_ns::api_key] = api_key;
@@ -1063,7 +1063,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        AccessToken(const String &token, size_t expire = 3600, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
+        AccessToken(const String &token, size_t expire = 3300, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
         {
             this->data.clear();
             this->data.access_token.val[access_tk_ns::token] = token;
@@ -1130,7 +1130,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        CustomToken(const String &api_key, const String &token, size_t expire = 3600)
+        CustomToken(const String &api_key, const String &token, size_t expire = 3300)
         {
             this->data.clear();
             this->data.custom_token.val[cust_tk_ns::token] = token;
@@ -1280,7 +1280,7 @@ namespace firebase
         {
             for (size_t i = 0; i < app_tk_ns::max_type; i++)
                 val[i].remove(0, val[i].length());
-            expire = 3600;
+            expire = 3300;
             authenticated = false;
             auth_type = auth_unknown_token;
             auth_data_type = user_auth_data_undefined;

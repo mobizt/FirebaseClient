@@ -1,66 +1,4 @@
-
-// Created by K. Suwatchai (Mobizt)
-// Email: k_suwatchai@hotmail.com
-// Github: https://github.com/mobizt/FirebaseClient
-// Copyright (c) 2024 mobizt
-
 /**
- * APP INITIALIZATION
- * ==================
- *
- * This library provides the APIs covers the different types of authentication and services.
- *
- * The FirebaseApp class was introduced as user authentication provider which provides the credentials data
- * used for accessing the Firebase services.
- *
- * The Database, Firestore, Functions, Messaging, Storage and Cloud Storage apps provided the functions based on
- * the specific Firebase services which take the auth credentials data from FirebaseApp.
- *
- * Multiples instances of FirebaseApp (auth provider) and services apps (Database, Firestore...) can be available
- * which depends on the device memory.
- *
- * The FirebaseApp should be initialized first before use via static function initializeApp.
- *
- * SYNTAXES:
- *
- * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
- *
- * The AsyncClient stores the user, server and network data which can be initialized as.
- *
- * WiFiClientSecure ssl_client;
- * DefaultNetwork network;
- * AsyncClient aClient(ssl_client, getNetwork(network));
- *
- * The FirebaseApp manage and stores the authentication data;
- *
- * The user_auth_data store the user credentials which can be obtained from one of following Auth classes.
- * UserAuth, ServiceAuth, CustomAuth, IDToken, AccessToken, CustomToken, LegacyToken and NoAuth via static function getAuth.
- *
- * Please see examples/App/AppInitialization for usage guidelines.
- *
- * To use other network interfaces, network data from one of the following Network classes
- * can be assigned.
- *
- * DefaultNetwork, GenericNetwork, EthernetNetwork and GSMNetwork.
- *
- * The network data (network_config_data) can be obtained from these Network classes via static function getNetwork.
- *
- * Please see examples/App/NetworkInterfaces for the usage guidelines.
- *
- * The auth credential data can be set to Services App e.g. Database to initialize via function getApp.
- *
- * SYNTAX:
- *
- * app.getApp<T>(<services_app>);
- *
- * Deallocation of FirebaseApp causes these services apps uninitialized and cannot be used.
- *
- */
-
-/**
- * SYNC PUSH FUNCTIONS
- * ===================
- *
  * SYNTAXES:
  *
  * String name = Database.push<T>(<AsyncClient>, <path>, <value>);
@@ -76,13 +14,8 @@
  *
  * In case of error, the operation error information can be obtain from AsyncClient via aClient.lastError().message() and
  * aClient.lastError().code().
- */
-
-/** THE STATIC ASYNC RESULT REQUIRED FOR ASYNC OPERATION
- * =====================================================
- *
- * Due to the authentication process is async operation, the async client object used in authentication task shoul be
- * defined globally as it keeps the auth token data, debug and error information.
+ * 
+ * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>

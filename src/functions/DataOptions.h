@@ -1,5 +1,5 @@
 /**
- * Created April 3, 2024
+ * Created April 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -210,7 +210,7 @@ namespace GoogleCloudFunctions
         BuildConfig &entryPoint(const String &value) { return wr.set<BuildConfig &, String>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
 
         // The location of the function source code.
-        BuildConfig &source(Source value) { return wr.set<BuildConfig &, Source>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+        BuildConfig &source(const Source &value) { return wr.set<BuildConfig &, Source>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
 
         // Name of the Cloud Build Custom Worker Pool that should be used to build the function. The format of this field is projects/{project}/locations/{region}/workerPools/{workerPool} where {project} and {region} are the project id and region respectively where the worker pool is defined and {workerPool} is the short name of the worker pool.
         BuildConfig &workerPool(const String &value) { return wr.set<BuildConfig &, String>(*this, value, buf, bufSize, 4, FPSTR(__func__)); }
@@ -295,7 +295,7 @@ namespace GoogleCloudFunctions
     public:
         
         // The function execution timeout. Execution is considered failed and can be terminated if the function is not completed at the end of the timeout period. Defaults to 60 seconds.
-        ServiceConfig &timeoutSeconds(uint32_t value) { return wr.set<ServiceConfig &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+        ServiceConfig &timeoutSeconds(uint32_t value) { return wr.set<ServiceConfig &, uint32_t>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
         
         // The amount of memory available for a function. Defaults to 256M. Supported units are k, M, G, Mi, Gi. If no unit is supplied the value is interpreted as bytes. See https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/apimachinery/pkg/api/resource/quantity.go a full description.
         ServiceConfig &availableMemory(const String &value) { return wr.set<ServiceConfig &, String>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }

@@ -1,5 +1,5 @@
 /**
- * Created April 4, 2024
+ * Created April 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -118,11 +118,11 @@ namespace Messages
 
         // Required. Along with light_off_duration, define the blink rate of LED flashes. Resolution defined by proto.Duration
         // A duration in seconds with up to nine fractional digits, ending with 's'. Example: "3.5s".
-        LightSettings &light_on_duration(const String &value) { return wr.set<LightSettings &, Color>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
+        LightSettings &light_on_duration(const String &value) { return wr.set<LightSettings &, String>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
 
         // Required. Along with light_on_duration, define the blink rate of LED flashes. Resolution defined by proto.Duration
         // A duration in seconds with up to nine fractional digits, ending with 's'. Example: "3.5s".
-        LightSettings &light_off_duration(const String &value) { return wr.set<LightSettings &, Color>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+        LightSettings &light_off_duration(const String &value) { return wr.set<LightSettings &, String>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
     };
 
     /**

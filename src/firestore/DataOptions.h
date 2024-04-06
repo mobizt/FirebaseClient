@@ -1,5 +1,5 @@
 /**
- * Created April 3, 2024
+ * Created April 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -974,7 +974,7 @@ public:
     // Union field consistency_selector
     // Timestamp. Reads documents as they were at the given time.
     // This must be a microsecond precision timestamp within the past one hour,or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
-    QueryOptions &readTime(const String &value) { return wr.set<QueryOptions &, TransactionOptions>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+    QueryOptions &readTime(const String &value) { return wr.set<QueryOptions &, String>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
 };
 
 #endif
@@ -1237,11 +1237,11 @@ namespace CollectionGroupsIndex
 
         // Union field value_mode
         // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
-        IndexField &order(const Order &value) { return wr.set<IndexField &, const char *>(*this, _Order[value].text, buf, bufSize, 2, FPSTR(__func__)); }
+        IndexField &order(Order value) { return wr.set<IndexField &, const char *>(*this, _Order[value].text, buf, bufSize, 2, FPSTR(__func__)); }
 
         // Union field value_mode
         // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
-        IndexField &arrayConfig(const ArrayConfig &value) { return wr.set<IndexField &, const char *>(*this, _ArrayConfig[value].text, buf, bufSize, 2, FPSTR(__func__)); }
+        IndexField &arrayConfig(ArrayConfig value) { return wr.set<IndexField &, const char *>(*this, _ArrayConfig[value].text, buf, bufSize, 2, FPSTR(__func__)); }
 
         // Union field value_mode
         // Indicates that this field supports nearest neighbors and distance operations on vector.
@@ -1257,10 +1257,10 @@ namespace CollectionGroupsIndex
         Index() {}
 
         // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
-        Index &queryScope(const QueryScope &value) { return wr.set<Index &, const char *>(*this, _QueryScope[value].text, buf, bufSize, 1, FPSTR(__func__)); }
+        Index &queryScope(QueryScope value) { return wr.set<Index &, const char *>(*this, _QueryScope[value].text, buf, bufSize, 1, FPSTR(__func__)); }
 
         // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
-        Index &apiScope(const ApiScope &value) { return wr.set<Index &, const char *>(*this, _ApiScope[value].text, buf, bufSize, 2, FPSTR(__func__)); }
+        Index &apiScope(ApiScope value) { return wr.set<Index &, const char *>(*this, _ApiScope[value].text, buf, bufSize, 2, FPSTR(__func__)); }
 
         // This value represents the item to add to an array.
         // Add the field that supported by this index.
