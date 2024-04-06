@@ -330,27 +330,27 @@ namespace GoogleCloudStorage
 
         // https://cloud.google.com/storage/docs/access-control/lists
         // This value represents the item to add to an array.
-        InsertProperties &acl(const String &value) { return wr.append<InsertProperties &, String>(*this, value, buf, bufSize, buf[1], FPSTR(__func__)); }
-        InsertProperties &cacheControl(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[2], FPSTR(__func__)); }
-        InsertProperties &contentDisposition(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[3], FPSTR(__func__)); }
-        InsertProperties &contentEncoding(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[4], FPSTR(__func__)); }
-        InsertProperties &contentLanguage(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[5], FPSTR(__func__)); }
-        InsertProperties &contentType(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[6], FPSTR(__func__)); }
-        InsertProperties &crc32c(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[7], FPSTR(__func__)); }
-        InsertProperties &customTime(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[8], FPSTR(__func__)); }
-        InsertProperties &eventBasedHold(bool value) { return wr.set<InsertProperties &, bool>(*this, value, buf, bufSize, buf[9], FPSTR(__func__)); }
-        InsertProperties &md5Hash(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[10], FPSTR(__func__)); }
+        InsertProperties &acl(const String &value) { return wr.append<InsertProperties &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+        InsertProperties &cacheControl(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
+        InsertProperties &contentDisposition(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+        InsertProperties &contentEncoding(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, 4, FPSTR(__func__)); }
+        InsertProperties &contentLanguage(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, 5, FPSTR(__func__)); }
+        InsertProperties &contentType(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, 6, FPSTR(__func__)); }
+        InsertProperties &crc32c(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, 7, FPSTR(__func__)); }
+        InsertProperties &customTime(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, 8, FPSTR(__func__)); }
+        InsertProperties &eventBasedHold(bool value) { return wr.set<InsertProperties &, bool>(*this, value, buf, bufSize, 9, FPSTR(__func__)); }
+        InsertProperties &md5Hash(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, 10, FPSTR(__func__)); }
         InsertProperties &metadata(const object_t value)
         {
             buf[11] = FPSTR("{\"metadata\":{\"firebaseStorageDownloadTokens\":\"a82781ce-a115-442f-bac6-a52f7f63b3e8\"}}");
             if (strlen(value.c_str()))
-                owriter.addMember(buf[11], value.c_str());
+                owriter.addMember(buf[11], value.c_str(), false);
             owriter.getBuf(buf, bufSize);
             return *this;
         }
-        InsertProperties &retention(const object_t value) { return wr.set<InsertProperties &, object_t>(*this, value, buf, bufSize, buf[12], FPSTR(__func__)); }
-        InsertProperties &storageClass(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, buf[13], FPSTR(__func__)); }
-        InsertProperties &temporaryHold(bool value) { return wr.set<InsertProperties &, bool>(*this, value, buf, bufSize, buf[14], FPSTR(__func__)); }
+        InsertProperties &retention(const object_t value) { return wr.set<InsertProperties &, object_t>(*this, value, buf, bufSize, 12, FPSTR(__func__)); }
+        InsertProperties &storageClass(const String &value) { return wr.set<InsertProperties &, String>(*this, value, buf, bufSize, 13, FPSTR(__func__)); }
+        InsertProperties &temporaryHold(bool value) { return wr.set<InsertProperties &, bool>(*this, value, buf, bufSize, 14, FPSTR(__func__)); }
     };
 
     class Parent

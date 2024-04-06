@@ -587,8 +587,8 @@ private:
                     String name, mime;
                     jut.addObject(name, "name", request.options->parent.getObject(), true, true);
                     jut.addObject(mime, "contentType", request.mime, true, true);
-                    owriter.addMember(request.options->payload, name, "}");
-                    owriter.addMember(request.options->payload, mime, "}");
+                    owriter.addMember(request.options->payload, name, false, "}");
+                    owriter.addMember(request.options->payload, mime, false, "}");
                     sData->request.file_data.multipart.setOptions(request.options->payload);
                     request.options->payload.remove(0, request.options->payload.length());
                     request.aClient->setFileContentLength(sData, sData->request.file_data.multipart.getOptions().length() + sData->request.file_data.multipart.getLast().length(), "Content-Length");

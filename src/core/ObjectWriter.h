@@ -38,7 +38,7 @@ private:
     JSONUtil jut;
 
 public:
-    void addMember(String &buf, const String &v, const String &token = "}}")
+    void addMember(String &buf, const String &v, bool isString, const String &token = "}}")
     {
         int p = buf.lastIndexOf(token);
         String str = buf.substring(0, p);
@@ -46,12 +46,23 @@ public:
         // Add to object
         if (token[0] == '}')
         {
-            String tmp = v;
+            String tmp;
+            if (isString)
+                tmp += '"';
+            tmp += v;
+            if (isString)
+                tmp += '"';
             str += tmp.substring(1, tmp.length() - 1);
         }
         // Add to array
         else
+        {
+            if (isString)
+                str += '"';
             str += v;
+            if (isString)
+                str += '"';
+        }
         str += token;
         buf = str;
     }
@@ -65,22 +76,25 @@ public:
             if (buf.length() == 0)
                 buf = object;
             else
-                addMember(buf, object, token);
+                addMember(buf, object, false, token);
         }
     }
 
-    void addMapArrayMember(String *buf, size_t size, String &buf_n, const String &key, const String &memberValue, bool isString)
+    void addMapArrayMember(String *buf, size_t size, uint8_t index, const String &key, const String &memberValue, bool isString)
     {
-        if (buf_n.length() == 0)
+        if (index < size)
         {
-            String temp;
-            jut.addArray(temp, memberValue, isString, true);
-            jut.addObject(buf_n, key, temp, false, true);
-        }
-        else
-            addMember(buf_n, isString ? jut.toString(memberValue) : memberValue, "]}");
+            if (buf[index].length() == 0)
+            {
+                String temp;
+                jut.addArray(temp, memberValue, isString, true);
+                jut.addObject(buf[index], key, temp, false, true);
+            }
+            else
+                addMember(buf[index], memberValue, isString, "]}");
 
-        getBuf(buf, size);
+            getBuf(buf, size);
+        }
     }
 
     void getBuf(String *buf, size_t size)
@@ -90,14 +104,17 @@ public:
             addObject(buf[0], buf[i], "}", i == 0);
     }
 
-    void setObject(String *buf, size_t size, String &buf_n, const String &key, const String &value, bool isString, bool last)
+    void setObject(String *buf, size_t size, uint8_t index, const String &key, const String &value, bool isString, bool last)
     {
-        if (key.length())
+        if (index < size)
         {
-            clear(buf_n);
-            jut.addObject(buf_n, key, value, isString, last);
+            if (key.length())
+            {
+                clear(buf[index]);
+                jut.addObject(buf[index], key, value, isString, last);
+            }
+            getBuf(buf, size);
         }
-        getBuf(buf, size);
     }
 
     void clearBuf(String *buf, size_t size)
@@ -171,9 +188,9 @@ private:
         static bool const value = std::is_same<T, const char *>::value || std::is_same<T, std::string>::value || std::is_same<T, String>::value;
     };
 
-    void setObject(String *buf, size_t bufSize, String &buf_n, const String &key, const String &value, bool isString, bool last)
+    void setObject(String *buf, size_t bufSize, uint8_t index, const String &key, const String &value, bool isString, bool last)
     {
-        owriter.setObject(buf, bufSize, buf_n, key, value, isString, last);
+        owriter.setObject(buf, bufSize, index, key, value, isString, last);
     }
 
 public:
@@ -211,58 +228,58 @@ public:
     }
 
     template <typename T1, typename T2>
-    T1 set(T1 ret, bool value, String *buf, size_t bufSize, String &buf_n, const String &name)
+    T1 set(T1 ret, bool value, String *buf, size_t bufSize, uint8_t index, const String &name)
     {
-        setObject(buf, bufSize, buf_n, name, owriter.getBoolStr(value), false, true);
+        setObject(buf, bufSize, index, name, owriter.getBoolStr(value), false, true);
         return ret;
     }
 
     template <typename T1, typename T2>
-    auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
+    auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
     {
-        setObject(buf, bufSize, buf_n, name, String(value), false, true);
+        setObject(buf, bufSize, index, name, String(value), false, true);
         return ret;
     }
 
     template <typename T1, typename T2>
-    auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<v_sring<T2>::value, T1>::type
+    auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<v_sring<T2>::value, T1>::type
     {
-        setObject(buf, bufSize, buf_n, name, value, true, true);
+        setObject(buf, bufSize, index, name, value, true, true);
         return ret;
     }
 
     template <typename T1, typename T2>
-    auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<(!v_sring<T2>::value && !v_number<T2>::value && !std::is_same<T2, bool>::value), T1>::type
+    auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<(!v_sring<T2>::value && !v_number<T2>::value && !std::is_same<T2, bool>::value), T1>::type
     {
-        setObject(buf, bufSize, buf_n, name, value.c_str(), false, true);
+        setObject(buf, bufSize, index, name, value.c_str(), false, true);
         return ret;
     }
 
     template <typename T1, typename T2>
-    T1 append(T1 ret, bool value, String *buf, size_t bufSize, String &buf_n, const String &name)
+    T1 append(T1 ret, bool value, String *buf, size_t bufSize, uint8_t index, const String &name)
     {
-        owriter.addMapArrayMember(buf, bufSize, buf_n, name, owriter.getBoolStr(value), false);
+        owriter.addMapArrayMember(buf, bufSize, index, name, owriter.getBoolStr(value), false);
         return ret;
     }
 
     template <typename T1, typename T2>
-    auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
+    auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
     {
-        owriter.addMapArrayMember(buf, bufSize, buf_n, name, String(value), false);
+        owriter.addMapArrayMember(buf, bufSize, index, name, String(value), false);
         return ret;
     }
 
     template <typename T1, typename T2>
-    auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<v_sring<T2>::value, T1>::type
+    auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<v_sring<T2>::value, T1>::type
     {
-        owriter.addMapArrayMember(buf, bufSize, buf_n, name, value, true);
+        owriter.addMapArrayMember(buf, bufSize, index, name, value, true);
         return ret;
     }
 
     template <typename T1, typename T2>
-    auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, String &buf_n, const String &name) -> typename std::enable_if<(!v_sring<T2>::value && !v_number<T2>::value && !std::is_same<T2, bool>::value), T1>::type
+    auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<(!v_sring<T2>::value && !v_number<T2>::value && !std::is_same<T2, bool>::value), T1>::type
     {
-        owriter.addMapArrayMember(buf, bufSize, buf_n, name, value.c_str(), false);
+        owriter.addMapArrayMember(buf, bufSize, index, name, value.c_str(), false);
         return ret;
     }
     void clear(String &buf) { buf.remove(0, buf.length()); }
@@ -479,7 +496,7 @@ namespace firebase
 
     class UnityRange
     {
-        public:
+    public:
         UnityRange() {}
 
         float val(float value)
