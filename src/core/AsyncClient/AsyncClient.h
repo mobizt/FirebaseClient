@@ -1741,6 +1741,8 @@ private:
         {
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
             sData->return_type = function_return_type_failure;
+            // This requires by WiFiSSLClient before stating a new connection in case session was reused.
+            reset(sData, true);
             return true;
         }
         return false;
@@ -1752,6 +1754,8 @@ private:
         {
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
             sData->return_type = function_return_type_failure;
+            // This requires by WiFiSSLClient before stating a new connection in case session was reused.
+            reset(sData, true);
             return true;
         }
         return false;

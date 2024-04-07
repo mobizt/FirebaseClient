@@ -351,14 +351,14 @@ When the authentication async operation was required, it will insert to the firs
 
 If the sync operation was called, it will insert to the first slot in the queue too but after the authentication task slot.
 
-When async Get operation in SSE mode (HTTP Streaming) was currently stored in queue, the new sync and async operations will be inserted before the async SSE (HTTP Streaming) slot.
+When async Get operation in `SSE mode (HTTP Streaming)` was currently stored in queue, the new sync and async operations will be inserted before the async `SSE (HTTP Streaming)` slot.
 
-When the async operation queue is full, the new sync and async operations will be cancelled.
+When the async operation queue is full or the another SSE mode get function was called, the new sync and async operations will be cancelled. The error code `-118` (`FIREBASE_ERROR_OPERATION_CANCELLED`) or `"operation was cancelled"` will show in the debug message.
  
 The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
 
-The async SSE operation will run continuously and repeatedly as long as the FirebaseApp and the services app
-(Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via app.loop() or database.loop().
+The async `SSE` operation will run continuously and repeatedly as long as the FirebaseApp and the services app
+(Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via `app.loop()` or `Database.loop()`.
 
 ### Async Client
 
