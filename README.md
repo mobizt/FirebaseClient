@@ -410,9 +410,9 @@ For example:
 `Database.get(aClient, "/test/int", options, asyncCB);`
 
 
-From source 1, the async result (`aResult`) shall be defined globally to use in async application because of the static data is needed for use while running the sync task.
+From source 1, the async result (`aResult`) shall be defined globally to use in async application because of the static data is needed for use while running the async task.
 
-From source 2, the async client (`aClient`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the sync task.
+From source 2, the async client (`aClient`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the async task.
 
 The async result from source 2 can be accessed from the async result callback.
 
