@@ -1,5 +1,5 @@
 /**
- * Created April 6, 2024
+ * Created April 7, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -46,15 +46,6 @@
 #endif
 
 using namespace firebase;
-
-__attribute__((unused)) static void meminfo(int pos)
-{
-#if defined(ESP8266)
-    Serial.printf("Pos: %d, Heap: %d, Stack: %d\n", pos, ESP.getFreeHeap(), ESP.getFreeContStack());
-#elif defined(ESP32)
-    Serial.printf("Pos: %d, Heap: %d\n", pos, ESP.getFreeHeap());
-#endif
-}
 
 enum async_state
 {
@@ -197,6 +188,8 @@ private:
 #endif
     async_request_handler_t::tcp_client_type client_type = async_request_handler_t::tcp_client_type_sync;
     bool sse = false;
+    String host;
+    uint16_t port;
     std::vector<uint32_t> sVec;
     Memory mem;
     Base64Util but;
@@ -230,6 +223,13 @@ private:
 #endif
         sData->request.file_data.file_status = file_config_data::file_status_opened;
         return true;
+    }
+
+    void newCon(async_data_item_t *sData, const char *host, uint16_t port)
+    {
+        if ((sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined) ||
+            strcmp(this->host.c_str(), host) != 0 || this->port != port)
+            stop(sData);
     }
 
     function_return_type sendHeader(async_data_item_t *sData, const char *data)
@@ -504,8 +504,7 @@ private:
 
         if (sData->state == async_state_undefined || sData->state == async_state_send_header)
         {
-            if ((sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined))
-                stop(sData);
+            newCon(sData, getHost(sData, true).c_str(), sData->request.port);
 
             if ((client_type == async_request_handler_t::tcp_client_type_sync && !client->connected()) || client_type == async_request_handler_t::tcp_client_type_async)
             {
@@ -1314,6 +1313,8 @@ private:
 #endif
         }
 
+        this->host = host;
+        this->port = port;
         return sData->return_type;
     }
 
@@ -1870,6 +1871,9 @@ public:
                 async_tcp_config->tcpStop();
 #endif
         }
+
+        clear(host);
+        port = 0;
     }
 
     FirebaseError lastError() const { return lastErr; }
