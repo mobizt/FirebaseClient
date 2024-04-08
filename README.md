@@ -14,7 +14,10 @@ The features can be configurable to add and exclude some unused features, see [L
 
 This library is the new Firebase Client library that supports both sync and async usages.
 
-This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client) library replacement.
+> [!NOTE]  
+> This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client) library replacement that is now outdated.
+
+This new library uses less program space with better performance and reliability.
 
 ## Contents
 
