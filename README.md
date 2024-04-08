@@ -176,7 +176,7 @@ If you are using those libraries, the code should be rewritten.
 
 In addition, some features are changed which included the following.
 
-### Realtime Database
+- ### Realtime Database
 
 The blob and file upload via set, push and update, the byte data will be converted to base64 encoded string and store to the database without the signature string (`file,` and `blob,`) prepended to the base64 string as in the old library.
 
@@ -184,7 +184,7 @@ The data on the database that read using the async get function which the blob a
 
 Then get the data that contains signature string (`file,` and `blob,`) created by old library will lead to the error after base64 decoding.
 
-### TCP KeepAlive
+- ### TCP KeepAlive
 
 The TCP session KeepAlive can be done by the network client if it was supportd e.g. `WiFiClient` in ESP32.
 
@@ -226,22 +226,22 @@ void setup()
 
 ```
 
-### PSRAM
+- ### PSRAM
 
 The PSRAM in this library was enabled by default but it was only used partly in tempolary buffer memory allocation.
 
-### Cloud Messaging
+- ### Cloud Messaging
 
 The legaycy Firebase Cloud Messaging API was deprecated, only HTTPv1 is supported.
 
-### Cloud Functions
+- ### Cloud Functions
 
  Deploying the Cloud Function from local flash or filesystem source in a single function is not available unless using several fnctions that are available to generate upload url, upload the source (zip file), deploy the function and set IAM permission.
 
 ## Installation
 
 
-### Using Library Manager
+- ### Using Library Manager
 
 At Arduino IDE, go to menu **Sketch** -> **Include Library** -> **Manage Libraries...**
 
@@ -258,7 +258,7 @@ For PlatformIO IDE, using the following command.
 Or at **PIO Home** -> **Library** -> **Registry** then search **FirebaseClient**.
 
 
-### Manual installation
+- ### Manual installation
 
 For Arduino IDE, download zip file from the repository (Github page) by select **Code** dropdown at the top of repository, select **Download ZIP** 
 
@@ -271,7 +271,7 @@ Rename folder from **FirebaseClient-main** to **FirebaseClient**.
 Go to menu **Files** -> **Examples** -> **FirebaseClient** and choose one from examples.
 
 
-### RP2040 Arduino SDK installation
+- ### RP2040 Arduino SDK installation
 
 For Arduino IDE, the Arduino-Pico SDK can be installed from Boards Manager by searching pico and choose Raspberry Pi Pico/RP2040 to install.
 
@@ -292,11 +292,11 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 
 ## Usages
 
-### Indroduction
+- ### Indroduction
 
 There are classes or objects that used for required operations and data in this library e.g. authentication and auth data, networking data, Firebase service apps and Firebase service apps data.
 
-### Authentication
+- ### Authentication
 
 The authentication classes provide the custom token, access token, ID token authentications using credentials or tokens from other sources.
 
@@ -325,7 +325,7 @@ For Cloud Firestore database security rules, see [this link](https://firebase.go
 Non-authentication (for testing only) and user management classes and functions also available.
 
 
-### Firebase and Google Services
+- ### Firebase and Google Services
 
 The Firebase and Google services Classes that are available are Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Cloud Functions and Google Cloud Storage classes.
 
@@ -351,7 +351,7 @@ This library used internal millis timer to handle the token time to live. Then d
 In access and custom token authentications using service accout file (sa and custom auths), it related to JWT token creation and the token signing using RSA private key.  This process require the valid timestamp, then the time status setting callback will be required in the sa and custom auth class constructor.
 
 
-### Async Queue
+- ### Async Queue
 
 All requests for sync and async operations are managed using queue.
  
@@ -374,7 +374,7 @@ The finished and time out operating slot will be removed from the queue unless t
 The async `SSE` operation will run continuously and repeatedly as long as the FirebaseApp and the services app
 (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via `app.loop()` or `Database.loop()`.
 
-### Async Client
+- ### Async Client
 
 The authentication and Firebase service apps taks require the async client for server connection.
 
@@ -404,20 +404,20 @@ The default send and read timeouts for async task are 30 seconds and cannot be c
 
 For sync task, the timeout in seconds can be set via the `AsyncClientClass` member functions, `setSyncSendTimeout` and `setSyncReadTimeout`.
 
-### Async Result
+- ### Async Result
 
 Library provides the class object called `AsyncResult` that keeps the server response data, debug and error information.
 
 There are two sources of async result in this library:
 
 
-#### 1. From user provided with async application (function).
+- #### 1. From user provided with async application (function).
 
 For example:
 
 `Database.get(aClient, "/test/int", options, aResult);`
 
-#### 2. From dynamic allocation in the async client.
+- #### 2. From dynamic allocation in the async client.
 
 For example:
 
@@ -439,7 +439,7 @@ The aync result provides two types of information, `app events` and `result data
 > Please avoid calling code or function that uses large memory inside the asyn callback because it can lead to stack overflow problem especially in ESP8266 and causes the wdt rest crash.
 > For ESP8266, global defined`AsyncResult` is recommended for async operation.
 
-### App Events
+- ### App Events
 
 The app event information of authentication task handler can be obtained from `aResult.appEvent().code()` and `aResult.appEvent().message()` respectively.
 
@@ -449,7 +449,7 @@ The following event code (`firebase_auth_event_type`), `auth_event_uninitialized
 
 The following event strings `"undefined"`, `"initializing"`, `"sign up"`, `"send verification email"`, `"delete user"`, `"reset password"`, `"token signing"`, `"authenticating"`, `"auth request sent"`, `"auth response received"`, `"ready"` and `"error"` are available.
 
-### Result Data
+- ### Result Data
 
 The result data can be obtained from `AsyncResult` object via `aResult.payload()`, `aResult.available()`, `aResult.path()`, `aResult.etag()`, `RTDB.isStream()`, `RTDB.event()`, `RTDB.dataPath()`, `RTDB.type()` and `RTDB.name()` where `RTDB` is the `RealtimeDatabaseResult `object that obtained from `aResult.to<RealtimeDatabaseResult>()`.
 
@@ -499,7 +499,7 @@ The auth token (ID token, access token or legacy token) can be obtained from `ge
 The refresh token (if available) can be obtained from `getRefreshToken()` of the `FirebaseApp` member function.
 
 
-### Custom UID User Authentication
+- ### Custom UID User Authentication
 
 The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) is the class to create cusom token (signed JWT token with custom claims).
 
@@ -533,7 +533,7 @@ CustomAuth custom_auth(<TimeStatusCallback>, <api_key>, <client_email>, <project
 
 `<expire>`The expiry period in seconds (less than or equal to 3600).
 
-### Service Account Authentication
+- ### Service Account Authentication
 
 With [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) provider class, you are now access the Firebase services as non-human or a service or application user.
 
@@ -560,7 +560,7 @@ ServiceAuth service_auth(<TimeStatusCallback>, <api_key>, <client_email>, <proje
 
 The internal process to refresh the token was done by creating the new token.
 
-### User Authentication with Email/Password
+- ### User Authentication with Email/Password
 
 With [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) provider class, you are now signin as a user with Email and password.
 
@@ -578,7 +578,7 @@ UserAuth user_auth(<api_key>, <user_email>, <user_password>, <expire>);
 
 `<expire>`The expiry period in seconds (less than or equal to 3600).
 
-### No Authentication
+- ### No Authentication
 
 The [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino) provider class, allows you to skip all auth data in the request that sent to the Firebase services.
 
@@ -586,7 +586,7 @@ You have to set the security rules for the Firebase and Google services to allow
 
 This used for testing only and should not use in production.
 
-### Custom Token Authorization
+- ### Custom Token Authorization
 
 With [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino) provider class, you are able to set the custom token (signed JWT token) that created and taken from other sources e.g. Firebase and Admin SDK apps, to use in the internal ID token exchanging process.
 
@@ -613,7 +613,7 @@ You can assign the refresh token that obtains from Google API server when genera
 
 The ID token itself is short-lived token which as expired in 1 Hour or less.
 
-### Access Token Authorization
+- ### Access Token Authorization
 
 The [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino) provider class allows you to authorize the Firebase and Google services with the access token.
 
@@ -645,7 +645,7 @@ The Client ID and Client Secret can be taken from https://console.developers.goo
 
 By providing `<refresh_token>` without `<client_id>` and `<client_secret>`, the token refrehing process will fail with unexpected error.
 
-### ID Token Authorization
+- ### ID Token Authorization
 
 The [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) provider class, allows you to set the ID token form other Firebase and Admin SDK apps to be used with this library.
 
@@ -665,7 +665,7 @@ IDToken id_token(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>);
 
 `<refresh_token>` Refresh token.
 
-### Legacy Token Authorization
+- ### Legacy Token Authorization
 
 The [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) provider class allows you to set the database secret used in Firebase Realtime database service.
 
@@ -680,7 +680,7 @@ LegacyToken legacy_token(<database_secret>);
 `<database_secret>` The Realtime database secret key.
 
 
-### Working with Filesystems and BLOB
+- ### Working with Filesystems and BLOB
 
 The file config class ([FileConfig](examples/App/AppInitialization/SaveAndLoad/)) will be used to hold the SD/Flash file information and the file operation callback when file upload or download is required.
 
@@ -767,7 +767,7 @@ void download()
 When filesystems are not used, remove `ENABLE_FS` macro in [src/Config.h](/src/Config.h) or user defined [src/UserConfig.h](/src) or adding `DISABLE_FS` in compiler build flags.
 
 
-### Working with Networks
+- ### Working with Networks
 
 The `AsyncClientClass` object requires network config data (`network_config_data`) that obtained from one of the following networking classes via static function called `getNetwork`.
 
@@ -970,7 +970,7 @@ In side the `<network_status_callback>` function, the `status` (Boolean variable
 
 See [this example](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.ino) for using WiFi with `GenericNetwork` for demonstation.
 
-### Required Operation Flows
+- ### Required Operation Flows
 
 When using this library, user have to follow the following operation flows otherwise unknown errors can be occurred.
 
@@ -1024,7 +1024,7 @@ void setup()
 }
 ```
 
-### Basic Example
+- ### Basic Example
 
 
 ```cpp
@@ -1206,7 +1206,7 @@ If the size of payload string in async reseut is large, to copy the char array b
 
 There is no JSON serialization/deserialization utilized or provided in this library.
 
-## Realtime Database Usage
+- ### Realtime Database Usage
 
 - [Examples](/examples/RealtimeDatabase).
 
@@ -1214,7 +1214,7 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 
 - [API Doc](https://firebase.google.com/docs/reference/rest/database).
 
-## Google Cloud Firestore Database Usage
+- ### Google Cloud Firestore Database Usage
 
 - [Examples](/examples/FirestoreDatabase).
 
@@ -1222,7 +1222,7 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 
 - [API Doc](https://firebase.google.com/docs/firestore/reference/rest).
 
-## Google Cloud Messaging Usage
+- ### Google Cloud Messaging Usage
 
 - [Examples](/examples/Messaging).
 
@@ -1231,13 +1231,13 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 - [API Doc](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages).
 
 
-## Firebase Storage Usage
+- ### Firebase Storage Usage
 
 - [Examples](/examples/Storage).
 
 - [Class and Functions](/resources/docs/storage.md).
 
-## Google Cloud Storage Usage
+- ### Google Cloud Storage Usage
 
 - [Examples](/examples/CloudStorage).
 
@@ -1245,7 +1245,7 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 
 - [API Doc](https://cloud.google.com/storage/docs/json_api/v1).
 
-## Google Cloud Functions Usage
+- ### Google Cloud Functions Usage
 
 - [Examples](/examples/CloudFunctions).
 
@@ -1262,13 +1262,13 @@ See [function description](/src/README.md) for all available functions.
 
 ## Memory Options
 
-### Memory Options for ESP8266
+- ### Memory Options for ESP8266
 
 When you update the ESP8266 Arduino Core SDK to v3.x.x, the memory for Heap and stack can be configurable from IDE.
 
 You can choose the Heap memory between internal and external memory chip from IDE e.g. Arduino IDE and PlatformIO on VSCode or Atom IDE.
 
-#### Arduino IDE
+- #### Arduino IDE
 
 
 For ESP8266 devices that don't have external SRAM/PSRAM chip installed, choose the MMU **option 3**, 16KB cache + 48KB IRAM and 2nd Heap (shared).
@@ -1282,7 +1282,7 @@ For ESP8266 devices that have external 23LC1024 SRAM chip installed, choose the 
 For ESP8266 devices that have external ESP-PSRAM64 chip installed, choose the MMU **option 6**, 1M External 64 MBit PSRAM.
 
 
-#### PlatformIO IDE
+- #### PlatformIO IDE
 
 The MMU options can be selected from build_flags in your project's platformio.ini file
 
@@ -1324,7 +1324,7 @@ monitor_speed = 115200
 ```
 
 
-#### ESP8266 and SRAM/PSRAM Chip connection
+- #### ESP8266 and SRAM/PSRAM Chip connection
 
 Most ESP8266 modules don't have the built-in SRAM/PSRAM on board. External memory chip connection can be done via SPI port as below.
 
@@ -1351,18 +1351,18 @@ This macro was defined by default when you installed or update the library.
 
 
 
-### Memory Options for ESP32
+- ### Memory Options for ESP32
 
 In ESP32 module that has PSRAM installed, you can enable it and set the library to use this external memory instead.
 
-#### Arduino IDE
+- #### Arduino IDE
 
 To enable PSRAM in ESP32 module.
 
 ![Enable PSRAM in ESP32](/resources/images/esp32_psram_option_arduino_ide.png)
 
 
-#### PlatformIO IDE
+- #### PlatformIO IDE
 
 
 In PlatformIO on VSCode or Atom IDE, add the following build_flags in your project's platformio.ini file.
@@ -1384,7 +1384,7 @@ The library build options are defined as preprocessor macros (`#define name`).
 
 Some options can be disabled.
 
-### Predefined Options
+- ### Predefined Options
 
 The predefined options that are already set in [**Config.h**](src/Config.h) are following.
 
@@ -1412,7 +1412,7 @@ ENABLE_ETHERNET_NETWORK
 ENABLE_GSM_NETWORK
 ```
 
-### Optional Options
+- ### Optional Options
 
 The following options are not yet defined in [**Config.h**](src/Config.h) and can be assigned by user.
 
