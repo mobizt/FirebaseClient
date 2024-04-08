@@ -170,9 +170,11 @@ The RP2040 boards required Arduino-Pico SDK from Earle F. Philhower https://gith
 
 ## Incompatability
 
-This library APIs are not compattible with Firebase-ESP8266, Firebase-ESP32 and Firebase-ESP-Clientlibraries.
+This library APIs are not compattible with Firebase-ESP8266, Firebase-ESP32 and Firebase-ESP-Client libraries.
 
 If you are using those libraries, the code should be rewritten.
+
+In addition, some features are changed which included the following.
 
 ### Realtime Database
 
