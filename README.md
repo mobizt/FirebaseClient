@@ -152,7 +152,8 @@ This new library uses less program space with better performance and reliability
  * W5500 SPI Ethernet module
  * SIMCom Modules with TinyGSMClient
 
- Note that this library does not support Arduino® UNO R4 WiFi due to the memory issue (related to stack and String class memory issue).
+> [!NOTE]  
+> This library does not support Arduino® UNO R4 WiFi due to the memory issue (related to stack and String class memory issue).
 
 
  ## Dependencies
@@ -419,7 +420,8 @@ From source 2, the async client (`aClient`) shall be defined globally to use in 
 
 The async result from source 2 can be accessed from the async result callback.
 
-Note that, the async client object used in authentication task shoul be defined globally as it is async task.
+> [!NOTE]  
+> The async client object used in authentication task shoul be defined globally as it is async task.
 
 The aync result provides two types of information, `app events` and `result data`.
 
@@ -431,7 +433,7 @@ The aync result provides two types of information, `app events` and `result data
 
 The app event information of authentication task handler can be obtained from `aResult.appEvent().code()` and `aResult.appEvent().message()` respectively.
 
-Note that `aResult` is the async result object (`AsyncResult`) in this case.
+The `aResult` is the async result object (`AsyncResult`) in this case.
 
 The following event code (`firebase_auth_event_type`), `auth_event_uninitialized`, `auth_event_initializing`, `auth_event_signup`, `auth_event_send_verify_email`, `auth_event_delete_user`, `auth_event_reset_password`, `auth_event_token_signing`, `auth_event_authenticating`, `auth_event_auth_request_sent`, `auth_event_auth_response_received`, `auth_event_ready` and `auth_event_error` are available.
 
@@ -476,7 +478,8 @@ The [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomTok
 
 The `getAuth` function is the function to get user auth data (`user_auth_data`) from these authentication provider classes.
 
-Note that the user auth data will be coppied and use internally, then changing these authentication provider classes's data cannot affect the authentication process unless `FirebaseApp` was re-initializing.
+> [!NOTE]  
+> The user auth data will be coppied and use internally, then changing these authentication provider classes's data cannot affect the authentication process unless `FirebaseApp` was re-initializing.
 
 
 The UID for signed in user can be obtained from `getUid()` of the `FirebaseApp` member function.
@@ -542,7 +545,8 @@ ServiceAuth service_auth(<TimeStatusCallback>, <api_key>, <client_email>, <proje
 
 `<expire>` The expiry period in seconds (less than or equal to 3600).
 
-Note that the refresh token is not available when authenticated with service account.
+> [!NOTE]  
+> The refresh token is not available when authenticated with service account.
 
 The internal process to refresh the token was done by creating the new token.
 
@@ -590,7 +594,8 @@ CustomToken custom_token(<api_key>, <custom_token>, <expire_in_seconds>);
 
 You should defined the expire period that less than the remaining time to live of your signed JWT token.
 
-Note that, the only valid sign JWT token can be used with Firebase and Google services that provided in the library is `RS256` signature that sined with the RSA private key of your project server.
+> [!NOTE]  
+> Only valid sign JWT token can be used with Firebase and Google services that provided in the library is `RS256` signature that sined with the RSA private key of your project server.
 
 Most Arduino boards that come with crypto chip e.g. ATECC608A do not support RSA-256 algorithm and can not use its crypto library to generate the signed JWT token used with this library.
 
@@ -795,7 +800,8 @@ The `DefaultNetwork` class constructors are the following.
 
 By define `DefaultNetwork` with no parameter, the WiFi reconnection will be enabled. 
 
-Note that, when the WiFi was manage for connection and reconnection by user code or third party library, the `<re_connect_option>` parameter should be assign with `false` to avoid the WiFi connection/reconnection interferences.
+> [!NOTE]  
+> When the WiFi was manage for connection and reconnection by user code or third party library, the `<re_connect_option>` parameter should be assign with `false` to avoid the WiFi connection/reconnection interferences.
 
 - `DefaultWiFiNetwork`
 
@@ -1183,7 +1189,8 @@ The library provides the placeholder struct for boolean, integer, float with cus
 
 The response payload returning result (output) is straightforward as String.
 
-It should be note that, the async result in the async callback can be lived only inside the callback and it decontructed when async operation is complete. To take the data out from the async result callback, the static or glocal variable should be used to copy the data.
+> [!NOTE]  
+> The async result in the async callback can be lived only inside the callback and it decontructed when async operation is complete. To take the data out from the async result callback, the static or glocal variable should be used to copy the data.
 
 If the size of payload string in async reseut is large, to copy the char array buffer directly, use `aResult.payload().c_str()` instead.
 
@@ -1459,7 +1466,8 @@ DISABLE_LEGACY_TOKEN
 FIREBASE_DISABLE_ALL_OPTIONS // For disabling all predefined build options above
 ```
 
-Note that, `UserConfig.h` for user config should be placed in the library install folder inside src folder.
+> [!NOTE]  
+> `UserConfig.h` for user config should be placed in the library installed folder inside the src folder.
 
 This `UserConfig.h` will not change or overwrite when update the library.
 
