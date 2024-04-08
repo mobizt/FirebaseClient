@@ -398,6 +398,9 @@ The async SSL client can be assigned to the async client class constructor but c
 
 The async operation can be cancelled and removed from the queue by calling `AsyncClientClass` member functions, i.e. `stopAsync()` for currently processed task or `stopAsync(true)` for stopping all tasks.
 
+> [!WARNING]  
+> The numbers of async client that can be used, the numbers of the sync/async tasks stored in the async client's queue will be limited which depends on the device free memory.
+
 ### Send and Read Timeouts for Sync and Async Tasks
 
 The default send and read timeouts for async task are 30 seconds and cannot be changed.
