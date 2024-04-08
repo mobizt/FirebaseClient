@@ -420,6 +420,10 @@ Note that, the async client object used in authentication task shoul be defined 
 
 The aync result provides two types of information, `app events` and `result data`.
 
+> [!CAUTION]
+> Please avoid calling code or function that uses large memory inside the asyn callback because it can lead to stack overflow problem especially in ESP8266 and causes the wdt rest crash.
+> For ESP8266, global defined`AsyncResult` is recommended for async operation.
+
 ### App Events
 
 The app event information of authentication task handler can be obtained from `aResult.appEvent().code()` and `aResult.appEvent().message()` respectively.
@@ -908,7 +912,8 @@ As required by the TinyGSMClient library, one of GSM module macro should be defi
 
 For example for SIM7600 module, the macro `TINY_GSM_MODEM_SIM7600` should be defined.
 
-📍 The additional important requirement to use as this library integration is the macros e.g. `TINY_GSM_MODEM_SIM7600` should be defined in [src/Config.h](/src/Config.h) or user defined [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
+> [!IMPORTANT]  
+> The GSM module macros e.g. `TINY_GSM_MODEM_SIM7600` should be defined in [src/Config.h](/src/Config.h) or user defined [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
 
 The class constructor parameter are following.
 
