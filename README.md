@@ -376,7 +376,7 @@ The order of lower priority slot data are sync task, async task and SSE task res
 
 Then when user uses async client for multiple tasks included Reltime database stream, sync and async operations, the stream will be interrupt (breaking the connection) because of the async client only connect to server via one TCP socket (Arduino Clinet) at a time.
 
-The async client that used for authentication task and async task included SSE stream, need to be defined globally otherwise the dangling pointer problem will be occured.
+The async client and SSL Client that used for authentication task and async task included SSE stream, need to be defined globally otherwise the dangling pointer problem will be occured.
 
 The SSL Client is a kind of sync or blocking Client that takes time during establishing the SSL server connection (SSL handshake).
 
