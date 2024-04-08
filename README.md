@@ -174,6 +174,14 @@ This library APIs are not compattible with Firebase-ESP8266, Firebase-ESP32 and 
 
 If you are using those libraries, the code should be rewritten.
 
+### Realtime Database
+
+The blob and file upload via set, push and update, the byte data will be converted to base64 encoded string and store to the database without the signature string (`file,` and `blob,`) prepended to the base64 string as in the old library.
+
+The data on the database that read using the async get function which the blob and file config data assign to the function, will treat as base64 encoded string and will be decoded to byte array using base64 decoder.
+
+Then get the data that contains signature string (`file,` and `blob,`) created by old library will lead to the error after base64 decoding.
+
 ### TCP KeepAlive
 
 The TCP session KeepAlive can be done by the network client if it was supportd e.g. `WiFiClient` in ESP32.
@@ -226,7 +234,7 @@ The legaycy Firebase Cloud Messaging API was deprecated, only HTTPv1 is supporte
 
 ### Cloud Functions
 
-The local flash or filesystem source does not support for deploying the Cloud Function.
+ Deploying the Cloud Function from local flash or filesystem source in a single function is not available unless using several fnctions that are available to generate upload url, upload the source (zip file), deploy the function and set IAM permission.
 
 ## Installation
 
