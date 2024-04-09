@@ -399,7 +399,7 @@ The SSL Client is a kind of sync or blocking Client that takes time during estab
 
 The async SSL client can be assigned to the async client class constructor but currently experimental.
 
-The async operation can be cancelled and removed from the queue by calling `AsyncClientClas::stopAsync()` for currently processed task or `AsyncClientClas::stopAsync(true)` for stopping all tasks.
+The async operation can be cancelled and removed from the queue by calling `AsyncClientClass::stopAsync()` for currently processed task or `AsyncClientClass::stopAsync(true)` for stopping all tasks.
 
 > [!WARNING]  
 > The numbers of async client that can be used, the numbers of the sync/async tasks stored in the async client's queue will be limited which depends on the device free memory.
@@ -427,7 +427,7 @@ For the detail of networking class, see [Working with Networks](#working-with-ne
 
 The default send and read timeouts for async task are 30 seconds and cannot be changed.
 
-For sync task, the timeout in seconds can be set via the `AsyncClientClas::setSyncSendTimeout` and `AsyncClientClas::setSyncReadTimeout`.
+For sync task, the timeout in seconds can be set via the `AsyncClientClass::setSyncSendTimeout` and `AsyncClientClass::setSyncReadTimeout`.
 
 - ### Async Result
 
