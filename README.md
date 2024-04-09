@@ -498,7 +498,7 @@ The server response payload in `AsyncResult` can be converted to the the values 
 
 ## App Initialization
 
-The Firebase app (`FirebaseApp`) is the main authentication and access token handler class in this library. All Firebase services Apps will take the authentication data called app token (`app_token_t`) that maintains by Firebase app, and use as the access key or bearer token while processing the request. 
+The Firebase app (`FirebaseApp`) is the main authentication and access token handler class in this library. All Firebase services Apps will take the authentication data called app token (`app_token_t`) that maintains by Firebase app, and was used as the access key or bearer token while processing the request. 
 
 The `FirebaseApp` class constructor accepts the user auth data (`user_auth_data`) which is the struct that holds the user input sign-in credentials and token.
 
