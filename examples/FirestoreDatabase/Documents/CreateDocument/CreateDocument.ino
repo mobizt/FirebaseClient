@@ -23,7 +23,7 @@
  *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -58,6 +58,8 @@
 void asyncCB(AsyncResult &aResult);
 
 void printResult(AsyncResult &aResult);
+
+String getTimestampString(uint64_t sec, uint32_t nano);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
@@ -176,7 +178,7 @@ void loop()
         Values::ReferenceValue refV(doc_path);
 
         // timestamp
-        Values::TimestampValue tsV("2014-10-02T15:01:23Z");
+        Values::TimestampValue tsV(getTimestampString(1712674441,  999999999));
 
         // bytes
         Values::BytesValue bytesV("aGVsbG8=");
@@ -245,4 +247,32 @@ void printResult(AsyncResult &aResult)
     {
         Firebase.printf("payload: %s\n", aResult.c_str());
     }
+}
+
+String getTimestampString(uint64_t sec, uint32_t nano)
+{
+    if (sec > 0x3afff4417f)
+        sec = 0x3afff4417f;
+
+    if (nano > 0x3b9ac9ff)
+        nano = 0x3b9ac9ff;
+
+    time_t now;
+    struct tm ts;
+    char buf[80];
+    now = sec;
+    ts = *localtime(&now);
+
+    String format = "%Y-%m-%dT%H:%M:%S";
+
+    if (nano > 0)
+    {
+        String fraction = String(double(nano) / 1000000000.0f, 9);
+        fraction.remove(0, 1);
+        format += fraction;
+    }
+    format += "Z";
+
+    strftime(buf, sizeof(buf), format.c_str(), &ts);
+    return buf;
 }

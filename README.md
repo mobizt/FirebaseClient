@@ -194,12 +194,13 @@ In the old Firebase library, this feature was done internally by the internal SS
 
 If you want to use this feature and if you use ESP32, you can use `ESP_SSLClient` library that included in this library and set the `WiFiClient` as the client.
 
-The following example code is for using `TCP KeepAlive` with `WiFiClient` in ESP32.
+The following example code is for using `TCP KeepAlive` with `WiFiClient` and built-in `ESP_SSLClient` in ESP32.
 
 ```cpp
 
 #include <lwip/sockets.h> // For lwIP TCP/IP sockets 
 
+bool tcp_keep_alive_set = false;
 int keepAlive = 1000; // Milliseconds
 int keepIdle = 5; // Seconds
 int keepInterval = 5; // Seconds
@@ -211,19 +212,32 @@ ESP_SSLClient ssl_client;
 
 void setup()
 {
-
     ssl_client.setClient(&basic_client);
+    ssl_client.setInsecure();
+}
 
-    basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPALIVE, (void *)&keepAlive, sizeof(keepAlive));
-    basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keepIdle, sizeof(keepIdle));
-    basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval));
-    basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepCount, sizeof(keepCount));
 
-    // Or simpler functions
-    // basic_client.setOption(TCP_KEEPALIVE, &keepAlive);
-    // basic_client.setOption(TCP_KEEPIDLE, &keepIdle);
-    // basic_client.setOption(TCP_KEEPINTVL, &keepInterval);
-    // basic_client.setOption(TCP_KEEPCNT, &keepCount);
+void loop()
+{
+    // TCP KeepAlive should be set once after server connected
+    if (basic_client.connected() && !tcp_keep_alive_set)
+    {
+        tcp_keep_alive_set = true;
+        basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPALIVE, (void *)&keepAlive, sizeof(keepAlive));
+        basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keepIdle, sizeof(keepIdle));
+        basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval));
+        basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepCount, sizeof(keepCount));
+
+        // Or simpler functions
+        // basic_client.setOption(TCP_KEEPALIVE, &keepAlive);
+        // basic_client.setOption(TCP_KEEPIDLE, &keepIdle);
+        // basic_client.setOption(TCP_KEEPINTVL, &keepInterval);
+        // basic_client.setOption(TCP_KEEPCNT, &keepCount);
+    }
+    else
+    {
+        tcp_keep_alive_set = false;
+    }
 }
 
 ```
