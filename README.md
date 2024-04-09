@@ -412,7 +412,7 @@ WiFiClientSecure ssl_client;
 
 DefaultNetwork network;
 
-AsyncClient aClient(ssl_client, getNetwork(network));
+AsyncClientClass aClient(ssl_client, getNetwork(network));
 ```
 
 The `network_config_data` will be copied to use internally while the reference of `SSL Client` object was used internally.
