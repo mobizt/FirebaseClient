@@ -1,8 +1,11 @@
 
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
  * bool status  = Database.remove(<AsyncClient>, <path>);
+ * 
+ * <AsyncClient> - The async client.
+ * <path> - The node path to remove the value.
  *
  * The sync Remove function returns the boolean indicated the operating status.
  * 

@@ -104,7 +104,7 @@ public:
      *
      * writeSizeLimit, the size of a write limit can be "tiny", "small", "meduim", "large" and "unlimited".
      *
-     * shallow, the option (boolean) for shallowing (truncating) the JSON object data into true while JSON primitive values
+     * shallow, the option (boolean) for shallowing (truncating) the JSON representation data data into true while JSON primitive values
      * (string, number and boolean) will not shallow.
      *
      * silent, the option (boolean) to mute the return reponse payload.
@@ -239,7 +239,7 @@ public:
      *
      * ### Example
      * ```cpp
-     * // Example of FileConfigCallback when SPIFFS used as filesystem.
+     * // Example of FileCallback when SPIFFS is used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -270,8 +270,9 @@ public:
      * @param aClient The async client.
      * @param path The node path to get value.
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The FileConfig object constructor should be included filename and FileCallback.
+     * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param aResult The async result (AsyncResult)
      */
     void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
@@ -285,7 +286,7 @@ public:
      *
      * ### Example
      * ```cpp
-     * // Example of FileConfigCallback when SPIFFS used as filesystem.
+     * // Example of FileCallback when SPIFFS is used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -315,8 +316,9 @@ public:
      * @param aClient The async client.
      * @param path The node path to get value.
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The FileConfig object constructor should be included filename and FileCallback.
+     * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
@@ -472,7 +474,7 @@ public:
      *
      * ### Example
      * ```cpp
-     * // Example of FileConfigCallback when SPIFFS used as filesystem.
+     * // Example of FileCallback when SPIFFS is used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -501,8 +503,9 @@ public:
      * @param aClient The async client.
      * @param path The node path to set value.
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The FileConfig object constructor should be included filename and FileCallback.
+     * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param aResult The async result (AsyncResult)
      */
     void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
@@ -516,7 +519,7 @@ public:
      *
      * ### Example
      * ```cpp
-     * // Example of FileConfigCallback when SPIFFS used as filesystem.
+     * // Example of FileCallback when SPIFFS is used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -545,8 +548,9 @@ public:
      * @param aClient The async client.
      * @param path The node path to set value.
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The FileConfig object constructor should be included filename and FileCallback.
+     * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      */
@@ -652,7 +656,7 @@ public:
      *
      * ### Example
      * ```cpp
-     * // Example of FileConfigCallback when SPIFFS used as filesystem.
+     * // Example of FileCallback when SPIFFS is used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -681,8 +685,9 @@ public:
      * @param aClient The async client.
      * @param path The node path to push value.
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The FileConfig object constructor should be included filename and FileCallback.
+     * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param aResult The async result (AsyncResult)
      *
      */
@@ -697,7 +702,7 @@ public:
      *
      * ### Example
      * ```cpp
-     * // Example of FileConfigCallback when SPIFFS used as filesystem.
+     * // Example of FileCallback when SPIFFS is used as filesystem.
      *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
@@ -726,8 +731,9 @@ public:
      * @param aClient The async client.
      * @param path The node path to push value.
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
-     * The FileConfig object constructor should be included filename and FileConfigCallback.
-     * The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The FileConfig object constructor should be included filename and FileCallback.
+     * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      *
      */
     void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
@@ -737,7 +743,7 @@ public:
     }
 
     /**
-     * Update (patch) JSON object to database.
+     * Update (patch) JSON representation data to database.
      *
      * ### Example
      * ```cpp
@@ -745,7 +751,7 @@ public:
      * ```
      * @param aClient The async client.
      * @param path The node path to update.
-     * @param value The JSON object (object_t) to update.
+     * @param value The JSON representation data (object_t) to update.
      * @return boolean value indicates the operating status.
      *
      */
@@ -757,7 +763,7 @@ public:
     }
 
     /**
-     * Update (patch) JSON object to database.
+     * Update (patch) JSON representation data to database.
      *
      * ### Example
      * ```cpp
@@ -765,7 +771,7 @@ public:
      * ```
      * @param aClient The async client.
      * @param path The node path to update.
-     * @param value The JSON object (object_t) to update.
+     * @param value The JSON representation data (object_t) to update.
      * @param aResult The async result (AsyncResult).
      */
     template <typename T = object_t>
@@ -775,7 +781,7 @@ public:
     }
 
     /**
-     * Update (patch) JSON object to database.
+     * Update (patch) JSON representation data to database.
      *
      * ### Example
      * ```cpp
@@ -783,7 +789,7 @@ public:
      * ```
      * @param aClient The async client.
      * @param path The node path to update.
-     * @param value The JSON object (object_t) to update.
+     * @param value The JSON representation data (object_t) to update.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      */

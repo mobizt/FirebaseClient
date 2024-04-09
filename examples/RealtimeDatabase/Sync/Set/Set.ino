@@ -1,7 +1,11 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
  * bool status = Database.set<T>(<AsyncClient>, <path>, <value>);
+ * 
+ * <AsyncClient> - The async client.
+ * <path> - The node path to set the value.
+ * <value> - The value to set.
  *
  * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
  *

@@ -1,7 +1,12 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
  * String name = Database.push<T>(<AsyncClient>, <path>, <value>);
+ * 
+ * T - The type of value to push.
+ * <AsyncClient> - The async client.
+ * <path> - The node path to push the value.
+ * <value> - The value to push.
  *
  * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
  *

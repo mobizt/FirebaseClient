@@ -1,15 +1,20 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
  * T value  = Database.get<T>(<AsyncClient>, <path>);
  * T value  = Database.get<T>(<AsyncClient>, <path>, <DatabaseOptions>);
+ * 
+ * T - The type of value to return.
+ * <AsyncClient> - The async client.
+ * <path> - The node path to get the value.
+ * <DatabaseOptions> - The database options (DatabaseOptions).
  *
- * In case of filtering the data and additional request parameters are required,
- * the DatabaseOptions can be assigned to the function.
+ * In case of data filtering and additional request options are required,
+ * the DatabaseOptions can be assigned to the get function.
  *
  * Please see examples/Database/extras/FilteringData/FilteringData.ino for how to filter the data.
  *
- * The value T returns from sync Get functions is primitype type value or Arduino String.
+ * The value of type T returns from sync Get functions is primitype type value or Arduino String.
  *
  * In case of error, the operation error information can be obtain from AsyncClient via aClient.lastError().message() and
  * aClient.lastError().code().

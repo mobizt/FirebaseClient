@@ -1,11 +1,11 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * bool status = Database.update(<path>);
- * bool status = Database.update(<path>, <network_data>);
- *
- * bool status = Database.update(<path>, <DatabaseSession>);
- * bool status = Database.update(<path>, <DatabaseSession>, <network_data>);
+ * bool status = Database.update(<AsyncClient>, <path>, <object_t>);
+ * 
+ * <AsyncClient> - The async client.
+ * <path> - The node path to set the value.
+ * <object_t> - The JSON representation data (object_t) to update.
  *
  * The sync Update function returns the boolean of operating status.
  *

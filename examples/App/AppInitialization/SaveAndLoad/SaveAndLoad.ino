@@ -1,5 +1,5 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *

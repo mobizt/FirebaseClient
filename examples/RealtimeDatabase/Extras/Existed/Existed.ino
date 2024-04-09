@@ -1,8 +1,11 @@
 
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
  * bool status = Database.existed(<AsyncClient>, <path>);
+ * 
+ * <AsyncClient> - The async client.
+ * <path> - The node path to check the value existent.
  *
  * The sync Existed function returns the operating status (true if existed).
  *

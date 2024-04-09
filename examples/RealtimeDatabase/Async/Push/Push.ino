@@ -1,14 +1,16 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
  * Database.push<T>(<AsyncClient>, <path>, <value>, <AsyncResult>);
  * Database.push<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
  *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ * T - The type of value to push.
+ * <AsyncClient> - The async client.
+ * <path> - The node path to push the value.
+ * <value> - The value to push.
+ * <AsyncResult>  - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

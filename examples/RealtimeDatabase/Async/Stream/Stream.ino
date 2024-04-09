@@ -1,15 +1,20 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
  * Database.get(<AsyncClient>, <path>, <AsyncResult>, <SSE>);
  * Database.get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
  *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
+ * Database.get(<AsyncClient>, <path>, <DatabaseOption>, <AsyncResult>);
+ * Database.get(<AsyncClient>, <path>, <DatabaseOption>, <AsyncResultCallback>, <uid>);
  *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
+ * <AsyncClient> - The async client.
+ * <path> - The node path to get/watch the value.
+ * <DatabaseOption> - The database options (DatabaseOptions).
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * <SSE> - The Server-sent events (HTTP Streaming) mode.
  *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
- * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -123,16 +128,16 @@ void setup()
 
     Database.url(DATABASE_URL);
 
-    Database.get(aClient, "/test/stream", asyncCB, true /* SSE mode */);
+    Database.get(aClient, "/test/stream", asyncCB, true /* SSE mode (HTTP Streaming) */);
 
-    // Only one Get in SSE mode (stream) is allowed, the operation will be cancelled if
-    // another Get in SSE mode was called.
+    // Only one Get in SSE mode (HTTP Streaming) is allowed, the operation will be cancelled if
+    // another Get in SSE mode (HTTP Streaming) was called.
 
     // To get anyc result without callback
-    // Database.get(aClient, "/test/stream", aResult_no_callback, true /* SSE mode */);
+    // Database.get(aClient, "/test/stream", aResult_no_callback, true /* SSE mode (HTTP Streaming) */);
 
     // To assign UID for async result
-    // Database.get(aClient, "/test/stream", asyncCB, true /* SSE mode */, "myUID");
+    // Database.get(aClient, "/test/stream", asyncCB, true /* SSE mode (HTTP Streaming) */, "myUID");
 
     // To stop the async (stream) operation.
     // aClient.stopAsync();

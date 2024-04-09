@@ -1,13 +1,26 @@
 
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
  * BlobConfig blob_config(<data>, <size>);
  *
- * <data> - The BLOB data (uint8_t array).
+ * <data> - The BLOB data (byte array).
  * <size> - The size of data.
  *
  * The data can be a source (input) and target (output) data that used in upload and download.
+ * 
+ * Database.set(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
+ * Database.set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
+ * 
+ * Database.get(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
+ * Database.get(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
+ *
+ * <AsyncClient> - The async client.
+ * <path> - The node path to set/get the BLOB data.
+ * <file_config_data> - The file config data which in case of BLOB, it will be obtained from BlobConfig via getBlob.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

@@ -1,5 +1,17 @@
 
 /**
+ * SYNTAX:
+ *
+ * To set the Etag to the request
+ * 
+ * aClient.setETag(<etag>)
+ * 
+ * <etag> - The Etag to set.
+ * 
+ * To get the Etag from server response
+ * 
+ * String etag = aClient.etag()
+ * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 

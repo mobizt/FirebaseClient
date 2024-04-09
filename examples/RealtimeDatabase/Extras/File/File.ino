@@ -5,8 +5,24 @@
  *
  * <file_name> - The filename included path of file that will be used.
  * <file_callback> - The callback function that provides file operation.
- *
+ * 
+ * The file_callback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+ * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
+ * 
  * The file name can be a name of source (input) and target (output) file that used in upload and download.
+ * 
+ * Database.set(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
+ * Database.set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
+ * 
+ * Database.get(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
+ * Database.get(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
+ *
+ * <AsyncClient> - The async client.
+ * <path> - The node path to set/get the file data.
+ * <file_config_data> - The file config data which in case of filesystem data, it will be obtained from FileConfig via getFile.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

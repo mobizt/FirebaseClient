@@ -194,9 +194,11 @@ In the old Firebase library, this feature was done internally by the internal SS
 
 If you want to use this feature and if you use ESP32, you can use `ESP_SSLClient` library that included in this library and set the `WiFiClient` as the client.
 
-The following example is for using TCP KeepAlive with WiFiClient in ESP32.
+The following example code is for using `TCP KeepAlive` with `WiFiClient` in ESP32.
 
 ```cpp
+
+#include <lwip/sockets.h> // For lwIP TCP/IP sockets 
 
 int keepAlive = 1000; // Milliseconds
 int keepIdle = 5; // Seconds
@@ -365,13 +367,13 @@ When the authentication async operation was required, it will insert to the firs
 
 If the sync operation was called, it will insert to the first slot in the queue too but after the authentication task slot.
 
-When async Get operation in `SSE mode (HTTP Streaming)` was currently stored in queue, the new sync and async operations will be inserted before the async `SSE (HTTP Streaming)` slot.
+When async Get operation in `SSE mode (HTTP Streaming)` was currently stored in queue, the new sync and async operations will be inserted before the async `SSE mode (HTTP Streaming)` slot.
 
 When the async operation queue is full or the another SSE mode get function was called, the new sync and async operations will be cancelled. The error code `-118` (`FIREBASE_ERROR_OPERATION_CANCELLED`) or `"operation was cancelled"` will show in the debug message.
  
-The finished and time out operating slot will be removed from the queue unless the async SSE and allow the vacant slot for the new async operation.
+The finished and time out operating slot will be removed from the queue unless the async `SSE mode (HTTP Streaming)` and allow the vacant slot for the new async operation.
 
-The async `SSE` operation will run continuously and repeatedly as long as the FirebaseApp and the services app
+The async `SSE mode (HTTP Streaming)` operation will run continuously and repeatedly as long as the FirebaseApp and the services app
 (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via `app.loop()` or `Database.loop()`.
 
 - ### Async Client
@@ -386,11 +388,11 @@ The async data created in the async client will hold the asyn http request heade
 
 The authentication task has highest priority and its async data will be inserted at the first slot of async queue.
 
-The order of lower priority slot data are sync task, async task and SSE task respectively.
+The order of lower priority slot data are sync task, async task and `SSE mode (HTTP Streaming)` task respectively.
 
 Then when user uses async client for multiple tasks included Reltime database stream, sync and async operations, the stream will be interrupt (breaking the connection) because of the async client only connect to server via one TCP socket (Arduino Clinet) at a time.
 
-The async client and SSL Client that used for authentication task and async task included SSE stream, need to be defined globally otherwise the dangling pointer problem will be occured.
+The async client and SSL Client that used for authentication task and async task included `SSE mode (HTTP Streaming)`, need to be defined globally otherwise the dangling pointer problem will be occured.
 
 The SSL Client is a kind of sync or blocking Client that takes time during establishing the SSL server connection (SSL handshake).
 
@@ -400,6 +402,25 @@ The async operation can be cancelled and removed from the queue by calling `Asyn
 
 > [!WARNING]  
 > The numbers of async client that can be used, the numbers of the sync/async tasks stored in the async client's queue will be limited which depends on the device free memory.
+
+The async client (`AsyncClientClass`) takes two arguments i.e. SSL Client and network config data (`network_config_data`) that obtained from networking classes via the static function called `getNetwork`.
+
+This example shows how the async client defined with its constructor parameters. 
+
+```cpp
+WiFiClientSecure ssl_client;
+
+DefaultNetwork network;
+
+AsyncClient aClient(ssl_client, getNetwork(network));
+```
+
+The `network_config_data` will be copied to use internally while the reference of `SSL Client` object was used internally.
+
+For the detail of networking class, see [Working with Networks](#working-with-networks) section.
+
+> [!WARNING]  
+> To prevent dangling pointer issue, the `SSL Client` should be defined at the same usage scope as `AsyncClientClass`.
 
 ### Send and Read Timeouts for Sync and Async Tasks
 
@@ -479,15 +500,15 @@ The server response payload in `AsyncResult` can be converted to the the values 
 
 The Firebase app (`FirebaseApp`) is the main authentication and access token handler class in this library. All Firebase services Apps will take the authentication data called app token (`app_token_t`) that maintains by Firebase app, and use as the access key or bearer token while processing the request. 
 
-The `FirebaseApp` class constructor accepts the user auth data (`user_auth_data`) which is the struct that holding the user input sign-in credentials and token.
+The `FirebaseApp` class constructor accepts the user auth data (`user_auth_data`) which is the struct that holds the user input sign-in credentials and token.
 
 The user auth data that passes to the `FirebaseApp` class constructor can be obtained from the following sign-in credentials, access key, auth token providers classs via `getAuth` function.
 
 Thses classes also mentioned in the earlier section.
 
-The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino), [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino), [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) , and [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino) are for authentications and non-authentication.
+The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino), [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino), [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino), and [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino) are for authentications and non-authentication.
 
-The [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino) ,[AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino) ,[IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino), and [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) are for the Firebase services authorizations using tokens. 
+The [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino), [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino), [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino), and [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) are for the Firebase services authorizations using tokens. 
 
 The `getAuth` function is the function to get user auth data (`user_auth_data`) from these authentication provider classes.
 
@@ -693,13 +714,19 @@ The `file_config_data` can be obtained from static functions called `getFile` an
 
 The `FileConfig` class constructor parameters that are available are following.
 
-`FileConfig file_config(<filename>, <file_operation_callback>)`
+`FileConfig file_config(<filename>, <file_callback>)`
 
 `<filename>` The full file name included its path.
 
-`<file_operation_callback>` The file callback that required for file open to read, write, append and remove.
+The file name can be a name of source (input) and target (output) file that used in upload and download.
 
-The example to work with `SPIFFS` filesystem.
+`<file_callback>` The file callback that required for file open to read, write, append and remove.
+
+The `<file_callback>` function parameters included the `File` reference returned from file operation, filename for file operation and file_operating_mode.
+
+The `file_operating_mode` included `file_mode_open_read`, `file_mode_open_write`, `file_mode_open_append` and `file_mode_open_remove` are available.
+
+This example code works with `SPIFFS` filesystem.
 
 ```cpp
 
@@ -742,11 +769,13 @@ The `BlobConfig` class constructor parameters that are available are following.
 
 `BlobConfig blob_config(<blob>, <blob_size>)`
 
-`<blob>` The byte array.
+`<blob>` The BLOB data (byte array).
 
-`<blob_size>` The size of byte array.
+`<blob_size>` The size of data.
 
-The example to work with `SPIFFS` filesystem.
+The data can be a source (input) and target (output) data that used in upload and download.
+
+This example code works with BLOB data.
 
 ```cpp
 uint8_t source[2048];
@@ -772,7 +801,7 @@ When filesystems are not used, remove `ENABLE_FS` macro in [src/Config.h](/src/C
 
 - ### Working with Networks
 
-The `AsyncClientClass` object requires network config data (`network_config_data`) that obtained from one of the following networking classes via static function called `getNetwork`.
+The `AsyncClientClass` object requires network config data (`network_config_data`) that obtained from one of the following networking classes via the static function called `getNetwork`.
 
 - [DefaultNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultNetwork/DefaultNetwork.ino) is for core WiFi enabled networking.
 
@@ -1017,7 +1046,7 @@ void setup()
             if (app.ready())
             {
                 // your other code here
-                // For non-callback stream, you can check the information that provided from AsyncResult that assigned with the asyn get function with SSE option (stream) 
+                // For non-callback stream, you can check the information that provided from AsyncResult that assigned with the asyn get function with SSE mode (HTTP Streaming)
             }
             vTaskDelay(10 / portTICK_PERIOD_MS);
         }
