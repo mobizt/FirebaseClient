@@ -364,7 +364,7 @@ The Firebase and Google services Classes that are available are Realtime databas
 
 This library used internal millis timer to handle the token time to live. Then device time setting is not requierd in most authentication types.
 
-In access and custom token authentications using service accout file (sa and custom auths), it related to JWT token creation and the token signing using RSA private key.  This process require the valid timestamp, then the time status setting callback will be required in the sa and custom auth class constructor.
+In access and custom token authentications using service accout file (sa and custom auths), it related to JWT token creation and the token signing using RSA private key.  These processes require the valid timestamp, then the time status setting callback will be required in the sa and custom auth class constructor.
 
 
 - ### Async Queue
