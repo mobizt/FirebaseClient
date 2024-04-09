@@ -219,7 +219,7 @@ void setup()
     basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval));
     basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepCount, sizeof(keepCount));
 
-    //Or simpler functions
+    // Or simpler functions
     // basic_client.setOption(TCP_KEEPALIVE, &keepAlive);
     // basic_client.setOption(TCP_KEEPIDLE, &keepIdle);
     // basic_client.setOption(TCP_KEEPINTVL, &keepInterval);
