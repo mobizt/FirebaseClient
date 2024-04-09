@@ -624,7 +624,7 @@ CustomToken custom_token(<api_key>, <custom_token>, <expire_in_seconds>);
 
 `<custom_token>` Auth custom token (jwt signed token).
 
-`<expire_in_seconds>` Expire period in seconds.
+`<expire_in_seconds>` Expiry period in seconds (less than 3600), 3300 is the default value.
 
 You should defined the expire period that less than the remaining time to live of your signed JWT token.
 
