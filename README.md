@@ -516,11 +516,11 @@ The `getAuth` function is the function to get user auth data (`user_auth_data`) 
 > The user auth data will be coppied and use internally, then changing these authentication provider classes's data cannot affect the authentication process unless `FirebaseApp` was re-initializing.
 
 
-The UID for signed in user can be obtained from `getUid()` of the `FirebaseApp` member function.
+The UID for signed in user can be obtained from `FirebaseApp::getUid()`.
 
-The auth token (ID token, access token or legacy token) can be obtained from `getToken()` of the `FirebaseApp` member function.
+The auth token (ID token, access token or legacy token) can be obtained from `FirebaseApp::getToken()`.
 
-The refresh token (if available) can be obtained from `getRefreshToken()` of the `FirebaseApp` member function.
+The refresh token (if available) can be obtained from `FirebaseApp::getRefreshToken()`.
 
 
 - ### Custom UID User Authentication
