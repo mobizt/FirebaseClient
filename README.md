@@ -555,7 +555,7 @@ CustomAuth custom_auth(<TimeStatusCallback>, <api_key>, <client_email>, <project
 
 `<claims>`The OAuth claims.
 
-`<expire>`The expiry period in seconds (less than or equal to 3600).
+`<expire>`The expiry period in seconds (less than 3600), 3300 is the default value.
 
 - ### Service Account Authentication
 
@@ -577,7 +577,7 @@ ServiceAuth service_auth(<TimeStatusCallback>, <api_key>, <client_email>, <proje
 
 `<private_key>` The service account private key.
 
-`<expire>` The expiry period in seconds (less than or equal to 3600).
+`<expire>` The expiry period in seconds (less than 3600), 3300 is the default value.
 
 > [!NOTE]  
 > The refresh token is not available when authenticated with service account.
@@ -600,7 +600,7 @@ UserAuth user_auth(<api_key>, <user_email>, <user_password>, <expire>);
 
 `<user_password>`The user password in the project.
 
-`<expire>`The expiry period in seconds (less than or equal to 3600).
+`<expire>`The expiry period in seconds (less than 3600), 3300 is the default value.
 
 - ### No Authentication
 
@@ -1089,7 +1089,7 @@ void asyncCB(AsyncResult &aResult);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (< 3600) */);
 
 FirebaseApp app;
 
