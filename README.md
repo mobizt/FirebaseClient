@@ -39,9 +39,9 @@ This new library uses less program space with better performance and reliability
 
 [6. Usages](#usages)
 
-- [Indroduction](#indroduction)
+- [Introduction](#indroduction)
 
-- [Aurhentication](#authentication)
+- [Authentication](#authentication)
 
 - [Firebase and Google Services](#firebase-and-google-services)
 
@@ -188,7 +188,7 @@ Then get the data that contains signature string (`file,` and `blob,`) created b
 
 The TCP session KeepAlive can be done by the network client if it was supportd e.g. `WiFiClient` in ESP32.
 
-If you use the core SSL client e.g. `WiFiClientSecre` or `WiFiSSLClient`, this feature is not available.
+If you use the core SSL client e.g. `WiFiClientSecure` or `WiFiSSLClient`, this feature is not available.
 
 In the old Firebase library, this feature was done internally by the internal SSL client and `WiFiClient` integration.
 
