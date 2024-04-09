@@ -19,7 +19,7 @@ This library is the new Firebase Client library that supports both sync and asyn
 
 This new library uses less program space with better performance and reliability.
 
-## Contents
+## $\color{green}{Contents}$
 
 [1. Features](#features)
 
@@ -119,7 +119,7 @@ This new library uses less program space with better performance and reliability
 
 [9. License](#license)
 
-## Features
+## $\color{green}{Features}$
 
 * Simple APIs.
 
@@ -135,7 +135,7 @@ This new library uses less program space with better performance and reliability
 
 * Faster and more reliable.
 
-## Supported Devices.
+## $\color{green}{Supported Devices}$
 
  * ESP8266 MCUs based boards
  * ESP32 MCUs based boards
@@ -156,7 +156,7 @@ This new library uses less program space with better performance and reliability
 > This library does not support Arduino® UNO R4 WiFi due to the memory issue (related to stack and String class memory issue).
 
 
- ## Dependencies
+ ## $\color{green}{Dependencies}$
 
 
 This library required **Platform's Core SDK** to be installed.
@@ -240,7 +240,7 @@ The legaycy Firebase Cloud Messaging API was deprecated, only HTTPv1 is supporte
 
  Deploying the Cloud Function from local flash or filesystem source in a single function is not available unless using several fnctions that are available to generate upload url, upload the source (zip file), deploy the function and set IAM permission.
 
-## Installation
+## $\color{green}{Installation}$
 
 
 - ### Using Library Manager
@@ -292,7 +292,7 @@ board_build.filesystem_size = 1m
 See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en/latest/) for more information.
 
 
-## Usages
+## $\color{green}{Usages}$
 
 - ### Indroduction
 
@@ -496,7 +496,7 @@ The `AsyncResult::to<RealtimeDatabaseResult>().dataPath()` and `AsyncResult::to<
 The server response payload in `AsyncResult` can be converted to the the values e.g. boolean, integer, float, double and string via `AsyncResult::to<RealtimeDatabaseResult>().to<T>()`.
 
 
-## App Initialization
+### App Initialization
 
 The Firebase app (`FirebaseApp`) is the main authentication and access token handler class in this library. All Firebase services Apps will take the authentication data called app token (`app_token_t`) that maintains by Firebase app, and was used as the access key or bearer token while processing the request. 
 
@@ -1292,7 +1292,7 @@ See [function description](/src/README.md) for all available functions.
 
 
 
-## Memory Options
+## $\color{green}{Memory Options}$
 
 - ### Memory Options for ESP8266
 
@@ -1410,7 +1410,7 @@ As in ESP8266, once the external Heap memory was enabled in IDE, to allow the li
 ```
 
 
-## Library Build Options 
+## $\color{green}{Library Build Options}$ 
 
 The library build options are defined as preprocessor macros (`#define name`).
 
@@ -1515,7 +1515,7 @@ This `UserConfig.h` will not change or overwrite when update the library.
 
 
 
-## License
+## $\color{green}{License}$
 
 The MIT License (MIT)
 
