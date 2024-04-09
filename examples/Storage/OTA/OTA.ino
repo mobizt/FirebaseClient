@@ -1,21 +1,18 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * storage.ota(<AsyncClient>, <FirebaseStorage::Parent>);
- * storage.ota(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResult>);
- * storage.ota(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResultCallback>, <uid>);
+ * Storage::ota(<AsyncClient>, <FirebaseStorage::Parent>);
+ * Storage::ota(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResult>);
+ * Storage::ota(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResultCallback>, <uid>);
  *
- * The <FirebaseStorage::Parent> is the FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <AsyncClient> - The async client.
+ * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The bucketid is the Storage bucket Id of object to download.
  * The object is the object in Storage bucket to download.
- *
- * The storage is Storage service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

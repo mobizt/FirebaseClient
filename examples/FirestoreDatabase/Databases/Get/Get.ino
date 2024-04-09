@@ -1,21 +1,19 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Databases.get(<AsyncClient>, <Firestore::Parent>);
- * Databases.get(<AsyncClient>, <Firestore::Parent>, <AsyncResult>);
- * Databases.get(<AsyncClient>, <Firestore::Parent>, <AsyncResultCallback>, <uid>);
+ * Firestore::Databases::get(<AsyncClient>, <Firestore::Parent>);
+ * Firestore::Databases::get(<AsyncClient>, <Firestore::Parent>, <AsyncResult>);
+ * Firestore::Databases::get(<AsyncClient>, <Firestore::Parent>, <AsyncResultCallback>, <uid>);
+ * 
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <storagePath> - The path in the Firebase Storage data bucket to store the exported database.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id is the id of database to get the infomation.
- *
- * The Databases is Firestore::Databases object that provide the main working functions.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

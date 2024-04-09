@@ -1,34 +1,32 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Docs.batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>);
- * Docs.batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>, <AsyncResult>);
- * Docs.batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>, <AsyncResultCallback>, <uid>);
+ * Firestore::Documents::batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>);
+ * Firestore::Documents::batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>, <AsyncResult>);
+ * Firestore::Documents::batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>, <AsyncResultCallback>, <uid>);
+ * 
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <BatchGetDocumentOptions> - The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
+ * 
+ * The following are the BatchGetDocumentOptions member functions.
  *
- * The <BatchGetDocumentOptions> is BatchGetDocumentOptions object which provided the member functions to construct the requst body.
- * addDocument, mask, transaction, newTransaction and readTime.
+ * BatchGetDocumentOptions::documents - Adding the document path to read.
+ * BatchGetDocumentOptions::mask - Setting the mask fields to return. If not set, returns all fields. 
+ * 
+ * If the document has a field that is not present in this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
  *
- * addDocument used for adding the document path to read.
- * mask used for setting the mask fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
- * that field will not be returned in the response. Use comma (,) to separate between the field names.
- *
- * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
- * transaction, newTransaction and readTime.
- *
- * Then the following functions can't be mixed used.
- * - transaction used for reading the document in a transaction. A base64-encoded string.
- * - newTransaction used for creating the transaction.
- * - readTime used for setting the documents as they were at the given time. This may not be older than 270 seconds.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ * The union field consistency_selector
+ * 
+ * BatchGetDocumentOptions::transaction - Rreading the document in a transaction. A base64-encoded string.
+ * BatchGetDocumentOptions::newTransaction - Creating the transaction.
+ * BatchGetDocumentOptions::readTime - Setting the documents as they were at the given time. This may not be older than 270 seconds.
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
@@ -170,9 +168,9 @@ void loop()
         Serial.println("Get multiple documents...");
 
         BatchGetDocumentOptions options;
-        options.addDocument("info/countries");
-        options.addDocument("a0/b0");
-        options.addDocument("test_collection/test_document");
+        options.documents("info/countries");
+        options.documents("a0/b0");
+        options.documents("test_collection/test_document");
         options.mask(DocumentMask("Singapore.population,key1"));
 
         // You can set the content of options object directly with options.setContent("your content")

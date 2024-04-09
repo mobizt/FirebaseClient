@@ -1,23 +1,19 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * indexes.deleteIndex(<AsyncClient>, <Firestore::Parent>, <indexId>);
- * indexes.deleteIndex(<AsyncClient>, <Firestore::Parent>, <indexId>, <AsyncResult>);
- * indexes.deleteIndex(<AsyncClient>, <Firestore::Parent>, <indexId>, <AsyncResultCallback>, <uid>);
+ * Firestore::Databases::Indexes::deleteIndex(<AsyncClient>, <Firestore::Parent>, <indexId>);
+ * Firestore::Databases::Indexes::deleteIndex(<AsyncClient>, <Firestore::Parent>, <indexId>, <AsyncResult>);
+ * Firestore::Databases::Indexes::deleteIndex(<AsyncClient>, <Firestore::Parent>, <indexId>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <indexId> - The index to delete;
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The <indexId> is the index to delete;
- *
- * The indexes is Firestore::Databases::Indexes object.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

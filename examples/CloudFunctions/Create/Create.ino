@@ -1,27 +1,20 @@
 
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * cfunctions.create(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>);
- * cfunctions.create(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <AsyncResult>);
- * cfunctions.create(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <AsyncResultCallback>, <uid>);
+ * CloudFunctions::create(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>);
+ * CloudFunctions::create(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <AsyncResult>);
+ * CloudFunctions::create(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <AsyncResultCallback>, <uid>);
  *
- * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The location name is the project location.
- * The bucket Id is the Firebase storage bucket Id in the project.
+ * <AsyncClient> - The async client.
+ * <GoogleCloudFunctions::Parent> - The GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
+ * <functionId> - The name of function to create.
+ * <GoogleCloudFunctions::Function> - The GoogleCloudFunctions::Function object that holds the information of function to create.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
  *
  * The <functionId> is the name of function to create.
- *
- * The <GoogleCloudFunctions::Function> is the GoogleCloudFunctions::Function object that holds the information of function to create.
- *
- * The cfunctions is Google Cloud Functions service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  * 
  * IAM owner permission required for service account,
  * https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable

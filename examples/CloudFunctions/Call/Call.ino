@@ -1,26 +1,20 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * cfunctions.call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>);
- * cfunctions.call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>, <AsyncResult>);
- * cfunctions.call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>, <AsyncResultCallback>, <uid>);
- *
- * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
+ * CloudFunctions::call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>);
+ * CloudFunctions::call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>, <AsyncResult>);
+ * CloudFunctions::call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>, <AsyncResultCallback>, <uid>);
+ * 
+ * <AsyncClient> - The async client.
+ * <GoogleCloudFunctions::Parent> - The GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
+ * <functionId> - The function name or Id to call.
+ * <data> - The data to be passed to the function.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The location name is the project location.
- * The bucket Id is the Firebase storage bucket Id in the project.
- *
- * The <functionId> is the function name or Id to call.
- *
- * The <data> is the data to be passed to the function.
- *
- * The cfunctions is Google Cloud Functions service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  * 
  * IAM owner permission required for service account,
  * https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable

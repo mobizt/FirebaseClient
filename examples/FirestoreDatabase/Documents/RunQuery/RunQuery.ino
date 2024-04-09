@@ -1,32 +1,26 @@
 
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Docs.runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>);
- * Docs.runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>, <AsyncResult>);
- * Docs.runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>, <AsyncResultCallback>, <uid>);
+ * Firestore::Documents::runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>);
+ * Firestore::Documents::runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>, <AsyncResult>);
+ * Firestore::Documents::runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
- *
- * The <QueryOptions> is the QueryOptions object that provides the function to create the query (StructuredQuery) and consistency mode which included
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <documentPath> - The relative path of document to patch with the input document.
+ * <QueryOptions> - The QueryOptions object that provides the function to create the query (StructuredQuery) and consistency mode which included
  * structuredQuery, transaction, newTransaction and readTime functions.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
  *
- * The following function used for creating the union field consistency_selector and can be only one of the following field e.g.
- * transaction, newTransaction and readTime  functions.
- *
- * Then the following functions can't be mixed used.
- * - transaction used for running the query within an already active transaction. A base64-encoded string.
- * - newTransaction used for starting a new transaction and reads the documents. Defaults to a read-only transaction.
+ * The following are the QueryOptions member functions applied for uinion field consistency_selector.
+ * 
+ * QueryOptions::transaction used for running the query within an already active transaction. A base64-encoded string.
+ * QueryOptions::newTransaction used for starting a new transaction and reads the documents. Defaults to a read-only transaction.
  * The new transaction ID will be returned as the first response in the stream.
- * - readTime used for reading the documents as they were at the given time.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ * QueryOptions::readTime used for reading the documents as they were at the given time.
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

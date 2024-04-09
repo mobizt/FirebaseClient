@@ -1,7 +1,7 @@
 /**
  * SYNTAX:
  *
- * FileConfig file_config(<file_name>, <file_callback>);
+ * FileConfig::FileConfig(<file_name>, <file_callback>);
  *
  * <file_name> - The filename included path of file that will be used.
  * <file_callback> - The callback function that provides file operation.
@@ -11,11 +11,11 @@
  * 
  * The file name can be a name of source (input) and target (output) file that used in upload and download.
  * 
- * Database.set(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
- * Database.set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
+ * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
  * 
- * Database.get(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
- * Database.get(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
  * <path> - The node path to set/get the file data.

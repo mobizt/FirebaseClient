@@ -1,21 +1,15 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * EthernetNetwork eth_network(<mac>, <cs_pin>, <reset_pin>);
- * EthernetNetwork eth_network(<mac>, <cs_pin>, <reset_pin>, <static_ip>);
- *
- * Firebase_StaticIP staIP(<local_ip>, <subnet>, <gateway>, <dns_server>, <optional>);
- *
- * The EthernetNetwork is the Network class that provides the Ethernet network configuarion to work in this library.
- *
- * The EthernetNetwork class constructor arguments.
+ * EthernetNetwork::EthernetNetwork(<mac>, <cs_pin>, <reset_pin>);
+ * EthernetNetwork::EthernetNetwork(<mac>, <cs_pin>, <reset_pin>, <static_ip>);
  *
  * <mac> - The six bytes mac address.
  * <cs_pin> - The Ethernet module chip select/enable pin.
  * <reset_pin> - The Ethernet module reset pin. Assign -1 if not used.
  * <static_ip> - The pointer to Firebase_StaticIP object that holds the static ip configuration.
  *
- * The Firebase_StaticIP class constructor arguments.
+ * Firebase_StaticIP staIP(<local_ip>, <subnet>, <gateway>, <dns_server>, <optional>);
  *
  * <local_ip>, <subnet>, <gateway> and <dns_server> - The static IP, subnet, default gateway and dns server IPs.
  * <optional> - The boolean option to force use static ip only (not use DHCP)

@@ -1,26 +1,20 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Databases.patch(<AsyncClient>, <Firestore::Parent>, <Database>, <UpdateMask>);
- * Databases.patch(<AsyncClient>, <Firestore::Parent>, <Database>, <UpdateMask>, <AsyncResult>);
- * Databases.patch(<AsyncClient>, <Firestore::Parent>, <Database>, <UpdateMask>, <AsyncResultCallback>, <uid>);
+ * Firestore::Databases::patch(<AsyncClient>, <Firestore::Parent>, <Database>, <UpdateMask>);
+ * Firestore::Databases::patch(<AsyncClient>, <Firestore::Parent>, <Database>, <UpdateMask>, <AsyncResult>);
+ * Firestore::Databases::patch(<AsyncClient>, <Firestore::Parent>, <Database>, <UpdateMask>, <AsyncResultCallback>, <uid>);
+ * 
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <Database> - The Firestore::Database object that holds the database information to update.
+ * <UpdateMask> - The list of fields to be updated. This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id is the id of database to update.
- *
- * The <Database> is the Firestore::Database object that hold the database information to update.
- *
- * The <UpdateMask> is the list of fields to be updated.
- * This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
- *
- * The Databases is Firestore::Databases object that provide the main working functions.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

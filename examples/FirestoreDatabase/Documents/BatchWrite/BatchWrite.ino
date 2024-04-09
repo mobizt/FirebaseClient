@@ -1,21 +1,19 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Docs.batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>);
- * Docs.batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResult>);
- * Docs.batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResultCallback>, <uid>);
+ * Firestore::Documents::batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>);
+ * Firestore::Documents::batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResult>);
+ * Firestore::Documents::batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <Writes> - The writes to apply.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The <Writes> is the writes to apply.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

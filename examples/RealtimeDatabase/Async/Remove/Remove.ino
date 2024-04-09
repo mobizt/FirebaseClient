@@ -1,8 +1,8 @@
 /**
  * SYNTAX:
  *
- * Database.remove(<AsyncClient>, <path>, <AsyncResult>);
- * Database.remove(<AsyncClient>, <path>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::remove(<AsyncClient>, <path>, <AsyncResult>);
+ * RealtimeDatabase::remove(<AsyncClient>, <path>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
  * <path> - The node path to remove the value.

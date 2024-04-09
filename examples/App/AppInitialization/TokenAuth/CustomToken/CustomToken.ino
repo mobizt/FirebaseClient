@@ -3,24 +3,20 @@
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *
- * The AsyncClient stores the user, server and network data which can be initialized as.
- *
- * WiFiClientSecure ssl_client;
- * DefaultNetwork network;
- * AsyncClient aClient(ssl_client, getNetwork(network));
- *
- * The FirebaseApp manage and stores the authentication data;
- *
- * The user_auth_data store the user credentials which can be obtained from one of following Auth classes.
- * UserAuth, ServiceAuth, CustomAuth, IDToken, AccessToken, CustomToken, LegacyToken and NoAuth via static function getAuth.
+ * <AsyncClient> - The async client.
+ * <FirebaseApp> - The authentication and access token handler.
+ * <user_auth_data> - The user auth data (user_auth_data struct) that holds the user input sign-in credentials and token.
+ * 
+ * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
+ * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken. 
  *
  * SYNTAX:
  *
- * CustomToken custom_token(<api_key>, <custom_token>, <expire_in_seconds>);
+ * CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>);
  *
  * <api_key> - API key can be obtained from Firebase console > Project Overview > Project settings.
  * <custom_token> - Auth custom token (jwt signed token).
- * <expire_in_seconds> - Expire period in seconds.
+ * <expire_in_seconds> - Expire period in seconds (less than 3600), 3300 is the default value.
  *
  * By assign the refresh token as <custom_token>, the auth token will be re-authenticated when calling initializeApp.
  *

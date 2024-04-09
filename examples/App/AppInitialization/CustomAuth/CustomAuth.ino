@@ -10,18 +10,9 @@
  * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
  * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken. 
  *
- * WiFiClientSecure ssl_client;
- * DefaultNetwork network;
- * AsyncClient aClient(ssl_client, getNetwork(network));
- *
- * The FirebaseApp manage and stores the authentication data;
- *
- * The user_auth_data store the user credentials which can be obtained from one of following Auth classes.
- * UserAuth, ServiceAuth, CustomAuth, IDToken, AccessToken, CustomToken, LegacyToken and NoAuth via static function getAuth.
- *
  * SYNTAX:
  *
- * CustomAuth custom_auth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>);
+ * CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>);
  *
  * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
  * <api_key> - The web API key of project.
@@ -31,7 +22,7 @@
  * <user_id> - The user ID.
  * <scope> - The OAuth scopes.
  * <claims> - The OAuth claims.
- * <expire> - The expiry period in seconds (less than or equal to 3600).
+ * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
  *
  * NOTE:
  *

@@ -1,23 +1,19 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * indexes.create(<AsyncClient>, <Firestore::Parent>, <Index>);
- * indexes.create(<AsyncClient>, <Firestore::Parent>, <Index>, <AsyncResult>);
- * indexes.create(<AsyncClient>, <Firestore::Parent>, <Index>, <AsyncResultCallback>, <uid>);
+ * Firestore::Databases::Indexes::create(<AsyncClient>, <Firestore::Parent>, <Index>);
+ * Firestore::Databases::Indexes::create(<AsyncClient>, <Firestore::Parent>, <Index>, <AsyncResult>);
+ * Firestore::Databases::Indexes::create(<AsyncClient>, <Firestore::Parent>, <Index>, <AsyncResultCallback>, <uid>);
+ * 
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <Index> - The DatabaseIndex::Index object;
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The <Index> is DatabaseIndex::Index object;
- *
- * The indexes is Firestore::Databases::Indexes object.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
@@ -164,8 +160,8 @@ void loop()
         indexField2.fieldPath(fieldPath2);
         indexField2.mode(DatabaseIndex::IndexMode::ASCENDING);
 
-        index.addField(indexField1);
-        index.addField(indexField2);
+        index.fields(indexField1);
+        index.fields(indexField2);
 
         indexes.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), index, asyncCB);
 

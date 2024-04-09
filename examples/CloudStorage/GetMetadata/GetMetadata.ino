@@ -1,24 +1,20 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * cstorage.getMetadata(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::GetOptions>);
- * cstorage.getMetadata(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::GetOptions>, <AsyncResult>);
- * cstorage.getMetadata(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
+ * CloudStorage::getMetadata(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::GetOptions>);
+ * CloudStorage::getMetadata(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::GetOptions>, <AsyncResult>);
+ * CloudStorage::getMetadata(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <GoogleCloudStorage::Parent> is the GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <AsyncClient> - The async client.
+ * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <GoogleCloudStorage::GetOptions> - The GoogleCloudStorage::GetOptions that holds the get options.
+ * For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objects/get#optional-parameters
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The bucketid is the Storage bucket Id of object to get metadata.
  * The object is the object in Storage bucket to get metadata.
- *
- * The <GoogleCloudStorage::GetOptions> is the GoogleCloudStorage::GetOptions that holds the get options.
- * For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objects/get#optional-parameters
- *
- * The cstorage is Google Cloud Storage service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

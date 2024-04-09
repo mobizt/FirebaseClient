@@ -1,11 +1,7 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * GSMNetwork gsm_network(<modem>, <gsm_pin>, <apn>, <user>, <password>);
- *
- * The GSMNetwork is the Network class that provides the GSM network configuarion using TinyGSMClient to work in this library.
- *
- * The GSMNetwork class constructor arguments.
+ * GSMNetwork::GSMNetwork(<modem>, <gsm_pin>, <apn>, <user>, <password>);
  *
  * <modem> - The pointer to TinyGsm modem object. Modem should be initialized and/or set mode before transfering data.
  * <gsm_pin> - The SIM pin.

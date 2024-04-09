@@ -1,26 +1,24 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Docs.patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>);
- * Docs.patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResult>);
- * Docs.patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResultCallback>, <uid>);
+ * Firestore::Documents::patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>);
+ * Firestore::Documents::patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResult>);
+ * Firestore::Documents::patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <documentPath> - The relative path of document to patch with the input document.
+ * <DocumentMask(updateMask)> - The fields to update. If the document exists on the server and has fields not referenced in the mask, they are left unchanged.
+ * <DocumentMask(mask)> - The fields to return. If not set, returns all fields. If the document has a field that is not present in this mask, that field will
+ * not be returned in the response. Use comma (,) to separate between the field names.
+ * <Document> - The Firestore document.
+ * <Precondition(currentDocument)> - An optional precondition on the document. The request will fail if this is set and not met by the target document.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The <documentPath> is the relative path of document to patch with the input document.
- * The <DocumentMask(updateMask)> is the fields to update. If the document exists on the server and has fields not referenced in the mask, they are left unchanged.
- * The <DocumentMask(mask)> is fields to return. If not set, returns all fields. If the document has a field that is not present in this mask, that field will
- * not be returned in the response. Use comma (,) to separate between the field names.
- * The <Document> is Firestore document.
- * The <Precondition(currentDocument)> is an optional precondition on the document. The request will fail if this is set and not met by the target document.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

@@ -1,8 +1,8 @@
 /**
  * SYNTAX:
  *
- * T value  = Database.get<T>(<AsyncClient>, <path>);
- * T value  = Database.get<T>(<AsyncClient>, <path>, <DatabaseOptions>);
+ * T value  = RealtimeDatabase::get<T>(<AsyncClient>, <path>);
+ * T value  = RealtimeDatabase::get<T>(<AsyncClient>, <path>, <DatabaseOptions>);
  * 
  * T - The type of value to return.
  * <AsyncClient> - The async client.

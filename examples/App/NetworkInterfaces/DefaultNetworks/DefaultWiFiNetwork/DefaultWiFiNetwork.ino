@@ -1,15 +1,12 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * DefaultWiFiNetwork network(<FirebaseWiFi>, <reconnect>);
+ * DefaultWiFiNetwork::DefaultWiFiNetwork(<FirebaseWiFi>, <re_connect_option>);
  *
- * The DefaultWiFiNetwork is the Network class that provides the WiFiMulti network configuarion to work in this library for the WiFiMulti supported devices.
- *
- * The DefaultWiFiNetwork class constructor arguments.
- *
- * <FirebaseWiFi> - The FirebaseWiFi class object that used for keeping the network credentials (WiFi APs and WiFi passwords).
- *
- * <reconnect> - The bool option for network reconnection.
+ * <FirebaseWiFi> - The FirebaseWiFi class object that used for keeping the network credentials (WiFi AP and WiFi password).
+ * <re_connect_option> - The Boolean value set for enabling the WiFi reconnection when the WiFi is disconnected.
+ * 
+ * This type of network class is for WiFi Multi or device that use WiFi class that does not support WiFi reconnection.
  *
  * For normal WiFi, see examples/NetworkInterfaces/DefaultNetwork/DefaultNetwork.ino
  *

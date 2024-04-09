@@ -1,8 +1,8 @@
 /**
  * SYNTAX:
  *
- * Database.set<T>(<AsyncClient>, <path>, <value>, <AsyncResult>);
- * Database.set<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>, <AsyncResult>);
+ * RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
  *
  * T - The type of value to set.
  * <AsyncClient> - The async client.

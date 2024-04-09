@@ -1,24 +1,20 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * cstorage.deleteObject(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::DeleteOptions>);
- * cstorage.deleteObject(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::DeleteOptions>, <AsyncResult>);
- * cstorage.deleteObject(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::DeleteOptions>, <AsyncResultCallback>, <uid>);
+ * CloudStorage::deleteObject(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::DeleteOptions>);
+ * CloudStorage::deleteObject(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::DeleteOptions>, <AsyncResult>);
+ * CloudStorage::deleteObject(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::DeleteOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <GoogleCloudStorage::Parent> is the GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <AsyncClient> - The async client.
+ * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <GoogleCloudStorage::DeleteOptions> - The GoogleCloudStorage::DeleteOptions that holds the delete options.
+ * For the delete options, see see https://cloud.google.com/storage/docs/json_api/v1/objects/delete#optional-parameters.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The bucketid is the Storage bucket Id of object to delete.
  * The object is the object in Storage bucket to delete.
- *
- * The <GoogleCloudStorage::DeleteOptions> is the GoogleCloudStorage::DeleteOptions that holds the delete options.
- * For the delete options, see see https://cloud.google.com/storage/docs/json_api/v1/objects/delete#optional-parameters.
- *
- * The cstorage is Google Cloud Storage service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

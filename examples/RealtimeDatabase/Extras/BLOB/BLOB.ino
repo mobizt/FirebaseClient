@@ -2,18 +2,18 @@
 /**
  * SYNTAX:
  *
- * BlobConfig blob_config(<data>, <size>);
+ * BlobConfig::BlobConfig(<data>, <size>);
  *
  * <data> - The BLOB data (byte array).
  * <size> - The size of data.
  *
  * The data can be a source (input) and target (output) data that used in upload and download.
  * 
- * Database.set(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
- * Database.set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
+ * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
  * 
- * Database.get(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
- * Database.get(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
  * <path> - The node path to set/get the BLOB data.

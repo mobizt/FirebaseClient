@@ -1,28 +1,24 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Databases.exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>);
- * Databases.exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
- * Databases.exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
+ * Firestore::Databases::exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>);
+ * Firestore::Databases::exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
+ * Firestore::Databases::exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <collectionIds> - The collection ids to export.
+ * <bucketID> - The Firebase storage bucket ID in the project.
+ * <storagePath> - The path in the Firebase Storage data bucket to store the exported database.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The <collectionIds> is the collection ids to export.
- * Unspecified means all collections.
+ * 
+ * Unspecified the collection ids means all collections will be exported.
  * Use comma (,) to separate between the collection ids.
- *
- * The <bucketID> is the Firebase storage bucket ID in the project.
- * The <storagePath> is the path in the Firebase Storage data bucket to store the exported database.
- *
- * The Databases is Firestore::Databases object that provide the main working functions.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

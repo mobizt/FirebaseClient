@@ -1,27 +1,27 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Docs.listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>);
- * Docs.listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>, <AsyncResult>);
- * Docs.listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>, <AsyncResultCallback>, <uid>);
+ * Firestore::Documents::listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>);
+ * Firestore::Documents::listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>, <AsyncResult>);
+ * Firestore::Documents::listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <ListCollectionIdsOptions> - The  ListCollectionIdsOptions object that provides the functions to set the pageSize, pageToken and readTime options.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
+ * 
+ * The following are the ListCollectionIdsOptions member functions.
  *
- * The <ListCollectionIdsOptions> is ListCollectionIdsOptions object that provides the member functions pageSize, pageToken and readTime
- * for creating the query string options pageSize, pageToken and readTime respectively.
- * The option pageSize is for setting the  maximum number of results to return.
- * The option pageToken is the page token. Must be a value from ListCollectionIdsResponse.
- * The option readTime is the timestamp for reading the documents as they were at the given time.
+ * ListCollectionIdsOptions::pageSize - Setting the  maximum number of results to return.
+ * ListCollectionIdsOptions::pageToken - The page token. Must be a value from ListCollectionIdsResponse.
+ * ListCollectionIdsOptions::readTime - The timestamp for reading the documents as they were at the given time.
  * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled,
  * can additionally be a whole minute timestamp within the past 7 days.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

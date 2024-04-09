@@ -1,29 +1,22 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * cfunctions.patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>);
- * cfunctions.patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>, <AsyncResult>);
- * cfunctions.patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>, <AsyncResultCallback>, <uid>);
+ * CloudFunctions::patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>);
+ * CloudFunctions::patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>, <AsyncResult>);
+ * CloudFunctions::patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>, <AsyncResultCallback>, <uid>);
  *
- * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
+ * <AsyncClient> - The async client.
+ * <GoogleCloudFunctions::Parent> - The GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
+ * <functionId> - The name of function to update.
+ * <GoogleCloudFunctions::Function> - The GoogleCloudFunctions::Function object that holds the information of function to update.
+ * <updateMask> - The list of fields to be updated. If no field mask is provided, all provided fields in the request will be updated.
+ * This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The location name is the project location.
- * The bucket Id is the Firebase storage bucket Id in the project.
- *
- * The <functionId> is the name of function to update.
- *
- * The <GoogleCloudFunctions::Function> is the GoogleCloudFunctions::Function object that holds the information of function to update.
- *
- * The <updateMask> is the list of fields to be updated. If no field mask is provided, all provided fields in the request will be updated.
- * This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
- *
- * The cfunctions is Google Cloud Functions service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * IAM owner permission required for service account,
  * https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable

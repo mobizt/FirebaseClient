@@ -1,11 +1,11 @@
 /**
  * SYNTAX:
  *
- * Database.get(<AsyncClient>, <path>, <AsyncResult>, <SSE>);
- * Database.get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <AsyncResult>, <SSE>);
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
  *
- * Database.get(<AsyncClient>, <path>, <DatabaseOption>, <AsyncResult>);
- * Database.get(<AsyncClient>, <path>, <DatabaseOption>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <DatabaseOption>, <AsyncResult>);
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <DatabaseOption>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
  * <path> - The node path to get/watch the value.

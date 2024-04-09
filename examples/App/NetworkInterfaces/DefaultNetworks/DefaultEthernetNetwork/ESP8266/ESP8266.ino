@@ -1,11 +1,7 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * DefaultEthernetNetwork network(<Firebase_SPI_ETH_Module>);
- *
- * The DefaultEthernetNetwork is the Network class that provides the built-in WiFi network configuarion to work in this library.
- *
- * The DefaultEthernetNetwork class constructor arguments.
+ * DefaultEthernetNetwork::DefaultEthernetNetwork(<Firebase_SPI_ETH_Module>);
  *
  * <Firebase_SPI_ETH_Module> - The Firebase_SPI_ETH_Module class object that keeping the pointer to lwip driver for each
  * SPI Ethernet module (e.g. ENC28J60lwIP, W5100lwIP and W5500lwIP).

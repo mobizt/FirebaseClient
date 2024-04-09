@@ -1,25 +1,27 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Docs.get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>);
- * Docs.get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>, <AsyncResult>);
- * Docs.get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>, <AsyncResultCallback>, <uid>);
+ * Firestore::Documents::get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>);
+ * Firestore::Documents::get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>, <AsyncResult>);
+ * Firestore::Documents::get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <documentPath> - The relative path of document to get in the collection.
+ * <GetDocumentOptions> - The GetDocumentOptions object that provide the functions to set the mask, transaction and readTime options.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
+ * 
+ * The following are the GetDocumentOptions member functions.
  *
- * The <GetDocumentOptions> is the GetDocumentOptions object included mask, transaction and readTime in its constructor.
- * The mask is the fields to return. If not set, returns all fields. If the document has a field that is not present in this mask,
- * that field will not be returned in the response. Use comma (,) to separate between the field names.
- * The transaction is a base64-encoded string. If set, reads the document in a transaction.
- * The readTime is a timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ * The GetDocumentOptions::mask - The fields to return. If not set, returns all fields. 
+ * If the document has a field that is not present in this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
+ * GetDocumentOptions::transaction - A base64-encoded string. If set, reads the document in a transaction.
+ * GetDocumentOptions::readTime - A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

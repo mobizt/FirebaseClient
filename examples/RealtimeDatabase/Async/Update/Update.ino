@@ -1,8 +1,8 @@
 /**
  * SYNTAX:
  *
- * Database.update(<AsyncClient>, <path>, <object_t>, <AsyncResult>);
- * Database.update(<AsyncClient>, <path>, <object_t>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::update(<AsyncClient>, <path>, <object_t>, <AsyncResult>);
+ * RealtimeDatabase::update(<AsyncClient>, <path>, <object_t>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
  * <path> - The node path to update (patch) the value.

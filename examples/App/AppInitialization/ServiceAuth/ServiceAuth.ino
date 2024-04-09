@@ -3,29 +3,22 @@
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *
- * The AsyncClient stores the user, server and network data which can be initialized as.
- *
- * WiFiClientSecure ssl_client;
- * DefaultNetwork network;
- * AsyncClient aClient(ssl_client, getNetwork(network));
- *
- * The FirebaseApp manage and stores the authentication data;
- *
- * The user_auth_data store the user credentials which can be obtained from one of following Auth classes.
- * UserAuth, ServiceAuth, CustomAuth, IDToken, AccessToken, CustomToken, LegacyToken and NoAuth via static function getAuth.
+ * <AsyncClient> - The async client.
+ * <FirebaseApp> - The authentication and access token handler.
+ * <user_auth_data> - The user auth data (user_auth_data struct) that holds the user input sign-in credentials and token.
+ * 
+ * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
+ * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken. 
  *
  * SYNTAX:
  *
- * ServiceAuth service_auth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
+ * ServiceAuth::ServiceAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
  *
  * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
  * <client_email> - The service account client Email.
  * <project_id> - The service account project ID.
  * <private_key> - The service account private key.
- * <expire> - The expiry period in seconds (less than or equal to 3600).
- *
- * The default network (built-in WiFi) configuration was used by default when
- * it was not assign to the function.
+ * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
  *
  * NOTE:
  *

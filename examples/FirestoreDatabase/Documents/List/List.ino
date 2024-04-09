@@ -1,31 +1,32 @@
 
 
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Docs.list(<AsyncClient>, <Firestore::Parent>, <documentPath>, <ListDocumentsOptions>);
- * Docs.list(<AsyncClient>, <Firestore::Parent>, <documentPath>, <ListDocumentsOptions>, <AsyncResult>);
- * Docs.list(<AsyncClient>, <Firestore::Parent>, <documentPath>, <ListDocumentsOptions>, <AsyncResultCallback>, <uid>);
+ * Firestore::Documents::list(<AsyncClient>, <Firestore::Parent>, <collectionId>, <ListDocumentsOptions>);
+ * Firestore::Documents::list(<AsyncClient>, <Firestore::Parent>, <collectionId>, <ListDocumentsOptions>, <AsyncResult>);
+ * Firestore::Documents::list(<AsyncClient>, <Firestore::Parent>, <collectionId>, <ListDocumentsOptions>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <collectionId> - The relative path of document collection.
+ * <ListDocumentsOptions> - The ListDocumentsOptions object that provides the functions to set the pageSize, pageToken, orderBy, mask and showMissing options.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
+ * 
+ * The following are the ListDocumentsOptions member functions.
  *
- * The <ListDocumentsOptions> is the ListDocumentsOptions object that provides the member functions pageSize, pageToken, orderBy, mask and
- * showMissing for creating the query string options pageSize, pageToken, orderBy, mask and showMissing respectively.
- * The option pageSize is for setting the maximum number of documents to return.
- * The option pageToken is the nextPageToken value returned from a previous List request, if any.
- * The option orderBy is the order to sort results by. For example: priority desc, name.
- * The option mask is for setting the fields to return. If not set, returns all fields.
+ * ListDocumentsOptions::pageSize - Setting the maximum number of documents to return.
+ * ListDocumentsOptions::pageToken - The nextPageToken value returned from a previous List request, if any.
+ * ListDocumentsOptions::orderBy - The order to sort results by. For example: priority desc, name.
+ * ListDocumentsOptions::mask - Setting the fields to return. If not set, returns all fields.
  * If a document has a field that is not present in this mask, that field will not be returned in the response.
- * The option showMissing is for setting if the list should show missing documents.
+ * ListDocumentsOptions::showMissing - Setting if the list should show missing documents.
  * A missing document is a document that does not exist but has sub-documents.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

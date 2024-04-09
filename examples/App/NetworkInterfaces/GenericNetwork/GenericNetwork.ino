@@ -1,11 +1,7 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * GenericNetwork generic_network(<net_connect_callback>, <network_status_callback>);
- *
- * The GenericNetwork is the Network class that provides the generic network configuarion to work in this library.
- *
- * The GenericNetwork class constructor arguments.
+ * GenericNetwork::GenericNetwork(<net_connect_callback>, <network_status_callback>);
  *
  * <net_connect_callback> - The network connection callback function.
  * <network_status_callback> - The network status callback function.

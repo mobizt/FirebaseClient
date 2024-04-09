@@ -1,26 +1,31 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
+ * 
+ * FileConfig::FileConfig(<file_name>, <file_callback>);
  *
- * cstorage.download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>);
- * cstorage.download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>, <AsyncResult>);
- * cstorage.download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
+ * <file_name> - The filename included path of file that will be used.
+ * <file_callback> - The callback function that provides file operation.
+ * 
+ * The file_callback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+ * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
+ * 
+ * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
- * The <GoogleCloudStorage::Parent> is the GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
+ * CloudStorage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>);
+ * CloudStorage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>, <AsyncResult>);
+ * CloudStorage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
+ *
+ * <AsyncClient> - The async client.
+ * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <file_config_data> - The filesystem data (file_config_data) obtained from FileConfig class object.
+ * <GoogleCloudStorage::GetOptions> - The GoogleCloudStorage::GetOptions that holds the get options.
+ * For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objects/get#optional-parameters
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The bucketid is the Storage bucket Id of object to download.
  * The object is the object to be downloaded in the Storage bucket.
- *
- * The <file_config_data> is the filesystem data (file_config_data) obtained from FileConfig class object.
- *
- * The <GoogleCloudStorage::GetOptions> is the GoogleCloudStorage::GetOptions that holds the get options.
- * For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objects/get#optional-parameters
- *
- * The cstorage is Google Cloud Storage service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

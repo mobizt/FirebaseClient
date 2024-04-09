@@ -1,13 +1,9 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * DefaultNetwork network(<reconnect>);
+ * DefaultNetwork::DefaultNetwork(<re_connect_option>);
  *
- * The DefaultNetwork is the Network class that provides the built-in WiFi network configuarion to work in this library.
- *
- * The DefaultNetwork class constructor arguments.
- *
- * <reconnect> - The bool option for network reconnection.
+ * <re_connect_option> - The Boolean value set for enabling the WiFi reconnection when the WiFi is disconnected.
  *
  * For WiFi Multi, see examples/NetworkInterfaces/DefaultWiFiNetwork/DefaultWiFiNetwork.ino
  *

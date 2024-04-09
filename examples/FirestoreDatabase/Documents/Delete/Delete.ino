@@ -1,29 +1,30 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * Docs.deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>);
- * Docs.deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>, <AsyncResult>);
- * Docs.deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>, <AsyncResultCallback>, <uid>);
+ * Firestore::Documents::deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>);
+ * Firestore::Documents::deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>, <AsyncResult>);
+ * Firestore::Documents::deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>, <AsyncResultCallback>, <uid>);
  *
- * The <Firestore::Parent> is the Firestore::Parent object included project Id and database Id in its constructor.
+ * <AsyncClient> - The async client.
+ * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
+ * <documentPath> - The relative path of document to delete in the collection.
+ * <Precondition> - The Precondition object for an optional precondition on the document and provides the functions to set the exists and updateTime.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
+ * 
+ * The following are the Precondition member functions.
  *
- * The <Precondition> is the Precondition object for an optional precondition on the document.
- * The request will fail if this is set and not met by the target document.
- *
- * There are the member functions exists and updateTime for creating the union field exists and updateTime respectively.
- *
- * The exists option, when set to true, the target document must exist. When set to false, the target document must not exist.
- * The updateTime (timestamp) option, when set, the target document must exist and have been last updated at that time.
+ * Precondition::exists - When set to true, the target document must exist. When set to false, the target document must not exist.
+ * Precondition::updateTime - When set, the target document must exist and have been last updated at that time.
+ * 
  * A timestamp is in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
  * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ * 
+ * The request will fail if Precondition is set and not met by the target document.
  * 
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

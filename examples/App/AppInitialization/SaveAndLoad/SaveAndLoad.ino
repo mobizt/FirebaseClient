@@ -3,17 +3,24 @@
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *
- * The AsyncClient stores the user, server and network data which can be initialized as.
+ * <AsyncClient> - The async client.
+ * <FirebaseApp> - The authentication and access token handler.
+ * <user_auth_data> - The user auth data (user_auth_data struct) that holds the user input sign-in credentials and token.
+ * 
+ * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
+ * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken. 
+ * 
+ * SYNTAX:
+ * 
+ * FileConfig::FileConfig(<file_name>, <file_callback>);
  *
- * WiFiClientSecure ssl_client;
- * DefaultNetwork network;
- * AsyncClient aClient(ssl_client, getNetwork(network));
- *
- * The FirebaseApp manage and stores the authentication data;
- *
- * The user_auth_data store the user credentials which can be obtained from one of following Auth classes.
- * UserAuth, ServiceAuth, CustomAuth, IDToken, AccessToken, CustomToken, LegacyToken and NoAuth via static function getAuth.
- *
+ * <file_name> - The filename included path of file that will be used.
+ * <file_callback> - The callback function that provides file operation.
+ * 
+ * The file_callback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+ * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
+ * 
+ * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
  * SYNTAX:
  *

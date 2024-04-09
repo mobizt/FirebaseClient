@@ -1,7 +1,7 @@
 /**
  * SYNTAX:
  *
- * String name = Database.push<T>(<AsyncClient>, <path>, <value>);
+ * String name = RealtimeDatabase::push<T>(<AsyncClient>, <path>, <value>);
  * 
  * T - The type of value to push.
  * <AsyncClient> - The async client.

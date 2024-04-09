@@ -1,7 +1,7 @@
 /**
  * SYNTAX:
  *
- * bool status = Database.set<T>(<AsyncClient>, <path>, <value>);
+ * bool status = RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>);
  * 
  * <AsyncClient> - The async client.
  * <path> - The node path to set the value.

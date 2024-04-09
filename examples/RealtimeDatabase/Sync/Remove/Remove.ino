@@ -2,7 +2,7 @@
 /**
  * SYNTAX:
  *
- * bool status  = Database.remove(<AsyncClient>, <path>);
+ * bool status  = RealtimeDatabase::remove(<AsyncClient>, <path>);
  * 
  * <AsyncClient> - The async client.
  * <path> - The node path to remove the value.

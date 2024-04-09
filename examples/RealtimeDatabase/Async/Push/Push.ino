@@ -1,8 +1,8 @@
 /**
  * SYNTAX:
  *
- * Database.push<T>(<AsyncClient>, <path>, <value>, <AsyncResult>);
- * Database.push<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::push<T>(<AsyncClient>, <path>, <value>, <AsyncResult>);
+ * RealtimeDatabase::push<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
  *
  * T - The type of value to push.
  * <AsyncClient> - The async client.

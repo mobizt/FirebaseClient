@@ -1,25 +1,30 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
+ * 
+ * FileConfig::FileConfig(<file_name>, <file_callback>);
  *
- * storage.upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>);
- * storage.upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>, <AsyncResult>);
- * storage.upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>, <AsyncResultCallback>, <uid>);
+ * <file_name> - The filename included path of file that will be used.
+ * <file_callback> - The callback function that provides file operation.
+ * 
+ * The file_callback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+ * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
+ * 
+ * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
- * The <FirebaseStorage::Parent> is the FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * Storage::upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>);
+ * Storage::upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>, <AsyncResult>);
+ * Storage::upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>, <AsyncResultCallback>, <uid>);
+ *
+ * <AsyncClient> - The async client.
+ * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <file_config_data> - The filesystem data (file_config_data) obtained from FileConfig class object.
+ * <MIME> - The MIME type of file to be upload.
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
  * The bucketid is the Storage bucket Id of object to upload.
  * The object is the object to be stored in the Storage bucket.
- *
- * The <file_config_data> is the filesystem data (file_config_data) obtained from FileConfig class object.
- *
- * The <MIME> is the MIME type of file to be upload.
- *
- * The storage is Storage service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

@@ -1,22 +1,15 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * messaging.send(<AsyncClient>, <Messages::Parent>, <Messages::Message>);
- * messaging.send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResult>);
- * messaging.send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResultCallback>, <uid>);
+ * Messaging::send(<AsyncClient>, <Messages::Parent>, <Messages::Message>);
+ * Messaging::send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResult>);
+ * Messaging::send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResultCallback>, <uid>);
  *
- * The <Messages::Parent> is the Messages::Parent object included project Id in its constructor.
+ * <AsyncClient> - The async client.
+ * The <Messages::Parent> - The Messages::Parent object included project Id in its constructor. 
+ * The <Messages::Message> - The Messages::Message object that holds the information of message to send.
+ * 
  * The Firebase project Id should be only the name without the firebaseio.com.
- *
- * The <Messages::Message> is Messages::Message object that holds the information of message to send.
- *
- * The messaging is Messaging service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

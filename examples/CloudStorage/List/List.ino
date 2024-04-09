@@ -1,23 +1,19 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * cstorage.list(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::ListOptions>);
- * cstorage.list(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::ListOptions>, <AsyncResult>);
- * cstorage.list(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::ListOptions>, <AsyncResultCallback>, <uid>);
- *
- * The <GoogleCloudStorage::Parent> is the GoogleCloudStorage::Parent object included Storage bucket Id in its constructor.
- * The bucketid is the Storage bucket Id to list all objects.
- *
- * The <GoogleCloudStorage::ListOptions> is the GoogleCloudStorage::ListOptions that holds the list options.
+ * CloudStorage::list(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::ListOptions>);
+ * CloudStorage::list(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::ListOptions>, <AsyncResult>);
+ * CloudStorage::list(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::ListOptions>, <AsyncResultCallback>, <uid>);
+ * 
+ * <AsyncClient> - The async client.
+ * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id in its constructor.
+ * <GoogleCloudStorage::ListOptions> - The GoogleCloudStorage::ListOptions that holds the list options.
  * For the list options, see https://cloud.google.com/storage/docs/json_api/v1/objects/list#optional-parameters
- *
- * The cstorage is Google Cloud Storage service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * 
+ * The bucketid is the Storage bucket Id to list all objects.
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */

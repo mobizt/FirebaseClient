@@ -1,8 +1,8 @@
 /**
  * SYNTAX:
  *
- * Database.ota(<AsyncClient>, <path>, <AsyncResult>);
- * Database.ota(<AsyncClient>, <path>, <AsyncResultCallback>, <uid>);
+ * RealtimeDatabase::ota(<AsyncClient>, <path>, <AsyncResult>);
+ * RealtimeDatabase::ota(<AsyncClient>, <path>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
  * <path> - The node path that store the base64 encoded string of firmware (bin) file.

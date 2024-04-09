@@ -1,27 +1,21 @@
 /**
- * SYNTAXES:
+ * SYNTAX:
  *
- * cfunctions.testIamPermissions(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Permissions>);
- * cfunctions.testIamPermissions(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Permissions>, <AsyncResult>);
- * cfunctions.testIamPermissions(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Permissions>, <AsyncResultCallback>, <uid>);
+ * CloudFunctions::testIamPermissions(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Permissions>);
+ * CloudFunctions::testIamPermissions(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Permissions>, <AsyncResult>);
+ * CloudFunctions::testIamPermissions(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Permissions>, <AsyncResultCallback>, <uid>);
  *
- * The <GoogleCloudFunctions::Parent> is the GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
+ * <AsyncClient> - The async client.
+ * <GoogleCloudFunctions::Parent> - The GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
+ * <functionId> - The function name or Id to get.
+ * <GoogleCloudFunctions::Permissions> - The GoogleCloudFunctions::Permissions object that that holds the list of permission string.
+ * For the list of permissions, see https://cloud.google.com/functions/docs/reference/iam/permissions
+ * <AsyncResult> - The async result (AsyncResult).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The location name is the project location.
- * The bucket Id is the Firebase storage bucket Id in the project.
- *
- * The <functionId> is the function name or Id to get.
- *
- * The <GoogleCloudFunctions::Permissions> options is the GoogleCloudFunctions::Permissions object that that holds the list of permission string.
- * For the list of permissions, see https://cloud.google.com/functions/docs/reference/iam/permissions
- *
- * The cfunctions is Google Cloud Functions service app.
- *
- * The async functions required AsyncResult or AsyncResultCallback function that keeping the result.
- *
- * The uid is user specified UID of async result (optional) which used as async task identifier.
- *
- * The uid can later get from AsyncResult object of AsyncResultCallback function via aResult.uid().
  *
  * IAM owner permission required for service account,
  * https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
