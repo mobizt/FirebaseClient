@@ -390,15 +390,16 @@ The authentication task has highest priority and its async data will be inserted
 
 The order of lower priority slot data are sync task, async task and `SSE mode (HTTP Streaming)` task respectively.
 
-Then when user uses async client for multiple tasks included Reltime database stream, sync and async operations, the stream will be interrupt (breaking the connection) because of the async client only connect to server via one TCP socket (Arduino Clinet) at a time.
+Then when user uses async client for multiple tasks included Realtime database get in `SSE mode (HTTP Streaming)`, sync and async operations, the `SSE mode (HTTP Streaming)` will be interrupted (breaking the connection) because of the async client is only able to connect to the server via one TCP socket at a time.
 
-The async client and SSL Client that used for authentication task and async task included `SSE mode (HTTP Streaming)`, need to be defined globally otherwise the dangling pointer problem will be occured.
+> [!WARNING]  
+> The async client and its SSL Client that used for authentication task and async task included `SSE mode (HTTP Streaming)`, need to be defined globally otherwise the dangling pointer problem will be occured.
 
 The SSL Client is a kind of sync or blocking Client that takes time during establishing the SSL server connection (SSL handshake).
 
 The async SSL client can be assigned to the async client class constructor but currently experimental.
 
-The async operation can be cancelled and removed from the queue by calling `AsyncClientClass` member functions, i.e. `stopAsync()` for currently processed task or `stopAsync(true)` for stopping all tasks.
+The async operation can be cancelled and removed from the queue by calling `AsyncClientClas::stopAsync()` for currently processed task or `AsyncClientClas::stopAsync(true)` for stopping all tasks.
 
 > [!WARNING]  
 > The numbers of async client that can be used, the numbers of the sync/async tasks stored in the async client's queue will be limited which depends on the device free memory.
@@ -426,7 +427,7 @@ For the detail of networking class, see [Working with Networks](#working-with-ne
 
 The default send and read timeouts for async task are 30 seconds and cannot be changed.
 
-For sync task, the timeout in seconds can be set via the `AsyncClientClass` member functions, `setSyncSendTimeout` and `setSyncReadTimeout`.
+For sync task, the timeout in seconds can be set via the `AsyncClientClas::setSyncSendTimeout` and `AsyncClientClas::setSyncReadTimeout`.
 
 - ### Async Result
 
@@ -474,7 +475,7 @@ The following event strings `"undefined"`, `"initializing"`, `"sign up"`, `"send
 
 - ### Result Data
 
-The result data can be obtained from `AsyncResult` object via `AsyncResult::payload()`, `AsyncResult::available()`, `AsyncResult::path()`, `AsyncResult::etag()`, `RTDB.isStream()`, `RTDB.event()`, `RTDB.dataPath()`, `RTDB.type()` and `RTDB.name()` where `RTDB` is the `RealtimeDatabaseResult `object that obtained from `AsyncResult::to<RealtimeDatabaseResult>()`.
+The result data can be obtained from `AsyncResult` object via `AsyncResult::payload()`, `AsyncResult::available()`, `AsyncResult::path()`, `AsyncResult::etag()`, `AsyncResult::to<RealtimeDatabaseResult>().isStream()`, `AsyncResult::to<RealtimeDatabaseResult>().event()`, `AsyncResult::to<RealtimeDatabaseResult>().dataPath()`, `AsyncResult::to<RealtimeDatabaseResult>().type()` and `AsyncResult::to<RealtimeDatabaseResult>().name()`.
 
 The function `AsyncResult::payload()` returns server serponse payload.
 
@@ -484,15 +485,15 @@ The function `AsyncResult::path()` returns the resource path that the request wa
 
 The function `AsyncResult::etag()` returns the ETag from server response header.
 
-The function `RTDB.name()` returns the name (random UID) of node that will be creaated after calling push.
+The function `AsyncResult::to<RealtimeDatabaseResult>().name()` returns the name (random UID) of node that will be creaated after calling push.
 
-The function `RTDB.type()` returns the following realtime data type enum.
+The function `AsyncResult::to<RealtimeDatabaseResult>().type()` returns the following realtime data type enum.
 
 `realtime_database_data_type_undefined` (-1), `realtime_database_data_type_null` (0), `realtime_database_data_type_integer` (1), `realtime_database_data_type_float` (2), `realtime_database_data_type_double` (3), `realtime_database_data_type_boolean` (4), `realtime_database_data_type_string` (5), `realtime_database_data_type_json` (6), and `realtime_database_data_type_array` (7).
 
-The `RTDB.dataPath()` and `RTDB.event()` are the Realtime database node path that data has changed and type of event in server-sent events (stream) mode.
+The `AsyncResult::to<RealtimeDatabaseResult>().dataPath()` and `AsyncResult::to<RealtimeDatabaseResult>().event()` are the Realtime database node path that data has changed and type of event in `SSE mode (HTTP Streaming)`.
 
-The server response payload in `AsyncResult` can be converted to the the values e.g. boolean, integer, float, double and string via `RTDB.to<T>()`.
+The server response payload in `AsyncResult` can be converted to the the values e.g. boolean, integer, float, double and string via `AsyncResult::to<RealtimeDatabaseResult>().to<T>()`.
 
 
 ## App Initialization
