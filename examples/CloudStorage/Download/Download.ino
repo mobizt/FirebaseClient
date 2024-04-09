@@ -11,6 +11,8 @@
  * 
  * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
+ * SYNTAX:
+ * 
  * CloudStorage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>);
  * CloudStorage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>, <AsyncResult>);
  * CloudStorage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);

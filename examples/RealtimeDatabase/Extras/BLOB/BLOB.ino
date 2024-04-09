@@ -9,6 +9,8 @@
  *
  * The data can be a source (input) and target (output) data that used in upload and download.
  * 
+ * SYNTAX:
+ * 
  * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
  * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
  * 

@@ -8,7 +8,7 @@
  * <AsyncClient> - The async client.
  * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
  * <GoogleCloudStorage::DeleteOptions> - The GoogleCloudStorage::DeleteOptions that holds the delete options.
- * For the delete options, see see https://cloud.google.com/storage/docs/json_api/v1/objects/delete#optional-parameters.
+ * For the delete options, see https://cloud.google.com/storage/docs/json_api/v1/objects/delete#optional-parameters.
  * <AsyncResult> - The async result (AsyncResult).
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).

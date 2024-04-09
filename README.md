@@ -439,18 +439,18 @@ There are two sources of async result in this library:
 
 For example:
 
-`Database.get(aClient, "/test/int", options, aResult);`
+`Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResult>);`
 
 - #### 2. From dynamic allocation in the async client.
 
 For example:
 
-`Database.get(aClient, "/test/int", options, asyncCB);`
+`Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResultCallback>);`
 
 
-From source 1, the async result (`aResult`) shall be defined globally to use in async application because of the static data is needed for use while running the async task.
+From source 1, the async result (`<AsyncResult>`) shall be defined globally to use in async application because of the static data is needed for use while running the async task.
 
-From source 2, the async client (`aClient`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the async task.
+From source 2, the async client (`AsyncClientClass`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the async task.
 
 The async result from source 2 can be accessed from the async result callback.
 
@@ -465,9 +465,8 @@ The aync result provides two types of information, `app events` and `result data
 
 - ### App Events
 
-The app event information of authentication task handler can be obtained from `aResult.appEvent().code()` and `aResult.appEvent().message()` respectively.
+The authentication task event information can be obtained from `AsyncResult::appEvent().code()` and `AsyncResult::appEvent().message()`.
 
-The `aResult` is the async result object (`AsyncResult`) in this case.
 
 The following event code (`firebase_auth_event_type`), `auth_event_uninitialized`, `auth_event_initializing`, `auth_event_signup`, `auth_event_send_verify_email`, `auth_event_delete_user`, `auth_event_reset_password`, `auth_event_token_signing`, `auth_event_authenticating`, `auth_event_auth_request_sent`, `auth_event_auth_response_received`, `auth_event_ready` and `auth_event_error` are available.
 
@@ -475,15 +474,15 @@ The following event strings `"undefined"`, `"initializing"`, `"sign up"`, `"send
 
 - ### Result Data
 
-The result data can be obtained from `AsyncResult` object via `aResult.payload()`, `aResult.available()`, `aResult.path()`, `aResult.etag()`, `RTDB.isStream()`, `RTDB.event()`, `RTDB.dataPath()`, `RTDB.type()` and `RTDB.name()` where `RTDB` is the `RealtimeDatabaseResult `object that obtained from `aResult.to<RealtimeDatabaseResult>()`.
+The result data can be obtained from `AsyncResult` object via `AsyncResult::payload()`, `AsyncResult::available()`, `AsyncResult::path()`, `AsyncResult::etag()`, `RTDB.isStream()`, `RTDB.event()`, `RTDB.dataPath()`, `RTDB.type()` and `RTDB.name()` where `RTDB` is the `RealtimeDatabaseResult `object that obtained from `AsyncResult::to<RealtimeDatabaseResult>()`.
 
-The function `aResult.payload()` returns server serponse payload.
+The function `AsyncResult::payload()` returns server serponse payload.
 
-The function `aResult.available()` returns the size of data that is ready to read.
+The function `AsyncResult::available()` returns the size of data that is ready to read.
 
-The function `aResult.path()` returns the resource path that the request was sent.
+The function `AsyncResult::path()` returns the resource path that the request was sent.
 
-The function `aResult.etag()` returns the ETag from server response header.
+The function `AsyncResult::etag()` returns the ETag from server response header.
 
 The function `RTDB.name()` returns the name (random UID) of node that will be creaated after calling push.
 
@@ -1234,7 +1233,7 @@ The response payload returning result (output) is straightforward as String.
 > [!NOTE]  
 > The async result in the async callback can be lived only inside the callback and it decontructed when async operation is complete. To take the data out from the async result callback, the static or glocal variable should be used to copy the data.
 
-If the size of payload string in async reseut is large, to copy the char array buffer directly, use `aResult.payload().c_str()` instead.
+If the size of payload string in async reseut is large, to copy the char array buffer directly, use `AsyncResult::payload().c_str()` instead.
 
 There is no JSON serialization/deserialization utilized or provided in this library.
 

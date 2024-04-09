@@ -11,6 +11,8 @@
  * 
  * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
+ * SYNTAX:
+ * 
  * Storage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>);
  * Storage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <AsyncResult>);
  * Storage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <AsyncResultCallback>, <uid>);
