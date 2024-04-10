@@ -168,13 +168,17 @@ For PlatfoemIO IDE, ESP8266 Core SDK can be installed through **PIO Home** > **P
 The RP2040 boards required Arduino-Pico SDK from Earle F. Philhower https://github.com/earlephilhower/arduino-pico
 
 
-## Incompatability
+## Incompatability Between Old Firebase Library and This Firebase Library.
 
-This library APIs are not compattible with Firebase-ESP8266, Firebase-ESP32 and Firebase-ESP-Client libraries.
+This library APIs are not compattible with the Firebase-ESP8266, Firebase-ESP32 and Firebase-ESP-Client libraries.
 
 If you are using those libraries, the code should be rewritten.
 
 In addition, some features are changed which included the following.
+
+- ### FirebaseJson
+
+There is no `JSON` library included in this `FirebaseClient` library. If you still prefer to use `FirebaseJson` functions as in the old library, you have to include it manually in your code.
 
 - ### Realtime Database
 
@@ -184,11 +188,15 @@ The data on the database that read using the async get function which the blob a
 
 Then get the data that contains signature string (`file,` and `blob,`) created by old library will lead to the error after base64 decoding.
 
+Due to some pitfalls in the old library's `Multipath Stream` usage. User is only looking for the `JSON` parsing data without checking the actual received stream event data, and this library does not include the JSON parser, then this feature will not be implemented in this `FirebaseClient` library. 
+
 - ### TCP KeepAlive
 
-The TCP session KeepAlive can be done by the network client if it was supportd e.g. `WiFiClient` in ESP32.
+The `lwIP`'s TCP KeepAlive is not implemented in this `FirebaseClient` library because it can only be done by the network client (if it was supportd) e.g. `WiFiClient` in ESP32.
 
-If you use the core SSL client e.g. `WiFiClientSecure` or `WiFiSSLClient`, this feature is not available.
+The TCP KeepAlive is currently not available in ESP8266 v3.1.2 at the time of this document writing and it will be available in the newer version after the pull request [#8940](https://github.com/esp8266/Arduino/pull/8940) was merged.
+
+If you use the core SSL client e.g. `WiFiClientSecure` or `WiFiSSLClient`, sush feature is not available.
 
 In the old Firebase library, this feature was done internally by the internal SSL client and `WiFiClient` integration.
 
@@ -219,7 +227,7 @@ void setup()
 
 void loop()
 {
-    // TCP KeepAlive should be set once after server connected
+    // TCP KeepAlive should be set once after server was connected
     if (basic_client.connected() && !tcp_keep_alive_set)
     {
         tcp_keep_alive_set = true;
@@ -228,7 +236,7 @@ void loop()
         basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval));
         basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepCount, sizeof(keepCount));
 
-        // Or simpler functions
+        // Or simpler functions in new ESP32 core
         // basic_client.setOption(TCP_KEEPALIVE, &keepAlive);
         // basic_client.setOption(TCP_KEEPIDLE, &keepIdle);
         // basic_client.setOption(TCP_KEEPINTVL, &keepInterval);
