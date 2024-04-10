@@ -1,5 +1,5 @@
 /**
- * Created April 7, 2024
+ * Created April 10, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -200,7 +200,7 @@ public:
     {
         static bool const value = std::is_same<T, uint64_t>::value || std::is_same<T, int64_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
                                   std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value ||
-                                  std::is_same<T, double>::value || std::is_same<T, float>::value || std::is_same<T, bool>::value || std::is_same<T, int>::value;
+                                  std::is_same<T, double>::value || std::is_same<T, float>::value || std::is_same<T, int>::value;
     };
 
     template <typename T = object_t>
@@ -210,18 +210,25 @@ public:
     }
 
     template <typename T = const char *>
-    auto getVal(String &buf, T value) -> typename std::enable_if<(v_number<T>::value || v_sring<T>::value) && !std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, boolean_t>::value && !std::is_same<T, number_t>::value, void>::type
+    auto getVal(String &buf, T value) -> typename std::enable_if<(v_number<T>::value || v_sring<T>::value || std::is_same<T, bool>::value) && !std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, boolean_t>::value && !std::is_same<T, number_t>::value, void>::type
     {
-        buf = "";
-        if (v_sring<T>::value)
-            buf += '\"';
-        buf += value;
-        if (v_sring<T>::value)
-            buf += '\"';
+        buf.remove(0, buf.length());
+        if (std::is_same<T, bool>::value)
+        {
+            buf = value ? "true" : "false";
+        }
+        else
+        {
+            if (v_sring<T>::value)
+                buf += '\"';
+            buf += value;
+            if (v_sring<T>::value)
+                buf += '\"';
+        }
     }
 
     template <typename T>
-    auto to(const char *payload) -> typename std::enable_if<v_number<T>::value, T>::type
+    auto to(const char *payload) -> typename std::enable_if<v_number<T>::value || std::is_same<T, bool>::value, T>::type
     {
         if (!useLength && strlen(payload) > 0)
         {
