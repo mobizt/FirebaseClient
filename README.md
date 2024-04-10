@@ -31,6 +31,12 @@ Due to the known issues in the old Firebase library.
 
 Then this [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was planned and developed.
 
+> [!CAUTION]
+> This library included the `SSL Client` library called [`ESP_SSLClient`](https://github.com/mobizt/FirebaseClient/tree/main/src/client/SSLClient) to use in JWT tiken signing and is the alternative use of the core SSL Client library e.g. `WiFIClientSecure` and `WiFiSSLClient` in some Arduino Client use cases.
+When this library was used together with my other library e.g. [ESP-Mail-Client](https://github.com/mobizt/ESP-Mail-Client) that comes with built-in `ESP_SSLClient` library, the Arduino IDE compilation error will be occurred.
+You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
+For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder `src/client/SSLClient` in the `ESP-Mail-Client` library installation folder should be removed.
+
 ## Contents
 
 [1. Features](#features)
