@@ -507,7 +507,7 @@ The function `AsyncResult::to<RealtimeDatabaseResult>().type()` returns the foll
 
 The `AsyncResult::to<RealtimeDatabaseResult>().dataPath()` and `AsyncResult::to<RealtimeDatabaseResult>().event()` are the Realtime database node path that data has changed and type of event in `SSE mode (HTTP Streaming)`.
 
-The server response payload in `AsyncResult` can be converted to the the values e.g. boolean, integer, float, double and string via `AsyncResult::to<RealtimeDatabaseResult>().to<T>()`.
+The server response payload in `AsyncResult` can be converted to the the values of any type `T` e.g. boolean, integer, float, double and string via `AsyncResult::to<RealtimeDatabaseResult>().to<T>()`.
 
 
 ### App Initialization
