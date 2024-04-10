@@ -18,7 +18,7 @@ This library is the new Firebase Client library that supports both sync and asyn
 > This library is the old Firebase libraries ([Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client), [Firebase-ESP32](https://github.com/mobizt/Firebase-ESP32) and [Firebase-ESP8266](https://github.com/mobizt/Firebase-ESP8266)) which those libraries are now obsoleted.
 
 
-Due to the known issues in the old library.
+Due to the known issues in the old Firebase library.
 
 - The confusion of different library names from the same developer and other developers in Library Manager.
 - The different main header file name and class name issue.
