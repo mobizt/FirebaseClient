@@ -20,9 +20,10 @@ This library is the new Firebase Client library that supports both sync and asyn
 
 Due to the known issues in the old library.
 
-- The confusion of different library name.
+- The confusion of different library names from the same developer and other developers in Library Manager.
+- The different main header file name and class name issue.
 - The long path issue due to long library name with spaces leads to `VisualMicro` IDE compilation error.
-- The cental of settings using only single config class can cause the usage confusion.
+- The cental settings using only single config class can cause the usage confusion.
 - The system time changes causes the auth token expiry period calculation error.
 - The internal SSL Client and WiFiClient issue causes the session need to be closed at some interval.
 - The Realtime database stream event data can be missing due to the sync read operation.
