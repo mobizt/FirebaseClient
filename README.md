@@ -430,12 +430,12 @@ DefaultNetwork network;
 AsyncClientClass aClient(ssl_client, getNetwork(network));
 ```
 
-The `network_config_data` will be copied to use internally while the reference of `SSL Client` object was used internally.
-
-For the detail of networking class, see [Working with Networks](#working-with-networks) section.
+The `network_config_data` will be copied to use internally while the reference of `SSL Client` object was used internally. Then `SSL Client` should be existed while using the `AsyncClientClass`. 
 
 > [!WARNING]  
 > To prevent dangling pointer issue, the `SSL Client` should be defined at the same usage scope as `AsyncClientClass`.
+
+For the detail of networking class, see [Working with Networks](#working-with-networks) section.
 
 ### Send and Read Timeouts for Sync and Async Tasks
 
