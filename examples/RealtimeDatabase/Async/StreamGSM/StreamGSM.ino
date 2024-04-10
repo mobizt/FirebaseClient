@@ -269,7 +269,7 @@ void printResult(AsyncResult &aResult)
             Firebase.printf("data: %s\n", RTDB.to<const char *>());
             Firebase.printf("type: %d\n", RTDB.type());
 
-            // The stream event from RealtimeDatabaseResult can be converted to the the values as following.
+            // The stream event from RealtimeDatabaseResult can be converted to the values as following.
             bool v1 = RTDB.to<bool>();
             int v2 = RTDB.to<int>();
             float v3 = RTDB.to<float>();
