@@ -180,6 +180,8 @@ In addition, some features are changed which included the following.
 
 There is no `JSON` library included in this `FirebaseClient` library. If you still prefer to use `FirebaseJson` functions as in the old library, you have to include it manually in your code.
 
+The `FirebaseJson` library can be installed via the Arduino's Library Manager and PlatformIO's Library Manager or can be download and install from the [FirebaseJson repository](https://github.com/mobizt/FirebaseJson).
+
 - ### Realtime Database
 
 The blob and file upload via set, push and update, the byte data will be converted to base64 encoded string and store to the database without the signature string (`file,` and `blob,`) prepended to the base64 string as in the old library.
@@ -189,6 +191,14 @@ The data on the database that read using the async get function which the blob a
 Then get the data that contains signature string (`file,` and `blob,`) created by old library will lead to the error after base64 decoding.
 
 Due to some pitfalls in the old library's `Multipath Stream` usage. User is only looking for the `JSON` parsing data without checking the actual received stream event data, and this library does not include the JSON parser, then this feature will not be implemented in this `FirebaseClient` library. 
+
+- ### Cloud Messaging
+
+The legaycy Firebase Cloud Messaging API was deprecated, only HTTPv1 is supported.
+
+- ### Cloud Functions
+
+ Deploying the Cloud Function from local flash or filesystem source in a single function is not available unless using several fnctions that are available to generate upload url, upload the source (zip file), deploy the function and set IAM permission.
 
 - ### TCP KeepAlive
 
@@ -254,13 +264,6 @@ void loop()
 
 The PSRAM in this library was enabled by default but it was only used partly in tempolary buffer memory allocation.
 
-- ### Cloud Messaging
-
-The legaycy Firebase Cloud Messaging API was deprecated, only HTTPv1 is supported.
-
-- ### Cloud Functions
-
- Deploying the Cloud Function from local flash or filesystem source in a single function is not available unless using several fnctions that are available to generate upload url, upload the source (zip file), deploy the function and set IAM permission.
 
 ## Installation
 
