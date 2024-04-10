@@ -27,7 +27,7 @@ This new library uses less program space with better performance and reliability
 
 [3. Dependencies](#dependencies)
 
-[4. Incompatability](#incompatability)
+[4. Incompatability Between Old Firebase Library and This Firebase Library](#incompatability-between-old-firebase-library-and-this-firebase-library)
 
 [5. Installation](#installation)
 
