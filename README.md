@@ -15,9 +15,20 @@ The features can be configurable to add and exclude some unused features, see [L
 This library is the new Firebase Client library that supports both sync and async usages.
 
 > [!NOTE]  
-> This library is [Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client) library replacement that is now outdated.
+> This library is the old Firebase libraries ([Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client), [Firebase-ESP32](https://github.com/mobizt/Firebase-ESP32) and [Firebase-ESP8266](https://github.com/mobizt/Firebase-ESP8266)) which those libraries are now obsoleted.
 
-This new library uses less program space with better performance and reliability.
+
+Due to the known issues in the old library.
+
+- The confusion of different library name.
+- The long path issue due to long library name with spaces leads to `VisualMicro` IDE compilation error.
+- The cental of settings using only single config class can cause the usage confusion.
+- The system time changes causes the auth token expiry period calculation error.
+- The internal SSL Client and WiFiClient issue causes the session need to be closed at some interval.
+- The Realtime database stream event data can be missing due to the sync read operation.
+- The async operation is not truely impremented.
+
+Then this [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was planned and developed.
 
 ## Contents
 
@@ -153,7 +164,8 @@ This new library uses less program space with better performance and reliability
  * SIMCom Modules with TinyGSMClient
 
 > [!NOTE]  
-> This library does not support Arduino® UNO R4 WiFi due to the memory issue (related to stack and String class memory issue).
+> This library does not support Arduino® UNO R4 WiFi due to the memory issue (related to stack and String class memory issue). 
+And this is not a library memory issue as the `Arduino MKR` (SAMD MCU) with the same amount of memory as `Arduino UNO R4 WiFi` can still be used without problem.
 
 
  ## Dependencies
