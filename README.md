@@ -5,7 +5,7 @@
 ![arduino-library-badge](https://www.ardu-badge.com/badge/FirebaseClient.svg) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg)
 
 
-Async Firebase Client library for Arduino.
+Async Firebase Client library for Arduino documentation (2024-04-11T02:48:45Z).
 
 This library supports Firebase Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Google Cloud Storage and Google Cloud Functions.
 
@@ -37,7 +37,7 @@ When this library was used together with my other library e.g. [ESP-Mail-Client]
 You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
 For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
 
-## Contents
+## Table of Contents
 
 [1. Features](#features)
 
