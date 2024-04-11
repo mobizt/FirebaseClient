@@ -5,7 +5,9 @@
 ![arduino-library-badge](https://www.ardu-badge.com/badge/FirebaseClient.svg) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg)
 
 
-Async Firebase Client library for Arduino Documentation (Updates `2024-04-11T02:48:45Z`).
+Async Firebase Client library for Arduino Documentation.
+
+💡Updates `2024-04-11T02:48:45Z`
 
 This library supports Firebase Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Google Cloud Storage and Google Cloud Functions.
 
