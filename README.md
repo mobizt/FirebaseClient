@@ -401,7 +401,7 @@ In access and custom token authentications using service accout file (sa and cus
 
 All requests for sync and async operations are managed using queue.
  
-Each sync and async requests data consume memory up to 1k. When many async operations are added to queue (FIFO), the memory usage was increased.
+Each sync and async requests data consume memory up to 1k. When many async tasks are added to the queue (FIFO), the memory usage will be increased.
  
 Each async client handles this queue separately. Then in order to limit the memory used for each async client, this library allows 10 async operations (called slots) can be stored in the queue at a time.
 
@@ -435,6 +435,10 @@ The authentication task has the highest priority in the queue. Its async data wh
 The lower priority tasks are sync task, async task and `SSE mode (HTTP Streaming)` task respectively.
 
 When user uses a async client for multiple tasks which included Realtime database get in `SSE mode (HTTP Streaming)`, sync and async operations, the `SSE mode (HTTP Streaming)` will be interrupted (breaking the connection) because of the async client is only able to connect to the server via one TCP socket at a time.
+
+> [!TIP]
+> In ESP32, if you want to run many async tasks concurrency with different async clients. It may not be possible because the ESP32's `WiFiClientSecure` required memory up to 50k per connection. Alternatively, this can be done by using the `ESP_SSLClient` that included in this library which it works in the same way as ESP8266's `WiFiClientSecure` which the lower memeory consumption can be achieve by setting the smaller buffer size. This is the [example](/examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) for how to use `ESP_SSLClient` with this library.
+
 
 > [!WARNING]  
 > The async client and its SSL Client that used for async tasks included authentication task, need to be defined globally otherwise the dangling pointer problem will be occured.
