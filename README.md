@@ -426,24 +426,24 @@ The authentication and Firebase service apps taks require the async client for s
 
 The async client holds the SSL client pointer that provided in its class constructor and used for server connection.
 
-The async client also create the instances of async data and stored as slot data in a FIFO queue.
+The async client also create the instances of async data and stored as a slot data in a FIFO queue.
 
-The async data created in the async client will hold the asyn http request header and payload, http response header and payload to be processed.
+The async data instance created in the async client, holds the header and payload of the http request and response.
 
-The authentication task has highest priority and its async data will be inserted at the first slot of async queue.
+The authentication task has the highest priority in the queue. Its async data when created will be inserted at the first slot of async queue.
 
-The order of lower priority slot data are sync task, async task and `SSE mode (HTTP Streaming)` task respectively.
+The lower priority tasks are sync task, async task and `SSE mode (HTTP Streaming)` task respectively.
 
-Then when user uses async client for multiple tasks included Realtime database get in `SSE mode (HTTP Streaming)`, sync and async operations, the `SSE mode (HTTP Streaming)` will be interrupted (breaking the connection) because of the async client is only able to connect to the server via one TCP socket at a time.
+When user uses a async client for multiple tasks which included Realtime database get in `SSE mode (HTTP Streaming)`, sync and async operations, the `SSE mode (HTTP Streaming)` will be interrupted (breaking the connection) because of the async client is only able to connect to the server via one TCP socket at a time.
 
 > [!WARNING]  
-> The async client and its SSL Client that used for authentication task and async task included `SSE mode (HTTP Streaming)`, need to be defined globally otherwise the dangling pointer problem will be occured.
+> The async client and its SSL Client that used for async tasks included authentication task, need to be defined globally otherwise the dangling pointer problem will be occured.
 
-The SSL Client is a kind of sync or blocking Client that takes time during establishing the SSL server connection (SSL handshake).
+The SSL Client is a kind of sync or blocking Client that takes time for SSL handshake during starting a new server connection.
 
-The async SSL client can be assigned to the async client class constructor but currently experimental.
+The async SSL client can be used with the async client but currently experimental.
 
-The async operation can be cancelled and removed from the queue by calling `AsyncClientClass::stopAsync()` for currently processed task or `AsyncClientClass::stopAsync(true)` for stopping all tasks.
+The async operation can be cancelled and removed from the async client's queue by calling `AsyncClientClass::stopAsync()` for stopping currently processed async task or `AsyncClientClass::stopAsync(true)` for stopping all tasks.
 
 > [!WARNING]  
 > The numbers of async client that can be used, the numbers of the sync/async tasks stored in the async client's queue will be limited which depends on the device free memory.
