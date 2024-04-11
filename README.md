@@ -2,54 +2,23 @@
 
 ![Compile](https://github.com/mobizt/FirebaseClient/actions/workflows/compile_library.yml/badge.svg) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![arduino-library-badge](https://www.ardu-badge.com/badge/FirebaseClient.svg) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-
-Async Firebase Client library for Arduino Documentation.
-
-💡Updates `2024-04-11T02:48:45Z`
-
-This library supports Firebase Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Google Cloud Storage and Google Cloud Functions.
-
-The features can be configurable to add and exclude some unused features, see [Library Build Options](#library-build-options).
-
-
-This library is the new Firebase Client library that supports both sync and async usages.
-
-> [!NOTE]  
-> This library is the replacement of the old Firebase libraries ([Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client), [Firebase-ESP32](https://github.com/mobizt/Firebase-ESP32) and [Firebase-ESP8266](https://github.com/mobizt/Firebase-ESP8266)) which those libraries are now obsoleted.
-
-
-Due to the known issues in the old Firebase library.
-
-- The confusion of different library names from the same developer and other developers in Library Manager.
-- The different main header file name and class name issue.
-- The long path issue due to long library name with spaces leads to `VisualMicro IDE` compilation error.
-- The cental settings using only single config class can cause the usage confusion.
-- The system time changes causes the auth token expiry period calculation error.
-- The internal SSL Client and WiFiClient issue causes the session need to be closed at some interval.
-- The Realtime database stream event data can be missing due to the sync read operation.
-- The async operation is not truely impremented.
-
-Then this [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was planned and developed.
-
-> [!CAUTION]
-> This library included the `SSL Client` library called [`ESP_SSLClient`](https://github.com/mobizt/FirebaseClient/tree/main/src/client/SSLClient) to use in JWT token signing and the alternative use of the core SSL Client library e.g. `WiFIClientSecure` and `WiFiSSLClient` in some Arduino Client use cases which makes this library portable with no third-party library needed.
-When this library was used together with my other library e.g. [ESP-Mail-Client](https://github.com/mobizt/ESP-Mail-Client) which comes with built-in `ESP_SSLClient` library, the Arduino IDE compilation error will be occurred.
-You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
-For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
+`2024-04-11T03:16:35Z`
 
 ## Table of Contents
 
-[1. Features](#features)
+[1. Introduction](#introduction)
 
-[2. Supported Devices](#supported-devices)
+[2. Features](#features)
 
-[3. Dependencies](#dependencies)
+[3. Supported Devices](#supported-devices)
 
-[4. Incompatability Between Old Firebase Library and This Firebase Library](#incompatability-between-old-firebase-library-and-this-firebase-library)
+[4. Dependencies](#dependencies)
 
-[5. Installation](#installation)
+[5. Incompatability Between Old Firebase Library and This Firebase Library](#incompatability-between-old-firebase-library-and-this-firebase-library)
+
+[6. Installation](#installation)
 
 - [Using Library Manager](#using-library-manager)
 
@@ -57,9 +26,7 @@ For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the fo
 
 - [RP2040 Arduino SDK installation](#rp2040-arduino-sdk-installation)
 
-[6. Usages](#usages)
-
-- [Introduction](#indroduction)
+[7. Usages](#usages)
 
 - [Authentication](#authentication)
 
@@ -115,7 +82,7 @@ For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the fo
 
 - [Google Cloud Functions Usage](#google-cloud-functions-usage)
 
-[7. Memory Options](#memory-options)
+[8. Memory Options](#memory-options)
 
 - [Memory Options for ESP8266](#memory-options-for-esp8266)
 
@@ -131,13 +98,49 @@ For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the fo
 
 - [PlatformIO IDE](#platformio-ide-1)
 
-[8. Library Build Options](#library-build-options)
+[9. Library Build Options](#library-build-options)
 
 - [Predefined Options](#predefined-options)
 
 - [Optional Options](#optional-options)
 
-[9. License](#license)
+[10. License](#license)
+
+
+## Introduction
+
+📖 Async Firebase Client library for Arduino Documentation.
+
+This library supports Firebase Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Google Cloud Storage and Google Cloud Functions.
+
+The features can be configurable to add and exclude some unused features, see [Library Build Options](#library-build-options).
+
+
+This library is the new Firebase Client library that supports both sync and async usages.
+
+> [!NOTE]  
+> This library is the replacement of the old Firebase libraries ([Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client), [Firebase-ESP32](https://github.com/mobizt/Firebase-ESP32) and [Firebase-ESP8266](https://github.com/mobizt/Firebase-ESP8266)) which those libraries are now obsoleted.
+
+
+Due to the known issues in the old Firebase library.
+
+- The confusion of different library names from the same developer and other developers in Library Manager.
+- The different main header file name and class name issue.
+- The long path issue due to long library name with spaces leads to `VisualMicro IDE` compilation error.
+- The cental settings using only single config class can cause the usage confusion.
+- The system time changes causes the auth token expiry period calculation error.
+- The internal SSL Client and WiFiClient issue causes the session need to be closed at some interval.
+- The Realtime database stream event data can be missing due to the sync read operation.
+- The async operation is not truely impremented.
+
+Then this [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was planned and developed.
+
+> [!CAUTION]
+> This library included the `SSL Client` library called [`ESP_SSLClient`](https://github.com/mobizt/FirebaseClient/tree/main/src/client/SSLClient) to use in JWT token signing and the alternative use of the core SSL Client library e.g. `WiFIClientSecure` and `WiFiSSLClient` in some Arduino Client use cases which makes this library portable with no third-party library needed.
+When this library was used together with my other library e.g. [ESP-Mail-Client](https://github.com/mobizt/ESP-Mail-Client) which comes with built-in `ESP_SSLClient` library, the Arduino IDE compilation error will be occurred.
+You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
+For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
+
 
 ## Features
 
@@ -339,8 +342,6 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 
 
 ## Usages
-
-- ### Indroduction
 
 There are classes or objects that used for required operations and data in this library e.g. authentication and auth data, networking data, Firebase service apps and Firebase service apps data.
 
