@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-11T03:16:35Z`
+`2024-04-11T03:25:37Z`
 
 ## Table of Contents
 
@@ -86,17 +86,17 @@
 
 - [Memory Options for ESP8266](#memory-options-for-esp8266)
 
-- [Arduino IDE](#arduino-ide)
+  - [Arduino IDE](#arduino-ide)
 
-- [PlatformIO IDE](#platformio-ide)
+  - [PlatformIO IDE](#platformio-ide)
 
-- [ESP8266 and SRAM/PSRAM Chip connection](#esp8266-and-srampsram-chip-connection)
+  - [ESP8266 and SRAM/PSRAM Chip connection](#esp8266-and-srampsram-chip-connection)
 
 - [Memory Options for ESP32](#memory-options-for-esp32)
 
-- [Arduino IDE](#arduino-ide-1)
+  - [Arduino IDE](#arduino-ide-1)
 
-- [PlatformIO IDE](#platformio-ide-1)
+  - [PlatformIO IDE](#platformio-ide-1)
 
 [9. Library Build Options](#library-build-options)
 
