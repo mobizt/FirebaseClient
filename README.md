@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-11T03:25:37Z`
+`2024-04-11T04:50:46Z`
 
 ## Table of Contents
 
@@ -262,19 +262,22 @@ void setup()
 void loop()
 {
     // TCP KeepAlive should be set once after server was connected
-    if (basic_client.connected() && !tcp_keep_alive_set)
+    if (basic_client.connected())
     {
-        tcp_keep_alive_set = true;
-        basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPALIVE, (void *)&keepAlive, sizeof(keepAlive));
-        basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keepIdle, sizeof(keepIdle));
-        basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval));
-        basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepCount, sizeof(keepCount));
-
-        // Or simpler functions in new ESP32 core
-        // basic_client.setOption(TCP_KEEPALIVE, &keepAlive);
-        // basic_client.setOption(TCP_KEEPIDLE, &keepIdle);
-        // basic_client.setOption(TCP_KEEPINTVL, &keepInterval);
-        // basic_client.setOption(TCP_KEEPCNT, &keepCount);
+        if(!tcp_keep_alive_set)
+        {
+            tcp_keep_alive_set = true;
+            basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPALIVE, (void *)&keepAlive, sizeof(keepAlive));
+            basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keepIdle, sizeof(keepIdle));
+            basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval));
+            basic_client.setSocketOption(IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepCount, sizeof(keepCount));
+            
+            // Or simpler functions in new ESP32 core
+            // basic_client.setOption(TCP_KEEPALIVE, &keepAlive);
+            // basic_client.setOption(TCP_KEEPIDLE, &keepIdle);
+            // basic_client.setOption(TCP_KEEPINTVL, &keepInterval);
+            // basic_client.setOption(TCP_KEEPCNT, &keepCount);
+        }
     }
     else
     {
