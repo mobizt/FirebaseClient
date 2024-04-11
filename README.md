@@ -5,7 +5,7 @@
 ![arduino-library-badge](https://www.ardu-badge.com/badge/FirebaseClient.svg) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg)
 
 
-Async Firebase Client library for Arduino documentation (2024-04-11T02:48:45Z).
+Async Firebase Client library for Arduino Documentation (Updates `2024-04-11T02:48:45Z`).
 
 This library supports Firebase Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Google Cloud Storage and Google Cloud Functions.
 
@@ -22,7 +22,7 @@ Due to the known issues in the old Firebase library.
 
 - The confusion of different library names from the same developer and other developers in Library Manager.
 - The different main header file name and class name issue.
-- The long path issue due to long library name with spaces leads to `VisualMicro` IDE compilation error.
+- The long path issue due to long library name with spaces leads to `VisualMicro IDE` compilation error.
 - The cental settings using only single config class can cause the usage confusion.
 - The system time changes causes the auth token expiry period calculation error.
 - The internal SSL Client and WiFiClient issue causes the session need to be closed at some interval.
