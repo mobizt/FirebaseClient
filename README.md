@@ -143,7 +143,7 @@ For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the fo
 
 * Supports synchronous and asynchronous operations.
 
-* Supports most Arduino devices (except for AVR) with or without external neywork module.
+* Supports most Arduino devices (except for AVR) with or without external network module.
 
 * Supports most Firebase Services included Google Cloud Storage.
 
@@ -171,7 +171,7 @@ For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the fo
  * SIMCom Modules with TinyGSMClient
 
 > [!NOTE]  
-> This library does not support Arduino® UNO R4 WiFi due to the memory issue (related to stack and String class memory issue). 
+> This library does not support Arduino® UNO R4 WiFi due to the stack memory issue (related to the String class). 
 And this is not a library memory issue as the `Arduino MKR` (SAMD MCU) with the same amount of memory as `Arduino UNO R4 WiFi` can still be used without problem.
 
 
