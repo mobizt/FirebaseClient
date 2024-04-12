@@ -143,7 +143,7 @@ For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the fo
 
 
 > [!IMPORTANT]  
-> In ESp8266 before using this library, you should read the section: [Memory Options for ESP8266](#memory-options-for-esp8266) first .
+> In ESP8266 before using this library, you should read the section: [Memory Options for ESP8266](#memory-options-for-esp8266) first .
 
 
 ## Features
