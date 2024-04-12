@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T02:07:04Z`
+`2024-04-12T02:10:52Z`
 
 ## Table of Contents
 
@@ -140,6 +140,10 @@ Then this [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library w
 When this library was used together with my other library e.g. [ESP-Mail-Client](https://github.com/mobizt/ESP-Mail-Client) which comes with built-in `ESP_SSLClient` library, the Arduino IDE compilation error will be occurred.
 You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
 For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
+
+
+> [!IMPORTANT]  
+> In ESp8266 before using this library, you should read the section: [Memory Options for ESP8266](#memory-options-for-esp8266) first .
 
 
 ## Features
