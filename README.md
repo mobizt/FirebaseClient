@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T01:47:17Z`
+`2024-04-12T02:02:06Z`
 
 ## Table of Contents
 
@@ -189,7 +189,7 @@ For Arduino IDE, ESP8266 Core SDK can be installed through **Boards Manager**.
 
 For PlatfoemIO IDE, ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
 
-The RP2040 boards required Arduino-Pico SDK from Earle F. Philhower https://github.com/earlephilhower/arduino-pico
+The RP2040 boards required [Arduino-Pico SDK](https://github.com/earlephilhower/arduino-pico) from Earle F. Philhower.
 
 
 ## Incompatability Between Old Firebase Library and This Firebase Library.
@@ -204,7 +204,7 @@ In addition, some features are changed which included the following.
 
 There is no `JSON` library included in this `FirebaseClient` library. If you still prefer to use `FirebaseJson` functions as in the old library, you have to include it manually in your code.
 
-The `FirebaseJson` library can be installed via the Arduino's Library Manager and PlatformIO's Library Manager or can be download and install from the [FirebaseJson repository](https://github.com/mobizt/FirebaseJson).
+The `FirebaseJson` library can be installed via the Arduino's Library Manager and PlatformIO's Library Manager or can be download and install from the [FirebaseJson Repository](https://github.com/mobizt/FirebaseJson).
 
 - ### Realtime Database
 
@@ -290,6 +290,15 @@ void loop()
 - ### PSRAM
 
 The PSRAM in this library was enabled by default but it was only used partly in tempolary buffer memory allocation.
+
+- ### Server Authorization
+
+The server certificate verification can be done with the SSL Client.
+
+
+- ### Filesystems
+
+The filesystem features e.g. types (SD/Flash), initialization and operations are not on the library side but done from user side.
 
 
 ## Installation
