@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T02:10:52Z`
+`2024-04-12T02:43:42Z`
 
 ## Table of Contents
 
@@ -745,7 +745,7 @@ The ID token itself is short-lived token which as expired in 1 Hour or less.
 The available parameters in class constructor are following.
 
 ```cpp
-IDToken id_token(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>);
+IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>);
 ```
 
 `<api_key>` API key can be obtained from Firebase console > Project Overview > Project settings.
