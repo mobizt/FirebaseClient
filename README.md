@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T08:53:46Z`
+`2024-04-12T14:51:54Z`
 
 ## Table of Contents
 
@@ -1104,6 +1104,9 @@ When using this library, user have to follow the following operation flows other
 This library does not run any background process in FreeRTOS task or schedule task and timer ISR.
 
 To maintaining the async tasks, you have to place the code for `Maintain Authentication and Async Operation Queue` in the infinite loop e.g. main `loop()` function, timer or scheduler cyclically event's callback function or infinite loop in FreeRTOS task (as in ESP32).
+
+> [!WARNING]  
+> Don't use delay in the loop when async task is running because it will block the process in the queue to run.
 
 For ESP32's `FreeRTOS` task, the CPU Core 1 is recommend for safely operation even the library is async operation but the SSL/TLS handshake during establishing the new server connection of the SSL client is the blocking process which can leed to wdt reset error.
 
