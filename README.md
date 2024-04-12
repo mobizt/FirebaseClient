@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T02:02:06Z`
+`2024-04-12T02:07:04Z`
 
 ## Table of Contents
 
@@ -293,12 +293,12 @@ The PSRAM in this library was enabled by default but it was only used partly in 
 
 - ### Server Authorization
 
-The server certificate verification can be done with the SSL Client.
+The server certificate verification can be done with the SSL Client on user side.
 
 
 - ### Filesystems
 
-The filesystem features e.g. types (SD/Flash), initialization and operations are not on the library side but done from user side.
+The filesystem features e.g. types (SD/Flash), initialization and operations should be done on user side.
 
 
 ## Installation
