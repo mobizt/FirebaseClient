@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T01:39:48Z`
+`2024-04-12T01:47:17Z`
 
 ## Table of Contents
 
@@ -873,11 +873,10 @@ The `AsyncClientClass` object requires network config data (`network_config_data
 
 - [GenericNetwork](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.ino) is for non-core or user defined networking.
 
+> [!WARNING]  
+> In ESP32, [ADC2](https://docs.espressif.com/projects/esp-idf/en/v4.2/esp32/api-reference/peripherals/adc.html) (`GPIO 0`, `GPIO 2`, `GPIO 4`, `GPIO 12`, `GPIO 13`, `GPIO 14`, `GPIO 15`, `GPIO 25`, `GPIO 26` and `GPIO 27`) cannot be used while using WiFi.
 
 The default network class can be used for WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W.
-
-> [!WARNING]  
-> In ESP32, [ADC2](https://docs.espressif.com/projects/esp-idf/en/v4.2/esp32/api-reference/peripherals/adc.html) (GPIO 0, GPIO 2, GPIO 4,GPIO 12, GPIO 13, GPIO 14, GPIO 15, GPIO 25, GPIO 26 and GPIO 27) cannot be used while using WiFi, otherwise the network connection lost can be occurred.
 
 The network (WiFI) reconnection or resume can be done automatically or manually by user can be configurable via the boolean parameter assigned with default network class constructor.
 
@@ -895,9 +894,11 @@ The user defined or generic networks are supported by assigning the ntwork conne
 
 The `DefaultNetwork` class constructors are the following.
 
-`DefaultNetwork default_network`
+```cpp
+DefaultNetwork::DefaultNetwork()
 
-`DefaultNetwork default_network(<re_connect_option>)`
+DefaultNetwork::DefaultNetwork(<re_connect_option>)
+```
 
 `<re_connect_option>` The Boolean value set for enabling the WiFi reconnection when the WiFi is disconnected. It should be set with `false` when the WiFi reconnection was controlled by your code or third-party library e.g. WiFiManager.
 
@@ -937,12 +938,9 @@ DefaultWiFiNetwork default_network(wifimulti, true /* reconnect network */);
 
 void setup()
 {
-
-    Serial.begin(115200);
-
-    wifimulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
-    wifimulti.addAP(WIFI_SSID2, WIFI_PASSWORD2);
-    wifimulti.addAP(WIFI_SSID3, WIFI_PASSWORD3);
+    wifimulti.addAP("wifi_ssid1", "password1");
+    wifimulti.addAP("wifi_ssid2", "password2");
+    wifimulti.addAP("wifi_ssid3", "password3");
 }
 ```
 
