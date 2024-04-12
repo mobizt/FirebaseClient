@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T01:15:11Z`
+`2024-04-12T01:39:48Z`
 
 ## Table of Contents
 
@@ -876,6 +876,9 @@ The `AsyncClientClass` object requires network config data (`network_config_data
 
 The default network class can be used for WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W.
 
+> [!WARNING]  
+> In ESP32, [ADC2](https://docs.espressif.com/projects/esp-idf/en/v4.2/esp32/api-reference/peripherals/adc.html) (GPIO 0, GPIO 2, GPIO 4,GPIO 12, GPIO 13, GPIO 14, GPIO 15, GPIO 25, GPIO 26 and GPIO 27) cannot be used while using WiFi, otherwise the network connection lost can be occurred.
+
 The network (WiFI) reconnection or resume can be done automatically or manually by user can be configurable via the boolean parameter assigned with default network class constructor.
 
 The default WiFi network class provided mean for multiple WiFi's ssid and passworrd connections (WiFi Multi),
@@ -896,12 +899,16 @@ The `DefaultNetwork` class constructors are the following.
 
 `DefaultNetwork default_network(<re_connect_option>)`
 
-`<re_connect_option>` The Boolean value set for enabling the WiFi reconnection when the WiFi is disconnected.
+`<re_connect_option>` The Boolean value set for enabling the WiFi reconnection when the WiFi is disconnected. It should be set with `false` when the WiFi reconnection was controlled by your code or third-party library e.g. WiFiManager.
 
 By define `DefaultNetwork` with no parameter, the WiFi reconnection will be enabled. 
 
 > [!NOTE]  
 > When the WiFi was manage for connection and reconnection by user code or third party library, the `<re_connect_option>` parameter should be assign with `false` to avoid the WiFi connection/reconnection interferences.
+
+> [!CAUTION]
+> If you are using third-party library to control your WiFi connection/reconnection e.g. WiFiManager or your code to do so,
+> You have to set the parameter, `<re_connect_option>` to false in the `DefaultNetwork` class constructor otherwise you cannot re-connect to the WiFi.
 
 - `DefaultWiFiNetwork`
 
@@ -909,11 +916,13 @@ This `DefaultWiFiNetwork` class required some parameter for reconnection using W
 
 The parameters for its class constructor are following.
 
-`DefaultWiFiNetwork wifi_network (<FirebaseWiFi>, <re_connect_option>)`
+```cpp
+DefaultWiFiNetwork::DefaultWiFiNetwork(<FirebaseWiFi>, <re_connect_option>)
+```
 
 `<FirebaseWiFi>` The FirebaseWiFi class object that used for keeping the network credentials (WiFi APs and WiFi passwords).
 
-`<re_connect_option>`  The bool option for network reconnection.
+`<re_connect_option>`  The bool option for network reconnection. It should be set with `false` when the WiFi reconnection was controlled by your code or third-party library e.g. WiFiManager.
 
 The `FirebaseWiFi` class holds the WiFi credentials list. The AP and password can be added to list with `addAP`.
 
@@ -941,9 +950,11 @@ void setup()
 
 The DefaultEthernetNetwork class constructors are the following.
 
-`DefaultEthernetNetwork default_network`
+```cpp
+DefaultEthernetNetwork::DefaultEthernetNetwork()
 
-`DefaultEthernetNetwork default_network(<Firebase_SPI_ETH_Module>)`
+DefaultEthernetNetwork::DefaultEthernetNetwork(<Firebase_SPI_ETH_Module>)
+```
 
 `<Firebase_SPI_ETH_Module>` The ESP8266 core SPI ethernet driver class that work with external SPI Ethernet modules that currently supported e.g. ENC28J60, Wiznet W5100 and Wiznet 5500. This `<Firebase_SPI_ETH_Module>` should be defined at the same level as `AsyncClientCalss` as it will be used internally by reference.
 
@@ -987,8 +998,9 @@ The Ethernet library and class other than `Ethernet.h` and `Ethernet` can be ass
 
 The calss constructor parameters are following.
 
-`EthernetNetwork eth_network(<mac>, <cs_pin>, <reset_pin>, <Firebase_StaticIP>)`
-
+```cpp
+`EthernetNetwork::EthernetNetwork(<mac>, <cs_pin>, <reset_pin>, <Firebase_StaticIP>)
+```
 `<mac>` The six bytes mac address.
 
 `<cs_pin>` The Ethernet module chip select/enable pin.
@@ -999,7 +1011,9 @@ The calss constructor parameters are following.
 
 The `Firebase_StaticIP` class constructor parameters for static IP are following.
 
-`Firebase_StaticIP static_ip(<local_ip>, <subnet>, <gateway>, <dns_server>, <optional>)`
+```cpp
+Firebase_StaticIP::Firebase_StaticIP(<local_ip>, <subnet>, <gateway>, <dns_server>, <optional>)
+```
 
 `<local_ip>` The static IP.
 
@@ -1026,7 +1040,9 @@ For example for SIM7600 module, the macro `TINY_GSM_MODEM_SIM7600` should be def
 
 The class constructor parameter are following.
 
-`GSMNetwork gsm_network(<modem>, <gsm_pin>, <apn>, <user>, <password>)`
+```cpp
+GSMNetwork::GSMNetwork(<modem>, <gsm_pin>, <apn>, <user>, <password>)
+```
 
 `<modem>` The pointer to TinyGsm modem object. Modem should be initialized and/or set mode before transfering data.
 
@@ -1048,7 +1064,9 @@ This type of network class is for all networking interfaces with some specific c
 
 Since the interface class APIs are variety, the class constructor parameters are the basic callbacks required for network control and network status as following.
 
-`GenericNetwork generic_network(<net_connect_callback>, <network_status_callback>)`
+```cpp
+GenericNetwork::GenericNetwork(<net_connect_callback>, <network_status_callback>)
+```
 
 `<net_connect_callback>` The network connection callback function.
 
@@ -1165,7 +1183,7 @@ AsyncClient aClient(ssl_client, getNetwork(network));
 
 RealtimeDatabase Database;
 
-unsigned long to = 0;
+unsigned long tmo = 0;
 
 void setup()
 {
@@ -1249,10 +1267,10 @@ void loop()
     /////////////////////////////////////
     // Call Service App
     /////////////////////////////////////
-    if (app.ready() && millis() - to > 3000)
+    if (app.ready() && millis() - tmo > 3000)
     {
       
-       to = millis();
+       tmo = millis();
     
        // Get int
        Database.get(aClient, "/test/int", asyncCB);
