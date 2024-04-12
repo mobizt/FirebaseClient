@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T02:43:42Z`
+`2024-04-12T08:53:46Z`
 
 ## Table of Contents
 
@@ -143,7 +143,7 @@ For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the fo
 
 
 > [!IMPORTANT]  
-> In ESP8266 before using this library, you should read the section: [Memory Options for ESP8266](#memory-options-for-esp8266) first .
+> In ESP8266 before using this library, you should read the section: [Memory Options for ESP8266](#memory-options-for-esp8266) first.
 
 
 ## Features
@@ -187,13 +187,17 @@ And this is not a library memory issue as the `Arduino MKR` (SAMD MCU) with the 
  ## Dependencies
 
 
-This library required **Platform's Core SDK** to be installed.
+This library required the latest **Platform's Core SDK** to be installed.
+
+> [!IMPORTANT]  
+> Library does not support the outdated SDK. To use this library you have to install the latest version of your device's `Core SDK`.
 
 For Arduino IDE, ESP8266 Core SDK can be installed through **Boards Manager**. 
 
 For PlatfoemIO IDE, ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
 
 The RP2040 boards required [Arduino-Pico SDK](https://github.com/earlephilhower/arduino-pico) from Earle F. Philhower.
+
 
 
 ## Incompatability Between Old Firebase Library and This Firebase Library.
