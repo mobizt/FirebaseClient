@@ -1,5 +1,5 @@
 /**
- * Created March 31, 2024
+ * Created April 13, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -63,7 +63,7 @@ namespace firebase
         Timer req_timer, auth_timer, err_timer;
         List vec;
         bool processing = false;
-        uint32_t expire = 3600;
+        uint32_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
         JSONUtil json;
         String extras, subdomain, host;
         slot_options_t sop;
@@ -192,6 +192,9 @@ namespace firebase
 
         void setEvent(firebase_auth_event_type event)
         {
+            if (auth_data.user_auth.status._event == event)
+                return;
+
             auth_data.user_auth.status._event = event;
 
             if (event == auth_event_initializing || event == auth_event_authenticating)
@@ -205,26 +208,14 @@ namespace firebase
 
             setEventResult(sData ? &sData->aResult : nullptr, auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
 
-            if (resultCb && sData)
-                resultCb(sData->aResult);
-
             if (event == auth_event_error || event == auth_event_ready)
             {
                 processing = false;
-                if (getClient())
-                    stop(aClient);
                 event = auth_event_uninitialized;
                 clearLastError(sData ? &sData->aResult : nullptr);
                 if (getClient())
-                    remove(aClient);
+                    stop(aClient);
             }
-        }
-
-        void remove(AsyncClientClass *aClient)
-        {
-            if (!aClient)
-                return;
-            aClient->handleRemove();
         }
 
         void clearLastError(AsyncResult *aResult)
@@ -240,12 +231,14 @@ namespace firebase
 
             if (!isRes)
                 aResult = new AsyncResult();
+
             aResult->app_event.setEvent(code, msg);
+
+            if (resultCb)
+                resultCb(*aResult);
+
             if (!isRes)
             {
-                if (resultCb)
-                    resultCb(*aResult);
-
                 delete aResult;
                 aResult = nullptr;
             }
@@ -277,6 +270,8 @@ namespace firebase
             if (!aClient)
                 return;
 
+            sys_idle();
+
             if (sData)
             {
                 addGAPIsHost(host, subdomain.c_str());
@@ -299,23 +294,24 @@ namespace firebase
 
             aClient->process(true);
             aClient->handleRemove();
-
-            if (resultCb && aResult && aResult->error().code() != 0 && aResult->error_available)
-            {
-                aResult->data_available = false;
-                resultCb(*aResult);
-            }
         }
 
+        // Stop client and remove slot
         void stop(AsyncClientClass *aClient)
         {
             if (!aClient)
                 return;
+
             aClient->stop(sData);
+
             if (sData)
             {
-                delete sData;
+                aClient->removeSlot(slot, false);
+                if (sData)
+                    delete sData;
+                sData = nullptr;
             }
+
             sData = nullptr;
         }
 
@@ -544,8 +540,12 @@ namespace firebase
 
             if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
             {
-                if (sData && (sData->aResult.error().code() != 0 || req_timer.remaining() == 0))
+                sys_idle();
+
+                if (sData && ((sData->response.payloadLen > 0 && sData->aResult.error().code() != 0) || req_timer.remaining() == 0))
                 {
+                    // In case of googleapis returns http status code >= 400 or request is timed out.
+                    // Note that, only status line was read in case http status code >= 400
                     setEvent(auth_event_error);
                     return false;
                 }
@@ -560,8 +560,8 @@ namespace firebase
                         auth_data.app_token.authenticated = auth_data.user_auth.task_type != firebase_core_auth_task_type_delete_user && auth_data.user_auth.task_type != firebase_core_auth_task_type_reset_password;
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
-                        auth_data.app_token.expire = 3600;
-                        auth_timer.feed(3600);
+                        auth_data.app_token.expire = FIREBASE_DEFAULT_TOKEN_TTL;
+                        auth_timer.feed(FIREBASE_DEFAULT_TOKEN_TTL);
                         setEvent(auth_event_ready);
                         return true;
                     }
@@ -596,7 +596,13 @@ namespace firebase
             app_addr = reinterpret_cast<uint32_t>(this);
             vec.addRemoveList(aVec, app_addr, true);
         };
-        ~FirebaseApp() { vec.addRemoveList(aVec, app_addr, false); };
+        ~FirebaseApp()
+        {
+            if (sData)
+                delete sData;
+            sData = nullptr;
+            vec.addRemoveList(aVec, app_addr, false);
+        };
 
         bool isInitialized() const { return auth_data.user_auth.initialized; }
 

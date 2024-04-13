@@ -520,14 +520,14 @@ For example:
 `Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResultCallback>);`
 
 
-From source 1, the async result (`<AsyncResult>`) shall be defined globally to use in async application because of the static data is needed for use while running the async task.
+From source 1, the async result (`<AsyncResult>`) shall be defined globally to use in async application because of the static data buffer is needed for use while running the async task.
 
 From source 2, the async client (`AsyncClientClass`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the async task.
 
 The async result from source 2 can be accessed from the async result callback.
 
 > [!NOTE]  
-> The async client object used in authentication task shoul be defined globally as it is async task.
+> The async client object used in authentication task shoul be defined globally as it runs asynchronously and requires the static data buffer to store the result.
 
 The aync result provides two types of information, `app events` and `result data`.
 
@@ -610,7 +610,7 @@ The parameters for the [CustomAuth](examples/App/AppInitialization/CustomAuth/Cu
 CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>);
 ```
 
-`<TimeStatusCallback>` The time status callback that provide the UNIX timestamp value used for JWT token signing.
+`<TimeStatusCallback>` The time status callback that provides the UNIX timestamp value used for JWT token signing.
 
 `<api_key>` The web API key of project.
 
@@ -620,11 +620,11 @@ CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project
 
 `<private_key>` The service account private key.
 
-`<user_id>`The user ID.
+`<user_id>` The user ID.
 
 `<scope>` The OAuth scopes.
 
-`<claims>`The OAuth claims.
+`<claims>` The OAuth claims.
 
 `<expire>`The expiry period in seconds (less than 3600), 3300 is the default value.
 
@@ -724,7 +724,7 @@ AccessToken::AccessToken(<auth_token>, <expire_in_seconds>, <refresh_token>, <cl
 
 `<auth_token>` Auth token from OAuthe2.0 auth.
 
-`<expire_in_seconds>`  Expire period in seconds
+`<expire_in_seconds>` Expire period in seconds
 
 `<refresh_token>` Refresh token.
 
