@@ -4,7 +4,10 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
-<object data="https://img.shields.io/github/sponsors/mobizt?logo=github&link=https%3A%2F%2Fgithub.com%2Fsponsors%2Fmobizt"></object>
+ ![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github&link=https%3A%2F%2Fgithub.com%2Fsponsors%2Fmobizt)
+
+ <object><img alt="GitHub Sponsors" src="https://img.shields.io/github/sponsors/mobizt?logo=github&link=https%3A%2F%2Fgithub.com%2Fsponsors%2Fmobizt"></object>
+
 
 
 `2024-04-13T16:37:12Z`
