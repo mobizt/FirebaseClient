@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T12:12:33Z`
+`2024-04-13T16:02:10Z`
 
 ## Table of Contents
 
@@ -373,17 +373,17 @@ The ID token authentication required the Email/Password Sign-in provider to be e
 
 The users tab will show the users that can sign in.
 
-![Email/Password Sign-in provider](/resources/images/user_auth_console.png)
+![Email/Password Sign-in provider](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/user_auth_console.png)
 
  Copy the `Web API Key` in the console as shown in the picture below to use as API key in your code.
 
-![API Key](/resources/images/api_key_console.png)
+![API Key](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/api_key_console.png)
 
 For the service account key file, chose the button `Generate new private key` in the console as shown in the picture below.
 
 The database secret used in Realtime database can be optained from the same Service accounts tab, and database secret section.
 
-![Service Account Key](/resources/images/sa_key_console.png)
+![Service Account Key](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/sa_key_console.png)
 
 Some Google Services, the sucurity rules can be used to control your authentication for more secure usage.
 
@@ -1101,9 +1101,9 @@ See [this example](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.
 
 When using this library, user have to follow the following operation flows otherwise unknown errors can be occurred.
 
-![Operation Flows 1](/resources/images/operation_flows1.png)
+![Operation Flows 1](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/operation_flows1.png)
 
-![Operation Flows 2](/resources/images/operation_flows2.png)
+![Operation Flows 2](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/operation_flows2.png)
 
 This library does not run any background process in FreeRTOS task or schedule task and timer ISR.
 
@@ -1403,11 +1403,11 @@ You can choose the Heap memory between internal and external memory chip from ID
 
 For ESP8266 devices that don't have external SRAM/PSRAM chip installed, choose the MMU **option 3**, 16KB cache + 48KB IRAM and 2nd Heap (shared).
 
-![Arduino IDE config](/resources/images/esp8266_heap_option_arduino_ide.png)
+![Arduino IDE config](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/esp8266_heap_option_arduino_ide.png)
 
 For ESP8266 devices that have external 23LC1024 SRAM chip installed, choose the MMU **option 5**, 128K External 23LC1024.
 
-![MMU VM 128K](/resources/images/esp8266_psram_option_arduino_ide.png)
+![MMU VM 128K](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/esp8266_psram_option_arduino_ide.png)
 
 For ESP8266 devices that have external ESP-PSRAM64 chip installed, choose the MMU **option 6**, 1M External 64 MBit PSRAM.
 
@@ -1489,7 +1489,7 @@ In ESP32 module that has PSRAM installed, you can enable it and set the library 
 
 To enable PSRAM in ESP32 module.
 
-![Enable PSRAM in ESP32](/resources/images/esp32_psram_option_arduino_ide.png)
+![Enable PSRAM in ESP32](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/esp32_psram_option_arduino_ide.png)
 
 
 - #### PlatformIO IDE
