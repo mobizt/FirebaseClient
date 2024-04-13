@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) 
 
-`2024-04-12T14:51:54Z`
+`2024-04-12T12:12:33Z`
 
 ## Table of Contents
 
@@ -511,13 +511,17 @@ There are two sources of async result in this library:
 
 For example:
 
-`Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResult>);`
+```cpp
+Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResult>);
+```
 
 - #### 2. From dynamic allocation in the async client.
 
 For example:
 
-`Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResultCallback>);`
+```cpp
+Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResultCallback>);
+```
 
 
 From source 1, the async result (`<AsyncResult>`) shall be defined globally to use in async application because of the static data buffer is needed for use while running the async task.
@@ -607,7 +611,7 @@ You can define any UID to represent the user identifier for security control cus
 The parameters for the [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) class constructor are following which most of the parameters can be taken from service account json key file.
 
 ```cpp
-CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>);
+CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
 ```
 
 `<TimeStatusCallback>` The time status callback that provides the UNIX timestamp value used for JWT token signing.
@@ -637,7 +641,7 @@ This type of authentication required when you use some APIs of Firebase and Goog
 The parameters for [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) provider class are following which most of the parameters can be taken from service account json key file.
 
 ```cpp
-ServiceAuth::ServiceAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
+ServiceAuth::ServiceAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>)
 ```
 
 `<TimeStatusCallback>` The time status callback that provide the UNIX timestamp value used for JWT token signing.
@@ -662,7 +666,7 @@ With [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) provider c
 The folowing are available parameters.
 
 ```cpp
-UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>);
+UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>)
 ```
 
 `<api_key>` API key can be obtained from Firebase console > Project Overview > Project settings.
@@ -688,7 +692,7 @@ With [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomTo
 The available parameters in class constructor are following.
 
 ```cpp
-CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>);
+CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>)
 ```
 
 `<api_key>` API key can be obtained from Firebase console > Project Overview > Project settings.
@@ -719,7 +723,7 @@ The access token can be obtain from Firebase and Admin SDK apps.
 The available parameters in class constructor are following.
 
 ```cpp
-AccessToken::AccessToken(<auth_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>);
+AccessToken::AccessToken(<auth_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>)
 ```
 
 `<auth_token>` Auth token from OAuthe2.0 auth.
@@ -749,7 +753,7 @@ The ID token itself is short-lived token which as expired in 1 Hour or less.
 The available parameters in class constructor are following.
 
 ```cpp
-IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>);
+IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>)
 ```
 
 `<api_key>` API key can be obtained from Firebase console > Project Overview > Project settings.
@@ -769,7 +773,7 @@ The database secret is now deprecated and should not be used in your production.
 The available parameters in class constructor are following.
 
 ```cpp
-LegacyToken::LegacyToken(<database_secret>);
+LegacyToken::LegacyToken(<database_secret>)
 ```
 
 `<database_secret>` The Realtime database secret key.
@@ -1014,7 +1018,7 @@ The Ethernet library and class other than `Ethernet.h` and `Ethernet` can be ass
 The calss constructor parameters are following.
 
 ```cpp
-`EthernetNetwork::EthernetNetwork(<mac>, <cs_pin>, <reset_pin>, <Firebase_StaticIP>)
+EthernetNetwork::EthernetNetwork(<mac>, <cs_pin>, <reset_pin>, <Firebase_StaticIP>)
 ```
 `<mac>` The six bytes mac address.
 
