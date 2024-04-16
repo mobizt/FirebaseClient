@@ -230,8 +230,8 @@ private:
     }
 
 public:
-    FirebaseError(){};
-    ~FirebaseError(){};
+    FirebaseError() = default;
+    ~FirebaseError() = default;
     String message() const { return err.message; }
     int code() const { return err.code; }
     void setLastError(int code, const String &msg)

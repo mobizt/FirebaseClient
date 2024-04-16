@@ -56,7 +56,7 @@ private:
     String uri;
 
 public:
-    DatabaseFilter(){};
+    DatabaseFilter() = default;
     ~DatabaseFilter() { clear(); };
 
     DatabaseFilter &orderBy(const String &val)

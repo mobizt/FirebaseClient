@@ -194,7 +194,7 @@ private:
     }
 
 public:
-    BufWriter() {}
+    BufWriter() = default;
     template <typename T1, typename T2>
     T1 add(T1 ret, bool value, String &buf, const String &name)
     {
@@ -294,7 +294,7 @@ protected:
     BufWriter wr;
 
 public:
-    BaseO1() {}
+    BaseO1() = default;
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
@@ -314,7 +314,7 @@ protected:
     BufWriter wr;
 
 public:
-    BaseO2() {}
+    BaseO2() = default;
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
@@ -334,7 +334,7 @@ protected:
     BufWriter wr;
 
 public:
-    BaseO4() {}
+    BaseO4() = default;
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
@@ -354,7 +354,7 @@ protected:
     BufWriter wr;
 
 public:
-    BaseO6() {}
+    BaseO6() = default;
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
@@ -373,7 +373,7 @@ protected:
     BufWriter wr;
 
 public:
-    BaseO8() {}
+    BaseO8() = default;
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
@@ -393,7 +393,7 @@ protected:
     BufWriter wr;
 
 public:
-    BaseO10() {}
+    BaseO10() = default;
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
@@ -413,7 +413,7 @@ protected:
     BufWriter wr;
 
 public:
-    BaseO12() {}
+    BaseO12() = default;
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
@@ -432,7 +432,7 @@ protected:
     BufWriter wr;
 
 public:
-    BaseO16() {}
+    BaseO16() = default;
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
@@ -451,7 +451,7 @@ protected:
     BufWriter wr;
 
 public:
-    BaseO26() {}
+    BaseO26() = default;
     const char *c_str() const { return buf[0].c_str(); }
     size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
@@ -497,7 +497,7 @@ namespace firebase
     class UnityRange
     {
     public:
-        UnityRange() {}
+        UnityRange() = default;
 
         float val(float value)
         {

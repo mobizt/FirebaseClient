@@ -42,11 +42,9 @@ namespace Firestore
     {
 
     public:
-        ~Databases(){};
+        ~Databases() = default;
 
-        Databases()
-        {
-        }
+        Databases() = default;
 
         Databases &operator=(Databases &rhs)
         {
@@ -419,14 +417,14 @@ namespace Firestore
             manageDatabase(aClient, nullptr, cb, uid, parent, "", "", Firestore::firestore_database_mode_list, true);
         }
 
-            /** Updates a database.
+        /** Updates a database.
          *
          * @param aClient The async client.
          * @param parent The Firestore::Parent object included project Id and database Id in its constructor.
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to update.
          * @param database The Firestore::Database object that hold the database information to update.
-         * @param updateMask The list of fields to be updated. This is a comma-separated list of fully qualified names of fields. 
+         * @param updateMask The list of fields to be updated. This is a comma-separated list of fully qualified names of fields.
          * Example: "user.displayName,photo"
          *
          * The Database information should be set via the following functions befor creation.
@@ -451,7 +449,7 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to update.
          * @param database The Firestore::Database object that hold the database information to update.
-         * @param updateMask The list of fields to be updated. This is a comma-separated list of fully qualified names of fields. 
+         * @param updateMask The list of fields to be updated. This is a comma-separated list of fully qualified names of fields.
          * Example: "user.displayName,photo"
          * @param aResult The async result (AsyncResult).
          *
@@ -473,7 +471,7 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to update.
          * @param database The Firestore::Database object that hold the database information to update.
-         * @param updateMask The list of fields to be updated. This is a comma-separated list of fully qualified names of fields. 
+         * @param updateMask The list of fields to be updated. This is a comma-separated list of fully qualified names of fields.
          * Example: "user.displayName,photo"
          * @param cb The async result callback (AsyncResultCallback).
          * @param uid The user specified UID of async result (optional).
@@ -492,7 +490,7 @@ namespace Firestore
         class Indexes : public FirestoreBase
         {
         public:
-            Indexes() {}
+            Indexes() = default;
 
             /** Creates the specified index.
              *

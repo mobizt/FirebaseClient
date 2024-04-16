@@ -907,7 +907,7 @@ private:
         file_config_data *file = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
-        async_request_data_t() {}
+        async_request_data_t() = default;
         async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;

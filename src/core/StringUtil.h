@@ -40,8 +40,8 @@ class StringUtil
 {
 
 public:
-    StringUtil() {}
-    ~StringUtil() {}
+    StringUtil() = default;
+    ~StringUtil() = default;
 
 #if defined(FIREBASE_USE_STRSEP_IMPL)
     char *strsepImpl(char **stringp, const char *delim)

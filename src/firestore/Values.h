@@ -427,7 +427,7 @@ namespace Values
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_mapValue].text, buf); }
 
     public:
-        MapValue() {}
+        MapValue() = default;
 
         /**
          * A map value.
@@ -467,7 +467,7 @@ namespace Values
         String buf;
 
     public:
-        Value() {}
+        Value() = default;
 
         /**
          * @param value The object value

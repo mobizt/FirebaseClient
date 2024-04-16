@@ -39,7 +39,7 @@ class CloudStorage
 public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
-    ~CloudStorage(){};
+    ~CloudStorage() = default;
     CloudStorage(const String &url = "")
     {
         this->service_url = url;

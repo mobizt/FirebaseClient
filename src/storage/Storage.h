@@ -40,7 +40,7 @@ class Storage
 public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
-    ~Storage(){};
+    ~Storage() = default;
     Storage(const String &url = "")
     {
         this->service_url = url;
@@ -397,7 +397,7 @@ private:
     String service_url;
     String path;
     String uid;
-    //FirebaseApp address and FirebaseApp vector address
+    // FirebaseApp address and FirebaseApp vector address
     uint32_t app_addr = 0, avec_addr = 0;
     app_token_t *app_token = nullptr;
 

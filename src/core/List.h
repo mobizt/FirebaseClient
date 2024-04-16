@@ -33,8 +33,8 @@ namespace firebase
     {
     private:
     public:
-        List(){};
-        ~List(){};
+        List() = default;
+        ~List() = default;
 
         void addRemoveList(std::vector<uint32_t> &vec, uint32_t addr, bool add)
         {

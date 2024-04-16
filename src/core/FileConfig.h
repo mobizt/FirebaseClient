@@ -49,7 +49,7 @@ enum file_operating_mode
 struct firebase_blob_writer
 {
 public:
-    firebase_blob_writer() {}
+    firebase_blob_writer() = default;
     void init(uint8_t *data, size_t size)
     {
         this->data = data;
@@ -103,7 +103,7 @@ private:
     resume_state state = resume_state_undefined;
 
 public:
-    file_upload_resumable_data() {}
+    file_upload_resumable_data() = default;
     bool isEnabled() { return enable; }
     void setSize(size_t size)
     {
@@ -213,7 +213,7 @@ private:
     multipart_state state = multipart_state_undefined;
 
 public:
-    file_upload_multipart_data() {}
+    file_upload_multipart_data() = default;
     bool isEnabled() { return enable; }
     void setSize(size_t size)
     {
@@ -462,7 +462,7 @@ public:
         setCallback(cb);
         data.initialized = true;
     }
-    ~FileConfig() {}
+    ~FileConfig() = default;
     void clear() { data.clear(); }
 
     FileConfig &setFilename(const String &filename)
@@ -516,7 +516,7 @@ public:
 
         this->data.initialized = true;
     }
-    ~BlobConfig() {}
+    ~BlobConfig() = default;
     void clear() { data.clear(); }
 
     uint8_t *blob() const { return data.data; }

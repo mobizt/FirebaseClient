@@ -120,7 +120,7 @@ public:
         this->tcpReceive = tcpReceive;
         this->tcpStop = tcpStop;
     };
-    ~AsyncTCPConfig(){};
+    ~AsyncTCPConfig()= default;
 };
 
 #endif

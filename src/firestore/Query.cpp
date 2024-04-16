@@ -36,7 +36,7 @@
 namespace FirestoreQuery
 {
 
-    StructuredQuery::StructuredQuery() {}
+    StructuredQuery::StructuredQuery() = default;
     StructuredQuery &StructuredQuery::select(const Projection &value) { return wr.set<StructuredQuery &, Projection>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
     StructuredQuery &StructuredQuery::from(const CollectionSelector &value) { return wr.append<StructuredQuery &, CollectionSelector>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
     StructuredQuery &StructuredQuery::where(const Filter &value) { return wr.set<StructuredQuery &, Filter>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
@@ -46,21 +46,21 @@ namespace FirestoreQuery
     StructuredQuery &StructuredQuery::offset(int value) { return wr.set<StructuredQuery &, int>(*this, value, buf, bufSize, 7, FPSTR(__func__)); }
     StructuredQuery &StructuredQuery::limit(int value) { return wr.set<StructuredQuery &, int>(*this, value, buf, bufSize, 8, FPSTR(__func__)); }
 
-    CompositeFilter::CompositeFilter() {}
+    CompositeFilter::CompositeFilter() = default;
     CompositeFilter &CompositeFilter::op(CompositFilterOperator::OPERATOR_TYPE value) { return wr.set<CompositeFilter &, const char *>(*this, CompositFilterOperator::_OPERATOR_TYPE[value].text, buf, bufSize, 1, FPSTR(__func__)); }
     CompositeFilter &CompositeFilter::filters(const Filter &value) { return wr.append<CompositeFilter &, Filter>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
     CompositeFilter &CompositeFilter::addFilter(const Filter &value) { return filters(value); }
 
-    FieldFilter::FieldFilter() {}
+    FieldFilter::FieldFilter() = default;
     FieldFilter &FieldFilter::field(const FieldReference &value) { return wr.set<FieldFilter &, FieldReference>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
     FieldFilter &FieldFilter::op(FieldFilterOperator::OPERATOR_TYPE value) { return wr.set<FieldFilter &, const char *>(*this, FieldFilterOperator::_OPERATOR_TYPE[value].text, buf, bufSize, 2, FPSTR(__func__)); }
     FieldFilter &FieldFilter::value(const Values::Value &value) { return wr.set<FieldFilter &, Values::Value>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
 
-    UnaryFilter::UnaryFilter() {}
+    UnaryFilter::UnaryFilter() = default;
     UnaryFilter &UnaryFilter::op(UnaryFilterOperator::OPERATOR_TYPE value) { return wr.set<UnaryFilter &, const char *>(*this, UnaryFilterOperator::_OPERATOR_TYPE[value].text, buf, bufSize, 1, FPSTR(__func__)); }
     UnaryFilter &UnaryFilter::field(const FieldReference &value) { return wr.set<UnaryFilter &, FieldReference>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
 
-    Order::Order(){};
+    Order::Order()= default;;
     Order::Order(const FieldReference &field, FilterSort::Direction direction) { Order::field(field).direction(direction); }
     Order &Order::field(const FieldReference &value) { return wr.set<Order &, FieldReference>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
     Order &Order::direction(FilterSort::Direction value) { return wr.set<Order &, const char *>(*this, FilterSort::_Direction[value].text, buf, bufSize, 2, FPSTR(__func__)); }
@@ -70,7 +70,7 @@ namespace FirestoreQuery
     Cursor &Cursor::values(const Values::Value &value) { return wr.append<Cursor &, Values::Value>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
     Cursor &Cursor::addValue(const Values::Value &value) { return values(value); }
 
-    Filter::Filter() {}
+    Filter::Filter() = default;
     Filter::Filter(const CompositeFilter &value) { wr.add<Filter &, CompositeFilter>(*this, value, buf, "compositeFilter"); }
     Filter::Filter(const FieldFilter &value) { wr.add<Filter &, FieldFilter>(*this, value, buf, "fieldFilter"); }
     Filter::Filter(const UnaryFilter &value) { wr.add<Filter &, UnaryFilter>(*this, value, buf, "unaryFilter"); }

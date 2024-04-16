@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-13T17:02:57Z`
+`2024-04-16T05:44:08Z`
 
 ## Table of Contents
 
@@ -100,13 +100,31 @@
 
   - [PlatformIO IDE](#platformio-ide-1)
 
-[9. Library Build Options](#library-build-options)
+[9. Project Preparation Setup](#project-preparation-setup)
+
+  - [Authentication Getting Started](#authentication-getting-started)
+
+  - [Realtime Database Getting Started](#realtime-database-getting-started)
+
+  - [Google Cloud Firestore Database Getting Started](#google-cloud-firestore-database-getting-started)
+
+  - [Storage Getting Started](#storage-getting-started)
+
+  - [Google Cloud Functions Getting Started](#google-cloud-functions-getting-started)
+
+  - [Cloud Messaging Getting Started](#cloud-messaging-getting-started)
+
+  - [Service Account](#service-account)
+
+  - [Google APIs and IAM Permission](#google-apis-and-iam-permission)
+
+[10. Library Build Options](#library-build-options)
 
 - [Predefined Options](#predefined-options)
 
 - [Optional Options](#optional-options)
 
-[10. License](#license)
+[11. License](#license)
 
 
 ## Introduction
@@ -367,6 +385,9 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 
 There are classes or objects that used for required operations and data in this library e.g. authentication and auth data, networking data, Firebase service apps and Firebase service apps data.
 
+> [!IMPORTANT]  
+> For new Firebase user, please read the [Project Preparation Setup](#project-preparation-setup) section first.
+
 - ### Authentication
 
 The authentication classes provide the custom token, access token, ID token authentications using credentials or tokens from other sources.
@@ -389,7 +410,7 @@ The database secret used in Realtime database can be optained from the same Serv
 
 Some Google Services, the sucurity rules can be used to control your authentication for more secure usage.
 
-For the Realtime database security rules, see [this link](https://firebase.google.com/docs/database/security).
+For more deatails of the Realtime database security rules, see [this link](https://firebase.google.com/docs/database/security).
 
 For Cloud Firestore database security rules, see [this link](https://firebase.google.com/docs/firestore/security/get-started).
 
@@ -530,7 +551,16 @@ From source 1, the async result (`<AsyncResult>`) shall be defined globally to u
 
 From source 2, the async client (`AsyncClientClass`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the async task.
 
-The async result from source 2 can be accessed from the async result callback.
+The async result from source 2 can be accessed from the async result callback. 
+
+For the `AsyncResult` instance from source 2 that obtains from `AsyncResultCallback`, this library allows you to set the `UID` (unique identifier) for each async task to identify the task. The `UID` is any string that user defined and it is useful to identify the tasks when the same `AsyncResultCallback` was set for various async tasks. 
+
+The async task's `UID` can be set via the Firebase services functions which provided the both parameters in the function i.e. `AsyncResultCallback` and `UID`. 
+
+You can get the `UID` from `AsyncResult` via the function `AsyncResult::uid()`. 
+
+> [!NOTE]  
+> You cannot set `UID` to the `AsyncResult` directly as it will be overwritten, then the `UID` from the `AsyncResult` that defined by user from source 1 will always be empty. 
 
 > [!NOTE]  
 > The async client object used in authentication task shoul be defined globally as it runs asynchronously and requires the static data buffer to store the result.
@@ -638,7 +668,9 @@ CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project
 
 With [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) provider class, you are now access the Firebase services as non-human or a service or application user.
 
-This type of authentication required when you use some APIs of Firebase and Google services.
+This uses `OAuth2.0 using Service Account` authentication flows to create the access token for authorization.
+
+This type of authentication required when you use some APIs of Firebase and Google services that required privilege (admin) access.
 
 The parameters for [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) provider class are following which most of the parameters can be taken from service account json key file.
 
@@ -1389,6 +1421,295 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 See [all examples](/examples) for complete usages.
 
 See [function description](/src/README.md) for all available functions.
+
+
+## Project Preparation Setup
+
+For new Firebase user, go to the [Google Firebase Console](https://console.firebase.google.com/), sign in to your Google account, and create a new project as the following images.
+
+![Create a project](/resources/images/blank_account_create_a_project.png)
+
+![Name a project](/resources/images/create_a_project_step1.png)
+
+![Ignore the Google Analytics](/resources/images/create_a_project_step2.png)
+
+Click the button `All products`.
+
+![All products](/resources/images/firebase_console_all_products.png)
+
+### Authentication Getting Started
+
+When `custom token`, `ID token` authentications are used via `CustomAuth`, `UserAuth`, `CustomToken` and `IDToken`, the `Authentication` service is needed and must be set up otherwise the `HTTP status code 400` error will return from the authentication task.
+
+> [!NOTE]  
+> The `Authentication` service is not required for `OAuth2.0 access token` authentication and legacy token (database secret) authorization.
+
+To get started with `Authentication`,  choose `Authentication` and click `Get started` button.
+
+![Authentication Get Started](/resources/images/firebase_console_authentication_get_started.png)
+
+Under Sign-in providers, choose Email/Password.
+
+![Authentication Select Email/Password Provider](/resources/images/firebase_console_authentication_get_started_step1.png)
+
+Select enable check option in Email/Password section, and click `Save` button.
+
+![Authentication Enable Email/Password](/resources/images/firebase_console_authentication_get_started_step2.png)
+
+Then click at `Users` tab, click `Add user` button.
+
+![Authentication Add User](/resources/images/firebase_console_authentication_get_started_step3.png)
+
+Fill in the `Email` and `Password` and click `Add user` button.
+
+Once the `Authentication` was setup, the `Web API Key` will be generated. See the `Project Settings` page for `Web API Key`. 
+
+![Authentication Web API Key](/resources/images/firebase_console_authentication_get_started_step4.png)
+
+The `Web API Key` is used in all `custom token`, `ID token` authentications that used via the `CustomAuth`, `UserAuth`, `CustomToken` and `IDToken` provider classes and it was assign to the `API_KEY` in the exampless.
+
+At the `Authentication` page, under `Sigm-in method` tab, other Sign-in providers can be added.
+
+To add `Anonymous` sign-in provider, click at `Add new provider` button.
+
+![Authentication Anonymous Provider](/resources/images/firebase_console_authentication_get_started_step5.png)
+
+Select enable check option in Email/Password section, and click `Save` button.
+
+![Authentication Enable Anonymous Provider](/resources/images/firebase_console_authentication_get_started_step6.png)
+
+### Realtime Database Getting Started
+
+To get start with Firebase Realtime database, choose `Realtime Database` and click `Create Database`. 
+
+![Create Database](/resources/images/firebase_console_rtdb_create_database.png)
+
+Set up your `Database options` and `Security rules`.
+
+![Set Database Location](/resources/images/firebase_console_rtdb_setup_database_step1.png)
+
+![Set Database Security Rules](/resources/images/firebase_console_rtdb_setup_database_step2.png)
+
+You can choose `Start in locked mode` or `Start in test mode` for `Security rules`.
+
+Once the database was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply change.
+
+```yaml
+{
+  "rules": {
+    ".read": "auth != null", 
+    ".write": "auth != null"
+  }
+}
+```
+![Change Database Security Rules](/resources/images/firebase_console_rtdb_setup_database_step3.png)
+
+The warning `Your security rules are not secure. Any authenticated user can steal, modify, or delete data in your database.` will be displayed due to insecure rules which you can change it for more secure later.
+
+For more details of the Realtime database security rules, see [this link](https://firebase.google.com/docs/database/security).
+
+The reference url is the `DATABASE_URL` that defined and used in the Realtime database examples can be obtained from the `Data` tab as the following.
+
+![Realtime database reference url](/resources/images/firebase_console_rtdb_reference_url.png)
+
+The reference url or database url also can be taken from the `Servic Account` key file, see [Service Account](#service-account) section.
+
+#### Realtime Database Legacy Usage
+
+The database secret is the secret key for privileged accessing the Realtime database.
+
+The database secret is now currently deprecated. Alternatively, to use the Realtime database with the same privileged access as database secret but secure, the `OAuth2.0 access token` athentication via `ServiceAuth` provider class is recommended.  
+
+To get the database secret, in the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), under the `Service accounts` Tab click `Database secret`.
+
+![Realtime database Database Secret on Service Accounts Tab](/resources/images/firebase_console_rtdb_secret_key_step1.png)
+
+The database secret for the databases are available in the `Secrets` column.
+
+![Realtime database Database Secret Table](/resources/images/firebase_console_rtdb_secret_key_step2.png)
+
+### Google Cloud Firestore Database Getting Started
+
+To get start with Firebase Realtime database, choose `Cloud Firestore` and click `Create database`. 
+
+![Create Firestore Database](/resources/images/firebase_console_firestore_create_database.png)
+
+Set up your database `Name and Location` and `Security rules`.
+
+> [!NOTE]  
+> The first database name (ID) is `(default)` which cannot be changed.
+
+![Set Name and Location](/resources/images/firebase_console_firestore_create_database_step1.png)
+
+![Set Security Rules](/resources/images/firebase_console_firestore_create_database_step2.png)
+
+Once the database was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply change.
+
+```yaml
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth.uid != null;
+    }
+  }
+}
+```
+![Change Security Rules](/resources/images/firebase_console_firestore_create_database_step3.png)
+
+For more details of the Cloud Firestore database security rules, see [this link](https://firebase.google.com/docs/firestore/security/get-started).
+
+### Storage Getting Started
+
+To get start with Storage, choose `Storage` and click `Get started`. 
+
+![Storage Get Started](/resources/images/firebase_console_storage_get_started.png)
+
+Then set the `Secure Rules for Cloud Storage` and `Cloud Storage location`.
+
+![Secure Rules for Cloud Storage](/resources/images/firebase_console_storage_get_started_step1.png)
+
+![Set Cloud Storage location](/resources/images/firebase_console_storage_get_started_step2.png)
+
+Once the storage bucket was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply change.
+
+```yaml
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if request.auth.uid != null
+    }
+  }
+}
+```
+
+![Change Security Rules](/resources/images/firebase_console_storage_get_started_step3.png)
+
+For more details of the Cloud Storage for Firebase's security rules, see [this link](https://firebase.google.com/docs/storage/security/get-started).
+
+The folder path is the `STORAGE_BUCKET_ID` that defined and used in the Storage examples can be obtained from the `Files` tab as the following.
+
+![Storage folder path](/resources/images/firebase_console_storage_folder_path.png)
+
+The folder path or the `STORAGE_BUCKET_ID` also can be taken from the `Servic Account` key file, see [Service Account](#service-account) section.
+
+### Google Cloud Functions Getting Started
+
+To use the `Cloud Functions` for running your backend automate code, the billing plan for the project is needed to be upgraded to at least `Blaze` plan.
+
+![Functions Get Started](/resources/images/firebase_console_functions_get_started.png)
+
+![Functions Upgrade Billing Plan](/resources/images/firebase_console_functions_get_started_step1.png)
+
+You can `Set a billing budget` at this step or skip it.
+
+![Functions Upgrade Plan Purchase](/resources/images/firebase_console_functions_get_started_step2.png)
+
+![Functions Upgrade Purchased](/resources/images/firebase_console_functions_get_started_step3.png)
+
+Click the `Get started` button and follow the steps as show in the following images.
+
+![Functions Install command line tools](/resources/images/firebase_console_functions_get_started_step4.png)
+
+![Functions Finishing](/resources/images/firebase_console_functions_get_started_step5.png)
+
+### Cloud Messaging Getting Started
+
+![Cloud Messaging Get Started](/resources/images/firebase_console_messaging_get_started.png)
+
+Create an app (iOS, Android, Web, or Unity app) for getting started.
+
+The following steps showed the web app (Javascript) is created.
+
+![Cloud Messaging Register App](/resources/images/firebase_console_messaging_get_started_step1.png)
+
+Add the Firebase SDK and click `Continue to console` button.
+
+![Cloud Messaging Add Firebase SDK](/resources/images/firebase_console_messaging_get_started_step2.png)
+
+Follow the [Firebase Cloud Messaging Quickstart for Javascript](https://github.com/firebase/quickstart-js/tree/master/messaging) for the rest of steps.
+
+> [!NOTE]  
+> The script that provided in [Firebase Cloud Messaging Quickstart for Javascript](https://github.com/firebase/quickstart-js/tree/master/messaging) does not work at the present with the error `Failed to register a Service Worker`.
+
+To workaround, change the script in `firebase-messaging-sw.js` as the following.
+
+From
+
+```js
+importScripts('/__/firebase/init.js');
+```
+
+To
+
+```js
+firebase.initializeApp({
+  apiKey: 'API_KEY', // Change this with your API Key
+  authDomain: 'PROJECT_ID.firebaseapp.com', // Change this with your API Key
+  databaseURL: 'https://PROJECT_ID.firebaseio.com', // Change this with your database url
+  projectId: 'PROJECT_ID', // Change this with your Project ID
+  storageBucket: 'PROJECT_ID.appspot.com', // Change this with your storage bucket
+  messagingSenderId: 'SENDER_ID', // Change this with your messaging sender ID
+  appId: 'APP_ID' // Change this with your app ID
+});
+```
+
+The app (iOS, Android, Web and Unity) registration token or `DEVICE_TOKEN` is a unique token string that identifies each client app instance. The registration token is required for single device and device group messaging. Note that registration tokens must be kept secret ([ref](https://firebase.google.com/docs/cloud-messaging/concept-options#credentials))
+
+
+### Service Account
+
+The `Service Account` credentials are required for `OAuth2.0 access token` and `custom token` authentications via the `ServiceAuth` and `CustomAuth` provider classes.
+
+The default `Service Account` private key contains the `Service Account` credentials which can be created.
+
+In the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), click at `Service accounts` tab and `Generate new private key`. 
+
+Open the .json file that is already downloaded with text editor.
+
+```json
+{
+  "type": "service_account",
+  "project_id": "...",
+  "private_key_id": "...",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+  "client_email": "...",
+  "client_id": "...",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "...",
+  "universe_domain": "googleapis.com"
+}
+```
+
+Copy the `project_id`, `client_email`, `private_key_id` and `private_key` from .json file and paste to these defines in the example.
+
+```cpp
+#define FIREBASE_PROJECT_ID "..." // Taken from "project_id" key in JSON file.
+#define FIREBASE_CLIENT_EMAIL "..." // Taken from "client_email" key in JSON file.
+const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"; // Taken from "private_key" key in JSON file.
+```
+
+### Google APIs and IAM Permission
+
+
+Some `Google Cloud Firestore`'s APIs and all `Google Cloud Functions`'s APIs required the privileged access with `OAuth2.0 access token` authentication which is obtained from `ServiceAuth` provider class and regular user authentication with `ID token` was not allowed. 
+
+With `OAuth2.0 access token` authentication, the error `permission denined` can be occurred when access the Google APIs, due to lack of the required permissions.
+
+The `Owner` permission is needed in this case.
+
+To assign the `Owner` permission for the `Service Account`, go to the [IAM Admin console](https://console.cloud.google.com/iam-admin)
+
+Then choose the project, and look at the `principal` column in the list (tab `VIEW BY PRINCIPALS`) which matches the client email in the `Service Account` credentials. Edit the permission, add the role `Owner` under the `Basic`.
+
+![IAM Add Permission](/resources/images/iam_add_permission.png)
+
+Wait a few minutes for the action to propagate after adding roles. 
+
+For Cloud Functions Cloud Build API must be enabled for the project. To enable Cloud Build API go to [this link](https://console.developers.google.com/apis/library/cloudbuild.googleapis.com).
 
 
 

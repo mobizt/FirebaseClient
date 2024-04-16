@@ -39,7 +39,7 @@ class CloudFunctions
 public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
-    ~CloudFunctions(){};
+    ~CloudFunctions() = default;
     CloudFunctions(const String &url = "")
     {
         this->service_url = url;

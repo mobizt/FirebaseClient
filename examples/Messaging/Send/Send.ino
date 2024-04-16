@@ -32,9 +32,6 @@
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
-// The API key can be obtained from Firebase console > Project Overview > Project settings.
-#define API_KEY "Web_API_KEY"
-
 /**
  * This information can be taken from the service account JSON file.
  *
@@ -147,7 +144,7 @@ void loop()
 
         Messages::Message msg;
         msg.topic("test");
-        // msg.token("DEVICE_TOKEN");
+        // msg.token("DEVICE_TOKEN"); // Registration token to send a message to
         // msg.condition("'foo' in topics && 'bar' in topics");
 
         Messages::Notification notification;
