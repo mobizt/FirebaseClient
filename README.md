@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-17T00:24:51Z`
+`2024-04-17T02:24:57Z`
 
 ## Table of Contents
 
@@ -116,7 +116,7 @@
 
   - [Service Account](#service-account)
 
-  - [Google APIs and IAM Permission](#google-apis-and-iam-permission)
+    - [Service Account Permission](#service-account-permission)
 
 [10. Library Build Options](#library-build-options)
 
@@ -250,7 +250,7 @@ The legaycy Firebase Cloud Messaging API was deprecated, only HTTPv1 is supporte
 
 - ### Cloud Functions
 
- Deploying the Cloud Function from local flash or filesystem source in a single function is not available unless using several fnctions that are available to generate upload url, upload the source (zip file), deploy the function and set IAM permission.
+ Deploying the Cloud Function from local flash or filesystem source in a single function is not available unless using several fnctions that are available to generate upload url, upload the source (zip file), deploy the function and set the permission.
 
 - ### TCP KeepAlive
 
@@ -1692,18 +1692,25 @@ Copy the `project_id`, `client_email`, `private_key_id` and `private_key` from .
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"; // Taken from "private_key" key in JSON file.
 ```
 
-### Google APIs and IAM Permission
+#### Service Account Permission
 
+The Firebase project except for the Google Cloud Project, its `Service Account` that use to access the `Google Cloud services` e.g. `Google Cloud Storage`, `Google Cloud Functions` and some features of `Google Cloud Firestore` that perform some sensitive tasks, required some permissive roles.
 
-Some `Google Cloud Firestore`'s APIs and all `Google Cloud Functions`'s APIs required the privileged access with `OAuth2.0 access token` authentication which is obtained from `ServiceAuth` provider class and regular user authentication with `ID token` was not allowed. 
+The `Basic roles` are highly permissive roles that used to grant principals broad access to Google Cloud resources.
 
-With `OAuth2.0 access token` authentication, the error `permission denined` can be occurred when access the Google APIs, due to lack of the required permissions.
+To access the `Google Cloud services` that support by this library using `Service Account` in `OAuth2.0 access token` authentication, the Basic's `Owner` and `Editor` roles are required.
 
-The `Owner` permission is needed in this case.
+The `Editor` role may be already set for your Firebase project's `Service Account` then you may have to add the `Owner` role in this case.
 
-To assign the `Owner` permission for the `Service Account`, go to the [IAM Admin console](https://console.cloud.google.com/iam-admin)
+To set the Basic's `Owner` role, go to the [Identity and Access Management console](https://console.cloud.google.com/iam-admin).
 
-Then choose the project, and look at the `principal` column in the list (tab `VIEW BY PRINCIPALS`) which matches the client email in the `Service Account` credentials. Edit the permission, add the role `Owner` under the `Basic`.
+Then choose the project, and select the `VIEW BY PRINCIPALS` tab.
+
+From the table displayed, look at the `Principal` column, choose the principal type `Service account` (`serviceAccount:SA_EMAIL_ADDRESS`) e.g. xxxx@yyyy.gserviceaccount.com as shown in your `Service Account` private key file. 
+
+Click on the pencil icon <svg width="12" height="12" viewBox="0 0 18 18" fit="" preserveAspectRatio="xMidYMid meet" focusable="false" sandboxuid="0"><path d="M2 13.12l8.49-8.488 2.878 2.878L4.878 16H2v-2.88zm13.776-8.017L14.37 6.507 11.494 3.63l1.404-1.406c.3-.3.783-.3 1.083 0l1.8 1.796c.3.3.3.784 0 1.083z" fill-rule="evenodd" sandboxuid="0"></path></svg> on the right to `Edit principal`. 
+
+Add the role `Owner` under the `Basic` roles.
 
 ![IAM Add Permission](/resources/images/iam_add_permission.png)
 
