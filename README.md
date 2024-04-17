@@ -1,12 +1,12 @@
 # FirebaseClient
 
-![Compile](https://github.com/mobizt/FirebaseClient/actions/workflows/compile_library.yml/badge.svg) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-17T08:38:10Z`
+`2024-04-17T12:05:06Z`
 
 ## Table of Contents
 
@@ -131,18 +131,16 @@
 
 📖 Async Firebase Client library for Arduino Documentation.
 
-This library supports `Firebase Realtime Database`, Cloud Firestore database, Cloud Messaging, Firebase Storage, Google Cloud Storage and Google Cloud Functions.
+This library is the `REST APIs Firebase Client` that supports the following `Firebase Products` and `Google Cloud Product`.
 
-The features can be configurable to add and exclude some unused features, see [Library Build Options](#library-build-options).
+- `Firebase Realtime Database`
+- `Cloud Firestore Database`
+- `Cloud Messaging`
+- `Firebase Storage`
+- `Google Cloud Functions`
+- `Google Cloud Storage`
 
-
-This library is the new Firebase Client library that supports both sync and async usages.
-
-> [!NOTE]  
-> This library is the replacement of the old Firebase libraries ([Firebase-ESP-Client](https://github.com/mobizt/Firebase-ESP-Client), [Firebase-ESP32](https://github.com/mobizt/Firebase-ESP32) and [Firebase-ESP8266](https://github.com/mobizt/Firebase-ESP8266)) which those libraries are now obsoleted.
-
-
-Due to the known issues in the old Firebase library.
+This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was cteated to eleminate the following issues in the old Firebase library.
 
 - The confusion of different library names from the same developer and other developers in Library Manager.
 - The different main header file name and class name issue.
@@ -153,7 +151,11 @@ Due to the known issues in the old Firebase library.
 - The `Realtime Database` stream event data can be missing due to the sync read operation.
 - The async operation is not truely impremented.
 
-Then this [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was planned and developed.
+> [!IMPORTANT]  
+> If you are new to `Firebase products`, please read the [Project Preparation Setup](#project-preparation-setup) section first.
+
+> [!IMPORTANT]  
+> For ESP8266 device usage, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section first.
 
 > [!CAUTION]
 > This library included the `SSL Client` library called [`ESP_SSLClient`](https://github.com/mobizt/FirebaseClient/tree/main/src/client/SSLClient) to use in JWT token signing and the alternative use of the core SSL Client library e.g. `WiFIClientSecure` and `WiFiSSLClient` in some Arduino Client use cases which makes this library portable with no third-party library needed.
@@ -161,9 +163,6 @@ When this library was used together with my other library e.g. [ESP-Mail-Client]
 You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
 For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
 
-
-> [!IMPORTANT]  
-> In ESP8266 before using this library, you should read the section: [Memory Options for ESP8266](#memory-options-for-esp8266) first.
 
 
 ## Features
@@ -207,16 +206,18 @@ And this is not a library memory issue as the `Arduino MKR` (SAMD MCU) with the 
  ## Dependencies
 
 
-This library required the latest **Platform's Core SDK** to be installed.
+This library required the latest device's **platform Core SDK** to be installed.
 
 > [!IMPORTANT]  
-> Library does not support the outdated SDK. To use this library you have to install the latest version of your device's `Core SDK`.
+> Please make sure that the `Arduino IDE's Board Manager URL` is up to date before you update your device's `platform Core SDK`. Any issue due to using out dated `platform Core SDK` is your own risk and does not support by library.
+>
+> In case the library compile status showed here is passing and your code compilation is error, you should check your libary installation, `platform Core SDK` installation and the library usage. You cannot install library in the cloud storage virtual folder or sandbox e.g. `Microsoft's OneDrive`.
 
-For Arduino IDE, ESP8266 Core SDK can be installed through **Boards Manager**. 
+For Arduino IDE, the ESP8266 Core SDK can be installed through **Boards Manager**. 
 
-For PlatfoemIO IDE, ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
+For PlatfoemIO IDE, the ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
 
-The RP2040 boards required [Arduino-Pico SDK](https://github.com/earlephilhower/arduino-pico) from Earle F. Philhower.
+The RP2040 boards required [Arduino-Pico SDK](https://github.com/earlephilhower/arduino-pico) from Earle F. Philhower to be installed.
 
 
 
@@ -1430,7 +1431,7 @@ See [function description](/src/README.md) for all available functions.
 
 ## Project Preparation Setup
 
-You have to setup the Firebase project to use Firebase products. Visit [Understand Firebase Projects](https://firebase.google.com/docs/projects/learn-more) to learn more about Firebase projects.
+You have to setup the Firebase project to use `Firebase products`. Visit [Understand Firebase Projects](https://firebase.google.com/docs/projects/learn-more) to learn more about Firebase projects.
 
 For new Firebase user, go to the [Google Firebase Console](https://console.firebase.google.com/), sign in to your Google account, and create a new project as the following images.
 
