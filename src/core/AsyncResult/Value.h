@@ -51,7 +51,7 @@ private:
     }
 
 public:
-    boolean_t() = default;
+    boolean_t() {}
     boolean_t(bool v) { buf = v ? FPSTR("true") : FPSTR("false"); }
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const { return p.print(buf.c_str()); }
@@ -63,7 +63,7 @@ private:
     String buf;
 
 public:
-    number_t() = default;
+    number_t() {}
     template <typename T1 = int, typename T = int>
     number_t(T1 v, T d) { buf = String(v, d); }
     template <typename T = int>
@@ -78,7 +78,7 @@ private:
     String buf;
 
 public:
-    string_t() = default;
+    string_t() {}
     template <typename T = const char *>
     string_t(T v)
     {
@@ -148,7 +148,7 @@ private:
     String buf;
 
 public:
-    object_t() = default;
+    object_t() {}
     object_t(const String &o) { buf = o; }
     const char *c_str() const { return buf.c_str(); }
     template <typename T = const char *>
@@ -186,8 +186,8 @@ private:
 class ValueConverter
 {
 public:
-    ValueConverter() = default;
-    ~ValueConverter() = default;
+    ValueConverter() {}
+    ~ValueConverter() {}
 
     template <typename T>
     struct v_sring

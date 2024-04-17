@@ -41,8 +41,8 @@ class JSONUtil
 
 private:
 public:
-    JSONUtil() = default;
-    ~JSONUtil() = default;
+    JSONUtil() {}
+    ~JSONUtil() {}
 
     void addObject(String &buf, const String &name, const String &value, bool stringValue, bool last = false)
     {
@@ -161,8 +161,8 @@ private:
     }
 
 public:
-    JsonWriter() = default;
-    ~JsonWriter() = default;
+    JsonWriter() {}
+    ~JsonWriter() {}
 
     void create(object_t &obj, const String &path, bool value) { create(obj, path, boolean_t(value)); }
 

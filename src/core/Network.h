@@ -268,7 +268,7 @@ class FirebaseWiFi
     friend class AsyncClientClass;
 
 public:
-    FirebaseWiFi() = default;
+    FirebaseWiFi() {}
     ~FirebaseWiFi()
     {
         clearAP();

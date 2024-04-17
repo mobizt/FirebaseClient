@@ -40,7 +40,7 @@ class Storage
 public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
-    ~Storage() = default;
+    ~Storage() {}
     Storage(const String &url = "")
     {
         this->service_url = url;

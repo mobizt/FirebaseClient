@@ -42,9 +42,9 @@ namespace Firestore
     {
 
     public:
-        ~Databases() = default;
+        ~Databases() {}
 
-        Databases() = default;
+        Databases() {}
 
         Databases &operator=(Databases &rhs)
         {
@@ -490,7 +490,7 @@ namespace Firestore
         class Indexes : public FirestoreBase
         {
         public:
-            Indexes() = default;
+            Indexes() {}
 
             /** Creates the specified index.
              *

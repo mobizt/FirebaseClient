@@ -109,7 +109,7 @@ public:
 
     void clear()
     {
-         
+
         for (size_t i = 0; i < req_hndlr_ns::max_type; i++)
             val[i].remove(0, val[i].length());
         port = 443;
@@ -130,7 +130,7 @@ public:
 
     void addNewLine()
     {
-       val[req_hndlr_ns::header] += "\r\n";
+        val[req_hndlr_ns::header] += "\r\n";
     }
 
     void addGAPIsHost(String &str, PGM_P sub)

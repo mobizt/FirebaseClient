@@ -40,7 +40,7 @@ class Messaging
 public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
-    ~Messaging() = default;
+    ~Messaging() {}
     Messaging(const String &url = "")
     {
         this->service_url = url;

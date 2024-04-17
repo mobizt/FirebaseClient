@@ -41,7 +41,7 @@ private:
 
 public:
     Timer(unsigned long sec = 60) { setInterval(sec); }
-    ~Timer() = default;
+    ~Timer() {}
     void reset() { end = ts + period; }
     void start()
     {

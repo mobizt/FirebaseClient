@@ -40,8 +40,8 @@ class Memory
 {
 private:
 public:
-    Memory() = default;
-    ~Memory() = default;
+    Memory() {}
+    ~Memory() {}
 
     // Free reserved memory at pointer.
     void release(void *ptr)

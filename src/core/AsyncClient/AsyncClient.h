@@ -148,7 +148,7 @@ public:
     bool no_etag = false;
     bool auth_param = false;
     app_token_t *app_token = nullptr;
-    slot_options_t() = default;
+    slot_options_t() {}
     slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, bool no_etag, bool auth_param = false)
     {
         this->auth_used = auth_used;

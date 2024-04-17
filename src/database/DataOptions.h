@@ -29,9 +29,7 @@
 #include "./Config.h"
 #include "./database/DatabaseFilter.h"
 
-
 #if defined(ENABLE_DATABASE)
-
 
 class DatabaseOptions
 {

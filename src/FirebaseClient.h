@@ -118,8 +118,8 @@ namespace firebase
         }
 
     public:
-        FirebaseClient() = default;
-        ~FirebaseClient() = default;
+        FirebaseClient() {}
+        ~FirebaseClient() {}
 
         void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
         {

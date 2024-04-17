@@ -383,7 +383,7 @@ private:
     }
 
 public:
-    Precondition() = default;
+    Precondition() {}
 
     /**
      * Set the exists condition.
@@ -801,7 +801,7 @@ private:
     JSONUtil jut;
 
 public:
-    ReadOnly() = default;
+    ReadOnly() {}
 
     /**
      * @param readTime Timestamp. Reads documents at the given time.
@@ -822,7 +822,7 @@ private:
     JSONUtil jut;
 
 public:
-    TransactionOptions() = default;
+    TransactionOptions() {}
 
     /**
      * @param readOnly The transaction can only be used for read operations.
@@ -868,7 +868,7 @@ private:
     URLUtil uut;
 
 public:
-    GetDocumentOptions() = default;
+    GetDocumentOptions() {}
     GetDocumentOptions(DocumentMask mask, const String &transaction = "", const String &readTime = "")
     {
         bool hasParam = false;
@@ -890,7 +890,7 @@ private:
     ObjectWriter owriter;
 
 public:
-    BatchGetDocumentOptions() = default;
+    BatchGetDocumentOptions() {}
 
     // This value represents the item to add to an array.
     // The names of the documents to retrieve.
@@ -940,7 +940,7 @@ class ExplainOptions : public BaseO1
 {
 
 public:
-    ExplainOptions() = default;
+    ExplainOptions() {}
 
     // Optional. Whether to execute this query.
     // When false (the default), the query will be planned, returning only metrics from the planning stages.
@@ -954,7 +954,7 @@ public:
 class QueryOptions : public BaseO4
 {
 public:
-    QueryOptions() = default;
+    QueryOptions() {}
 
     // Optional. Explain options for the query. If set, additional query statistics will be returned. If not, only query results will be returned.
     QueryOptions &explainOptions(const ExplainOptions &value) { return wr.set<QueryOptions &, ExplainOptions>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -1016,7 +1016,7 @@ private:
     }
 
 public:
-    ListDocumentsOptions() = default;
+    ListDocumentsOptions() {}
 
     // Optional. The maximum number of documents to return in a single response.
     // Firestore may return fewer than this value.
@@ -1084,7 +1084,7 @@ class ListCollectionIdsOptions : public BaseO4
 {
 
 public:
-    ListCollectionIdsOptions() = default;
+    ListCollectionIdsOptions() {}
 
     /**
      * The maximum number of results to return.
@@ -1135,7 +1135,7 @@ namespace DatabaseIndex
     {
 
     public:
-        IndexField() = default;
+        IndexField() {}
 
         // The path of the field. Must match the field path specification described by [google.firestore.v1beta1.Document.fields][fields]. Special field path __name__ may be used by itself or at the end of a path. __type__ may be used only at the end of path.
         IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -1230,7 +1230,7 @@ namespace CollectionGroupsIndex
     class IndexField : public BaseO4
     {
     public:
-        IndexField() = default;
+        IndexField() {}
 
         // Can be name. For single field indexes, this must match the name of the field or may be omitted.
         IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -1254,7 +1254,7 @@ namespace CollectionGroupsIndex
     class Index : public BaseO4
     {
     public:
-        Index() = default;
+        Index() {}
 
         // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
         Index &queryScope(QueryScope value) { return wr.set<Index &, const char *>(*this, _QueryScope[value].text, buf, bufSize, 1, FPSTR(__func__)); }
@@ -1286,7 +1286,7 @@ namespace Firestore
         bool databaseIdParam = false;
 
     public:
-        Parent() = default;
+        Parent() {}
         Parent(const String &projectId, const String &databaseId = "")
         {
             this->projectId = projectId;

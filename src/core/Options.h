@@ -141,7 +141,6 @@
 #define FPSTR
 #endif
 
-
 /// CORE_ARDUINO_XXXX macro for MCU build target.
 
 #if defined(ESP8266) || defined(ESP32)
@@ -235,7 +234,6 @@
 #if __has_include(<time.h>)
 #include <time.h>
 #endif
-
 
 #if defined(ENABLE_OTA) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
 #if defined(ESP32)

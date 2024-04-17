@@ -841,7 +841,7 @@ namespace Firestore
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
          * @param patchOptions The PatchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
-         * 
+         *
          * updateMask is he fields to update. If the document exists on the server and has fields not referenced in the mask,
          * they are left unchanged.
          * Fields referenced in the mask, but not present in the input document (content), are deleted from the document on the server.
@@ -879,7 +879,7 @@ namespace Firestore
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
          * @param patchOptions The PatchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
-         * 
+         *
          * updateMask is he fields to update. If the document exists on the server and has fields not referenced in the mask,
          * they are left unchanged.
          * Fields referenced in the mask, but not present in the input document (content), are deleted from the document on the server.
@@ -915,7 +915,7 @@ namespace Firestore
          * The Firestore database id should be (default) or empty "".
          * @param documentPath The relative path of document to patch with the input document.
          * @param patchOptions The PatchDocumentOptions object that included the DocumentMask (updateMask), DocumentMask (mask), Precondition (currentDocument) in its constructor.
-         * 
+         *
          * updateMask is he fields to update. If the document exists on the server and has fields not referenced in the mask,
          * they are left unchanged.
          * Fields referenced in the mask, but not present in the input document (content), are deleted from the document on the server.

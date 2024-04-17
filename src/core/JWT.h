@@ -96,7 +96,7 @@ namespace firebase
 
         bool begin(auth_data_t *auth_data);
         bool create();
-        void sendErrCB(AsyncResultCallback cb, AsyncResult *aResult= nullptr);
+        void sendErrCB(AsyncResultCallback cb, AsyncResult *aResult = nullptr);
 
     public:
         JWTClass();

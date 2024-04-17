@@ -39,12 +39,12 @@ namespace Firestore
     class CollectionGroups : public FirestoreBase
     {
     public:
-        CollectionGroups() = default;
+        CollectionGroups() {}
 
         class Indexes : public FirestoreBase
         {
         public:
-            Indexes() = default;
+            Indexes() {}
 
             /** Creates a composite index.
              *

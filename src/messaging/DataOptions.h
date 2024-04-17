@@ -389,7 +389,7 @@ namespace Messages
         String projectId;
 
     public:
-        Parent() = default;
+        Parent() {}
         Parent(const String &projectId)
         {
             this->projectId = projectId;
@@ -427,7 +427,7 @@ namespace Messages
         DataOptions *options = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
-        async_request_data_t() = default;
+        async_request_data_t() {}
         async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DataOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;

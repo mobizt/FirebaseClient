@@ -1,6 +1,6 @@
 /**
  * Created March 21, 2024
- * 
+ *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
  * The MIT License (MIT)

@@ -6,9 +6,9 @@
  * <AsyncClient> - The async client.
  * <FirebaseApp> - The authentication and access token handler.
  * <user_auth_data> - The user auth data (user_auth_data struct) that holds the user input sign-in credentials and token.
- * 
+ *
  * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
- * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken. 
+ * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
  *
  * SYNTAX:
  *
@@ -31,9 +31,9 @@
  *
  * For ServiceAuth and CustomAuth authentications, you need to check for JWT token geration process requirement,
  * before running the JWT process function in the main loop as the following.
- * 
+ *
  * JWT.loop(app.getAuth());
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -52,7 +52,7 @@
 
 #include <FirebaseClient.h>
 
-#if defined(ENABLE_FS) // Defined in this library
+#if defined(ENABLE_FS)      // Defined in this library
 #if defined(FLASH_SUPPORTS) // Defined in this library
 #if defined(ESP32)
 #include <SPIFFS.h>
@@ -64,7 +64,6 @@
 #define MY_FS SD
 #endif
 #endif
-
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"

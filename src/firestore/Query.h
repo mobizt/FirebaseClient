@@ -165,7 +165,7 @@ namespace FirestoreQuery
     {
 
     public:
-        CollectionSelector() = default;
+        CollectionSelector() {}
         CollectionSelector(const String &collectionId, bool allDescendants) { CollectionSelector::collectionId(collectionId).allDescendants(allDescendants); }
 
         // The collection ID. When set, selects only collections with this ID.

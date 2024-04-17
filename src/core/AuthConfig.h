@@ -277,7 +277,7 @@ namespace firebase
             friend class FirebaseClient;
 
         public:
-            service_account() = default;
+            service_account() {}
             ~service_account() { clear(); }
             void copy(service_account &rhs)
             {
@@ -313,7 +313,7 @@ namespace firebase
             TimeStatusCallback timestatus_cb = NULL;
 
         public:
-            custom_data() = default;
+            custom_data() {}
             ~custom_data() { clear(); }
             void copy(custom_data &rhs)
             {
@@ -337,7 +337,7 @@ namespace firebase
             size_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
 
         public:
-            user_data() = default;
+            user_data() {}
             ~user_data() { clear(); }
             void copy(user_data &rhs)
             {
@@ -360,7 +360,7 @@ namespace firebase
             size_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
 
         public:
-            id_token_data() = default;
+            id_token_data() {}
             ~id_token_data() { clear(); }
             void copy(id_token_data &rhs)
             {
@@ -385,7 +385,7 @@ namespace firebase
             TimeStatusCallback timestatus_cb = NULL;
 
         public:
-            access_token_data() = default;
+            access_token_data() {}
             ~access_token_data() { clear(); }
             void copy(access_token_data &rhs)
             {
@@ -412,7 +412,7 @@ namespace firebase
             TimeStatusCallback timestatus_cb = NULL;
 
         public:
-            custom_token_data() = default;
+            custom_token_data() {}
             ~custom_token_data() { clear(); }
             void copy(custom_token_data &rhs)
             {
@@ -435,7 +435,7 @@ namespace firebase
             String val[legacy_tk_ns::max_type];
 
         public:
-            legacy_token_data() = default;
+            legacy_token_data() {}
             ~legacy_token_data() { clear(); }
             void copy(legacy_token_data &rhs) { this->val[legacy_tk_ns::token] = rhs.val[legacy_tk_ns::token]; }
             void clear() { val[legacy_tk_ns::token].remove(0, val[legacy_tk_ns::token].length()); }
@@ -443,7 +443,7 @@ namespace firebase
 #endif
 
     public:
-        user_auth_data() = default;
+        user_auth_data() {}
         ~user_auth_data() { clear(); }
         user_auth_data &operator=(user_auth_data &rhs)
         {
@@ -1287,7 +1287,7 @@ namespace firebase
             auth_type = auth_unknown_token;
             auth_data_type = user_auth_data_undefined;
         }
-        app_token_t() = default;
+        app_token_t() {}
     };
 
     struct auth_data_t

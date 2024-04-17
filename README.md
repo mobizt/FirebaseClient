@@ -1430,6 +1430,8 @@ See [function description](/src/README.md) for all available functions.
 
 ## Project Preparation Setup
 
+You have to setup the Firebase project to use Firebase products. Visit [Understand Firebase Projects](https://firebase.google.com/docs/projects/learn-more) to learn more about Firebase projects.
+
 For new Firebase user, go to the [Google Firebase Console](https://console.firebase.google.com/), sign in to your Google account, and create a new project as the following images.
 
 ![Create a project](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/blank_account_create_a_project.png)
