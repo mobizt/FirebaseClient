@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-17T12:05:06Z`
+`2024-04-17T12:17:26Z`
 
 ## Table of Contents
 
@@ -1672,13 +1672,13 @@ The app (iOS, Android, Web and Unity) registration token or `DEVICE_TOKEN` is a 
 
 ### Service Account
 
+A `Firebase Admin SDK Service Account` is created automatically when you create a Firebase project or add Firebase to a Google Cloud project and it is used to communicate with Firebase.
+
 The `Service Account` credentials are required for `OAuth2.0 access token` and `custom token` authentications via the `ServiceAuth` and `CustomAuth` provider classes.
 
 The `Service Account` private key contains the `Service Account` credentials which used for initialize the Firebase mobile app.
 
-The `Service Account`
-
-In the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), click at `Service accounts` tab and `Generate new private key`. 
+To generate and download `Service Account` private key file, in the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), click at `Service accounts` tab and `Generate new private key`. 
 
 Open the .json file that is already downloaded with text editor.
 
@@ -1708,13 +1708,11 @@ const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----\n...\n-----END P
 
 #### Service Account Permissions
 
-A `Firebase Admin SDK Service Account` is created automatically when you create a Firebase project or add Firebase to a Google Cloud project and it is used to communicate with Firebase.
-
-When you use this `Service Account` to access the `Google Cloud services` e.g. `Google Cloud Storage`, `Google Cloud Functions` and some features of `Google Cloud Firestore` that perform some sensitive tasks, you have to add the `Basic roles`.
+When you want to use the `Firebase Admin SDK Service Account` to access the `Google Cloud services` e.g. `Google Cloud Storage`, `Google Cloud Functions` and some features of `Google Cloud Firestore` that perform some sensitive tasks, you have to add some permissive roles.
 
 The `Basic roles` are highly permissive roles that used to grant principals broad access to Google Cloud resources.
 
-The `Basic roles` e.g. `Owner` and `Editor` are required for `Firebase Admin SDK Service Account`.
+The `Basic roles` e.g. `Owner` and `Editor` will be added for this reason. The `Owner` role is already covered the `Editor` role, then you can add only `Owner` role.
 
 To add the Basic's `Owner` and `Editor` roles, go to the [Identity and Access Management console](https://console.cloud.google.com/iam-admin).
 
