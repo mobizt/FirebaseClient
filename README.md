@@ -131,7 +131,7 @@
 
 📖 Async Firebase Client library for Arduino Documentation.
 
-This library supports Firebase Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Google Cloud Storage and Google Cloud Functions.
+This library supports `Firebase Realtime Database`, Cloud Firestore database, Cloud Messaging, Firebase Storage, Google Cloud Storage and Google Cloud Functions.
 
 The features can be configurable to add and exclude some unused features, see [Library Build Options](#library-build-options).
 
@@ -150,7 +150,7 @@ Due to the known issues in the old Firebase library.
 - The cental settings using only single config class can cause the usage confusion.
 - The system time changes causes the auth token expiry period calculation error.
 - The internal SSL Client and WiFiClient issue causes the session need to be closed at some interval.
-- The Realtime database stream event data can be missing due to the sync read operation.
+- The `Realtime Database` stream event data can be missing due to the sync read operation.
 - The async operation is not truely impremented.
 
 Then this [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was planned and developed.
@@ -404,13 +404,13 @@ The users tab will show the users that can sign in.
 
 For the service account key file, chose the button `Generate new private key` in the console as shown in the picture below.
 
-The database secret used in Realtime database can be optained from the same Service accounts tab, and database secret section.
+The database secret used in `Realtime Database` can be optained from the same Service accounts tab, and database secret section.
 
 ![Service Account Key](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/sa_key_console.png)
 
 Some Google Services, the sucurity rules can be used to control your authentication for more secure usage.
 
-For more deatails of the Realtime database security rules, see [this link](https://firebase.google.com/docs/database/security).
+For more deatails of the `Realtime Database` security rules, see [this link](https://firebase.google.com/docs/database/security).
 
 For Cloud Firestore database security rules, see [this link](https://firebase.google.com/docs/firestore/security/get-started).
 
@@ -419,23 +419,23 @@ Non-authentication (for testing only) and user management classes and functions 
 
 - ### Firebase and Google Services
 
-The Firebase and Google services Classes that are available are Realtime database, Cloud Firestore database, Cloud Messaging, Firebase Storage, Cloud Functions and Google Cloud Storage classes.
+The Firebase and Google services Classes that are available are `Realtime Database`, `Cloud Firestore Database`, `Cloud Messaging`, `Firebase Storage`, `Cloud Functions` and `Google Cloud Storage` classes.
 
-- [RealtimeDatabase](examples/RealtimeDatabase/) is for Realtime database operation.
+- [RealtimeDatabase](examples/RealtimeDatabase/) is for `Realtime Database` operation.
 
-- [Firestore::Databases](examples/FirestoreDatabase/Databases/) is for Cloud Firestore databases operation.
+- [Firestore::Databases](examples/FirestoreDatabase/Databases/) is for `Cloud Firestore Database` operation.
 
-- [Firestore::Documents](examples/FirestoreDatabase/Documents/) is for Cloud Firestore documents operation.
+- [Firestore::Documents](examples/FirestoreDatabase/Documents/) is for `Cloud Firestore Document` operation.
 
 - [Firestore::CollectionGroups::Indexes](examples/FirestoreDatabase/CollectionGroups/Indexes/) is for Cloud Firestore CollectionGroups's Indexes operation.
 
-- [Messaging](examples/Messaging/) is for Cloud Messaging operation.
+- [Messaging](examples/Messaging/) is for `Cloud Messaging` operation.
 
-- [Storage](examples/Storage/) is for Firebase Storage operation.
+- [Storage](examples/Storage/) is for `Firebase Storage` operation.
 
-- [CloudStorage](examples/CloudStorage/) is for Google Cloud Storage operation.
+- [CloudStorage](examples/CloudStorage/) is for `Google Cloud Storage` operation.
 
-- [CloudFunctions](examples/CloudFunctions/) is for Google Cloud Functions operation.
+- [CloudFunctions](examples/CloudFunctions/) is for `Google Cloud Functions` operation.
 
 
 This library used internal millis timer to handle the token time to live. Then device time setting is not requierd in most authentication types.
@@ -480,7 +480,7 @@ The authentication task has the highest priority in the queue. Its async data wh
 
 The lower priority tasks are sync task, async task and `SSE mode (HTTP Streaming)` task respectively.
 
-When user uses a async client for multiple tasks which included Realtime database get in `SSE mode (HTTP Streaming)`, sync and async operations, the `SSE mode (HTTP Streaming)` will be interrupted (breaking the connection) because of the async client is only able to connect to the server via one TCP socket at a time.
+When user uses a async client for multiple tasks which included `Realtime Database` get in `SSE mode (HTTP Streaming)`, sync and async operations, the `SSE mode (HTTP Streaming)` will be interrupted (breaking the connection) because of the async client is only able to connect to the server via one TCP socket at a time.
 
 > [!TIP]
 > In ESP32, if you want to run many async tasks concurrency with different async clients. It may not be possible because the ESP32's `WiFiClientSecure` required memory up to 50k per connection. Alternatively, this can be done by using the `ESP_SSLClient` that included in this library which it works in the same way as ESP8266's `WiFiClientSecure` which the lower memeory consumption can be achieve by setting the smaller buffer size. This is the [example](/examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) for how to use `ESP_SSLClient` with this library.
@@ -598,7 +598,7 @@ The function `AsyncResult::to<RealtimeDatabaseResult>().type()` returns the foll
 
 `realtime_database_data_type_undefined` (-1), `realtime_database_data_type_null` (0), `realtime_database_data_type_integer` (1), `realtime_database_data_type_float` (2), `realtime_database_data_type_double` (3), `realtime_database_data_type_boolean` (4), `realtime_database_data_type_string` (5), `realtime_database_data_type_json` (6), and `realtime_database_data_type_array` (7).
 
-The `AsyncResult::to<RealtimeDatabaseResult>().dataPath()` and `AsyncResult::to<RealtimeDatabaseResult>().event()` are the Realtime database node path that data has changed and type of event in `SSE mode (HTTP Streaming)`.
+The `AsyncResult::to<RealtimeDatabaseResult>().dataPath()` and `AsyncResult::to<RealtimeDatabaseResult>().event()` are the `Realtime Database` node path that data has changed and the event type of `SSE mode (HTTP Streaming)`.
 
 The server response payload in `AsyncResult` can be converted to the the values of any type `T` e.g. boolean, integer, float, double and string via `AsyncResult::to<RealtimeDatabaseResult>().to<T>()`.
 
@@ -800,7 +800,7 @@ IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>)
 
 - ### Legacy Token Authorization
 
-The [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) provider class allows you to set the database secret used in Firebase Realtime database service.
+The [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) provider class allows you to set the database secret used in `Firebase Realtime Database` service.
 
 The database secret is now deprecated and should not be used in your production.
 
@@ -810,7 +810,7 @@ The available parameters in class constructor are following.
 LegacyToken::LegacyToken(<database_secret>)
 ```
 
-`<database_secret>` The Realtime database secret key.
+`<database_secret>` The `Realtime Database` secret key.
 
 
 - ### Working with Filesystems and BLOB
@@ -1480,7 +1480,7 @@ Select enable check option in Email/Password section, and click `Save` button.
 
 ### Realtime Database Getting Started
 
-To get started with Firebase Realtime database, choose `Realtime Database` and click `Create Database`. 
+To get started with `Firebase Realtime Database`, choose `Realtime Database` and click `Create Database`. 
 
 ![Create Database](/resources/images/firebase_console_rtdb_create_database.png)
 
@@ -1506,31 +1506,31 @@ Once the database was created, click on the `Rules` tab and change the `Security
 
 The warning `Your security rules are not secure. Any authenticated user can steal, modify, or delete data in your database.` will be displayed due to insecure rules which you can change it for more secure later.
 
-For more details of the Realtime database security rules, see [this link](https://firebase.google.com/docs/database/security).
+For more details of the `Realtime Database` security rules, see [this link](https://firebase.google.com/docs/database/security).
 
-The reference url is the `DATABASE_URL` that defined and used in the Realtime database examples can be obtained from the `Data` tab as the following.
+The reference url is the `DATABASE_URL` that defined and used in the `Realtime Database` examples can be obtained from the `Data` tab as the following.
 
-![Realtime database reference url](/resources/images/firebase_console_rtdb_reference_url.png)
+![Realtime Database Reference URL](/resources/images/firebase_console_rtdb_reference_url.png)
 
 The reference url or database url also can be taken from the `Service Account` key file, see [Service Account](#service-account) section.
 
 #### Realtime Database Legacy Usage
 
-The database secret is the secret key for privileged accessing the Realtime database.
+The database secret is the secret key for privileged accessing the `Realtime Database`.
 
-The database secret is now currently deprecated. Alternatively, to use the Realtime database with the same privileged access as database secret but secure, the `OAuth2.0 access token` athentication via `ServiceAuth` provider class is recommended.  
+The database secret is now currently deprecated. Alternatively, to use the `Realtime Database` with the same privileged access as database secret but secure, the `OAuth2.0 access token` athentication via `ServiceAuth` provider class is recommended.  
 
 To get the database secret, in the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), under the `Service accounts` Tab click `Database secret`.
 
-![Realtime database Database Secret on Service Accounts Tab](/resources/images/firebase_console_rtdb_secret_key_step1.png)
+![Realtime Database Database Secret on Service Accounts Tab](/resources/images/firebase_console_rtdb_secret_key_step1.png)
 
 The database secret for the databases are available in the `Secrets` column.
 
-![Realtime database Database Secret Table](/resources/images/firebase_console_rtdb_secret_key_step2.png)
+![Realtime Database Database Secret Table](/resources/images/firebase_console_rtdb_secret_key_step2.png)
 
 ### Google Cloud Firestore Database Getting Started
 
-To get started with Firebase Realtime database, choose `Cloud Firestore` and click `Create database`. 
+To get started with `Cloud Firestore Database`, choose `Cloud Firestore` and click `Create database`. 
 
 ![Create Firestore Database](/resources/images/firebase_console_firestore_create_database.png)
 
@@ -1561,7 +1561,7 @@ For more details of the Cloud Firestore database security rules, see [this link]
 
 ### Storage Getting Started
 
-To get started with Storage, choose `Storage` and click `Get started`. 
+To get started with `Storage`, choose `Storage` and click `Get started`. 
 
 ![Storage Get Started](/resources/images/firebase_console_storage_get_started.png)
 
