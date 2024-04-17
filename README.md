@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-17T02:24:57Z`
+`2024-04-17T08:22:22Z`
 
 ## Table of Contents
 
@@ -116,7 +116,7 @@
 
   - [Service Account](#service-account)
 
-    - [Service Account Permission](#service-account-permission)
+    - [Service Account Permissions](#service-account-permissions)
 
 [10. Library Build Options](#library-build-options)
 
@@ -1427,15 +1427,15 @@ See [function description](/src/README.md) for all available functions.
 
 For new Firebase user, go to the [Google Firebase Console](https://console.firebase.google.com/), sign in to your Google account, and create a new project as the following images.
 
-![Create a project](/resources/images/blank_account_create_a_project.png)
+![Create a project](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/blank_account_create_a_project.png)
 
-![Name a project](/resources/images/create_a_project_step1.png)
+![Name a project](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/create_a_project_step1.png)
 
-![Ignore the Google Analytics](/resources/images/create_a_project_step2.png)
+![Ignore the Google Analytics](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/create_a_project_step2.png)
 
 Click the button `All products`.
 
-![All products](/resources/images/firebase_console_all_products.png)
+![All products](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_all_products.png)
 
 ### Authentication Getting Started
 
@@ -1446,25 +1446,25 @@ When `custom token`, `ID token` authentications are used via `CustomAuth`, `User
 
 To get started with `Authentication`,  choose `Authentication` and click `Get started` button.
 
-![Authentication Get Started](/resources/images/firebase_console_authentication_get_started.png)
+![Authentication Get Started](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started.png)
 
 Under Sign-in providers, choose Email/Password.
 
-![Authentication Select Email/Password Provider](/resources/images/firebase_console_authentication_get_started_step1.png)
+![Authentication Select Email/Password Provider](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step1.png)
 
 Select enable check option in Email/Password section, and click `Save` button.
 
-![Authentication Enable Email/Password](/resources/images/firebase_console_authentication_get_started_step2.png)
+![Authentication Enable Email/Password](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step2.png)
 
 Then click at `Users` tab, click `Add user` button.
 
-![Authentication Add User](/resources/images/firebase_console_authentication_get_started_step3.png)
+![Authentication Add User](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step3.png)
 
 Fill in the `Email` and `Password` and click `Add user` button.
 
 Once the `Authentication` was setup, the `Web API Key` will be generated. See the `Project Settings` page for `Web API Key`. 
 
-![Authentication Web API Key](/resources/images/firebase_console_authentication_get_started_step4.png)
+![Authentication Web API Key](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step4.png)
 
 The `Web API Key` is used in all `custom token`, `ID token` authentications that used via the `CustomAuth`, `UserAuth`, `CustomToken` and `IDToken` provider classes and it was assign to the `API_KEY` in the exampless.
 
@@ -1472,23 +1472,23 @@ At the `Authentication` page, under `Sigm-in method` tab, other Sign-in provider
 
 To add `Anonymous` sign-in provider, click at `Add new provider` button.
 
-![Authentication Anonymous Provider](/resources/images/firebase_console_authentication_get_started_step5.png)
+![Authentication Anonymous Provider](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step5.png)
 
 Select enable check option in Email/Password section, and click `Save` button.
 
-![Authentication Enable Anonymous Provider](/resources/images/firebase_console_authentication_get_started_step6.png)
+![Authentication Enable Anonymous Provider](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step6.png)
 
 ### Realtime Database Getting Started
 
 To get started with `Firebase Realtime Database`, choose `Realtime Database` and click `Create Database`. 
 
-![Create Database](/resources/images/firebase_console_rtdb_create_database.png)
+![Create Database](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_create_database.png)
 
 Set up your `Database options` and `Security rules`.
 
-![Set Database Location](/resources/images/firebase_console_rtdb_setup_database_step1.png)
+![Set Database Location](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_setup_database_step1.png)
 
-![Set Database Security Rules](/resources/images/firebase_console_rtdb_setup_database_step2.png)
+![Set Database Security Rules](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_setup_database_step2.png)
 
 You can choose `Start in locked mode` or `Start in test mode` for `Security rules`.
 
@@ -1502,7 +1502,7 @@ Once the database was created, click on the `Rules` tab and change the `Security
   }
 }
 ```
-![Change Database Security Rules](/resources/images/firebase_console_rtdb_setup_database_step3.png)
+![Change Database Security Rules](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_setup_database_step3.png)
 
 The warning `Your security rules are not secure. Any authenticated user can steal, modify, or delete data in your database.` will be displayed due to insecure rules which you can change it for more secure later.
 
@@ -1510,7 +1510,7 @@ For more details of the `Realtime Database` security rules, see [this link](http
 
 The reference url is the `DATABASE_URL` that defined and used in the `Realtime Database` examples can be obtained from the `Data` tab as the following.
 
-![Realtime Database Reference URL](/resources/images/firebase_console_rtdb_reference_url.png)
+![Realtime Database Reference URL](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_reference_url.png)
 
 The reference url or database url also can be taken from the `Service Account` key file, see [Service Account](#service-account) section.
 
@@ -1522,26 +1522,26 @@ The database secret is now currently deprecated. Alternatively, to use the `Real
 
 To get the database secret, in the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), under the `Service accounts` Tab click `Database secret`.
 
-![Realtime Database Database Secret on Service Accounts Tab](/resources/images/firebase_console_rtdb_secret_key_step1.png)
+![Realtime Database Database Secret on Service Accounts Tab](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_secret_key_step1.png)
 
 The database secret for the databases are available in the `Secrets` column.
 
-![Realtime Database Database Secret Table](/resources/images/firebase_console_rtdb_secret_key_step2.png)
+![Realtime Database Database Secret Table](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_secret_key_step2.png)
 
 ### Google Cloud Firestore Database Getting Started
 
 To get started with `Cloud Firestore Database`, choose `Cloud Firestore` and click `Create database`. 
 
-![Create Firestore Database](/resources/images/firebase_console_firestore_create_database.png)
+![Create Firestore Database](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_firestore_create_database.png)
 
 Set up your database `Name and Location` and `Security rules`.
 
 > [!NOTE]  
 > The first database name (ID) is `(default)` which cannot be changed.
 
-![Set Name and Location](/resources/images/firebase_console_firestore_create_database_step1.png)
+![Set Name and Location](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_firestore_create_database_step1.png)
 
-![Set Security Rules](/resources/images/firebase_console_firestore_create_database_step2.png)
+![Set Security Rules](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_firestore_create_database_step2.png)
 
 Once the database was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
 
@@ -1555,7 +1555,7 @@ service cloud.firestore {
   }
 }
 ```
-![Change Security Rules](/resources/images/firebase_console_firestore_create_database_step3.png)
+![Change Security Rules](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_firestore_create_database_step3.png)
 
 For more details of the Cloud Firestore database security rules, see [this link](https://firebase.google.com/docs/firestore/security/get-started).
 
@@ -1563,13 +1563,13 @@ For more details of the Cloud Firestore database security rules, see [this link]
 
 To get started with `Storage`, choose `Storage` and click `Get started`. 
 
-![Storage Get Started](/resources/images/firebase_console_storage_get_started.png)
+![Storage Get Started](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_storage_get_started.png)
 
 Then set the `Secure Rules for Cloud Storage` and `Cloud Storage location`.
 
-![Secure Rules for Cloud Storage](/resources/images/firebase_console_storage_get_started_step1.png)
+![Secure Rules for Cloud Storage](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_storage_get_started_step1.png)
 
-![Set Cloud Storage location](/resources/images/firebase_console_storage_get_started_step2.png)
+![Set Cloud Storage location](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_storage_get_started_step2.png)
 
 Once the storage bucket was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
 
@@ -1584,13 +1584,13 @@ service firebase.storage {
 }
 ```
 
-![Change Security Rules](/resources/images/firebase_console_storage_get_started_step3.png)
+![Change Security Rules](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_storage_get_started_step3.png)
 
 For more details of the Cloud Storage for Firebase's security rules, see [this link](https://firebase.google.com/docs/storage/security/get-started).
 
 The folder path is the `STORAGE_BUCKET_ID` that defined and used in the Storage examples can be obtained from the `Files` tab as the following.
 
-![Storage folder path](/resources/images/firebase_console_storage_folder_path.png)
+![Storage folder path](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_storage_folder_path.png)
 
 The folder path or the `STORAGE_BUCKET_ID` also can be taken from the `Service Account` key file, see [Service Account](#service-account) section.
 
@@ -1598,35 +1598,39 @@ The folder path or the `STORAGE_BUCKET_ID` also can be taken from the `Service A
 
 To use the `Cloud Functions` for running your backend automate code, the billing plan for the project is needed to be upgraded to at least `Blaze` plan.
 
-![Functions Get Started](/resources/images/firebase_console_functions_get_started.png)
+![Functions Get Started](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_functions_get_started.png)
 
-![Functions Upgrade Billing Plan](/resources/images/firebase_console_functions_get_started_step1.png)
+![Functions Upgrade Billing Plan](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_functions_get_started_step1.png)
 
 You can `Set a billing budget` at this step or skip it.
 
-![Functions Upgrade Plan Purchase](/resources/images/firebase_console_functions_get_started_step2.png)
+![Functions Upgrade Plan Purchase](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_functions_get_started_step2.png)
 
-![Functions Upgrade Purchased](/resources/images/firebase_console_functions_get_started_step3.png)
+![Functions Upgrade Purchased](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_functions_get_started_step3.png)
 
 Click the `Get started` button and follow the steps as show in the following images.
 
-![Functions Install command line tools](/resources/images/firebase_console_functions_get_started_step4.png)
+![Functions Install command line tools](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_functions_get_started_step4.png)
 
-![Functions Finishing](/resources/images/firebase_console_functions_get_started_step5.png)
+![Functions Finishing](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_functions_get_started_step5.png)
+
+> [!IMPORTANT]  
+> The `Cloud Build API` and `Cloud Run Admin API` must be enabled, click [here](https://console.developers.google.com/apis/library/cloudbuild.googleapis.com) to enable `Cloud Build API`and [here](https://console.cloud.google.com/apis/library/run.googleapis.com) to enable `Cloud Run Admin API`.
+
 
 ### Cloud Messaging Getting Started
 
-![Cloud Messaging Get Started](/resources/images/firebase_console_messaging_get_started.png)
+![Cloud Messaging Get Started](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_messaging_get_started.png)
 
 Create an app (iOS, Android, Web, or Unity app) for getting started.
 
 The following steps showed the web app (Javascript) is created.
 
-![Cloud Messaging Register App](/resources/images/firebase_console_messaging_get_started_step1.png)
+![Cloud Messaging Register App](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_messaging_get_started_step1.png)
 
 Add the Firebase SDK and click `Continue to console` button.
 
-![Cloud Messaging Add Firebase SDK](/resources/images/firebase_console_messaging_get_started_step2.png)
+![Cloud Messaging Add Firebase SDK](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_messaging_get_started_step2.png)
 
 Follow the [Firebase Cloud Messaging Quickstart for Javascript](https://github.com/firebase/quickstart-js/tree/master/messaging) for the rest of steps.
 
@@ -1662,7 +1666,9 @@ The app (iOS, Android, Web and Unity) registration token or `DEVICE_TOKEN` is a 
 
 The `Service Account` credentials are required for `OAuth2.0 access token` and `custom token` authentications via the `ServiceAuth` and `CustomAuth` provider classes.
 
-The default `Service Account` private key contains the `Service Account` credentials which can be created.
+The `Service Account` private key contains the `Service Account` credentials which used for initialize the Firebase mobile app.
+
+The `Service Account`
 
 In the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), click at `Service accounts` tab and `Generate new private key`. 
 
@@ -1692,31 +1698,30 @@ Copy the `project_id`, `client_email`, `private_key_id` and `private_key` from .
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"; // Taken from "private_key" key in JSON file.
 ```
 
-#### Service Account Permission
+#### Service Account Permissions
 
-The Firebase project except for the Google Cloud Project, its `Service Account` that use to access the `Google Cloud services` e.g. `Google Cloud Storage`, `Google Cloud Functions` and some features of `Google Cloud Firestore` that perform some sensitive tasks, required some permissive roles.
+A `Firebase Admin SDK Service Account` is created automatically when you create a Firebase project or add Firebase to a Google Cloud project and it is used to communicate with Firebase.
+
+When you use this `Service Account` to access the `Google Cloud services` e.g. `Google Cloud Storage`, `Google Cloud Functions` and some features of `Google Cloud Firestore` that perform some sensitive tasks, you have to add the `Basic roles`.
 
 The `Basic roles` are highly permissive roles that used to grant principals broad access to Google Cloud resources.
 
-To access the `Google Cloud services` that support by this library using `Service Account` in `OAuth2.0 access token` authentication, the Basic's `Owner` and `Editor` roles are required.
+The `Basic roles` e.g. `Owner` and `Editor` are required for `Firebase Admin SDK Service Account`.
 
-The `Editor` role may be already set for your Firebase project's `Service Account` then you may have to add the `Owner` role in this case.
-
-To set the Basic's `Owner` role, go to the [Identity and Access Management console](https://console.cloud.google.com/iam-admin).
+To add the Basic's `Owner` and `Editor` roles, go to the [Identity and Access Management console](https://console.cloud.google.com/iam-admin).
 
 Then choose the project, and select the `VIEW BY PRINCIPALS` tab.
 
-From the table displayed, look at the `Principal` column, choose the principal type `Service account` (`serviceAccount:SA_EMAIL_ADDRESS`) e.g. xxxx@yyyy.gserviceaccount.com as shown in your `Service Account` private key file. 
+From the table displayed, look at the `firebase-adminsdk` in the `Name` column, then click on the pencil icon on the right side in this table row to `Edit principal`. 
 
-Click on the pencil icon <svg width="12" height="12" viewBox="0 0 18 18" fit="" preserveAspectRatio="xMidYMid meet" focusable="false" sandboxuid="0"><path d="M2 13.12l8.49-8.488 2.878 2.878L4.878 16H2v-2.88zm13.776-8.017L14.37 6.507 11.494 3.63l1.404-1.406c.3-.3.783-.3 1.083 0l1.8 1.796c.3.3.3.784 0 1.083z" fill-rule="evenodd" sandboxuid="0"></path></svg> on the right to `Edit principal`. 
+![IAM Add Permission](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/iam_add_permission_step1.png)
 
-Add the role `Owner` under the `Basic` roles.
-
-![IAM Add Permission](/resources/images/iam_add_permission.png)
+Add the role `Owner` and `Editor` under the `Basic` roles and click `Save` button.
 
 Wait a few minutes for the action to propagate after adding roles. 
 
-For Cloud Functions Cloud Build API must be enabled for the project. To enable Cloud Build API go to [this link](https://console.developers.google.com/apis/library/cloudbuild.googleapis.com).
+![IAM Add Roles](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/iam_add_permission_step2.png)
+
 
 
 
