@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-16T05:44:08Z`
+`2024-04-17T00:24:51Z`
 
 ## Table of Contents
 
@@ -1480,7 +1480,7 @@ Select enable check option in Email/Password section, and click `Save` button.
 
 ### Realtime Database Getting Started
 
-To get start with Firebase Realtime database, choose `Realtime Database` and click `Create Database`. 
+To get started with Firebase Realtime database, choose `Realtime Database` and click `Create Database`. 
 
 ![Create Database](/resources/images/firebase_console_rtdb_create_database.png)
 
@@ -1492,7 +1492,7 @@ Set up your `Database options` and `Security rules`.
 
 You can choose `Start in locked mode` or `Start in test mode` for `Security rules`.
 
-Once the database was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply change.
+Once the database was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
 
 ```yaml
 {
@@ -1512,7 +1512,7 @@ The reference url is the `DATABASE_URL` that defined and used in the Realtime da
 
 ![Realtime database reference url](/resources/images/firebase_console_rtdb_reference_url.png)
 
-The reference url or database url also can be taken from the `Servic Account` key file, see [Service Account](#service-account) section.
+The reference url or database url also can be taken from the `Service Account` key file, see [Service Account](#service-account) section.
 
 #### Realtime Database Legacy Usage
 
@@ -1530,7 +1530,7 @@ The database secret for the databases are available in the `Secrets` column.
 
 ### Google Cloud Firestore Database Getting Started
 
-To get start with Firebase Realtime database, choose `Cloud Firestore` and click `Create database`. 
+To get started with Firebase Realtime database, choose `Cloud Firestore` and click `Create database`. 
 
 ![Create Firestore Database](/resources/images/firebase_console_firestore_create_database.png)
 
@@ -1543,7 +1543,7 @@ Set up your database `Name and Location` and `Security rules`.
 
 ![Set Security Rules](/resources/images/firebase_console_firestore_create_database_step2.png)
 
-Once the database was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply change.
+Once the database was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
 
 ```yaml
 rules_version = '2';
@@ -1561,7 +1561,7 @@ For more details of the Cloud Firestore database security rules, see [this link]
 
 ### Storage Getting Started
 
-To get start with Storage, choose `Storage` and click `Get started`. 
+To get started with Storage, choose `Storage` and click `Get started`. 
 
 ![Storage Get Started](/resources/images/firebase_console_storage_get_started.png)
 
@@ -1571,7 +1571,7 @@ Then set the `Secure Rules for Cloud Storage` and `Cloud Storage location`.
 
 ![Set Cloud Storage location](/resources/images/firebase_console_storage_get_started_step2.png)
 
-Once the storage bucket was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply change.
+Once the storage bucket was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
 
 ```yaml
 rules_version = '2';
@@ -1592,7 +1592,7 @@ The folder path is the `STORAGE_BUCKET_ID` that defined and used in the Storage 
 
 ![Storage folder path](/resources/images/firebase_console_storage_folder_path.png)
 
-The folder path or the `STORAGE_BUCKET_ID` also can be taken from the `Servic Account` key file, see [Service Account](#service-account) section.
+The folder path or the `STORAGE_BUCKET_ID` also can be taken from the `Service Account` key file, see [Service Account](#service-account) section.
 
 ### Google Cloud Functions Getting Started
 
