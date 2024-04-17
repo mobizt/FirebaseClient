@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-17T12:17:26Z`
+`2024-04-17T12:53:13Z`
 
 ## Table of Contents
 
@@ -1910,8 +1910,8 @@ You can assign the optional build options using one of the following methods.
 In PlatformIO IDE, using `build_flags` in PlatformIO IDE's platformio.ini is more convenient 
 
 ```ini
-build_flags = -D DISABLE_FB_STORAGE
-              -D EFIREBASE_DISABLE_ONBOARD_WIFI
+build_flags = -D DISABLE_STORAGE
+              -D FIREBASE_DISABLE_ONBOARD_WIFI
 ```
 
 For external Ethernet module integation used with function `setEthernetClient`, both `FIREBASE_ETHERNET_MODULE_LIB` and `FIREBASE_ETHERNET_MODULE_CLASS` should be defined.
