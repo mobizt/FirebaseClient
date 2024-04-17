@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-17T08:22:22Z`
+`2024-04-17T08:38:10Z`
 
 ## Table of Contents
 
@@ -464,7 +464,12 @@ When the async operation queue is full or the another SSE mode get function was 
 The finished and time out operating slot will be removed from the queue unless the async `SSE mode (HTTP Streaming)` and allow the vacant slot for the new async operation.
 
 The async `SSE mode (HTTP Streaming)` operation will run continuously and repeatedly as long as the FirebaseApp and the services app
-(Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via `app.loop()` or `Database.loop()`.
+(Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via `FirebaseApp::loop()` or `<FirebaseServices>::loop()`.
+
+
+> [!IMPORTANT]  
+> The user blocking code and `delay` used in the same loop of `FirebaseApp::loop()` and `<FirebaseServices>::loop()` that are running will block the async operations in a `FirebaseClientClass`'s async queue. Please avoid to use `delay` in the loop.
+
 
 - ### Async Client
 
