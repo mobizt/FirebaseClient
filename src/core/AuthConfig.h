@@ -1262,7 +1262,7 @@ namespace firebase
             this->data.clear();
             this->data.initialized = true;
             this->data.auth_type = auth_unknown_token;
-            this->data.auth_data_type = user_auth_data_undefined;
+            this->data.auth_data_type = user_auth_data_no_token;
         }
         user_auth_data &get() { return data; }
 
