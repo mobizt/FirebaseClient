@@ -472,7 +472,7 @@ The Firebase and Google Services classes that are available in this library are 
 
 All requests for sync and async operations are managed using queue.
 
-![Async TAsk Queue](/resources/images/async_task_queue.png)
+![Async TAsk Queue](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue.png)
  
 Each sync and async requests data consume memory up to 1k. When many async tasks are added to the queue (FIFO), the memory usage will be increased.
  
