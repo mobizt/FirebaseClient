@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-17T12:53:13Z`
+`2024-04-18T06:09:39Z`
 
 ## Table of Contents
 
@@ -48,21 +48,21 @@
 
 - [App Initialization](#app-initialization)
  
-  - [Custom UID User Authentication](#custom-uid-user-authentication)
+  - [CustomAuth (ID Token Authorization Using Service Account)](#customauth-id-token-authorization-using-service-account)
 
-  - [Service Account Authentication](#service-account-authentication)
+  - [ServiceAuth (OAuth2.0 Access Token Authorization Using Service Account)](#serviceauth-oauth20-access-token-authorization-using-service-account)
 
-  - [User Authentication with Email/Password](#user-authentication-with-emailpassword)
+  - [UserAuth (User Sign-In Authentication)](#userauth-user-sign-in-authentication)
 
-  - [No Authentication](#no-authentication)
+  - [NoAuth (Non-Authentication)](#noauth-non-authentication)
 
-  - [Custom Token Authorization](#custom-token-authorization)
+  - [CustomToken (ID Token Authorization Using Custom Token)](#customtoken-id-token-authorization-using-custom-token)
 
-  - [Access Token Authorization](#access-token-authorization)
+  - [AccessToken (OAuth2.0 Access Token Authorization)](#accesstoken-oauth20-access-token-authorization)
 
-  - [ID Token Authorization](#id-token-authorization)
+  - [IDToken (ID token Authorization)](#idtoken-id-token-authorization)
 
-  - [Legacy Token Authorization](#legacy-token-authorization)
+  - [LegacyToken (Database Secret)](#legacytoken-database-secret)
 
 - [Working with Filesystems and BLOB](#working-with-filesystems-and-blob)
 
@@ -384,43 +384,72 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 
 ## Usages
 
-There are classes or objects that used for required operations and data in this library e.g. authentication and auth data, networking data, Firebase service apps and Firebase service apps data.
+Based on the async library design , there are no main generic `Firebase` class, central configuration class (`FirebaseConfig`) and all-in-one data containter class (`FirebaseData`) as in the old Firebase library. 
+
+This library provides the managed classes that are used in different purposes i.e. the classes that used to hadle the sync and async tasks and to use as a container (data provider) for authentication credentials, networking and filesystems configurations, and async task result.
+
+For the concept and basic usage understanding, you should read this documentation thoroughly. 
 
 > [!IMPORTANT]  
-> For new Firebase user, please read the [Project Preparation Setup](#project-preparation-setup) section first.
+> For new `Firebase` users, please read the [Project Preparation Setup](#project-preparation-setup) section first.
 
 - ### Authentication
 
-The authentication classes provide the custom token, access token, ID token authentications using credentials or tokens from other sources.
+The authentication classes provide the authentication data for authentication and authorization using service account, sign-in credentials and auth tokens.
 
-The ID token authentication required the Email/Password Sign-in provider to be enabled and the API key.
+The REST API client (this library) will use the short-lived token for authorization or no token in some case.
 
-The users tab will show the users that can sign in.
+This token will be expired in 60 minutes.
+
+The token types that can be used are `ID token` and `access token` which both type can be refered as `auth token` in this library.
+
+The following authentication classes generate and hold the `auth token` to be used in further authorization requests.
+
+- The `UserAuth` class is for `User Sign-in authentication` which is the only authentication method that allows user to sign in and provides the ID token.
+
+- The `IDToken` class is for `ID token authorization` using the ID token that is generated from other applications.
+
+- The `CustomAuth` class is for `ID token authorization using service account` that allows user defined UID.
+
+- The `CustomToken` class is for `ID token authorization using custom token` using the custom claims signed JWT token that is generated from other applications.
+
+The following classes provide privilege access (admin) to the Firebase and Google services.
+
+- The `ServiceAuth` class is for `OAuth2.0 access token authorization using service account`.
+
+- The `AcessToken` class is for `OAuth2.0 access token authorization` using the access token that is generated from other applications.
+
+- The `LegacyToken` class is for `database secret` for `Realtime Database` privilege access.
+
+The following class provides non-authentication.
+
+- The `NoAuth` class is for non-authentication.
+
+The `User Sign-in authentication` requires the Email/Password Sign-in provider to be enabled in your project 
+
+The `Users` tab in the `Authentication` page in the [`Firebase console`](https://console.firebase.google.com/) shows the list of users that are signed up or added.
 
 ![Email/Password Sign-in provider](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/user_auth_console.png)
 
- Copy the `Web API Key` in the console as shown in the picture below to use as API key in your code.
+The user management using this library are also [available](/examples/App/UserManagement).
 
-![API Key](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/api_key_console.png)
+The sucurity rules can be used for user accessing control.
 
-For the service account key file, chose the button `Generate new private key` in the console as shown in the picture below.
+Visit [Understand Firebase Realtime Database Security Rules](https://firebase.google.com/docs/database/security), [Get started with Cloud Firestore Security Rules](https://firebase.google.com/docs/firestore/security/get-started) and [Get started with Firebase Security Rules](https://firebase.google.com/docs/storage/security/get-started) to learn more about security rules.
 
-The database secret used in `Realtime Database` can be optained from the same Service accounts tab, and database secret section.
 
-![Service Account Key](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/sa_key_console.png)
+This library used the internal millis timer to handle the token time to live. Then device time setting is not requierd in most authentication types.
 
-Some Google Services, the sucurity rules can be used to control your authentication for more secure usage.
+In `OAuth2.0 access token authentication using service account` and `ID token authorization using service account` involve the JWT token generation and RSA private key signing.
 
-For more deatails of the `Realtime Database` security rules, see [this link](https://firebase.google.com/docs/database/security).
+The valid time is needed in the JWT token generation process, the time status callback that takes the user defined timestamp will be use in both `ServiceAuth`and `CustomToken` classes.
 
-For Cloud Firestore database security rules, see [this link](https://firebase.google.com/docs/firestore/security/get-started).
-
-Non-authentication (for testing only) and user management classes and functions also available.
+The details for these authentication classes will be discussed later in the [App Initialization](#app-initialization) section.
 
 
 - ### Firebase and Google Services
 
-The Firebase and Google services Classes that are available are `Realtime Database`, `Cloud Firestore Database`, `Cloud Messaging`, `Firebase Storage`, `Cloud Functions` and `Google Cloud Storage` classes.
+The Firebase and Google Services classes that are available in this library are the following. 
 
 - [RealtimeDatabase](examples/RealtimeDatabase/) is for `Realtime Database` operation.
 
@@ -439,14 +468,11 @@ The Firebase and Google services Classes that are available are `Realtime Databa
 - [CloudFunctions](examples/CloudFunctions/) is for `Google Cloud Functions` operation.
 
 
-This library used internal millis timer to handle the token time to live. Then device time setting is not requierd in most authentication types.
-
-In access and custom token authentications using service accout file (sa and custom auths), it related to JWT token creation and the token signing using RSA private key.  These processes require the valid timestamp, then the time status setting callback will be required in the sa and custom auth class constructor.
-
-
 - ### Async Queue
 
 All requests for sync and async operations are managed using queue.
+
+![Async TAsk Queue](/resources/images/async_task_queue.png)
  
 Each sync and async requests data consume memory up to 1k. When many async tasks are added to the queue (FIFO), the memory usage will be increased.
  
@@ -619,34 +645,48 @@ The user auth data that passes to the `FirebaseApp` class constructor can be obt
 
 Thses classes also mentioned in the earlier section.
 
-The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino), [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino), [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino), and [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino) are for authentications and non-authentication.
+The following authentication classes generate and hold the `auth token` to be used in further authorization requests.
 
-The [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino), [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino), [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino), and [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) are for the Firebase services authorizations using tokens. 
+- [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino)
+
+- [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino)
+
+- [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino)
+
+The following classes provide privilege access (admin) to the Firebase and Google services.
+
+ - [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino)
+ 
+ - [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino)
+
+ - [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino)
+
+ The following class provides non-authentication.
+ 
+ - [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino)
+
 
 The `getAuth` function is the function to get user auth data (`user_auth_data`) from these authentication provider classes.
 
 > [!NOTE]  
 > The user auth data will be coppied and use internally, then changing these authentication provider classes's data cannot affect the authentication process unless `FirebaseApp` was re-initializing.
 
-
-The UID for signed in user can be obtained from `FirebaseApp::getUid()`.
+The UID for user can be obtained from `FirebaseApp::getUid()`.
 
 The auth token (ID token, access token or legacy token) can be obtained from `FirebaseApp::getToken()`.
 
 The refresh token (if available) can be obtained from `FirebaseApp::getRefreshToken()`.
 
 
-- ### Custom UID User Authentication
+- ### CustomAuth (ID Token Authorization Using Service Account)
 
-The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) is the class to create cusom token (signed JWT token with custom claims).
+The cusom signed JWT token was not exposed to the user unless it was used create internally and use tempolary.
 
-The cusom token was not exposed to the user unless it was used in internal ID token exchanging with Google APIs server.
+This is the approach that allows you to access the service as a user with the custom UID without sign in.
 
-This is the approach that allows you to sign in as user (alternative from regular email/password sign-in) with the user defined UID.
+You can define any UID to represent the user identifier for the access control.
 
-You can define any UID to represent the user identifier for security control customization.
-
-The parameters for the [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) class constructor are following which most of the parameters can be taken from service account json key file.
+The parameters for the [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) class constructor are the following which most of the parameters can be taken from the service account credentials.
 
 ```cpp
 CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
@@ -670,15 +710,11 @@ CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project
 
 `<expire>`The expiry period in seconds (less than 3600), 3300 is the default value.
 
-- ### Service Account Authentication
+- ### ServiceAuth (OAuth2.0 Access Token Authorization Using Service Account)
 
-With [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) provider class, you are now access the Firebase services as non-human or a service or application user.
+This type of authentication is used when privilege (admin) access is needed.
 
-This uses `OAuth2.0 using Service Account` authentication flows to create the access token for authorization.
-
-This type of authentication required when you use some APIs of Firebase and Google services that required privilege (admin) access.
-
-The parameters for [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) provider class are following which most of the parameters can be taken from service account json key file.
+The parameters for [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) provider class are the following which most of the parameters can be taken from service account credentials.
 
 ```cpp
 ServiceAuth::ServiceAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>)
@@ -695,11 +731,11 @@ ServiceAuth::ServiceAuth(<TimeStatusCallback>, <api_key>, <client_email>, <proje
 `<expire>` The expiry period in seconds (less than 3600), 3300 is the default value.
 
 > [!NOTE]  
-> The refresh token is not available when authenticated with service account.
+> The refresh token is not available for this authentication type.
 
-The internal process to refresh the token was done by creating the new token.
+The auth token need to be re-created instead of refreshing.
 
-- ### User Authentication with Email/Password
+- ### UserAuth (User Sign-In Authentication)
 
 With [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) provider class, you are now signin as a user with Email and password.
 
@@ -717,19 +753,19 @@ UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>)
 
 `<expire>`The expiry period in seconds (less than 3600), 3300 is the default value.
 
-- ### No Authentication
+- ### NoAuth (Non-Authentication)
 
 The [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino) provider class, allows you to skip all auth data in the request that sent to the Firebase services.
 
-You have to set the security rules for the Firebase and Google services to allow read and write access with unconditional.
+The security rules should allow read and write access without conditiona.
 
-This used for testing only and should not use in production.
+This is suitable for testing and should not use in production.
 
-- ### Custom Token Authorization
+- ### CustomToken (ID Token Authorization Using Custom Token)
 
-With [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino) provider class, you are able to set the custom token (signed JWT token) that created and taken from other sources e.g. Firebase and Admin SDK apps, to use in the internal ID token exchanging process.
+With [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino) provider class, you are able to set the custom token (custom claims signed JWT token) that generated from other Firebase client apps.
 
-The available parameters in class constructor are following.
+The available parameters in the class constructor are the following.
 
 ```cpp
 CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>)
@@ -744,23 +780,23 @@ CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>)
 You should defined the expire period that less than the remaining time to live of your signed JWT token.
 
 > [!NOTE]  
-> Only valid sign JWT token can be used with Firebase and Google services that provided in the library is `RS256` signature that sined with the RSA private key of your project server.
+> Only valid `RS256` signed JWT token can be used with Firebase and Google services that provided in the library. 
 
-Most Arduino boards that come with crypto chip e.g. ATECC608A do not support RSA-256 algorithm and can not use its crypto library to generate the signed JWT token used with this library.
+Most Arduino boards that come with crypto chip e.g. [ATECC608A](https://www.microchip.com/en-us/product/atecc608a) do not support RSA-256 algorithm and can not use its crypto library to generate the signed JWT token used with this library.
 
 You can assign the refresh token that obtains from Google API server when generating the ID token, as the `<custom_token>` parameter to refresh the token and use it last long.
 
 The ID token itself is short-lived token which as expired in 1 Hour or less.
 
-- ### Access Token Authorization
+- ### AccessToken (OAuth2.0 Access Token Authorization)
 
 The [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino) provider class allows you to authorize the Firebase and Google services with the access token.
 
-The access token itself is short-lived token which as expired in 1 Hour or less.
+The access token itself is short-lived token which will be expired in 1 Hour or less.
 
-The access token can be obtain from Firebase and Admin SDK apps.
+The access token can be obtained from Firebase client apps.
 
-The available parameters in class constructor are following.
+The available parameters in the class constructor are the following.
 
 ```cpp
 AccessToken::AccessToken(<auth_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>)
@@ -784,13 +820,13 @@ The Client ID and Client Secret can be taken from https://console.developers.goo
 
 By providing `<refresh_token>` without `<client_id>` and `<client_secret>`, the token refrehing process will fail with unexpected error.
 
-- ### ID Token Authorization
+- ### IDToken (ID token Authorization)
 
-The [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) provider class, allows you to set the ID token form other Firebase and Admin SDK apps to be used with this library.
+The [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) provider class, allows you to set the ID token form other Firebase clent apps.
 
-The ID token itself is short-lived token which as expired in 1 Hour or less.
+The ID token itself is short-lived token which will be expired in 1 Hour or less.
 
-The available parameters in class constructor are following.
+The available parameters in the class constructor are the following.
 
 ```cpp
 IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>)
@@ -804,13 +840,13 @@ IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>)
 
 `<refresh_token>` Refresh token.
 
-- ### Legacy Token Authorization
+- ### LegacyToken (Database Secret)
 
 The [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) provider class allows you to set the database secret used in `Firebase Realtime Database` service.
 
-The database secret is now deprecated and should not be used in your production.
+The database secret is now deprecated and should not use in production.
 
-The available parameters in class constructor are following.
+The available parameter in the class constructor is the following.
 
 ```cpp
 LegacyToken::LegacyToken(<database_secret>)
@@ -1514,7 +1550,7 @@ Once the database was created, click on the `Rules` tab and change the `Security
 
 The warning `Your security rules are not secure. Any authenticated user can steal, modify, or delete data in your database.` will be displayed due to insecure rules which you can change it for more secure later.
 
-For more details of the `Realtime Database` security rules, see [this link](https://firebase.google.com/docs/database/security).
+Visit [Understand Firebase Realtime Database Security Rules](https://firebase.google.com/docs/database/security) to learn more about security rules.
 
 The reference url is the `DATABASE_URL` that defined and used in the `Realtime Database` examples can be obtained from the `Data` tab as the following.
 
@@ -1565,7 +1601,7 @@ service cloud.firestore {
 ```
 ![Change Security Rules](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_firestore_create_database_step3.png)
 
-For more details of the Cloud Firestore database security rules, see [this link](https://firebase.google.com/docs/firestore/security/get-started).
+Visit [Get started with Cloud Firestore Security Rules](https://firebase.google.com/docs/firestore/security/get-started) to learn more about security rules.
 
 ### Storage Getting Started
 
@@ -1594,7 +1630,7 @@ service firebase.storage {
 
 ![Change Security Rules](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_storage_get_started_step3.png)
 
-For more details of the Cloud Storage for Firebase's security rules, see [this link](https://firebase.google.com/docs/storage/security/get-started).
+Visit [Get started with Firebase Security Rules](https://firebase.google.com/docs/storage/security/get-started) to learn more about security rules.
 
 The folder path is the `STORAGE_BUCKET_ID` that defined and used in the Storage examples can be obtained from the `Files` tab as the following.
 
