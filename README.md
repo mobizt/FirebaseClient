@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-18T07:00:48Z`
+`2024-04-18T11:42:01Z`
 
 ## Table of Contents
 
@@ -470,7 +470,6 @@ The Firebase and Google Services classes that are available in this library are 
 
 - ### Async Queue
 
-![Async TAsk Queue](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue.png)
 
 All requests for sync and async operations are managed using queue.
  
@@ -480,7 +479,13 @@ Each async client handles this queue separately. Then in order to limit the memo
 
 The maximum queue size can be set via the build flag `FIREBASE_ASYNC_QUEUE_LIMIT` or macro in [src/Config.h](src/Config.h) or created your own config in [src/UserConfig.h](src/UserConfig.h).
 
-When the authentication async operation was required, it will insert to the first slot of the queue.
+The image below show the order of tasks that inserted or add to the queue. The only one task in the first slot will be executed.
+
+![Async TAsk Queue](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue.png)
+
+When the authentication async operation was required, it will insert to the first slot of the queue and all tasks are cancelled and removed from queue to reduce the menory usage unless the `SSE mode (HTTP Streaming)`task that stopped and waiting for restarting.
+
+![Async TAsk Queue](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue_running.png)
 
 If the sync operation was called, it will insert to the first slot in the queue too but after the authentication task slot.
 
