@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-18T11:42:01Z`
+`2024-04-18T13:40:12Z`
 
 ## Table of Contents
 
@@ -397,13 +397,13 @@ For the concept and basic usage understanding, you should read this documentatio
 
 The authentication classes provide the authentication data for authentication and authorization using service account, sign-in credentials and auth tokens.
 
-The REST API client (this library) will use the short-lived token for authorization or no token in some case.
+The REST API client (this library) will use the short-lived token for authorization or no token used in some case.
 
 This token will be expired in 60 minutes.
 
-The token types that can be used are `ID token` and `access token` which both type can be refered as `auth token` in this library.
+The token types that can be used are `ID token` and `access token` which both types will be refered to as `auth token` in this library.
 
-The following authentication classes generate and hold the `auth token` to be used in further authorization requests.
+The following authentication classes generate and hold the `auth token` to be used in authorization requests.
 
 - The `UserAuth` class is for `User Sign-in authentication` which is the only authentication method that allows user to sign in and provides the ID token.
 
@@ -471,36 +471,36 @@ The Firebase and Google Services classes that are available in this library are 
 - ### Async Queue
 
 
-All requests for sync and async operations are managed using queue.
+All requests for sync and async operations are managed using FIFO queue.
  
-Each sync and async requests data consume memory up to 1k. When many async tasks are added to the queue (FIFO), the memory usage will be increased.
+Each sync and async requests data can be consumed the memory up to 1k. When many async tasks are added to the queue, the memory usage will be increased.
  
-Each async client handles this queue separately. Then in order to limit the memory used for each async client, this library allows 10 async operations (called slots) can be stored in the queue at a time.
+Each async client handles this queue separately. Then in order to limit the memory used for each async client, this library allows 10 async tasks (called slots) can be stored in the queue at a time.
 
 The maximum queue size can be set via the build flag `FIREBASE_ASYNC_QUEUE_LIMIT` or macro in [src/Config.h](src/Config.h) or created your own config in [src/UserConfig.h](src/UserConfig.h).
 
-The image below show the order of tasks that inserted or add to the queue. The only one task in the first slot will be executed.
+The image below shows the order of tasks that inserted or add to the queue. The only one task in the first slot will be executed.
 
 ![Async TAsk Queue](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue.png)
 
-When the authentication async operation was required, it will insert to the first slot of the queue and all tasks are cancelled and removed from queue to reduce the menory usage unless the `SSE mode (HTTP Streaming)`task that stopped and waiting for restarting.
+When the authentication task was required, it will insert to the first slot of the queue and all tasks are cancelled and removed from queue to reduce the menory usage unless the `SSE mode (HTTP Streaming)`task that stopped and waiting for restarting.
 
 ![Async TAsk Queue](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue_running.png)
 
 If the sync operation was called, it will insert to the first slot in the queue too but after the authentication task slot.
 
-When async Get operation in `SSE mode (HTTP Streaming)` was currently stored in queue, the new sync and async operations will be inserted before the async `SSE mode (HTTP Streaming)` slot.
+When async Get operation in `SSE mode (HTTP Streaming)` was currently stored in queue, the new sync and async tasks will be inserted before the async `SSE mode (HTTP Streaming)` slot.
 
-When the async operation queue is full or the another SSE mode get function was called, the new sync and async operations will be cancelled. The error code `-118` (`FIREBASE_ERROR_OPERATION_CANCELLED`) or `"operation was cancelled"` will show in the debug message.
+When the queue is full or the another `SSE mode (HTTP Streaming)` function was called, the new sync and async tasks will be cancelled. The error code `-118` (`FIREBASE_ERROR_OPERATION_CANCELLED`) or `"operation was cancelled"` will show in the debug message.
  
-The finished and time out operating slot will be removed from the queue unless the async `SSE mode (HTTP Streaming)` and allow the vacant slot for the new async operation.
+The finished or timed out task will be removed from the queue unless the async `SSE mode (HTTP Streaming)` and allow the vacant slot for the new async task.
 
 The async `SSE mode (HTTP Streaming)` operation will run continuously and repeatedly as long as the FirebaseApp and the services app
 (Database, Firestore, Messaging, Functions, Storage and CloudStorage) objects was run in the loop via `FirebaseApp::loop()` or `<FirebaseServices>::loop()`.
 
 
 > [!IMPORTANT]  
-> The user blocking code and `delay` used in the same loop of `FirebaseApp::loop()` and `<FirebaseServices>::loop()` that are running will block the async operations in a `FirebaseClientClass`'s async queue. Please avoid to use `delay` in the loop.
+> The user blocking code and `delay` used in the same loop of `FirebaseApp::loop()` and `<FirebaseServices>::loop()` that are running will block the async tasks in a `FirebaseClientClass`'s async queue. Please avoid to use `delay` in the loop.
 
 
 - ### Async Client
@@ -517,7 +517,7 @@ The authentication task has the highest priority in the queue. Its async data wh
 
 The lower priority tasks are sync task, async task and `SSE mode (HTTP Streaming)` task respectively.
 
-When user uses a async client for multiple tasks which included `Realtime Database` get in `SSE mode (HTTP Streaming)`, sync and async operations, the `SSE mode (HTTP Streaming)` will be interrupted (breaking the connection) because of the async client is only able to connect to the server via one TCP socket at a time.
+When user uses a async client for multiple tasks which included `Realtime Database` get in `SSE mode (HTTP Streaming)`, sync and async tasks, the `SSE mode (HTTP Streaming)` will be interrupted (breaking the connection) because of the async client is only able to connect to the server via one TCP socket at a time.
 
 > [!TIP]
 > In ESP32, if you want to run many async tasks concurrency with different async clients. It may not be possible because the ESP32's `WiFiClientSecure` required memory up to 50k per connection. Alternatively, this can be done by using the `ESP_SSLClient` that included in this library which it works in the same way as ESP8266's `WiFiClientSecure` which the lower memeory consumption can be achieve by setting the smaller buffer size. This is the [example](/examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) for how to use `ESP_SSLClient` with this library.
@@ -530,7 +530,7 @@ The SSL Client is a kind of sync or blocking Client that takes time for SSL hand
 
 The async SSL client can be used with the async client but currently experimental.
 
-The async operation can be cancelled and removed from the async client's queue by calling `AsyncClientClass::stopAsync()` for stopping currently processed async task or `AsyncClientClass::stopAsync(true)` for stopping all tasks.
+The async task can be cancelled and removed from the async client's queue by calling `AsyncClientClass::stopAsync()` for stopping currently processed async task or `AsyncClientClass::stopAsync(true)` for stopping all tasks.
 
 > [!WARNING]  
 > The numbers of async client that can be used, the numbers of the sync/async tasks stored in the async client's queue will be limited which depends on the device free memory.
@@ -606,7 +606,7 @@ The aync result provides two types of information, `app events` and `result data
 
 > [!CAUTION]
 > Please avoid calling code or function that uses large memory inside the asyn callback because it can lead to stack overflow problem especially in ESP8266 and causes the wdt rest crash.
-> For ESP8266, global defined`AsyncResult` is recommended for async operation.
+> For ESP8266, global defined`AsyncResult` is recommended for async task.
 
 - ### App Events
 
@@ -1193,7 +1193,7 @@ To maintaining the async tasks, you have to place the code for `Maintain Authent
 > [!WARNING]  
 > Don't use delay in the loop when async task is running because it will block the process in the queue to run.
 
-For ESP32's `FreeRTOS` task, the CPU Core 1 is recommend for safely operation even the library is async operation but the SSL/TLS handshake during establishing the new server connection of the SSL client is the blocking process which can leed to wdt reset error.
+For ESP32's `FreeRTOS` task, the CPU Core 1 is recommend for safely operation. Although the async task is designed to run without blocking, the SSL/TLS handshake in SSL client is the blocking process and running the task in Core 0 may cause the wdt reset.
 
 **Example** for `Maintain Authentication and Async Operation Queue` in ESP32's `FreeRTOS` task in lambda function usage style.
 
