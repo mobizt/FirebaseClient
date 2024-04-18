@@ -86,6 +86,7 @@ namespace Messages
         // Contains the URL of an image that is going to be downloaded on the device and displayed in a notification. JPEG, PNG, BMP have full support across platforms.
         Notification &image(const String &value) { return wr.set<Notification &, String>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
     };
+
     /**
      * Represents a color in the RGBA color space. This representation is designed for simplicity of conversion to/from color representations in various languages over compactness.
      */
@@ -107,6 +108,7 @@ namespace Messages
         // This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color.
         Color &alpha(float value) { return wr.set<Color &, float>(*this, UnityRange().val(value), buf, bufSize, 4, FPSTR(__func__)); }
     };
+    
     /**
      * Settings to control notification LED.
      */
