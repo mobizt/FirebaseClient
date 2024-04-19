@@ -45,3 +45,10 @@
 
 - [API Doc](https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions).
 
+## The placeholder represents the primitive types values that used in this library 
+
+- [Class and Functions](/resources/docs/placeholders.md).
+
+## JsonWriter
+
+- [Class and Functions](/resources/docs/json_writer.md).

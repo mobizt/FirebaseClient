@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-18T13:40:12Z`
+`2024-04-19T06:48:41Z`
 
 ## Table of Contents
 
@@ -42,9 +42,13 @@
 
 - [Async Result](#async-result)
 
-- [App Events](#app-events)
+  - [App Events](#app-events)
 
-- [Result Data](#result-data)
+  - [Server Response and Event Data](#server-response-and-event-data)
+
+  - [Error Information](#error-information)
+
+  - [Debug Information](#debug-information)
 
 - [App Initialization](#app-initialization)
  
@@ -83,6 +87,8 @@
 - [Google Cloud Storage Usage](#google-cloud-storage-usage)
 
 - [Google Cloud Functions Usage](#google-cloud-functions-usage)
+
+- [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
 
 [8. Memory Options](#memory-options)
 
@@ -562,83 +568,219 @@ For sync task, the timeout in seconds can be set via the `AsyncClientClass::setS
 
 - ### Async Result
 
-Library provides the class object called `AsyncResult` that keeps the server response data, debug and error information.
+Library provides the class object called async result (`AsyncResult`) used as a container that provides 4 types of information: `App Events` (`app_event_t`), `Server Response and Event Data`, `Debug` and `Error` information which will be mentioned later.
 
-There are two sources of async result in this library:
+The information of `App Events` (`app_event_t`)'s authentication task can be obtained from `AsyncResult::appEvent()`
 
+The information of `Server Response and Event Data` included the payload, `SSE mode (HTTP Streaming)` event-data, status and header data.
 
-- #### 1. From user provided with async application (function).
+The `Error` (`FirebaseError`) information can be obtained from `AsyncResult::error()`.
 
-For example:
+The `Debug` (`String`) information can be obtained from `AsyncResult::debug()`.
+
+#### How `AsyncResult` works in this library?
+
+There are two use cases of async result:
+
+   1. User provided async result.
+
+   The async result is defined by user and provide to the async function.
+
+Example:
 
 ```cpp
 Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResult>);
 ```
 
-- #### 2. From dynamic allocation in the async client.
+   2. From the instance of async data.
 
-For example:
+   The async result was taken from async data which created within the async task.
+
+   This is the case where the async result callback function was set to the async function.   
+
+Example:
 
 ```cpp
 Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResultCallback>);
 ```
 
+In case 1, the async result (`AsyncResult`) shall be defined globally because it needs the containter to keep the result while running the async task.
 
-From source 1, the async result (`<AsyncResult>`) shall be defined globally to use in async application because of the static data buffer is needed for use while running the async task.
+In case 1, when the async result was used in the `loop` function to take or print information from it. It should follow the below recommendation for checking its status before processing the data to avoid processing or printing the same data.
 
-From source 2, the async client (`AsyncClientClass`) shall be defined globally to use in async application too to make sure the instance of async result was existed or valid while running the async task.
+> To check the `App Event` changes, you should use `AsyncResult::appEvent().code() > 0`.
+>
+> To check the `Server Response and Event Data` changes, you should use `AsyncResult::available()`.
+>
+> To check whether `Error` is occurred, you should use `AsyncResult::isError()`.
+>
+> To check when `Debug` information is available, you should use `AsyncResult::isDebug()`.
 
-The async result from source 2 can be accessed from the async result callback. 
 
-For the `AsyncResult` instance from source 2 that obtains from `AsyncResultCallback`, this library allows you to set the `UID` (unique identifier) for each async task to identify the task. The `UID` is any string that user defined and it is useful to identify the tasks when the same `AsyncResultCallback` was set for various async tasks. 
+In case 2, the async client (`AsyncClientClass`) where the async data was created as inser in to its queue, shall be defined globally because the async data should be existed while running the async task.
 
-The async task's `UID` can be set via the Firebase services functions which provided the both parameters in the function i.e. `AsyncResultCallback` and `UID`. 
+In case 2, the async result which provided by the async result callback function is dynamically created and it will be deconstructed when the async task is finished or stopped. 
 
-You can get the `UID` from `AsyncResult` via the function `AsyncResult::uid()`. 
+Then you may need to copy the async result in the async result callback to use anywhere when the async result instance was deconstructed.
+
+You can set the `UID` (unique identifier) to identify the task in case 2. The `UID` is any string that user defined and it is useful to identify the tasks when the same `AsyncResultCallback` was set for various async tasks. 
+
+The async task's `UID` can be set via the functions that have `AsyncResultCallback` and `UID` in its parameter. 
+
+You can get the `UID` from `AsyncResult` via `AsyncResult::uid()`. 
 
 > [!NOTE]  
 > You cannot set `UID` to the `AsyncResult` directly as it will be overwritten, then the `UID` from the `AsyncResult` that defined by user from source 1 will always be empty. 
 
 > [!NOTE]  
-> The async client object used in authentication task shoul be defined globally as it runs asynchronously and requires the static data buffer to store the result.
+> The async client used in authentication task should be defined globally as it runs asynchronously.
 
 The aync result provides two types of information, `app events` and `result data`.
 
 > [!CAUTION]
-> Please avoid calling code or function that uses large memory inside the asyn callback because it can lead to stack overflow problem especially in ESP8266 and causes the wdt rest crash.
-> For ESP8266, global defined`AsyncResult` is recommended for async task.
+> Please avoid calling the codes or functions that consumed large memory inside the asyn callback because they use stack memory then the wdt reset crash can be occurred in ESP8266 device because stack overflow.
+> Then in ESP8266 device, global defined `AsyncResult` case 1 is recommended for async task.
 
 - ### App Events
 
-The authentication task event information can be obtained from `AsyncResult::appEvent().code()` and `AsyncResult::appEvent().message()`.
+The authentication task information or `App Events` can be obtained from `firebase_auth_event_type AsyncResult::appEvent().code()` and `String AsyncResult::appEvent().message()`.
+
+The event codes (`firebase_auth_event_type enum`) return from `AsyncResult::appEvent().code()` are included the following.
+
+- `auth_event_uninitialized` corresponds to 0.
+
+- `auth_event_initializing` corresponds to 1.
+
+- `auth_event_signup` corresponds to 2.
+
+- `auth_event_send_verify_email` corresponds to 3.
+
+- `auth_event_delete_user` corresponds to 4.
+
+- `auth_event_reset_password` corresponds to 5.
+
+- `auth_event_token_signing` corresponds to 6.
+
+- `auth_event_authenticating` corresponds to 7.
+
+- `auth_event_auth_request_sent` corresponds to 8.
+
+- `auth_event_auth_response_received` corresponds to 9.
+
+- `auth_event_ready` corresponds to 10.
+
+- `auth_event_error` corresponds to 11.
+
+The event strings return from `AsyncResult::appEvent().message()` are included the following.
+
+- `"undefined"`
+
+- `"initializing"`
+
+- `"sign up"`
+
+- `"send verification email"`
+
+- `"delete user"`
+
+- `"reset password"`
+
+- `"token signing"`
+
+- `"authenticating"`
+
+- `"auth request sent"`
+
+- `"auth response received"`
+
+- `"ready"`
+
+- `"error"` 
+
+- ### Server Response and Event Data
+
+The generic server response can be obtained from `AsyncResult` via the following member functions.
+
+- `String AsyncResult::payload()` returns the copy of server response payload string.  
+
+- `const char *AsyncResult::c_str() const` returns the pointer to the internal server response payload string buffer. 
+
+- `bool AsyncResult::available()` returns true if server response payload was received.
+
+- `String AsyncResult::path()` returns the path of the resource of the request. 
+
+- `String AsyncResult::etag()` returns the Etag of the server response headers.
+
+<br>
+
+The specific `Realtime Database` response payload and `SSE mode (HTTP Streaming)` event data (`RealtimeDatabaseResult`) can be obtained from  `AsyncResult::to<RealtimeDatabaseResult>()` are included the following.
+
+- `bool RealtimeDatabaseResult::isStream()` returns true if the result is from `SSE mode (HTTP Streaming)` task.
+
+- `String RealtimeDatabaseResult::event()` returns the `SSE mode (HTTP Streaming)` event type strings include `put`, `patch`, `keep-alive`, `cancel` and `auth_revoked`.
+
+- `String RealtimeDatabaseResult::dataPath()` returns the `SSE mode (HTTP Streaming)` event data path which is the relative path of the changed value in the database. The absolute path of the changed value can be obtained from the concatenation of `AsyncResult::path()` and `RealtimeDatabaseResult::dataPath()` e.g. `AsyncResult::path() + "/" + RealtimeDatabaseResult::dataPath()`.
+
+- `realtime_database_data_type RealtimeDatabaseResult::type()` returns the `realtime_database_data_type` enum (see below) represents the type of `Realtime Database` response payload and event data (`HTTP Streaming`).
+
+- `RealtimeDatabaseResult::name()` returns the name (random UID) of the node that will be creaated after from `RealtimeDatabase::Push`.
+
+<br>
+
+The `realtime_database_data_type` enums are included the following.
+
+- `realtime_database_data_type_undefined` corresponds to -1.
+
+- `realtime_database_data_type_null`  corresponds to 5.
+
+- `realtime_database_data_type_integer` corresponds to 1.
+
+- `realtime_database_data_type_float` corresponds to 2.
+
+- `realtime_database_data_type_double` corresponds to 3.
+
+- `realtime_database_data_type_boolean` corresponds to 4.
+
+- `realtime_database_data_type_string` corresponds to 5.
+
+- `realtime_database_data_type_json` corresponds to 6.
+
+- `realtime_database_data_type_array` corresponds to 7.
+
+<br>
+
+The `Realtime Database` response payload and event data (`HTTP Streaming`) can be converted to the values of any type `T` e.g. boolean, integer, float, double and string via `RealtimeDatabaseResult::to<T>()`.
+
+The following is the example for how to convert the payload to values.
+
+```cpp
+
+// aResult is the AsyncResult object.
+RealtimeDatabaseResult &databaseResult = aResult.to<RealtimeDatabaseResult>();
+
+bool boolVal = databaseResult.to<bool>();
+
+int intVal = databaseResult.to<int>();
+
+float floatval = databaseResult.to<float>();
+
+double doubleVal = databaseResult.to<double>();
+
+String stringVal = databaseResult.to<String>();
+```
+
+- ### Error Information
+
+The error information (`FirebaseError`) from async result can be obtained from `AsyncResult::error()` are included the following.
+
+- `AsyncResult::error().code()` returns the numeric error of two major sources: `TCP Client Error` and `Server Response Error`. The `TCP Client Error` was defined [here](https://github.com/mobizt/FirebaseClient/blob/27dd55a6f726eea2f7b9c7c0afe0ab1e042f6d78/src/core/Error.h#L33-L64) and the `Server Response Error` was defined [here](https://github.com/mobizt/FirebaseClient/blob/27dd55a6f726eea2f7b9c7c0afe0ab1e042f6d78/src/core/Error.h#L73-L94).
+
+- `String AsyncResult::error().message()` returns the error string based on the `AsyncResult::error().code()` which in case `Server Response Error`, the `unauthorized`, `precondition failed (ETag does not match)` and `HTTP Status xxx` can be returned. In case `TCP Client Error`, the [predefined messages](https://github.com/mobizt/FirebaseClient/blob/27dd55a6f726eea2f7b9c7c0afe0ab1e042f6d78/src/core/Error.h#L150-L226) can be returned.
 
 
-The following event code (`firebase_auth_event_type`), `auth_event_uninitialized`, `auth_event_initializing`, `auth_event_signup`, `auth_event_send_verify_email`, `auth_event_delete_user`, `auth_event_reset_password`, `auth_event_token_signing`, `auth_event_authenticating`, `auth_event_auth_request_sent`, `auth_event_auth_response_received`, `auth_event_ready` and `auth_event_error` are available.
+- ### Debug Information
 
-The following event strings `"undefined"`, `"initializing"`, `"sign up"`, `"send verification email"`, `"delete user"`, `"reset password"`, `"token signing"`, `"authenticating"`, `"auth request sent"`, `"auth response received"`, `"ready"` and `"error"` are available.
-
-- ### Result Data
-
-The result data can be obtained from `AsyncResult` object via `AsyncResult::payload()`, `AsyncResult::available()`, `AsyncResult::path()`, `AsyncResult::etag()`, `AsyncResult::to<RealtimeDatabaseResult>().isStream()`, `AsyncResult::to<RealtimeDatabaseResult>().event()`, `AsyncResult::to<RealtimeDatabaseResult>().dataPath()`, `AsyncResult::to<RealtimeDatabaseResult>().type()` and `AsyncResult::to<RealtimeDatabaseResult>().name()`.
-
-The function `AsyncResult::payload()` returns server serponse payload.
-
-The function `AsyncResult::available()` returns the size of data that is ready to read.
-
-The function `AsyncResult::path()` returns the resource path that the request was sent.
-
-The function `AsyncResult::etag()` returns the ETag from server response header.
-
-The function `AsyncResult::to<RealtimeDatabaseResult>().name()` returns the name (random UID) of node that will be creaated after calling push.
-
-The function `AsyncResult::to<RealtimeDatabaseResult>().type()` returns the following realtime data type enum.
-
-`realtime_database_data_type_undefined` (-1), `realtime_database_data_type_null` (0), `realtime_database_data_type_integer` (1), `realtime_database_data_type_float` (2), `realtime_database_data_type_double` (3), `realtime_database_data_type_boolean` (4), `realtime_database_data_type_string` (5), `realtime_database_data_type_json` (6), and `realtime_database_data_type_array` (7).
-
-The `AsyncResult::to<RealtimeDatabaseResult>().dataPath()` and `AsyncResult::to<RealtimeDatabaseResult>().event()` are the `Realtime Database` node path that data has changed and the event type of `SSE mode (HTTP Streaming)`.
-
-The server response payload in `AsyncResult` can be converted to the the values of any type `T` e.g. boolean, integer, float, double and string via `AsyncResult::to<RealtimeDatabaseResult>().to<T>()`.
-
+The debug information (`String`) from async result can be obtained from `AsyncResult::debug()` which is currently availabele when starting and closing the server connection and information about network connection process.
 
 ### App Initialization
 
@@ -1415,7 +1557,9 @@ The response payload returning result (output) is straightforward as String.
 
 If the size of payload string in async reseut is large, to copy the char array buffer directly, use `AsyncResult::payload().c_str()` instead.
 
-There is no JSON serialization/deserialization utilized or provided in this library.
+There is no `JSON` serialization/deserialization utilized or provided in this library unless the `JsonWriter` utility class to create the `JSON` object placeholder (`object_t`).
+
+The `object_t` is the placeholder class represents the `JSON` object used in this libaray.
 
 - ### Realtime Database Usage
 
@@ -1427,42 +1571,53 @@ There is no JSON serialization/deserialization utilized or provided in this libr
 
 - ### Google Cloud Firestore Database Usage
 
-  - [Examples](/examples/FirestoreDatabase).
+    - [Examples](/examples/FirestoreDatabase).
 
-  - [Class and Functions](/resources/docs/firestore_database.md).
+    - [Class and Functions](/resources/docs/firestore_database.md).
 
-  - [API Doc](https://firebase.google.com/docs/firestore/reference/rest).
+    - [API Doc](https://firebase.google.com/docs/firestore/reference/rest).
 
 - ### Google Cloud Messaging Usage
 
-  - [Examples](/examples/Messaging).
+    - [Examples](/examples/Messaging).
 
-  - [Class and Functions](/resources/docs/messaging.md).
+    - [Class and Functions](/resources/docs/messaging.md).
 
-  - [API Doc](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages).
-
+    - [API Doc](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages).
 
 - ### Firebase Storage Usage
 
-  - [Examples](/examples/Storage).
+    - [Examples](/examples/Storage).
 
-  - [Class and Functions](/resources/docs/storage.md).
+    - [Class and Functions](/resources/docs/storage.md).
 
 - ### Google Cloud Storage Usage
 
-  - [Examples](/examples/CloudStorage).
+    - [Examples](/examples/CloudStorage).
 
-  - [Class and Functions](/resources/docs/cloud_storage.md).
+    - [Class and Functions](/resources/docs/cloud_storage.md).
 
-  - [API Doc](https://cloud.google.com/storage/docs/json_api/v1).
+    - [API Doc](https://cloud.google.com/storage/docs/json_api/v1).
 
 - ### Google Cloud Functions Usage
 
-  - [Examples](/examples/CloudFunctions).
+    - [Examples](/examples/CloudFunctions).
 
-  - [Class and Functions](/resources/docs/cloud_functions.md).
+    - [Class and Functions](/resources/docs/cloud_functions.md).
 
-  - [API Doc](https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions).
+    - [API Doc](https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions).
+
+- ### The placeholder represents the primitive types values that used in this library 
+
+    - [Class and Functions](/resources/docs/placeholders.md).
+
+- ### JsonWriter
+
+    - [Class and Functions](/resources/docs/json_writer.md).
+
+
+
+
 
 
 See [all examples](/examples) for complete usages.
