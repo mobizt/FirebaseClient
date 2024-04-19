@@ -585,7 +585,7 @@ There are two use cases of async result:
 
    1. User provided async result.
 
-   The async result is defined by user and provide to the async function.
+   The async result is defined by user and assigned with the async function.
 
 Example:
 
