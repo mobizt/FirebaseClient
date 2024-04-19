@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-19T06:48:41Z`
+`2024-04-19T07:33:55Z`
 
 ## Table of Contents
 
@@ -90,23 +90,8 @@
 
 - [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
 
-[8. Memory Options](#memory-options)
 
-- [Memory Options for ESP8266](#memory-options-for-esp8266)
-
-  - [Arduino IDE](#arduino-ide)
-
-  - [PlatformIO IDE](#platformio-ide)
-
-  - [ESP8266 and SRAM/PSRAM Chip connection](#esp8266-and-srampsram-chip-connection)
-
-- [Memory Options for ESP32](#memory-options-for-esp32)
-
-  - [Arduino IDE](#arduino-ide-1)
-
-  - [PlatformIO IDE](#platformio-ide-1)
-
-[9. Project Preparation Setup](#project-preparation-setup)
+[8. Project Preparation Setup](#project-preparation-setup)
 
   - [Authentication Getting Started](#authentication-getting-started)
 
@@ -123,6 +108,22 @@
   - [Service Account](#service-account)
 
     - [Service Account Permissions](#service-account-permissions)
+
+[9. Memory Options](#memory-options)
+
+- [Memory Options for ESP8266](#memory-options-for-esp8266)
+
+  - [Arduino IDE](#arduino-ide)
+
+  - [PlatformIO IDE](#platformio-ide)
+
+  - [ESP8266 and SRAM/PSRAM Chip connection](#esp8266-and-srampsram-chip-connection)
+
+- [Memory Options for ESP32](#memory-options-for-esp32)
+
+  - [Arduino IDE](#arduino-ide-1)
+
+  - [PlatformIO IDE](#platformio-ide-1)
 
 [10. Library Build Options](#library-build-options)
 
