@@ -1616,15 +1616,6 @@ The `object_t` is the placeholder class represents the `JSON` object used in thi
     - [Class and Functions](/resources/docs/json_writer.md).
 
 
-
-
-
-
-See [all examples](/examples) for complete usages.
-
-See [function description](/src/README.md) for all available functions.
-
-
 ## Project Preparation Setup
 
 You have to setup the Firebase project to use `Firebase products`. Visit [Understand Firebase Projects](https://firebase.google.com/docs/projects/learn-more) to learn more about Firebase projects.
