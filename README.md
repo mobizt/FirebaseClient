@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-20T13:29:40Z`
+`2024-04-20T15:34:32Z`
 
 ## Table of Contents
 
@@ -774,9 +774,9 @@ String stringVal = databaseResult.to<String>();
 
 The error information (`FirebaseError`) from async result can be obtained from `AsyncResult::error()` are included the following.
 
-  - `AsyncResult::error().code()` returns the numeric error of two major sources: `TCP Client Error` and `Server Response Error`. The `TCP Client Error` was defined [here](https://github.com/mobizt/FirebaseClient/blob/27dd55a6f726eea2f7b9c7c0afe0ab1e042f6d78/src/core/Error.h#L33-L64) and the `Server Response Error` was defined [here](https://github.com/mobizt/FirebaseClient/blob/27dd55a6f726eea2f7b9c7c0afe0ab1e042f6d78/src/core/Error.h#L73-L94).
+  - `AsyncResult::error().code()` returns the numeric error of two major sources: `TCP Client Error` and `Server Response Error`. The `TCP Client Error` was defined [here](/src/core/Error.h#L32-L64) and the `Server Response Error` was defined [here](/src/core/Error.h#L72-L87).
 
-  - `String AsyncResult::error().message()` returns the error string based on the `AsyncResult::error().code()` which in case `Server Response Error`, the `unauthorized`, `precondition failed (ETag does not match)` and `HTTP Status xxx` can be returned. In case `TCP Client Error`, the [predefined messages](https://github.com/mobizt/FirebaseClient/blob/27dd55a6f726eea2f7b9c7c0afe0ab1e042f6d78/src/core/Error.h#L150-L226) can be returned.
+  - `String AsyncResult::error().message()` returns the error string based on the `AsyncResult::error().code()` which in case `Server Response Error`, the `unauthorized`, `precondition failed (ETag does not match)` and `HTTP Status xxx` can be returned. In case `TCP Client Error`, the [predefined messages](/src/core/Error.h#L141-L199) can be returned.
 
 
 - ### Debug Information
