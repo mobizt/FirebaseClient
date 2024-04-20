@@ -68,19 +68,12 @@
 #define FIREBASE_ERROR_TCP_SEND -2
 #define FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT -3
 #define FIREBASE_ERROR_TCP_DISCONNECTED -4
-#define FIREBASE_ERROR_TCP_CLIENT_UNDEFINED -5
 
 // Firebase error
-#define FIREBASE_ERROR_NETWORK_DISCONNECTED -100
-#define FIREBASE_ERROR_NETWORK_CONNECTION_CALLBACK -101
-#define FIREBASE_ERROR_NETWORK_STATUS_CALLBACK -102
 #define FIREBASE_ERROR_OPEN_FILE -103
 #define FIREBASE_ERROR_FILE_READ -104
 #define FIREBASE_ERROR_FILE_WRITE -105
 #define FIREBASE_ERROR_UNAUTHENTICATE -106
-#define FIREBASE_ERROR_SERVER_RESPONSE -107
-#define FIREBASE_ERROR_PATH_NOT_EXIST -108
-#define FIREBASE_ERROR_MAX_REDIRECT_REACHED -109
 #define FIREBASE_ERROR_TOKEN_PARSE_PK -110
 #define FIREBASE_ERROR_TOKEN_SIGN -111
 #define FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE -112
@@ -159,18 +152,6 @@ private:
             case FIREBASE_ERROR_TCP_DISCONNECTED:
                 err.message = FPSTR("TCP disconnected");
                 break;
-            case FIREBASE_ERROR_TCP_CLIENT_UNDEFINED:
-                err.message = FPSTR("TCP client was undefined");
-                break;
-            case FIREBASE_ERROR_NETWORK_DISCONNECTED:
-                err.message = FPSTR("network disconnected");
-                break;
-            case FIREBASE_ERROR_NETWORK_CONNECTION_CALLBACK:
-                err.message = FPSTR("network connection callback was undefined");
-                break;
-            case FIREBASE_ERROR_NETWORK_STATUS_CALLBACK:
-                err.message = FPSTR("network status callback was undefined");
-                break;
             case FIREBASE_ERROR_OPEN_FILE:
                 err.message = FPSTR("error opening file");
                 break;
@@ -182,15 +163,6 @@ private:
                 break;
             case FIREBASE_ERROR_UNAUTHENTICATE:
                 err.message = FPSTR("unauthenticate");
-                break;
-            case FIREBASE_ERROR_SERVER_RESPONSE:
-                err.message = FPSTR("server responses ");
-                break;
-            case FIREBASE_ERROR_PATH_NOT_EXIST:
-                err.message = FPSTR("path does not exists");
-                break;
-            case FIREBASE_ERROR_MAX_REDIRECT_REACHED:
-                err.message = FPSTR("maximum redirection reaches");
                 break;
             case FIREBASE_ERROR_TOKEN_PARSE_PK:
                 err.message = FPSTR("parse private key");

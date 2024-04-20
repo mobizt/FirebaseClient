@@ -131,7 +131,9 @@
 
 - [Optional Options](#optional-options)
 
-[11. License](#license)
+[11. Frequently Asked Questions](#frequently-asked-questions)
+
+[12. License](#license)
 
 
 ## Introduction
@@ -539,6 +541,8 @@ The async SSL client can be used with the async client but it is currently exper
 
 To stop and cancel the tasks, use `AsyncClientClass::stopAsync()` to stop only running task or `AsyncClientClass::stopAsync(true)` to stop all tasks.
 
+You cannot stop the authentication task unless you can remove the queue from loop by remove the functions; `FirebaseApp::loop()` and/or `FirebaseServicesApps::loop()`(if the same async client was used in `FirebaseServicesApps` and `FirebaseApp`) from the `loop` function.
+
 > [!WARNING]  
 > The numbers of async clients that can be used, the numbers of the tasks stored in the async client's queue will be limited which depends on the device free memory.
 
@@ -563,9 +567,9 @@ For the details of networking class, see [Working with Networks](#working-with-n
 
 ### Tasks Timeout
 
-In async task, the send timeout and read timeout are 30 seconds by default and it cannot be changed.
+In case async task, the send timeout and read timeout are 30 seconds by default and it cannot be changed.
 
-In sync task, the timeout can be set via `AsyncClientClass::setSyncSendTimeout` and `AsyncClientClass::setSyncReadTimeout` for send timeout and read timeout respectively.
+In case sync task, the timeouts can be set via `AsyncClientClass::setSyncSendTimeout` and `AsyncClientClass::setSyncReadTimeout` for send timeout and read timeout respectively.
 
 - ### Async Result
 
@@ -1153,12 +1157,13 @@ DefaultNetwork::DefaultNetwork(<reconnect_option>)
 
 When you define `DefaultNetwork` with no parameter, the WiFi reconnection will be enabled. 
 
-> [!NOTE]  
-> When the WiFi was manage for connection and reconnection by user code or third party library, the `<reconnect_option>` parameter should be assign with `false` to avoid the WiFi connection/reconnection interferences.
+> [!CAUTION]
+> When the WiFi was manage for connection and reconnection by user code or third party library e.g. WiFiManager,
+> you have to set the parameter, `<reconnect_option>` to false in the `DefaultNetwork` class constructor otherwise you are unable to  re-connect to the WiFi due to interferences operations.
 
 > [!CAUTION]
-> If you are using third-party library to control your WiFi connection/reconnection e.g. WiFiManager or your code to do so,
-> You have to set the parameter, `<reconnect_option>` to false in the `DefaultNetwork` class constructor otherwise you cannot re-connect to the WiFi.
+> If you are using ESP32 device, and `<reconnect_option>` was enabled. The bugs in outdated ESP32 Core WiFi will cause the unknown network connection issue when library is trying to reconnect your WiFi using `WiFi.reconnect()`.
+> You have to update the ESP32 Arduino Core SDK to latest version or at least v2.x.x.
 
 - `DefaultWiFiNetwork`
 
@@ -2141,7 +2146,9 @@ FIREBASE_DISABLE_ALL_OPTIONS // For disabling all predefined build options above
 
 This `UserConfig.h` will not change or overwrite when update the library.
 
+## Frequently Asked Questions
 
+For FAQ (Frequently Asked Questions), please go [here](/FAQ.md)
 
 ## License
 
