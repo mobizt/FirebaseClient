@@ -2148,7 +2148,7 @@ This `UserConfig.h` will not change or overwrite when update the library.
 
 ## Frequently Asked Questions
 
-For FAQ (Frequently Asked Questions), please go [here](/FAQ.md)
+For FAQ (Frequently Asked Questions), please go [here](/FAQ.md).
 
 ## License
 
