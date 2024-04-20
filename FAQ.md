@@ -180,14 +180,14 @@ The memory allocation failure due to out of memory can cause the dangling pointe
 
 You have to wait for the authentication task to be ready before calling the Firebase functions.
 
-Please read [Required Operation Flows](https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#required-operation-flows) for more details.
+Please read [Required Operation Flows](/README.md#required-operation-flows) for more details.
 
 
 ## Q9: What should I do when I get the error `"JWT, private key parsing fail"`?
 
 ### A9: The RSA private key that uses in JWT token signing process is not valid.
 
-The private key can be obtained from the service account credentials. Please read [Service Account](https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#service-account) for more details.
+The private key can be obtained from the service account credentials. Please read [Service Account](/README.md#service-account) for more details.
 
 ## Q10: What should I do when I get the error `"JWT, token signing fail"`?
 
@@ -226,7 +226,7 @@ The delay function and user blocking code are used in the same loop that authent
 
 ### A15 The FirebaseApp was not applied to the Firebase Service apps.
 
-You have to apply the FirebaseApp by using `FirebaseApp::getApp`. Please read [Required Operation Flows](https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#required-operation-flows) for more details.
+You have to apply the FirebaseApp by using `FirebaseApp::getApp`. Please read [Required Operation Flows](/README.md#required-operation-flows) for more details.
 
 ## Q16: Why I get the error `"operation was cancelled"`?
 
