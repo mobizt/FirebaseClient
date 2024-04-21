@@ -55,7 +55,7 @@
 
 - [Q26: How can I run more than one Reaktime Database Stream with the same async client?](#q26-how-can-i-run-more-than-one-reaktime-database-stream-with-the-same-async-client)
 
-- [Q27: How can I run Reaktime Database task and Cloud Firestore Database using the same async client?](#q27-how-can-i-run-reaktime-database-task-and-cloud-firestore-database-using-the-same-async-client)
+- [Q27: How can I run Reaktime Database task and Cloud Firestore Database task using the same async client?](#q27-how-can-i-run-reaktime-database-task-and-cloud-firestore-database-task-using-the-same-async-client)
 
 ## Q1: Why I get an error `"TCP connection failed"`?
 
@@ -323,7 +323,7 @@ To run many `SSE mode (HTTP Streaming)` tasks, you have to run each task in diff
 
 For running more tasks concurrency, see [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](/#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients).
 
-## Q27: How can I run Reaktime Database task and Cloud Firestore Database using the same async client?
+## Q27: How can I run Reaktime Database task and Cloud Firestore Database task using the same async client?
 ### A27: Yes, you can run different Firebase Products using the same async client or different async client.
 
 When you run different Firebase products using the same async client, all tasks are in the same queue and it needs to start the new server connection for different host of Firebase products. This takes time when establish the new server connection.
