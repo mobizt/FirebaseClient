@@ -222,19 +222,19 @@ Please read [Possible WiFi issues](#possible-wifi-issues).
 
 ## Q14: What should I do when I get the error `"auth revoked"`?
 
-### A14 The auth token is expired.
+### A14: The auth token is expired.
 
 The delay function and user blocking code are used in the same loop that authentication task handler is running and they blocked the authentication task handler to work. You have to remove the delay function from loop function or minimize the time that used by your blocking code.
 
 ## Q15: Why I get the error `"app was not assigned"`?
 
-### A15 The FirebaseApp was not applied to the Firebase Service apps.
+### A15: The FirebaseApp was not applied to the Firebase Service apps.
 
 You have to apply the FirebaseApp by using `FirebaseApp::getApp`. Please read [Required Operation Flows](https://github.com/mobizt/FirebaseClient#required-operation-flows) for more details.
 
 ## Q16: Why I get the error `"operation was cancelled"`?
 
-### A16 The async client's queue is full due to too many new tasks are added while the old tasks that waiting in the queue are not yet processed.
+### A16: The async client's queue is full due to too many new tasks are added while the old tasks that waiting in the queue are not yet processed.
 
 The currently running task in the queue may be slow because of the delay function and user blocking codes are used in the same loop that async task handler is running and they blocked the async task handler to work. You have to remove the delay function from loop function or minimize the time that used by your blocking code.
 
@@ -247,14 +247,14 @@ When no more memory to be allocated for new task. You have to reduce the memory 
 
 ## Q17: Why I get the error `"JWT, time was not set or not valid"`?
 
-### A17 The time is not set or not valid
+### A17: The time is not set or not valid
 
 The timestamp that you set in the uint32_t variable of time status callback function is not valid or it was not set.
 
 
 ## Q18: Why sometimes the Reltime Database Stream does not work when WiFi was disconnected and reconnected and I get the error `"stream time out"`?
 
-### A18 The problem is due to the WiFi reconnection interferences.
+### A18: The problem is due to the WiFi reconnection interferences.
 
 Please read [Possible WiFi issues](#possible-wifi-issues).
 
