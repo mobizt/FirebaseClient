@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-21T09:59:09Z`
+`2024-04-21T13:18:06Z`
 
 ## Table of Contents
 
@@ -487,7 +487,7 @@ The Firebase and Google Services classes that are available in this library are 
 
 All sync and async tasks are managed using `FIFO queue` in async client. The task in the queue will refer to `slot` in this library. 
  
-The memory required for sync and async task is up to 1k. Each async client handles this queue separately. Then in order to limit the memory usage in async client, this library allows only 10 async tasks can be stored in the queue at a time.
+The memory used for a task that stores in the queue is approximately 1 k. Then in order to limit the memory usage in a async client, this library allows only 10 tasks can be stored in the queue at a time.
 
 The maximum queue size can be set via the build flag `FIREBASE_ASYNC_QUEUE_LIMIT` or macro that defined in [src/Config.h](src/Config.h) or in your own defined config at [src/UserConfig.h](src/UserConfig.h).
 
