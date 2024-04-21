@@ -527,7 +527,7 @@ To run multiple `SSE mode (HTTP Streaming)` tasks, you have to run each task in 
 
 In Raspberry Pi Pico W, its `WiFiClientSecure` memory used for the transmit and receive buffers are adjustable (512 to 16384) and you have enough memory to run many tasks concurrency using different async clients.
 
-In ESP32 device, its `WiFiClientSecure` memory usage cannot be adjusted, it requires at least 50 k per connection and only three `WiFiClientSecure` can be defined.
+In ESP32 device, its `WiFiClientSecure` memory usage cannot be adjusted, it requires at least 50 k per connection and only three `WiFiClientSecure`(s) can be defined.
 
 Alternatively, for ESP32 device, you can use `ESP_SSLClient` that was included in this library. It works in the same way as ESP8266's `WiFiClientSecure` and the memory used for the transmit and receive buffers are adjustable (512 to 16384). This is the [example](/examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) for how to use `ESP_SSLClient` with this library.
 
