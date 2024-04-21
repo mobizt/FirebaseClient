@@ -116,7 +116,7 @@ void setup()
     // with minimum receive and transmit buffer size setting as following.
     // ssl_client.setBufferSizes(1024, 512);
     // ssl_client2.setBufferSizes(1024, 512);
-    // Note that, because the receive buffer size was set to minimum save value, 1024, the large server response may not be able to handle.
+    // Note that, because the receive buffer size was set to minimum safe value, 1024, the large server response may not be able to handle.
 
 #endif
 #endif
