@@ -1016,7 +1016,7 @@ LegacyToken::LegacyToken(<database_secret>)
 
 - ### Working with Filesystems and BLOB
 
-The file config class ([FileConfig](examples/App/AppInitialization/SaveAndLoad/)) will be used to hold the SD/Flash file information and the file operation callback when file upload or download is required.
+The file config class ([FileConfig](examples/App/AppInitialization/SaveAndLoad/)) will be used to hold the SD/Flash filesystems information and the file operation callback when file upload or download is required.
 
 The function that requires file/BLOB for download and upload will accept the file config data (`file_config_data`) in its parameters.
 
