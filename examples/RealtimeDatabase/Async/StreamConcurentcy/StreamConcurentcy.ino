@@ -111,6 +111,13 @@ void setup()
     ssl_client2.setBufferSizes(2048, 1024);
     ssl_client3.setBufferSizes(2048, 1024);
 
+    // In case using ESP8266 without PSRAM and you want to reduce the memory usage,
+    // you can use WiFiClientSecure or ESP_SSLClient with minimum receive and transmit buffer size setting as following.
+    // ssl_client1.setBufferSizes(1024, 512);
+    // ssl_client2.setBufferSizes(1024, 512);
+    // ssl_client3.setBufferSizes(1024, 512);
+    // Note that, because the receive buffer size was set to minimum save value, 1024, the large server response may not be able to handle.
+
     ssl_client1.setDebugLevel(1);
     ssl_client2.setDebugLevel(1);
     ssl_client3.setDebugLevel(1);
@@ -185,9 +192,6 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.available())
     {
-        // To get the UID (string) from async result
-        // aResult.uid();
-
         RealtimeDatabaseResult &RTDB = aResult.to<RealtimeDatabaseResult>();
         if (RTDB.isStream())
         {

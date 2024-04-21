@@ -16,12 +16,12 @@
  * <uid> - The user specified UID of async result (optional).
  *
  * The following are the QueryOptions member functions applied for uinion field consistency_selector.
- * 
+ *
  * QueryOptions::transaction used for running the query within an already active transaction. A base64-encoded string.
  * QueryOptions::newTransaction used for starting a new transaction and reads the documents. Defaults to a read-only transaction.
  * The new transaction ID will be returned as the first response in the stream.
  * QueryOptions::readTime used for reading the documents as they were at the given time.
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -150,7 +150,7 @@ void loop()
         StructuredQuery query;
 
         Projection projection(FieldReference("myDouble"));
-         //This change in v1.0.7 from add to fields to correspond to the Firestore documentation.
+        // This change in v1.0.7 from add to fields to correspond to the Firestore documentation.
         projection.fields(FieldReference("myInteger"));
         projection.fields(FieldReference("myTimestamp"));
         query.select(projection);
@@ -194,10 +194,6 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
-
-    // To get the UID (string) from async result
-    // aResult.uid();
-
     printResult(aResult);
 }
 
@@ -205,21 +201,21 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Firebase.printf("payload: %s\n", aResult.c_str());
+        Firebase.printf("payload: task: %s, %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }

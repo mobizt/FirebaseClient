@@ -1907,14 +1907,7 @@ public:
         sData->request.val[req_hndlr_ns::etag] = reqEtag;
 
         clear(reqEtag);
-
-        if (uid.length() == 0)
-        {
-            sData->aResult.val[ares_ns::res_uid] = FPSTR("task_ms_");
-            sData->aResult.val[ares_ns::res_uid] += String(millis());
-        }
-        else
-            sData->aResult.val[ares_ns::res_uid] = uid;
+        sData->aResult.val[ares_ns::res_uid] = uid;
 
         clear(sData->request.val[req_hndlr_ns::header]);
         sData->request.addRequestHeaderFirst(method);

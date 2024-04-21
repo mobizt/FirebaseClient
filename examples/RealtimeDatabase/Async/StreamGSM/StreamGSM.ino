@@ -237,9 +237,6 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
-    // To get the UID (string) from async result
-    // aResult.uid();
-
     printResult(aResult);
 }
 
@@ -247,27 +244,26 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        // To get the UID (string) from async result
-        // aResult.uid();
-
         RealtimeDatabaseResult &RTDB = aResult.to<RealtimeDatabaseResult>();
         if (RTDB.isStream())
         {
+            Serial.println("----------------------------");
+            Firebase.printf("task: %s\n", aResult.uid().c_str());
             Firebase.printf("event: %s\n", RTDB.event().c_str());
             Firebase.printf("path: %s\n", RTDB.dataPath().c_str());
             Firebase.printf("data: %s\n", RTDB.to<const char *>());
@@ -282,7 +278,9 @@ void printResult(AsyncResult &aResult)
         }
         else
         {
-            Firebase.printf("payload: %s\n", aResult.c_str());
+            Serial.println("----------------------------");
+            Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
         }
+        Firebase.printf("Free Heap: %d\n", ESP.getFreeHeap());
     }
 }

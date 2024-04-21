@@ -6,9 +6,9 @@
  * <AsyncClient> - The async client.
  * <FirebaseApp> - The authentication and access token handler.
  * <user_auth_data> - The user auth data (user_auth_data struct) that holds the user input sign-in credentials and token.
- * 
+ *
  * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
- * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken. 
+ * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
  *
  * SYNTAX:
  *
@@ -123,16 +123,16 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 }

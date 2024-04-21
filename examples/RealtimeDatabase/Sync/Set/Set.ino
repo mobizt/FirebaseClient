@@ -2,7 +2,7 @@
  * SYNTAX:
  *
  * bool status = RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>);
- * 
+ *
  * <AsyncClient> - The async client.
  * <path> - The node path to set the value.
  * <value> - The value to set.
@@ -18,7 +18,7 @@
  *
  * In case of error, the operation error information can be obtain from AsyncClient via aClient.lastError().message() and
  * aClient.lastError().code().
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -198,17 +198,17 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 }
 

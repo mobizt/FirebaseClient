@@ -1,18 +1,18 @@
 /**
  * SYNTAX:
- * 
+ *
  * FileConfig::FileConfig(<file_name>, <file_callback>);
  *
  * <file_name> - The filename included path of file that will be used.
  * <file_callback> - The callback function that provides file operation.
- * 
+ *
  * The file_callback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
  * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
- * 
+ *
  * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
  * SYNTAX:
- * 
+ *
  * Storage::upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>);
  * Storage::upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>, <AsyncResult>);
  * Storage::upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <MIME>, <AsyncResultCallback>, <uid>);
@@ -24,7 +24,7 @@
  * <AsyncResult> - The async result (AsyncResult).
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- * 
+ *
  * The bucketid is the Storage bucket Id of object to upload.
  * The object is the object to be stored in the Storage bucket.
  *
@@ -190,43 +190,34 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
-    }
-
-    if (aResult.available())
-    {
-        // To get the UID (string) from async result
-        // aResult.uid();
-        Firebase.printf("payload: %s\n", aResult.c_str());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.downloadProgress())
     {
-        Firebase.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        Firebase.printf("Downloaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
         if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
         {
-            Serial.println("Download completed!");
+            Firebase.printf("Download task: %s, completed!", aResult.uid().c_str());
         }
     }
 
     if (aResult.uploadProgress())
     {
-        Firebase.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        Firebase.printf("Uploaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
         if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
         {
-            Serial.println("Upload completed!");
-            // This url will be updated after the payload received,
-            // then you should call aResult.uploadInfo().downloadUrl again to get the real url.
+            Firebase.printf("Upload task: %s, completed!", aResult.uid().c_str());
             Serial.print("Download URL: ");
             Serial.println(aResult.uploadInfo().downloadUrl);
         }

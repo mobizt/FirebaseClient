@@ -231,42 +231,34 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
-    }
-
-    if (aResult.available())
-    {
-        // To get the UID (string) from async result
-        // aResult.uid();
-        Firebase.printf("payload: %s\n", aResult.c_str());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.downloadProgress())
     {
-        Firebase.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        Firebase.printf("Downloaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
         if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
         {
-            Serial.println("Download completed!");
+            Firebase.printf("Download task: %s, completed!", aResult.uid().c_str());
         }
     }
 
     if (aResult.uploadProgress())
     {
-        Firebase.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        Firebase.printf("Uploaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
         if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
         {
-            Serial.println("Upload completed!");
-            // Not available for simple upload.
+            Firebase.printf("Upload task: %s, completed!", aResult.uid().c_str());
             Serial.print("Download URL: ");
             Serial.println(aResult.uploadInfo().downloadUrl);
         }

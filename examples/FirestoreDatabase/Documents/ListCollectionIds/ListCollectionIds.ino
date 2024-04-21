@@ -11,10 +11,10 @@
  * <AsyncResult> - The async result (AsyncResult).
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- * 
+ *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- * 
+ *
  * The following are the ListCollectionIdsOptions member functions.
  *
  * ListCollectionIdsOptions::pageSize - Setting the  maximum number of results to return.
@@ -22,7 +22,7 @@
  * ListCollectionIdsOptions::readTime - The timestamp for reading the documents as they were at the given time.
  * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled,
  * can additionally be a whole minute timestamp within the past 7 days.
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -199,10 +199,6 @@ void timeStatusCB(uint32_t &ts)
 
 void asyncCB(AsyncResult &aResult)
 {
-
-    // To get the UID (string) from async result
-    // aResult.uid();
-
     printResult(aResult);
 }
 
@@ -210,21 +206,21 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Firebase.printf("payload: %s\n", aResult.c_str());
+        Firebase.printf("payload: task: %s, %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }

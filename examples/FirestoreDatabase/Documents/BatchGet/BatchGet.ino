@@ -4,7 +4,7 @@
  * Firestore::Documents::batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>);
  * Firestore::Documents::batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>, <AsyncResult>);
  * Firestore::Documents::batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>, <AsyncResultCallback>, <uid>);
- * 
+ *
  * <AsyncClient> - The async client.
  * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
  * <BatchGetDocumentOptions> - The BatchGetDocumentOptions object which provided the member functions to construct the requst body.
@@ -14,16 +14,16 @@
  *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- * 
+ *
  * The following are the BatchGetDocumentOptions member functions.
  *
  * BatchGetDocumentOptions::documents - Adding the document path to read.
- * BatchGetDocumentOptions::mask - Setting the mask fields to return. If not set, returns all fields. 
- * 
+ * BatchGetDocumentOptions::mask - Setting the mask fields to return. If not set, returns all fields.
+ *
  * If the document has a field that is not present in this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
  *
  * The union field consistency_selector
- * 
+ *
  * BatchGetDocumentOptions::transaction - Rreading the document in a transaction. A base64-encoded string.
  * BatchGetDocumentOptions::newTransaction - Creating the transaction.
  * BatchGetDocumentOptions::readTime - Setting the documents as they were at the given time. This may not be older than 270 seconds.
@@ -205,10 +205,6 @@ void timeStatusCB(uint32_t &ts)
 
 void asyncCB(AsyncResult &aResult)
 {
-
-    // To get the UID (string) from async result
-    // aResult.uid();
-
     printResult(aResult);
 }
 
@@ -216,21 +212,21 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Firebase.printf("payload: %s\n", aResult.c_str());
+        Firebase.printf("payload: task: %s, %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }

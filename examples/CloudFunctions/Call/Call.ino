@@ -4,7 +4,7 @@
  * CloudFunctions::call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>);
  * CloudFunctions::call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>, <AsyncResult>);
  * CloudFunctions::call(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <data>, <AsyncResultCallback>, <uid>);
- * 
+ *
  * <AsyncClient> - The async client.
  * <GoogleCloudFunctions::Parent> - The GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
  * <functionId> - The function name or Id to call.
@@ -12,13 +12,13 @@
  * <AsyncResult> - The async result (AsyncResult).
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- * 
+ *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The location name is the project location.
- * 
+ *
  * IAM owner permission required for service account,
  * https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  *
  */
@@ -192,23 +192,21 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        // To get the UID (string) from async result
-        // aResult.uid();
-        Firebase.printf("payload: %s\n", aResult.c_str());
+        Firebase.printf("payload: task: %s, %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }

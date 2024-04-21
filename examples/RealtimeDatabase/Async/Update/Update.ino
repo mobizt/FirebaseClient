@@ -6,11 +6,11 @@
  *
  * <AsyncClient> - The async client.
  * <path> - The node path to update (patch) the value.
- * <object_t> - The JSON representation data (object_t) to update. 
+ * <object_t> - The JSON representation data (object_t) to update.
  * <AsyncResult> - The async result (AsyncResult).
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -133,26 +133,23 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
-    // To get the UID (string) from async result
-    // aResult.uid();
-
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        Firebase.printf("payload: %s\n", aResult.c_str());
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }

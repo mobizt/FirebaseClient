@@ -8,12 +8,12 @@
  * <size> - The size of data.
  *
  * The data can be a source (input) and target (output) data that used in upload and download.
- * 
+ *
  * SYNTAX:
- * 
+ *
  * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
  * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
- * 
+ *
  * RealtimeDatabase::get(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
  * RealtimeDatabase::get(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
  *
@@ -23,7 +23,7 @@
  * <AsyncResult> - The async result (AsyncResult).
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -156,42 +156,36 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
-
-  // To get the UID (string) from async result
-  // aResult.uid();
-
   if (aResult.appEvent().code() > 0)
   {
-
-    Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+    Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
   }
 
   if (aResult.isDebug())
   {
-    Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+    Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
   }
 
   if (aResult.isError())
   {
-    Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+    Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
   }
 
   if (aResult.downloadProgress())
   {
-
-    Firebase.printf("Downloaded: %d%s (%d of %d)\n", aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+    Firebase.printf("Downloaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
     if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
     {
-      Serial.println("Download completed!");
+      Firebase.printf("Download task: %s, completed!", aResult.uid().c_str());
       printBlob(dest, 2048);
     }
   }
 
   if (aResult.uploadProgress())
   {
-    Firebase.printf("Uploaded: %d%s (%d of %d)\n", aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+    Firebase.printf("Uploaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
     if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
-      Serial.println("Upload completed!");
+      Firebase.printf("Upload task: %s, completed!", aResult.uid().c_str());
   }
 }
 

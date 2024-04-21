@@ -67,6 +67,7 @@ namespace firebase
         JSONUtil json;
         String extras, subdomain, host;
         slot_options_t sop;
+        String uid;
 
 #if defined(ENABLE_JWT)
 
@@ -230,7 +231,11 @@ namespace firebase
             bool isRes = aResult != nullptr;
 
             if (!isRes)
+            {
                 aResult = new AsyncResult();
+                // Store the default uid;
+                uid = aResult->uid();
+            }
 
             aResult->app_event.setEvent(code, msg);
 
@@ -457,8 +462,10 @@ namespace firebase
                         else
                             extras += auth_data.user_auth.user.val[user_ns::api_key];
                     }
+
                     if (getClient())
-                        newRequest(aClient, sop, subdomain, extras, resultCb);
+                        newRequest(aClient, sop, subdomain, extras, resultCb, uid);
+
                     extras.remove(0, extras.length());
                     host.remove(0, host.length());
                     setEvent(auth_event_auth_request_sent);
@@ -530,7 +537,8 @@ namespace firebase
                         extras += auth_data.user_auth.user.val[user_ns::api_key];
 
                     if (getClient())
-                        newRequest(aClient, sop, subdomain, extras, resultCb);
+                        newRequest(aClient, sop, subdomain, extras, resultCb, uid);
+
                     extras.remove(0, extras.length());
                     host.remove(0, host.length());
                     setEvent(auth_event_auth_request_sent);

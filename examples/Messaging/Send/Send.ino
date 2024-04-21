@@ -6,9 +6,9 @@
  * Messaging::send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
- * The <Messages::Parent> - The Messages::Parent object included project Id in its constructor. 
+ * The <Messages::Parent> - The Messages::Parent object included project Id in its constructor.
  * The <Messages::Message> - The Messages::Message object that holds the information of message to send.
- * 
+ *
  * The Firebase project Id should be only the name without the firebaseio.com.
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
@@ -219,23 +219,21 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
     {
-        // To get the UID (string) from async result
-        // aResult.uid();
-        Firebase.printf("payload: %s\n", aResult.c_str());
+        Firebase.printf("payload: task: %s, %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }

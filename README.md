@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-20T15:34:32Z`
+`2024-04-21T09:52:53Z`
 
 ## Table of Contents
 
@@ -174,7 +174,7 @@ When this library was used together with my other library e.g. [ESP-Mail-Client]
 You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
 For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
 
-The useful of using `ESP_SSLClient` library is it uses `PSRAM` by default, you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
+The useful of using `ESP_SSLClient` library is it uses `PSRAM` by default (if it is available), you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
 
 For using `PSRAM`, see [Memory Options for ESP8266](#memory-options-for-esp8266) section.
 
@@ -539,6 +539,10 @@ The useful of using `ESP_SSLClient` is it uses `PSRAM` by default, you can use i
 In case of ESP8266 that connected to external `PSRAM`, you have enough RAM for running many tasks concurrency, and you can run [Stream Concurentcy example](/examples/RealtimeDatabase/Async/StreamConcurentcy/StreamConcurentcy.ino) without memory problem.
 
 For how to use `PSRAM` in ESP32 and ESP8266 devices, see [Memory Options](#memory-options) section.
+
+In case using ESP8266 without `PSRAM` and you want to reduce the memory usage, you can use `WiFiClientSecure` or `ESP_SSLClient` with minimum receive and transmit buffer size setting: 1024 for receive buffer and 512 for transmit buffer.
+
+Note that, because the receive buffer size was set to minimum save value, 1024, the large server response may not be able to handle. 
 
 
 - ### Async Client
@@ -1556,17 +1560,22 @@ void asyncCB(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.available())
+    {
+        Firebase.printf("payload: task: %s, %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }
 
