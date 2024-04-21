@@ -36,6 +36,8 @@
 
 - [Async Queue](#async-queue)
 
+  - [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients)
+
 - [Async Client](#async-client)
 
 - [Tasks Timeout](#tasks-timeout)
@@ -486,12 +488,13 @@ The memory required for sync and async task is up to 1k. Each async client handl
 
 The maximum queue size can be set via the build flag `FIREBASE_ASYNC_QUEUE_LIMIT` or macro that defined in [src/Config.h](src/Config.h) or in your own defined config at [src/UserConfig.h](src/UserConfig.h).
 
-
 The below image shows the ordering of tasks that are inserted or added to the queue. Only the first task in the queue will be executed.
 
 ![Async Task Queue](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue.png)
 
 When the authentication task was required, it will insert to the first slot of the queue and all tasks are cancelled and removed from queue to reduce the menory usage unless the `SSE mode (HTTP Streaming)`task that stopped and waiting for restarting.
+
+The authentication task has the highest priority and `SSE mode (HTTP Streaming)` task has the lowest priority in the queue.
 
 ![Async Task Queue Running](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue_running.png)
 
@@ -505,11 +508,28 @@ The error code `-118` (`FIREBASE_ERROR_OPERATION_CANCELLED`) or `"operation was 
  
 The running task will be removed from the queue when operation is finished or error occurred.
 
-The `SSE mode (HTTP Streaming)` task will run continuously and repeatedly as long as the async task handler e.g. `FirebaseApp::loop()` and `<FirebaseServices>::loop()` are running in the loop function.
+The `SSE mode (HTTP Streaming)` task will run continuously and repeatedly as long as the async task handler e.g. `<FirebaseServices>::loop()` and/or `FirebaseApp::loop()` (if it used the same async client) are running in the loop function.
 
+The `SSE mode (HTTP Streaming)` is a kind of `infinite task` which the server connection was kept alive and waiting for the incoming event data.
+
+When `SSE mode (HTTP Streaming)` task is currently running and new sync or async task is added to the queue, the `SSE mode (HTTP Streaming)` task will be stopped (but remains in the queue) as another task was inserted in to the first slot, the `SSE mode (HTTP Streaming)` task will be restart when another task is finished.
+
+There is no notification error message like `"strean timed out"` in this library, when the `SSE mode (HTTP Streaming)` task was timed out because of network or any delay or blocking operation, it will reconnect automatically.
+
+You cannot run more than one `infinite task` in the same async client's queue as one `infinite task` is never finished, and another `infinite task` is never started.
+
+To run multiple `SSE mode (HTTP Streaming)` tasks, you have to run each task in different async client. Please note that `SSE mode (HTTP Streaming)` task consumes memory all the time while it is running. Running many `SSE mode (HTTP Streaming)` tasks may not possible because of out of memory especially in ESP8266 and SAMD devices.
 
 > [!IMPORTANT]  
 > The user blocking code and `delay` function that used in the same loop of async task handler will block the async tasks to run. Please avoid to use `delay` function in the same loop of async task handler.
+
+#### Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)
+
+In Raspberry Pi Pico W, its `WiFiClientSecure` memory used for the transmit and receive buffers are adjustable (512 to 16384) and you have enough memory to run many tasks concurrency using different async clients.
+
+In ESP32 device, its `WiFiClientSecure` memory usage cannot be adjusted, it requires at least 50 k per connection and only three `WiFiClientSecure` can be defined.
+
+Alternatively, in ESP32, this can be done by using the `ESP_SSLClient` that was included in this library which it works in the same way as ESP8266's `WiFiClientSecure` which the lower memeory consumption can be achieve by setting the smaller buffer size. This is the [example](/examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) for how to use `ESP_SSLClient` with this library.
 
 
 - ### Async Client
@@ -521,15 +541,6 @@ The async client operates the SSL client via its pointer.
 The async client also create the instances of async data and stored as a slot in its queue.
 
 The async data created in the async client queue, holds the header and payload of the http request and response.
-
-The authentication task has the highest priority and `SSE mode (HTTP Streaming)` task has the lowest priority in the queue.
-
-When `SSE mode (HTTP Streaming)` task is currently running and new sync or async task is added to the queue, the `SSE mode (HTTP Streaming)` task will be stopped (but remains in the queue) because we can open one TCP socket connection using one SSL client at a time.
-
-> [!TIP]
-> In ESP32 device, if you want to run many tasks concurrency using different async clients. It may not be possible in some case because  ESP32's `WiFiClientSecure` consumed memory up to 50k per a server connection. 
-
-Alternatively, this can be done by using the `ESP_SSLClient` that was included in this library which it works in the same way as ESP8266's `WiFiClientSecure` which the lower memeory consumption can be achieve by setting the smaller buffer size. This is the [example](/examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) for how to use `ESP_SSLClient` with this library.
 
 
 > [!WARNING]  

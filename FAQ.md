@@ -53,6 +53,10 @@
 
 - [Q25: How can I stop authentication task?](#q25-how-can-i-stop-authentication-task)
 
+- [Q26: How can I run more than one Reaktime Database Stream with the same async client?](#q26-how-can-i-run-more-than-one-reaktime-database-stream-with-the-same-async-client)
+
+- [Q27: How can I run Reaktime Database task and Cloud Firestore Database using the same async client?](#q27-how-can-i-run-reaktime-database-task-and-cloud-firestore-database-using-the-same-async-client)
+
 ## Q1: Why I get an error `"TCP connection failed"`?
 
 ### A1: The server was disconnected or unable to connect to the server.
@@ -236,7 +240,7 @@ The currently running task in the queue may be slow because of the delay functio
 
 Some network problem can be the cause, see [Q1: Why I get an error `"TCP connection failed"`?](#q1-why-i-get-an-error-tcp-connection-failed).
 
-When more than one `SSE mode (HTTP Streaming)`task was add to the queue. You cannot run more than one stream per async client.
+When more than one `SSE mode (HTTP Streaming)`task was add to the queue. You cannot run more than one stream per async client. Please see [Q26: How can I run more than one Reaktime Database Stream with the same async client?](#q26-how-can-i-run-more-than-one-reaktime-database-stream-with-the-same-async-client).
 
 When no more memory to be allocated for new task. You have to reduce the memory usage.
 
@@ -307,3 +311,23 @@ The `AsyncClientClass::stopAsync()` will stop only the running task and remove f
 ### A25: Normally you cannot stop the authentication task unless you can remove the queue from loop.
 
 You have to remove the functions; `FirebaseApp::loop()` and/or `FirebaseServicesApps::loop()`(if the same async client was used in `FirebaseServicesApps` and `FirebaseApp`) from the `loop`.
+
+## Q26: How can I run more than one Reaktime Database Stream with the same async client?
+### A26: No, it is not possible by design.
+
+The `SSE mode (HTTP Streaming)` task is a kind of `infinite task` which the server connection was kept alive and waiting for the incoming event data.
+
+You cannot run more than one `infinite task` in the same async client's queue as one `infinite task` is never finished, and another `infinite task` is never started.
+
+To run many `SSE mode (HTTP Streaming)` tasks, you have to run each task in different async client. Please note that `SSE mode (HTTP Streaming)` task consumes memory all the time while it is running. Running many `SSE mode (HTTP Streaming)` tasks may not possible because of out of memory.
+
+For running more tasks concurrency, see [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](/#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients).
+
+## Q27: How can I run Reaktime Database task and Cloud Firestore Database using the same async client?
+### A27: Yes, you can run different Firebase Products using the same async client or different async client.
+
+When you run different Firebase products using the same async client, all tasks are in the same queue and it needs to start the new server connection for different host of Firebase products. This takes time when establish the new server connection.
+
+When you run different Firebase products using the different async clients, all tasks are in the different queues. When tasks are running concurrency, it consumed more memory which may not suitable for low memory devices.
+
+For running more tasks concurrency, see [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](/#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients).
