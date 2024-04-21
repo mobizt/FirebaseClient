@@ -13,7 +13,7 @@
 
 - [Q5: What should I do when I get the error `"error opening file"`?](#q5-what-should-i-do-when-i-get-the-error-error-opening-file)
 
-- [Q6: What should I do when I get the error `"error reading file"`or `"error writng file"`?](#q6-what-should-i-do-when-i-get-the-error-error-reading-fileor-error-writng-file)
+- [Q6: What should I do when I get the error `"error reading file"` or `"error writng file"`?](#q6-what-should-i-do-when-i-get-the-error-error-reading-file-or-error-writng-file)
 
 - [Q7: What should I do when ESP32 crashed with the error `"Exception was unhandled"`?](#q7-what-should-i-do-when-esp32-crashed-with-the-error-exception-was-unhandled)
 
@@ -147,7 +147,7 @@ Read [Q1: Why I get an error `"TCP connection failed"`?](#q1-why-i-get-an-error-
 - Memory allocation failure due to out of memory. The filesystem may not work in this case and you have to solve the memory issue. You have to reduce the memory used by your code and inspect memory usage for memory leaks.
 
 
-## Q6: What should I do when I get the error `"error reading file"`or `"error writng file"`?
+## Q6: What should I do when I get the error `"error reading file"` or `"error writng file"`?
 
 ### A6: The error occurred while reading from or writing to filesystem.
 

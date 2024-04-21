@@ -529,7 +529,7 @@ In Raspberry Pi Pico W, its `WiFiClientSecure` memory used for the transmit and 
 
 In ESP32 device, its `WiFiClientSecure` memory usage cannot be adjusted, it requires at least 50 k per connection and only three `WiFiClientSecure` can be defined.
 
-Alternatively, in ESP32, this can be done by using the `ESP_SSLClient` that was included in this library which it works in the same way as ESP8266's `WiFiClientSecure` which the lower memeory consumption can be achieve by setting the smaller buffer size. This is the [example](/examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) for how to use `ESP_SSLClient` with this library.
+Alternatively, for ESP32 device, you can use `ESP_SSLClient` that was included in this library. It works in the same way as ESP8266's `WiFiClientSecure` and the memory used for the transmit and receive buffers are adjustable (512 to 16384). This is the [example](/examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) for how to use `ESP_SSLClient` with this library.
 
 
 - ### Async Client
