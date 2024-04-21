@@ -199,6 +199,6 @@ void asyncCB(AsyncResult &aResult)
 
     if (aResult.available())
     {
-        Firebase.printf("payload: task: %s, %s\n", aResult.uid().c_str(), aResult.c_str());
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }
