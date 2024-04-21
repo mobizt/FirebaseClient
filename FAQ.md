@@ -184,14 +184,14 @@ The memory allocation failure due to out of memory can cause the dangling pointe
 
 You have to wait for the authentication task to be ready before calling the Firebase functions.
 
-Please read [Required Operation Flows](/#required-operation-flows) for more details.
+Please read [Required Operation Flows](https://github.com/mobizt/FirebaseClient#required-operation-flows) for more details.
 
 
 ## Q9: What should I do when I get the error `"JWT, private key parsing fail"`?
 
 ### A9: The RSA private key that uses in JWT token signing process is not valid.
 
-The private key can be obtained from the service account credentials. Please read [Service Account](/#service-account) for more details.
+The private key can be obtained from the service account credentials. Please read [Service Account](https://github.com/mobizt/FirebaseClient#service-account) for more details.
 
 ## Q10: What should I do when I get the error `"JWT, token signing fail"`?
 
@@ -230,7 +230,7 @@ The delay function and user blocking code are used in the same loop that authent
 
 ### A15 The FirebaseApp was not applied to the Firebase Service apps.
 
-You have to apply the FirebaseApp by using `FirebaseApp::getApp`. Please read [Required Operation Flows](/#required-operation-flows) for more details.
+You have to apply the FirebaseApp by using `FirebaseApp::getApp`. Please read [Required Operation Flows](https://github.com/mobizt/FirebaseClient#required-operation-flows) for more details.
 
 ## Q16: Why I get the error `"operation was cancelled"`?
 
@@ -321,7 +321,7 @@ You cannot run more than one `infinite task` in the same async client's queue as
 
 To run many `SSE mode (HTTP Streaming)` tasks, you have to run each task in different async client. Please note that `SSE mode (HTTP Streaming)` task consumes memory all the time while it is running. Running many `SSE mode (HTTP Streaming)` tasks may not possible because of out of memory.
 
-For running more tasks concurrency, see [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](/#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients).
+For running more tasks concurrency, see [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](https://github.com/mobizt/FirebaseClient#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients).
 
 ## Q27: How can I run Reaktime Database task and Cloud Firestore Database task using the same async client?
 ### A27: Yes, you can run different Firebase Products using the same async client or different async client.
@@ -330,4 +330,4 @@ When you run different Firebase products using the same async client, all tasks 
 
 When you run different Firebase products using the different async clients, all tasks are in the different queues. When tasks are running concurrency, it consumed more memory which may not suitable for low memory devices.
 
-For running more tasks concurrency, see [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](/#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients).
+For running more tasks concurrency, see [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](https://github.com/mobizt/FirebaseClient#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients).
