@@ -552,7 +552,9 @@ The async SSL client can be used with the async client but it is currently exper
 
 To stop and cancel the tasks, use `AsyncClientClass::stopAsync()` to stop only running task or `AsyncClientClass::stopAsync(true)` to stop all tasks.
 
-You cannot stop the authentication task unless you can remove the queue from loop by remove the functions; `FirebaseApp::loop()` and/or `FirebaseServicesApps::loop()`(if the same async client was used in `FirebaseServicesApps` and `FirebaseApp`) from the `loop` function.
+In case `UID` is provided with the async task (see [Async Result](#async-result) section below), you can stop that task directly with `AsyncClientClass::stopAsync(<uid>)`.
+
+You cannot stop the authentication task unless you can remove the functions; `FirebaseApp::loop()` and/or `FirebaseServicesApps::loop()`(if the same async client was used in `FirebaseServicesApps` and `FirebaseApp`) from the `loop` function.
 
 > [!WARNING]  
 > The numbers of async clients that can be used, the numbers of the tasks stored in the async client's queue will be limited which depends on the device free memory.
@@ -1568,9 +1570,9 @@ The function name or method is the same or identical to the Google API documenta
 
 The library provides the placeholder struct for boolean, integer, float with custom precision, double with custom precision and object represents JSON or map and Array for input.
 
-- `bool_t` is the laceholder class represents the `bool` value used in this libaray. The normal `bool` value is supported.
+- `bool_t` is the placeholder class represents the `bool` value used in this libaray. The normal `bool` value is supported.
 
-- `number_t` is the laceholder class represents the `int`, `float` and `double` values used in this libaray. The normal `int`, `float` and `double` values are supported unless the default decimal places will be used for `float` and `double` values.
+- `number_t` is the placeholder class represents the `int`, `float` and `double` values used in this libaray. The normal `int`, `float` and `double` values are supported unless the default decimal places will be used for `float` and `double` values.
 
 - `string_t` is the placeholder class represents the string used in this libaray. The normal `String`, `const char*` are supported.
 
