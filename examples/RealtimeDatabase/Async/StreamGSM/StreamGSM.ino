@@ -84,6 +84,8 @@ TinyGsmClient gsm_client2(modem, 1);
 
 // This is the library internal SSL clients.
 // You can use any SSL Client that works with Ethernet library.
+// The ESP_SSLClient uses PSRAM by default (if it is available), for PSRAM usage, see https://github.com/mobizt/FirebaseClient#memory-options
+// For ESP_SSLClient documentation, see https://github.com/mobizt/ESP_SSLClient
 ESP_SSLClient ssl_client1, ssl_client2;
 
 GSMNetwork gsm_network(&modem, GSM_PIN, apn, gprsUser, gprsPass);
@@ -113,7 +115,7 @@ void setup()
 {
     ESP.getMaxAllocHeap()
 
-    Serial.begin(115200);
+        Serial.begin(115200);
     Serial.begin(115200);
 
     delay(10);
@@ -184,6 +186,7 @@ void setup()
 
     app.setCallback(asyncCB);
 
+    // The async client used for auth task should not use for stream task
     initializeApp(aClient1, app, getAuth(user_auth));
 
     // Waits for app to be authenticated.

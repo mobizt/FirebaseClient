@@ -8,7 +8,7 @@
  * <apn> - The GPRS APN (Access Point Name).
  * <user> - The GPRS user.
  * <password> - The GPRS password.
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  *
  */
@@ -80,6 +80,8 @@ TinyGsmClient gsm_client(modem);
 
 // This is a library internal SSL client.
 // You can use any SSL Client that works with GSM library.
+// The ESP_SSLClient uses PSRAM by default (if it is available), for PSRAM usage, see https://github.com/mobizt/FirebaseClient#memory-options
+// For ESP_SSLClient documentation, see https://github.com/mobizt/ESP_SSLClient
 ESP_SSLClient ssl_client;
 
 GSMNetwork gsm_network(&modem, GSM_PIN, apn, gprsUser, gprsPass);

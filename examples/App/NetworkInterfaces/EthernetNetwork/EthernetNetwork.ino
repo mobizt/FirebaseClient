@@ -13,7 +13,7 @@
  *
  * <local_ip>, <subnet>, <gateway> and <dns_server> - The static IP, subnet, default gateway and dns server IPs.
  * <optional> - The boolean option to force use static ip only (not use DHCP)
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -58,6 +58,8 @@ FirebaseApp app;
 
 // This is a library internal SSL client.
 // You can use any SSL Client that works with Ethernet library.
+// The ESP_SSLClient uses PSRAM by default (if it is available), for PSRAM usage, see https://github.com/mobizt/FirebaseClient#memory-options
+// For ESP_SSLClient documentation, see https://github.com/mobizt/ESP_SSLClient
 ESP_SSLClient ssl_client;
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change

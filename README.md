@@ -133,7 +133,7 @@
 
 - [Optional Options](#optional-options)
 
-[11. Frequently Asked Questions](#frequently-asked-questions)
+[11. Frequently Asked Questions](/FAQ.md)
 
 [12. License](#license)
 
@@ -174,6 +174,9 @@ When this library was used together with my other library e.g. [ESP-Mail-Client]
 You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
 For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
 
+The useful of using `ESP_SSLClient` library is it uses `PSRAM` by default, you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
+
+For using `PSRAM`, see [Memory Options for ESP8266](#memory-options-for-esp8266) section.
 
 
 ## Features
@@ -529,7 +532,13 @@ In Raspberry Pi Pico W, its `WiFiClientSecure` memory used for the transmit and 
 
 In ESP32 device, its `WiFiClientSecure` memory usage cannot be adjusted, it requires at least 50 k per connection and only three `WiFiClientSecure`(s) can be defined.
 
-Alternatively, for ESP32 device, you can use `ESP_SSLClient` that was included in this library. It works in the same way as ESP8266's `WiFiClientSecure` and the memory used for the transmit and receive buffers are adjustable (512 to 16384). This is the [example](/examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) for how to use `ESP_SSLClient` with this library.
+Alternatively, for ESP32 device, you can use `ESP_SSLClient` that was included in this library. It works in the same way as ESP8266's `WiFiClientSecure` and the memory used for the transmit and receive buffers are adjustable (512 to 16384). This is the [StreamCon curentcy example](/examples/RealtimeDatabase/Async/StreamConcurentcy/StreamConcurentcy.ino) for how to use `ESP_SSLClient` with this library.
+
+The useful of using `ESP_SSLClient` is it uses `PSRAM` by default, you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
+
+In case of ESP8266 that connected to external `PSRAM`, you have enough RAM for running many tasks concurrency, and you can run [Stream Concurentcy example](/examples/RealtimeDatabase/Async/StreamConcurentcy/StreamConcurentcy.ino) without memory problem.
+
+For how to use `PSRAM` in ESP32 and ESP8266 devices, see [Memory Options](#memory-options) section.
 
 
 - ### Async Client

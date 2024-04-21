@@ -54,28 +54,22 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
-#include <WiFiClientSecure.h>
-WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD)
-#include <WiFiSSLClient.h>
-WiFiSSLClient ssl_client;
-#endif
+WiFiClient basic_client1, basic_client2, basic_client3;
+
+// The ESP_SSLClient uses PSRAM by default (if it is available), for PSRAM usage, see https://github.com/mobizt/FirebaseClient#memory-options
+// For ESP_SSLClient documentation, see https://github.com/mobizt/ESP_SSLClient
+ESP_SSLClient ssl_client1, ssl_client2, ssl_client3;
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
 // it with other name with keyword "using" or use the class name AsyncClientClass directly.
 
 using AsyncClient = AsyncClientClass;
 
-AsyncClient aClient(ssl_client, getNetwork(network));
-
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
-WiFiClientSecure ssl_client2;
-#elif __has_include(<WiFiSSLClient.h>)
-WiFiSSLClient ssl_client2;
-#endif
+AsyncClient aClient1(ssl_client1, getNetwork(network));
 
 AsyncClient aClient2(ssl_client2, getNetwork(network));
+
+AsyncClient aClient3(ssl_client3, getNetwork(network));
 
 RealtimeDatabase Database;
 
@@ -105,19 +99,26 @@ void setup()
 
     Serial.println("Initializing app...");
 
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
-    ssl_client.setInsecure();
+    ssl_client1.setClient(&basic_client1);
+    ssl_client2.setClient(&basic_client2);
+    ssl_client3.setClient(&basic_client3);
+
+    ssl_client1.setInsecure();
     ssl_client2.setInsecure();
-#if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
-    ssl_client2.setBufferSizes(4096, 1024);
-#endif
-#endif
+    ssl_client3.setInsecure();
+
+    ssl_client1.setBufferSizes(2048, 1024);
+    ssl_client2.setBufferSizes(2048, 1024);
+    ssl_client3.setBufferSizes(2048, 1024);
+
+    ssl_client1.setDebugLevel(1);
+    ssl_client2.setDebugLevel(1);
+    ssl_client3.setDebugLevel(1);
 
     app.setCallback(asyncCB);
 
     // The async client used for auth task should not use for stream task
-    initializeApp(aClient2, app, getAuth(user_auth));
+    initializeApp(aClient3, app, getAuth(user_auth));
 
     // Waits for app to be authenticated.
     // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
@@ -129,19 +130,9 @@ void setup()
 
     Database.url(DATABASE_URL);
 
-    Database.get(aClient, "/test/stream", asyncCB, true /* SSE mode (HTTP Streaming) */);
+    Database.get(aClient1, "/test/stream/path1", asyncCB, true /* SSE mode (HTTP Streaming) */, "streamTask1");
 
-    // Only one Get in SSE mode (HTTP Streaming) is allowed, the operation will be cancelled if
-    // another Get in SSE mode (HTTP Streaming) was called.
-
-    // To get anyc result without callback
-    // Database.get(aClient, "/test/stream", aResult_no_callback, true /* SSE mode (HTTP Streaming) */);
-
-    // To assign UID for async result
-    // Database.get(aClient, "/test/stream", asyncCB, true /* SSE mode (HTTP Streaming) */, "myUID");
-
-    // To stop the async (stream) operation.
-    // aClient.stopAsync();
+    Database.get(aClient2, "/test/stream/path2", asyncCB, true /* SSE mode (HTTP Streaming) */, "streamTask2");
 }
 
 void loop()
@@ -164,24 +155,14 @@ void loop()
         writer.create(obj2, "rand", random(10000, 30000));
         writer.join(json, 2, obj1, obj2);
 
-        Database.set<object_t>(aClient2, "/test/stream/number", json, asyncCB);
+        Database.set<object_t>(aClient3, "/test/stream/path1/number", json, asyncCB, "setTask");
 
-        // When the async operation queue was full, the operation will be cancelled for new sync and async operation.
-        // When the async operation was time out, it will be removed from queue and allow the slot for the new async operation.
-
-        // To assign UID for async result
-        // Database.set<object_t>(aClient2, "/test/stream/number", json, asyncCB, "myUID");
+        Database.set<object_t>(aClient3, "/test/stream/path2/number", random(100000, 200000), asyncCB, "setTask");
     }
-
-    // To get anyc result without callback
-    // printResult(aResult_no_callback);
 }
 
 void asyncCB(AsyncResult &aResult)
 {
-    // To get the UID (string) from async result
-    // aResult.uid();
-
     printResult(aResult);
 }
 
@@ -189,17 +170,17 @@ void printResult(AsyncResult &aResult)
 {
     if (aResult.appEvent().code() > 0)
     {
-        Firebase.printf("Event msg: %s, code: %d\n", aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
 
     if (aResult.isDebug())
     {
-        Firebase.printf("Debug msg: %s\n", aResult.debug().c_str());
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
     }
 
     if (aResult.isError())
     {
-        Firebase.printf("Error msg: %s, code: %d\n", aResult.error().message().c_str(), aResult.error().code());
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
 
     if (aResult.available())
@@ -210,6 +191,8 @@ void printResult(AsyncResult &aResult)
         RealtimeDatabaseResult &RTDB = aResult.to<RealtimeDatabaseResult>();
         if (RTDB.isStream())
         {
+            Serial.println("----------------------------");
+            Firebase.printf("task: %s\n", aResult.uid().c_str());
             Firebase.printf("event: %s\n", RTDB.event().c_str());
             Firebase.printf("path: %s\n", RTDB.dataPath().c_str());
             Firebase.printf("data: %s\n", RTDB.to<const char *>());
@@ -224,7 +207,9 @@ void printResult(AsyncResult &aResult)
         }
         else
         {
-            Firebase.printf("payload: %s\n", aResult.c_str());
+            Serial.println("----------------------------");
+            Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
         }
+        Firebase.printf("Free Heap: %d\n", ESP.getFreeHeap());
     }
 }

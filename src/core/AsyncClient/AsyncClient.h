@@ -1910,7 +1910,7 @@ public:
 
         if (uid.length() == 0)
         {
-            sData->aResult.val[ares_ns::res_uid] = sData->auth_used ? FPSTR("auth_ms_") : FPSTR("task_ms_");
+            sData->aResult.val[ares_ns::res_uid] = FPSTR("task_ms_");
             sData->aResult.val[ares_ns::res_uid] += String(millis());
         }
         else
