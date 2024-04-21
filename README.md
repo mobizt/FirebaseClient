@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-21T09:52:53Z`
+`2024-04-21T09:59:09Z`
 
 ## Table of Contents
 
@@ -657,7 +657,7 @@ In case 2, you can set the `UID` (unique identifier) to identify the task. The `
 You can get the `UID` from `AsyncResult` via `AsyncResult::uid()`. 
 
 > [!NOTE]  
-> You cannot set `UID` to the `AsyncResult` directly as it will be overwritten, then the `UID` from the `AsyncResult` that defined by user in case 1 will always be empty. 
+> You cannot set `UID` to the `AsyncResult` directly as it will be overwritten, then the `UID` from the `AsyncResult` that defined by user in case 1 will always be the default `UID`. 
 
 > [!NOTE]  
 > The async client used in authentication task should be defined globally as it runs asynchronously.
