@@ -499,7 +499,7 @@ You cannot run more than one `infinite task` in the same async client's queue as
 To run multiple `SSE mode (HTTP Streaming)` tasks, you have to run each task in different async client. Please note that `SSE mode (HTTP Streaming)` task consumes memory all the time while it is running. Running many `SSE mode (HTTP Streaming)` tasks may not possible because of out of memory especially in ESP8266 and SAMD devices.
 
 > [!IMPORTANT]  
-> The user blocking code and `delay` function that used in the same loop of async task handler will block the async tasks to run. Please avoid to use `delay` function in the same loop of async task handler.
+> The user blocking code and `delay` function that used in the same loop of async task handler will block the async tasks to run. Please avoid using `delay` function in the same loop of async task handler.
 
 #### Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)
 
