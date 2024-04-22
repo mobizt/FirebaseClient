@@ -6,13 +6,13 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-22T09:15:27Z`
+`2024-04-22T10:54:56Z`
 
 ## Table of Contents
 
 [1. Introduction](#introduction)
 
-[2. Features](#features)
+[2. Frequently Asked Questions](/FAQ.md)
 
 [3. Supported Devices](#supported-devices)
 
@@ -93,7 +93,7 @@
 - [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
 
 
-[8. Project Preparation Setup](#project-preparation-setup)
+[8. Project Preparation and Setup](#project-preparation-and-setup)
 
   - [Authentication Getting Started](#authentication-getting-started)
 
@@ -133,9 +133,7 @@
 
 - [Optional Options](#optional-options)
 
-[11. Frequently Asked Questions](/FAQ.md)
-
-[12. License](#license)
+[11. License](#license)
 
 
 ## Introduction
@@ -163,27 +161,14 @@ This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was ct
 - The async operation is not truely impremented.
 
 > [!IMPORTANT]  
-> If you are new to `Firebase Products`, please read the [Project Preparation Setup](#project-preparation-setup) section first.
+> If you are new to `Firebase Products`, please read the [Project Preparation and Setup](#project-preparation-and-setup) section first.
 
 > [!IMPORTANT]  
 > For ESP8266 device usage, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section for heap selection.
 
+## Frequently Asked Questions
 
-## Features
-
-* Simple APIs.
-
-* Supports synchronous and asynchronous operations.
-
-* Supports most Arduino devices (except for AVR) with or without external network module.
-
-* Supports most Firebase Services included Google Cloud Storage.
-
-* Supports Firmware OTA updates.
-
-* Supports user management.
-
-* Faster and more reliable.
+For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
 ## Supported Devices.
 
@@ -395,7 +380,7 @@ This library provides the managed classes that are used in different purposes i.
 For the concept and basic usage understanding, you should read this documentation thoroughly. 
 
 > [!IMPORTANT]  
-> For new `Firebase` users, please read the [Project Preparation Setup](#project-preparation-setup) section first.
+> For new `Firebase` users, please read the [Project Preparation and Setup](#project-preparation-and-setup) section.
 
 - ### Authentication
 
@@ -1627,7 +1612,7 @@ The useful of using `ESP_SSLClient` library is it uses `PSRAM` by default (if it
 For using `PSRAM`, see [Memory Options](#memory-options) section.
 
 
-## Project Preparation Setup
+## Project Preparation and Setup
 
 You have to setup the Firebase project to use `Firebase products`. Visit [Understand Firebase Projects](https://firebase.google.com/docs/projects/learn-more) to learn more about Firebase projects.
 
