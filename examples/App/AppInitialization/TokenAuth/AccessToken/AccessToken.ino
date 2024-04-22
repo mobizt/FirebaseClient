@@ -49,7 +49,7 @@ DefaultNetwork network; // initilize with boolean parameter to enable/disable ne
 // Use refresh token and force token to refresh immediately
 // Refresh token, Client ID and Client Secret are required for OAuth2.0 token refreshing.
 // The Client ID and Client Secret can be taken from https://console.developers.google.com/apis/credentials
-AccessToken access_token("authtoken", 3000 /* expire period in seconds (<= 3600) */, "refresh", "clientid", "clientsecret");
+AccessToken access_token("access_token", 3000 /* expire period in seconds (<= 3600) */, "refresh", "clientid", "clientsecret");
 
 FirebaseApp app;
 

@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-21T02:03:24Z`
+`2024-04-22T09:037:55Z`
 
 ## Table of Contents
 
@@ -142,7 +142,7 @@
 
 📖 Async Firebase Client library for Arduino Documentation.
 
-This library is the `REST APIs Firebase Client` that supports the following `Firebase Products` and `Google Cloud Product`.
+This library is the `REST APIs Firebase Client` that supports the following `Firebase Products` and `Google Cloud Products`.
 
 - `Firebase Realtime Database`
 - `Cloud Firestore Database`
@@ -163,10 +163,10 @@ This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was ct
 - The async operation is not truely impremented.
 
 > [!IMPORTANT]  
-> If you are new to `Firebase products`, please read the [Project Preparation Setup](#project-preparation-setup) section first.
+> If you are new to `Firebase Products`, please read the [Project Preparation Setup](#project-preparation-setup) section first.
 
 > [!IMPORTANT]  
-> For ESP8266 device usage, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section first.
+> For ESP8266 device usage, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section for heap selection.
 
 > [!CAUTION]
 > This library included the `SSL Client` library called [`ESP_SSLClient`](https://github.com/mobizt/FirebaseClient/tree/main/src/client/SSLClient) to use in JWT token signing and the alternative use of the core SSL Client library e.g. `WiFIClientSecure` and `WiFiSSLClient` in some Arduino Client use cases which makes this library portable with no third-party library needed.
@@ -176,7 +176,7 @@ For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the fo
 
 The useful of using `ESP_SSLClient` library is it uses `PSRAM` by default (if it is available), you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
 
-For using `PSRAM`, see [Memory Options for ESP8266](#memory-options-for-esp8266) section.
+For using `PSRAM`, see [Memory Options](#memory-options) section.
 
 
 ## Features
@@ -411,33 +411,33 @@ For the concept and basic usage understanding, you should read this documentatio
 
 The authentication classes provide the authentication data for authentication and authorization using service account, sign-in credentials and auth tokens.
 
-The REST API client (this library) will use the short-lived token for authorization or no token used in some case.
+The REST API client (this library) will use the short-lived token for authorization.
 
-This token will be expired in 60 minutes.
+This authorization token will be expired in 60 minutes or 3600 seconds.
 
-The token types that can be used are `ID token` and `access token` which both types will be refered to as `auth token` in this library.
+The authorization token types that can be used for Firebase/Google APIs authorization are `ID token` and `access token` which will be called shorter as `auth tokens` in this library.
 
-The following authentication classes generate and hold the `auth token` to be used in authorization requests.
+The following authentication/authorization classes generate and hold the `ID token` to be used in the authorization requests.
 
-- The `UserAuth` class is for `User Sign-in authentication` which is the only authentication method that allows user to sign in and provides the ID token.
+- The `UserAuth` class is for `User Sign-in authentication` which is the only authentication method that allows user to sign in for confirming the identity of a user and it provides the `ID token` to use in the authorization requests.
 
-- The `IDToken` class is for `ID token authorization` using the ID token that is generated from other applications.
+- The `IDToken` class is for `ID token authorization`, which the `ID token` that obtained from the user authentication process in other applications will be used for authorization request. 
 
-- The `CustomAuth` class is for `ID token authorization using service account` that allows user defined UID.
+- The `CustomAuth` class is for `ID token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `ID token` that uses in the authorization requests. This allows the client to acess the services on behalf of user with custom `UID`.
 
-- The `CustomToken` class is for `ID token authorization using custom token`, using the custom claims signed JWT token that is generated from other applications.
+- The `CustomToken` class is for `ID token authorization using custom token`, which the custom claims signed `JWT` token obtained from the user authentication process in other applications will be used in the authorization requests.
 
-The following classes provide privilege access (admin rights) to the Firebase and Google services.
+The following authentication/authorization classes generate and hold the `access token` and `secret key` for Firebase/Google APIs privilege access.
 
-- The `ServiceAuth` class is for `OAuth2.0 access token authorization using service account`.
+- The `ServiceAuth` class is for `OAuth2.0 access token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `access token` that uses in the authorization requests.
 
-- The `AcessToken` class is for `OAuth2.0 access token authorization` using the access token that is generated from other applications.
+- The `AcessToken` class is for `OAuth2.0 access token authorization`, which the `access token` from the user authentication process in other applications will be used in the authorization requests.
 
-- The `LegacyToken` class is for `database secret` for `Realtime Database` privilege access.
+- The `LegacyToken` class that holds the `database secret` that used as the `secret key` for `Realtime Database` privilege access.
 
 The following class provides non-authentication access.
 
-- The `NoAuth` class is for non-authentication.
+- The `NoAuth` class is for non-authentication acesss.
 
 The `User Sign-in authentication` requires the Email/Password Sign-in provider to be enabled in your project 
 
@@ -542,7 +542,7 @@ For how to use `PSRAM` in ESP32 and ESP8266 devices, see [Memory Options](#memor
 
 In case using ESP8266 without `PSRAM` and you want to reduce the memory usage, you can use `WiFiClientSecure` or `ESP_SSLClient` with minimum receive and transmit buffer size setting: 1024 for receive buffer and 512 for transmit buffer.
 
-Note that, because the receive buffer size was set to minimum save value, 1024, the large server response may not be able to handle. 
+Note that, because the receive buffer size was set to minimum safe value, 1024, the large server response may not be able to handle. 
 
 
 - ### Async Client
@@ -672,45 +672,45 @@ The authentication task information or `app_event_t` can be obtained from `app_e
 
 The event codes (`firebase_auth_event_type enum`) return from `AsyncResult::appEvent().code()` are included the following.
 
-- `auth_event_uninitialized` which corresponds to 0.
+- `auth_event_uninitialized` or 0, when authentication task is not initialized.
 
-- `auth_event_initializing` which corresponds to 1.
+- `auth_event_initializing` or 1, when authentication task is begin.
 
-- `auth_event_signup` which corresponds to 2.
+- `auth_event_signup` or 2, when the user sign up process is begin.
 
-- `auth_event_send_verify_email` which corresponds to 3.
+- `auth_event_send_verify_email` or 3, when the user verification email sending process is begin.
 
-- `auth_event_delete_user` which corresponds to 4.
+- `auth_event_delete_user` or 4, when the user deletion process is begin.
 
-- `auth_event_reset_password` which corresponds to 5.
+- `auth_event_reset_password` or 5, when the user reset password process is begin.
 
-- `auth_event_token_signing` which corresponds to 6.
+- `auth_event_token_signing` or 6, when the `JWT` token signing process is begin.
 
-- `auth_event_authenticating` which corresponds to 7.
+- `auth_event_authenticating` or 7, when the google API authorization token request is begin.
 
-- `auth_event_auth_request_sent` which corresponds to 8.
+- `auth_event_auth_request_sent` or 8, when the a authorization token request was sent.
 
-- `auth_event_auth_response_received` which corresponds to 9.
+- `auth_event_auth_response_received` or 9, when a authorization token was received.
 
-- `auth_event_ready` which corresponds to 10.
+- `auth_event_ready` or 10, when the authorization token is ready.
 
-- `auth_event_error` which corresponds to 11.
+- `auth_event_error` or 11, when error was occurred in the authentication process.
 
-The event strings return from `String AsyncResult::appEvent().message()` that give the event detail are included the following.
+The event strings return from `String AsyncResult::appEvent().message()` which give the event detail are included the following.
 
 - `"undefined"` when authentication task is not initialized.
 
 - `"initializing"` when authentication task is begin.
 
-- `"sign up"` when the user sign up process in begin.
+- `"sign up"` when the user sign up process is begin.
 
-- `"send verification email"` when the user verification email sending process in begin.
+- `"send verification email"` when the user verification email sending process is begin.
 
-- `"delete user"` when the user deletion process in begin.
+- `"delete user"` when the user deletion process is begin.
 
-- `"reset password"` when the user reset password process in begin.
+- `"reset password"` when the user reset password process is begin.
 
-- `"token signing"` when the `JWT` token signing process in begin.
+- `"token signing"` when the `JWT` token signing process is begin.
 
 - `"authenticating"` when the google API authorization token request is begin.
 
@@ -728,7 +728,7 @@ The generic server response can be obtained from `AsyncResult` via the following
 
 - `String AsyncResult::payload()` returns the copy of server response payload string.  
 
-- `const char *AsyncResult::c_str() const` returns the pointer to the internal server response payload string buffer. 
+- `const char *AsyncResult::c_str() const` returns the pointer to the internal response payload string buffer. 
 
 - `bool AsyncResult::available()` returns true if server response payload was received.
 
@@ -756,27 +756,27 @@ The specific `Realtime Database` server response payload and `SSE mode (HTTP Str
 
 The `realtime_database_data_type` enums are included the following.
 
-- `realtime_database_data_type_undefined` which corresponds to -1.
+- `realtime_database_data_type_undefined` or -1.
 
-- `realtime_database_data_type_null`  which corresponds to 5.
+- `realtime_database_data_type_null`  or 5.
 
-- `realtime_database_data_type_integer` which corresponds to 1.
+- `realtime_database_data_type_integer` or 1.
 
-- `realtime_database_data_type_float` which corresponds to 2.
+- `realtime_database_data_type_float` or 2.
 
-- `realtime_database_data_type_double` which corresponds to 3.
+- `realtime_database_data_type_double` or 3.
 
-- `realtime_database_data_type_boolean` which corresponds to 4.
+- `realtime_database_data_type_boolean` or 4.
 
-- `realtime_database_data_type_string` which corresponds to 5.
+- `realtime_database_data_type_string` or 5.
 
-- `realtime_database_data_type_json` which corresponds to 6.
+- `realtime_database_data_type_json` or 6.
 
-- `realtime_database_data_type_array` which corresponds to 7.
+- `realtime_database_data_type_array` or 7.
 
 <br>
 
-The `Realtime Database` server response payload and `HTTP Streaming` event data can be converted to the values of type `T` e.g. boolean, integer, float, double and string via `RealtimeDatabaseResult::to<T>()`.
+The `Realtime Database` server response payload and `HTTP Streaming` event data can be converted to the values of type `T` via `RealtimeDatabaseResult::to<T>()` e.g. boolean, integer, float, double and string.
 
 The following is the example for how to convert the payload to any value.
 
@@ -798,28 +798,34 @@ String stringVal = databaseResult.to<String>();
 
 - ### Error Information
 
-The error information (`FirebaseError`) from async result can be obtained from `AsyncResult::error()` are included the following.
+The error information (`FirebaseError`) from the async result can be obtained from `FirebaseError AsyncResult::error()` are included the following.
 
-  - `AsyncResult::error().code()` returns the numeric error of two major sources: `TCP Client Error` and `Server Response Error`. The `TCP Client Error` was defined [here](/src/core/Error.h#L32-L64) and the `Server Response Error` was defined [here](/src/core/Error.h#L72-L87).
+  - `int AsyncResult::error().code()` returns the numeric error of two major sources: `TCP Client Error` and `Server Response Error`. The `TCP Client Error` was defined [here](/src/core/Error.h#L32-L64) and the `Server Response Error` was defined [here](/src/core/Error.h#L72-L87).
 
   - `String AsyncResult::error().message()` returns the error string based on the `AsyncResult::error().code()` which in case `Server Response Error`, the `unauthorized`, `precondition failed (ETag does not match)` and `HTTP Status xxx` can be returned. In case `TCP Client Error`, the [predefined messages](/src/core/Error.h#L141-L199) can be returned.
 
 
 - ### Debug Information
 
-The debug information (`String`) from async result can be obtained from `AsyncResult::debug()` which is currently availabele when starting and closing the server connection and information about network connection process.
+The debug information (`String`) from the async result can be obtained from `String AsyncResult::debug()` which is currently availabele when starting and closing the server connection and information about network connection process.
 
 ### App Initialization
 
-The Firebase app (`FirebaseApp`) is the class that used for authentication handling. All Firebase Services Apps will take the authentication data which called app token (`app_token_t`) that maintains by Firebase app, and was used as the access key or bearer token while processing the REST API request. 
+The Firebase app (`FirebaseApp`) is the class that used to handle the authentication task. 
 
-The `FirebaseApp` class constructor accepts the user auth data (`user_auth_data`) which is the struct that holds the user input sign-in credentials and tokens.
+The process of App intitialization:
 
-The user auth data that passes to the `FirebaseApp` class constructor can be obtained from the following sign-in credentials, access key, auth token providers classs via `getAuth` function.
+- The `FirebaseApp` class accepts the user auth data (`user_auth_data`) which is the struct that holds the user sign-in credentials and tokens.
 
-Thses classes also mentioned in the earlier section.
+The user auth data that passes to the `FirebaseApp` class constructor can be obtained from the authentication/authorization classes via `getAuth` function.
 
-The following authentication classes generate and hold the `auth token` to be used in the authorization requests.
+The app token (`app_token_t`) that is the object that provided by the user auth data (`user_auth_data`), will provide the `auth tokens` that used in the authorization requests.
+
+- User call `FirebaseApp::getApp<T>(<FirebaseServiceApp>)` to apply the auth data from app token to the Service apps before use.
+
+The authentication/authorization classes also mentioned in the earlier section will be discussed here.
+
+The following authentication/authorization classes generate and hold the `ID token` which used in the authorization requests.
 
 - [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino)
 
@@ -827,7 +833,7 @@ The following authentication classes generate and hold the `auth token` to be us
 
 - [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino)
 
-The following classes provide privilege access (admin rights) to the Firebase and Google services.
+The following classes provide the privilege access to the Firebase/Google APIs.
 
  - [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino)
  
@@ -835,40 +841,34 @@ The following classes provide privilege access (admin rights) to the Firebase an
 
  - [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino)
 
- The following class provides non-authentication.
+ The following class provides for non-authentication acesss.
  
  - [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino)
 
 
-The `getAuth` function is the function to get user auth data (`user_auth_data`) from these authentication provider classes.
+The `getAuth` function is the function that provides the user auth data (`user_auth_data`) from the authentication/authorization classes.
 
 > [!NOTE]  
-> The user auth data will be coppied to use internally, then changing these authentication provider classes's data cannot affected the authentication process unless `FirebaseApp` was re-initializing.
+> The user auth data that passes to `FirebaseApp` will be coppied to use internally, then changing the credentials in authentication/authorization classes after the `FirebaseApp` was initialized will not change the internal user auth data. You have to re-initiate the `FirebaseApp` again for apply the changes.
 
-The `UID` for user can be obtained from `FirebaseApp::getUid()`. Don't be confused with the task `UID` that described earlier.
+The user `UID` can be obtained from `FirebaseApp::getUid()`. Don't be confused with the task `UID` that described earlier.
 
-The auth token (ID token, access token or legacy token) can be obtained from `FirebaseApp::getToken()`.
+The `auth token` (`ID token` and `access token`) and legacy token can be obtained from `FirebaseApp::getToken()`.
 
-The refresh token (if it is available from user sign in) can be obtained from `FirebaseApp::getRefreshToken()`.
+The refresh token (when using authentication/authorization classes that provided the `ID token`) can be obtained from `FirebaseApp::getRefreshToken()`.
 
 
 - ### CustomAuth (ID Token Authorization Using Service Account)
 
-The cusom signed `JWT` token was not exposed to the user unless it was created internally for tempolary use.
-
-This is the approach that allows you to access the service as a user with the custom `UID` without sign in.
-
-You can define any `UID` that represents the user identifier which used for access control.
-
-The parameters for the [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) class constructor are included the following which most of the parameters can be taken from the service account credentials.
+The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) class parameters are included the following.
 
 ```cpp
 CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
 ```
 
-`<TimeStatusCallback>` The time status callback that provides the UNIX timestamp value used for JWT token signing.
+`<TimeStatusCallback>` The time status callback that provides the UNIX timestamp used to set the issue time and expiration time in the JWT token payload.
 
-`<api_key>` The web API key of project.
+`<api_key>` The web API key of the project.
 
 `<client_email>` The service account client Email.
 
@@ -888,13 +888,13 @@ CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project
 
 This type of authentication is used when privilege (admin rights) access is needed.
 
-The parameters for [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) provider class are the following which most of the parameters can be taken from service account credentials.
+The [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) class parameters are included the following.
 
 ```cpp
 ServiceAuth::ServiceAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>)
 ```
 
-`<TimeStatusCallback>` The time status callback that provide the UNIX timestamp value used for JWT token signing.
+`<TimeStatusCallback>` The time status callback that provides the UNIX timestamp used to set the issue time and expiration time in the JWT token payload.
 
 `<client_email>` The service account client Email.
 
@@ -905,41 +905,37 @@ ServiceAuth::ServiceAuth(<TimeStatusCallback>, <api_key>, <client_email>, <proje
 `<expire>` The expiry period in seconds (less than 3600), 3300 is the default value.
 
 > [!NOTE]  
-> The refresh token is not available for this authentication type.
+> The refresh token is not available for OAuth 2.0 JWT Bearer Flow.
 
 The auth token need to be re-created instead of refreshing.
 
 - ### UserAuth (User Sign-In Authentication)
 
-With [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) provider class, you are now signin as a user with Email and password.
-
-The folowing are available parameters.
+The [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) class parameters are included the following.
 
 ```cpp
 UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>)
 ```
 
-`<api_key>` API key can be obtained from Firebase console > Project Overview > Project settings.
+`<api_key>` The API key which can be obtained from Firebase console > Project Overview > Project settings.
 
-`<user_email>` The user Email that in the project.
+`<user_email>` The Email of user in the project.
 
-`<user_password>`The user password in the project.
+`<user_password>`The password of user in the project.
 
 `<expire>`The expiry period in seconds (less than 3600), 3300 is the default value.
 
 - ### NoAuth (Non-Authentication)
 
-The [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino) provider class, allows you to skip all auth data in the REST API request that sent to the Firebase services.
+The [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino) class allows you to access the Firebase/Google APIs without authorization token. There is no parameters in its class constructor.
 
-The security rules should allow read and write access without conditiona.
+This required read and write access in Firebase/Google APIs.
 
-This is suitable for testing only and should not use in the production.
+It should be used for testing only.
 
 - ### CustomToken (ID Token Authorization Using Custom Token)
 
-With [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino) provider class, you are able to set the custom token (custom claims signed JWT token) that generated from other Firebase client apps.
-
-The available parameters in the class constructor are the following.
+The [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino) class parameters are included the following.
 
 ```cpp
 CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>)
@@ -951,32 +947,26 @@ CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>)
 
 `<expire_in_seconds>` Expiry period in seconds (less than 3600), 3300 is the default value.
 
-You should defined the expire period that less than the remaining time to live of your signed JWT token.
+The expire period should be less than the remaining time to live of your signed `JWT` token.
 
 > [!NOTE]  
-> Only valid `RS256` signed JWT token can be used with Firebase and Google services that provided in the library. 
+> Only valid `RS256` signed `JWT` token can be used with Firebase Products and Google Cloud Product that provided in this library. 
 
-Most Arduino boards that come with crypto chip e.g. [ATECC608A](https://www.microchip.com/en-us/product/atecc608a) do not support RSA-256 algorithm and can not use its crypto library to generate the signed JWT token used with this library.
+Some Arduino boards that have built-in crypto chip e.g. [ATECC608A](https://www.microchip.com/en-us/product/atecc608a) do not support RSA-256 algorithm and its crypto library cannot use to create the signed JWT token used in this library.
 
-You can assign the refresh token that obtains from Google API server when generating the ID token, as the `<custom_token>` parameter to refresh the token and use it last long.
+You can pass the refresh token to the `<custom_token>` to refresh the token and use it last long. The refresh token is generally available from the ID token request.
 
-The ID token itself is a short-lived token which is expired in 1 Hour or less.
+The ID token is a short-lived token which will be expired in 1 hour.
 
 - ### AccessToken (OAuth2.0 Access Token Authorization)
 
-The [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino) provider class allows you to authorize the Firebase and Google services with the access token.
-
-The access token itself is a short-lived token which will be expired in 1 Hour or less.
-
-The access token can be obtained from the Firebase SDK client apps.
-
-The available parameters in its class constructor are included the following.
+The [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino) class parameters are included the following.
 
 ```cpp
 AccessToken::AccessToken(<auth_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>)
 ```
 
-`<auth_token>` Auth token from OAuthe2.0 auth.
+`<auth_token>` The access token.
 
 `<expire_in_seconds>` Expire period in seconds
 
@@ -988,19 +978,11 @@ AccessToken::AccessToken(<auth_token>, <expire_in_seconds>, <refresh_token>, <cl
 
 Normally `<refresh_token>` is not needed, if it is provided, the token will be refresh immediately when calling `FirebaseApp`'s  `initializeApp`.
 
-The `<refresh_token>`, `<client_id>` and `<client_secret>` are required for OAuth2.0 token refreshing.
-
-The Client ID and Client Secret can be taken from https://console.developers.google.com/apis/credentials
-
-By providing `<refresh_token>` without `<client_id>` and `<client_secret>`, the token refrehing process will fail with unexpected error.
+The Client ID and Client Secret are OAuth 2.0 credentials that can be taken from the [developer console](https://console.developers.google.com/apis/credentials).
 
 - ### IDToken (ID token Authorization)
 
-The [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) provider class, allows you to set the ID token form other Firebase clent apps.
-
-The ID token itself is a short-lived token which will be expired in 1 Hour or less.
-
-The available parameters in the class constructor are the following.
+The [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) class parameters are included the following.
 
 ```cpp
 IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>)
@@ -1016,11 +998,7 @@ IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>)
 
 - ### LegacyToken (Database Secret)
 
-The [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) provider class allows you to set the database secret used in `Firebase Realtime Database` service.
-
-The database secret is a secret key and it will not expire. However the database secret is now deprecated and should not use in the production.
-
-The available parameter in its class constructor is the following.
+The [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) class parameters is included the following.
 
 ```cpp
 LegacyToken::LegacyToken(<database_secret>)
@@ -1037,7 +1015,7 @@ The function that requires file/BLOB for download and upload will accept the fil
 
 The `file_config_data` can be obtained from the static functions called `getFile` and `getBlob`.
 
-The `FileConfig` class constructor parameters that are available are the following.
+The `FileConfig` class parameters is included the following.
 
 ```cpp
 FileConfig::FileConfig(<filename>, <file_callback>)
@@ -1047,11 +1025,11 @@ FileConfig::FileConfig(<filename>, <file_callback>)
 
 The file name can be a name of source (input) file and target (output) file that used in upload and download.
 
-`<file_callback>` The file callback that required for file operations: read, write, append and remove.
+`<file_callback>` The file callback required for file operations: read, write, append and remove.
 
-The `<file_callback>` function parameters included the `File` reference returned from file operation, filename for file operation and `file_operating_mode` enum.
+The `<file_callback>` function parameters included the `File` reference returned from the file operation, filename and the `file_operating_mode` enum.
 
-The `file_operating_mode` enum included the following
+The `file_operating_mode` enums included the following.
 
 - `file_mode_open_read`
 
@@ -1061,7 +1039,7 @@ The `file_operating_mode` enum included the following
 
 - `file_mode_open_remove`
 
-The following example code works with `SPIFFS` filesystem.
+The following example shows how the `FileConfig` works with `SPIFFS` filesystem.
 
 ```cpp
 
@@ -1098,9 +1076,9 @@ void download()
 
 ```
 
-The blob config class ([BlobConfig](examples/RealtimeDatabase/Extras/BLOB/BLOB.ino)) will provide the in/out data payload for the function that required upload and download operations.
+The blob config class ([BlobConfig](examples/RealtimeDatabase/Extras/BLOB/BLOB.ino)) provides the in/out data for upload and download functions.
 
-The `BlobConfig` class constructor parameters that are available are the following.
+The `BlobConfig` class constructor parameters class parameters are included the following.
 
 ```cpp
 BlobConfig::BlobConfig(<blob>, <blob_size>)
@@ -1110,9 +1088,9 @@ BlobConfig::BlobConfig(<blob>, <blob_size>)
 
 `<blob_size>` The size of data.
 
-The data can be a source (input) and target (output) data that used in upload and download.
+The data can be a source (input) for upload and target (output) for download.
 
-This example code works with BLOB data.
+The following example shows how the `BlobConfig` works.
 
 ```cpp
 uint8_t source[2048];
@@ -1133,7 +1111,7 @@ void download()
 
 ```
 
-When you don't use filesystems, you can exclude the related code in this library by removing the `ENABLE_FS` macro in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `DISABLE_FS` in compiler build flags.
+When you don't use filesystems, you can exclude the related code in this library by removing the `ENABLE_FS` macro in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `DISABLE_FS` in the compiler build flags.
 
 
 - ### Working with Networks
@@ -1157,21 +1135,21 @@ The `AsyncClientClass` object requires the network config data (`network_config_
 
 The default network class can be used with WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W.
 
-The network (WiFI) reconnection or resume can be done automatically or manually by user, can be configurable via the boolean parameter assigned with the default network class constructor.
+The boolean parameter assigned with the default network class constructor is the option for how the network (WiFi) reconnection can be done automatically or manually.
 
-The default WiFi network class provided the mean for multiple WiFi's ssid and passworrd connections (WiFi Multi),
+The default WiFi network class provided the mean for connection with multiple WiFi credentials (WiFi Multi),
 
-This default WiFi network class is suitable for device that provided the built-in WiFi module (e.g. U-blox) for non-WiFI capable MCU that the WiFi reconnection requires the ssid and password and device that supports WiFi Multi in its core.
+This default WiFi network class is suitable for device that has the built-in WiFi module (e.g. U-blox) or device that supports WiFi Multi in its core.
 
 The default ethernet network class can be used with the Ethernet capable MCUs using core Ethernet drivers e.g. ESP8266 and ESP32 devices.
 
 The other known networks (Ethernet and GSM) classes are also available.
 
-The user defined or generic networks are supported by assigning the network connection and its status callacks in its class constructor.
+The user defined or generic networks are supported by assigning the callbacks for network connection and the connection status in its class constructor.
 
 - `DefaultNetwork`
 
-The `DefaultNetwork` class constructors are the following.
+The `DefaultNetwork` class parameters are included the following.
 
 ```cpp
 DefaultNetwork::DefaultNetwork()
@@ -1188,14 +1166,14 @@ When you define `DefaultNetwork` with no parameter, the WiFi reconnection will b
 > you have to set the parameter, `<reconnect_option>` to false in the `DefaultNetwork` class constructor otherwise you are unable to  re-connect to the WiFi due to interferences operations.
 
 > [!CAUTION]
-> If you are using ESP32 device, and `<reconnect_option>` was enabled. The bugs in outdated ESP32 Core WiFi will cause the unknown network connection issue when library is trying to reconnect your WiFi using `WiFi.reconnect()`.
-> You have to update the ESP32 Arduino Core SDK to latest version or at least v2.x.x.
+> If you are using ESP32 device, and `<reconnect_option>` was enabled. The bugs in the outdated ESP32 Core WiFi will cause unknown network connection issue when library is trying to reconnect your WiFi using `WiFi.reconnect()`.
+> You have to update the ESP32 Arduino Core SDK to the latest version or at least v2.x.x.
 
 - `DefaultWiFiNetwork`
 
 This `DefaultWiFiNetwork` class required some parameter for reconnection using WiFi credentials.
 
-The parameters for its class constructor are following.
+The class parameters are included the following.
 
 ```cpp
 DefaultWiFiNetwork::DefaultWiFiNetwork(<FirebaseWiFi>, <reconnect_option>)
@@ -1203,11 +1181,11 @@ DefaultWiFiNetwork::DefaultWiFiNetwork(<FirebaseWiFi>, <reconnect_option>)
 
 `<FirebaseWiFi>` The FirebaseWiFi class object that used for keeping the network credentials (WiFi APs and WiFi passwords).
 
-`<reconnect_option>`  The bool option for network reconnection. It should be set with `false` when the WiFi reconnection was controlled by your code or third-party library e.g. WiFiManager.
+`<reconnect_option>`  The bool option for network reconnection. It should set with `false` when the WiFi reconnection was controlled by your code or third-party library e.g. WiFiManager.
 
 The `FirebaseWiFi` class holds the WiFi credentials list. The AP and password can be added to list with `addAP`.
 
-The `FirebaseWiFi` object should be defined at the same level of `DefaultWiFiNetwork` and `AsyncClientClass` as it will be used internally by reference.
+The `FirebaseWiFi` object should be defined at the same usage scope of `DefaultWiFiNetwork` and `AsyncClientClass`.
 
 The example for working with multiple WiFi APs.
 
@@ -1226,7 +1204,7 @@ void setup()
 
 - `DefaultEthernetNetwork`
 
-The DefaultEthernetNetwork class constructors are the following.
+The DefaultEthernetNetwork class parameters are included the following.
 
 ```cpp
 DefaultEthernetNetwork::DefaultEthernetNetwork()
@@ -1234,13 +1212,12 @@ DefaultEthernetNetwork::DefaultEthernetNetwork()
 DefaultEthernetNetwork::DefaultEthernetNetwork(<Firebase_SPI_ETH_Module>)
 ```
 
-`<Firebase_SPI_ETH_Module>` The ESP8266 core SPI ethernet driver class that work with external SPI Ethernet modules that currently supported e.g. ENC28J60, Wiznet W5100 and Wiznet 5500. This `<Firebase_SPI_ETH_Module>` should be defined at the same level as `AsyncClientCalss` as it will be used internally by reference.
+`<Firebase_SPI_ETH_Module>` The ESP8266 core SPI ethernet driver class that work with external SPI Ethernet modules that currently supported e.g. ENC28J60, Wiznet W5100 and Wiznet 5500. This `<Firebase_SPI_ETH_Module>` should be defined at the same usage scope of `AsyncClientCalss`.
 
- To use ESP8266 native lwIP Ethernet, the one of following macros, `#defined ENABLE_ESP8266_ENC28J60_ETH`, `#definedENABLE_ESP8266_W5500_ETH` and `#defined ENABLE_ESP8266_W5100_ETH` should be defined in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding 
- `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in compiler build flags.
+ To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` should be defined in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in the compiler build flags.
 
 
-The example for using ENC28J60lwIP with ESP8266
+The following example shows how to use ENC28J60 Ethernet module with ESP8266
 ```cpp
 #include <ENC28J60lwIP.h>
 
@@ -1272,14 +1249,14 @@ See [ESP32 DefaultEthernetNetwork example](examples/App/NetworkInterfaces/Defaul
 
 By default the external Ethernet module can be used with the library when the macro `ENABLE_ETHERNET_NETWORK` was assigned and Ethernet library was included in the user sketch.
 
-Other Ethernet library and class than `Ethernet.h` and `Ethernet` can be used, see the [Library Build Options](#library-build-options) section.
+The user defined Ethernet class and header other than `Ethernet.h` and `Ethernet` can be used, see the [Library Build Options](#library-build-options) section.
 
-The class constructor parameters are included the following.
+The class parameters are included the following.
 
 ```cpp
 EthernetNetwork::EthernetNetwork(<mac>, <cs_pin>, <reset_pin>, <Firebase_StaticIP>)
 ```
-`<mac>` The six bytes mac address.
+`<mac>` The mac address.
 
 `<cs_pin>` The Ethernet module chip select/enable pin.
 
@@ -1307,22 +1284,22 @@ See [EthernetNetwork example](examples/App/NetworkInterfaces/EthernetNetwork/Eth
 
 - `GSMNetwork`
 
-This `GSMNetwork` class is used for [TinyGSMClient](https://github.com/vshymanskyy/TinyGSM) library.
+The `GSMNetwork` class can be used only with [TinyGSMClient](https://github.com/vshymanskyy/TinyGSM) library.
 
-As required by the TinyGSMClient library, one of GSM module macro should be defined in the sketch. 
+As TinyGSMClient library requirement, one of GSM module macro should be defined in the sketch. 
 
 For example, for SIM7600 module, the macro `TINY_GSM_MODEM_SIM7600` should be defined.
 
 > [!IMPORTANT]  
 > The GSM module macros e.g. `TINY_GSM_MODEM_SIM7600` should be defined in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
 
-The class constructor parameter are following.
+The class parameters are included the following.
 
 ```cpp
 GSMNetwork::GSMNetwork(<modem>, <gsm_pin>, <apn>, <user>, <password>)
 ```
 
-`<modem>` The pointer to TinyGsm modem object. Modem should be initialized and/or set mode before transfering data.
+`<modem>` The pointer to TinyGsm modem object. Modem should be initialized and/or set the mode before transfering the data.
 
 `<gsm_pin>` The SIM pin.
 
@@ -1332,15 +1309,15 @@ GSMNetwork::GSMNetwork(<modem>, <gsm_pin>, <apn>, <user>, <password>)
 
 `<password>` The GPRS password.
 
-The TinyGsm modem should be defined at the same level of `GSMNetwork` and `AsyncClientClass` as it will be used internally by reference.
+The TinyGsm modem should be defined at the same usage scope of `GSMNetwork` and `AsyncClientClass`.
 
 See [GSMNetwork example](examples/App/NetworkInterfaces/GSMNetwork/GSMNetwork.ino) for using TinyGSMClient with this library.
 
 - `GenericNetwork`
 
-This type of network class works with all networking interfaces with some specific channels or ports e.g. Ethernet Module, WiFI Module, Bluetooth Module, NB-IoT module, and LoRa Module that have the internet access ability.
+This type of network class works with all networking interfaces: Ethernet Module, WiFI Module, Bluetooth Module, NB-IoT module, and LoRa Module that have the internet access ability.
 
-Since the interface class APIs are variety, the class constructor parameters are the basic callbacks required for network control and network status as in the following.
+The class parameters are included the following.
 
 ```cpp
 GenericNetwork::GenericNetwork(<net_connect_callback>, <network_status_callback>)
@@ -1348,11 +1325,11 @@ GenericNetwork::GenericNetwork(<net_connect_callback>, <network_status_callback>
 
 `<net_connect_callback>` The network connection callback function.
 
-`<network_status_callback>`The network status callback function.
+`<network_status_callback>` The network status callback function.
 
 In the `<net_connect_callback>`, the complete operations for the carier (network) and internet connection should be performed and waits until the internet connection was established.
 
-In the `<network_status_callback>` function, the `status` (Boolean variable) that passed by reference in the function, should be set based on the network status.
+In the `<network_status_callback>` function, the `status` (Boolean variable) that provided in the function, should set with the network status.
 
 See [GenericNetwork example](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.ino) for using WiFi with `GenericNetwork` for demonstation.
 
@@ -1364,9 +1341,9 @@ When using this library, you should follow one of the following operation flows 
 
 ![Operation Flows 2](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/operation_flows2.png)
 
-This library does not run any background process in FreeRTOS task or schedule task and timer ISR.
+This library does not run any background process in the FreeRTOS task or schedule task and timer ISR.
 
-For maintaining the async tasks, you have to place the code for `Maintain Authentication and Async Operation Queue` in the infinite loop e.g. main `loop()` function, timer or scheduler cyclically event's callback function or infinite loop in the FreeRTOS task (as in ESP32).
+For maintaining the async tasks, you have to place the code for `Maintain Authentication and Async Operation Queue` in the infinite loop function e.g. main `loop()` function, timer or scheduler cyclically event's callback function or infinite loop in the FreeRTOS task (as in ESP32).
 
 For ESP32's `FreeRTOS` task, the CPU Core 1 is recommend for safely operation. Although the async task is designed to run without blocking, the SSL/TLS handshake in SSL client is the blocking process then running the task in Core 0 may cause the wdt reset.
 
@@ -1580,13 +1557,8 @@ void asyncCB(AsyncResult &aResult)
 }
 
 ```
-As the library is the Firebase (REST API) Client, it also provides the extras functions to use in OTA update, filesystem download and upload as in the old library with cleaner and easy to read API and functions.
 
-The request payload and URL query parameters are supported as class object with the same names and types that represent the inputs and qury parameters that are available from Google API documentation.
-
-The function name or method is the same or identical to the Google API documentation unlesss some function names cannot be used due to prohibit keyword in C/C++ language, e.g. delete, visibility.
-
-The library provides the placeholder struct for boolean, integer, float with custom precision, double with custom precision and object represents JSON or map and Array for input.
+The library provides the placeholder struct for boolean, integer, float with custom precision, double with custom precision and object represents JSON or map and Array to use as the input of the functions.
 
 - `bool_t` is the placeholder class represents the `bool` value used in this libaray. The normal `bool` value is supported.
 
@@ -1960,7 +1932,7 @@ Wait a few minutes for the action to propagate after adding roles.
 
 - ### Memory Options for ESP8266
 
-When you update the ESP8266 Arduino Core SDK to v3.x.x, the memory for Heap and stack can be configurable from the IDE.
+When you update the ESP8266 Arduino Core SDK to v3.x.x, the memory for Heap and stack can be choosen from the IDE.
 
 You can choose the Heap memory between internal and external memory chip from IDE e.g. Arduino IDE and PlatformIO on VSCode or Atom IDE.
 
@@ -2179,7 +2151,7 @@ This `UserConfig.h` will not change or overwrite when update the library.
 
 ## Frequently Asked Questions
 
-For FAQ (Frequently Asked Questions), please go [here](/FAQ.md).
+For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
 ## License
 
