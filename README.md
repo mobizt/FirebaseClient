@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-22T09:037:55Z`
+`2024-04-22T09:11:52Z`
 
 ## Table of Contents
 
@@ -167,16 +167,6 @@ This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was ct
 
 > [!IMPORTANT]  
 > For ESP8266 device usage, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section for heap selection.
-
-> [!CAUTION]
-> This library included the `SSL Client` library called [`ESP_SSLClient`](https://github.com/mobizt/FirebaseClient/tree/main/src/client/SSLClient) to use in JWT token signing and the alternative use of the core SSL Client library e.g. `WiFIClientSecure` and `WiFiSSLClient` in some Arduino Client use cases which makes this library portable with no third-party library needed.
-When this library was used together with my other library e.g. [ESP-Mail-Client](https://github.com/mobizt/ESP-Mail-Client) which comes with built-in `ESP_SSLClient` library, the Arduino IDE compilation error will be occurred.
-You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
-For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
-
-The useful of using `ESP_SSLClient` library is it uses `PSRAM` by default (if it is available), you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
-
-For using `PSRAM`, see [Memory Options](#memory-options) section.
 
 
 ## Features
@@ -1624,6 +1614,17 @@ There is no `JSON` serialization/deserialization class in this library unless th
 - ### JsonWriter
 
     - [Class and Functions](/resources/docs/json_writer.md).
+
+
+> [!WARNING]
+> This library included the `SSL Client` library called [`ESP_SSLClient`](https://github.com/mobizt/FirebaseClient/tree/main/src/client/SSLClient) to use in JWT token signing and the alternative use of the core SSL Client library e.g. `WiFIClientSecure` and `WiFiSSLClient` in some Arduino Client use cases which makes this library portable with no third-party library needed.
+When this library was used together with my other library e.g. [ESP-Mail-Client](https://github.com/mobizt/ESP-Mail-Client) which comes with built-in `ESP_SSLClient` library, the Arduino IDE compilation error will be occurred.
+You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
+For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
+
+The useful of using `ESP_SSLClient` library is it uses `PSRAM` by default (if it is available), you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
+
+For using `PSRAM`, see [Memory Options](#memory-options) section.
 
 
 ## Project Preparation Setup
