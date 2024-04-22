@@ -140,7 +140,7 @@
 
 ## Introduction
 
-📖 Async Firebase Client library for Arduino Documentation.
+Async Firebase Client library for Arduino Documentation.
 
 This library is the `REST APIs Firebase Client` that supports the following `Firebase Products` and `Google Cloud Products`.
 
@@ -151,7 +151,7 @@ This library is the `REST APIs Firebase Client` that supports the following `Fir
 - `Google Cloud Functions`
 - `Google Cloud Storage`
 
-This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was cteated to eleminate the following issues in the old Firebase library.
+This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was cteated to solve the following issues in the old Firebase library.
 
 - The confusion of different library names from the same developer and other developers in Library Manager.
 - The different main header file name and class name issue.
