@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-22T10:54:56Z`
+`2024-04-22T12:38:32Z`
 
 ## Table of Contents
 
@@ -1855,6 +1855,18 @@ The app (iOS, Android, Web and Unity) registration token or `DEVICE_TOKEN` is a 
 
 ### Service Account
 
+A service account is a special kind of account (bot or application account) that belongs to app instead of to an individual end user. Service accounts enable server-to-server interactions between an app and a Google service.
+
+#### Types of service accounts
+
+In Google Cloud, there are several different types of service accounts:
+
+- User-managed service accounts: Service accounts that you create and manage. These service accounts are often used as identities for workloads.
+
+- Default service accounts: User-managed service accounts that are created automatically when you enable certain Google Cloud services e.g. `Firebase Admin SDK Service Account`. You are responsible for managing these service accounts.
+
+- Google-managed service accounts: Google-created and Google-managed service accounts that allow services to access resources on your behalf.
+
 A `Firebase Admin SDK Service Account` is created automatically when you create a Firebase project or add Firebase to a Google Cloud project and it is used to communicate with Firebase.
 
 The `Service Account` credentials are required for `OAuth2.0 access token authentication using service account` and `ID token authorization using service account` via the `ServiceAuth` and `CustomAuth` provider classes.
@@ -1889,15 +1901,19 @@ Copy the `project_id`, `client_email`, `private_key_id` and `private_key` from .
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"; // Taken from "private_key" key in JSON file.
 ```
 
+Normally `Firebase Admin SDK Service Account` is used in Firebase APIs authenticatyin/authorization.
+
+To access `Google Cloud APIs` e.g. `Google Cloud Storage`, `Google Cloud Functions` services, you have to update the service account permissions.
+
 #### Service Account Permissions
 
-When you want to use the `Firebase Admin SDK Service Account` to access the `Google Cloud services` e.g. `Google Cloud Storage`, `Google Cloud Functions` and some features of `Google Cloud Firestore` that perform some sensitive tasks, you have to add some permissive roles.
+When the `Firebase Admin SDK Service Account` was used for Google Cloud APIs authenticatyin/authorization, you have to update its permissive roles.
 
 The `Basic roles` are highly permissive roles that used to grant principals broad access to Google Cloud resources.
 
-The `Basic roles` e.g. `Owner` and `Editor` will be added for this reason. The `Owner` role is already covered the `Editor` role, then you can add only `Owner` role.
+We can add one of `Basic roles` i.e. `Editor` and/or `Owner`.
 
-To add the Basic's `Owner` and `Editor` roles, go to the [Identity and Access Management console](https://console.cloud.google.com/iam-admin).
+To add the Basic's `Owner` or `Editor` roles, go to the [Identity and Access Management console](https://console.cloud.google.com/iam-admin).
 
 Then choose the project, and select the `VIEW BY PRINCIPALS` tab.
 
@@ -1905,13 +1921,11 @@ From the table displayed, look at the `firebase-adminsdk` in the `Name` column, 
 
 ![IAM Add Permission](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/iam_add_permission_step1.png)
 
-Add the role `Owner` and `Editor` under the `Basic` roles and click `Save` button.
+Add the role `Editor` and/or `Owner` under the `Basic` roles and click `Save` button.
 
 Wait a few minutes for the action to propagate after adding roles. 
 
 ![IAM Add Roles](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/iam_add_permission_step2.png)
-
-
 
 
 ## Memory Options
