@@ -109,6 +109,8 @@ WiFiClientSecure ssl_client;
 #elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
+#else
+ESP_SSLClient ssl_client;
 #endif
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change

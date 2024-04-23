@@ -26,9 +26,7 @@
 #ifndef FIREBASE_CLIENT_H
 #define FIREBASE_CLIENT_H
 
-#if defined(FIREBASE_CLIENT_VERSION)
-#undef FIREBASE_CLIENT_VERSION
-#endif
+// FIREBASE_CLIENT_VERSION macro moved to core/Core.h
 
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"

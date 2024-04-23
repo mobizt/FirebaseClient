@@ -66,7 +66,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 
 #if defined(ESP32) && __has_include(<ETH.h>)
 #include <ETH.h>
-#define FIREBASE_ETH_IS_AVAILABLE
+#define FIREBASE_LWIP_ETH_IS_AVAILABLE
 #elif defined(ESP8266) && defined(ESP8266_CORE_SDK_V3_X_X)
 
 #if __has_include(<LwipIntfDev.h>)
@@ -93,7 +93,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 #endif
 
 #if defined(INC_ENC28J60_LWIP) || defined(INC_W5100_LWIP) || defined(INC_W5500_LWIP)
-#define FIREBASE_ETH_IS_AVAILABLE
+#define FIREBASE_LWIP_ETH_IS_AVAILABLE
 #endif
 
 #endif
@@ -111,17 +111,17 @@ typedef void (*NetworkStatusCallback)(bool &);
 #if defined(FIREBASE_ETHERNET_MODULE_LIB) && defined(FIREBASE_ETHERNET_MODULE_CLASS)
 #if __has_include(FIREBASE_ETHERNET_MODULE_LIB)
 #include FIREBASE_ETHERNET_MODULE_LIB
-#define ETH_MODULE_CLASS FIREBASE_ETHERNET_MODULE_CLASS
+#define FIREBASE_ETHERNET_MODULE_CLASS_IMPL FIREBASE_ETHERNET_MODULE_CLASS
 #elif __has_include(<Ethernet.h>)
 #include <Ethernet.h>
-#define ETH_MODULE_CLASS Ethernet
+#define FIREBASE_ETHERNET_MODULE_CLASS_IMPL Ethernet
 #endif
 #else
 #include <Ethernet.h>
-#define ETH_MODULE_CLASS Ethernet
+#define FIREBASE_ETHERNET_MODULE_CLASS_IMPL Ethernet
 #endif
 
-#if defined(ETH_MODULE_CLASS)
+#if defined(FIREBASE_ETHERNET_MODULE_CLASS_IMPL)
 
 #define FIREBASE_ETHERNET_MODULE_IS_AVAILABLE
 

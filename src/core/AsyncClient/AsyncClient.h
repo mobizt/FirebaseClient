@@ -1328,7 +1328,7 @@ private:
 
 #if defined(ENABLE_ETHERNET_NETWORK)
 
-#if defined(FIREBASE_ETH_IS_AVAILABLE)
+#if defined(FIREBASE_LWIP_ETH_IS_AVAILABLE)
 
 #if defined(ESP32)
         if (validIP(ETH.localIP()))
@@ -1484,7 +1484,7 @@ private:
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
 
         if (net.ethernet.ethernet_cs_pin > -1)
-            ETH_MODULE_CLASS.init(net.ethernet.ethernet_cs_pin);
+            FIREBASE_ETHERNET_MODULE_CLASS_IMPL.init(net.ethernet.ethernet_cs_pin);
 
         if (net.ethernet.ethernet_reset_pin > -1)
         {
@@ -1507,18 +1507,18 @@ private:
         {
 
             if (net.ethernet.static_ip->optional == false)
-                ETH_MODULE_CLASS.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
-            else if (!ETH_MODULE_CLASS.begin(net.ethernet.ethernet_mac))
+                FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
+            else if (!FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac))
             {
-                ETH_MODULE_CLASS.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
+                FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
             }
         }
         else
-            ETH_MODULE_CLASS.begin(net.ethernet.ethernet_mac);
+            FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac);
 
         net.eth_timer.feed(FIREBASE_ETHERNET_MODULE_TIMEOUT);
 
-        while (ETH_MODULE_CLASS.linkStatus() == LinkOFF && net.eth_timer.remaining() > 0)
+        while (FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkOFF && net.eth_timer.remaining() > 0)
         {
             delay(100);
         }
@@ -1528,7 +1528,7 @@ private:
         if (ret && sData)
         {
             String debug = FPSTR("Starting Ethernet connection...");
-            debug += ETH_MODULE_CLASS.localIP();
+            debug += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP();
             sData->aResult.setDebug(debug);
         }
 
@@ -1543,11 +1543,11 @@ private:
     bool ethernetConnected()
     {
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE)
-        net.network_status = ETH_MODULE_CLASS.linkStatus() == LinkON && validIP(ETH_MODULE_CLASS.localIP());
+        net.network_status = FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkON && validIP(FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP());
         if (!net.network_status)
         {
             delay(FIREBASE_ETHERNET_MODULE_TIMEOUT);
-            net.network_status = ETH_MODULE_CLASS.linkStatus() == LinkON && validIP(ETH_MODULE_CLASS.localIP());
+            net.network_status = FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkON && validIP(FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP());
         }
 #endif
         return net.network_status;
