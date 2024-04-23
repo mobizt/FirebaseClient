@@ -39,7 +39,7 @@
 
 #### A1: The server was disconnected or unable to connect to the server.
 
-There are manypossible cases of this issue.
+There are many possible causes of this issue.
 
 #### Possible WiFi issues
 
