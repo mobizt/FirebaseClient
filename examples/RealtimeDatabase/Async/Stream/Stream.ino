@@ -231,6 +231,8 @@ void printResult(AsyncResult &aResult)
 
 #if defined(ESP32) || defined(ESP8266)
         Firebase.printf("Free Heap: %d\n", ESP.getFreeHeap());
+#elif defined(ARDUINO_RASPBERRY_PI_PICO_W)
+        Firebase.printf("Free Heap: %d\n", rp2040.getFreeHeap());
 #endif
     }
 }

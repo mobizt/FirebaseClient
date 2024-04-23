@@ -121,13 +121,15 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
  * Arduino® Nano RP2040
  * Arduino® GIGA R1 WiFi
  * Raspberry Pi Pico (RP2040)
+ * STM32 MCU based boards (minimum 256k Flash)
+ * Teensy 3.6, 4.0 and 4.1
  * LAN8720 Ethernet PHY
  * TLK110 Ethernet PHY
  * IP101 Ethernet PHY
  * ENC28J60 SPI Ethernet module
  * W5100 SPI Ethernet module
  * W5500 SPI Ethernet module
- * SIMCom Modules with TinyGSMClient
+ * SIMCom Modules with [TinyGSM](https://github.com/vshymanskyy/TinyGSM)
 
 
  ## Dependencies
@@ -1144,6 +1146,11 @@ DefaultEthernetNetwork::DefaultEthernetNetwork(<Firebase_SPI_ETH_Module>)
 
  To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` should be defined in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in the compiler build flags.
 
+In `PlatformIO IDE`, please set the `lib_ldf_mode` option in `platformio.ini` as the following.
+
+```ini
+lib_ldf_mode = chain+
+```
 
 The following example shows how to use ENC28J60 Ethernet module with ESP8266
 ```cpp
@@ -1212,9 +1219,9 @@ See [EthernetNetwork example](examples/App/NetworkInterfaces/EthernetNetwork/Eth
 
 - `GSMNetwork`
 
-The `GSMNetwork` class can be used only with [TinyGSMClient](https://github.com/vshymanskyy/TinyGSM) library.
+The `GSMNetwork` class can be used only with [TinyGSM](https://github.com/vshymanskyy/TinyGSM) library.
 
-As TinyGSMClient library requirement, one of GSM module macro should be defined in the sketch. 
+As [TinyGSM](https://github.com/vshymanskyy/TinyGSM) library requirement, one of GSM module macro should be defined in the sketch. 
 
 For example, for SIM7600 module, the macro `TINY_GSM_MODEM_SIM7600` should be defined.
 
@@ -1241,7 +1248,7 @@ GSMNetwork::GSMNetwork(<modem>, <gsm_pin>, <apn>, <user>, <password>)
 
 The TinyGsm modem should be defined at the same usage scope of `GSMNetwork` and `AsyncClientClass`.
 
-See [GSMNetwork example](examples/App/NetworkInterfaces/GSMNetwork/GSMNetwork.ino) for using TinyGSMClient with this library.
+See [GSMNetwork example](examples/App/NetworkInterfaces/GSMNetwork/GSMNetwork.ino) for using [TinyGSM](https://github.com/vshymanskyy/TinyGSM) with this library.
 
 - `GenericNetwork`
 

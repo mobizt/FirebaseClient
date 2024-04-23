@@ -39,7 +39,7 @@
   #define ENABLE_ESP8266_ENC28J60_ETH
 */
 
-/** For W5100 ethernet module and PlatformIO IDE, please set the lib_ldf_mode in platformio.ini as this
+/** For PlatformIO IDE, please set the lib_ldf_mode in platformio.ini as the following.
   lib_ldf_mode = chain+
 */
 
