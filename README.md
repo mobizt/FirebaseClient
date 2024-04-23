@@ -121,8 +121,8 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
  * Arduino® Nano RP2040
  * Arduino® GIGA R1 WiFi
  * Raspberry Pi Pico (RP2040)
- * STM32 MCU based boards (minimum 256k Flash)
- * Teensy 3.6, 4.0 and 4.1
+ * STM32 MCU based boards (minimum 256k Flash memory)
+ * Teensy 3.1, 3.2, 3.5, 3.6, 4.0 and 4.1
  * LAN8720 Ethernet PHY
  * TLK110 Ethernet PHY
  * IP101 Ethernet PHY
