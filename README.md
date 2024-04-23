@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-23T11:24:40Z`
+`2024-04-23T11:47:49Z`
 
 ## Table of Contents
 
@@ -1219,7 +1219,9 @@ As TinyGSMClient library requirement, one of GSM module macro should be defined 
 For example, for SIM7600 module, the macro `TINY_GSM_MODEM_SIM7600` should be defined.
 
 > [!IMPORTANT]  
-> The GSM module macros e.g. `TINY_GSM_MODEM_SIM7600` should be defined in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
+> The GSM module macros e.g. `TINY_GSM_MODEM_SIM7600` should be defined in two locations.
+> 1. In [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
+> 2. In your sketch.
 
 The class parameters are included the following.
 

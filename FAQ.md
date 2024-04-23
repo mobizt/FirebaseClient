@@ -1,5 +1,5 @@
 
-`2024-04-23T11:32:30Z`
+`2024-04-23T11:47:49Z`
 
 # Async Firebase Client library for Arduino Frequently Asked Questions.
 
@@ -32,6 +32,8 @@
 - [Q25: How can I stop authentication task?](#q25-how-can-i-stop-authentication-task)
 - [Q26: How can I run more than one Realtime Database Stream with the same async client?](#q26-how-can-i-run-more-than-one-realtime-database-stream-with-the-same-async-client)
 - [Q27: How can I run Realtime Database task and Cloud Firestore Database task using the same async client?](#q27-how-can-i-run-realtime-database-task-and-cloud-firestore-database-task-using-the-same-async-client)
+- [Q28: Why my Arduino MKR board failed to connect to the server?](#q28-why-my-arduino-mkr-board-failed-to-connect-to-the-server)
+- [Q29: Why my SIM7600 failed to connect to the server?](#q29-why-my-sim7600-failed-to-connect-to-the-server)
 
 ### Q1: Why I get an error `"TCP connection failed"`?
 
@@ -53,6 +55,8 @@ There are manypossible cases of this issue.
 
 - In ESP32, ADC channel 2 cannot be used while using WiFi.
 
+#### Possible WiFi firmware issues
+
 - If you are using `Arduino UNO R4 WiFi`, `Arduino Portenta C33`, `Arduino MKR WiFi 1010`, `Arduino NANO 33 IoT`, and `Arduino Nano RP2040`, please make sure you have already done the following.
   - Add the `Realtime Database host root certificate` to the board firmware. Plese see [Upload SSL root certificates](https://support.arduino.cc/hc/en-us/articles/360016119219-Upload-SSL-root-certificates) for how to.
   - Install the WiFiNINA library.
@@ -73,7 +77,9 @@ There are manypossible cases of this issue.
 
 #### Possible GSM issues
 
-- Incorrect TinyGSMClient library configuration. The GSM module macros e.g. `TINY_GSM_MODEM_SIM7600` should be defined in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
+- Incorrect TinyGSMClient library configuration. The GSM module macros e.g. `TINY_GSM_MODEM_SIM7600` should be defined in two locations.
+   1. In [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
+   2. In your sketch.
 
 - GSM library issue. Follow the GSM library examples. Post your issue in the GSM library repository.
 
@@ -311,3 +317,9 @@ When you run different Firebase products using the same async client, all tasks 
 When you run different Firebase products using the different async clients, all tasks are in the different queues. When tasks are running concurrency, it consumed more memory which may not suitable for low memory devices.
 
 For running more tasks concurrency, see [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](https://github.com/mobizt/FirebaseClient#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients).
+
+### Q28: Why my Arduino MKR board failed to connect to the server?
+#### A28: Please see, [Possible WiFi issues](#possible-wifi-issues) and [Possible WiFi firmware issues](#possible-wifi-firmware-issues).
+
+### Q29: Why my SIM7600 failed to connect to the server?
+#### A29: Please see, [Possible GSM issues](#possible-gsm-issues).
