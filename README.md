@@ -6,134 +6,72 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-23T08:54:39Z`
+`2024-04-23T11:24:40Z`
 
 ## Table of Contents
 
-[1. Introduction](#introduction)
-
-[2. Frequently Asked Questions](/FAQ.md)
-
-[3. Supported Devices](#supported-devices)
-
-[4. Dependencies](#dependencies)
-
-[5. Incompatability Between Old Firebase Library and This Firebase Library](#incompatability-between-old-firebase-library-and-this-firebase-library)
-
-[6. Installation](#installation)
-
-- [Using Library Manager](#using-library-manager)
-
-- [Manual installation](#manual-installation)
-
-- [RP2040 Arduino SDK installation](#rp2040-arduino-sdk-installation)
-
-[7. Usages](#usages)
-
-- [Authentication](#authentication)
-
-- [Firebase and Google Services](#firebase-and-google-services)
-
-- [Async Queue](#async-queue)
-
-  - [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients)
-
-- [Async Client](#async-client)
-
-- [Tasks Timeout](#tasks-timeout)
-
-- [Async Result](#async-result)
-
-  - [App Events](#app-events)
-
-  - [Server Response and Event Data](#server-response-and-event-data)
-
-  - [Error Information](#error-information)
-
-  - [Debug Information](#debug-information)
-
-- [App Initialization](#app-initialization)
- 
-  - [CustomAuth (ID Token Authorization Using Service Account)](#customauth-id-token-authorization-using-service-account)
-
-  - [ServiceAuth (OAuth2.0 Access Token Authorization Using Service Account)](#serviceauth-oauth20-access-token-authorization-using-service-account)
-
-  - [UserAuth (User Sign-In Authentication)](#userauth-user-sign-in-authentication)
-
-  - [NoAuth (Non-Authentication)](#noauth-non-authentication)
-
-  - [CustomToken (ID Token Authorization Using Custom Token)](#customtoken-id-token-authorization-using-custom-token)
-
-  - [AccessToken (OAuth2.0 Access Token Authorization)](#accesstoken-oauth20-access-token-authorization)
-
-  - [IDToken (ID token Authorization)](#idtoken-id-token-authorization)
-
-  - [LegacyToken (Database Secret)](#legacytoken-database-secret)
-
-- [Working with Filesystems and BLOB](#working-with-filesystems-and-blob)
-
-- [Working with Networks](#working-with-networks)
-
-- [Required Operation Flows](#required-operation-flows)
-
-- [Basic Example](#basic-example)
-
-- [Realtime Database Usage](#realtime-database-usage)
-
-- [Google Cloud Firestore Database Usage](#google-cloud-firestore-database-usage)
-
-- [Google Cloud Messaging Usage](#google-cloud-messaging-usage)
-
-- [Firebase Storage Usage](#firebase-storage-usage)
-
-- [Google Cloud Storage Usage](#google-cloud-storage-usage)
-
-- [Google Cloud Functions Usage](#google-cloud-functions-usage)
-
-- [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
-
-
-[8. Project Preparation and Setup](#project-preparation-and-setup)
-
-  - [Authentication Getting Started](#authentication-getting-started)
-
-  - [Realtime Database Getting Started](#realtime-database-getting-started)
-
-  - [Google Cloud Firestore Database Getting Started](#google-cloud-firestore-database-getting-started)
-
-  - [Storage Getting Started](#storage-getting-started)
-
-  - [Google Cloud Functions Getting Started](#google-cloud-functions-getting-started)
-
-  - [Cloud Messaging Getting Started](#cloud-messaging-getting-started)
-
-  - [Service Account](#service-account)
-
-    - [Service Account Permissions](#service-account-permissions)
-
-[9. Memory Options](#memory-options)
-
-- [Memory Options for ESP8266](#memory-options-for-esp8266)
-
-  - [Arduino IDE](#arduino-ide)
-
-  - [PlatformIO IDE](#platformio-ide)
-
-  - [ESP8266 and SRAM/PSRAM Chip connection](#esp8266-and-srampsram-chip-connection)
-
-- [Memory Options for ESP32](#memory-options-for-esp32)
-
-  - [Arduino IDE](#arduino-ide-1)
-
-  - [PlatformIO IDE](#platformio-ide-1)
-
-[10. Library Build Options](#library-build-options)
-
-- [Predefined Options](#predefined-options)
-
-- [Optional Options](#optional-options)
-
-[11. License](#license)
+1. [Introduction](#introduction)
+2. [Frequently Asked Questions](/FAQ.md)
+3. [Supported Devices](#supported-devices)
+4. [Dependencies](#dependencies)
+5. [Incompatability Between Old Firebase Library and This Firebase Library](#incompatability-between-old-firebase-library-and-this-firebase-library)
+6. [Installation](#installation)
+    1. [Using Library Manager](#using-library-manager)
+    2. [Manual installation](#manual-installation)
+    3. [RP2040 Arduino SDK installation](#rp2040-arduino-sdk-installation)
+7. [Usages](#usages)
+    1. [Authentication](#authentication)
+    2. [Firebase and Google Services](#firebase-and-google-services)
+    3. [Async Queue](#async-queue)
+        1. [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients)
+    4. [Async Client](#async-client)
+    5. [Tasks Timeout](#tasks-timeout)
+    6. [Async Result](#async-result)
+        1. [App Events](#app-events)
+        2. [Server Response and Event Data](#server-response-and-event-data)
+        3. [Error Information](#error-information)
+        4. [Debug Information](#debug-information)
+    7. [App Initialization](#app-initialization)
+        1. [CustomAuth (ID Token Authorization Using Service Account)](#customauth-id-token-authorization-using-service-account)
+        2. [ServiceAuth (OAuth2.0 Access Token Authorization Using Service Account)](#serviceauth-oauth20-access-token-authorization-using-service-account)
+        3. [UserAuth (User Sign-In Authentication)](#userauth-user-sign-in-authentication)
+        4. [NoAuth (Non-Authentication)](#noauth-non-authentication)
+        5. [CustomToken (ID Token Authorization Using Custom Token)](#customtoken-id-token-authorization-using-custom-token)
+        6. [AccessToken (OAuth2.0 Access Token Authorization)](#accesstoken-oauth20-access-token-authorization)
+        7. [IDToken (ID token Authorization)](#idtoken-id-token-authorization)
+        8. [LegacyToken (Database Secret)](#legacytoken-database-secret)
+    8. [Working with Filesystems and BLOB](#working-with-filesystems-and-blob)
+    9. [Working with Networks](#working-with-networks)
+    10. [Required Operation Flows](#required-operation-flows)
+    11. [Basic Example](#basic-example)
+    12. [Realtime Database Usage](#realtime-database-usage)
+    13. [Google Cloud Firestore Database Usage](#google-cloud-firestore-database-usage)
+    14. [Google Cloud Messaging Usage](#google-cloud-messaging-usage)
+    15. [Firebase Storage Usage](#firebase-storage-usage)
+    16. [Google Cloud Storage Usage](#google-cloud-storage-usage)
+    17. [Google Cloud Functions Usage](#google-cloud-functions-usage)
+    18. [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
+8. [Project Preparation and Setup](#project-preparation-and-setup)
+    1. [Authentication Getting Started](#authentication-getting-started)
+    2. [Realtime Database Getting Started](#realtime-database-getting-started)
+    3. [Google Cloud Firestore Database Getting Started](#google-cloud-firestore-database-getting-started)
+    4. [Storage Getting Started](#storage-getting-started)
+    5. [Google Cloud Functions Getting Started](#google-cloud-functions-getting-started)
+    6. [Cloud Messaging Getting Started](#cloud-messaging-getting-started)
+    7. [Service Account](#service-account)
+        1. [Service Account Permissions](#service-account-permissions)
+9. [Memory Options](#memory-options)
+    1. [Memory Options for ESP8266](#memory-options-for-esp8266)
+        1. [Arduino IDE](#arduino-ide)
+        2. [PlatformIO IDE](#platformio-ide)
+        3. [ESP8266 and SRAM/PSRAM Chip connection](#esp8266-and-srampsram-chip-connection)
+    2. [Memory Options for ESP32](#memory-options-for-esp32)
+        1. [Arduino IDE](#arduino-ide-1)
+        2. [PlatformIO IDE](#platformio-ide-1)
+10. [Library Build Options](#library-build-options)
+    1. [Predefined Options](#predefined-options)
+    2. [Optional Options](#optional-options)
+11. [License](#license)
 
 
 ## Introduction
@@ -224,8 +162,6 @@ For Arduino IDE, the ESP8266 Core SDK can be installed through **Boards Manager*
 For PlatfoemIO IDE, the ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
 
 The RP2040 boards required [Arduino-Pico SDK](https://github.com/earlephilhower/arduino-pico) from Earle F. Philhower to be installed.
-
-
 
 ## Incompatability Between Old Firebase Library and This Firebase Library.
 
