@@ -1,5 +1,5 @@
 
-`2024-04-21T08:54:22Z`
+`2024-04-23T08:54:39Z`
 
 # Async Firebase Client library for Arduino Frequently Asked Questions.
 
@@ -78,6 +78,14 @@ There are manypossible cases of this issue.
 - WiFi AP was not responding because of static IP. You can connect your device to WiFi AP using DHCP instead.
 
 - In ESP32, ADC channel 2 cannot be used while using WiFi.
+
+- If you are using `Arduino UNO R4 WiFi`, `Arduino Portenta C33`, `Arduino MKR WiFi 1010`, `Arduino NANO 33 IoT`, and `Arduino Nano RP2040`, please make sure you have already done the following.
+  - Add the `Realtime Database host root certificate` to the board firmware. Plese see [Upload SSL root certificates](https://support.arduino.cc/hc/en-us/articles/360016119219-Upload-SSL-root-certificates) for how to.
+  - Install the WiFiNINA library.
+
+- If you are using `Arduino® MKR 1000 WIFI`, please make sure you have already done the following.
+  - Add the `Realtime Database host root certificate` to the board firmware. 
+  - Install the WiFi101 library and uninstall or remove the WiFiNINA library from the libraries folder if it was installed.
 
 #### Possible Ethernet issues
 

@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created April 23, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -29,6 +29,7 @@
 
 #include <Arduino.h>
 #include "./Config.h"
+#include <vector>
 
 typedef void (*NetworkConnectionCallback)(void);
 typedef void (*NetworkStatusCallback)(bool &);
@@ -150,7 +151,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 
 #define FIREBASE_WIFI_IS_AVAILABLE
 
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_PORTENTA_H7_M4)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -158,10 +159,32 @@ typedef void (*NetworkStatusCallback)(bool &);
 #include <WiFiNINA.h>
 #elif __has_include(<WiFi101.h>)
 #include <WiFi101.h>
-#elif __has_include(<WiFiS3.h>)
+#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
 #include <WiFiS3.h>
+#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
+#include <WiFiC3.h>
 #elif __has_include(<WiFi.h>)
 #include <WiFi.h>
+#endif
+
+#if defined(ARDUINO_ARCH_SAMD) ||      \
+    defined(ARDUINO_UNOWIFIR4) ||      \
+    defined(ARDUINO_GIGA) ||           \
+    defined(ARDUINO_PORTENTA_C33) ||   \
+    defined(ARDUINO_PORTENTA_H7_M7) || \
+    defined(ARDUINO_PORTENTA_H7_M4) || \
+    defined(ARDUINO_PORTENTA_X8)
+
+#if !defined(FIREBASE_HAS_ARDUINO_WIFISSLCLIENT)
+#define FIREBASE_HAS_ARDUINO_WIFISSLCLIENT
+#endif
+
+#endif
+
+#if  defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
+#if !defined(FIREBASE_HAS_WIFICLIENTSECURE)
+#define FIREBASE_HAS_WIFICLIENTSECURE
+#endif
 #endif
 
 #if !defined(ARDUINO_RASPBERRY_PI_PICO_W) && \
@@ -169,7 +192,10 @@ typedef void (*NetworkStatusCallback)(bool &);
     !defined(CORE_ARDUINO_MBED_PORTENTA) &&  \
     !defined(ARDUINO_UNOWIFIR4) &&           \
     !defined(ARDUINO_PORTENTA_C33) &&        \
-    !defined(ARDUINO_NANO_RP2040_CONNECT)
+    !defined(ARDUINO_NANO_RP2040_CONNECT) && \
+    !defined(ARDUINO_GIGA) &&                \
+    !defined(ARDUINO_PORTENTA_H7_M7) &&      \
+    !defined(ARDUINO_PORTENTA_H7_M4)
 #define FIREBASE_HAS_WIFI_DISCONNECT
 #endif
 

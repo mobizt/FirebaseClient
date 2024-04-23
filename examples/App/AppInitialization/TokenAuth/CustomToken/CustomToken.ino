@@ -25,16 +25,20 @@
  */
 
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
-#elif __has_include(<WiFiNINA.h>)
+#elif __has_include(<WiFiNINA.h>) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiNINA.h>
 #elif __has_include(<WiFi101.h>)
 #include <WiFi101.h>
-#elif __has_include(<WiFiS3.h>)
+#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
 #include <WiFiS3.h>
+#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
+#include <WiFiC3.h>
+#elif __has_include(<WiFi.h>)
+#include <WiFi.h>
 #endif
 
 #include <FirebaseClient.h>
@@ -53,10 +57,10 @@ CustomToken custom_token(API_KEY, "custom token", 3000 /* expire period in secon
 
 FirebaseApp app;
 
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
+#if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD)
+#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif

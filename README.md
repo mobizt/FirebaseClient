@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-22T12:38:32Z`
+`2024-04-23T08:54:39Z`
 
 ## Table of Contents
 
@@ -174,10 +174,14 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
  * ESP8266 MCUs based boards
  * ESP32 MCUs based boards
- * Arduino MKR WiFi 1010
- * Arduino MKR 1000 WIFI
- * Arduino Nano 33 IoT
- * Arduino MKR Vidor 4000
+ * Arduino® MKR WiFi 1010
+ * Arduino® MKR 1000 WIFI
+ * Arduino® Nano 33 IoT
+ * Arduino® MKR Vidor 4000
+ * Arduino® UNO R4 WiFi (Renesas)
+ * Arduino® Portenta C33
+ * Arduino® Nano RP2040
+ * Arduino® GIGA R1 WiFi
  * Raspberry Pi Pico (RP2040)
  * LAN8720 Ethernet PHY
  * TLK110 Ethernet PHY
@@ -186,10 +190,6 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
  * W5100 SPI Ethernet module
  * W5500 SPI Ethernet module
  * SIMCom Modules with TinyGSMClient
-
-> [!NOTE]  
-> This library does not support Arduino® UNO R4 WiFi due to the stack memory issue (related to the String class). 
-And this is not a library memory issue as the `Arduino MKR` (SAMD MCU) with the same amount of memory as `Arduino UNO R4 WiFi` can still be used without problem.
 
 
  ## Dependencies
@@ -201,6 +201,23 @@ This library required the latest device's **platform Core SDK** to be installed.
 > Please make sure that the `Arduino IDE's Board Manager URL` is up to date before you update your device's `platform Core SDK`. Any issue due to using out dated `platform Core SDK` is your own risk and does not support by library.
 >
 > In case the library compile status showed here is passing and your code compilation is error, you should check your libary installation, `platform Core SDK` installation and the library usage. You cannot install library in the cloud storage virtual folder or sandbox e.g. `Microsoft's OneDrive`.
+
+> [!IMPORTANT]
+> If you are using `Arduino UNO R4 WiFi`, `Arduino Portenta C33`, `Arduino MKR WiFi 1010`, `Arduino NANO 33 IoT`, and `Arduino Nano RP2040`, please make sure you have already done the following.
+> - Add the `Realtime Database host root certificate` to the board firmware. Plese see [Upload SSL root certificates](https://support.arduino.cc/hc/en-us/articles/360016119219-Upload-SSL-root-certificates) for how to.
+> - Install the WiFiNINA library.
+>
+
+> [!IMPORTANT]
+> If you are using `Arduino® MKR 1000 WIFI`, please make sure you have already done the following.
+> - Add the `Realtime Database host root certificate` to the board firmware. 
+> - Install the WiFi101 library and uninstall or remove the WiFiNINA library from the libraries folder if it was installed.
+>
+
+> [!WARNING]  
+> Only in `PlatformIO IDE`, if you are using `Arduino® UNO R4 WiFi` board and using the `Firebase Realtime Database`, your `Arduino® UNO R4 WiFi` board will stop with the error: `"Fault on interrupt or bare metal(no OS) environment"`.
+> This is the error related to the `Realtime Database` server certificate issue in WiFiS3 library that compiled with `PlatformIO IDE` even you upload SSL root certificates of `Realtime Database` server using the Arduino IDE tool.
+> This is problem is only specific to `Firebase Realtime Database` in `Arduino® UNO R4 WiFi` which compiled using `PlatformIO IDE` only.  
 
 For Arduino IDE, the ESP8266 Core SDK can be installed through **Boards Manager**. 
 
@@ -1367,16 +1384,20 @@ void setup()
 
 ```cpp
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
-#elif __has_include(<WiFiNINA.h>)
+#elif __has_include(<WiFiNINA.h>) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiNINA.h>
 #elif __has_include(<WiFi101.h>)
 #include <WiFi101.h>
-#elif __has_include(<WiFiS3.h>)
+#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
 #include <WiFiS3.h>
+#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
+#include <WiFiC3.h>
+#elif __has_include(<WiFi.h>)
+#include <WiFi.h>
 #endif
 
 #include <FirebaseClient.h>
@@ -1399,10 +1420,10 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in 
 
 FirebaseApp app;
 
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
+#if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD)
+#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif

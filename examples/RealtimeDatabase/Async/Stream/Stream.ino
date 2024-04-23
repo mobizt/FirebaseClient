@@ -19,16 +19,20 @@
  */
 
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
-#elif __has_include(<WiFiNINA.h>)
+#elif __has_include(<WiFiNINA.h>) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiNINA.h>
 #elif __has_include(<WiFi101.h>)
 #include <WiFi101.h>
-#elif __has_include(<WiFiS3.h>)
+#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
 #include <WiFiS3.h>
+#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
+#include <WiFiC3.h>
+#elif __has_include(<WiFi.h>)
+#include <WiFi.h>
 #endif
 
 #include <FirebaseClient.h>
@@ -54,12 +58,12 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
+#if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFiClientSecure.h>
-WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD)
+WiFiClientSecure ssl_client1, ssl_client2;
+#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiSSLClient.h>
-WiFiSSLClient ssl_client;
+WiFiSSLClient ssl_client1, ssl_client2;
 #endif
 
 // In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
@@ -67,14 +71,7 @@ WiFiSSLClient ssl_client;
 
 using AsyncClient = AsyncClientClass;
 
-AsyncClient aClient(ssl_client, getNetwork(network));
-
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
-WiFiClientSecure ssl_client2;
-#elif __has_include(<WiFiSSLClient.h>)
-WiFiSSLClient ssl_client2;
-#endif
-
+AsyncClient aClient(ssl_client1, getNetwork(network));
 AsyncClient aClient2(ssl_client2, getNetwork(network));
 
 RealtimeDatabase Database;
@@ -106,15 +103,15 @@ void setup()
     Serial.println("Initializing app...");
 
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
-    ssl_client.setInsecure();
+    ssl_client1.setInsecure();
     ssl_client2.setInsecure();
 #if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
+    ssl_client1.setBufferSizes(4096, 1024);
     ssl_client2.setBufferSizes(4096, 1024);
 
     // In case using ESP8266 without PSRAM and you want to reduce the memory usage, you can use WiFiClientSecure instead of ESP_SSLClient (see examples/RealtimeDatabase/StreamConcurentcy/StreamConcurentcy.ino)
     // with minimum receive and transmit buffer size setting as following.
-    // ssl_client.setBufferSizes(1024, 512);
+    // ssl_client1.setBufferSizes(1024, 512);
     // ssl_client2.setBufferSizes(1024, 512);
     // Note that, because the receive buffer size was set to minimum safe value, 1024, the large server response may not be able to handle.
     // The WiFiClientSecure uses 1k less memory than ESP_SSLClient.
@@ -231,6 +228,9 @@ void printResult(AsyncResult &aResult)
             Serial.println("----------------------------");
             Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
         }
+
+#if defined(ESP32) || defined(ESP8266)
         Firebase.printf("Free Heap: %d\n", ESP.getFreeHeap());
+#endif
     }
 }

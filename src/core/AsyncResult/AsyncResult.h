@@ -24,6 +24,8 @@
  */
 #ifndef ASYNC_RESULT_H
 #define ASYNC_RESULT_H
+
+#include "./core/Core.h"
 #include "Value.h"
 #include "./core/Error.h"
 #include "./core/List.h"
@@ -322,7 +324,9 @@ public:
         rtdbResult.ref_payload = &val[ares_ns::data_payload];
 #endif
         addr = reinterpret_cast<uint32_t>(this);
-        val[ares_ns::res_uid] = FPSTR("task_ms_");
+        val[ares_ns::res_uid] = FPSTR("task_v");
+        val[ares_ns::res_uid] += FIREBASE_CLIENT_VERSION;
+        val[ares_ns::res_uid] += FPSTR("_");
         val[ares_ns::res_uid] += String(millis());
     };
     ~AsyncResult()
