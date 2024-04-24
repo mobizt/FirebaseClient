@@ -797,7 +797,7 @@ The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) class
 ```cpp
 CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
 ```
-And
+
 
 ```cpp
 CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>)
