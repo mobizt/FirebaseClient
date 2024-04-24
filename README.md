@@ -796,8 +796,10 @@ The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) class
 
 ```cpp
 CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
+```
 
-CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>);
+```cpp
+CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>)
 ```
 
 `<TimeStatusCallback>` The time status callback that provides the UNIX timestamp used to set the issue time and expiration time in the JWT token payload.
@@ -831,7 +833,7 @@ The [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) cl
 ```cpp
 ServiceAuth::ServiceAuth(<TimeStatusCallback>, <client_email>, <project_id>, <private_key>, <expire>)
 
-ServiceAuth::ServiceAuth(<TimeStatusCallback>, <file_config_data>, <expire>);
+ServiceAuth::ServiceAuth(<TimeStatusCallback>, <file_config_data>, <expire>)
 ```
 
 `<TimeStatusCallback>` The time status callback that provides the UNIX timestamp used to set the issue time and expiration time in the JWT token payload.
@@ -860,9 +862,9 @@ The [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) class param
 ```cpp
 UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>)
 
-UserAuth::UserAuth(<file_config_data>);
+UserAuth::UserAuth(<file_config_data>)
 
-UserAuth::save(<file_config_data>);
+UserAuth::save(<file_config_data>)
 ```
 
 `<api_key>` The API key which can be obtained from Firebase console > Project Overview > Project settings.
@@ -892,9 +894,9 @@ The [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomTok
 ```cpp
 CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>)
 
-CustomToken::CustomToken(<file_config_data>);
+CustomToken::CustomToken(<file_config_data>)
 
-CustomToken::save(<file_config_data>);
+CustomToken::save(<file_config_data>)
 ```
 
 `<api_key>` API key can be obtained from Firebase console > Project Overview > Project settings.
@@ -925,9 +927,9 @@ The [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessTok
 ```cpp
 AccessToken::AccessToken(<access_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>)
 
-AccessToken::AccessToken(<file_config_data>);
+AccessToken::AccessToken(<file_config_data>)
 
-AccessToken::save(<file_config_data>);
+AccessToken::save(<file_config_data>)
 ```
 
 `<access_token>` The access token.
@@ -955,9 +957,9 @@ The [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) clas
 ```cpp
 IDToken::IDToken(<api_key>, <ID_token>, <expire_in_seconds>, <refresh_token>)
 
-IDToken::IDToken(<file_config_data>);
+IDToken::IDToken(<file_config_data>)
 
-IDToken::save(<file_config_data>);
+IDToken::save(<file_config_data>)
 ```
 
 `<api_key>` API key can be obtained from Firebase console > Project Overview > Project settings.
