@@ -2103,7 +2103,7 @@ Some options can be disabled.
 
 The predefined options that are already set in [**Config.h**](src/Config.h) are following.
 
-```yaml
+```cpp
 ENABLE_DATABASE // For RTDB compilation
 ENABLE_FIRESTORE // For Firestore compilation
 ENABLE_FIRESTORE_QUERY // For Firestore Query feature compilation
@@ -2123,6 +2123,7 @@ ENABLE_ACCESS_TOKEN
 ENABLE_CUSTOM_TOKEN
 ENABLE_ID_TOKEN
 ENABLE_LEGACY_TOKEN
+
 // For enabling non-sdk networking
 ENABLE_ETHERNET_NETWORK
 ENABLE_GSM_NETWORK
@@ -2132,7 +2133,7 @@ ENABLE_GSM_NETWORK
 
 The following options are not yet defined in [**Config.h**](src/Config.h) and can be assigned by user.
 
-```yaml
+```cpp
 FIREBASE_ETHERNET_MODULE_LIB `"EthernetLibrary.h"` // For the Ethernet library to work with external Ethernet module
 FIREBASE_ETHERNET_MODULE_CLASS EthernetClass // For the Ethernet class object of Ethernet library to work with external Ethernet module
 FIREBASE_ETHERNET_MODULE_TIMEOUT 2000 // For the time out in milliseconds to wait external Ethernet module to connect to network
@@ -2169,7 +2170,7 @@ For external Ethernet module integation used with function `setEthernetClient`, 
 
 For disabling predefined options instead of editing the [**Config.h**](src/Config.h) or using `#undef` in `UserConfig.h`, you can define these build flags with these names or macros in `UserConfig.h`.
 
-```yaml
+```cpp
 DISABLE_DATABASE // For disabling RTDB support
 DISABLE_FIRESTORE // For disabling Firestore support
 DISABLE_FIRESTORE_QUERY // For Firestore Query feature compilation
@@ -2180,6 +2181,7 @@ DISABLE_FUNCTIONS // For disabling Google Cloud Functions support
 DISABLE_PSRAM // For disabling PSRAM support
 DISABLE_OTA // For disabling OTA updates support
 DISABLE_FS // For disabling filesystem support
+
 // For disabling authentication and token
 DISABLE_SERVICE_AUTH
 DISABLE_CUSTOM_AUTH
