@@ -1,5 +1,5 @@
 /**
- * Created April 13, 2024
+ * Created April 24, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -550,6 +550,7 @@ namespace firebase
         firebase_core_auth_task_type task_type = firebase_core_auth_task_type_undefined;
         auth_status status;
         TimeStatusCallback timestatus_cb = NULL;
+        file_config_data file_data;
     };
 
 #if defined(ENABLE_FS)
@@ -757,6 +758,7 @@ namespace firebase
                 if (p1 > -1 && p2 > -1)
                 {
                     auth_data.sa.val[sa_ns::pk] = buf.substring(p1 + 1, p2 - 1);
+                    auth_data.sa.val[sa_ns::pk].replace("\\n", "\n");
                     p1 = p2;
                     auth_data.initialized = true;
                     ret = true;
@@ -807,13 +809,7 @@ namespace firebase
             data.clear();
             if (userFile.initialized)
             {
-                userFile.cb(userFile.file, userFile.filename.c_str(), file_mode_open_read);
-                if (userFile.file)
-                {
-                    if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_user_data, userFile.file, data))
-                        data.initialized = true;
-                    userFile.file.close();
-                }
+                data.file_data.copy(userFile);
             }
 #endif
         }
@@ -837,7 +833,20 @@ namespace firebase
 
         ~UserAuth() { data.clear(); };
         void clear() { data.clear(); }
-        user_auth_data &get() { return data; }
+        user_auth_data &get()
+        {
+#if defined(ENABLE_FS)
+            if (data.file_data.cb)
+                data.file_data.cb(data.file_data.file, data.file_data.filename.c_str(), file_mode_open_read);
+            if (data.file_data.file)
+            {
+                if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_user_data, data.file_data.file, data))
+                    data.initialized = true;
+                data.file_data.file.close();
+            }
+#endif
+            return data;
+        }
 
     private:
         user_auth_data data;
@@ -864,18 +873,14 @@ namespace firebase
             data.timestatus_cb = timeCb;
         };
 
-        ServiceAuth(TimeStatusCallback timeCb, file_config_data &safile)
+        ServiceAuth(TimeStatusCallback timeCb, file_config_data &safile, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
         {
 #if defined(ENABLE_FS)
             data.clear();
             if (safile.initialized)
             {
-                safile.cb(safile.file, safile.filename.c_str(), file_mode_open_read);
-                if (safile.file)
-                {
-                    SAParser::parseSAFile(safile.file, data);
-                    safile.file.close();
-                }
+                data.file_data.copy(safile);
+                data.sa.expire = expire;
                 data.timestatus_cb = timeCb;
             }
 #endif
@@ -883,7 +888,25 @@ namespace firebase
 
         ~ServiceAuth() { data.clear(); };
         void clear() { data.clear(); }
-        user_auth_data &get() { return data; }
+        user_auth_data &get()
+        {
+#if defined(ENABLE_FS)
+            if (data.file_data.cb)
+                data.file_data.cb(data.file_data.file, data.file_data.filename.c_str(), file_mode_open_read);
+            if (data.file_data.file)
+            {
+                bool ret = SAParser::parseSAFile(data.file_data.file, data);
+                data.file_data.file.close();
+                if (ret)
+                {
+                    data.initialized = isInitialized();
+                    data.auth_type = auth_sa_access_token;
+                    data.auth_data_type = user_auth_data_service_account;
+                }
+            }
+#endif
+            return data;
+        }
         bool isInitialized() { return data.sa.val[sa_ns::cm].length() > 0 && data.sa.val[sa_ns::pid].length() > 0 && data.sa.val[sa_ns::pk].length() > 0; }
 
     private:
@@ -915,31 +938,44 @@ namespace firebase
             data.timestatus_cb = timeCb;
         };
 
-        CustomAuth(TimeStatusCallback timeCb, file_config_data &safile, const String &uid)
+        CustomAuth(TimeStatusCallback timeCb, file_config_data &safile, const String &apiKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
         {
 #if defined(ENABLE_FS)
             data.clear();
             if (safile.initialized)
             {
-                safile.cb(safile.file, safile.filename.c_str(), file_mode_open_read);
-                if (safile.file)
-                {
-                    if (SAParser::parseSAFile(safile.file, data))
-                    {
-                        data.cust.val[cust_ns::uid] = uid;
-                        data.auth_type = auth_sa_custom_token;
-                        data.auth_data_type = user_auth_data_custom_data;
-                    }
-                    safile.file.close();
-                    data.timestatus_cb = timeCb;
-                }
+                data.file_data.copy(safile);
+                data.sa.expire = expire;
+                data.cust.val[cust_ns::api_key] = apiKey;
+                data.cust.val[cust_ns::uid] = uid;
+                data.cust.val[cust_ns::scope] = scope;
+                data.cust.val[cust_ns::claims] = claims;
+                data.timestatus_cb = timeCb;
             }
 #endif
         }
 
         ~CustomAuth() { data.clear(); };
 
-        user_auth_data &get() { return data; }
+        user_auth_data &get()
+        {
+#if defined(ENABLE_FS)
+            if (data.file_data.cb)
+                data.file_data.cb(data.file_data.file, data.file_data.filename.c_str(), file_mode_open_read);
+            if (data.file_data.file)
+            {
+                bool ret = SAParser::parseSAFile(data.file_data.file, data);
+                data.file_data.file.close();
+                if (ret)
+                {
+                    data.initialized = isInitialized();
+                    data.auth_type = auth_sa_custom_token;
+                    data.auth_data_type = user_auth_data_custom_data;
+                }
+            }
+#endif
+            return data;
+        }
 
         bool isInitialized() { return data.sa.val[sa_ns::pk].length() > 0 && data.sa.val[sa_ns::cm].length() > 0 && data.sa.val[sa_ns::pid].length() > 0 && data.sa.val[sa_ns::pk].length() > 0 && data.cust.val[cust_ns::uid].length() > 0; }
 
@@ -1017,17 +1053,7 @@ namespace firebase
             data.clear();
             if (tokenFile.initialized)
             {
-                tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_read);
-                if (tokenFile.file)
-                {
-                    if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_id_token, tokenFile.file, data))
-                    {
-                        data.initialized = true;
-                        data.auth_type = auth_id_token;
-                        data.auth_data_type = user_auth_data_id_token;
-                    }
-                    tokenFile.file.close();
-                }
+                data.file_data.copy(tokenFile);
             }
 #endif
         }
@@ -1050,7 +1076,24 @@ namespace firebase
         }
 
         void clear() { data.clear(); }
-        user_auth_data &get() { return data; }
+        user_auth_data &get()
+        {
+#if defined(ENABLE_FS)
+            if (data.file_data.cb)
+                data.file_data.cb(data.file_data.file, data.file_data.filename.c_str(), file_mode_open_read);
+            if (data.file_data.file)
+            {
+                if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_id_token, data.file_data.file, data))
+                {
+                    data.initialized = true;
+                    data.auth_type = auth_id_token;
+                    data.auth_data_type = user_auth_data_id_token;
+                }
+                data.file_data.file.close();
+            }
+#endif
+            return data;
+        }
 
     private:
         user_auth_data data;
@@ -1084,17 +1127,7 @@ namespace firebase
             data.clear();
             if (tokenFile.initialized)
             {
-                tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_read);
-                if (tokenFile.file)
-                {
-                    if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_access_token, tokenFile.file, data))
-                    {
-                        data.initialized = true;
-                        data.auth_type = auth_access_token;
-                        data.auth_data_type = user_auth_data_access_token;
-                    }
-                    tokenFile.file.close();
-                }
+                data.file_data.copy(tokenFile);
             }
 #endif
         }
@@ -1117,7 +1150,24 @@ namespace firebase
         }
 
         void clear() { data.clear(); }
-        user_auth_data &get() { return data; }
+        user_auth_data &get()
+        {
+#if defined(ENABLE_FS)
+            if (data.file_data.cb)
+                data.file_data.cb(data.file_data.file, data.file_data.filename.c_str(), file_mode_open_read);
+            if (data.file_data.file)
+            {
+                if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_access_token, data.file_data.file, data))
+                {
+                    data.initialized = true;
+                    data.auth_type = auth_access_token;
+                    data.auth_data_type = user_auth_data_access_token;
+                }
+                data.file_data.file.close();
+            }
+#endif
+            return data;
+        }
 
     private:
         user_auth_data data;
@@ -1143,24 +1193,13 @@ namespace firebase
             this->data.auth_data_type = user_auth_data_custom_token;
         }
 
-        CustomToken(TimeStatusCallback timeCb, file_config_data &tokenFile)
+        CustomToken(file_config_data &tokenFile)
         {
             data.clear();
             if (tokenFile.initialized)
             {
 #if defined(ENABLE_FS)
-                tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_read);
-                if (tokenFile.file)
-                {
-                    if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_custom_token, tokenFile.file, data))
-                    {
-                        data.initialized = data.custom_token.val[cust_tk_ns::token].length() > 0 && data.user.val[user_ns::api_key].length() > 0;
-                        data.auth_type = auth_custom_token;
-                        data.auth_data_type = user_auth_data_custom_token;
-                    }
-                    tokenFile.file.close();
-                    data.timestatus_cb = timeCb;
-                }
+                data.file_data.copy(tokenFile);
 #endif
             }
         }
@@ -1183,7 +1222,24 @@ namespace firebase
         }
 
         void clear() { data.clear(); }
-        user_auth_data &get() { return data; }
+        user_auth_data &get()
+        {
+#if defined(ENABLE_FS)
+            if (data.file_data.cb)
+                data.file_data.cb(data.file_data.file, data.file_data.filename.c_str(), file_mode_open_read);
+            if (data.file_data.file)
+            {
+                if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_custom_token, data.file_data.file, data))
+                {
+                    data.initialized = data.custom_token.val[cust_tk_ns::token].length() > 0 && data.user.val[user_ns::api_key].length() > 0;
+                    data.auth_type = auth_custom_token;
+                    data.auth_data_type = user_auth_data_custom_token;
+                }
+                data.file_data.file.close();
+            }
+#endif
+            return data;
+        }
 
     private:
         user_auth_data data;
@@ -1211,17 +1267,7 @@ namespace firebase
             data.clear();
             if (tokenFile.initialized)
             {
-                tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_read);
-                if (tokenFile.file)
-                {
-                    if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_legacy_token, tokenFile.file, data))
-                    {
-                        data.initialized = true;
-                        data.auth_type = auth_unknown_token;
-                        data.auth_data_type = user_auth_data_legacy_token;
-                    }
-                    tokenFile.file.close();
-                }
+                data.file_data.copy(tokenFile);
             }
 #endif
         }
@@ -1244,7 +1290,24 @@ namespace firebase
         }
 
         void clear() { data.clear(); }
-        user_auth_data &get() { return data; }
+        user_auth_data &get()
+        {
+#if defined(ENABLE_FS)
+            if (data.file_data.cb)
+                data.file_data.cb(data.file_data.file, data.file_data.filename.c_str(), file_mode_open_read);
+            if (data.file_data.file)
+            {
+                if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_legacy_token, data.file_data.file, data))
+                {
+                    data.initialized = true;
+                    data.auth_type = auth_unknown_token;
+                    data.auth_data_type = user_auth_data_legacy_token;
+                }
+                data.file_data.file.close();
+            }
+#endif
+            return data;
+        }
 
     private:
         user_auth_data data;

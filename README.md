@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-24T12:02:04Z`
+`2024-04-24T18:37:40Z`
 
 ## Table of Contents
 
@@ -790,13 +790,19 @@ The refresh token (when using authentication/authorization classes that provided
 
 - ### CustomAuth (ID Token Authorization Using Service Account)
 
+The service account credentials and json file can be used for authentication. 
+
 The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) class parameters are included the following.
 
 ```cpp
 CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
+
+CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>);
 ```
 
 `<TimeStatusCallback>` The time status callback that provides the UNIX timestamp used to set the issue time and expiration time in the JWT token payload.
+
+`<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of service account key file.
 
 `<api_key>` The web API key of the project.
 
@@ -818,13 +824,19 @@ CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project
 
 This type of authentication is used when privilege (admin rights) access is needed.
 
+The service account credentials and json file can be used for authentication. 
+
 The [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) class parameters are included the following.
 
 ```cpp
-ServiceAuth::ServiceAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>)
+ServiceAuth::ServiceAuth(<TimeStatusCallback>, <client_email>, <project_id>, <private_key>, <expire>)
+
+ServiceAuth::ServiceAuth(<TimeStatusCallback>, <file_config_data>, <expire>);
 ```
 
 `<TimeStatusCallback>` The time status callback that provides the UNIX timestamp used to set the issue time and expiration time in the JWT token payload.
+
+`<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of service account key file.
 
 `<client_email>` The service account client Email.
 
@@ -841,10 +853,16 @@ The auth token need to be re-created instead of refreshing.
 
 - ### UserAuth (User Sign-In Authentication)
 
+The user name and password credentials are used for authentication. You can save the credentials to file and load it with the constructor.
+
 The [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) class parameters are included the following.
 
 ```cpp
 UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>)
+
+UserAuth::UserAuth(<file_config_data>);
+
+UserAuth::save(<file_config_data>);
 ```
 
 `<api_key>` The API key which can be obtained from Firebase console > Project Overview > Project settings.
@@ -854,6 +872,8 @@ UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>)
 `<user_password>`The password of user in the project.
 
 `<expire>`The expiry period in seconds (less than 3600), 3300 is the default value.
+
+`<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of file that the `UserAuth` credentials will be saved to or read from.
 
 - ### NoAuth (Non-Authentication)
 
@@ -865,17 +885,25 @@ It should be used for testing only.
 
 - ### CustomToken (ID Token Authorization Using Custom Token)
 
+The API key and the custom token credentials are used for authorization. You can save the credentials to file and load it with the constructor.
+
 The [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino) class parameters are included the following.
 
 ```cpp
 CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>)
+
+CustomToken::CustomToken(<file_config_data>);
+
+CustomToken::save(<file_config_data>);
 ```
 
 `<api_key>` API key can be obtained from Firebase console > Project Overview > Project settings.
 
-`<custom_token>` Auth custom token (jwt signed token).
+`<custom_token>` The custom token (jwt signed token).
 
 `<expire_in_seconds>` Expiry period in seconds (less than 3600), 3300 is the default value.
+
+`<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of file that the `CustomToken` credentials will be saved to or read from.
 
 The expire period should be less than the remaining time to live of your signed `JWT` token.
 
@@ -890,13 +918,19 @@ The ID token is a short-lived token which will be expired in 1 hour.
 
 - ### AccessToken (OAuth2.0 Access Token Authorization)
 
+The access token was used for authorization. You can save the credentials to file and load it with the constructor.
+
 The [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino) class parameters are included the following.
 
 ```cpp
-AccessToken::AccessToken(<auth_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>)
+AccessToken::AccessToken(<access_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>)
+
+AccessToken::AccessToken(<file_config_data>);
+
+AccessToken::save(<file_config_data>);
 ```
 
-`<auth_token>` The access token.
+`<access_token>` The access token.
 
 `<expire_in_seconds>` Expire period in seconds
 
@@ -906,35 +940,53 @@ AccessToken::AccessToken(<auth_token>, <expire_in_seconds>, <refresh_token>, <cl
 
 `<client_secret>` Client secret.
 
+`<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of file that the `AccessToken` credentials will be saved to or read from.
+
 Normally `<refresh_token>` is not needed, if it is provided, the token will be refresh immediately when calling `FirebaseApp`'s  `initializeApp`.
 
 The Client ID and Client Secret are OAuth 2.0 credentials that can be taken from the [developer console](https://console.developers.google.com/apis/credentials).
 
 - ### IDToken (ID token Authorization)
 
+The API key and ID token are used for authorization. You can save the credentials to file and load it with the constructor.
+
 The [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) class parameters are included the following.
 
 ```cpp
-IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>)
+IDToken::IDToken(<api_key>, <ID_token>, <expire_in_seconds>, <refresh_token>)
+
+IDToken::IDToken(<file_config_data>);
+
+IDToken::save(<file_config_data>);
 ```
 
 `<api_key>` API key can be obtained from Firebase console > Project Overview > Project settings.
 
-`<auth_token>` Auth token from user auth.
+`<ID_token>` The ID token.
 
 `<expire_in_seconds>` Expire period in seconds.
 
 `<refresh_token>` Refresh token.
 
+`<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of file that the `IDToken` credentials will be saved to or read from.
+
 - ### LegacyToken (Database Secret)
+
+The database secret was used for authorization. You can save the credentials to file and load it with the constructor.
 
 The [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) class parameters is included the following.
 
 ```cpp
 LegacyToken::LegacyToken(<database_secret>)
+
+LegacyToken::LegacyToken(<file_config_data>);
+
+LegacyToken::save(<file_config_data>);
 ```
 
 `<database_secret>` The `Realtime Database` secret key.
+
+`<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of file that the `LegacyToken` credentials will be saved to or read from.
 
 
 - ### Working with Filesystems and BLOB

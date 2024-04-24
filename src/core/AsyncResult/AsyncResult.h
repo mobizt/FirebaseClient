@@ -324,9 +324,7 @@ public:
         rtdbResult.ref_payload = &val[ares_ns::data_payload];
 #endif
         addr = reinterpret_cast<uint32_t>(this);
-        val[ares_ns::res_uid] = FPSTR("task_v");
-        val[ares_ns::res_uid] += FIREBASE_CLIENT_VERSION;
-        val[ares_ns::res_uid] += FPSTR("_");
+        val[ares_ns::res_uid] = FPSTR("task_");
         val[ares_ns::res_uid] += String(millis());
     };
     ~AsyncResult()

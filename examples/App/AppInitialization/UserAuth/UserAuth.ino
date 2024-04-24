@@ -13,11 +13,14 @@
  * SYNTAX:
  *
  * UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>);
+ * UserAuth::UserAuth(<file_config_data>);
+ * UserAuth::save(<file_config_data>);
  *
  * <api_key> - API key can be obtained from Firebase console > Project Overview > Project settings.
  * <user_email> - The user Email that in the project.
  * <user_password> - The user password in the project.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
+ * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the UserAuth credentials will be saved to or read from.
  *
  * To use other network interfaces, network data from one of the following Network classes
  * can be assigned.

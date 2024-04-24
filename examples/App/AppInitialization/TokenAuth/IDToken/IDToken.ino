@@ -12,12 +12,15 @@
  *
  * SYNTAX:
  *
- * IDToken::IDToken(<api_key>, <auth_token>, <expire_in_seconds>, <refresh_token>);
+ * IDToken::IDToken(<api_key>, <ID_token>, <expire_in_seconds>, <refresh_token>);
+ * IDToken::IDToken(<file_config_data>);
+ * IDToken::save(<file_config_data>);
  *
  * <api_key> - API key can be obtained from Firebase console > Project Overview > Project settings.
- * <auth_token> - Auth token from user auth.
+ * <ID_token> - The ID token.
  * <expire_in_seconds> - Expire period in seconds (less than 3600), 3300 is the default value.
  * <refresh_token> - Refresh token.
+ * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the IDToken credentials will be saved to or read from.
  *
  * By leaving auth_token empty and assign the refresh token, the auth token will be re-authenticated when calling initializeApp.
  *

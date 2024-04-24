@@ -12,13 +12,16 @@
  *
  * SYNTAX:
  *
- * AccessToken::AccessToken(<auth_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>);
+ * AccessToken::AccessToken(<access_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>);
+ * AccessToken::AccessToken(<file_config_data>);
+ * AccessToken::save(<file_config_data>);
  *
- * <auth_token> - Auth token from OAuthe2.0 auth.
+ * <access_token> - The access token from OAuthe2.0 authentication.
  * <expire_in_seconds> -  Expire period in seconds (less than 3600), 3300 is the default value.
  * <refresh_token> - Refresh token.
  * <client_id> - Client ID.
  * <client_secret> Client secret.
+ * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the AccessToken credentials will be saved to or read from.
  *
  * By leaving auth_token empty and assign the refresh token, the auth token will be re-authenticated when calling initializeApp.
  *

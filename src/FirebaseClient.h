@@ -1,5 +1,5 @@
 /**
- * Created April 23, 2024
+ * Created April 24, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -193,6 +193,10 @@ namespace firebase
                 app.auth_data.app_token.authenticated = false;
                 uint32_t exp = app.auth_data.user_auth.auth_type == auth_user_id_token ? app.auth_data.user_auth.user.expire : app.auth_data.user_auth.sa.expire;
                 resetTimer(app, true, 0, exp);
+            }
+            else
+            {
+                app.setEventResult(nullptr, FPSTR("initialization failed"), auth_event_error);
             }
         }
 

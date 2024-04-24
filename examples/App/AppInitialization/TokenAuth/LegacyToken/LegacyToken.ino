@@ -13,8 +13,11 @@
  * SYNTAX:
  *
  * LegacyToken::LegacyToken(<database_secret>);
+ * LegacyToken::LegacyToken(<file_config_data>);
+ * LegacyToken::save(<file_config_data>);
  *
  * <database_secret> - The Realtime Database secret.
+ * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the LegacyToken credentials will be saved to or read from.
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  * 

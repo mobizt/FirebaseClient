@@ -12,9 +12,11 @@
  *
  * SYNTAX:
  *
- * ServiceAuth::ServiceAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <expire>);
+ * ServiceAuth::ServiceAuth(<TimeStatusCallback>, <client_email>, <project_id>, <private_key>, <expire>);
+ * ServiceAuth::ServiceAuth(<TimeStatusCallback>, <file_config_data>, <expire>);
  *
  * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
+ * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of service account key file.
  * <client_email> - The service account client Email.
  * <project_id> - The service account project ID.
  * <private_key> - The service account private key.

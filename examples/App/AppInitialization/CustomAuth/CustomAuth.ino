@@ -13,8 +13,10 @@
  * SYNTAX:
  *
  * CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>);
- *
+ * CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>);
+ * 
  * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
+ * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of service account key file.
  * <api_key> - The web API key of project.
  * <client_email> - The service account client Email.
  * <project_id> - The service account project ID.
@@ -99,7 +101,7 @@ CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PR
 
 // FileConfig sa_file("/sa_file.json", fileCallback);
 
-// CustomAuth sa_file_auth(timeStatusCB, getFile(sa_file), "myId");
+// CustomAuth sa_file_auth(timeStatusCB, getFile(sa_file), API_KEY, "myId");
 
 FirebaseApp app;
 

@@ -13,10 +13,13 @@
  * SYNTAX:
  *
  * CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>);
+ * CustomToken::CustomToken(<file_config_data>);
+ * CustomToken::save(<file_config_data>);
  *
  * <api_key> - API key can be obtained from Firebase console > Project Overview > Project settings.
- * <custom_token> - Auth custom token (jwt signed token).
+ * <custom_token> - The custom token (jwt signed token).
  * <expire_in_seconds> - Expire period in seconds (less than 3600), 3300 is the default value.
+ * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the CustomToken credentials will be saved to or read from.
  *
  * By assign the refresh token as <custom_token>, the auth token will be re-authenticated when calling initializeApp.
  *
