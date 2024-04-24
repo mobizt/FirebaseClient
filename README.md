@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-23T11:47:49Z`
+`2024-04-24T12:02:04Z`
 
 ## Table of Contents
 
@@ -1859,7 +1859,7 @@ To use `Service Account` in your sketch, open the .json file that is already dow
 }
 ```
 
-Copy the `project_id`, `client_email`, `private_key_id` and `private_key` from .json file and paste to these defines in the example.
+Copy the `project_id`, `client_email` and `private_key` from .json file and paste to these defines in the example.
 
 ```cpp
 #define FIREBASE_PROJECT_ID "..." // Taken from "project_id" key in JSON file.
@@ -1867,13 +1867,13 @@ Copy the `project_id`, `client_email`, `private_key_id` and `private_key` from .
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"; // Taken from "private_key" key in JSON file.
 ```
 
-Normally `Firebase Admin SDK Service Account` is used in Firebase APIs authenticatyin/authorization.
+Normally `Firebase Admin SDK Service Account` is used in Firebase APIs authentication/authorization.
 
 To access `Google Cloud APIs` e.g. `Google Cloud Storage`, `Google Cloud Functions` services, you have to update the service account permissions.
 
 #### Service Account Permissions
 
-When the `Firebase Admin SDK Service Account` was used for Google Cloud APIs authenticatyin/authorization, you have to update its permissive roles.
+When the `Firebase Admin SDK Service Account` was used for Google Cloud APIs authentication/authorization, you have to update its permissive roles.
 
 The `Basic roles` are highly permissive roles that used to grant principals broad access to Google Cloud resources.
 
