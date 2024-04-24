@@ -833,7 +833,9 @@ The [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) cl
 
 ```cpp
 ServiceAuth::ServiceAuth(<TimeStatusCallback>, <client_email>, <project_id>, <private_key>, <expire>)
+```
 
+```cpp
 ServiceAuth::ServiceAuth(<TimeStatusCallback>, <file_config_data>, <expire>)
 ```
 
@@ -862,9 +864,13 @@ The [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) class param
 
 ```cpp
 UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>)
+```
 
+```cpp
 UserAuth::UserAuth(<file_config_data>)
+```
 
+```cpp
 UserAuth::save(<file_config_data>)
 ```
 
@@ -894,9 +900,13 @@ The [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomTok
 
 ```cpp
 CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>)
+```
 
+```cpp
 CustomToken::CustomToken(<file_config_data>)
+```
 
+```cpp
 CustomToken::save(<file_config_data>)
 ```
 
@@ -927,9 +937,13 @@ The [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessTok
 
 ```cpp
 AccessToken::AccessToken(<access_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>)
+```
 
+```cpp
 AccessToken::AccessToken(<file_config_data>)
+```
 
+```cpp
 AccessToken::save(<file_config_data>)
 ```
 
@@ -957,9 +971,13 @@ The [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) clas
 
 ```cpp
 IDToken::IDToken(<api_key>, <ID_token>, <expire_in_seconds>, <refresh_token>)
+```
 
+```cpp
 IDToken::IDToken(<file_config_data>)
+```
 
+```cpp
 IDToken::save(<file_config_data>)
 ```
 
@@ -981,9 +999,13 @@ The [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyTok
 
 ```cpp
 LegacyToken::LegacyToken(<database_secret>)
+```
 
+```cpp
 LegacyToken::LegacyToken(<file_config_data>);
+```
 
+```cpp
 LegacyToken::save(<file_config_data>);
 ```
 
@@ -1138,7 +1160,9 @@ The `DefaultNetwork` class parameters are included the following.
 
 ```cpp
 DefaultNetwork::DefaultNetwork()
+```
 
+```cpp
 DefaultNetwork::DefaultNetwork(<reconnect_option>)
 ```
 
@@ -1193,7 +1217,9 @@ The DefaultEthernetNetwork class parameters are included the following.
 
 ```cpp
 DefaultEthernetNetwork::DefaultEthernetNetwork()
+```
 
+```cpp
 DefaultEthernetNetwork::DefaultEthernetNetwork(<Firebase_SPI_ETH_Module>)
 ```
 
@@ -2077,7 +2103,7 @@ Some options can be disabled.
 
 The predefined options that are already set in [**Config.h**](src/Config.h) are following.
 
-```cpp
+```yaml
 ENABLE_DATABASE // For RTDB compilation
 ENABLE_FIRESTORE // For Firestore compilation
 ENABLE_FIRESTORE_QUERY // For Firestore Query feature compilation
@@ -2088,6 +2114,7 @@ ENABLE_FUNCTIONS // For Google Cloud Functions compilation
 ENABLE_PSRAM // For enabling PSRAM support
 ENABLE_OTA // For enabling OTA updates support via RTDB, Firebase Storage and Google Cloud Storage buckets
 ENABLE_FS // For enabling Flash filesystem support
+
 // For enabling authentication and token
 ENABLE_SERVICE_AUTH
 ENABLE_CUSTOM_AUTH
@@ -2105,7 +2132,7 @@ ENABLE_GSM_NETWORK
 
 The following options are not yet defined in [**Config.h**](src/Config.h) and can be assigned by user.
 
-```cpp
+```yaml
 FIREBASE_ETHERNET_MODULE_LIB `"EthernetLibrary.h"` // For the Ethernet library to work with external Ethernet module
 FIREBASE_ETHERNET_MODULE_CLASS EthernetClass // For the Ethernet class object of Ethernet library to work with external Ethernet module
 FIREBASE_ETHERNET_MODULE_TIMEOUT 2000 // For the time out in milliseconds to wait external Ethernet module to connect to network
@@ -2142,7 +2169,7 @@ For external Ethernet module integation used with function `setEthernetClient`, 
 
 For disabling predefined options instead of editing the [**Config.h**](src/Config.h) or using `#undef` in `UserConfig.h`, you can define these build flags with these names or macros in `UserConfig.h`.
 
-```cpp
+```yaml
 DISABLE_DATABASE // For disabling RTDB support
 DISABLE_FIRESTORE // For disabling Firestore support
 DISABLE_FIRESTORE_QUERY // For Firestore Query feature compilation
