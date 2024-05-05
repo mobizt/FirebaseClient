@@ -26,6 +26,7 @@
 #define APP_DATA_H
 
 #include <Arduino.h>
+#include <vector>
 
 struct app_data_t
 {

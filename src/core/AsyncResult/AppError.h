@@ -26,6 +26,7 @@
 #define APP_ERROR_H
 
 #include <Arduino.h>
+#include <vector>
 
 struct app_error_t
 {

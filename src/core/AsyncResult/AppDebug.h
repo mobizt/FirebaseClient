@@ -26,6 +26,7 @@
 #define APP_DEBUG_H
 
 #include <Arduino.h>
+#include <vector>
 
 namespace firebase
 {

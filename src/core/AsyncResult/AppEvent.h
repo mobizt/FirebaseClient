@@ -26,6 +26,7 @@
 #define APP_EVENT_H
 
 #include <Arduino.h>
+#include <vector>
 
 namespace firebase
 {
