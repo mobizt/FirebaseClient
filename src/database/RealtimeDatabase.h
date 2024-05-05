@@ -1,5 +1,5 @@
 /**
- * Created April 9, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -32,7 +32,7 @@ using namespace firebase;
 
 #if defined(ENABLE_DATABASE)
 
-class RealtimeDatabase
+class RealtimeDatabase : public RTDBResultBase
 {
     friend class FirebaseApp;
 
@@ -348,7 +348,7 @@ public:
         options.silent = true;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), &options, nullptr, &result, NULL);
         asyncRequest(aReq);
-        return !result.rtdbResult.null_etag;
+        return !getNullETagOption(&result.rtdbResult);
     }
 
     /**
@@ -816,7 +816,7 @@ public:
         AsyncResult result;
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(), nullptr, nullptr, &result, nullptr);
         asyncRequest(aReq);
-        return result.rtdbResult.null_etag && String(result.rtdbResult.data()).indexOf("null") > -1;
+        return getNullETagOption(&result.rtdbResult) && String(result.rtdbResult.data()).indexOf("null") > -1;
     }
 
     /**
@@ -1025,7 +1025,6 @@ private:
         if (!aResult)
             aResult = new AsyncResult();
 
-        aResult->error_available = true;
         aResult->lastError.setClientError(code);
 
         if (request.cb)

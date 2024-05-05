@@ -1,4 +1,4 @@
-/** 
+/**
  * This example does not include any async TCP client library, you have to include it prior to use and
  * async TCP should support SSL.
  *
@@ -38,6 +38,8 @@
 
 void asyncCB(AsyncResult &aResult);
 
+void printResult(AsyncResult &aResult);
+
 void AsyncTCPConnectCB(const char *host, uint16_t port);
 void AsyncTCPStatusCB(bool &status);
 void AsyncTCPSendCB(uint8_t *data, size_t size, uint32_t &sent);
@@ -53,11 +55,6 @@ FirebaseApp app;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 AsyncTCPConfig asyncTCP(AsyncTCPConnectCB, AsyncTCPStatusCB, AsyncTCPSendCB, AsyncTCPReceiveCB, AsyncTCPStop);
 
-/**
- * In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
- * it with other name with keyword "using" or use the class name AsyncClientClass directly.
- */
-
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(asyncTCP, getNetwork(network));
@@ -66,7 +63,6 @@ AsyncClient aClient(asyncTCP, getNetwork(network));
 
 void setup()
 {
-
     Serial.begin(115200);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
@@ -86,21 +82,16 @@ void setup()
 
     Serial.println("Initializing app...");
 
-    app.setCallback(asyncCB);
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
-    initializeApp(aClient, app, getAuth(user_auth));
+    initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 #endif
-
-    // Waits for app to be authenticated.
-    // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    ms = millis();
-    while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-        ;
 }
 
 void loop()
 {
-    // This function is required for handling and maintaining the authentication tasks.
+    // The async task handler should run inside the main loop
+    // without blocking delay or bypassing with millis code blocks.
+
     app.loop();
 
     // To get the authentication time to live in seconds before expired.
@@ -109,7 +100,15 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
-    if (aResult.appEvent().code() > 0)
+    // WARNING!
+    // Do not put your codes inside the callback and printResult.
+
+    printResult(aResult);
+}
+
+void printResult(AsyncResult &aResult)
+{
+    if (aResult.isEvent())
     {
         Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }

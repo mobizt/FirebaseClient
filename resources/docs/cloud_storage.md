@@ -238,7 +238,7 @@ void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, Go
 - `uid` - The user specified UID of async result (optional).
 
 
-12. ## 🔹  bool getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options)
+12. ## 🔹  String getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options)
 
 
 The bucketid is the Storage bucket Id of object to get metadata.
@@ -248,7 +248,7 @@ For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objec
 
 
 ```cpp
-bool getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options)
+String getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options)
 ```
 
 **Params:**
@@ -259,7 +259,7 @@ bool getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &pa
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 13. ## 🔹  void getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
 
@@ -302,7 +302,7 @@ void getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &pa
 - `uid` - The user specified UID of async result (optional).
 
 
-15. ## 🔹  bool list(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::ListOptions &options)
+15. ## 🔹  String list(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::ListOptions &options)
 
 
 The bucketid is the Storage bucket Id to list all objects.
@@ -310,7 +310,7 @@ For the list options, see https://cloud.google.com/storage/docs/json_api/v1/obje
 
 
 ```cpp
-bool list(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::ListOptions &options)
+String list(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::ListOptions &options)
 ```
 
 **Params:**
@@ -321,7 +321,7 @@ bool list(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, G
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 16. ## 🔹  void list(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::ListOptions &options, AsyncResult &aResult)
 

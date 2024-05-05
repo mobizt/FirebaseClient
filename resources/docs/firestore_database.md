@@ -12,8 +12,9 @@ class Documents
 
 ## Functions
 
-1. ## 🔹 bool batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions)
+1. ## 🔹 String batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions)
 
+ Gets multiple documents.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -40,7 +41,7 @@ For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/p
 
 
 ```cpp
-bool batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions)
+String batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions)
 ```
 
 **Params:**
@@ -51,10 +52,11 @@ bool batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchG
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 2. ## 🔹 void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResult &aResult)
 
+ Gets multiple documents.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -94,6 +96,7 @@ void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchG
 
 3. ## 🔹 void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResultCallback cb, const String &uid = "")
 
+ Gets multiple documents.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -132,8 +135,9 @@ void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchG
 - `uid` - The user specified UID of async result (optional).
 
 
-4. ## 🔹 bool batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
+4. ## 🔹 String batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
 
+Applies a batch of write operations.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -147,7 +151,7 @@ For more description, see https://cloud.google.com/firestore/docs/reference/rest
 
 
 ```cpp
-bool batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
+String batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
 ```
 
 **Params:**
@@ -158,10 +162,11 @@ bool batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writ
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 5. ## 🔹 void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
 
+Applies a batch of write operations.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -186,6 +191,7 @@ void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writ
 
 6. ## 🔹 void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
 
+Applies a batch of write operations.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -209,8 +215,9 @@ void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writ
 - `uid` - The user specified UID of async result (optional).
 
 
-7. ## 🔹 bool beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions)
+7. ## 🔹 String beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions)
 
+Starts a new transaction.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -232,7 +239,7 @@ See https://cloud.google.com/firestore/docs/reference/rest/v1/TransactionOptions
 This function requires ServiceAuth authentication.
 
 ```cpp
-bool beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions)
+String beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions)
 ```
 
 **Params:**
@@ -243,10 +250,11 @@ bool beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 8. ## 🔹 void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResult &aResult)
 
+Starts a new transaction.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -281,6 +289,7 @@ void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent
 
 9. ## 🔹 void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "")
 
+Starts a new transaction.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -314,8 +323,9 @@ void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent
 - `uid` - The user specified UID of async result (optional).
 
 
-10. ## 🔹 bool commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
+10. ## 🔹 String commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
 
+Commits a transaction, while optionally updating documents.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -327,7 +337,7 @@ This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken
 
 
 ```cpp
-bool commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
+String commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
 ```
 
 **Params:**
@@ -338,10 +348,11 @@ bool commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 11. ## 🔹 void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
 
+Commits a transaction, while optionally updating documents.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -365,6 +376,7 @@ void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &
 
 12. ## 🔹 void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
 
+Commits a transaction, while optionally updating documents.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -387,8 +399,9 @@ void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &
 - `uid` - The user specified UID of async result (optional).
 
 
-13. ## 🔹 bool createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
+13. ## 🔹 String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
 
+Create a document at the defined document path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -399,7 +412,7 @@ This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken
 
 
 ```cpp
-bool createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
+String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
 ```
 
 **Params:**
@@ -412,10 +425,11 @@ bool createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 14. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
 
+Create a document at the defined document path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -440,6 +454,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 
 15. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
 
+Create a document at the defined document path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -463,8 +478,9 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `uid` - The user specified UID of async result (optional).
 
 
-16. ## 🔹 bool createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
+16. ## 🔹 String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
 
+Create a document at the defined document path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -475,7 +491,7 @@ This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken
 
 
 ```cpp
-bool createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
+String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
 ```
 
 **Params:**
@@ -489,10 +505,11 @@ bool createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 17. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
 
+Create a document at the defined document path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -519,6 +536,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 
 18. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
 
+Create a document at the defined document path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -544,8 +562,9 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `uid` - The user specified UID of async result (optional).
 
 
-19. ## 🔹 bool deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument)
+19. ## 🔹 String deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument)
 
+Delete a document at the defined path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -563,7 +582,7 @@ This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken
 
 
 ```cpp
-bool deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument)
+String deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument)
 ```
 
 **Params:**
@@ -575,10 +594,11 @@ bool deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 20. ## 🔹 void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult)
 
+Delete a document at the defined path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -610,6 +630,7 @@ void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const
 
 21. ## 🔹 void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "")
 
+Delete a document at the defined path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -640,8 +661,9 @@ void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const
 - `uid` - The user specified UID of async result (optional).
 
 
-22. ## 🔹 bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options)
+22. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options)
 
+Get a document at the defined path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -657,7 +679,7 @@ This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken
 
 
 ```cpp
-bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options)
+String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options)
 ```
 
 **Params:**
@@ -669,10 +691,11 @@ bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 23. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult)
 
+Get a document at the defined path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -701,6 +724,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 
 24. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "")
 
+Get a document at the defined path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -728,8 +752,9 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 - `uid` - The user specified UID of async result (optional).
 
 
-25. ## 🔹 bool list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
+25. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
 
+List the documents in the defined documents collection.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -747,7 +772,7 @@ This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken
 
 
 ```cpp
-bool list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
+String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
 ```
 
 **Params:**
@@ -759,10 +784,11 @@ bool list(AsyncClientClass &aClient, const Firestore::Parent &parent, const Stri
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 26. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult)
 
+List the documents in the defined documents collection.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -794,6 +820,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const Stri
 
 27. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResultCallback cb, const String &uid = "")
 
+List the documents in the defined documents collection.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -824,8 +851,9 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const Stri
 - `uid` - The user specified UID of async result (optional).
 
 
-28. ## 🔹 bool listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
+28. ## 🔹 String listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
 
+List the document collection ids in the defined document path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -841,7 +869,7 @@ This function requires ServiceAuth authentication.
 
 
 ```cpp
-bool listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
+String listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
 ```
 
 **Params:**
@@ -853,10 +881,11 @@ bool listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &paren
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 29. ## 🔹 void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult)
 
+List the document collection ids in the defined document path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -886,6 +915,7 @@ void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &paren
 
 30. ## 🔹 void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
 
+List the document collection ids in the defined document path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -914,8 +944,9 @@ void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &paren
 - `uid` - The user specified UID of async result (optional).
 
 
-31. ## 🔹 bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
+31. ## 🔹 String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
 
+Patch or update a document at the defined path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -942,7 +973,7 @@ This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken
 
 
 ```cpp
-bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
+String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
 ```
 
 **Params:**
@@ -954,10 +985,11 @@ bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const Str
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 32. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
 
+Patch or update a document at the defined path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -998,6 +1030,7 @@ void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const Str
 
 33. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
 
+Patch or update a document at the defined path.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1037,8 +1070,9 @@ void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const Str
 - `uid` - The user specified UID of async result (optional).
 
 
-34. ## 🔹 bool rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction)
+34. ## 🔹 String rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction)
 
+Rolls back a transaction.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1047,7 +1081,7 @@ The Firestore database id should be (default) or empty "".
 This function requires ServiceAuth authentication.
 
 ```cpp
-bool rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction)
+String rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction)
 ```
 
 **Params:**
@@ -1058,10 +1092,11 @@ bool rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const 
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 35. ## 🔹 void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResult &aResult)
 
+Rolls back a transaction.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1083,10 +1118,10 @@ void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const 
 
 36. ## 🔹 void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "")
 
+Rolls back a transaction.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
-
 
 This function requires ServiceAuth authentication.
 
@@ -1103,8 +1138,9 @@ void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const 
 - `uid` - The user specified UID of async result (optional).
 
 
-37. ## 🔹 bool runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions)
+37. ## 🔹 String runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions)
 
+Runs a query.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1126,7 +1162,7 @@ For more description, see https://firebase.google.com/docs/firestore/reference/r
 
 
 ```cpp
-bool runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions)
+String runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions)
 ```
 
 **Params:**
@@ -1138,10 +1174,11 @@ bool runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const 
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 38. ## 🔹 void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult)
 
+Runs a query.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1176,6 +1213,7 @@ void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const 
 
 39. ## 🔹 void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResultCallback cb, const String &uid = "")
 
+Runs a query.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1222,8 +1260,9 @@ class Databases
 
 ## Functions
 
-1. ## 🔹 bool exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
+1. ## 🔹 String exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
 
+Export the documents in the database to the Firebase Storage data bucket.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1238,7 +1277,7 @@ This function requires ServiceAuth or AccessToken authentication.
 
 
 ```cpp
-bool exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
+String exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
 ```
 
 **Params:**
@@ -1249,10 +1288,11 @@ bool exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 2. ## 🔹 void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions, AsyncResult &aResult)
 
+Export the documents in the database to the Firebase Storage data bucket.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1279,6 +1319,7 @@ void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 
 3. ## 🔹 void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions, AsyncResultCallback cb, const String &uid = "")
 
+Export the documents in the database to the Firebase Storage data bucket.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1304,8 +1345,9 @@ void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 - `uid` - The user specified UID of async result (optional).
 
 
-4. ## 🔹 bool importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
+4. ## 🔹 String importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
 
+Import the exported documents stored in the Firebase Storage data bucket.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1320,7 +1362,7 @@ This function requires ServiceAuth or AccessToken authentication.
 
 
 ```cpp
-bool importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
+String importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
 ```
 
 **Params:**
@@ -1331,10 +1373,11 @@ bool importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 5. ## 🔹 void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions, AsyncResult &aResult)
 
+Import the exported documents stored in the Firebase Storage data bucket.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1361,6 +1404,7 @@ void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 
 6. ## 🔹 void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions, AsyncResultCallback cb, const String &uid = "")
 
+Import the exported documents stored in the Firebase Storage data bucket.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1386,8 +1430,9 @@ void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 - `uid` - The user specified UID of async result (optional).
 
 
-7. ## 🔹 bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
+7. ## 🔹 String create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
 
+Create a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to create.
@@ -1400,7 +1445,7 @@ This function requires ServiceAuth or AccessToken authentication.
 
 
 ```cpp
-bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
+String create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
 ```
 
 **Params:**
@@ -1411,10 +1456,11 @@ bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 8. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, AsyncResult &aResult)
 
+Create a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to create.
@@ -1439,6 +1485,7 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 
 9. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, AsyncResultCallback cb, const String &uid = "")
 
+Create a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to create.
@@ -1462,8 +1509,9 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 - `uid` - The user specified UID of async result (optional).
 
 
-10. ## 🔹 bool deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
+10. ## 🔹 String deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
 
+Deletes a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to delete.
@@ -1474,7 +1522,7 @@ This function requires ServiceAuth or AccessToken authentication.
 
 
 ```cpp
-bool deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
+String deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
 ```
 
 **Params:**
@@ -1485,10 +1533,11 @@ bool deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, 
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 11. ## 🔹 void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResult &aResult)
 
+Deletes a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to delete.
@@ -1511,6 +1560,7 @@ void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, 
 
 12. ## 🔹 void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResultCallback cb, const String &uid = "")
 
+Deletes a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to delete.
@@ -1532,8 +1582,9 @@ void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, 
 - `uid` - The user specified UID of async result (optional).
 
 
-13. ## 🔹 bool get(AsyncClientClass &aClient, const Firestore::Parent &parent)
+13. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
+Gets information about a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to get the infomation.
@@ -1543,7 +1594,7 @@ This function requires ServiceAuth or AccessToken authentication.
 
 
 ```cpp
-bool get(AsyncClientClass &aClient, const Firestore::Parent &parent)
+String get(AsyncClientClass &aClient, const Firestore::Parent &parent)
 ```
 
 **Params:**
@@ -1553,10 +1604,11 @@ bool get(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 14. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
 
+Gets information about a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to get the infomation.
@@ -1577,6 +1629,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult
 
 15. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
 
+Gets information about a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to get the infomation.
@@ -1596,8 +1649,9 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult
 - `uid` - The user specified UID of async result (optional).
 
 
-16. ## 🔹 bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+16. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
+List all the databases in the project.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 Leave the Firestore database Id to be empty for this case.
@@ -1607,7 +1661,7 @@ This function requires ServiceAuth or AccessToken authentication.
 
 
 ```cpp
-bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 ```
 
 **Params:**
@@ -1617,10 +1671,11 @@ bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 17. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
 
+List all the databases in the project.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 Leave the Firestore database Id to be empty for this case.
@@ -1641,6 +1696,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResul
 
 18. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
 
+List all the databases in the project.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 Leave the Firestore database Id to be empty for this case.
@@ -1660,8 +1716,9 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResul
 - `uid` - The user specified UID of async result (optional).
 
 
-19. ## 🔹 bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
+19. ## 🔹 String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
 
+Updates a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to update.
@@ -1675,7 +1732,7 @@ This function requires ServiceAuth or AccessToken authentication.
 
 
 ```cpp
-bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
+String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
 ```
 
 **Params:**
@@ -1687,10 +1744,11 @@ bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database 
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 20. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask, AsyncResult &aResult)
 
+Updates a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to update.
@@ -1717,6 +1775,7 @@ void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database 
 
 21. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
 
+Updates a database.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database Id is the Id of database to update.
@@ -1742,8 +1801,9 @@ void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database 
 - `uid` - The user specified UID of async result (optional).
 
 
-22. ## 🔹 bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
+22. ## 🔹 String create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
 
+Creates the specified index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1755,7 +1815,7 @@ This function requires ServiceAuth authentication.
 
 
 ```cpp
-bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
+String create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
 ```
 
 **Params:**
@@ -1766,10 +1826,11 @@ bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 23. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index, AsyncResult &aResult)
 
+Creates the specified index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1793,6 +1854,7 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 
 24. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index, AsyncResultCallback cb, const String &uid = "")
 
+Creates the specified index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1815,8 +1877,9 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 - `uid` - The user specified UID of async result (optional).
 
 
-25. ## 🔹 bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+25. ## 🔹 String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
 
+Deletes an index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1828,7 +1891,7 @@ This function requires ServiceAuth authentication.
 
 
 ```cpp
-bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
 ```
 
 **Params:**
@@ -1839,10 +1902,11 @@ bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 26. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
 
+Deletes an index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1866,6 +1930,7 @@ void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 
 27. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
 
+Deletes an index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1888,8 +1953,9 @@ void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 - `uid` - The user specified UID of async result (optional).
 
 
-28. ## 🔹 bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+28. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
 
+Gets an index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1901,7 +1967,7 @@ This function requires ServiceAuth authentication.
 
 
 ```cpp
-bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
 ```
 
 **Params:**
@@ -1912,10 +1978,11 @@ bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 29. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
 
+Gets an index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1939,6 +2006,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 
 30. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
 
+Gets an index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1961,8 +2029,9 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 - `uid` - The user specified UID of async result (optional).
 
 
-31. ## 🔹 bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+31. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
+Lists the indexes.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -1974,7 +2043,7 @@ This function requires ServiceAuth authentication.
 
 
 ```cpp
-bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 ```
 
 **Params:**
@@ -1984,10 +2053,11 @@ bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 32. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
 
+Lists the indexes.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2011,6 +2081,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResul
 
 33. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
 
+Lists the indexes.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2044,12 +2115,12 @@ class CollectionGroups
 ```
 
 
-1. ## 🔹 bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
+1. ## 🔹 String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
 
+Creates a composite index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
-
 
 For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
 
@@ -2057,7 +2128,7 @@ This function requires ServiceAuth authentication.
 
 
 ```cpp
-bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
+String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
 ```
 
 **Params:**
@@ -2069,10 +2140,11 @@ bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, const St
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 2. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResult &aResult)
 
+Creates a composite index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2097,6 +2169,7 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const St
 
 3. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResultCallback cb, const String &uid = "")
 
+Creates a composite index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2120,8 +2193,9 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const St
 - `uid` - The user specified UID of async result (optional).
 
 
-4. ## 🔹 bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+4. ## 🔹 String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
 
+Deletes a composite index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2133,7 +2207,7 @@ This function requires ServiceAuth authentication.
 
 
 ```cpp
-bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
 ```
 
 **Params:**
@@ -2145,10 +2219,11 @@ bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 5. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
 
+Deletes a composite index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2173,6 +2248,7 @@ void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 
 6. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
 
+Deletes a composite index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2196,12 +2272,12 @@ void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 - `uid` - The user specified UID of async result (optional).
 
 
-7. ## 🔹 bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+7. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
 
+Gets a composite index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
-
 
 For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
 
@@ -2209,7 +2285,7 @@ This function requires ServiceAuth authentication.
 
 
 ```cpp
-bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
 ```
 
 **Params:**
@@ -2221,10 +2297,11 @@ bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 8. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
 
+Gets a composite index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2249,6 +2326,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 
 9. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
 
+Gets a composite index.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2272,8 +2350,9 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 - `uid` - The user specified UID of async result (optional).
 
 
-10. ## 🔹 bool list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
+10. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
 
+Lists composite indexes.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2285,7 +2364,7 @@ This function requires ServiceAuth authentication.
 
 
 ```cpp
-bool list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
+String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
 ```
 
 **Params:**
@@ -2295,10 +2374,11 @@ bool list(AsyncClientClass &aClient, const Firestore::Parent &parent, const Stri
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 11. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResult &aResult)
 
+Lists composite indexes.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".
@@ -2322,6 +2402,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const Stri
 
 12. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResultCallback cb, const String &uid = "")
 
+Lists composite indexes.
 
 The Firebase project Id should be only the name without the firebaseio.com.
 The Firestore database id should be (default) or empty "".

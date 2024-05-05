@@ -1,5 +1,5 @@
 /**
- * Created March 31, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -106,19 +106,19 @@ public:
      * The location name is the project location.
      * @param functionId The name of function to create.
      * @param function The GoogleCloudFunctions::Function object that holds the information of function to create.
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function)
+    String create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, function.c_str(), false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Creates a new function.
@@ -180,19 +180,19 @@ public:
      * @param function The GoogleCloudFunctions::Function object that holds the information of function to update.
      * @param updateMask The list of fields to be updated. If no field mask is provided, all provided fields in the request will be updated.
      * This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask)
+    String patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, function.c_str(), false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Creates a new function.
@@ -253,19 +253,19 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The location name is the project location.
      * @param functionId The name of function.
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+    String deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_delete, "", false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Deletes a function with the given name from the specified project. If the given function is used by some trigger, the trigger will be updated to remove this function.
@@ -316,19 +316,19 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The location name is the project location.
      * @param listOptions The GoogleCloudFunctions::ListOptions object that holds the query parameters e.g. pageSize, pageToken, filter, and orderBy.
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions)
+    String list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, "", &listOptions, "", GoogleCloudFunctions::google_cloud_functions_request_type_list, "", false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Returns a list of functions that belong to the requested project.
@@ -379,19 +379,19 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The location name is the project location.
      * @param functionId The name of function.
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+    String get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, "", nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_get, "", false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Returns a function with the given name from the requested project.
@@ -443,19 +443,19 @@ public:
      * The location name is the project location.
      * @param functionId The name of function.
      * @param payload The Input to be passed to the function.
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload)
+    String call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_call, payload, false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Synchronously invokes a deployed Cloud Function. To be used for testing purposes as very limited traffic is allowed. For more information on the actual limits, refer to Rate Limits (https://cloud.google.com/functions/quotas#rate_limits).
@@ -508,19 +508,19 @@ public:
      * The Firebase project Id should be only the name without the firebaseio.com.
      * The location name is the project location.
      * @param functionId The name of function.
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+    String generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_downloadUrl, "", false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Returns a signed URL for downloading deployed function source code. The URL is only valid for a limited period and should be used within 30 minutes of generation. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls
@@ -572,19 +572,19 @@ public:
      * The location name is the project location.
      * @param functionId The name of function.
      * @param options The GoogleCloudFunctions::UploadURLOptions object that provides the kmsKeyName and environment options.
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options)
+    String generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl, options.c_str(), false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Returns a signed URL for uploading a function source code. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls. Once the function source code upload is complete, the used signed URL should be provided in functions.create or functions.patch request as a reference to the function source code.
@@ -638,19 +638,19 @@ public:
      * The location name is the project location.
      * @param functionId The name of function.
      * @param options The GoogleCloudFunctions::GetPolicyOptions options that provides requestedPolicyVersion option.
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options)
+    String getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_get_iam_policy, options.c_str(), false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
@@ -705,19 +705,19 @@ public:
      * The location name is the project location.
      * @param functionId The name of function.
      * @param options The GoogleCloudFunctions::SetPolicyOptions options that provides Policy and updateMask settings.
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options)
+    String setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy, options.c_str(), false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Sets the access control policy on the specified resource. Replaces any existing policy.
@@ -774,19 +774,19 @@ public:
      * @param functionId The name of function.
      * @param permissions The GoogleCloudFunctions::Permissions object that holds the list of permission string.
      * For the list of permissions, see https://cloud.google.com/functions/docs/reference/iam/permissions
-     * @return Boolean type status indicates the success of the operation.
+     * @return String The response payload.
      *
      * @note Use FirebaseData.payload() to get the returned payload.
      *
      * This function requires OAuth2.0 authentication.
      *
      */
-    bool testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions)
+    String testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_test_iam_permission, permissions.c_str(), false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.
@@ -1004,8 +1004,7 @@ private:
         if (!aResult)
             aResult = new AsyncResult();
 
-        aResult->error_available = true;
-        aResult->lastError.setClientError(code);
+        aResult->error().setClientError(code);
 
         if (request.cb)
             request.cb(*aResult);

@@ -1,5 +1,5 @@
 /**
- * Created March 12, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -55,18 +55,18 @@ namespace Firestore
              * @param collectionId The collection Id.
              * @param index The Cloud Firestore indexes enable simple and complex queries against documents in a database.
              *
-             * @return Boolean value, indicates the success of the operation.
+             * @return String The response payload.
              *
              * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/create
              *
              * This function requires ServiceAuth authentication.
              *
              */
-            bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
+            String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
             {
                 AsyncResult result;
                 collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, "", false, false);
-                return result.lastError.code() == 0;
+                return result.c_str();
             }
 
             /** Creates a composite index.
@@ -119,19 +119,19 @@ namespace Firestore
              * @param collectionId The collection Id.
              * @param indexId The index to delete.
              *
-             * @return Boolean value, indicates the success of the operation.
+             * @return String The response payload.
              *
              * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/delete
              *
              * This function requires ServiceAuth authentication.
              *
              */
-            bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+            String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
             {
                 AsyncResult result;
                 CollectionGroupsIndex::Index index;
                 collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, indexId, true, false);
-                return result.lastError.code() == 0;
+                return result.c_str();
             }
 
             /** Deletes a composite index.
@@ -186,19 +186,19 @@ namespace Firestore
              * @param collectionId The collection Id.
              * @param indexId The index to get.
              *
-             * @return Boolean value, indicates the success of the operation.
+             * @return String The response payload.
              *
              * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/get
              *
              * This function requires ServiceAuth authentication.
              *
              */
-            bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+            String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
             {
                 AsyncResult result;
                 CollectionGroupsIndex::Index index;
                 collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, indexId, false, false);
-                return result.lastError.code() == 0;
+                return result.c_str();
             }
 
             /** Gets a composite index.
@@ -251,19 +251,19 @@ namespace Firestore
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              *
-             * @return Boolean value, indicates the success of the operation.
+             * @return String The response payload.
              *
              * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.collectionGroups.indexes/list
              *
              * This function requires ServiceAuth authentication.
              *
              */
-            bool list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
+            String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
             {
                 AsyncResult result;
                 CollectionGroupsIndex::Index index;
                 collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, "", false, false);
-                return result.lastError.code() == 0;
+                return result.c_str();
             }
 
             /** Lists composite indexes.

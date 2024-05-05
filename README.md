@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-04-24T18:37:40Z`
+`2024-05-05T14:06:57Z`
 
 ## Table of Contents
 
@@ -42,15 +42,19 @@
         8. [LegacyToken (Database Secret)](#legacytoken-database-secret)
     8. [Working with Filesystems and BLOB](#working-with-filesystems-and-blob)
     9. [Working with Networks](#working-with-networks)
-    10. [Required Operation Flows](#required-operation-flows)
-    11. [Basic Example](#basic-example)
-    12. [Realtime Database Usage](#realtime-database-usage)
-    13. [Google Cloud Firestore Database Usage](#google-cloud-firestore-database-usage)
-    14. [Google Cloud Messaging Usage](#google-cloud-messaging-usage)
-    15. [Firebase Storage Usage](#firebase-storage-usage)
-    16. [Google Cloud Storage Usage](#google-cloud-storage-usage)
-    17. [Google Cloud Functions Usage](#google-cloud-functions-usage)
-    18. [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
+    10. [Examples](#examples)
+    11. [Firebase Client Class and Static Functions Usage](#firebase-client-class-and-static-functions-usage)
+    12. [Async Client Class Usage](#async-client-class-usage)
+    13. [Firebase App Usage](#firebase-app-usage)
+    14. [Async Result Usage](#async-result-usage)
+    15. [Realtime Database Usage](#realtime-database-usage)
+    16. [Realtime Database Result Usage](#realtime-database-result-usage)
+    17. [Google Cloud Firestore Database Usage](#google-cloud-firestore-database-usage)
+    18. [Google Cloud Messaging Usage](#google-cloud-messaging-usage)
+    19. [Firebase Storage Usage](#firebase-storage-usage)
+    20. [Google Cloud Storage Usage](#google-cloud-storage-usage)
+    21. [Google Cloud Functions Usage](#google-cloud-functions-usage)
+    22. [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
 8. [Project Preparation and Setup](#project-preparation-and-setup)
     1. [Authentication Getting Started](#authentication-getting-started)
     2. [Realtime Database Getting Started](#realtime-database-getting-started)
@@ -328,7 +332,7 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 
 ## Usages
 
-Based on the async library design , there are no main generic `Firebase` class, central configuration class (`FirebaseConfig`) and all-in-one data containter class (`FirebaseData`) as in the old Firebase library. 
+Based on the async library design , there are no central configuration class (`FirebaseConfig`) and all-in-one data containter class (`FirebaseData`) as in the old Firebase library. 
 
 This library provides the managed classes that are used in different purposes i.e. the classes that used to hadle the sync and async tasks and to use as a container (data provider) for authentication credentials, networking and filesystems configurations, and async task result.
 
@@ -375,7 +379,7 @@ The `Users` tab in the `Authentication` page in the [`Firebase console`](https:/
 
 ![Email/Password Sign-in provider](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/user_auth_console.png)
 
-The user management using this library are also [available](/examples/App/UserManagement).
+The user management using this library are also [available](/examples/App/UserManagement/).
 
 The sucurity rules can be used for user accessing control.
 
@@ -415,7 +419,9 @@ The Firebase and Google Services classes that are available in this library are 
 - ### Async Queue
 
 
-All sync and async tasks are managed using `FIFO queue` in async client. The task in the queue will refer to `slot` in this library. 
+All sync and async tasks are managed using `FIFO queue` in async client. The task in the queue will refer to `slot` in this library.
+
+The queue is task based or session based which stores the HTTP request and response data which used for a task. 
  
 The memory used for a task that stores in the queue is approximately 1 k. Then in order to limit the memory usage in a async client, this library allows only 10 tasks can be stored in the queue at a time.
 
@@ -438,6 +444,8 @@ When `SSE mode (HTTP Streaming)` task was currently stored in the queue, the new
 The new task can be cancelled in case the queue is full or the another `SSE mode (HTTP Streaming)` task is already stored in the queue. 
 
 The error code `-118` (`FIREBASE_ERROR_OPERATION_CANCELLED`) or `"operation was cancelled"` will show in this case.
+
+The number of tasks that currently stored in the queue can be obtained from `AsyncClientClass::taskCount()` function.
  
 The running task will be removed from the queue when operation is finished or error occurred.
 
@@ -453,8 +461,14 @@ You cannot run more than one `infinite task` in the same async client's queue as
 
 To run multiple `SSE mode (HTTP Streaming)` tasks, you have to run each task in different async client. Please note that `SSE mode (HTTP Streaming)` task consumes memory all the time while it is running. Running many `SSE mode (HTTP Streaming)` tasks may not possible because of out of memory especially in ESP8266 and SAMD devices.
 
+The async task handler will kepp the async tasks running as long as it places in the main `loop` function.
+
 > [!IMPORTANT]  
-> The user blocking code and `delay` function that used in the same loop of async task handler will block the async tasks to run. Please avoid using `delay` function in the same loop of async task handler.
+> Do not underestimate the important the async task handler location and usage. The non-async third-party library and user blocking code, `delay` function and placing the async task handler in the `millis` code blocks, will cause the async task to run slowly and the time out can of operation will be occurred. The  `SSE mode (HTTP Streaming)` task will not update in realtime.
+> The async task handler i.e. `FirebaseApp::loop()`, `RealtimeDatabase::loop()`, `Storage::loop()`, `Messaging::loop()`, `CloudStorage::loop()` and `CloudFunctions` should be placed inside the main `loop` function, at the top most of the `loop`.
+
+> [!NOTE] 
+> Even the authentication task can run asynchronously, you can run it asynchronously by waiting until the `FirebaseApp::ready()` function returns true.
 
 #### Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)
 
@@ -462,17 +476,20 @@ In Raspberry Pi Pico W, its `WiFiClientSecure` memory used for the transmit and 
 
 In ESP32 device, its `WiFiClientSecure` memory usage cannot be adjusted, it requires at least 50 k per connection (37 k used for `mbedTLS` memory allocation) and only three `WiFiClientSecure`(s) can be defined.
 
-Alternatively, for ESP32 device, you can use `ESP_SSLClient` that was included in this library. It works similar to ESP8266's `WiFiClientSecure` and the memory used for the transmit and receive buffers are adjustable (512 to 16384). See the [Stream Concurentcy example](/examples/RealtimeDatabase/Async/StreamConcurentcy/StreamConcurentcy.ino) for how to run many tasks concurrency.
+Alternatively, for ESP32 device, you can use `ESP_SSLClient` that was included in this library. It works similar to ESP8266's `WiFiClientSecure` and the memory used for the transmit and receive buffers are adjustable (512 to 16384). See the [Stream Concurentcy example](/examples/RealtimeDatabase/Async/Callback/StreamConcurentcy/) for how to run many tasks concurrency.
 
 The useful of using `ESP_SSLClient` is it uses `PSRAM` by default, you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
 
-In case of ESP8266 that connected to external `PSRAM`, you have enough RAM for running many tasks concurrency, and you can run [Stream Concurentcy example](/examples/RealtimeDatabase/Async/StreamConcurentcy/StreamConcurentcy.ino) without memory problem.
+In case of ESP8266 that connected to external `PSRAM`, you have enough RAM for running many tasks concurrency, and you can run [Stream Concurentcy example](/examples/RealtimeDatabase/Async/Callback/StreamConcurentcy/) without memory problem.
 
 For how to use `PSRAM` in ESP32 and ESP8266 devices, see [Memory Options](#memory-options) section.
 
 In case using ESP8266 without `PSRAM` and you want to reduce the memory usage, you can use `WiFiClientSecure` or `ESP_SSLClient` with minimum receive and transmit buffer size setting: 1024 for receive buffer and 512 for transmit buffer.
 
 Note that, because the receive buffer size was set to minimum safe value, 1024, the large server response may not be able to handle. 
+
+> [!WARNING] 
+> When using `WiFiClient` with `ESP_SSLClient` classes in ESP32, the `TCP receive time out` error can be occurred as found in the old Firebase library because of ESP32's `WiFiClient` issue. Then using `WiFiClient` with `ESP_SSLClient` in ESP32 is your own risk.
 
 
 - ### Async Client
@@ -527,6 +544,7 @@ In case async task, the send timeout and read timeout are 30 seconds by default 
 
 In case sync task, the timeouts can be set via `AsyncClientClass::setSyncSendTimeout` and `AsyncClientClass::setSyncReadTimeout` for send timeout and read timeout respectively.
 
+
 - ### Async Result
 
 This library provides the class object called async result (`AsyncResult`) which is used as a container that provides 4 types of information: `App Events` (`app_event_t`), `Server Response and Event Data`, `Debug Information` and `Error Information` and will be discussed later.
@@ -539,35 +557,45 @@ The `Error Information` (`FirebaseError`) can be obtained from `AsyncResult::err
 
 The `Debug Information` (`String`) can be obtained from `AsyncResult::debug()`.
 
-There are two use cases of async result:
+There are two use cases of async result: with callback function and without callback function.
 
-   1. User provided async result.
+   1. User provided async result (without callback function).
 
-   The async result is defined by user and assigned with the async function.
-
-Example:
+   The async result was defined by user and passed to the async tasks as the following.
 
 ```cpp
-Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResult>);
+FirebaseApp::setAsyncResult(<AsyncResult>); // Recommend setting AsyncResult via initializeApp instead.
 ```
 
-   2. From the instance of async data.
-
-   The async result was taken from async data which created within the async task.
-
-   This is the case where the async result callback function was set to the async function.   
-
-Example:
+```cpp
+initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResult>); // Since v1.2.0
+```
 
 ```cpp
-Database.get(<AsyncClientClass>, <path>, <options>, <AsyncResultCallback>);
+RealtimeDatabase::get(<AsyncClientClass>, <path>, <options>, <AsyncResult>);
+```
+
+   2. From the instance of async data (with callback function).
+
+   The async result instance was created inside the async task and can be accessed via the async result callback function that passed to the async tasks as the following.
+
+```cpp
+FirebaseApp::setCallback(<AsyncResultCallback>); // Recommend setting AsyncResultCallback via initializeApp instead.
+```
+
+```cpp
+initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResultCallback>, <UID>); // Since v1.2.0
+```
+ 
+```cpp
+RealtimeDatabase::get(<AsyncClientClass>, <path>, <options>, <AsyncResultCallback>);
 ```
 
 In case 1, the async result (`AsyncResult`) shall be defined globally because it needs the containter to keep the result while running the async task.
 
 In case 1, when the async result was used in the `loop` function to take or print information from it. It should follow the below recommendation for checking its status before processing the data to avoid processing or printing the same data.
 
-> To check the `App Event` changes, you should use `AsyncResult::appEvent().code() > 0`.
+> To check the `App Event` changes, you should use `AsyncResult::isEvent()`.
 >
 > To check the `Server Response and Event Data` changes, you should use `AsyncResult::available()`.
 >
@@ -593,8 +621,7 @@ You can get the `UID` from `AsyncResult` via `AsyncResult::uid()`.
 > The async client used in authentication task should be defined globally as it runs asynchronously.
 
 > [!CAUTION]
-> Please avoid calling the codes or functions that consumed large memory inside the asyn callback function because they use stack memory then the wdt reset crash can be occurred in ESP8266 device because of stack overflow.
-> Then in ESP8266 device, global defined `AsyncResult` as used in case 1 is recommended for async task.
+> Please don't run your code inside the async callback function because it use stack memory.
 
 - ### App Events
 
@@ -688,7 +715,7 @@ The `realtime_database_data_type` enums are included the following.
 
 - `realtime_database_data_type_undefined` or -1.
 
-- `realtime_database_data_type_null`  or 5.
+- `realtime_database_data_type_null` or 5.
 
 - `realtime_database_data_type_integer` or 1.
 
@@ -737,7 +764,7 @@ The error information (`FirebaseError`) from the async result can be obtained fr
 
 - ### Debug Information
 
-The debug information (`String`) from the async result can be obtained from `String AsyncResult::debug()` which is currently availabele when starting and closing the server connection and information about network connection process.
+The debug information (`String`) from the async result can be obtained from `String AsyncResult::debug()` which is currently availabele when getting current time, starting and closing the server connection and information about network connection process.
 
 ### App Initialization
 
@@ -757,23 +784,23 @@ The authentication/authorization classes also mentioned in the earlier section w
 
 The following authentication/authorization classes generate and hold the `ID token` which used in the authorization requests.
 
-- [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino)
+- [UserAuth](/examples/App/AppInitialization/Async/Callback/UserAuth/)
 
-- [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino)
+- [CustomAuth](/examples/App/AppInitialization/Async/Callback/CustomAuth/)
 
-- [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino)
+- [IDToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/IDToken/)
 
 The following classes provide the privilege access to the Firebase/Google APIs.
 
- - [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino)
+ - [ServiceAuth](/examples/App/AppInitialization/Async/Callback/ServiceAuth/)
  
- - [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino)
+ - [AccessToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/AccessToken/)
 
- - [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino)
+ - [LegacyToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/LegacyToken/)
 
  The following class provides for non-authentication acesss.
  
- - [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino)
+ - [NoAuth](/examples/App/AppInitialization/Async/Callback/NoAuth/)
 
 
 The `getAuth` function is the function that provides the user auth data (`user_auth_data`) from the authentication/authorization classes.
@@ -787,12 +814,40 @@ The `auth token` (`ID token` and `access token`) and legacy token can be obtaine
 
 The refresh token (when using authentication/authorization classes that provided the `ID token`) can be obtained from `FirebaseApp::getRefreshToken()`.
 
+- ### initializeApp or Firebase::initializeApp
+
+To initialize the `FirebaseApp`, call `Firebase::initializeApp` or static function `initializeApp` which the functions parameters are included the following.
+
+Initialize with the callback (Since v1.2.0).
+
+```cpp
+initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResult>);
+```
+
+Initialize with the AsyncResult without the callback (Since v1.2.0)
+
+```cpp
+initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResultCallback>, <UID>);
+```
+
+`<AsyncClientClass>` The async client to work for authentication/authorization task.
+
+`<FirebaseApp>` The `FirebaseApp` class object to handle authentication/authorization task. 
+
+`<user_auth_data>` The user auth data (`user_auth_data`) which is the struct that holds the user sign-in credentials and tokens that obtained from the authentication/authorization classes via `getAuth` as described earlier.
+
+`<AsyncResult>` The Async Result. See [Async Result](#async-result) section.
+
+`<AsyncResultCallback>` The Async Result Callback function. See [Async Result](#async-result) section.
+
+`<UID>` The Task UID. See [Async Result](#async-result) section.
+
 
 - ### CustomAuth (ID Token Authorization Using Service Account)
 
 The service account credentials and json file can be used for authentication. 
 
-The [CustomAuth](examples/App/AppInitialization/CustomAuth/CustomAuth.ino) class parameters are included the following.
+The [CustomAuth](/examples/App/AppInitialization/Async/Callback/CustomAuth/) class parameters are included the following.
 
 ```cpp
 CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
@@ -829,7 +884,7 @@ This type of authentication is used when privilege (admin rights) access is need
 
 The service account credentials and json file can be used for authentication. 
 
-The [ServiceAuth](examples/App/AppInitialization/ServiceAuth/ServiceAuth.ino) class parameters are included the following.
+The [ServiceAuth](/examples/App/AppInitialization/Async/Callback/ServiceAuth/) class parameters are included the following.
 
 ```cpp
 ServiceAuth::ServiceAuth(<TimeStatusCallback>, <client_email>, <project_id>, <private_key>, <expire>)
@@ -860,7 +915,7 @@ The auth token need to be re-created instead of refreshing.
 
 The user name and password credentials are used for authentication. You can save the credentials to file and load it with the constructor.
 
-The [UserAuth](examples/App/AppInitialization/UserAuth/UserAuth.ino) class parameters are included the following.
+The [UserAuth](/examples/App/AppInitialization/Async/Callback/UserAuth/) class parameters are included the following.
 
 ```cpp
 UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>)
@@ -886,7 +941,7 @@ UserAuth::save(<file_config_data>)
 
 - ### NoAuth (Non-Authentication)
 
-The [NoAuth](examples/App/AppInitialization/NoAuth/NoAuth.ino) class allows you to access the Firebase/Google APIs without authorization token. There is no parameters in its class constructor.
+The [NoAuth](/examples/App/AppInitialization/Async/Callback/NoAuth/) class allows you to access the Firebase/Google APIs without authorization token. There is no parameters in its class constructor.
 
 This required read and write access in Firebase/Google APIs.
 
@@ -896,7 +951,7 @@ It should be used for testing only.
 
 The API key and the custom token credentials are used for authorization. You can save the credentials to file and load it with the constructor.
 
-The [CustomToken](examples/App/AppInitialization/TokenAuth/CustomToken/CustomToken.ino) class parameters are included the following.
+The [CustomToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/CustomToken/) class parameters are included the following.
 
 ```cpp
 CustomToken::CustomToken(<api_key>, <custom_token>, <expire_in_seconds>)
@@ -933,7 +988,7 @@ The ID token is a short-lived token which will be expired in 1 hour.
 
 The access token was used for authorization. You can save the credentials to file and load it with the constructor.
 
-The [AccessToken](examples/App/AppInitialization/TokenAuth/AccessToken/AccessToken.ino) class parameters are included the following.
+The [AccessToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/AccessToken/) class parameters are included the following.
 
 ```cpp
 AccessToken::AccessToken(<access_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>)
@@ -967,7 +1022,7 @@ The Client ID and Client Secret are OAuth 2.0 credentials that can be taken from
 
 The API key and ID token are used for authorization. You can save the credentials to file and load it with the constructor.
 
-The [IDToken](examples/App/AppInitialization/TokenAuth/IDToken/IDToken.ino) class parameters are included the following.
+The [IDToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/IDToken/) class parameters are included the following.
 
 ```cpp
 IDToken::IDToken(<api_key>, <ID_token>, <expire_in_seconds>, <refresh_token>)
@@ -995,7 +1050,7 @@ IDToken::save(<file_config_data>)
 
 The database secret was used for authorization. You can save the credentials to file and load it with the constructor.
 
-The [LegacyToken](examples/App/AppInitialization/TokenAuth/LegacyToken/LegacyToken.ino) class parameters is included the following.
+The [LegacyToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/LegacyToken/) class parameters aer included the following.
 
 ```cpp
 LegacyToken::LegacyToken(<database_secret>)
@@ -1016,13 +1071,13 @@ LegacyToken::save(<file_config_data>);
 
 - ### Working with Filesystems and BLOB
 
-The file config class ([FileConfig](examples/App/AppInitialization/SaveAndLoad/)) will be used to hold the SD/Flash filesystems information and the file operation callback when file upload or download is required.
+The file config class ([FileConfig](/examples/App/AppInitialization/Async/Callback/SaveAndLoad/)) will be used to hold the SD/Flash filesystems information and the file operation callback when file upload or download is required.
 
 The function that requires file/BLOB for download and upload will accept the file config data (`file_config_data`) in its parameters.
 
 The `file_config_data` can be obtained from the static functions called `getFile` and `getBlob`.
 
-The `FileConfig` class parameters is included the following.
+The `FileConfig` class parameters are included the following.
 
 ```cpp
 FileConfig::FileConfig(<filename>, <file_callback>)
@@ -1083,7 +1138,7 @@ void download()
 
 ```
 
-The blob config class ([BlobConfig](examples/RealtimeDatabase/Extras/BLOB/BLOB.ino)) provides the in/out data for upload and download functions.
+The blob config class ([BlobConfig](examples/RealtimeDatabase/Async/Callback/BLOB/)) provides the in/out data for upload and download functions.
 
 The `BlobConfig` class constructor parameters class parameters are included the following.
 
@@ -1125,24 +1180,24 @@ When you don't use filesystems, you can exclude the related code in this library
 
 The `AsyncClientClass` object requires the network config data (`network_config_data`) that obtained from one of the following networking classes via the static function called `getNetwork`.
 
-- [DefaultNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultNetwork/DefaultNetwork.ino) is used with the core WiFi enabled networking.
+- [DefaultNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultNetwork/) is used with the core WiFi enabled networking.
 
-- [DefaultWiFiNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultWiFiNetwork/DefaultWiFiNetwork.ino) is used with the core WiFi Multi enabled networking or non-core WiFi networking.
+- [DefaultWiFiNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultWiFiNetwork/) is used with the core WiFi Multi enabled networking or non-core WiFi networking.
 
-- [DefaultEthernetNetwork](examples/App/NetworkInterfaces/DefaultNetworks/DefaultEthernetNetwork) is used with the core Ethernet enabled networking.
+- [DefaultEthernetNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/) is used with the core Ethernet enabled networking.
 
-- [EthernetNetwork](examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino) is used with the non-core Ethernet networking.
+- [EthernetNetwork](/examples/App/NetworkInterfaces/Async/Callback/EthernetNetwork/) is used with the non-core Ethernet networking.
 
-- [GSMNetwork](examples/App/NetworkInterfaces/GSMNetwork/GSMNetwork.ino) is used with the non-core GSM networking.
+- [GSMNetwork](/examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/) is used with the non-core GSM networking.
 
-- [GenericNetwork](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.ino) is used with the non-core or user defined networking.
+- [GenericNetwork](/examples/App/NetworkInterfaces/Async/Callback/GenericNetwork/) is used with the non-core or user defined networking.
 
 > [!WARNING]  
 > In ESP32, [ADC2](https://docs.espressif.com/projects/esp-idf/en/v4.2/esp32/api-reference/peripherals/adc.html) (`GPIO 0`, `GPIO 2`, `GPIO 4`, `GPIO 12`, `GPIO 13`, `GPIO 14`, `GPIO 15`, `GPIO 25`, `GPIO 26` and `GPIO 27`) cannot be used while using WiFi.
 
 The default network class can be used with WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W.
 
-The boolean parameter assigned with the default network class constructor is the option for how the network (WiFi) reconnection can be done automatically or manually.
+The boolean parameter passed to the default network class constructor is the option for how the network (WiFi) reconnection can be done automatically or manually.
 
 The default WiFi network class provided the mean for connection with multiple WiFi credentials (WiFi Multi),
 
@@ -1255,15 +1310,15 @@ void setup()
 }
 ```
 
-See [ESP8266 DefaultEthernetNetwork example](examples/App/NetworkInterfaces/DefaultNetworks/DefaultEthernetNetwork/ESP8266/ESP8266.ino) for using ESP8266 with its native lwIP Ethernet library.
+See [ESP8266 DefaultEthernetNetwork example](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/ESP8266/) for using ESP8266 with its native lwIP Ethernet library.
 
 For ESP32, to use the native ETH class, define the `DefaultEthernetNetwork` object with no parameter.
 
-See [ESP32 DefaultEthernetNetwork example](examples/App/NetworkInterfaces/DefaultNetworks/DefaultEthernetNetwork/ESP32/ESP32.ino) for using ESP32 with its native Ethernet library.
+See [ESP32 DefaultEthernetNetwork example](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/ESP32/) for using ESP32 with its native Ethernet library.
 
 - `EthernetNetwork`
 
-By default the external Ethernet module can be used with the library when the macro `ENABLE_ETHERNET_NETWORK` was assigned and Ethernet library was included in the user sketch.
+By default the external Ethernet module can be used with the library when the macro `ENABLE_ETHERNET_NETWORK` was defined and Ethernet library was included in the user sketch.
 
 The user defined Ethernet class and header other than `Ethernet.h` and `Ethernet` can be used, see the [Library Build Options](#library-build-options) section.
 
@@ -1296,7 +1351,7 @@ Firebase_StaticIP::Firebase_StaticIP(<local_ip>, <subnet>, <gateway>, <dns_serve
 
 `<optional>` The boolean option to force use static IP only (not use DHCP).
 
-See [EthernetNetwork example](examples/App/NetworkInterfaces/EthernetNetwork/EthernetNetwork.ino)  for external Ethernet module usage.
+See [EthernetNetwork example](/examples/App/NetworkInterfaces/Async/Callback/EthernetNetwork/)  for external Ethernet module usage.
 
 - `GSMNetwork`
 
@@ -1329,7 +1384,7 @@ GSMNetwork::GSMNetwork(<modem>, <gsm_pin>, <apn>, <user>, <password>)
 
 The TinyGsm modem should be defined at the same usage scope of `GSMNetwork` and `AsyncClientClass`.
 
-See [GSMNetwork example](examples/App/NetworkInterfaces/GSMNetwork/GSMNetwork.ino) for using [TinyGSM](https://github.com/vshymanskyy/TinyGSM) with this library.
+See [GSMNetwork example](/examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/) for using [TinyGSM](https://github.com/vshymanskyy/TinyGSM) with this library.
 
 - `GenericNetwork`
 
@@ -1349,63 +1404,642 @@ In the `<net_connect_callback>`, the complete operations for the carier (network
 
 In the `<network_status_callback>` function, the `status` (Boolean variable) that provided in the function, should set with the network status.
 
-See [GenericNetwork example](examples/App/NetworkInterfaces/GenericNetwork/GenericNetwork.ino) for using WiFi with `GenericNetwork` for demonstation.
+See [GenericNetwork example](/examples/App/NetworkInterfaces/Async/Callback/GenericNetwork/) for using WiFi with `GenericNetwork` for demonstation.
 
-- ### Required Operation Flows
 
-When using this library, you should follow one of the following operation flows otherwise unexpected errors can be occurred.
+- ### Examples
 
-![Operation Flows 1](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/operation_flows1.png)
+With this library, you can use async functions with or without the callback functions. The sync functions are also supported. 
 
-![Operation Flows 2](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/operation_flows2.png)
+The examples provided by this library can be divided into two use cases i.e. `Async` (with `Callback` and `NoCallback`) and `Sync` as listed in the following tree structure.
 
-This library does not run any background process in the FreeRTOS task or schedule task and timer ISR.
+<details>
+<summary>Library Examples Structure</summary>
 
-For maintaining the async tasks, you have to place the code for `Maintain Authentication and Async Operation Queue` in the infinite loop function e.g. main `loop()` function, timer or scheduler cyclically event's callback function or infinite loop in the FreeRTOS task (as in ESP32).
+* [App](/examples/App/)
+    * [AppInitialization](/examples/App/AppInitialization/)
+        * [Async](/examples/App/AppInitialization/Async/)
+            * [Callback](/examples/App/AppInitialization/Async/Callback/)
+                * [CustomAuth](/examples/App/AppInitialization/Async/Callback/CustomAuth/)
+                * [CustomAuthFile](/examples/App/AppInitialization/Async/Callback/CustomAuthFile/)
+                * [NoAuth](/examples/App/AppInitialization/Async/Callback/NoAuth/)
+                * [SaveAndLoad](/examples/App/AppInitialization/Async/Callback/SaveAndLoad/)
+                * [ServiceAuth](/examples/App/AppInitialization/Async/Callback/ServiceAuth/)
+                * [ServiceAuthFile](/examples/App/AppInitialization/Async/Callback/ServiceAuth/)
+                * [TokenAuth](/examples/App/AppInitialization/Async/Callback/TokenAuth/)
+                    * [AccessToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/AccessToken/)
+                    * [CustomToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/CustomToken/)
+                    * [IDToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/IDToken/)
+                    * [LegacyToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/LegacyToken/)
+                * [UserAuth](/examples/App/AppInitialization/Async/Callback/UserAuth/)
+            * [NoCallback](/examples/App/AppInitialization/Async/NoCallback/)
+                * [CustomAuth](/examples/App/AppInitialization/Async/NoCallback/CustomAuth/)
+                * [NoAuth](/examples/App//AppInitialization//Async/NoCallback/NoAuth/)
+                * [ServiceAuth](/examples/App/AppInitialization/Async/NoCallback/ServiceAuth/)
+                * [TokenAuth](/examples/App/AppInitialization/Async/NoCallback/TokenAuth/)
+                    * [AccessToken](/examples/App/AppInitialization/Async/NoCallback/TokenAuth/AccessToken/)
+                    * [CustomToken](/examples/App/AppInitialization/Async/NoCallback/TokenAuth/CustomToken/)
+                    * [IDToken](/examples/App/AppInitialization/Async/NoCallback/TokenAuth/IDToken/)
+                    * [LegacyToken](/examples/App/AppInitialization/Async/NoCallback/TokenAuth/LegacyToken/)
+                * [UserAuth](/examples/App/AppInitialization/Async/NoCallback/UserAuth/)
+        * [Sync](/examples/App/AppInitialization/Sync/)
+            * [CustomAuth](/examples/App/AppInitialization/Sync/CustomAuth/)
+            * [CustomAuthFile](/examples/App/AppInitialization/Sync/CustomAuthFile/)
+            * [NoAuth](/examples/App/AppInitialization/Sync/SaveAndLoad/)
+            * [SaveAndLoad](/examples/App/AppInitialization/Sync/SaveAndLoad/)
+            * [ServiceAuth](/examples/App/AppInitialization/Sync/ServiceAuth/)
+            * [ServiceAuthFile](/examples/App/AppInitialization/Sync/ServiceAuthFile/)
+            * [TokenAuth](/examples/App/AppInitialization/Sync/TokenAuth/)
+                * [AccessToken](/examples/App/AppInitialization/Sync/TokenAuth/AccessToken/)
+                * [CustomToken](/examples/App/AppInitialization/Sync/TokenAuth/CustomToken/)
+                * [IDToken](/examples/App/AppInitialization/Sync/TokenAuth/IDToken/)
+                * [LegacyToken](/examples/App/AppInitialization/Sync/TokenAuth/LegacyToken/)
+            * [UserAuth](/examples/App/AppInitialization/Sync/UserAuth/)
+    * [NetworkInterfaces](/examples/App/NetworkInterfaces/)
+        * [Async](/examples/App/NetworkInterfaces/Async/)
+            * [Callback](/examples/App/NetworkInterfaces/Async/Callback/)
+                * [DefaultNetworks](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/)
+                    * [DefaultEthernetNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/)
+                        * [ESP32](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/ESP32/)
+                        * [ESP8266](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/ESP8266/)
+                    * [DefaultNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultNetwork/)
+                    * [DefaultWiFiNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultWiFiNetwork/)
+                * [EthernetNetwork](/examples/App/NetworkInterfaces/Async/Callback/EthernetNetwork/)
+                * [GenericNetwork](/examples/App/NetworkInterfaces/Async/Callback/GenericNetwork/)
+                * [GSMNetwork](/examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/)
+            * [NoCallback](/examples/App/NetworkInterfaces/Async/NoCallback/)
+                * [DefaultNetworks](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/)
+                    * [DefaultEthernetNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultEthernetNetwork/)
+                        * [ESP32](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultEthernetNetwork/ESP32/)
+                        * [ESP8266](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultEthernetNetwork/ESP8266/)
+                    * [DefaultNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultNetwork/)
+                    * [DefaultWiFiNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultWiFiNetwork/)
+                * [EthernetNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/EthernetNetwork/)
+                * [GenericNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/GenericNetwork/)
+                * [GSMNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/GSMNetwork/)
+        * [Sync](/examples/App/NetworkInterfaces/Sync/)
+            * [DefaultNetworks](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/)
+                * [DefaultEthernetNetwork](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultEthernetNetwork/)
+                    * [ESP32](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultEthernetNetwork/ESP32/)
+                    * [ESP8266](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultEthernetNetwork/ESP8266/)
+                * [DefaultNetwork](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultNetwork/)
+                * [DefaultWiFiNetwork](/examples/App/NetworkInterfaces/Sync//DefaultNetworks/DefaultWiFiNetwork/)
+            * [EthernetNetwork](/examples/App/NetworkInterfaces/Sync/EthernetNetwork/)
+            * [GenericNetwork](/examples/App/NetworkInterfaces/Sync/GenericNetwork/)
+            * [GSMNetwork](/examples/App/NetworkInterfaces/Sync/GSMNetwork/)
+    * [UserManagement](/examples/App/UserManagement/)
+        * [Async](/examples/App/UserManagement/Async/)
+            * [Callback](/examples/App/UserManagement/Async/Callback/)
+                * [Anonymous](/examples/App/UserManagement/Async/Callback/Anonymous/)
+                * [DeleteUser](/examples/App/UserManagement/Async/Callback/DeleteUser/)
+                * [ResetPassword](/examples/App/UserManagement/Async/Callback/ResetPassword/)
+                * [SignUp](/examples/App/UserManagement/Async/Callback/SignUp/)
+                * [Verify](/examples/App/UserManagement/Async/Callback/Verify/)
+            * [NoCallback](/examples/App/UserManagement/Async/NoCallback/)
+                * [Anonymous](/examples/App/UserManagement/Async/NoCallback/Anonymous/)
+                * [DeleteUser](/examples/App/UserManagement/Async/NoCallback/DeleteUser/)
+                * [ResetPassword](/examples/App/UserManagement/Async/NoCallback/ResetPassword/)
+                * [SignUp](/examples/App/UserManagement/Async/NoCallback/SignUp/)
+                * [Verify](/examples/App/UserManagement/Async/NoCallback/Verify/)
+        * [Sync](/examples/App/UserManagement/Sync/)
+            * [Anonymous](/examples/App/UserManagement/Sync/Anonymous/)
+            * [DeleteUser](/examples/App/UserManagement/Sync/DeleteUser/)
+            * [ResetPassword](/examples/App/UserManagement/Sync/ResetPassword/)
+            * [SignUp](/examples/App/UserManagement/Sync/SignUp/)
+            * [Verify](/examples/App/UserManagement/Sync/Verify/)
+* [AsyncTCP](/examples/AsyncTCP/)
+* [CloudFunctions](/examples/CloudFunctions/)
+    * [Async](/examples/CloudFunctions/Async/)
+        * [Callback](/examples/CloudFunctions/Async/Callback/)
+            * [Call](/examples/CloudFunctions/Async/Callback/Call/)
+            * [Create](/examples/CloudFunctions/Async/Callback/Create/)
+            * [Delete](/examples/CloudFunctions/Async/Callback/Delete/)
+            * [GenDownloadURL](/examples/CloudFunctions/Async/Callback/GenDownloadURL/)
+            * [GenUploadURL](/examples/CloudFunctions/Async/Callback/GenUploadURL/)
+            * [Get](/examples/CloudFunctions/Async/Callback/Get/)
+            * [GetIamPolicy](/examples/CloudFunctions/Async/Callback/GetIamPolicy/)
+            * [List](/examples/CloudFunctions/Async/Callback/List/)
+            * [Patch](/examples/CloudFunctions/Async/Callback/Patch/)
+            * [SetIamPolicy](/examples/CloudFunctions/Async/Callback/SetIamPolicy/)
+            * [TestIamPermissions](/examples/CloudFunctions/Async/Callback/TestIamPermissions/)
+        * [NoCallback](/examples/CloudFunctions/Async/NoCallback/)
+            * [Call](/examples/CloudFunctions/Async/NoCallback/Call/)
+            * [Create](/examples/CloudFunctions/Async/NoCallback/Create/)
+            * [Delete](/examples/CloudFunctions/Async/NoCallback/Delete/)
+            * [GenDownloadURL](/examples/CloudFunctions/Async/NoCallback/GenDownloadURL/)
+            * [GenUploadURL](/examples/CloudFunctions/Async/NoCallback/Get/)
+            * [Get](/examples/CloudFunctions/Async/NoCallback/Get/)
+            * [GetIamPolicy](/examples/CloudFunctions/Async/NoCallback/GetIamPolicy/)
+            * [List](/examples/CloudFunctions/Async/NoCallback/List/)
+            * [Patch](/examples/CloudFunctions/Async/NoCallback/Patch/)
+            * [SetIamPolicy](/examples/CloudFunctions/Async/NoCallback/SetIamPolicy/)
+            * [TestIamPermissions](/examples/CloudFunctions/Async/NoCallback/TestIamPermissions/)
+    * [Sync](/examples/CloudFunctions/Sync/)
+        * [Call](/examples/CloudFunctions/Sync/Call/)
+        * [Create](/examples/CloudFunctions/Sync/Create/)
+        * [Delete](/examples/CloudFunctions/Sync/Delete/)
+        * [GenDownloadURL](/examples/CloudFunctions//Sync/GenDownloadURL/)
+        * [GenUploadURL](/examples/CloudFunctions/Sync/GenUploadURL/)
+        * [Get](/examples/CloudFunctions//Sync/Get/)
+        * [GetIamPolicy](/examples/CloudFunctions/Sync/GetIamPolicy/)
+        * [List](/examples/CloudFunctions/Sync/List/)
+        * [Patch](/examples/CloudFunctions/Sync/Patch/)
+        * [SetIamPolicy](/examples/CloudFunctions/Sync//SetIamPolicy/)
+        * [TestIamPermissions](/examples/CloudFunctions/Sync/TestIamPermissions/)
+* [CloudStorage](/examples/CloudStorage/)
+    * [Async](/examples/CloudStorage/Async/)
+        * [Callback](/examples/CloudStorage/Async/Callback/)
+            * [Delete](/examples/CloudStorage/Async/Callback/Delete/)
+            * [Download](/examples/CloudStorage/Async/Callback/Download/)
+            * [GetMetadata](/examples/CloudStorage/Async/Callback/GetMetadata/)
+            * [List](/examples/CloudStorage/Async/Callback/List/)
+            * [OTA](/examples/CloudStorage/Async/Callback/OTA/)
+            * [Upload](/examples/CloudStorage/Async/Callback/Upload/)
+        * [NoCallback](/examples/CloudStorage/Async/NoCallback/)
+            * [Delete](/examples/CloudStorage/Async/NoCallback/Delete/)
+            * [Download](/examples/CloudStorage/Async/NoCallback/Download/)
+            * [GetMetadata](/examples/CloudStorage/Async/NoCallback/GetMetadata/)
+            * [List](/examples/CloudStorage/Async/NoCallback/List/)
+            * [OTA](/examples/CloudStorage/Async/NoCallback/OTA/)
+            * [Upload](/examples/CloudStorage/Async/NoCallback/Upload/)
+    * [Sync](/examples/CloudStorage//Sync/)
+        * [Delete](/examples/CloudStorage//Sync/Delete/)
+        * [Download](/examples/CloudStorage//Sync/Download/)
+        * [GetMetadata](/examples/CloudStorage//Sync/GetMetadata/)
+        * [List](/examples/CloudStorage//Sync/List/)
+        * [OTA](/examples/CloudStorage//Sync/OTA/)
+        * [Upload](/examples/CloudStorage//Sync/Upload/)
+* [FirestoreDatabase](/examples/FirestoreDatabase/)
+    * [CollectionGroups](/examples/FirestoreDatabase//CollectionGroups/)
+        * [Indexes](/examples/FirestoreDatabase/CollectionGroups/Indexes/)
+            * [Async](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/)
+                * [Callback](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/Callback/)
+                    * [Create](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/Callback/Create/)
+                    * [Delete](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/Callback/Delete/)
+                    * [Get](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/Callback/Get/)
+                    * [List](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/Callback/List/)
+                * [NoCallback](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/NoCallback/)
+                    * [Create](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/NoCallback/Create/)
+                    * [Delete](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/NoCallback/Delete/)
+                    * [Get](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/NoCallback/Get/)
+                    * [List](/examples/FirestoreDatabase/CollectionGroups/Indexes/Async/NoCallback/List/)
+            * [Sync](/examples/FirestoreDatabase/CollectionGroups/Indexes/Sync/)
+                * [Create](/examples/FirestoreDatabase/CollectionGroups/Indexes/Sync/Create/)
+                * [Delete](/examples/FirestoreDatabase/CollectionGroups/Indexes/Sync/Delete/)
+                * [Get](/examples/FirestoreDatabase/CollectionGroups/Indexes/Sync/Get/)
+                * [List](/examples/FirestoreDatabase/CollectionGroups/Indexes/Sync/List/)
+        * [Databases](/examples/FirestoreDatabase/Databases/)
+            * [Async](/examples/FirestoreDatabase/Databases/Async/)
+                * [Callback](/examples/FirestoreDatabase/Databases/Async/Callback/)
+                    * [Create](/examples/FirestoreDatabase/Databases/Async/Callback/Create/)
+                    * [Delete](/examples/FirestoreDatabase/Databases/Async/Callback/Delete/)
+                    * [ExportDocuments](/examples/FirestoreDatabase/Databases/Async/Callback/ExportDocuments/)
+                    * [Get](/examples/FirestoreDatabase/Databases/Async/Callback/Get/)
+                    * [ImportDocuments](/examples/FirestoreDatabase/Databases/Async/Callback/ImportDocuments/)
+                    * [Indexes](/examples/FirestoreDatabase/Databases/Async/Callback/Indexes/)
+                        * [Create](/examples/FirestoreDatabase/Databases/Async/Callback/Indexes/Create/)
+                        * [Delete](/examples/FirestoreDatabase/Databases/Async/Callback/Indexes/Delete/)
+                        * [Get](/examples/FirestoreDatabase/Databases/Async/Callback/Indexes/Get/)
+                        * [List](/examples/FirestoreDatabase/Databases/Async/Callback/Indexes/List/)
+                    * [List](/examples/FirestoreDatabase/Databases/Async/Callback/List/)
+                    * [Update](/examples/FirestoreDatabase/Databases/Async/Callback/Update/)
+                * [NoCallback](/examples/FirestoreDatabase/Databases/Async/NoCallback/)
+                    * [Create](/examples/FirestoreDatabase/Databases/Async/NoCallback/Create/)
+                    * [Delete](/examples/FirestoreDatabase/Databases/Async/NoCallback/Delete/)
+                    * [ExportDocuments](/examples/FirestoreDatabase/Databases/Async/NoCallback/ExportDocuments/)
+                    * [Get](/examples/FirestoreDatabase/Databases/Async/NoCallback/Get/)
+                    * [ImportDocuments](/examples/FirestoreDatabase/Databases/Async/NoCallback/ImportDocuments/)
+                    * [Indexes](/examples/FirestoreDatabase/Databases/Async/NoCallback/Indexes/)
+                        * [Create](/examples/FirestoreDatabase/Databases/Async/NoCallback/Indexes/Create/)
+                        * [Delete](/examples/FirestoreDatabase/Databases/Async/NoCallback/Indexes/Delete/)
+                        * [Get](/examples/FirestoreDatabase/Databases/Async/NoCallback/Indexes/Get/)
+                        * [List](/examples/FirestoreDatabase/Databases/Async/NoCallback/Indexes/List/)
+                    * [List](/examples/FirestoreDatabase/Databases/Async/NoCallback/List/)
+                    * [Update](/examples/FirestoreDatabase/Databases/Async/NoCallback/Update/)
+            * [Sync](/examples/FirestoreDatabase/Databases/Sync/)
+                * [Create](/examples/FirestoreDatabase/Databases/Sync/Create/)
+                * [Delete](/examples/FirestoreDatabase/Databases/Sync/Delete/)
+                * [ExportDocuments](/examples/FirestoreDatabase/Databases/Sync/ExportDocuments/)
+                * [Get](/examples/FirestoreDatabase/Databases/Sync/Get/)
+                * [ImportDocuments](/examples/FirestoreDatabase/Databases/Sync/ImportDocuments/)
+                * [Indexes](/examples/FirestoreDatabase/Databases/Sync/Indexes/)
+                    * [Create](/examples/FirestoreDatabase/Databases/Sync/Indexes/Create/)
+                    * [Delete](/examples/FirestoreDatabase/Databases/Sync/Indexes/Delete/)
+                    * [Get](/examples/FirestoreDatabase/Databases/Sync/Indexes/Get/)
+                    * [List](/examples/FirestoreDatabase/Databases/Sync/Indexes/List/)
+                * [List](/examples/FirestoreDatabase/Databases/Sync/List/)
+                * [Update](/examples/FirestoreDatabase/Databases/Sync/Update/)
+        * [Documents](/examples/FirestoreDatabase/Documents/)
+            * [Async](/examples/FirestoreDatabase/Documents/Async/)
+                * [Callback](/examples/FirestoreDatabase/Documents/Async/Callback/)
+                    * [BatchGet](/examples/FirestoreDatabase/Documents/Async/Callback/BatchGet/)
+                    * [BatchWrite](/examples/FirestoreDatabase/Documents/Async/Callback/BatchWrite/)
+                    * [Commit](/examples/FirestoreDatabase/Documents/Async/Callback/Commit/)
+                        * [AppendArray](/examples/FirestoreDatabase/Documents/Async/Callback/Commit/AppendArray/)
+                        * [AppendMapValue](/examples/FirestoreDatabase/Documents/Async/Callback/Commit/AppendMapValue/)
+                        * [AppendMapValueArray](/examples/FirestoreDatabase/Documents/Async/Callback/Commit/AppendMapValueArray/)
+                        * [AppendMapValueTimestamp](/examples/FirestoreDatabase/Documents/Async/Callback/Commit/AppendMapValueTimestamp/)
+                        * [IncrementFieldValue](/examples/FirestoreDatabase/Documents/Async/Callback/Commit/IncrementFieldValue/)
+                        * [SetUpdateDelete](/examples/FirestoreDatabase/Documents/Async/Callback/Commit/SetUpdateDelete/)
+                    * [CreateDocument](/examples/FirestoreDatabase/Documents/Async/Callback/CreateDocument/)
+                    * [Delete](/examples/FirestoreDatabase/Documents/Async/Callback/Delete/)
+                    * [Get](/examples/FirestoreDatabase/Documents/Async/Callback/Get/)
+                    * [List](/examples/FirestoreDatabase/Documents/Async/Callback/List/)
+                    * [ListCollectionIds](/examples/FirestoreDatabase/Documents/Async/Callback/ListCollectionIds/)
+                    * [Patch](/examples/FirestoreDatabase/Documents/Async/Callback/Patch/)
+                        * [AppendMapValue](/examples/FirestoreDatabase/Documents/Async/Callback/Patch/AppendMapValue/)
+                        * [UpdateDocument](/examples/FirestoreDatabase/Documents/Async/Callback/Patch/UpdateDocument/)
+                    * [RunQuery](/examples/FirestoreDatabase//Documents/Async/Callback/RunQuery/)
+                * [NoCallback](/examples/FirestoreDatabase/Documents/Async/NoCallback/)
+                    * [BatchGet](/examples/FirestoreDatabase/Documents/Async/NoCallback/BatchGet/)
+                    * [BatchWrite](/examples/FirestoreDatabase/Documents/Async/NoCallback/BatchWrite/)
+                    * [Commit](/examples/FirestoreDatabase/Documents/Async/NoCallback/Commit/)
+                        * [AppendArray](/examples/FirestoreDatabase/Documents/Async/NoCallback/Commit/AppendArray/)
+                        * [AppendMapValue](/examples/FirestoreDatabase/Documents/Async/NoCallback/Commit/AppendMapValue/)
+                        * [AppendMapValueArray](/examples/FirestoreDatabase/Documents/Async/NoCallback/Commit/AppendMapValueArray/)
+                        * [AppendMapValueTimestamp](/examples/FirestoreDatabase/Documents/Async/NoCallback/Commit/AppendMapValueTimestamp/)
+                        * [IncrementFieldValue](/examples/FirestoreDatabase/Documents/Async/NoCallback/Commit/IncrementFieldValue/)
+                        * [SetUpdateDelete](/examples/FirestoreDatabase/Documents/Async/NoCallback/Commit/SetUpdateDelete/)
+                    * [CreateDocument](/examples/FirestoreDatabase/Documents/Async/NoCallback/CreateDocument/)
+                    * [Delete](/examples/FirestoreDatabase/Documents/Async/NoCallback/Delete/)
+                    * [Get](/examples/FirestoreDatabase/Documents/Async/NoCallback/Get/)
+                    * [List](/examples/FirestoreDatabase/Documents/Async/NoCallback/List/)
+                    * [ListCollectionIds](/examples/FirestoreDatabase/Documents/Async/NoCallback/ListCollectionIds/)
+                    * [Patch](/examples/FirestoreDatabase/Documents/Async/NoCallback/Patch/)
+                        * [AppendMapValue](/examples/FirestoreDatabase/Documents/Async/NoCallback/Patch/AppendMapValue/)
+                        * [UpdateDocument](/examples/FirestoreDatabase/Documents/Async/NoCallback/Patch/UpdateDocument/)
+                    * [RunQuery](/examples/FirestoreDatabase/Documents/Async/NoCallback/RunQuery/)
+            * [Sync](/examples/FirestoreDatabase/Documents/Sync/)
+                * [BatchGet](/examples/FirestoreDatabase/Documents/Sync/BatchGet/)
+                * [BatchWrite](/examples/FirestoreDatabase/Documents/Sync/BatchWrite/)
+                * [Commit](/examples/FirestoreDatabase/Documents/Sync/Commit/)
+                    * [AppendArray](/examples/FirestoreDatabase/Documents/Sync/Commit/AppendArray/)
+                    * [AppendMapValue](/examples/FirestoreDatabase/Documents/Sync/Commit/AppendMapValue/)
+                    * [AppendMapValueArray](/examples/FirestoreDatabase/Documents/Sync/Commit/AppendMapValueArray/)
+                    * [AppendMapValueTimestamp](/examples/FirestoreDatabase/Documents/Sync/Commit/AppendMapValueTimestamp/)
+                    * [IncrementFieldValue](/examples/FirestoreDatabase/Documents/Sync/Commit/IncrementFieldValue/)
+                    * [SetUpdateDelete](/examples/FirestoreDatabase/Documents/Sync/Commit/SetUpdateDelete/)
+                * [CreateDocument](/examples/FirestoreDatabase/Documents/Sync/CreateDocument/)
+                * [Delete](/examples/FirestoreDatabase/Documents/Sync/Delete/)
+                * [Get](/examples/FirestoreDatabase/Documents/Sync/Get/)
+                * [List](/examples/FirestoreDatabase/Documents/Sync/List/)
+                * [ListCollectionIds](/examples/FirestoreDatabase/Documents/Sync/ListCollectionIds/)
+                * [Patch](/examples/FirestoreDatabase/Documents/Sync/Patch/)
+                    * [AppendMapValue](/examples/FirestoreDatabase/Documents/Sync/Patch/AppendMapValue/)
+                    * [UpdateDocument](/examples/FirestoreDatabase/Documents/Sync/Patch/UpdateDocument/)
+                * [RunQuery](/examples/FirestoreDatabase/Documents/Sync/RunQuery/)
+* [Messaging](/examples/Messaging/)
+    * [Async](/examples/Messaging/Async/)
+        * [Callback](/examples/Messaging/Async/Callback/)
+            * [Send](/examples/Messaging/Async/Callback/Send/)
+        * [NoCallback](/examples//Messaging/Async/NoCallback/Send/)
+            * [Send](/examples/Messaging/Async/NoCallback/Send/)
+    * [Sync](/examples/Messaging/Sync/)
+        * [Send](/examples/Messaging/Sync/Send/)
+* [RealtimeDatabase](/examples/RealtimeDatabase/)
+    * [Async](/examples/RealtimeDatabase/Async/)
+        * [Callback](/examples/RealtimeDatabase/Async/Callback/)
+            * [BLOB](/examples/RealtimeDatabase/Async/Callback/BLOB/)
+            * [File](/examples/RealtimeDatabase/Async/Callback/File/)
+            * [Get](/examples/RealtimeDatabase/Async/Callback/Get/)
+            * [OTA](/examples/RealtimeDatabase/Async/Callback/OTA/)
+            * [Push](/examples/RealtimeDatabase/Async/Callback/Push/)
+            * [Remove](/examples/RealtimeDatabase/Async/Callback/Remove/)
+            * [Set](/examples/RealtimeDatabase/Async/Callback/Set/)
+            * [Stream](/examples/RealtimeDatabase/Async/Callback/Stream/)
+            * [StreamConcurentcy](/examples/RealtimeDatabase/Async/Callback/StreamConcurentcy/)
+            * [StreamGSM](/examples/RealtimeDatabase/Async/Callback/StreamGSM/)
+            * [Update](/examples/RealtimeDatabase/Async/Callback/Update/)
+        * [NoCallback](/examples/RealtimeDatabase/Async/NoCallback/)
+            * [BLOB](/examples/RealtimeDatabase/Async/NoCallback//BLOB/)
+            * [File](/examples/RealtimeDatabase/Async/NoCallback/File/)
+            * [Get](/examples/RealtimeDatabase/Async/NoCallback/Get/)
+            * [OTA](/examples/RealtimeDatabase/Async/NoCallback/OTA/)
+            * [Push](/examples/RealtimeDatabase/Async/NoCallback/Push/)
+            * [Remove](/examples/RealtimeDatabase/Async/NoCallback/Remove/)
+            * [Set](/examples/RealtimeDatabase/Async/NoCallback/Set/)
+            * [Stream](/examples/RealtimeDatabase/Async/NoCallback/Stream/)
+            * [StreamConcurentcy](/examples/RealtimeDatabase/Async/NoCallback/StreamConcurentcy/)
+            * [StreamGSM](/examples/RealtimeDatabase/Async/NoCallback/StreamGSM/)
+            * [Update](/examples/RealtimeDatabase/Async/NoCallback/Update/)
+    * [Sync](/examples/RealtimeDatabase/Sync/)
+        * [ETAG](/examples/RealtimeDatabase/Sync/ETAG/)
+        * [Existed](/examples/RealtimeDatabase/Sync/Existed/)
+        * [FilteringData](/examples/RealtimeDatabase/Sync/FilteringData/)
+        * [Get](/examples/RealtimeDatabase/Sync/Get/)
+        * [IndexingData](/examples/RealtimeDatabase/Sync/IndexingData/)
+        * [Priority](/examples/RealtimeDatabase/Sync/Priority/)
+        * [Push](/examples/RealtimeDatabase/Sync/Push/)
+        * [Remove](/examples/RealtimeDatabase/Sync/Remove/)
+        * [SecurityRules](/examples/RealtimeDatabase/Sync/SecurityRules/)
+        * [Set](/examples/RealtimeDatabase/Sync/Set/)
+        * [Shallow](/examples/RealtimeDatabase/Sync/Shallow/)
+        * [Timestamp](/examples/RealtimeDatabase/Sync/Timestamp/)
+        * [Update](/examples/RealtimeDatabase/Sync/Update/)
+* [Storage](/examples/Storage/)
+    * [Async](/examples/Storage/Async/)
+        * [Callback](/examples/Storage/Async/Callback/)
+            * [Delete](/examples/Storage/Async/Callback/Delete/)
+            * [Download](/examples/Storage/Async/Callback/Download/)
+            * [GetMetadata](/examples/Storage/Async/Callback/GetMetadata/)
+            * [List](/examples/Storage/Async/Callback/List/)
+            * [OTA](/examples/Storage/Async/Callback/OTA/)
+            * [Upload](/examples/Storage/Async/Callback/Upload/)
+        * [NoCallback](/examples/Storage/Async/NoCallback/)
+            * [Delete](/examples/Storage/Async/NoCallback/Delete/)
+            * [Download](/examples/Storage/Async/NoCallback/Download/)
+            * [GetMetadata](/examples/Storage/Async/NoCallback/GetMetadata/)
+            * [List](/examples/Storage/Async/NoCallback/List/)
+            * [OTA](/examples/Storage/Async/NoCallback/OTA/)
+            * [Upload](/examples/Storage/Async/NoCallback/Upload/)
+    * [Sync](/examples/Storage/Sync/)
+        * [Delete](/examples/Storage/Sync/Delete/)
+        * [Download](/examples/Storage/Sync/Download/)
+        * [GetMetadata](/examples/Storage/Sync/GetMetadata/)
+        * [List](/examples/Storage/Sync/List/)
+        * [OTA](/examples/Storage/Sync/OTA/)
+        * [Upload](/examples/Storage/Sync/Upload/)
+</details>
 
-For ESP32's `FreeRTOS` task, the CPU Core 1 is recommend for safely operation. Although the async task is designed to run without blocking, the SSL/TLS handshake in SSL client is the blocking process then running the task in Core 0 may cause the wdt reset.
 
-**Example** for `Maintain Authentication and Async Operation Queue` in ESP32's `FreeRTOS` task in lambda function usage style.
+  #### The Async Example with Callback.
 
 ```cpp
+#include <Arduino.h>
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
+#include <WiFi.h>
+#elif defined(ESP8266)
+#include <ESP8266WiFi.h>
+#elif __has_include(<WiFiNINA.h>) || defined(ARDUINO_NANO_RP2040_CONNECT)
+#include <WiFiNINA.h>
+#elif __has_include(<WiFi101.h>)
+#include <WiFi101.h>
+#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
+#include <WiFiS3.h>
+#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
+#include <WiFiC3.h>
+#elif __has_include(<WiFi.h>)
+#include <WiFi.h>
+#endif
+
+#include <FirebaseClient.h>
+
+#define WIFI_SSID "WIFI_AP"
+#define WIFI_PASSWORD "WIFI_PASSWORD"
+
+#define API_KEY "Web_API_KEY"
+#define USER_EMAIL "USER_EMAIL"
+#define USER_PASSWORD "USER_PASSWORD"
+
+void asyncCB(AsyncResult &aResult);
+
+DefaultNetwork network;
+
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000);
+
+FirebaseApp app;
+
+#if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#include <WiFiClientSecure.h>
+WiFiClientSecure ssl_client;
+#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
+#include <WiFiSSLClient.h>
+WiFiSSLClient ssl_client;
+#endif
+
+using AsyncClient = AsyncClientClass;
+
+AsyncClient aClient(ssl_client, getNetwork(network));
+
+RealtimeDatabase Database;
+
+unsigned long tmo = 0;
+
 void setup()
 {
-    /////////////////////////////////////
-    // Network connection code here
-    /////////////////////////////////////
 
-    /////////////////////////////////////
-    // Authentication code here
-    /////////////////////////////////////
+    Serial.begin(115200);
 
-    auto loopTask = [](void *pvParameters)
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+    Serial.print("Connecting to Wi-Fi");
+    unsigned long ms = millis();
+    while (WiFi.status() != WL_CONNECTED)
     {
-        for (;;)
-        {
-            /////////////////////////////////////
-            // Maintain Authentication Queue
-            /////////////////////////////////////
-            app.loop();
+        Serial.print(".");
+        delay(300);
+    }
+    Serial.println();
+    Serial.print("Connected with IP: ");
+    Serial.println(WiFi.localIP());
+    Serial.println();
 
-            /////////////////////////////////////
-            // Maintain App Async Queue
-            /////////////////////////////////////
-            Database.loop();
+    Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-            if (app.ready())
-            {
-                // your other code here
-                // For non-callback stream, you can check the information that provided from AsyncResult that assigned with the asyn get function with SSE mode (HTTP Streaming)
-            }
-            vTaskDelay(10 / portTICK_PERIOD_MS);
-        }
-    };
+    Serial.println("Initializing app...");
 
-    xTaskCreatePinnedToCore(loopTask, "loopTask", 8000, NULL, 3, NULL, 1 /* must be core 1 for network task */);
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
+#endif
+
+    initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
+
+    app.getApp<RealtimeDatabase>(Database);
+
+    Database.url(DATABASE_URL);
+
 }
+
+void loop()
+{
+    // The async task handler should run inside the main loop
+    // without blocking delay or bypassing with millis code blocks.
+
+    app.loop();
+    Database.loop();
+
+    if (app.ready() && millis() - tmo > 3000)
+    {
+      
+       tmo = millis();
+       
+       // User code can be put here
+       Database.get(aClient, "/test/int", asyncCB, "someTask");
+    }
+
+}
+
+void asyncCB(AsyncResult &aResult)
+{
+    // WARNING!
+    // Do not put your codes inside the callback.
+
+    if (aResult.isEvent())
+    {
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.available())
+    {
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+    }
+}
+
 ```
 
-- ### Basic Example
+  #### The Async Example without Callback.
+
+```cpp
+#include <Arduino.h>
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
+#include <WiFi.h>
+#elif defined(ESP8266)
+#include <ESP8266WiFi.h>
+#elif __has_include(<WiFiNINA.h>) || defined(ARDUINO_NANO_RP2040_CONNECT)
+#include <WiFiNINA.h>
+#elif __has_include(<WiFi101.h>)
+#include <WiFi101.h>
+#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
+#include <WiFiS3.h>
+#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
+#include <WiFiC3.h>
+#elif __has_include(<WiFi.h>)
+#include <WiFi.h>
+#endif
+
+#include <FirebaseClient.h>
+
+#define WIFI_SSID "WIFI_AP"
+#define WIFI_PASSWORD "WIFI_PASSWORD"
+
+#define API_KEY "Web_API_KEY"
+#define USER_EMAIL "USER_EMAIL"
+#define USER_PASSWORD "USER_PASSWORD"
+
+void printResult(AsyncResult &aResult);
+
+DefaultNetwork network;
+
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000);
+
+FirebaseApp app;
+
+#if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#include <WiFiClientSecure.h>
+WiFiClientSecure ssl_client;
+#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
+#include <WiFiSSLClient.h>
+WiFiSSLClient ssl_client;
+#endif
+
+using AsyncClient = AsyncClientClass;
+
+AsyncClient aClient(ssl_client, getNetwork(network));
+
+RealtimeDatabase Database;
+
+unsigned long tmo = 0;
+
+AsyncResult aResult_no_callback;
+
+void setup()
+{
+
+    Serial.begin(115200);
+
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+    Serial.print("Connecting to Wi-Fi");
+    unsigned long ms = millis();
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.print(".");
+        delay(300);
+    }
+    Serial.println();
+    Serial.print("Connected with IP: ");
+    Serial.println(WiFi.localIP());
+    Serial.println();
+
+    Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
+
+    Serial.println("Initializing app...");
+
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
+    ssl_client.setInsecure();
+#if defined(ESP8266)
+    ssl_client.setBufferSizes(4096, 1024);
+#endif
+#endif
+
+    initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
+    
+    app.getApp<RealtimeDatabase>(Database);
+
+    Database.url(DATABASE_URL);
+
+}
+
+void loop()
+{
+    // The async task handler should run inside the main loop
+    // without blocking delay or bypassing with millis code blocks.
+    
+    app.loop();
+    Database.loop();
+
+    if (app.ready() && millis() - tmo > 3000)
+    {
+      
+       tmo = millis();
+    
+       Database.get(aClient, "/test/int", aResult_no_callback);
+    }
+    
+    // Print the task result 
+    printResult(aResult_no_callback);
+
+}
+
+void printResult(AsyncResult &aResult)
+{
+    if (aResult.isEvent())
+    {
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
+    }
+
+    if (aResult.isDebug())
+    {
+        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
+    }
+
+    if (aResult.isError())
+    {
+        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.available())
+    {
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+    }
+}
+
+```
+
+  #### The Sync Example.
 
 
 ```cpp
@@ -1437,12 +2071,17 @@ void setup()
 // User Email and password that already registerd or added in your project.
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
+#define DATABASE_URL "URL"
 
-void asyncCB(AsyncResult &aResult);
+void authHandler();
+
+void printError(int code, const String &msg);
+
+void printResult(AsyncResult &aResult);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
-UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (< 3600) */);
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
@@ -1460,16 +2099,12 @@ AsyncClient aClient(ssl_client, getNetwork(network));
 
 RealtimeDatabase Database;
 
-unsigned long tmo = 0;
+AsyncResult aResult_no_callback;
 
 void setup()
 {
 
     Serial.begin(115200);
-
-    /////////////////////////////////////
-    // Network connection
-    /////////////////////////////////////
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     Serial.print("Connecting to Wi-Fi");
@@ -1495,69 +2130,46 @@ void setup()
 #endif
 #endif
 
-    /////////////////////////////////////
-    // Authentication
-    /////////////////////////////////////
+    initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
-    app.setCallback(asyncCB);
+    authHandler();
 
-    initializeApp(aClient, app, getAuth(user_auth));
-
-    
-    /////////////////////////////////////
-    // Waits for App authenticate
-    /////////////////////////////////////
-    ms = millis();
-    while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-        ;
-    
-    /////////////////////////////////////
-    // Apply auth data to Service app
-    /////////////////////////////////////
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);
 
-    /////////////////////////////////////
-    // Call Service App
-    /////////////////////////////////////
-    if (app.ready())
-    {
-       // Set int
-       Database.set<int>(aClient, "/test/int", 12345, asyncCB);
-    }
+    Serial.println("Synchronous Get... ");
 
+    Serial.print("Get int... ");
+    int v1 = Database.get<int>(aClient, "/test/int");
+    if (aClient.lastError().code() == 0)
+        Serial.println(v1);
+    else
+        printError(aClient.lastError().code(), aClient.lastError().message());
 }
 
 void loop()
 {
-    /////////////////////////////////////
-    // Maintain Authentication Queue
-    /////////////////////////////////////
-    app.loop();
+    authHandler();
 
-    /////////////////////////////////////
-    // Maintain App Async Queue
-    /////////////////////////////////////
     Database.loop();
-
-    /////////////////////////////////////
-    // Call Service App
-    /////////////////////////////////////
-    if (app.ready() && millis() - tmo > 3000)
-    {
-      
-       tmo = millis();
-    
-       // Get int
-       Database.get(aClient, "/test/int", asyncCB);
-    }
-
 }
 
-void asyncCB(AsyncResult &aResult)
+void authHandler()
 {
-    if (aResult.appEvent().code() > 0)
+    // Blocking authentication handler with timeout
+    unsigned long ms = millis();
+    while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
+    {
+        // This JWT token process required for ServiceAuth and CustomAuth authentications
+        JWT.loop(app.getAuth());
+        printResult(aResult_no_callback);
+    }
+}
+
+void printResult(AsyncResult &aResult)
+{
+    if (aResult.isEvent())
     {
         Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }
@@ -1571,13 +2183,12 @@ void asyncCB(AsyncResult &aResult)
     {
         Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
     }
-
-    if (aResult.available())
-    {
-        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
-    }
 }
 
+void printError(int code, const String &msg)
+{
+    Firebase.printf("Error, msg: %s, code: %d\n", msg.c_str(), code);
+}
 ```
 
 The library provides the placeholder struct for boolean, integer, float with custom precision, double with custom precision and object represents JSON or map and Array to use as the input of the functions.
@@ -1592,6 +2203,21 @@ The library provides the placeholder struct for boolean, integer, float with cus
 
 There is no `JSON` serialization/deserialization class in this library unless the `JsonWriter` utility class to create the `JSON` object placeholder (`object_t`) which will be available for user and also used in the examples.
 
+- ### Firebase Client Class and Static Functions Usage
+
+    - [Class and Functions](/resources/docs/firebase_client.md).
+
+- ### Async Client Class Usage
+
+    - [Class and Functions](/resources/docs/async_client.md).
+
+- ### Firebase App Usage
+
+    - [Class and Functions](/resources/docs/firebase_app.md).
+
+- ### Async Result Usage
+
+    - [Class and Functions](/resources/docs/async_result.md).
 
 - ### Realtime Database Usage
 
@@ -1600,6 +2226,10 @@ There is no `JSON` serialization/deserialization class in this library unless th
     - [Class and Functions](/resources/docs/realtime_database.md).
 
     - [API Doc](https://firebase.google.com/docs/reference/rest/database).
+
+- ### Realtime Database Result Usage
+
+    - [Class and Functions](/resources/docs/realtime_database_result.md).
 
 - ### Google Cloud Firestore Database Usage
 
@@ -1690,7 +2320,7 @@ Under Sign-in providers, choose Email/Password.
 
 ![Authentication Select Email/Password Provider](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step1.png)
 
-Select enable check option in Email/Password section, and click `Save` button.
+Select `Enable` check option in `Email/Password` section, and click `Save` button.
 
 ![Authentication Enable Email/Password](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step2.png)
 
@@ -1705,6 +2335,8 @@ Once the `Authentication` was setup, the `Web API Key` will be generated. See th
 ![Authentication Web API Key](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step4.png)
 
 The `Web API Key` is used in all `custom token`, `ID token` authentications that used via the `CustomAuth`, `UserAuth`, `CustomToken` and `IDToken` provider classes and it was assign to the `API_KEY` in the exampless.
+
+See [API Keys Overview](https://cloud.google.com/api-keys/docs/overview) and [Authenticate by using API keys](https://cloud.google.com/docs/authentication/api-keys) for more details. 
 
 At the `Authentication` page, under `Sign-in method` tab, other Sign-in providers can be added.
 
@@ -1897,7 +2529,7 @@ firebase.initializeApp({
 });
 ```
 
-The app (iOS, Android, Web and Unity) registration token or `DEVICE_TOKEN` is a unique token string that identifies each client app instance. The registration token is required for single device and device group messaging. Note that registration tokens must be kept secret ([ref](https://firebase.google.com/docs/cloud-messaging/concept-options#credentials))
+The app (iOS, Android, Web and Unity) registration token or `DEVICE_TOKEN` is a unique token string that identifies each client app instance. The registration token is required for single device and device group messaging. Note that registration tokens must be kept secret ([Ref.](https://firebase.google.com/docs/cloud-messaging/concept-options#credentials))
 
 
 ### Service Account
@@ -2131,7 +2763,7 @@ ENABLE_GSM_NETWORK
 
 - ### Optional Options
 
-The following options are not yet defined in [**Config.h**](src/Config.h) and can be assigned by user.
+The following options are not yet defined in [**Config.h**](src/Config.h) and can be defined by user.
 
 ```cpp
 FIREBASE_ETHERNET_MODULE_LIB `"EthernetLibrary.h"` // For the Ethernet library to work with external Ethernet module

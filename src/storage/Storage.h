@@ -1,5 +1,5 @@
 /**
- * Created March 31, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -255,15 +255,15 @@ public:
      * The bucketid is the Storage bucket Id of object to get metadata.
      * The object is the object in Storage bucket to get metadata.
      *
-     * @return Boolean value, indicates the success of the operation.
+     * @return String The response payload.
      *
      */
-    bool getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
+    String getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_get_meta, false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** Get the metadata of object in Firebase Storage data bucket.
@@ -303,15 +303,15 @@ public:
      * @param parent The FirebaseStorage::Parent object included Storage bucket Id in its constructor.
      * The bucketid is the Storage bucket Id to list all objects.
      *
-     * @return Boolean value, indicates the success of the operation.
+     * @return String The response payload.
      *
      */
-    bool list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
+    String list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
     {
         AsyncResult result;
         file_config_data file;
         sendRequest(aClient, &result, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_list, false);
-        return result.lastError.code() == 0;
+        return result.c_str();
     }
 
     /** List all objects in Firebase Storage data bucket.
@@ -521,7 +521,6 @@ private:
         if (!aResult)
             aResult = new AsyncResult();
 
-        aResult->error_available = true;
         aResult->lastError.setClientError(code);
 
         if (request.cb)

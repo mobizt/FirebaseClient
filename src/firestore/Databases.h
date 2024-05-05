@@ -1,5 +1,5 @@
 /**
- * Created March 12, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -64,16 +64,16 @@ namespace Firestore
          * - bucketID is the Firebase storage bucket ID in the project.
          * - storagePath is the path in the Firebase Storage data bucket to store the exported database.
          *
-         * @return Boolean value, indicates the success of the operation.
+         * @return String The response payload.
          *
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
+        String exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
         {
             AsyncResult result;
             eximDocs(aClient, &result, NULL, "", parent, exportOptions, false, false);
-            return result.lastError.code() == 0;
+            return result.c_str();
         }
 
         /** Export the documents in the database to the Firebase Storage data bucket.
@@ -134,16 +134,16 @@ namespace Firestore
          * - bucketID is the Firebase storage bucket ID in the project.
          * - storagePath is the path in the Firebase Storage data bucket that stores the exported database.
          *
-         * @return Boolean value, indicates the success of the operation.
+         * @return String The response payload.
          *
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
+        String importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
         {
             AsyncResult result;
             eximDocs(aClient, &result, NULL, "", parent, importOptions, true, false);
-            return result.lastError.code() == 0;
+            return result.c_str();
         }
 
         /** Import the exported documents stored in the Firebase Storage data bucket.
@@ -202,16 +202,16 @@ namespace Firestore
          * The Database information should be set via the following functions befor creation.
          * concurrencyMode, appEngineIntegrationMode, deleteProtectionState, pointInTimeRecoveryEnablement, databaseType, locationId and name.
          *
-         * @return Boolean value, indicates the success of the operation.
+         * @return String The response payload.
          *
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
+        String create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, database.c_str(), "", Firestore::firestore_database_mode_create, false);
-            return result.lastError.code() == 0;
+            return result.c_str();
         }
 
         /** Create a database.
@@ -264,16 +264,16 @@ namespace Firestore
          * @param etag The current etag of the Database.
          * If an etag is provided and does not match the current etag of the database, deletion will be blocked and a FAILED_PRECONDITION error will be returned.
          *
-         * @return Boolean value, indicates the success of the operation.
+         * @return String The response payload.
          *
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
+        String deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, "", etag, Firestore::firestore_database_mode_delete, false);
-            return result.lastError.code() == 0;
+            return result.c_str();
         }
 
         /** Deletes a database.
@@ -320,16 +320,16 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * The Firestore database Id is the Id of database to get the infomation.
          *
-         * @return Boolean value, indicates the success of the operation.
+         * @return String The response payload.
          *
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool get(AsyncClientClass &aClient, const Firestore::Parent &parent)
+        String get(AsyncClientClass &aClient, const Firestore::Parent &parent)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, "", "", Firestore::firestore_database_mode_get, false);
-            return result.lastError.code() == 0;
+            return result.c_str();
         }
 
         /** Gets information about a database.
@@ -372,16 +372,16 @@ namespace Firestore
          * The Firebase project Id should be only the name without the firebaseio.com.
          * Leave the Firestore database Id to be empty for this case.
          *
-         * @return Boolean value, indicates the success of the operation.
+         * @return String The response payload.
          *
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+        String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, "", "", Firestore::firestore_database_mode_list, false);
-            return result.lastError.code() == 0;
+            return result.c_str();
         }
 
         /** List all the databases in the project.
@@ -430,16 +430,16 @@ namespace Firestore
          * The Database information should be set via the following functions befor creation.
          * concurrencyMode, appEngineIntegrationMode, deleteProtectionState, pointInTimeRecoveryEnablement, databaseType, locationId and name.
          *
-         * @return Boolean value, indicates the success of the operation.
+         * @return String The response payload.
          *
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        bool patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
+        String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
         {
             AsyncResult result;
             manageDatabase(aClient, &result, NULL, "", parent, database.c_str(), updateMask, Firestore::firestore_database_mode_patch, false);
-            return result.lastError.code() == 0;
+            return result.c_str();
         }
 
         /** Updates a database.
@@ -500,18 +500,18 @@ namespace Firestore
              * The Firestore database id should be (default) or empty "".
              * @param index The Index object that provides an index definition.
              *
-             * @return Boolean value, indicates the success of the operation.
+             * @return String The response payload.
              *
              * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/create
              *
              * This function requires ServiceAuth authentication.
              *
              */
-            bool create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
+            String create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
             {
                 AsyncResult result;
                 databaseIndexManager(aClient, &result, NULL, "", parent, index, "", false, false);
-                return result.lastError.code() == 0;
+                return result.c_str();
             }
 
             /** Creates the specified index.
@@ -561,19 +561,19 @@ namespace Firestore
              * The Firestore database id should be (default) or empty "".
              * @param indexId The index to delete.
              *
-             * @return Boolean value, indicates the success of the operation.
+             * @return String The response payload.
              *
              * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/delete
              *
              * This function requires ServiceAuth authentication.
              *
              */
-            bool deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+            String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
             {
                 AsyncResult result;
                 DatabaseIndex::Index index("");
                 databaseIndexManager(aClient, &result, NULL, "", parent, index, indexId, true, false);
-                return result.lastError.code() == 0;
+                return result.c_str();
             }
 
             /** Deletes an index.
@@ -625,19 +625,19 @@ namespace Firestore
              * The Firestore database id should be (default) or empty "".
              * @param indexId The index to get.
              *
-             * @return Boolean value, indicates the success of the operation.
+             * @return String The response payload.
              *
              * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/get
              *
              * This function requires ServiceAuth authentication.
              *
              */
-            bool get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+            String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
             {
                 AsyncResult result;
                 DatabaseIndex::Index index("");
                 databaseIndexManager(aClient, &result, NULL, "", parent, index, indexId, false, false);
-                return result.lastError.code() == 0;
+                return result.c_str();
             }
 
             /** Gets an index.
@@ -688,19 +688,19 @@ namespace Firestore
              * The Firebase project Id should be only the name without the firebaseio.com.
              * The Firestore database id should be (default) or empty "".
              *
-             * @return Boolean value, indicates the success of the operation.
+             * @return String The response payload.
              *
              * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/list
              *
              * This function requires ServiceAuth authentication.
              *
              */
-            bool list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+            String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
             {
                 AsyncResult result;
                 DatabaseIndex::Index index("");
                 databaseIndexManager(aClient, &result, NULL, "", parent, index, "", false, false);
-                return result.lastError.code() == 0;
+                return result.c_str();
             }
 
             /** Lists the indexes.

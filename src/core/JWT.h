@@ -1,5 +1,5 @@
 /**
- * Created March 25, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -71,6 +71,7 @@ namespace firebase
     class JWTClass
     {
         friend class FirebaseApp;
+        friend class FirebaseClient;
 
     private:
         Memory mem;
@@ -83,6 +84,7 @@ namespace firebase
         Timer err_timer;
         auth_data_t *auth_data = nullptr;
         bool processing = false;
+        app_debug_t *app_debug = nullptr;
 
         bool exit(bool ret)
         {
@@ -97,6 +99,8 @@ namespace firebase
         bool begin(auth_data_t *auth_data);
         bool create();
         void sendErrCB(AsyncResultCallback cb, AsyncResult *aResult = nullptr);
+        void sendErrResult(AsyncResult *refResult);
+        void setAppDebug(app_debug_t *app_debug);
 
     public:
         JWTClass();

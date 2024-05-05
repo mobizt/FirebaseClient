@@ -1,17 +1,17 @@
 /**
  * SYNTAX:
  *
- * bool status = RealtimeDatabase::update(<AsyncClient>, <path>, <object_t>);
- * 
+ * bool RealtimeDatabase::update(<AsyncClient>, <path>, <object_t>);
+ *
  * <AsyncClient> - The async client.
  * <path> - The node path to set the value.
  * <object_t> - The JSON representation data (object_t) to update.
  *
- * The sync Update function returns the boolean of operating status.
+ * This function returns bool status when task is complete.
  *
  * In case of error, the operation error information can be obtain from AsyncClient via aClient.lastError().message() and
  * aClient.lastError().code().
- * 
+ *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
@@ -45,9 +45,9 @@
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
 
-void printError(int code, const String &msg);
+void printResult(AsyncResult &aResult);
 
-void asyncCB(AsyncResult &aResult);
+void printError(int code, const String &msg);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
@@ -63,14 +63,13 @@ WiFiClientSecure ssl_client;
 WiFiSSLClient ssl_client;
 #endif
 
-// In case the keyword AsyncClient using in this example was ambigous and used by other library, you can change
-// it with other name with keyword "using" or use the class name AsyncClientClass directly.
-
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
 RealtimeDatabase Database;
+
+AsyncResult aResult_no_callback;
 
 void setup()
 {
@@ -101,15 +100,9 @@ void setup()
 #endif
 #endif
 
-    app.setCallback(asyncCB);
+    initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
-    initializeApp(aClient, app, getAuth(user_auth));
-
-    // Waits for app to be authenticated.
-    // For asynchronous operation, this blocking wait can be ignored by calling app.loop() in loop().
-    ms = millis();
-    while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-        ;
+    authHandler();
 
     app.getApp<RealtimeDatabase>(Database);
 
@@ -135,16 +128,26 @@ void setup()
 
 void loop()
 {
-    // This function is required for handling async operations and maintaining the authentication tasks.
-    app.loop();
+    authHandler();
 
-    // (For Async Only) This required when different AsyncClients than used in FirebaseApp assigned to the Realtime database functions.
     Database.loop();
 }
 
-void asyncCB(AsyncResult &aResult)
+void authHandler()
 {
-    if (aResult.appEvent().code() > 0)
+    // Blocking authentication handler with timeout
+    unsigned long ms = millis();
+    while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
+    {
+        // This JWT token process required for ServiceAuth and CustomAuth authentications
+        JWT.loop(app.getAuth());
+        printResult(aResult_no_callback);
+    }
+}
+
+void printResult(AsyncResult &aResult)
+{
+    if (aResult.isEvent())
     {
         Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
     }

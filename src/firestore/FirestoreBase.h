@@ -1,5 +1,5 @@
 /**
- * Created March 31, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -34,7 +34,7 @@ using namespace firebase;
 
 #include "./firestore/Query.h"
 
-class FirestoreBase
+class FirestoreBase : public AppBase
 {
     friend class FirebaseApp;
 
@@ -93,8 +93,8 @@ public:
             AsyncClientClass *aClient = reinterpret_cast<AsyncClientClass *>(cVec[i]);
             if (aClient)
             {
-                aClient->process(true);
-                aClient->handleRemove();
+                processBase(aClient, true);
+                handleRemoveBase(aClient);
             }
         }
     }
@@ -159,31 +159,31 @@ protected:
 
         url(FPSTR("firestore.googleapis.com"));
 
-        async_data_item_t *sData = request.aClient->createSlot(request.opt);
+        async_data_item_t *sData = createSlotBase(request.aClient, request.opt);
 
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
-        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
+        newRequestBase(request.aClient, sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
         if (request.options->payload.length())
         {
             sData->request.val[req_hndlr_ns::payload] = request.options->payload;
-            request.aClient->setContentLength(sData, request.options->payload.length());
+            setContentLengthBase(request.aClient, sData, request.options->payload.length());
         }
 
         if (request.cb)
             sData->cb = request.cb;
 
-        request.aClient->addRemoveClientVec(reinterpret_cast<uint32_t>(&(cVec)), true);
+        addRemoveClientVecBase(request.aClient, reinterpret_cast<uint32_t>(&(cVec)), true);
 
         if (request.aResult)
-            sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->rVec)));
+            sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(getRVec(request.aClient))));
 
         sData->download = request.method == async_request_handler_t::http_get && sData->request.file_data.filename.length();
-
-        request.aClient->process(sData->async);
-        request.aClient->handleRemove();
+        
+        processBase(request.aClient, sData->async);
+        handleRemoveBase(request.aClient);
     }
 
     void addParams(async_request_data_t &request, String &extras)
@@ -200,7 +200,6 @@ protected:
         if (!aResult)
             aResult = new AsyncResult();
 
-        aResult->error_available = true;
         aResult->lastError.setClientError(code);
 
         if (request.cb)

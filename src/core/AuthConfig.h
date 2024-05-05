@@ -1,5 +1,5 @@
 /**
- * Created April 24, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -544,6 +544,7 @@ namespace firebase
         bool initialized = false;
         bool jwt_signing = false;
         bool jwt_loop = false;
+        bool jwt_time_debug = false;
         uint32_t jwt_ts = 0;
         auth_token_type auth_type = auth_unknown_token;
         user_auth_data_type auth_data_type = user_auth_data_undefined;
@@ -1358,6 +1359,7 @@ namespace firebase
         user_auth_data user_auth;
         app_token_t app_token;
         AsyncResultCallback cb;
+        AsyncResult *refResult = nullptr;
     };
 
 };

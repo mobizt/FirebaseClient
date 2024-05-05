@@ -34,7 +34,7 @@ void loop()
 ```
 
 
-2. ## 🔹  bool create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function)
+2. ## 🔹  String create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function)
 
 If a function with the given name already exists in the specified project,
 the long running operation will return ALREADY_EXISTS error.
@@ -48,7 +48,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function)
+String create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function)
 ```
 
 **Params:**
@@ -60,7 +60,7 @@ bool create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &paren
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 3. ## 🔹  void create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResult &aResult)
 
@@ -115,7 +115,7 @@ void create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &paren
 - `uid` - The user specified UID of async result (optional).
 
 
-5. ## 🔹  bool patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask)
+5. ## 🔹  String patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask)
 
 If a function with the given name already exists in the specified project,
 the long running operation will return ALREADY_EXISTS error.
@@ -130,7 +130,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask)
+String patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask)
 ```
 
 **Params:**
@@ -143,7 +143,7 @@ bool patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 6. ## 🔹  void patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask, AsyncResult &aResult)
 
@@ -202,7 +202,7 @@ void patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent
 - `uid` - The user specified UID of async result (optional).
 
 
-8. ## 🔹  bool deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+8. ## 🔹  String deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
 
 
 The Firebase project Id should be only the name without the firebaseio.com.
@@ -214,7 +214,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+String deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
 ```
 
 **Params:**
@@ -225,7 +225,7 @@ bool deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Paren
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 9. ## 🔹  void deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, AsyncResult &aResult)
 
@@ -274,7 +274,7 @@ void deleteFunction(AsyncClientClass &aClient, const GoogleCloudFunctions::Paren
 - `uid` - The user specified UID of async result (optional).
 
 
-11. ## 🔹  bool list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions)
+11. ## 🔹  String list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions)
 
 
 The Firebase project Id should be only the name without the firebaseio.com.
@@ -286,7 +286,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions)
+String list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions)
 ```
 
 **Params:**
@@ -297,7 +297,7 @@ bool list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent,
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 12. ## 🔹  void list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, GoogleCloudFunctions::ListOptions &listOptions, AsyncResult &aResult)
 
@@ -346,7 +346,7 @@ void list(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent,
 - `uid` - The user specified UID of async result (optional).
 
 
-14. ## 🔹  bool get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+14. ## 🔹  String get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
 
 
 The Firebase project Id should be only the name without the firebaseio.com.
@@ -358,7 +358,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+String get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
 ```
 
 **Params:**
@@ -369,7 +369,7 @@ bool get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, 
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 15. ## 🔹  void get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, AsyncResult &aResult)
 
@@ -418,7 +418,7 @@ void get(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, 
 - `uid` - The user specified UID of async result (optional).
 
 
-17. ## 🔹  bool call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload)
+17. ## 🔹  String call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload)
 
 
 The Firebase project Id should be only the name without the firebaseio.com.
@@ -430,7 +430,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload)
+String call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload)
 ```
 
 **Params:**
@@ -442,7 +442,7 @@ bool call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent,
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 18. ## 🔹  void call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const String &payload, AsyncResult &aResult)
 
@@ -493,7 +493,7 @@ void call(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent,
 - `uid` - The user specified UID of async result (optional).
 
 
-20. ## 🔹  bool generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+20. ## 🔹  String generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
 
 
 The Firebase project Id should be only the name without the firebaseio.com.
@@ -505,7 +505,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
+String generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId)
 ```
 
 **Params:**
@@ -516,7 +516,7 @@ bool generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 21. ## 🔹  void generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, AsyncResult &aResult)
 
@@ -565,7 +565,7 @@ void generateDownloadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::
 - `uid` - The user specified UID of async result (optional).
 
 
-23. ## 🔹  bool generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options)
+23. ## 🔹  String generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options)
 
 
 The Firebase project Id should be only the name without the firebaseio.com.
@@ -577,7 +577,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options)
+String generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options)
 ```
 
 **Params:**
@@ -589,7 +589,7 @@ bool generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Pa
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 24. ## 🔹  void generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options, AsyncResult &aResult)
 
@@ -640,7 +640,7 @@ void generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Pa
 - `uid` - The user specified UID of async result (optional).
 
 
-26. ## 🔹  bool getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options)
+26. ## 🔹  String getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options)
 
 
 The Firebase project Id should be only the name without the firebaseio.com.
@@ -652,7 +652,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options)
+String getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options)
 ```
 
 **Params:**
@@ -664,7 +664,7 @@ bool getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent 
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 27. ## 🔹  void getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options, AsyncResult &aResult)
 
@@ -715,7 +715,7 @@ void getIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent 
 - `uid` - The user specified UID of async result (optional).
 
 
-29. ## 🔹  bool setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options)
+29. ## 🔹  String setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options)
 
 Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
 
@@ -728,7 +728,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options)
+String setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options)
 ```
 
 **Params:**
@@ -740,7 +740,7 @@ bool setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent 
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 30. ## 🔹  void setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options, AsyncResult &aResult)
 
@@ -793,7 +793,7 @@ void setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent 
 - `uid` - The user specified UID of async result (optional).
 
 
-32. ## 🔹  bool testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions)
+32. ## 🔹  String testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions)
 
 
 The Firebase project Id should be only the name without the firebaseio.com.
@@ -806,7 +806,7 @@ This function requires OAuth2.0 authentication.
 
 
 ```cpp
-bool testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions)
+String testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions)
 ```
 
 **Params:**
@@ -818,7 +818,7 @@ bool testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::P
 
 **Returns:**
 
-- Boolean type status indicates the success of the operation.
+- `String` - The response payload.
 
 33. ## 🔹  void testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions, AsyncResult &aResult)
 

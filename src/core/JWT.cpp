@@ -1,5 +1,5 @@
 /**
- * Created March 25, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -74,6 +74,7 @@ void JWTClass::clear()
     {
         this->auth_data->user_auth.sa.step = jwt_step_begin;
         this->auth_data->user_auth.jwt_ts = 0;
+        this->auth_data->user_auth.jwt_time_debug = false;
     }
     processing = false;
 }
@@ -90,7 +91,12 @@ bool JWTClass::loop(auth_data_t *auth_data)
         if (ret)
             ret = create();
         if (!ret)
-            sendErrCB(auth_data ? auth_data->cb : NULL, nullptr);
+        {
+            if (auth_data->refResult)
+                sendErrResult(auth_data->refResult);
+            else
+                sendErrCB(auth_data ? auth_data->cb : NULL, nullptr);
+        }
         return ret;
     }
     return false;
@@ -106,8 +112,7 @@ void JWTClass::sendErrCB(AsyncResultCallback cb, AsyncResult *aResult)
             bool hasRes = aResult != nullptr;
             if (!hasRes)
                 aResult = new AsyncResult();
-            aResult->error_available = true;
-            aResult->lastError.setLastError(jwt_data.err_code, jwt_data.msg);
+            aResult->error().setLastError(jwt_data.err_code, jwt_data.msg);
             cb(*aResult);
             if (!hasRes)
             {
@@ -116,6 +121,17 @@ void JWTClass::sendErrCB(AsyncResultCallback cb, AsyncResult *aResult)
             }
         }
     }
+}
+
+void JWTClass::sendErrResult(AsyncResult *refResult)
+{
+    if (refResult)
+        refResult->error().setLastError(jwt_data.err_code, jwt_data.msg);
+}
+
+void JWTClass::setAppDebug(app_debug_t *app_debug)
+{
+    this->app_debug = app_debug;
 }
 
 bool JWTClass::begin(auth_data_t *auth_data)
@@ -144,7 +160,16 @@ bool JWTClass::create()
 
         uint32_t now = 0;
         if (auth_data->user_auth.timestatus_cb)
+        {
+
+            if (app_debug && !auth_data->user_auth.jwt_time_debug)
+            {
+                auth_data->user_auth.jwt_time_debug = true;
+                app_debug->setDebug(FPSTR("Getting current time..."));
+                return exit(false);
+            }
             auth_data->user_auth.timestatus_cb(now);
+        }
 
         if (now < FIREBASE_DEFAULT_TS)
         {

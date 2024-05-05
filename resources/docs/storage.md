@@ -219,7 +219,7 @@ void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, Async
 - `uid` - The user specified UID of async result (optional).
 
 
-12. ## 🔹  bool getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
+12. ## 🔹  String getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
 
 
 The bucketid is the Storage bucket Id of object to get metadata.
@@ -228,7 +228,7 @@ The object is the object in Storage bucket to get metadata.
 
 
 ```cpp
-bool getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
+String getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
 ```
 
 **Params:**
@@ -238,7 +238,7 @@ bool getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &paren
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 13. ## 🔹  void getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult)
 
@@ -277,7 +277,7 @@ void getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &paren
 - `uid` - The user specified UID of async result (optional).
 
 
-15. ## 🔹  bool list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
+15. ## 🔹  String list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
 
 
 The bucketid is the Storage bucket Id to list all objects.
@@ -285,7 +285,7 @@ The bucketid is the Storage bucket Id to list all objects.
 
 
 ```cpp
-bool list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
+String list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
 ```
 
 **Params:**
@@ -295,7 +295,7 @@ bool list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
 
 **Returns:**
 
-- Boolean value, indicates the success of the operation.
+- `String` - The response payload.
 
 16. ## 🔹  void list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult)
 

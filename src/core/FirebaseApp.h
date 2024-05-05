@@ -1,5 +1,5 @@
 /**
- * Created April 13, 2024
+ * Created May 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -28,18 +28,20 @@
 #include "./Config.h"
 #include "./core/AuthConfig.h"
 #include "./core/AsyncClient/AsyncClient.h"
+#include "./core/AsyncResult/ResultBase.h"
 #include "./core/List.h"
 #if defined(ENABLE_JWT)
 #include "./core/JWT.h"
 #endif
 #include "./core/Timer.h"
+#include "./core/AppBase.h"
 
 namespace firebase
 {
 
     static JWTClass JWT;
 
-    class FirebaseApp
+    class FirebaseApp : public AppBase, public ResultBase
     {
         friend class RealtimeDatabase;
         friend class FirebaseClient;
@@ -60,7 +62,9 @@ namespace firebase
         std::vector<uint32_t> aVec; // FirebaseApp vector
         std::vector<uint32_t> cVec; // AsyncClient vector
         AsyncResultCallback resultCb = NULL;
-        Timer req_timer, auth_timer, err_timer;
+        AsyncResult *refResult = nullptr;
+        uint32_t ref_result_addr = 0;
+        Timer req_timer, auth_timer, err_timer, app_ready_timer;
         List vec;
         bool processing = false;
         uint32_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
@@ -73,8 +77,7 @@ namespace firebase
 
         void setLastError(AsyncResult *aResult, int code, const String &message)
         {
-            if (aResult)
-                aResult->lastError.setLastError(code, message);
+            setLastErrorBase(aResult, code, message);
         }
 
 #endif
@@ -207,7 +210,7 @@ namespace firebase
                 auth_timer.stop();
             }
 
-            setEventResult(sData ? &sData->aResult : nullptr, auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
+            setEventResult(sData ? &sData->aResult : getRefResult(), auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
 
             if (event == auth_event_error || event == auth_event_ready)
             {
@@ -221,8 +224,7 @@ namespace firebase
 
         void clearLastError(AsyncResult *aResult)
         {
-            if (aResult)
-                aResult->lastError.setLastError(0, "");
+            clearLastErrorBase(aResult);
         }
 
         void setEventResult(AsyncResult *aResult, const String &msg, int code)
@@ -230,14 +232,27 @@ namespace firebase
             // If aResult was not initiated, create and send temporary result to callback
             bool isRes = aResult != nullptr;
 
+            // Set uid from user defined async result.
+            if (getRefResult())
+                uid = refResult->uid();
+
             if (!isRes)
             {
                 aResult = new AsyncResult();
-                // Store the default uid;
-                uid = aResult->uid();
+                resultSetEvent(aResult, getAppEvent(aClient));
+                resultSetDebug(aResult, getAppDebug(aClient));
+
+                // Store the uid;
+                if (uid.length() == 0)
+                    uid = aResult->uid();
+                else
+                    setResultUID(aResult, uid);
             }
 
-            aResult->app_event.setEvent(code, msg);
+            if (!getRefResult())
+                resetEvent(*getAppEvent(aClient));
+
+            setEventBase(*getAppEvent(aClient), code, msg);
 
             if (resultCb)
                 resultCb(*aResult);
@@ -267,7 +282,26 @@ namespace firebase
         void createSlot(AsyncClientClass *aClient, slot_options_t &soption)
         {
             if (aClient)
-                sData = aClient->createSlot(soption);
+                sData = createSlotBase(aClient, soption);
+        }
+
+        AsyncResult *getRefResult()
+        {
+            List vec;
+            return aClient && vec.existed(getRVec(aClient), ref_result_addr) ? refResult : nullptr;
+        }
+
+        void setRefResult(AsyncResult *refResult, uint32_t rvec_addr)
+        {
+            this->refResult = refResult;
+            ref_result_addr = reinterpret_cast<uint32_t>(refResult);
+            setRVec(this->refResult, rvec_addr);
+            if (rvec_addr > 0)
+            {
+                std::vector<uint32_t> *rVec = reinterpret_cast<std::vector<uint32_t> *>(rvec_addr);
+                List vec;
+                vec.addRemoveList(*rVec, ref_result_addr, true);
+            }
         }
 
         void newRequest(AsyncClientClass *aClient, slot_options_t &soption, const String &subdomain, const String &extras, AsyncResultCallback resultCb, const String &uid = "")
@@ -280,13 +314,15 @@ namespace firebase
             if (sData)
             {
                 addGAPIsHost(host, subdomain.c_str());
-                aClient->newRequest(sData, host, extras, "", async_request_handler_t::http_post, soption, uid);
+                newRequestBase(aClient, sData, host, extras, "", async_request_handler_t::http_post, soption, uid);
 
                 addContentTypeHeader(sData->request.val[req_hndlr_ns::header], "application/json");
-                aClient->setContentLength(sData, sData->request.val[req_hndlr_ns::payload].length());
+                setContentLengthBase(aClient, sData, sData->request.val[req_hndlr_ns::payload].length());
                 req_timer.feed(FIREBASE_TCP_READ_TIMEOUT_SEC);
-                slot = aClient->slotCount() - 1;
-                sData->aResult.setDebug(FPSTR("Connecting to server..."));
+                slot = slotCountBase(aClient) - 1;
+
+                setDebugBase(*getAppDebug(aClient), FPSTR("Connecting to server..."));
+
                 if (resultCb)
                     resultCb(sData->aResult);
             }
@@ -297,8 +333,8 @@ namespace firebase
             if (!aClient)
                 return;
 
-            aClient->process(true);
-            aClient->handleRemove();
+            processBase(aClient, true);
+            handleRemoveBase(aClient);
         }
 
         // Stop client and remove slot
@@ -307,11 +343,11 @@ namespace firebase
             if (!aClient)
                 return;
 
-            aClient->stop(sData);
+            stopAsync(aClient, sData);
 
             if (sData)
             {
-                aClient->removeSlot(slot, false);
+                removeSlotBase(aClient, slot, false);
                 if (sData)
                     delete sData;
                 sData = nullptr;
@@ -327,6 +363,9 @@ namespace firebase
 
             if (!getClient())
                 return false;
+
+            updateDebug(*getAppDebug(aClient));
+            updateEvent(*getAppEvent(aClient));
 
             process(aClient, sData ? &sData->aResult : nullptr, resultCb);
 
@@ -353,7 +392,10 @@ namespace firebase
                 err_timer.feed(3);
                 JWT.jwt_data.err_code = FIREBASE_ERROR_JWT_CREATION_REQUIRED;
                 JWT.jwt_data.msg = "JWT process has not begun";
-                JWT.sendErrCB(auth_data.cb, nullptr);
+                if (getRefResult())
+                    JWT.sendErrResult(auth_data.refResult);
+                else
+                    JWT.sendErrCB(auth_data.cb, nullptr);
             }
 
             if (auth_data.user_auth.status._event == auth_event_uninitialized && err_timer.remaining() > 0)
@@ -408,8 +450,8 @@ namespace firebase
                     // Remove all slots except sse in case ServiceAuth and CustomAuth to free up memory.
                     if (getClient())
                     {
-                        for (size_t i = aClient->slotCount() - 1; i == 0; i--)
-                            aClient->removeSlot(i, false);
+                        for (size_t i = slotCountBase(aClient) - 1; i == 0; i--)
+                            removeSlotBase(aClient, i, false);
 
                         createSlot(aClient, sop);
                     }
@@ -546,8 +588,9 @@ namespace firebase
                 }
             }
 
-            if (auth_data.user_auth.status._event == auth_event_auth_request_sent)
+            if (auth_data.user_auth.status._event == auth_event_auth_request_sent || auth_data.user_auth.status._event == auth_event_auth_response_received)
             {
+                // token_ready = false;
                 sys_idle();
 
                 if (sData && ((sData->response.payloadLen > 0 && sData->aResult.error().code() != 0) || req_timer.remaining() == 0))
@@ -560,8 +603,12 @@ namespace firebase
 
                 if (sData && sData->response.auth_data_available)
                 {
-
-                    setEvent(auth_event_auth_response_received);
+                    if (auth_data.user_auth.status._event != auth_event_auth_response_received)
+                    {
+                        setEvent(auth_event_auth_response_received);
+                        if (getRefResult())
+                            return false;
+                    }
 
                     if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user || auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email || auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
                     {
@@ -583,10 +630,11 @@ namespace firebase
                         auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         auth_data.app_token.authenticated = true;
                         if (getClient())
-                            aClient->setAuthTs(millis());
+                            setAuthTsBase(aClient, millis());
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
                         setEvent(auth_event_ready);
+                        app_ready_timer.feed(1);
                     }
                     else
                     {
@@ -594,6 +642,10 @@ namespace firebase
                     }
                 }
             }
+
+            // Defer the ready status to allow the remaining information to be read or printed inside the waiting loop.
+            if (auth_data.user_auth.status._event == auth_event_ready && auth_data.app_token.authenticated && app_ready_timer.remaining() > 0)
+                return false;
 
             return true;
         }
@@ -604,6 +656,7 @@ namespace firebase
             app_addr = reinterpret_cast<uint32_t>(this);
             vec.addRemoveList(aVec, app_addr, true);
         };
+
         ~FirebaseApp()
         {
             if (sData)
@@ -612,8 +665,16 @@ namespace firebase
             vec.addRemoveList(aVec, app_addr, false);
         };
 
+        /**
+         * Get the app initialization status.
+         *
+         * @return bool Return true if initialized.
+         */
         bool isInitialized() const { return auth_data.user_auth.initialized; }
 
+        /**
+         * The authentication/authorization handler.
+         */
         void loop()
         {
             auth_data.user_auth.jwt_loop = true;
@@ -621,29 +682,100 @@ namespace firebase
             auth_data.user_auth.jwt_loop = false;
         }
 
+        /**
+         * Get the authentication/autorization process status.
+         *
+         * @return bool Return true if the auth process was finished. Returns false if isExpired() returns true.
+         */
         bool ready() { return processAuth() && auth_data.app_token.authenticated; }
 
+        /**
+         * Appy the authentication/authorization credentials to the Firebase services app.
+         *
+         * @param app The Firebase services calss object e.g. RealtimeDatabase, Storage, Messaging, CloudStorage and CloudFunctions.
+         */
         template <typename T>
         void getApp(T &app) { app.setApp(app_addr, &auth_data.app_token, reinterpret_cast<uint32_t>(&aVec)); }
 
+        /**
+         * Get the auth token.
+         *
+         * @return String of auth tokens based on the authentication/authoeization e.g. ID token and access token.
+         */
         String getToken() const { return auth_data.app_token.val[app_tk_ns::token]; }
 
+        /**
+         * Get the refresh token.
+         *
+         * @return String of refresh token after user sign in or authorization using ID token.
+         */
         String getRefreshToken() const { return auth_data.app_token.val[app_tk_ns::refresh]; }
 
+        /**
+         * Get unique identifier.
+         *
+         * @return String of unique identifier after user sign in or authorization using ID token.
+         */
         String getUid() const { return auth_data.app_token.val[app_tk_ns::uid]; }
 
+        /**
+         * Get the authentication status since app initialized.
+         *
+         * @return bool Return true once authenticated since initialized. It will reset when app re-initialized and user management task was executed.
+         */
         bool isAuthenticated() const { return auth_data.app_token.authenticated; }
 
+        /**
+         * Get the auth token expiration status.
+         *
+         * @return bool Return true if auth token was expired upon the expire period setup.
+         */
         bool isExpired() { return auth_timer.remaining() == 0; }
 
+        /**
+         * Get the remaining time to live of token until expired.
+         *
+         * @return integer value of ttl.
+         */
         unsigned long ttl() { return auth_timer.remaining(); }
 
+        /**
+         * Set the async result callback function.
+         *
+         * @param cb The async result callback function (AsyncResultCallback).
+         */
         void setCallback(AsyncResultCallback cb)
         {
             this->resultCb = cb;
             auth_data.cb = cb;
         }
 
+        /**
+         * Set the async result class object.
+         *
+         * @param aResult The async result class object (AsyncResult).
+         */
+        void setAsyncResult(AsyncResult &aResult)
+        {
+            refResult = &aResult;
+            auth_data.refResult = &aResult;
+        }
+
+        /**
+         * Set the UID for authentication task.
+         *
+         * @param uid The unique identifier for the authentication task.
+         *
+         * The UID will be applied when used with the async result callback only.
+         * The async result object set via initializeApp and FirebaseApp::setAsyncResult will not take effect.
+         */
+        void setUID(const String &uid) { this->uid = uid; }
+
+        /**
+         * Get the pointer to the internal auth data.
+         *
+         * @return auth_data_t* The pointer to internal auth data.
+         */
         auth_data_t *getAuth() { return &auth_data; }
     };
 };

@@ -279,6 +279,7 @@ isAuthenticated KEYWORD2
 isExpired   KEYWORD2
 ttl KEYWORD2
 setCallback KEYWORD2
+setAsyncResult  KEYWORD2
 getAuth KEYWORD2
 join    KEYWORD2
 setDebugLevel   KEYWORD2
@@ -287,6 +288,7 @@ setBufferSizes  KEYWORD2
 setInsecure KEYWORD2
 setSyncSendTimeout  KEYWORD2
 setSyncReadTimeout  KEYWORD2
+taskCount   KEYWORD2
 
 ###################
 # Struct (KEYWORD3)
