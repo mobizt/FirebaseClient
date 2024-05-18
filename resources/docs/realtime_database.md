@@ -880,7 +880,7 @@ class RealtimeDatabase
 
     Filtering response payload for SSE mode (HTTP Streaming).
 
-    This is optional option to allow specific events filtering.
+    This is optional to allow specific events filtering.
 
     The following event keywords are supported.
     

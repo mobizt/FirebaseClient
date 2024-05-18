@@ -869,6 +869,8 @@ public:
      * Filtering response payload for SSE mode (HTTP Streaming).
      * @param filter The event keywords for filtering.
      * 
+     * This is optional to allow specific events filtering.
+     * 
      * The following event keywords are supported.
      * get - Allow the http get response (first put event since stream connected).
      * put - Allow the put event.
