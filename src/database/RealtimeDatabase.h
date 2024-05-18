@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -88,10 +88,9 @@ public:
     template <typename T = int>
     auto get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
     {
-        AsyncResult result;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL);
         asyncRequest(aReq);
-        return result.rtdbResult.to<T>();
+        return aClient.getResult()->rtdbResult.to<T>();
     }
 
     /**
@@ -136,10 +135,9 @@ public:
     template <typename T = int>
     auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
     {
-        AsyncResult result;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, false, false, options.shallow), &options, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, false, false, options.shallow), &options, nullptr, aClient.getResult(), NULL);
         asyncRequest(aReq);
-        return result.rtdbResult.to<T>();
+        return aClient.getResult()->rtdbResult.to<T>();
     }
 
     /**
@@ -275,7 +273,7 @@ public:
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param aResult The async result (AsyncResult)
      */
-    void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, &file, &aResult, NULL);
         asyncRequest(aReq);
@@ -323,7 +321,7 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
@@ -343,12 +341,11 @@ public:
      */
     bool existed(AsyncClientClass &aClient, const String &path)
     {
-        AsyncResult result;
         DatabaseOptions options;
         options.silent = true;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), &options, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), &options, nullptr, aClient.getResult(), NULL);
         asyncRequest(aReq);
-        return !getNullETagOption(&result.rtdbResult);
+        return !getNullETagOption(&aClient.getResult()->rtdbResult);
     }
 
     /**
@@ -414,8 +411,7 @@ public:
     template <typename T = const char *>
     bool set(AsyncClientClass &aClient, const String &path, T value)
     {
-        AsyncResult result;
-        return storeAsync(aClient, path, value, async_request_handler_t::http_put, false, &result, NULL, "");
+        return storeAsync(aClient, path, value, async_request_handler_t::http_put, false, aClient.getResult(), NULL, "");
     }
 
     /**
@@ -508,7 +504,7 @@ public:
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param aResult The async result (AsyncResult)
      */
-    void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
@@ -554,7 +550,7 @@ public:
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      */
-    void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
@@ -584,12 +580,11 @@ public:
     String push(AsyncClientClass &aClient, const String &path, T value)
     {
         ValueConverter vcon;
-        AsyncResult result;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(), nullptr, nullptr, &result, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL);
         asyncRequest(aReq, payload.c_str());
-        return result.rtdbResult.name();
+        return aClient.getResult()->rtdbResult.name();
     }
 
     /**
@@ -691,7 +686,7 @@ public:
      * @param aResult The async result (AsyncResult)
      *
      */
-    void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+    void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
@@ -736,7 +731,7 @@ public:
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      *
      */
-    void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+    void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
@@ -758,8 +753,7 @@ public:
     template <typename T = object_t>
     bool update(AsyncClientClass &aClient, const String &path, const T &value)
     {
-        AsyncResult result;
-        return storeAsync(aClient, path, value, async_request_handler_t::http_patch, false, &result, NULL, "");
+        return storeAsync(aClient, path, value, async_request_handler_t::http_patch, false, aClient.getResult(), NULL, "");
     }
 
     /**
@@ -813,10 +807,9 @@ public:
      */
     bool remove(AsyncClientClass &aClient, const String &path)
     {
-        AsyncResult result;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(), nullptr, nullptr, &result, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(), nullptr, nullptr, aClient.getResult(), nullptr);
         asyncRequest(aReq);
-        return getNullETagOption(&result.rtdbResult) && String(result.rtdbResult.data()).indexOf("null") > -1;
+        return getNullETagOption(&aClient.getResult()->rtdbResult) && String(aClient.getResult()->rtdbResult.data()).indexOf("null") > -1;
     }
 
     /**

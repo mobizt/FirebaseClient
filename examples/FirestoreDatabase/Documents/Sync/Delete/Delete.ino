@@ -99,7 +99,6 @@ void setup()
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     Serial.print("Connecting to Wi-Fi");
-    unsigned long ms = millis();
     while (WiFi.status() != WL_CONNECTED)
     {
         Serial.print(".");
@@ -126,6 +125,10 @@ void setup()
     authHandler();
 
     app.getApp<Firestore::Documents>(Docs);
+
+    // In case setting the external async result to the sync task (optional)
+    // To unset, use unsetAsyncResult().
+    aClient.setAsyncResult(aResult_no_callback);
 }
 
 void loop()
@@ -149,11 +152,16 @@ void loop()
 
             Document<Values::Value> doc("myDouble", Values::Value(Values::DoubleValue(123.456)));
 
-            Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB);
+            String payload = Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc);
+
+            if (aClient.lastError().code() == 0)
+                Serial.println(payload);
+            else
+                printError(aClient.lastError().code(), aClient.lastError().message());
 
             Serial.println("Delete a document... ");
 
-            String payload = Docs.deleteDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */);
+            payload = Docs.deleteDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */);
 
             if (aClient.lastError().code() == 0)
                 Serial.println(payload);

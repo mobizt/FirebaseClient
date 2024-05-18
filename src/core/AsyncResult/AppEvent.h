@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -56,7 +56,7 @@ namespace firebase
         {
             for (int i = evntVec.size() - 1; i >= 0; i--)
             {
-                if (evntVec[i].read || millis() - evntVec[i].ts > 3000)
+                if (evntVec[i].read || millis() - evntVec[i].ts > 30000)
                     evntVec.erase(evntVec.begin() + i);
             }
 
@@ -72,6 +72,7 @@ namespace firebase
 
         void setEvent(int code, const String &msg)
         {
+            
             if (code == 0 || last == code)
                 return;
 

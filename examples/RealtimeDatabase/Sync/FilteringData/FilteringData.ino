@@ -98,6 +98,10 @@ void setup()
 
     Database.url(DATABASE_URL);
 
+    // In case setting the external async result to the sync task (optional)
+    // To unset, use unsetAsyncResult().
+    aClient.setAsyncResult(aResult_no_callback);
+
     // For Filtering data doc, please see https://firebase.google.com/docs/database/rest/retrieve-data#section-rest-filtering
     Serial.print("Filtering data... ");
 

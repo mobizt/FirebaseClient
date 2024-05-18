@@ -1,5 +1,5 @@
 /**
- * Created March 31, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -109,11 +109,10 @@ public:
      * @return Boolean value, indicates the success of the operation.
      *
      */
-    bool download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::GetOptions &options)
+    bool download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::GetOptions &options)
     {
-        AsyncResult result;
-        sendRequest(aClient, &result, NULL, "", parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download, false);
-        return result.lastError.code() == 0;
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, &file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download, false);
+        return aClient.getResult()->lastError.code() == 0;
     }
 
     /** Download object from the Google Cloud Storage.
@@ -128,9 +127,9 @@ public:
      * @param aResult The async result (AsyncResult).
      *
      */
-    void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
+    void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
     {
-        sendRequest(aClient, &aResult, NULL, "", parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, &file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download, true);
     }
 
     /** Download object from the Google Cloud Storage.
@@ -146,9 +145,9 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
+    void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
-        sendRequest(aClient, nullptr, cb, uid, parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, &file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download, true);
     }
 
     /** Upload file to the Google Cloud Storage.
@@ -165,11 +164,10 @@ public:
      * @return Boolean value, indicates the success of the operation.
      *
      */
-    bool upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::uploadOptions &options)
+    bool upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::uploadOptions &options)
     {
-        AsyncResult result;
-        sendRequest(aClient, &result, NULL, "", parent, file, nullptr, &options, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_uploads, false);
-        return result.lastError.code() == 0;
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, &file, nullptr, &options, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_uploads, false);
+        return aClient.getResult()->lastError.code() == 0;
     }
 
     /** Upload file to the Google Cloud Storage.
@@ -186,9 +184,9 @@ public:
      *
      *
      */
-    void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::uploadOptions &options, AsyncResult &aResult)
+    void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::uploadOptions &options, AsyncResult &aResult)
     {
-        sendRequest(aClient, &aResult, NULL, "", parent, file, nullptr, &options, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_uploads, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, &file, nullptr, &options, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_uploads, true);
     }
 
     /** Upload file to the Google Cloud Storage.
@@ -205,9 +203,9 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::uploadOptions &options, AsyncResultCallback cb, const String &uid = "")
+    void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::uploadOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
-        sendRequest(aClient, nullptr, cb, uid, parent, file, nullptr, &options, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_uploads, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, &file, nullptr, &options, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_uploads, true);
     }
 
     /** Perform OTA update using a firmware (object) from the Google Cloud Storage.
@@ -224,10 +222,8 @@ public:
      */
     bool ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options)
     {
-        AsyncResult result;
-        file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download_ota, false);
-        return result.lastError.code() == 0;
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download_ota, false);
+        return aClient.getResult()->lastError.code() == 0;
     }
 
     /** Perform OTA update using a firmware (object) from the Google Cloud Storage.
@@ -243,8 +239,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
     {
-        file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download_ota, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download_ota, true);
     }
 
     /** Perform OTA update using a firmware (object) from the Google Cloud Storage.
@@ -261,8 +256,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
-        file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download_ota, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_download_ota, true);
     }
 
     /** Get the metadata of object in Google Cloud Storage data bucket.
@@ -279,10 +273,8 @@ public:
      */
     String getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options)
     {
-        AsyncResult result;
-        file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_get_meta, false);
-        return result.c_str();
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_get_meta, false);
+        return aClient.getResult()->c_str();
     }
 
     /** Get the metadata of object in Google Cloud Storage data bucket.
@@ -298,8 +290,7 @@ public:
      */
     void getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
     {
-        file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_get_meta, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_get_meta, true);
     }
 
     /** Get the metadata of object in Google Cloud Storage data bucket.
@@ -316,8 +307,8 @@ public:
      */
     void getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
-        file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_get_meta, true);
+        // file_config_data file;
+        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_get_meta, true);
     }
 
     /** List all objects in Google Cloud Storage data bucket.
@@ -332,10 +323,8 @@ public:
      */
     String list(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::ListOptions &options)
     {
-        AsyncResult result;
-        file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, nullptr, nullptr, &options, GoogleCloudStorage::google_cloud_storage_request_type_list, false);
-        return result.c_str();
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, nullptr, nullptr, &options, GoogleCloudStorage::google_cloud_storage_request_type_list, false);
+        return aClient.getResult()->c_str();
     }
 
     /** List all objects in Google Cloud Storage data bucket.
@@ -350,8 +339,7 @@ public:
      */
     void list(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::ListOptions &options, AsyncResult &aResult)
     {
-        file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, nullptr, nullptr, &options, GoogleCloudStorage::google_cloud_storage_request_type_list, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, nullptr, nullptr, &options, GoogleCloudStorage::google_cloud_storage_request_type_list, true);
     }
 
     /** List all objects in Google Cloud Storage data bucket.
@@ -367,8 +355,7 @@ public:
      */
     void list(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::ListOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
-        file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, nullptr, nullptr, &options, GoogleCloudStorage::google_cloud_storage_request_type_list, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, nullptr, nullptr, &options, GoogleCloudStorage::google_cloud_storage_request_type_list, true);
     }
 
     /** Delete the object in Google Cloud Storage data bucket.
@@ -385,10 +372,8 @@ public:
      */
     bool deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::DeleteOptions options)
     {
-        AsyncResult result;
-        file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_delete, false);
-        return result.lastError.code() == 0;
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_delete, false);
+        return aClient.getResult()->lastError.code() == 0;
     }
 
     /** Delete the object in Google Cloud Storage data bucket.
@@ -404,8 +389,7 @@ public:
      */
     void deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::DeleteOptions options, AsyncResult &aResult)
     {
-        file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_delete, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_delete, true);
     }
 
     /** Delete the object in Firebase Storage data bucket.
@@ -422,8 +406,7 @@ public:
      */
     void deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::DeleteOptions options, AsyncResultCallback cb, const String &uid = "")
     {
-        file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_delete, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_delete, true);
     }
 
 private:
@@ -436,7 +419,7 @@ private:
     app_token_t *app_token = nullptr;
     Memory mem;
 
-    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::BaseOptions *baseOptions, GoogleCloudStorage::uploadOptions *uploadOptions, GoogleCloudStorage::ListOptions *listOptions, GoogleCloudStorage::google_cloud_storage_request_type requestType, bool async)
+    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudStorage::Parent &parent, file_config_data *file, GoogleCloudStorage::BaseOptions *baseOptions, GoogleCloudStorage::uploadOptions *uploadOptions, GoogleCloudStorage::ListOptions *listOptions, GoogleCloudStorage::google_cloud_storage_request_type requestType, bool async)
     {
         GoogleCloudStorage::DataOptions options;
         options.requestType = requestType;
@@ -474,11 +457,11 @@ private:
                 {
 #if defined(ENABLE_FS)
                     // resumable upload is only for file bigger than 256k
-                    if (file.cb)
+                    if (file && file->cb)
                     {
-                        file.cb(file.file, file.filename.c_str(), file_mode_open_read);
-                        options.extras += file.file.size() < 256 * 1024 ? "multipart" : "resumable";
-                        file.file.close();
+                        file->cb(file->file, file->filename.c_str(), file_mode_open_read);
+                        options.extras += file->file.size() < 256 * 1024 ? "multipart" : "resumable";
+                        file->file.close();
                     }
 #endif
                 }
@@ -503,7 +486,7 @@ private:
             options.extras += uploadOptions->insertOptions.c_str();
         }
 
-        GoogleCloudStorage::async_request_data_t aReq(&aClient, path, method, slot_options_t(false, false, async, false, requestType == GoogleCloudStorage::google_cloud_storage_request_type_download_ota, false), &options, &file, result, cb, uid);
+        GoogleCloudStorage::async_request_data_t aReq(&aClient, path, method, slot_options_t(false, false, async, false, requestType == GoogleCloudStorage::google_cloud_storage_request_type_download_ota, false), &options, file, result, cb, uid);
 
         if (uploadOptions && uploadOptions->mime.length() && requestType == GoogleCloudStorage::google_cloud_storage_request_type_uploads)
             aReq.mime = uploadOptions->mime;

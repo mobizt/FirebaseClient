@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -74,9 +74,8 @@ namespace Firestore
          */
         String batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions)
         {
-            AsyncResult result;
-            batchGetDoc(aClient, &result, NULL, "", parent, batchOptions, false);
-            return result.c_str();
+            batchGetDoc(aClient, getResultBase(&aClient), NULL, "", parent, batchOptions, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Gets multiple documents.
@@ -169,9 +168,8 @@ namespace Firestore
          */
         String batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
         {
-            AsyncResult result;
-            batchWriteDoc(aClient, &result, NULL, "", parent, writes, false);
-            return result.c_str();
+            batchWriteDoc(aClient, getResultBase(&aClient), NULL, "", parent, writes, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Applies a batch of write operations.
@@ -242,9 +240,8 @@ namespace Firestore
          */
         String beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions)
         {
-            AsyncResult result;
-            beginTrans(aClient, &result, NULL, "", parent, transOptions, false);
-            return result.c_str();
+            beginTrans(aClient, getResultBase(&aClient), NULL, "", parent, transOptions, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Starts a new transaction.
@@ -325,9 +322,8 @@ namespace Firestore
          */
         String commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
         {
-            AsyncResult result;
-            commitDoc(aClient, &result, NULL, "", parent, writes, false);
-            return result.c_str();
+            commitDoc(aClient, getResultBase(&aClient), NULL, "", parent, writes, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Commits a transaction, while optionally updating documents.
@@ -387,12 +383,11 @@ namespace Firestore
          */
         String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
         {
-            AsyncResult result;
             parent.setDocPath(documentPath);
             String collectionId, documentId;
             parent.pathResove(collectionId, documentId);
-            createDoc(aClient, &result, NULL, "", parent, collectionId, documentId, mask, document, false);
-            return result.c_str();
+            createDoc(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, documentId, mask, document, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Create a document at the defined document path.
@@ -461,9 +456,8 @@ namespace Firestore
          */
         String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
         {
-            AsyncResult result;
-            createDoc(aClient, &result, NULL, "", parent, collectionId, documentId, mask, document, false);
-            return result.c_str();
+            createDoc(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, documentId, mask, document, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Create a document in the defined collection id.
@@ -535,9 +529,8 @@ namespace Firestore
          */
         String deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument)
         {
-            AsyncResult result;
-            deleteDocBase(aClient, &result, NULL, "", parent, documentPath, currentDocument, false);
-            return result.c_str();
+            deleteDocBase(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, currentDocument, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Delete a document at the defined path.
@@ -617,9 +610,8 @@ namespace Firestore
          */
         String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options)
         {
-            AsyncResult result;
-            getDoc(aClient, &result, NULL, "", parent, documentPath, options, false);
-            return result.c_str();
+            getDoc(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, options, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Get a document at the defined path.
@@ -695,9 +687,8 @@ namespace Firestore
          */
         String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
         {
-            AsyncResult result;
-            listDocs(aClient, &result, NULL, "", parent, collectionId, listDocsOptions, false);
-            return result.c_str();
+            listDocs(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, listDocsOptions, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** List the documents in the defined documents collection.
@@ -777,9 +768,8 @@ namespace Firestore
          */
         String listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
         {
-            AsyncResult result;
-            listCollIds(aClient, &result, NULL, "", parent, documentPath, listCollectionIdsOptions, false);
-            return result.c_str();
+            listCollIds(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, listCollectionIdsOptions, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** List the document collection ids in the defined document path.
@@ -866,9 +856,8 @@ namespace Firestore
          */
         String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document)
         {
-            AsyncResult result;
-            patchDoc(aClient, &result, NULL, "", parent, documentPath, patchOptions, document, false);
-            return result.c_str();
+            patchDoc(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, patchOptions, document, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Patch or update a document at the defined path.
@@ -958,9 +947,8 @@ namespace Firestore
          */
         String rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction)
         {
-            AsyncResult result;
-            transRollback(aClient, &result, NULL, "", parent, transaction, false);
-            return result.c_str();
+            transRollback(aClient, getResultBase(&aClient), NULL, "", parent, transaction, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Rolls back a transaction.
@@ -1028,9 +1016,8 @@ namespace Firestore
          */
         String runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions)
         {
-            AsyncResult result;
-            runQueryImpl(aClient, &result, NULL, "", parent, documentPath, queryOptions, false);
-            return result.c_str();
+            runQueryImpl(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, queryOptions, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Runs a query.

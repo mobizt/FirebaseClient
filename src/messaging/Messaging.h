@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -111,9 +111,8 @@ public:
      */
     String send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message)
     {
-        AsyncResult result;
-        sendRequest(aClient, &result, NULL, "", parent, message.c_str(), Messages::firebase_cloud_messaging_request_type_send, false);
-        return result.c_str();
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, message.c_str(), Messages::firebase_cloud_messaging_request_type_send, false);
+        return aClient.getResult()->c_str();
     }
 
     /** Send a message to specified target (a registration token, topic or condition) with HTTP v1 API.

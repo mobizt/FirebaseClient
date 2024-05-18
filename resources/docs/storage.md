@@ -35,7 +35,7 @@ void loop()
 ```
 
 
-3. ## 🔹  bool download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file)
+3. ## 🔹  bool download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -44,7 +44,7 @@ The object is the object in Storage bucket to download.
 
 
 ```cpp
-bool download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file)
+bool download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file)
 ```
 
 **Params:**
@@ -57,7 +57,7 @@ bool download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, 
 
 - Boolean value, indicates the success of the operation.
 
-4. ## 🔹  void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, AsyncResult &aResult)
+4. ## 🔹  void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, AsyncResult &aResult)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -65,7 +65,7 @@ The object is the object in Storage bucket to download.
 
 
 ```cpp
-void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, AsyncResult &aResult)
+void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, AsyncResult &aResult)
 ```
 
 **Params:**
@@ -76,7 +76,7 @@ void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, 
 - `aResult` - The async result (AsyncResult).
 
 
-5. ## 🔹  void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+5. ## 🔹  void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -84,7 +84,7 @@ The object is the object in Storage bucket to download.
 
 
 ```cpp
-void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 ```
 
 **Params:**
@@ -96,7 +96,7 @@ void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, 
 - `uid` - The user specified UID of async result (optional).
 
 
-6. ## 🔹  bool upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, const String &mime)
+6. ## 🔹  bool upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime)
 
 
 The bucketid is the Storage bucket Id of object to upload.
@@ -105,7 +105,7 @@ The object is the object to be stored in the Storage bucket.
 
 
 ```cpp
-bool upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, const String &mime)
+bool upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime)
 ```
 
 **Params:**
@@ -119,7 +119,7 @@ bool upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, fi
 
 - Boolean value, indicates the success of the operation.
 
-7. ## 🔹  void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, const String &mime, AsyncResult &aResult)
+7. ## 🔹  void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime, AsyncResult &aResult)
 
 
 The bucketid is the Storage bucket Id of object to upload.
@@ -128,7 +128,7 @@ The object is the object to be stored in the Storage bucket.
 
 
 ```cpp
-void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, const String &mime, AsyncResult &aResult)
+void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime, AsyncResult &aResult)
 ```
 
 **Params:**
@@ -140,7 +140,7 @@ void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, fi
 - `aResult` - The async result (AsyncResult).
 
 
-8. ## 🔹  void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, const String &mime, AsyncResultCallback cb, const String &uid = "")
+8. ## 🔹  void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime, AsyncResultCallback cb, const String &uid = "")
 
 
 The bucketid is the Storage bucket Id of object to upload.
@@ -148,7 +148,7 @@ The object is the object to be stored in the Storage bucket.
 
 
 ```cpp
-void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, const String &mime, AsyncResultCallback cb, const String &uid = "")
+void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime, AsyncResultCallback cb, const String &uid = "")
 ```
 
 **Params:**

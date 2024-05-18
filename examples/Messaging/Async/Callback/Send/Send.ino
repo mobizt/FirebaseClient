@@ -46,6 +46,8 @@
 #define FIREBASE_CLIENT_EMAIL "CLIENT_EMAIL"
 const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----END PRIVATE KEY-----\n";
 
+void getMsg(Messages::Message &msg);
+
 void timeStatusCB(uint32_t &ts);
 
 void asyncCB(AsyncResult &aResult);
@@ -82,7 +84,6 @@ void setup()
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     Serial.print("Connecting to Wi-Fi");
-    unsigned long ms = millis();
     while (WiFi.status() != WL_CONNECTED)
     {
         Serial.print(".");
@@ -127,52 +128,61 @@ void loop()
         Serial.println("Sending message...");
 
         Messages::Message msg;
-        msg.topic("test");
-        // msg.token("DEVICE_TOKEN"); // Registration token to send a message to
-        // msg.condition("'foo' in topics && 'bar' in topics");
-
-        Messages::Notification notification;
-
-        notification.body("Notification body").title("Notification title");
-
-        // Library does not provide JSON parser library, the following JSON writer class will be used with
-        // object_t for simple demonstration.
-
-        object_t data, obj1, obj2, obj3, obj4;
-        JsonWriter writer;
-
-        writer.create(obj1, "name", string_t("wrench"));
-        writer.create(obj2, "mass", string_t("1.3kg"));
-        writer.create(obj3, "count", string_t("3"));
-        writer.join(data, 3 /* no. of object_t (s) to join */, obj1, obj2, obj3);
-
-        // object_t data2("{\"name\":\"wrench\",\"mass\":\"1.3kg\",\"count\":\"3\"}");
-
-        msg.data(data);
-
-        Messages::AndroidConfig androidConfig;
-
-        // Priority of a message to send to Android devices.
-        // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#androidmessagepriority
-        androidConfig.priority(Messages::AndroidMessagePriority::_HIGH);
-
-        Messages::AndroidNotification androidNotification;
-
-        // Set the relative priority for this notification.
-        // Priority is an indication of how much of the user's attention should be consumed by this notification.
-        // Low-priority notifications may be hidden from the user in certain situations,
-        // while the user might be interrupted for a higher-priority notification.
-        // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#NotificationPriority
-        androidNotification.notification_priority(Messages::NotificationPriority::PRIORITY_HIGH);
-
-        androidConfig.notification(androidNotification);
-
-        msg.android(androidConfig);
+        getMsg(msg);
 
         // You can set the content of msg object directly with msg.setContent("your content")
 
         messaging.send(aClient, Messages::Parent(FIREBASE_PROJECT_ID), msg, asyncCB, "fcmSendTask");
     }
+}
+
+void getMsg(Messages::Message &msg)
+{
+    msg.topic("test");
+    // msg.token("DEVICE_TOKEN"); // Registration token to send a message to
+    // msg.condition("'foo' in topics && 'bar' in topics");
+
+    // Basic notification
+    Messages::Notification notification;
+    notification.body("Notification body").title("Notification title");
+
+    // Library does not provide JSON parser library, the following JSON writer class will be used with
+    // object_t for simple demonstration.
+
+    object_t data, obj1, obj2, obj3, obj4;
+    JsonWriter writer;
+
+    writer.create(obj1, "name", string_t("wrench"));
+    writer.create(obj2, "mass", string_t("1.3kg"));
+    writer.create(obj3, "count", string_t("3"));
+    writer.join(data, 3 /* no. of object_t (s) to join */, obj1, obj2, obj3);
+
+    // object_t data2("{\"name\":\"wrench\",\"mass\":\"1.3kg\",\"count\":\"3\"}");
+
+    msg.data(data);
+
+    data.clear();
+
+    Messages::AndroidConfig androidConfig;
+
+    // Priority of a message to send to Android devices.
+    // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#androidmessagepriority
+    androidConfig.priority(Messages::AndroidMessagePriority::_HIGH);
+
+    Messages::AndroidNotification androidNotification;
+
+    // Set the relative priority for this notification.
+    // Priority is an indication of how much of the user's attention should be consumed by this notification.
+    // Low-priority notifications may be hidden from the user in certain situations,
+    // while the user might be interrupted for a higher-priority notification.
+    // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#NotificationPriority
+    androidNotification.notification_priority(Messages::NotificationPriority::PRIORITY_HIGH);
+
+    androidConfig.notification(androidNotification);
+
+    msg.android(androidConfig);
+
+    msg.notification(notification);
 }
 
 void timeStatusCB(uint32_t &ts)

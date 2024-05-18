@@ -557,9 +557,9 @@ The `Error Information` (`FirebaseError`) can be obtained from `AsyncResult::err
 
 The `Debug Information` (`String`) can be obtained from `AsyncResult::debug()`.
 
-There are two use cases of async result: with callback function and without callback function.
+There are four use cases of async result: async task with callback function, async task without callback function, sync task with external async result and sync task with internal default async result.
 
-   1. User provided async result (without callback function).
+   1. User provided async result in case async task (without callback function).
 
    The async result was defined by user and passed to the async tasks as the following.
 
@@ -575,7 +575,7 @@ initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResult>
 RealtimeDatabase::get(<AsyncClientClass>, <path>, <options>, <AsyncResult>);
 ```
 
-   2. From the instance of async data (with callback function).
+   2. From the instance of async data in case async task (with callback function).
 
    The async result instance was created inside the async task and can be accessed via the async result callback function that passed to the async tasks as the following.
 
@@ -590,6 +590,23 @@ initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResultC
 ```cpp
 RealtimeDatabase::get(<AsyncClientClass>, <path>, <options>, <AsyncResultCallback>);
 ```
+
+   3. User provided async result in case sync task.
+
+   In this case, the external async result was set/unset to use with the sync task via the following functions.
+
+```cpp
+AsyncClientClass::setAsyncResult(<AsyncResult>); // Since v1.2.1
+```
+
+```cpp
+AsyncClientClass::unsetAsyncResult(); // Since v1.2.1
+```
+    If no async result was set (unset) for sync task, the internal async result will be used and shared usage for all sync tasks.
+
+   4. From the default async result created in the async client in case sync task.
+
+   This case, the internal async result in the async client will be used and shared usage for all sync tasks.
 
 In case 1, the async result (`AsyncResult`) shall be defined globally because it needs the containter to keep the result while running the async task.
 
@@ -2137,6 +2154,10 @@ void setup()
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);
+
+    // In case setting the external async result to the sync task (optional)
+    // To unset, use unsetAsyncResult().
+    aClient.setAsyncResult(aResult_no_callback);
 
     Serial.println("Synchronous Get... ");
 

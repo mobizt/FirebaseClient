@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -56,7 +56,7 @@ namespace firebase
         {
             for (int i = dbgVec.size() - 1; i >= 0; i--)
             {
-                if (dbgVec[i].read || millis() - dbgVec[i].ts > 3000)
+                if (dbgVec[i].read || millis() - dbgVec[i].ts > 30000)
                     dbgVec.erase(dbgVec.begin() + i);
             }
 
@@ -66,13 +66,14 @@ namespace firebase
 
         void limitQueue()
         {
-            if (dbgVec.size() > 5)
+            if (dbgVec.size() > 3)
                 dbgVec.erase(dbgVec.begin());
         }
 
         void setDebug(const String &msg)
         {
-            if (strcmp(last.c_str(), msg.c_str()) == 0)
+
+            if (msg.length() == 0 || strcmp(last.c_str(), msg.c_str()) == 0)
                 return;
 
             limitQueue();
@@ -88,7 +89,7 @@ namespace firebase
 
         void reset() { dbgVec.clear(); }
 
-        bool remaining() { return dbgVec.size() && !dbgVec[0].read; }
+        bool remaining() { return dbgVec.size() && !dbgVec[0].read && dbgVec[0].msg.length(); }
 
         bool isDebug()
         {
@@ -99,7 +100,7 @@ namespace firebase
             {
                 available = false;
                 new_msg = getDebug().msg;
-                return strcmp(current_msg.c_str(), new_msg.c_str()) != 0;
+                return new_msg.length() && strcmp(current_msg.c_str(), new_msg.c_str()) != 0;
             }
 
             // remaining to read?

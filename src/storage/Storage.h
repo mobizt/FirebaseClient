@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -108,11 +108,10 @@ public:
      * @return Boolean value, indicates the success of the operation.
      *
      */
-    bool download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file)
+    bool download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file)
     {
-        AsyncResult result;
-        sendRequest(aClient, &result, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_download, false);
-        return result.lastError.code() == 0;
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, &file, "", FirebaseStorage::firebase_storage_request_type_download, false);
+        return aClient.getResult()->lastError.code() == 0;
     }
 
     /** Download object from the Firebase Storage.
@@ -125,9 +124,9 @@ public:
      * @param aResult The async result (AsyncResult).
      *
      */
-    void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, AsyncResult &aResult)
+    void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, AsyncResult &aResult)
     {
-        sendRequest(aClient, &aResult, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_download, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, &file, "", FirebaseStorage::firebase_storage_request_type_download, true);
     }
 
     /** Download object from the Firebase Storage.
@@ -141,9 +140,9 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+    void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     {
-        sendRequest(aClient, nullptr, cb, uid, parent, file, "", FirebaseStorage::firebase_storage_request_type_download, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, &file, "", FirebaseStorage::firebase_storage_request_type_download, true);
     }
 
     /** Upload file to the Firebase Storage.
@@ -158,11 +157,10 @@ public:
      * @return Boolean value, indicates the success of the operation.
      *
      */
-    bool upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, const String &mime)
+    bool upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime)
     {
-        AsyncResult result;
-        sendRequest(aClient, &result, NULL, "", parent, file, mime, FirebaseStorage::firebase_storage_request_type_upload, false);
-        return result.lastError.code() == 0;
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, &file, mime, FirebaseStorage::firebase_storage_request_type_upload, false);
+        return aClient.getResult()->lastError.code() == 0;
     }
 
     /** Upload file to the Firebase Storage.
@@ -177,9 +175,9 @@ public:
      *
      *
      */
-    void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, const String &mime, AsyncResult &aResult)
+    void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime, AsyncResult &aResult)
     {
-        sendRequest(aClient, &aResult, NULL, "", parent, file, mime, FirebaseStorage::firebase_storage_request_type_upload, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, &file, mime, FirebaseStorage::firebase_storage_request_type_upload, true);
     }
 
     /** Upload file to the Firebase Storage.
@@ -194,9 +192,9 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data file, const String &mime, AsyncResultCallback cb, const String &uid = "")
+    void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime, AsyncResultCallback cb, const String &uid = "")
     {
-        sendRequest(aClient, nullptr, cb, uid, parent, file, mime, FirebaseStorage::firebase_storage_request_type_upload, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, &file, mime, FirebaseStorage::firebase_storage_request_type_upload, true);
     }
 
     /** Perform OTA update using a firmware (object) from the Firebase Storage.
@@ -211,10 +209,8 @@ public:
      */
     bool ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
     {
-        AsyncResult result;
-        file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_download_ota, false);
-        return result.lastError.code() == 0;
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_download_ota, false);
+        return aClient.getResult()->lastError.code() == 0;
     }
 
     /** Perform OTA update using a firmware (object) from the Firebase Storage.
@@ -228,8 +224,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult)
     {
-        file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_download_ota, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_download_ota, true);
     }
 
     /** Perform OTA update using a firmware (object) from the Firebase Storage.
@@ -244,8 +239,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResultCallback cb, const String &uid = "")
     {
-        file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, "", FirebaseStorage::firebase_storage_request_type_download_ota, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_download_ota, true);
     }
 
     /** Get the metadata of object in Firebase Storage data bucket.
@@ -260,10 +254,8 @@ public:
      */
     String getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
     {
-        AsyncResult result;
-        file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_get_meta, false);
-        return result.c_str();
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_get_meta, false);
+        return aClient.getResult()->c_str();
     }
 
     /** Get the metadata of object in Firebase Storage data bucket.
@@ -277,8 +269,7 @@ public:
      */
     void getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult)
     {
-        file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_get_meta, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_get_meta, true);
     }
 
     /** Get the metadata of object in Firebase Storage data bucket.
@@ -293,8 +284,7 @@ public:
      */
     void getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResultCallback cb, const String &uid = "")
     {
-        file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, "", FirebaseStorage::firebase_storage_request_type_get_meta, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_get_meta, true);
     }
 
     /** List all objects in Firebase Storage data bucket.
@@ -308,10 +298,8 @@ public:
      */
     String list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
     {
-        AsyncResult result;
-        file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_list, false);
-        return result.c_str();
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_list, false);
+        return aClient.getResult()->c_str();
     }
 
     /** List all objects in Firebase Storage data bucket.
@@ -324,8 +312,7 @@ public:
      */
     void list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult)
     {
-        file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_list, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_list, true);
     }
 
     /** List all objects in Firebase Storage data bucket.
@@ -339,8 +326,7 @@ public:
      */
     void list(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResultCallback cb, const String &uid = "")
     {
-        file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, "", FirebaseStorage::firebase_storage_request_type_list, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_list, true);
     }
 
     /** Delete the object in Firebase Storage data bucket.
@@ -355,10 +341,8 @@ public:
      */
     bool deleteObject(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
     {
-        AsyncResult result;
-        file_config_data file;
-        sendRequest(aClient, &result, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_delete, false);
-        return result.lastError.code() == 0;
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_delete, false);
+        return aClient.getResult()->lastError.code() == 0;
     }
 
     /** Delete the object in Firebase Storage data bucket.
@@ -372,8 +356,7 @@ public:
      */
     void deleteObject(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult)
     {
-        file_config_data file;
-        sendRequest(aClient, &aResult, NULL, "", parent, file, "", FirebaseStorage::firebase_storage_request_type_delete, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_delete, true);
     }
 
     /** Delete the object in Firebase Storage data bucket.
@@ -388,8 +371,7 @@ public:
      */
     void deleteObject(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResultCallback cb, const String &uid = "")
     {
-        file_config_data file;
-        sendRequest(aClient, nullptr, cb, uid, parent, file, "", FirebaseStorage::firebase_storage_request_type_delete, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_delete, true);
     }
 
 private:
@@ -401,7 +383,7 @@ private:
     uint32_t app_addr = 0, avec_addr = 0;
     app_token_t *app_token = nullptr;
 
-    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const FirebaseStorage::Parent &parent, file_config_data &file, const String &mime, FirebaseStorage::firebase_storage_request_type requestType, bool async)
+    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const FirebaseStorage::Parent &parent, file_config_data *file, const String &mime, FirebaseStorage::firebase_storage_request_type requestType, bool async)
     {
         FirebaseStorage::DataOptions options;
         options.requestType = requestType;
@@ -429,7 +411,7 @@ private:
                 method = async_request_handler_t::http_delete;
         }
 
-        FirebaseStorage::async_request_data_t aReq(&aClient, path, method, slot_options_t(false, false, async, false, requestType == FirebaseStorage::firebase_storage_request_type_download_ota, false), &options, &file, result, cb, uid);
+        FirebaseStorage::async_request_data_t aReq(&aClient, path, method, slot_options_t(false, false, async, false, requestType == FirebaseStorage::firebase_storage_request_type_download_ota, false), &options, file, result, cb, uid);
 
         if (mime.length() && requestType == FirebaseStorage::firebase_storage_request_type_upload)
             aReq.mime = mime;

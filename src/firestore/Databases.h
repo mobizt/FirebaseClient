@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -71,9 +71,8 @@ namespace Firestore
          */
         String exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
         {
-            AsyncResult result;
-            eximDocs(aClient, &result, NULL, "", parent, exportOptions, false, false);
-            return result.c_str();
+            eximDocs(aClient, getResultBase(&aClient), NULL, "", parent, exportOptions, false, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Export the documents in the database to the Firebase Storage data bucket.
@@ -141,9 +140,8 @@ namespace Firestore
          */
         String importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
         {
-            AsyncResult result;
-            eximDocs(aClient, &result, NULL, "", parent, importOptions, true, false);
-            return result.c_str();
+            eximDocs(aClient, getResultBase(&aClient), NULL, "", parent, importOptions, true, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Import the exported documents stored in the Firebase Storage data bucket.
@@ -209,9 +207,8 @@ namespace Firestore
          */
         String create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
         {
-            AsyncResult result;
-            manageDatabase(aClient, &result, NULL, "", parent, database.c_str(), "", Firestore::firestore_database_mode_create, false);
-            return result.c_str();
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, database.c_str(), "", Firestore::firestore_database_mode_create, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Create a database.
@@ -271,9 +268,8 @@ namespace Firestore
          */
         String deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
         {
-            AsyncResult result;
-            manageDatabase(aClient, &result, NULL, "", parent, "", etag, Firestore::firestore_database_mode_delete, false);
-            return result.c_str();
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, "", etag, Firestore::firestore_database_mode_delete, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Deletes a database.
@@ -327,9 +323,8 @@ namespace Firestore
          */
         String get(AsyncClientClass &aClient, const Firestore::Parent &parent)
         {
-            AsyncResult result;
-            manageDatabase(aClient, &result, NULL, "", parent, "", "", Firestore::firestore_database_mode_get, false);
-            return result.c_str();
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, "", "", Firestore::firestore_database_mode_get, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Gets information about a database.
@@ -379,9 +374,8 @@ namespace Firestore
          */
         String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
         {
-            AsyncResult result;
-            manageDatabase(aClient, &result, NULL, "", parent, "", "", Firestore::firestore_database_mode_list, false);
-            return result.c_str();
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, "", "", Firestore::firestore_database_mode_list, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** List all the databases in the project.
@@ -437,9 +431,8 @@ namespace Firestore
          */
         String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
         {
-            AsyncResult result;
-            manageDatabase(aClient, &result, NULL, "", parent, database.c_str(), updateMask, Firestore::firestore_database_mode_patch, false);
-            return result.c_str();
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, database.c_str(), updateMask, Firestore::firestore_database_mode_patch, false);
+            return getResultBase(&aClient)->c_str();
         }
 
         /** Updates a database.
@@ -509,9 +502,8 @@ namespace Firestore
              */
             String create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
             {
-                AsyncResult result;
-                databaseIndexManager(aClient, &result, NULL, "", parent, index, "", false, false);
-                return result.c_str();
+                databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, "", false, false);
+                return getResultBase(&aClient)->c_str();
             }
 
             /** Creates the specified index.
@@ -570,10 +562,9 @@ namespace Firestore
              */
             String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
             {
-                AsyncResult result;
                 DatabaseIndex::Index index("");
-                databaseIndexManager(aClient, &result, NULL, "", parent, index, indexId, true, false);
-                return result.c_str();
+                databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, indexId, true, false);
+                return getResultBase(&aClient)->c_str();
             }
 
             /** Deletes an index.
@@ -634,10 +625,9 @@ namespace Firestore
              */
             String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
             {
-                AsyncResult result;
                 DatabaseIndex::Index index("");
-                databaseIndexManager(aClient, &result, NULL, "", parent, index, indexId, false, false);
-                return result.c_str();
+                databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, indexId, false, false);
+                return getResultBase(&aClient)->c_str();
             }
 
             /** Gets an index.
@@ -697,10 +687,9 @@ namespace Firestore
              */
             String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
             {
-                AsyncResult result;
                 DatabaseIndex::Index index("");
-                databaseIndexManager(aClient, &result, NULL, "", parent, index, "", false, false);
-                return result.c_str();
+                databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, "", false, false);
+                return getResultBase(&aClient)->c_str();
             }
 
             /** Lists the indexes.

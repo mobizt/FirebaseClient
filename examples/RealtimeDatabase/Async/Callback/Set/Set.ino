@@ -77,7 +77,6 @@ void setup()
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     Serial.print("Connecting to Wi-Fi");
-    unsigned long ms = millis();
     while (WiFi.status() != WL_CONNECTED)
     {
         Serial.print(".");
@@ -124,16 +123,16 @@ void loop()
         Serial.println("Asynchronous Set... ");
 
         // Set int
-        Database.set<int>(aClient, "/test/int", 12345, aResult_no_callback);
+        Database.set<int>(aClient, "/test/int", 12345, asyncCB, "setIntTask");
 
         // Set bool
-        Database.set<bool>(aClient, "/test/bool", true, aResult_no_callback);
+        Database.set<bool>(aClient, "/test/bool", true, asyncCB, "setBoolTask");
 
         // Set string
-        Database.set<String>(aClient, "/test/string", "hello", aResult_no_callback);
+        Database.set<String>(aClient, "/test/string", "hello", asyncCB, "setStringTask");
 
         // Set json
-        Database.set<object_t>(aClient, "/test/json", object_t("{\"data\":123}"), aResult_no_callback);
+        Database.set<object_t>(aClient, "/test/json", object_t("{\"data\":123}"), asyncCB, "setJsonTask");
 
         // Library does not provide JSON parser library, the following JSON writer class will be used with
         // object_t for simple demonstration.
@@ -150,7 +149,7 @@ void loop()
         // To print object_t
         // Serial.println(json);
 
-        Database.set<object_t>(aClient, "/test/json", json, aResult_no_callback);
+        Database.set<object_t>(aClient, "/test/json", json, asyncCB, "setJsonTask");
 
         object_t arr;
         arr.initArray(); // initialize to be used as array
@@ -160,13 +159,13 @@ void loop()
         // used as array member value as above i.e. object_t(string_t("steve")) and object_t(888).
 
         // Set array
-        Database.set<object_t>(aClient, "/test/arr", arr, aResult_no_callback);
+        Database.set<object_t>(aClient, "/test/arr", arr, asyncCB, "setArrayTask");
 
         // Set float
-        Database.set<number_t>(aClient, "/test/float", number_t(123.456, 2), aResult_no_callback);
+        Database.set<number_t>(aClient, "/test/float", number_t(123.456, 2), asyncCB, "setFloatTask");
 
         // Set double
-        Database.set<number_t>(aClient, "/test/double", number_t(1234.56789, 4), aResult_no_callback);
+        Database.set<number_t>(aClient, "/test/double", number_t(1234.56789, 4), asyncCB, "setDoubleTask");
     }
 }
 

@@ -120,6 +120,8 @@ AsyncResult aResult_no_callback;
 
 bool taskCompleted = false;
 
+#define SHOW_PROGRESS
+
 void setup()
 {
 
@@ -127,7 +129,6 @@ void setup()
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     Serial.print("Connecting to Wi-Fi");
-    unsigned long ms = millis();
     while (WiFi.status() != WL_CONNECTED)
     {
         Serial.print(".");
@@ -155,6 +156,10 @@ void setup()
 
     app.getApp<CloudStorage>(cstorage);
 
+    // In case setting the external async result to the sync task (optional)
+    // To unset, use unsetAsyncResult().
+    aClient.setAsyncResult(aResult_no_callback);
+
 #if defined(ENABLE_FS)
     MY_FS.begin();
 #endif
@@ -176,15 +181,24 @@ void loop()
 
 #if defined(ENABLE_FS)
 
-        // There is no download progress available for sync download.
-        // To get the download progress, use async download instead.
+#if defined(SHOW_PROGRESS)
+        cstorage.download(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options, aResult_no_callback);
 
+        for (;;)
+        {
+            printResult(aResult_no_callback);
+            if (aResult_no_callback.downloadInfo().total == aResult_no_callback.downloadInfo().downloaded || aResult_no_callback.error().code() > 0)
+                break;
+        }
+#else
         bool result = cstorage.download(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options);
 
         if (result)
             Serial.println("Object downloaded.");
         else
             printError(aClient.lastError().code(), aClient.lastError().message());
+#endif
+
 #endif
     }
 }
@@ -234,6 +248,26 @@ void printResult(AsyncResult &aResult)
     if (aResult.isError())
     {
         Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.downloadProgress())
+    {
+        Firebase.printf("Downloaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
+        {
+            Firebase.printf("Download task: %s, completed!", aResult.uid().c_str());
+        }
+    }
+
+    if (aResult.uploadProgress())
+    {
+        Firebase.printf("Uploaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
+        {
+            Firebase.printf("Upload task: %s, completed!", aResult.uid().c_str());
+            Serial.print("Download URL: ");
+            Serial.println(aResult.uploadInfo().downloadUrl);
+        }
     }
 }
 

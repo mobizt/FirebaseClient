@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -358,7 +358,6 @@ namespace firebase
 
         bool processAuth()
         {
-
             sys_idle();
 
             if (!getClient())
@@ -387,15 +386,21 @@ namespace firebase
                 }
             }
 
-            if (auth_data.user_auth.jwt_signing && auth_data.user_auth.jwt_ts == 0 && err_timer.remaining() == 0)
+            if (auth_data.user_auth.jwt_signing && auth_data.user_auth.jwt_ts == 0)
             {
-                err_timer.feed(3);
-                JWT.jwt_data.err_code = FIREBASE_ERROR_JWT_CREATION_REQUIRED;
-                JWT.jwt_data.msg = "JWT process has not begun";
-                if (getRefResult())
-                    JWT.sendErrResult(auth_data.refResult);
-                else
-                    JWT.sendErrCB(auth_data.cb, nullptr);
+
+                if (err_timer.remaining() == 0)
+                {
+                    err_timer.feed(3);
+                    JWT.jwt_data.err_code = FIREBASE_ERROR_JWT_CREATION_REQUIRED;
+                    JWT.jwt_data.msg = "JWT process has not begun";
+                    if (getRefResult())
+                        JWT.sendErrResult(auth_data.refResult);
+                    else
+                        JWT.sendErrCB(auth_data.cb, nullptr);
+                }
+
+                return false;
             }
 
             if (auth_data.user_auth.status._event == auth_event_uninitialized && err_timer.remaining() > 0)
@@ -421,7 +426,6 @@ namespace firebase
 #if defined(ENABLE_JWT)
                     if (auth_data.user_auth.sa.step == jwt_step_begin)
                     {
-                        auth_data.user_auth.sa.step = jwt_step_sign;
                         if (getClient())
                             stop(aClient);
 
@@ -429,11 +433,14 @@ namespace firebase
                             setEvent(auth_event_token_signing);
 
                         auth_data.user_auth.jwt_signing = true;
+
+                        JWT.begin(&auth_data);
                     }
                     else if (auth_data.user_auth.sa.step == jwt_step_sign || auth_data.user_auth.sa.step == jwt_step_ready)
                     {
                         if (JWT.ready())
                         {
+                            auth_data.user_auth.jwt_signing = false;
                             setEvent(auth_event_authenticating);
                             auth_data.user_auth.sa.step = jwt_step_begin;
                         }

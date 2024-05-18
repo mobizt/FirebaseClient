@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -64,9 +64,8 @@ namespace Firestore
              */
             String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
             {
-                AsyncResult result;
-                collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, "", false, false);
-                return result.c_str();
+                collectionGroupIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, collectionId, "", false, false);
+                return getResultBase(&aClient)->c_str();
             }
 
             /** Creates a composite index.
@@ -128,10 +127,9 @@ namespace Firestore
              */
             String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
             {
-                AsyncResult result;
                 CollectionGroupsIndex::Index index;
-                collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, indexId, true, false);
-                return result.c_str();
+                collectionGroupIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, collectionId, indexId, true, false);
+                return getResultBase(&aClient)->c_str();
             }
 
             /** Deletes a composite index.
@@ -195,10 +193,9 @@ namespace Firestore
              */
             String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
             {
-                AsyncResult result;
                 CollectionGroupsIndex::Index index;
-                collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, indexId, false, false);
-                return result.c_str();
+                collectionGroupIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, collectionId, indexId, false, false);
+                return getResultBase(&aClient)->c_str();
             }
 
             /** Gets a composite index.
@@ -260,10 +257,9 @@ namespace Firestore
              */
             String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
             {
-                AsyncResult result;
                 CollectionGroupsIndex::Index index;
-                collectionGroupIndexManager(aClient, &result, NULL, "", parent, index, collectionId, "", false, false);
-                return result.c_str();
+                collectionGroupIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, collectionId, "", false, false);
+                return getResultBase(&aClient)->c_str();
             }
 
             /** Lists composite indexes.

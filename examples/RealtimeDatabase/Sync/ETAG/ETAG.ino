@@ -110,6 +110,10 @@ void setup()
 
     Database.url(DATABASE_URL);
 
+    // In case setting the external async result to the sync task (optional)
+    // To unset, use unsetAsyncResult().
+    aClient.setAsyncResult(aResult_no_callback);
+
     Serial.println("Set and get ETAG (sync)... ");
 
     bool result = Database.set<int>(aClient, "test/etag", 1234);

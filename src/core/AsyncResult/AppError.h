@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -53,7 +53,7 @@ private:
     {
         for (int i = errVec.size() - 1; i >= 0; i--)
         {
-            if (errVec[i].read || millis() - errVec[i].ts > 3000)
+            if (errVec[i].read || millis() - errVec[i].ts > 30000)
                 errVec.erase(errVec.begin() + i);
         }
 
@@ -69,6 +69,7 @@ private:
 
     void setError(int code, const String &msg)
     {
+
         if (code == 0 || code == last)
             return;
 

@@ -129,7 +129,6 @@ void setup()
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     Serial.print("Connecting to Wi-Fi");
-    unsigned long ms = millis();
     while (WiFi.status() != WL_CONNECTED)
     {
         Serial.print(".");
@@ -156,6 +155,10 @@ void setup()
     authHandler();
 
     app.getApp<CloudStorage>(cstorage);
+
+    // In case setting the external async result to the sync task (optional)
+    // To unset, use unsetAsyncResult().
+    aClient.setAsyncResult(aResult_no_callback);
 
 #if defined(ENABLE_FS)
     MY_FS.begin();

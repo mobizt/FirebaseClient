@@ -36,7 +36,7 @@ void loop()
 ```
 
 
-3. ## 🔹  bool download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::GetOptions &options)
+3. ## 🔹  bool download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::GetOptions &options)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -46,7 +46,7 @@ For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objec
 
 
 ```cpp
-bool download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::GetOptions &options)
+bool download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::GetOptions &options)
 ```
 
 **Params:**
@@ -60,7 +60,7 @@ bool download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &paren
 
 - Boolean value, indicates the success of the operation.
 
-4. ## 🔹  void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
+4. ## 🔹  void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -69,7 +69,7 @@ For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objec
 
 
 ```cpp
-void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
+void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
 ```
 
 **Params:**
@@ -81,7 +81,7 @@ void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &paren
 - `aResult` - The async result (AsyncResult).
 
 
-5. ## 🔹  void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
+5. ## 🔹  void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -90,7 +90,7 @@ For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objec
 
 
 ```cpp
-void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
+void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
 ```
 
 **Params:**
@@ -103,7 +103,7 @@ void download(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &paren
 - `uid` - The user specified UID of async result (optional).
 
 
-6. ## 🔹  bool upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::uploadOptions &options)
+6. ## 🔹  bool upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::uploadOptions &options)
 
 
 The bucketid is the Storage bucket Id of object to upload.
@@ -114,7 +114,7 @@ For insert properties (options.insertProps), see https://cloud.google.com/storag
 
 
 ```cpp
-bool upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::uploadOptions &options)
+bool upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::uploadOptions &options)
 ```
 
 **Params:**
@@ -128,7 +128,7 @@ bool upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent,
 
 - Boolean value, indicates the success of the operation.
 
-7. ## 🔹  void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::uploadOptions &options, AsyncResult &aResult)
+7. ## 🔹  void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::uploadOptions &options, AsyncResult &aResult)
 
 
 The bucketid is the Storage bucket Id of object to upload.
@@ -139,7 +139,7 @@ For insert properties (options.insertProps), see https://cloud.google.com/storag
 
 
 ```cpp
-void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::uploadOptions &options, AsyncResult &aResult)
+void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::uploadOptions &options, AsyncResult &aResult)
 ```
 
 **Params:**
@@ -151,7 +151,7 @@ void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent,
 - `aResult` - The async result (AsyncResult).
 
 
-8. ## 🔹  void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::uploadOptions &options, AsyncResultCallback cb, const String &uid = "")
+8. ## 🔹  void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::uploadOptions &options, AsyncResultCallback cb, const String &uid = "")
 
 
 The bucketid is the Storage bucket Id of object to upload.
@@ -161,7 +161,7 @@ For insert properties (options.insertProps), see https://cloud.google.com/storag
 
 
 ```cpp
-void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data file, GoogleCloudStorage::uploadOptions &options, AsyncResultCallback cb, const String &uid = "")
+void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, file_config_data &file, GoogleCloudStorage::uploadOptions &options, AsyncResultCallback cb, const String &uid = "")
 ```
 
 **Params:**

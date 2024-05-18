@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -180,9 +180,12 @@ private:
     app_event_t app_event;
     FirebaseError lastErr;
     String header, reqEtag, resETag;
+    AsyncResult *refResult = nullptr;
+    AsyncResult aResult;
     int netErrState = 0;
     uint32_t auth_ts = 0;
     uint32_t cvec_addr = 0;
+    uint32_t result_addr = 0;
     uint32_t sync_send_timeout_sec = 0, sync_read_timeout_sec = 0;
     Client *client = nullptr;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
@@ -233,7 +236,10 @@ private:
     {
         if ((sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined) ||
             strcmp(this->host.c_str(), host) != 0 || this->port != port)
+        {
             stop(sData);
+            getResult()->clear();
+        }
     }
 
     function_return_type sendHeader(async_data_item_t *sData, const char *data)
@@ -688,6 +694,12 @@ private:
     {
         List vec;
         return vec.existed(rVec, sData->ref_result_addr) ? sData->refResult : nullptr;
+    }
+
+    AsyncResult *getResult()
+    {
+        List vec;
+        return vec.existed(rVec, result_addr) ? refResult : &aResult;
     }
 
     void returnResult(async_data_item_t *sData, bool setData)
@@ -1431,10 +1443,18 @@ private:
             // The XBee must run the gprsConnect function BEFORE waiting for network!
             gsmModem->gprsConnect(_apn.c_str(), _user.c_str(), _password.c_str());
 #endif
+            // ISSUE
+            // This debug will be missed because of current blocking code.
+            // TO DO
+            // Replace with non-blocking reconnect process.
             if (netErrState == 0 && sData)
                 sData->aResult.setDebug(FPSTR("Waiting for network..."));
             if (!gsmModem->waitForNetwork())
             {
+                // ISSUE
+                // This debug will be missed because of current blocking code.
+                // TO DO
+                // Replace with non-blocking reconnect process.
                 if (netErrState == 0 && sData)
                     sData->aResult.setDebug(FPSTR("Network connection failed"));
                 netErrState = 1;
@@ -1442,6 +1462,10 @@ private:
                 return false;
             }
 
+            // ISSUE
+            // This debug will be missed because of current blocking code.
+            // TO DO
+            // Replace with non-blocking reconnect process.
             if (netErrState == 0 && sData)
                 sData->aResult.setDebug(FPSTR("Network connected"));
 
@@ -1450,6 +1474,10 @@ private:
 
                 if (netErrState == 0 && sData)
                 {
+                    // ISSUE
+                    // This debug will be missed because of current blocking code.
+                    // TO DO
+                    // Replace with non-blocking reconnect process.
                     String debug = FPSTR("Connecting to ");
                     debug += net.gsm.apn.c_str();
                     sData->aResult.setDebug(debug);
@@ -1460,6 +1488,10 @@ private:
 
                 if (netErrState == 0 && sData)
                 {
+                    // ISSUE
+                    // This debug will be missed because of current blocking code.
+                    // TO DO
+                    // Replace with non-blocking reconnect process.
                     if (net.network_status)
                         sData->aResult.setDebug(FPSTR("GPRS/EPS connected"));
                     else
@@ -1506,6 +1538,10 @@ private:
 
         if (net.ethernet.ethernet_reset_pin > -1)
         {
+            // ISSUE
+            // This debug will be missed because of current blocking code.
+            // TO DO
+            // Replace with non-blocking reconnect process.
             if (sData)
                 sData->aResult.setDebug(FPSTR("Resetting Ethernet Board..."));
 
@@ -1518,6 +1554,10 @@ private:
             delay(200);
         }
 
+        // ISSUE
+        // This debug will be missed because of current blocking code.
+        // TO DO
+        // Replace with non-blocking reconnect process.
         if (sData)
             sData->aResult.setDebug(FPSTR("Starting Ethernet connection..."));
 
@@ -1545,11 +1585,19 @@ private:
 
         if (ret && sData)
         {
+            // ISSUE
+            // This debug will be missed because of current blocking code.
+            // TO DO
+            // Replace with non-blocking reconnect process.
             String debug = FPSTR("Starting Ethernet connection...");
-            debug += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP();
+            debug += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP().toString();
             sData->aResult.setDebug(debug);
         }
 
+        // ISSUE
+        // This debug will be missed because of current blocking code.
+        // TO DO
+        // Replace with non-blocking reconnect process.
         if (!ret && sData)
             sData->aResult.setDebug(FPSTR("Can't connect to network"));
 
@@ -1584,6 +1632,10 @@ private:
             {
                 net.net_timer.feed(FIREBASE_NET_RECONNECT_TIMEOUT_SEC);
 
+                // ISSUE
+                // This debug will be missed because of current blocking code in case Ethernet and GSM modules.
+                // TO DO
+                // Replace with non-blocking reconnect process.
                 if (sData)
                     sData->aResult.setDebug(FPSTR("Reconnecting to network..."));
 
@@ -1905,8 +1957,8 @@ private:
                 sData->request.addNewLine();
             }
 
-            sData->request.val[req_hndlr_ns::header] += FPSTR("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
-            sData->request.addNewLine();
+            // sData->request.val[req_hndlr_ns::header] += FPSTR("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
+            //  sData->request.addNewLine();
             sData->request.addConnectionHeader(true);
             if (!options.sv && !options.no_etag && method != async_request_handler_t::http_patch && extras.indexOf("orderBy") == -1)
             {
@@ -2177,6 +2229,32 @@ public:
         }
 
         addRemoveClientVec(cvec_addr, false);
+    }
+
+    /**
+     * Set the external async result to use with the sync task.
+     *
+     * @param result The AsyncResult to set.
+     *
+     * If no async result was set (unset) for sync task, the internal async result will be used and shared usage for all sync tasks.
+     *
+     */
+    void setAsyncResult(AsyncResult &result)
+    {
+        refResult = &result;
+        result_addr = reinterpret_cast<uint32_t>(refResult);
+    }
+
+    /**
+     * Unset the external async result use with the sync task.
+     *
+     * The internal async result will be used and shared usage for all sync tasks.
+     *
+     */
+    void unsetAsyncResult()
+    {
+        refResult = nullptr;
+        result_addr = 0;
     }
 
     /**

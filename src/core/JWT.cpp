@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created May 18, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -138,13 +138,18 @@ bool JWTClass::begin(auth_data_t *auth_data)
 {
     if (processing || !auth_data)
         return false;
-    processing = true;
-    this->auth_data = auth_data;
-    this->auth_data->app_token.clear();
-    this->auth_data->user_auth.jwt_ts = millis();
-    this->auth_data->user_auth.jwt_signing = false;
-    this->auth_data->user_auth.sa.step = jwt_step_begin;
-    return create();
+
+    if (auth_data->user_auth.sa.step == jwt_step_begin)
+    {
+        processing = true;
+        this->auth_data = auth_data;
+        this->auth_data->app_token.clear();
+        this->auth_data->user_auth.jwt_ts = millis();
+        this->auth_data->user_auth.sa.step = jwt_step_create_jwt;
+        processing = false;
+    }
+
+    return true;
 }
 
 bool JWTClass::create()
@@ -155,7 +160,7 @@ bool JWTClass::create()
     if (!auth_data)
         return exit(false);
 
-    if (auth_data->user_auth.sa.step == jwt_step_begin)
+    if (auth_data->user_auth.sa.step == jwt_step_create_jwt)
     {
 
         uint32_t now = 0;
@@ -173,9 +178,16 @@ bool JWTClass::create()
 
         if (now < FIREBASE_DEFAULT_TS)
         {
-            jwt_data.err_code = FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID;
-            jwt_data.msg = (const char *)FPSTR("JWT, time was not set or not valid");
-            return exit(false);
+            configTime(3 * 3600, 0, "pool.ntp.org");
+            while (time(nullptr) < FIREBASE_DEFAULT_TS)
+            {
+                delay(100);
+            }
+
+            now = time(nullptr);
+            //  jwt_data.err_code = FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID;
+            //   jwt_data.msg = (const char *)FPSTR("JWT, time was not set or not valid");
+            //  return exit(false);
         }
 
         // header
@@ -293,6 +305,7 @@ bool JWTClass::create()
         PrivateKey *pk = nullptr;
         sys_idle();
         // parse priv key
+
         if (jwt_data.pk.length() > 0)
             pk = new PrivateKey(jwt_data.pk.c_str());
         else if (auth_data->user_auth.sa.val[sa_ns::pk].length() > 0)

@@ -220,7 +220,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-10. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+10. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
 
     Get value at the node path.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -260,7 +260,7 @@ class RealtimeDatabase
     ```
     
     ```cpp
-    void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     ```
     
     **Params:**
@@ -269,7 +269,7 @@ class RealtimeDatabase
     - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
     - `aResult` - The async result (AsyncResult)
 
-11. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+11. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 
     Get value at the node path.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -309,7 +309,7 @@ class RealtimeDatabase
     ```
     
     ```cpp
-    void get(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     ```
     **Params:**
     - `aClient` - The async client.
@@ -467,7 +467,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-18. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+18. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
 
     Set content from file to database.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -507,7 +507,7 @@ class RealtimeDatabase
     ```
 
     ```cpp
-    void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     ```
     
     **Params:**
@@ -517,7 +517,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
 
 
-19. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+19. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 
     Set content from file to database.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -557,7 +557,7 @@ class RealtimeDatabase
     ```
     
     ```cpp
-    void set(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     ```
     
     **Params:**
@@ -650,7 +650,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-23. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+23. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
 
     Push content from file to database.
     
@@ -691,7 +691,7 @@ class RealtimeDatabase
     ```
     
     ```cpp
-    void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResult &aResult)
+    void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     ```
     
     **Params:**
@@ -701,7 +701,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
 
 
-24. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+24. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 
     Push content from file to database.
 
@@ -742,7 +742,7 @@ class RealtimeDatabase
     ```
     
     ```cpp
-    void push(AsyncClientClass &aClient, const String &path, file_config_data file, AsyncResultCallback cb, const String &uid = "")
+    void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     ```
     
     **Params:**
