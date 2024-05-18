@@ -178,16 +178,9 @@ bool JWTClass::create()
 
         if (now < FIREBASE_DEFAULT_TS)
         {
-            configTime(3 * 3600, 0, "pool.ntp.org");
-            while (time(nullptr) < FIREBASE_DEFAULT_TS)
-            {
-                delay(100);
-            }
-
-            now = time(nullptr);
-            //  jwt_data.err_code = FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID;
-            //   jwt_data.msg = (const char *)FPSTR("JWT, time was not set or not valid");
-            //  return exit(false);
+            jwt_data.err_code = FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID;
+            jwt_data.msg = (const char *)FPSTR("JWT, time was not set or not valid");
+            return exit(false);
         }
 
         // header

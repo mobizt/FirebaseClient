@@ -179,7 +179,7 @@ private:
     app_debug_t app_debug;
     app_event_t app_event;
     FirebaseError lastErr;
-    String header, reqEtag, resETag;
+    String header, reqEtag, resETag, sse_events_filter;
     AsyncResult *refResult = nullptr;
     AsyncResult aResult;
     int netErrState = 0;
@@ -834,12 +834,31 @@ private:
                                 // order of checking: event, data, newline
                                 if (sData->response.val[res_hndlr_ns::payload].indexOf("event: ") > -1 && sData->response.val[res_hndlr_ns::payload].indexOf("data: ") > -1 && sData->response.val[res_hndlr_ns::payload].indexOf("\n") > -1)
                                 {
-                                    // save payload to slot result
-                                    sData->aResult.setPayload(sData->response.val[res_hndlr_ns::payload]);
-                                    clear(sData->response.val[res_hndlr_ns::payload]);
+
                                     parseSSE(&sData->aResult.rtdbResult);
-                                    sData->response.flags.payload_available = true;
-                                    returnResult(sData, true);
+
+                                    // Event filtering.
+                                    String event = sData->aResult.rtdbResult.event();
+                                    if (sse_events_filter.length() == 0 ||
+                                        (sData->response.flags.http_response && sse_events_filter.indexOf("get") > -1 && event.indexOf("put") > -1) ||
+                                        (!sData->response.flags.http_response && sse_events_filter.indexOf("put") > -1 && event.indexOf("put") > -1) ||
+                                        (sse_events_filter.indexOf("patch") > -1 && event.indexOf("patch") > -1) ||
+                                        (sse_events_filter.indexOf("keep-alive") > -1 && event.indexOf("keep-alive") > -1) ||
+                                        (sse_events_filter.indexOf("cancel") > -1 && event.indexOf("cancel") > -1) ||
+                                        (sse_events_filter.indexOf("auth_revoked") > -1 && event.indexOf("auth_revoked") > -1))
+                                    {
+                                        // save payload to slot result
+                                        sData->aResult.setPayload(sData->response.val[res_hndlr_ns::payload]);
+                                        clear(sData->response.val[res_hndlr_ns::payload]);
+                                        sData->response.flags.payload_available = true;
+                                        returnResult(sData, true);
+                                    }
+                                    else
+                                    {
+                                        clear(sData->response.val[res_hndlr_ns::payload]);
+                                    }
+
+                                    sData->response.flags.http_response = false;
                                 }
                             }
 #endif
@@ -891,6 +910,7 @@ private:
             if ((read == 1 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\r') ||
                 (read == 2 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 2] == '\r' && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\n'))
             {
+                sData->response.flags.http_response = true;
                 clear(sData->response.val[res_hndlr_ns::etag]);
                 String temp[5];
 #if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
@@ -1913,6 +1933,9 @@ private:
 
     async_data_item_t *createSlot(slot_options_t &options)
     {
+        if (!options.auth_used)
+            sse_events_filter.remove(0, sse_events_filter.length());
+
         int slot_index = sMan(options);
         // Only one SSE mode is allowed
         if (slot_index == -2)

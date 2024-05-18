@@ -290,6 +290,7 @@ setSyncSendTimeout  KEYWORD2
 setSyncReadTimeout  KEYWORD2
 taskCount   KEYWORD2
 unsetAsyncResult    KEYWORD2
+setSSEFilters   KEYWORD2
 
 ###################
 # Struct (KEYWORD3)

@@ -58,6 +58,7 @@ public:
         bool payload_remaining = false;
         bool keep_alive = false;
         bool sse = false;
+        bool http_response = false;
         bool chunks = false;
         bool payload_available = false;
 

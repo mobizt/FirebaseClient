@@ -864,6 +864,25 @@ public:
                 this->service_url.remove(this->service_url.length() - 1, 1);
         }
     }
+    
+    /**
+     * Filtering response payload for SSE mode (HTTP Streaming).
+     * @param filter The event keywords for filtering.
+     * 
+     * The following event keywords are supported.
+     * get - Allow the http get response (first put event since stream connected).
+     * put - Allow the put event.
+     * patch - Allow the patch event.
+     * keep-alive - Allow the keep-alive event.
+     * cancel - Allow the cancel event.
+     * auth_revoked - Allow the auth_revoked event.
+     * 
+     * Call RealtimeDatabase::setSSEFilters() to clear the filter to allow all events.
+     */
+    void setSSEFilters(const String &filter = "")
+    {
+        this->sse_events_filter = filter;
+    }
 
     /**
      * Perform the async task repeatedly.
@@ -884,6 +903,8 @@ public:
 
 private:
     String service_url;
+    String sse_events_filter;
+
     // FirebaseApp address and FirebaseApp vector address
     uint32_t app_addr = 0, avec_addr = 0;
     app_token_t *app_token = nullptr;
@@ -984,6 +1005,9 @@ private:
 
         if (request.aResult)
             sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->rVec)));
+
+        if (sData->sse && sse_events_filter.length())
+            request.aClient->sse_events_filter = sse_events_filter;
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();

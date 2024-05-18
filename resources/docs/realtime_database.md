@@ -876,8 +876,36 @@ class RealtimeDatabase
     **Params:**
     - `url` - The Firebase database URL.
 
+32. ### 🔹 void setSSEFilters(const String &filter = "")
 
-32. ### 🔹 void loop()
+    Filtering response payload for SSE mode (HTTP Streaming).
+
+    This is optional option to allow specific events filtering.
+
+    The following event keywords are supported.
+    
+    `get` - Allow the http get response (first put event since stream connected).
+    
+    `put` - Allow the put event.
+    
+    `patch` - Allow the patch event.
+    
+    `keep-alive` - Allow the keep-alive event.
+    
+    `cancel` - Allow the cancel event.
+    
+    `auth_revoked` - Allow the auth_revoked event.
+    
+    Call `RealtimeDatabase::setSSEFilters()` to clear the filter to allow all events.
+
+    ```cpp
+    void setSSEFilters(const String &filter = "")
+    ```
+    **Params:**
+    - `filter` - The event keywords for filtering.
+
+
+33. ### 🔹 void loop()
 
     Perform the async task repeatedly.
     Should be places in main loop function.
