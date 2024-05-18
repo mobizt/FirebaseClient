@@ -240,6 +240,13 @@ private:
             stop(sData);
             getResult()->clear();
         }
+
+        // Required for sync task.
+        if (!sData->async)
+        {
+            sData->aResult.lastError.clearError();
+            lastErr.clearError();
+        }
     }
 
     function_return_type sendHeader(async_data_item_t *sData, const char *data)
@@ -746,12 +753,20 @@ private:
             sData->aResult.lastError.setClientError(sData->error.code);
             lastErr.setClientError(sData->error.code);
             clearAppData(sData->aResult.app_data);
+
+            // Required for sync task.
+            if (!sData->async)
+                lastErr.isError();
         }
         else if (sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
         {
             sData->aResult.lastError.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
             lastErr.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
             clearAppData(sData->aResult.app_data);
+
+            // Required for sync task.
+            if (!sData->async)
+                lastErr.isError();
         }
     }
 
