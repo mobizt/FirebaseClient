@@ -130,7 +130,7 @@ void loop()
     {
         ms = millis();
 
-        Serial.println("Asynchronous Push vs Set with custom UUID... ");
+        Serial.println("Synchronous Push vs Set with custom UUID... ");
 
         String path = "/test/int2/" + genUUID();
 
