@@ -41,7 +41,6 @@ public:
     bool shallow = false;
     bool silent = false;
     bool classicRequest = false;
-    String customHeaders;
     DatabaseFilter filter;
 
     void copy(DatabaseOptions &rhs)
@@ -51,7 +50,6 @@ public:
         this->shallow = rhs.shallow;
         this->silent = rhs.silent;
         this->classicRequest = rhs.classicRequest;
-        this->customHeaders = rhs.customHeaders;
         this->filter.copy(rhs.filter);
         this->ota = rhs.ota;
         this->base64 = rhs.base64;
@@ -64,7 +62,6 @@ public:
         shallow = false;
         silent = false;
         classicRequest = false;
-        customHeaders.remove(0, customHeaders.length());
         filter.clear();
     }
 

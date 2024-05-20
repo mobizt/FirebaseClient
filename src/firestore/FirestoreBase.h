@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created May 20, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -37,6 +37,7 @@ using namespace firebase;
 class FirestoreBase : public AppBase
 {
     friend class FirebaseApp;
+    friend class AppBase;
 
 public:
     std::vector<uint32_t> cVec; // AsyncClient vector
@@ -61,25 +62,6 @@ public:
     void url(const String &url)
     {
         this->service_url = url;
-    }
-
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
-    {
-        this->app_addr = app_addr;
-        this->app_token = app_token;
-        this->avec_addr = avec_addr; // AsyncClient vector (list) address
-    }
-
-    app_token_t *appToken()
-    {
-        if (avec_addr > 0)
-        {
-            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
-            List vec;
-            if (cVec)
-                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
-        }
-        return nullptr;
     }
 
     /**
@@ -132,6 +114,25 @@ protected:
         }
     };
 
+    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
+    {
+        this->app_addr = app_addr;
+        this->app_token = app_token;
+        this->avec_addr = avec_addr; // AsyncClient vector (list) address
+    }
+
+    app_token_t *appToken()
+    {
+        if (avec_addr > 0)
+        {
+            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
+            List vec;
+            if (cVec)
+                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
+        }
+        return nullptr;
+    }
+
     void asyncRequest(async_request_data_t &request, int beta = 0)
     {
         URLUtil uut;
@@ -181,7 +182,7 @@ protected:
             sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(getRVec(request.aClient))));
 
         sData->download = request.method == async_request_handler_t::http_get && sData->request.file_data.filename.length();
-        
+
         processBase(request.aClient, sData->async);
         handleRemoveBase(request.aClient);
     }

@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created May 20, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -57,7 +57,7 @@ protected:
             return aClient->createSlot(soption);
         return nullptr;
     }
-    
+
     AsyncResult *getResultBase(AsyncClientClass *aClient) { return aClient->getResult(); }
 
     void newRequestBase(AsyncClientClass *aClient, async_data_item_t *sData, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t &options, const String &uid) { aClient->newRequest(sData, url, path, extras, method, options, uid); }
@@ -93,6 +93,9 @@ protected:
 
         aClient->process(async);
     }
+
+    template <typename T>
+    void setAppBase(T &app, uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr) { app.setApp(app_addr, app_token, avec_addr); }
 };
 
 #endif

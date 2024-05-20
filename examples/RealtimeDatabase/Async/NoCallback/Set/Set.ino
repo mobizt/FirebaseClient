@@ -6,6 +6,7 @@
  * T - The type of value to set.
  * <AsyncClient> - The async client.
  * <path> - The node path to set the value.
+ * <value> - The value to set.
  * <AsyncResult> - The async result (AsyncResult).
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient

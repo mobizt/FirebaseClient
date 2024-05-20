@@ -81,7 +81,6 @@ namespace FirebaseStorage
 
     class DataOptions
     {
-        friend class Messaging;
 
     public:
         String payload, extras;

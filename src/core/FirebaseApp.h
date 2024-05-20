@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created May 20, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -702,7 +702,7 @@ namespace firebase
          * @param app The Firebase services calss object e.g. RealtimeDatabase, Storage, Messaging, CloudStorage and CloudFunctions.
          */
         template <typename T>
-        void getApp(T &app) { app.setApp(app_addr, &auth_data.app_token, reinterpret_cast<uint32_t>(&aVec)); }
+        void getApp(T &app) { setAppBase(app, app_addr, &auth_data.app_token, reinterpret_cast<uint32_t>(&aVec)); }
 
         /**
          * Get the auth token.

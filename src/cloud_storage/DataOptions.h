@@ -388,7 +388,6 @@ namespace GoogleCloudStorage
 
     class DataOptions
     {
-        friend class Messaging;
 
     public:
         String payload, extras;

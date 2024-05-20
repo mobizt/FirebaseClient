@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-05-18T07:29:15Z`
+`2024-05-20T03:04:55Z`
 
 ## Table of Contents
 
@@ -1451,8 +1451,11 @@ The examples provided by this library can be divided into two use cases i.e. `As
                 * [UserAuth](/examples/App/AppInitialization/Async/Callback/UserAuth/)
             * [NoCallback](/examples/App/AppInitialization/Async/NoCallback/)
                 * [CustomAuth](/examples/App/AppInitialization/Async/NoCallback/CustomAuth/)
+                * [CustomAuthFile](/examples/App/AppInitialization/Async/NoCallback/CustomAuthFile/)
                 * [NoAuth](/examples/App//AppInitialization//Async/NoCallback/NoAuth/)
+                * [SaveAndLoad](/examples/App/AppInitialization/Async/NoCallback/SaveAndLoad/)
                 * [ServiceAuth](/examples/App/AppInitialization/Async/NoCallback/ServiceAuth/)
+                * [ServiceAuthFile](/examples/App/AppInitialization/Async/NoCallback/ServiceAuth/)
                 * [TokenAuth](/examples/App/AppInitialization/Async/NoCallback/TokenAuth/)
                     * [AccessToken](/examples/App/AppInitialization/Async/NoCallback/TokenAuth/AccessToken/)
                     * [CustomToken](/examples/App/AppInitialization/Async/NoCallback/TokenAuth/CustomToken/)
@@ -1717,6 +1720,7 @@ The examples provided by this library can be divided into two use cases i.e. `As
     * [Async](/examples/RealtimeDatabase/Async/)
         * [Callback](/examples/RealtimeDatabase/Async/Callback/)
             * [BLOB](/examples/RealtimeDatabase/Async/Callback/BLOB/)
+            * [CustomPushID](/examples/RealtimeDatabase/Async/Callback/CustomPushID/)
             * [File](/examples/RealtimeDatabase/Async/Callback/File/)
             * [Get](/examples/RealtimeDatabase/Async/Callback/Get/)
             * [OTA](/examples/RealtimeDatabase/Async/Callback/OTA/)
@@ -1729,6 +1733,7 @@ The examples provided by this library can be divided into two use cases i.e. `As
             * [Update](/examples/RealtimeDatabase/Async/Callback/Update/)
         * [NoCallback](/examples/RealtimeDatabase/Async/NoCallback/)
             * [BLOB](/examples/RealtimeDatabase/Async/NoCallback//BLOB/)
+            * [CustomPushID](/examples/RealtimeDatabase/Async/NoCallback/CustomPushID/)
             * [File](/examples/RealtimeDatabase/Async/NoCallback/File/)
             * [Get](/examples/RealtimeDatabase/Async/NoCallback/Get/)
             * [OTA](/examples/RealtimeDatabase/Async/NoCallback/OTA/)
@@ -1740,6 +1745,7 @@ The examples provided by this library can be divided into two use cases i.e. `As
             * [StreamGSM](/examples/RealtimeDatabase/Async/NoCallback/StreamGSM/)
             * [Update](/examples/RealtimeDatabase/Async/NoCallback/Update/)
     * [Sync](/examples/RealtimeDatabase/Sync/)
+        * [CustomPushID](/examples/RealtimeDatabase/Sync/CustomPushID/)
         * [ETAG](/examples/RealtimeDatabase/Sync/ETAG/)
         * [Existed](/examples/RealtimeDatabase/Sync/Existed/)
         * [FilteringData](/examples/RealtimeDatabase/Sync/FilteringData/)

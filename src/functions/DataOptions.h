@@ -562,7 +562,6 @@ namespace GoogleCloudFunctions
 
     class DataOptions
     {
-        friend class Messaging;
 
     public:
         String payload, extras;

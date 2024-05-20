@@ -1,6 +1,15 @@
 /**
  * SYNTAX:
  *
+ * RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
+ *
+ * T - The type of value to set.
+ * <AsyncClient> - The async client.
+ * <path> - The node path to set the value.
+ * <value> - The value to set.
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ *
  * RealtimeDatabase::push<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
  *
  * T - The type of value to push.
@@ -47,6 +56,10 @@ void asyncCB(AsyncResult &aResult);
 
 void printResult(AsyncResult &aResult);
 
+void timeStatusCB(uint32_t &ts);
+
+String genUUID();
+
 DefaultNetwork network;
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
@@ -67,7 +80,7 @@ AsyncClient aClient(ssl_client, getNetwork(network));
 
 RealtimeDatabase Database;
 
-bool taskComplete = false;
+unsigned long ms = 0;
 
 void setup()
 {
@@ -113,56 +126,19 @@ void loop()
 
     Database.loop();
 
-    if (app.ready() && !taskComplete)
+    if (app.ready() && (ms == 0 || millis() - ms > 60000))
     {
-        taskComplete = true;
+        ms = millis();
 
-        Serial.println("Asynchronous Push... ");
+        Serial.println("Asynchronous Push vs Set with custom UUID... ");
+
+        String path = "/test/int2/" + genUUID();
 
         // Push int
         Database.push<int>(aClient, "/test/int", 12345, asyncCB, "pushIntTask");
 
-        // Push bool
-        Database.push<bool>(aClient, "/test/bool", true, asyncCB, "pushBoolTask");
-
-        // Push string
-        Database.push<String>(aClient, "/test/string", "hello", asyncCB, "pushStringTask");
-
-        // Push json
-        Database.push<object_t>(aClient, "/test/json", object_t("{\"data\":123}"), asyncCB, "pushJsonTask1");
-
-        // Library does not provide JSON parser library, the following JSON writer class will be used with
-        // object_t for simple demonstration.
-
-        object_t json, obj1, obj2, obj3, obj4;
-        JsonWriter writer;
-
-        writer.create(obj1, "int/value", 9999);
-        writer.create(obj2, "string/value", string_t("hello"));
-        writer.create(obj3, "float/value", number_t(123.456, 2));
-        writer.join(obj4, 3 /* no. of object_t (s) to join */, obj1, obj2, obj3);
-        writer.create(json, "node/list", obj4);
-
-        // To print object_t
-        // Serial.println(json);
-
-        Database.push<object_t>(aClient, "/test/json", json, asyncCB, "pushJsonTask2");
-
-        object_t arr;
-        arr.initArray(); // initialize to be used as array
-        writer.join(arr, 4 /* no. of object_t (s) to join */, object_t("[12,34]"), object_t("[56,78]"), object_t(string_t("steve")), object_t(888));
-
-        // Note that value that sets to object_t other than JSON ({}) and Array ([]) can be valid only if it
-        // used as array member value as above i.e. object_t(string_t("steve")) and object_t(888).
-
-        // Push array
-        Database.push<object_t>(aClient, "/test/arr", arr, asyncCB, "pushArrayTask");
-
-        // Push float
-        Database.push<number_t>(aClient, "/test/float", number_t(123.456, 2), asyncCB, "pushFloatTask");
-
-        // Push double
-        Database.push<number_t>(aClient, "/test/double", number_t(1234.56789, 4), asyncCB, "pushDoubleTask");
+        // Set int with custom UUID
+        Database.set<object_t>(aClient, path, 12345, asyncCB, "setTask");
     }
 }
 
@@ -197,4 +173,106 @@ void printResult(AsyncResult &aResult)
             Firebase.printf("task: %s, name: %s\n", aResult.uid().c_str(), aResult.to<RealtimeDatabaseResult>().name().c_str());
         Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
+}
+
+void timeStatusCB(uint32_t &ts)
+{
+#if defined(ESP8266) || defined(ESP32) || defined(CORE_ARDUINO_PICO)
+    if (time(nullptr) < FIREBASE_DEFAULT_TS)
+    {
+
+        configTime(3 * 3600, 0, "pool.ntp.org");
+        while (time(nullptr) < FIREBASE_DEFAULT_TS)
+        {
+            delay(100);
+        }
+    }
+    ts = time(nullptr);
+#elif __has_include(<WiFiNINA.h>) || __has_include(<WiFi101.h>)
+    ts = WiFi.getTime();
+#endif
+}
+
+String genUUID()
+{
+    // Push UUID generator, https://gist.github.com/mikelehen/3596a30bd69384624c11
+
+    /**
+     * Fancy ID generator that creates 20-character string identifiers with the following properties:
+     *
+     * 1. They're based on timestamp so that they sort *after* any existing ids.
+     * 2. They contain 72-bits of random data after the timestamp so that IDs won't collide with other clients' IDs.
+     * 3. They sort *lexicographically* (so the timestamp is converted to characters that will sort properly).
+     * 4. They're monotonically increasing.  Even if you generate more than one in the same timestamp, the
+     *    latter ones will sort after the former ones.  We do this by using the previous random bits
+     *    but "incrementing" them by 1 (only in the case of a timestamp collision).
+     */
+
+    // Modeled after base64 web-safe chars, but ordered by ASCII.
+    static char PUSH_CHARS[] = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
+
+    // Timestamp of last push, used to prevent local collisions if you push twice in one ms.
+    static long long lastPushTime = 0;
+
+    // We generate 72-bits of randomness which get turned into 12 characters and appended to the
+    // timestamp to prevent collisions with other clients.  We store the last characters we
+    // generated because in the event of a collision, we'll use those same characters except
+    // "incremented" by one.
+    char lastRandChars[72] = "";
+    char timeStampChars[9] = "";
+
+    uint32_t ts = 0;
+    timeStatusCB(ts);
+
+    long long now = ts * 1000LL;
+
+    srand(now);
+
+    bool duplicateTime = (now == lastPushTime);
+    lastPushTime = now;
+
+    for (int i = 7; i >= 0; i--)
+    {
+        timeStampChars[i] = PUSH_CHARS[(int)(now % 64)];
+        now = now / 64;
+    }
+
+    // We should have converted the entire timestamp.
+    if (now != 0)
+        return String();
+
+    timeStampChars[8] = '\0';
+
+    String id = timeStampChars;
+
+    if (!duplicateTime)
+    {
+        for (int i = 0; i < 12; i++)
+        {
+            double fl = ((double)rand() / (double)(RAND_MAX + 1.0)) * 64;
+            lastRandChars[i] = (char)floor(fl);
+        }
+    }
+    else
+    {
+        // If the timestamp hasn't changed since last push, use the same random number, except incremented by 1.
+        int val = 0;
+        for (int i = 11; i >= 0 && lastRandChars[i] == 63; i--)
+        {
+            val = i;
+            lastRandChars[i] = 0;
+        }
+
+        if (val >= 0)
+            lastRandChars[val]++;
+    }
+
+    for (int i = 0; i < 12; i++)
+        id += PUSH_CHARS[(int)lastRandChars[i]];
+
+    // Length should be 20.
+    if (id.length() != 20)
+        return String();
+
+    return id;
 }

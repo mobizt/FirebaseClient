@@ -45,6 +45,8 @@
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
 
+void authHandler();
+
 void printResult(AsyncResult &aResult);
 
 void printError(int code, const String &msg);

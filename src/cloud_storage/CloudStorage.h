@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created May 20, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -36,6 +36,8 @@ using namespace firebase;
 class CloudStorage
 {
 
+    friend class AppBase;
+
 public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
@@ -58,25 +60,6 @@ public:
     void url(const String &url)
     {
         this->service_url = url;
-    }
-
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
-    {
-        this->app_addr = app_addr;
-        this->app_token = app_token;
-        this->avec_addr = avec_addr; // AsyncClient vector (list) address
-    }
-
-    app_token_t *appToken()
-    {
-        if (avec_addr > 0)
-        {
-            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
-            List vec;
-            if (cVec)
-                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
-        }
-        return nullptr;
     }
 
     /**
@@ -418,6 +401,25 @@ private:
     uint32_t app_addr = 0, avec_addr = 0;
     app_token_t *app_token = nullptr;
     Memory mem;
+
+    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
+    {
+        this->app_addr = app_addr;
+        this->app_token = app_token;
+        this->avec_addr = avec_addr; // AsyncClient vector (list) address
+    }
+
+    app_token_t *appToken()
+    {
+        if (avec_addr > 0)
+        {
+            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
+            List vec;
+            if (cVec)
+                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
+        }
+        return nullptr;
+    }
 
     void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudStorage::Parent &parent, file_config_data *file, GoogleCloudStorage::BaseOptions *baseOptions, GoogleCloudStorage::uploadOptions *uploadOptions, GoogleCloudStorage::ListOptions *listOptions, GoogleCloudStorage::google_cloud_storage_request_type requestType, bool async)
     {

@@ -6,6 +6,7 @@
  * T - The type of value to set.
  * <AsyncClient> - The async client.
  * <path> - The node path to set the value.
+ * <value> - The value to set.
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
  *

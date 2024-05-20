@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created May 20, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -35,6 +35,7 @@ using namespace firebase;
 class RealtimeDatabase : public RTDBResultBase
 {
     friend class FirebaseApp;
+    friend class AppBase;
 
 public:
     std::vector<uint32_t> cVec; // AsyncClient vector
@@ -48,25 +49,6 @@ public:
     {
         this->service_url = rhs.service_url;
         return *this;
-    }
-
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
-    {
-        this->app_addr = app_addr;
-        this->app_token = app_token;
-        this->avec_addr = avec_addr; // AsyncClient vector (list) address
-    }
-
-    app_token_t *appToken()
-    {
-        if (avec_addr > 0)
-        {
-            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
-            List vec;
-            if (cVec)
-                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
-        }
-        return nullptr;
     }
 
     ~RealtimeDatabase()
@@ -110,10 +92,6 @@ public:
      *
      * classicRequest, the option (boolean) to use HTTP POST for PUT (set) and DELETE (remove).
      *
-     * customHeaders, the custom header which is currently supported only X-Firebase-ETag header.
-     *
-     * ETAG, the ETAG value for The if-match condition request header for the data you want to update.
-     *
      * Filter, the options for complex data filtering which included the properties i.e., orderBy, startAt, endAt, limitToFirst, limitToLast, and equalTo.
      *
      * ### Example
@@ -135,7 +113,7 @@ public:
     template <typename T = int>
     auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, false, false, options.shallow), &options, nullptr, aClient.getResult(), NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, false, options.shallow), &options, nullptr, aClient.getResult(), NULL);
         asyncRequest(aReq);
         return aClient.getResult()->rtdbResult.to<T>();
     }
@@ -864,13 +842,13 @@ public:
                 this->service_url.remove(this->service_url.length() - 1, 1);
         }
     }
-    
+
     /**
      * Filtering response payload for SSE mode (HTTP Streaming).
      * @param filter The event keywords for filtering.
-     * 
+     *
      * This is optional to allow specific events filtering.
-     * 
+     *
      * The following event keywords are supported.
      * get - Allow the http get response (first put event since stream connected).
      * put - Allow the put event.
@@ -878,7 +856,7 @@ public:
      * keep-alive - Allow the keep-alive event.
      * cancel - Allow the cancel event.
      * auth_revoked - Allow the auth_revoked event.
-     * 
+     *
      * Call RealtimeDatabase::setSSEFilters() to clear the filter to allow all events.
      */
     void setSSEFilters(const String &filter = "")
@@ -937,6 +915,25 @@ private:
             this->uid = uid;
         }
     };
+
+    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
+    {
+        this->app_addr = app_addr;
+        this->app_token = app_token;
+        this->avec_addr = avec_addr; // AsyncClient vector (list) address
+    }
+
+    app_token_t *appToken()
+    {
+        if (avec_addr > 0)
+        {
+            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
+            List vec;
+            if (cVec)
+                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
+        }
+        return nullptr;
+    }
 
     template <typename T = object_t>
     bool storeAsync(AsyncClientClass &aClient, const String &path, const T &value, async_request_handler_t::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb, const String &uid)
