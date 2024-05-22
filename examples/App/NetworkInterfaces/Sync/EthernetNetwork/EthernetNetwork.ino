@@ -18,9 +18,8 @@
  */
 
 #include <Arduino.h>
-#include <FirebaseClient.h>
-
 #include <Ethernet.h>
+#include <FirebaseClient.h>
 
 // The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
