@@ -1643,9 +1643,9 @@ private:
 
             if (ret)
             {
-                String debug = FPSTR("Connected, IP: ");
-                debug += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP().toString();
-                setDebugBase(app_debug, debug);
+                String msg = FPSTR("Connected, IP: ");
+                msg += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP().toString();
+                setDebugBase(app_debug, msg);
             }
             else
             {
