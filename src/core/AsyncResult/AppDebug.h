@@ -72,7 +72,7 @@ namespace firebase
 
         void setDebug(const String &msg)
         {
-
+            
             if (msg.length() == 0 || strcmp(last.c_str(), msg.c_str()) == 0)
                 return;
 

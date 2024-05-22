@@ -1,5 +1,5 @@
 /**
- * Created April 23, 2024
+ * Created May 22, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -125,6 +125,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 
 #define FIREBASE_ETHERNET_MODULE_IS_AVAILABLE
 
+// milliseconds
 #if !defined(FIREBASE_ETHERNET_MODULE_TIMEOUT)
 #define FIREBASE_ETHERNET_MODULE_TIMEOUT 2000
 #elif FIREBASE_ETHERNET_MODULE_TIMEOUT <= 0 || FIREBASE_ETHERNET_MODULE_TIMEOUT > 120 * 1000

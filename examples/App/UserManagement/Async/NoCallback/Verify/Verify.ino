@@ -97,7 +97,7 @@ void loop()
 {
     // The async task handler should run inside the main loop
     // without blocking delay or bypassing with millis code blocks.
-    
+
     app.loop();
 }
 
@@ -116,5 +116,10 @@ void printResult(AsyncResult &aResult)
     if (aResult.isError())
     {
         Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.available())
+    {
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }

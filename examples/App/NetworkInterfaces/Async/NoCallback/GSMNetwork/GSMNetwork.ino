@@ -102,7 +102,6 @@ void setup()
 {
 
     Serial.begin(115200);
-    Serial.begin(115200);
 
     delay(10);
     pinMode(BAT_EN, OUTPUT);
@@ -199,5 +198,10 @@ void printResult(AsyncResult &aResult)
     if (aResult.isError())
     {
         Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.available())
+    {
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }

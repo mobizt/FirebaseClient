@@ -101,14 +101,14 @@ void loop()
 
 void authHandler()
 {
-    // Blocking authentication handler with timeout
-    unsigned long ms = millis();
-    while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
-    {
-        // This JWT token process required for ServiceAuth and CustomAuth authentications
-        JWT.loop(app.getAuth());
-        printResult(aResult_no_callback);
-    }
+  // Blocking authentication handler with timeout
+  unsigned long ms = millis();
+  while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
+  {
+    // This JWT token process required for ServiceAuth and CustomAuth authentications
+    JWT.loop(app.getAuth());
+    printResult(aResult_no_callback);
+  }
 }
 
 void printResult(AsyncResult &aResult)
@@ -126,6 +126,11 @@ void printResult(AsyncResult &aResult)
   if (aResult.isError())
   {
     Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+  }
+
+  if (aResult.available())
+  {
+    Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
   }
 }
 

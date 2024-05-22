@@ -85,7 +85,6 @@ void setup()
 #endif
 
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
-
 }
 
 void loop()
@@ -100,7 +99,6 @@ void loop()
 
     printResult(aResult_no_callback);
 }
-
 
 void printResult(AsyncResult &aResult)
 {
@@ -117,5 +115,10 @@ void printResult(AsyncResult &aResult)
     if (aResult.isError())
     {
         Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+    }
+
+    if (aResult.available())
+    {
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }

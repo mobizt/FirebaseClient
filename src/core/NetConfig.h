@@ -1,5 +1,5 @@
 /**
- * Created April 23, 2024
+ * Created May 22, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,7 +30,7 @@
 #include "./core/Network.h"
 #include "./core/Memory.h"
 
-#define FIREBASE_NET_RECONNECT_TIMEOUT_SEC 10000
+#define FIREBASE_NET_RECONNECT_TIMEOUT_SEC 10
 
 struct network_config_data
 {
@@ -61,10 +61,20 @@ private:
         }
     };
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(ENABLE_GSM_NETWORK)
+
+    enum gsm_conn_status
+    {
+        gsm_conn_status_idle,
+        gsm_conn_status_waits_network,
+        gsm_conn_status_network_connected,
+        gsm_conn_status_waits_gprs
+    };
+
     struct gsm_data
     {
         String pin, apn, user, password;
         void *modem = nullptr;
+        gsm_conn_status conn_status;
 
     public:
         void copy(gsm_data &rhs)
@@ -87,6 +97,16 @@ private:
 #endif
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
 
+    enum ethernet_conn_status
+    {
+        ethernet_conn_status_idle,
+        ethernet_conn_status_rst_pin_unselected,
+        ethernet_conn_status_rst_pin_selected,
+        ethernet_conn_status_rst_pin_released,
+        ethernet_conn_status_begin,
+        ethernet_conn_status_waits,
+    };
+
     // SPI Ethernet Module Data
     struct ethernet_data
     {
@@ -94,6 +114,8 @@ private:
         int ethernet_cs_pin = -1;
         uint8_t *ethernet_mac = nullptr;
         Firebase_StaticIP *static_ip = nullptr;
+        ethernet_conn_status conn_satatus;
+        unsigned long stobe_ms = 0;
 
     public:
         void copy(ethernet_data &rhs)

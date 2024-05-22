@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created May 22, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -247,6 +247,20 @@ private:
             sData->aResult.lastError.clearError();
             lastErr.clearError();
         }
+    }
+
+    function_return_type networkConnect(async_data_item_t *sData)
+    {
+        function_return_type ret = netConnect(sData);
+
+        if (!sData || ret == function_return_type_failure)
+        {
+            // In case TCP (network) disconnected error.
+            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
+            return function_return_type_failure;
+        }
+
+        return ret;
     }
 
     function_return_type sendHeader(async_data_item_t *sData, const char *data)
@@ -515,14 +529,12 @@ private:
 
     function_return_type send(async_data_item_t *sData)
     {
-        if (!sData || !netConnect(sData))
-        {
-            // In case TCP (network) disconnected error.
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
-            return function_return_type_failure;
-        }
+        function_return_type ret = networkConnect(sData);
 
-        function_return_type ret = function_return_type_continue;
+        if (ret != function_return_type_complete)
+            return ret;
+
+        ret = function_return_type_continue;
 
         if (sData->state == async_state_undefined || sData->state == async_state_send_header)
         {
@@ -588,12 +600,10 @@ private:
 
     function_return_type receive(async_data_item_t *sData)
     {
-        if (!sData || !netConnect(sData))
-        {
-            // In case TCP (network) disconnected error.
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
-            return function_return_type_failure;
-        }
+        function_return_type ret = networkConnect(sData);
+
+        if (ret != function_return_type_complete)
+            return ret;
 
         if (!readResponse(sData))
         {
@@ -715,7 +725,7 @@ private:
         bool error_notify_timeout = false;
         if (sData->err_timer.remaining() == 0)
         {
-            sData->err_timer.feed(5000);
+            sData->err_timer.feed(5);
             error_notify_timeout = true;
         }
 
@@ -812,7 +822,7 @@ private:
 
     bool readResponse(async_data_item_t *sData)
     {
-        if (!netConnect(sData) || !client || !sData)
+        if (!client || !sData)
             return false;
 
         if (sData->response.tcpAvailable(client_type, client, async_tcp_config) > 0)
@@ -979,7 +989,7 @@ private:
                     sData->response.flags.payload_remaining = false;
 
                 if (sData->request.method == async_request_handler_t::http_delete && sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
-                    sData->aResult.setDebug(FPSTR("Delete operation complete"));
+                    setDebugBase(app_debug, FPSTR("Delete operation complete"));
             }
         }
     }
@@ -1350,7 +1360,7 @@ private:
         lastErr.clearError();
 
         if (client && !client->connected() && !sData->auth_used) // This info is already show in auth task
-            sData->aResult.setDebug(FPSTR("Connecting to server..."));
+            setDebugBase(app_debug, FPSTR("Connecting to server..."));
 
         if (client && !client->connected() && client_type == async_request_handler_t::tcp_client_type_sync)
             sData->return_type = client->connect(host, port) > 0 ? function_return_type_complete : function_return_type_failure;
@@ -1464,84 +1474,82 @@ private:
         return strcmp(buf, "0.0.0.0") != 0;
     }
 
-    bool gprsConnect(async_data_item_t *sData)
+    function_return_type gprsConnect(async_data_item_t *sData)
     {
+        bool ret = false;
+
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
         TinyGsm *gsmModem = (TinyGsm *)net.gsm.modem;
+
         if (gsmModem)
         {
-            // Unlock your SIM card with a PIN if needed
-            if (net.gsm.pin.length() && gsmModem->getSimStatus() != 3)
-                gsmModem->simUnlock(net.gsm.pin.c_str());
+            if (net.gsm.conn_status == network_config_data::gsm_conn_status_idle)
+            {
+                net.gsm.conn_status = network_config_data::gsm_conn_status_waits_network;
+
+                gprsDisconnect();
+
+                // Unlock your SIM card with a PIN if needed
+                if (net.gsm.pin.length() && gsmModem->getSimStatus() != 3)
+                    gsmModem->simUnlock(net.gsm.pin.c_str());
 
 #if defined(TINY_GSM_MODEM_XBEE)
-            // The XBee must run the gprsConnect function BEFORE waiting for network!
-            gsmModem->gprsConnect(_apn.c_str(), _user.c_str(), _password.c_str());
+                // The XBee must run the gprsConnect function BEFORE waiting for network!
+                gsmModem->gprsConnect(_apn.c_str(), _user.c_str(), _password.c_str());
 #endif
-            // ISSUE
-            // This debug will be missed because of current blocking code.
-            // TO DO
-            // Replace with non-blocking reconnect process.
-            if (netErrState == 0 && sData)
-                sData->aResult.setDebug(FPSTR("Waiting for network..."));
-            if (!gsmModem->waitForNetwork())
-            {
-                // ISSUE
-                // This debug will be missed because of current blocking code.
-                // TO DO
-                // Replace with non-blocking reconnect process.
-                if (netErrState == 0 && sData)
-                    sData->aResult.setDebug(FPSTR("Network connection failed"));
-                netErrState = 1;
-                net.network_status = false;
-                return false;
+
+                setDebugBase(app_debug, FPSTR("Waiting for network..."));
+                return function_return_type_continue;
             }
-
-            // ISSUE
-            // This debug will be missed because of current blocking code.
-            // TO DO
-            // Replace with non-blocking reconnect process.
-            if (netErrState == 0 && sData)
-                sData->aResult.setDebug(FPSTR("Network connected"));
-
-            if (gsmModem->isNetworkConnected())
+            else if (net.gsm.conn_status == network_config_data::gsm_conn_status_waits_network)
             {
-
-                if (netErrState == 0 && sData)
+                if (!gsmModem->waitForNetwork())
                 {
-                    // ISSUE
-                    // This debug will be missed because of current blocking code.
-                    // TO DO
-                    // Replace with non-blocking reconnect process.
-                    String debug = FPSTR("Connecting to ");
-                    debug += net.gsm.apn.c_str();
-                    sData->aResult.setDebug(debug);
+                    setDebugBase(app_debug, FPSTR("Network connection failed"));
+                    netErrState = 1;
+                    net.network_status = false;
+                    net.gsm.conn_status = network_config_data::gsm_conn_status_idle;
+                    return function_return_type_failure;
                 }
 
-                net.network_status = gsmModem->gprsConnect(net.gsm.apn.c_str(), net.gsm.user.c_str(), net.gsm.password.c_str()) &&
-                                     gsmModem->isGprsConnected();
+                net.gsm.conn_status = network_config_data::gsm_conn_status_waits_gprs;
 
-                if (netErrState == 0 && sData)
+                setDebugBase(app_debug, FPSTR("Network connected"));
+
+                if (gsmModem->isNetworkConnected())
                 {
-                    // ISSUE
-                    // This debug will be missed because of current blocking code.
-                    // TO DO
-                    // Replace with non-blocking reconnect process.
-                    if (net.network_status)
-                        sData->aResult.setDebug(FPSTR("GPRS/EPS connected"));
-                    else
-                        sData->aResult.setDebug(FPSTR("GPRS/EPS connection failed"));
+                    if (netErrState == 0)
+                    {
+                        String debug = FPSTR("Connecting to ");
+                        debug += net.gsm.apn.c_str();
+                        setDebugBase(app_debug, debug);
+                    }
+                }
+
+                return function_return_type_continue;
+            }
+            else if (net.gsm.conn_status == network_config_data::gsm_conn_status_waits_gprs)
+            {
+                if (gsmModem->isNetworkConnected())
+                {
+
+                    net.network_status = gsmModem->gprsConnect(net.gsm.apn.c_str(), net.gsm.user.c_str(), net.gsm.password.c_str()) && gsmModem->isGprsConnected();
+
+                    if (netErrState == 0)
+                        setDebugBase(app_debug, net.network_status ? FPSTR("GPRS/EPS connected") : FPSTR("GPRS/EPS connection failed"));
+
+                    if (!net.network_status)
+                        netErrState = 1;
                 }
             }
 
-            if (!net.network_status)
-                netErrState = 1;
+            net.gsm.conn_status = network_config_data::gsm_conn_status_idle;
 
-            return net.network_status;
+            return net.network_status ? function_return_type_complete : function_return_type_failure;
         }
 
 #endif
-        return false;
+        return function_return_type_failure;
     }
 
     bool gprsConnected()
@@ -1562,99 +1570,105 @@ private:
         return !net.network_status;
     }
 
-    bool ethernetConnect(async_data_item_t *sData)
+    function_return_type ethernetConnect(async_data_item_t *sData)
     {
         bool ret = false;
 
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
 
-        if (net.ethernet.ethernet_cs_pin > -1)
+        if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_idle && net.ethernet.ethernet_cs_pin > -1)
             FIREBASE_ETHERNET_MODULE_CLASS_IMPL.init(net.ethernet.ethernet_cs_pin);
 
         if (net.ethernet.ethernet_reset_pin > -1)
         {
-            // ISSUE
-            // This debug will be missed because of current blocking code.
-            // TO DO
-            // Replace with non-blocking reconnect process.
-            if (sData)
-                sData->aResult.setDebug(FPSTR("Resetting Ethernet Board..."));
-
-            pinMode(net.ethernet.ethernet_reset_pin, OUTPUT);
-            digitalWrite(net.ethernet.ethernet_reset_pin, HIGH);
-            delay(200);
-            digitalWrite(net.ethernet.ethernet_reset_pin, LOW);
-            delay(50);
-            digitalWrite(net.ethernet.ethernet_reset_pin, HIGH);
-            delay(200);
-        }
-
-        // ISSUE
-        // This debug will be missed because of current blocking code.
-        // TO DO
-        // Replace with non-blocking reconnect process.
-        if (sData)
-            sData->aResult.setDebug(FPSTR("Starting Ethernet connection..."));
-
-        if (net.ethernet.static_ip)
-        {
-
-            if (net.ethernet.static_ip->optional == false)
-                FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
-            else if (!FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac))
+            if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_idle)
             {
-                FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
+                setDebugBase(app_debug, FPSTR("Resetting Ethernet Board..."));
+
+                pinMode(net.ethernet.ethernet_reset_pin, OUTPUT);
+                digitalWrite(net.ethernet.ethernet_reset_pin, HIGH);
+
+                net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_rst_pin_unselected;
+                net.ethernet.stobe_ms = millis();
+            }
+            else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_rst_pin_unselected && millis() - net.ethernet.stobe_ms > 200)
+            {
+                digitalWrite(net.ethernet.ethernet_reset_pin, LOW);
+                net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_rst_pin_selected;
+                net.ethernet.stobe_ms = millis();
+            }
+            else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_rst_pin_selected && millis() - net.ethernet.stobe_ms > 50)
+            {
+                digitalWrite(net.ethernet.ethernet_reset_pin, HIGH);
+                net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_rst_pin_released;
+                net.ethernet.stobe_ms = millis();
+            }
+            else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_rst_pin_released && millis() - net.ethernet.stobe_ms > 200)
+            {
+                net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_begin;
             }
         }
-        else
-            FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac);
+        else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_idle)
+            net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_begin;
 
-        net.eth_timer.feed(FIREBASE_ETHERNET_MODULE_TIMEOUT);
-
-        while (FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkOFF && net.eth_timer.remaining() > 0)
+        if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_begin)
         {
-            delay(100);
+
+            net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_waits;
+            setDebugBase(app_debug, FPSTR("Starting Ethernet connection..."));
+
+            if (net.ethernet.static_ip)
+            {
+                if (net.ethernet.static_ip->optional == false)
+                    FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
+                else if (!FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac))
+                {
+                    FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
+                }
+            }
+            else
+                FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac);
+
+            net.eth_timer.feed(FIREBASE_ETHERNET_MODULE_TIMEOUT / 1000);
         }
-
-        ret = ethernetConnected();
-
-        if (ret && sData)
+        else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_waits)
         {
-            // ISSUE
-            // This debug will be missed because of current blocking code.
-            // TO DO
-            // Replace with non-blocking reconnect process.
-            String debug = FPSTR("Starting Ethernet connection...");
-            debug += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP().toString();
-            sData->aResult.setDebug(debug);
-        }
 
-        // ISSUE
-        // This debug will be missed because of current blocking code.
-        // TO DO
-        // Replace with non-blocking reconnect process.
-        if (!ret && sData)
-            sData->aResult.setDebug(FPSTR("Can't connect to network"));
+            if (FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() != LinkON && net.eth_timer.remaining() > 0)
+                return function_return_type_continue;
+
+            net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_idle;
+
+            ret = ethernetConnected();
+
+            if (ret)
+            {
+                String msg = FPSTR("Connected, IP: ");
+                msg += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP().toString();
+                setDebugBase(app_debug, msg);
+            }
+            else
+            {
+                setDebugBase(app_debug, FPSTR("Can't connect to network"));
+            }
+
+            return ret ? function_return_type_complete : function_return_type_failure;
+        }
 
 #endif
 
-        return ret;
+        return function_return_type_continue;
     }
 
     bool ethernetConnected()
     {
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE)
         net.network_status = FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkON && validIP(FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP());
-        if (!net.network_status)
-        {
-            delay(FIREBASE_ETHERNET_MODULE_TIMEOUT);
-            net.network_status = FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkON && validIP(FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP());
-        }
 #endif
         return net.network_status;
     }
 
-    bool netConnect(async_data_item_t *sData)
+    function_return_type netConnect(async_data_item_t *sData)
     {
         if (!netStatus(sData))
         {
@@ -1663,16 +1677,17 @@ private:
             if (net.wifi && net.net_timer.feedCount() == 0)
                 recon = true;
 
-            if (recon && (net.net_timer.remaining() == 0))
-            {
+            // Self network connection controls.
+            bool self_connect = net.network_data_type == firebase_network_data_gsm_network || net.network_data_type == firebase_network_data_ethernet_network;
+
+            if (!self_connect && net.net_timer.remaining() == 0)
                 net.net_timer.feed(FIREBASE_NET_RECONNECT_TIMEOUT_SEC);
 
-                // ISSUE
-                // This debug will be missed because of current blocking code in case Ethernet and GSM modules.
-                // TO DO
-                // Replace with non-blocking reconnect process.
-                if (sData)
-                    sData->aResult.setDebug(FPSTR("Reconnecting to network..."));
+            if (recon && (self_connect || (!self_connect && net.net_timer.remaining() == 0)))
+            {
+
+                if (!self_connect)
+                    setDebugBase(app_debug, FPSTR("Reconnecting to network..."));
 
                 if (net.network_data_type == firebase_network_data_generic_network)
                 {
@@ -1681,7 +1696,7 @@ private:
                     if (WiFI_CONNECTED)
                     {
                         WiFi.reconnect();
-                        return netStatus(sData);
+                        return netStatus(sData) ? function_return_type_complete : function_return_type_failure;
                     }
 #endif
                     if (net.generic.net_con_cb)
@@ -1689,12 +1704,13 @@ private:
                 }
                 else if (net.network_data_type == firebase_network_data_gsm_network)
                 {
-                    gprsDisconnect();
-                    gprsConnect(sData);
+                    if (gprsConnect(sData) == function_return_type_continue)
+                        return function_return_type_continue;
                 }
                 else if (net.network_data_type == firebase_network_data_ethernet_network)
                 {
-                    ethernetConnect(sData);
+                    if (ethernetConnect(sData) == function_return_type_continue)
+                        return function_return_type_continue;
                 }
                 else if (net.network_data_type == firebase_network_data_default_network)
                 {
@@ -1714,7 +1730,7 @@ private:
             }
         }
 
-        return netStatus(sData);
+        return netStatus(sData) ? function_return_type_complete : function_return_type_failure;
     }
 
     bool netStatus(async_data_item_t *sData)
@@ -1723,13 +1739,11 @@ private:
         if (net.network_data_type == firebase_network_data_gsm_network)
         {
             net.network_status = gprsConnected();
-            if (!net.network_status)
-                gprsConnect(sData);
         }
         else if (net.network_data_type == firebase_network_data_ethernet_network)
         {
-            if (!ethernetConnected())
-                ethernetConnect(sData);
+            if (net.ethernet.conn_satatus != network_config_data::ethernet_conn_status_waits)
+                net.network_status = ethernetConnected();
         }
         // also check the native network before calling external cb
         else if (net.network_data_type == firebase_network_data_default_network || WiFI_CONNECTED || ethLinkUp())
@@ -1926,8 +1940,8 @@ private:
 
     void stop(async_data_item_t *sData)
     {
-        if (sData && client && client->connected())
-            sData->aResult.setDebug(FPSTR("Terminating the server connection..."));
+        if (client && client->connected())
+            setDebugBase(app_debug, FPSTR("Terminating the server connection..."));
 
         if (client_type == async_request_handler_t::tcp_client_type_sync)
         {
@@ -2088,8 +2102,14 @@ private:
 
     size_t slotCount() { return sVec.size(); }
 
+    void exitProcess(bool status)
+    {
+        inProcess = status;
+    }
+
     void process(bool async)
     {
+
         if (processLocked())
             return;
 
@@ -2099,16 +2119,13 @@ private:
             async_data_item_t *sData = getData(slot);
 
             if (!sData)
-            {
-                inProcess = false;
-                return;
-            }
+                return exitProcess(false);
 
             updateDebug(app_debug);
             updateEvent(app_event);
             sData->aResult.updateData();
 
-            if (!netConnect(sData))
+            if (networkConnect(sData) == function_return_type_failure)
             {
                 // In case TCP (network) disconnected error.
                 setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
@@ -2117,15 +2134,12 @@ private:
                     returnResult(sData, false);
                     reset(sData, true);
                 }
-                inProcess = false;
-                return;
+
+                return exitProcess(false);
             }
 
             if (sData->async && !async)
-            {
-                inProcess = false;
-                return;
-            }
+                return exitProcess(false);
 
             // We have to re-start sse when the authenticate changed
             if (sData->sse && sData->auth_ts != auth_ts)
@@ -2156,10 +2170,7 @@ private:
             {
                 handleSendTimeout(sData);
                 if (sData->async && sData->return_type == function_return_type_continue)
-                {
-                    inProcess = false;
-                    return;
-                }
+                    return exitProcess(false);
             }
 
             sys_idle();
@@ -2176,12 +2187,11 @@ private:
                     handleEventTimeout(sData);
 #endif
                     handleReadTimeout(sData);
-                    inProcess = false;
-                    return;
+                    return exitProcess(false);
                 }
                 else if (!sData->async) // wait for non async
                 {
-                    while (!sData->response.tcpAvailable(client_type, client, async_tcp_config) && netConnect(sData))
+                    while (!sData->response.tcpAvailable(client_type, client, async_tcp_config) && networkConnect(sData) == function_return_type_complete)
                     {
                         sys_idle();
                         if (handleReadTimeout(sData))
@@ -2232,7 +2242,7 @@ private:
                 removeSlot(slot);
         }
 
-        inProcess = false;
+        exitProcess(false);
     }
 
     std::vector<uint32_t> rVec; // AsyncResult vector
