@@ -1643,9 +1643,9 @@ private:
 
             if (ret)
             {
-                String msg = FPSTR("Connected, IP: ");
-                msg += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP().toString();
-                setDebugBase(app_debug, msg);
+                String debug = FPSTR("Connected, IP: ");
+                debug += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP().toString();
+                setDebugBase(app_debug, debug);
             }
             else
             {
@@ -1663,7 +1663,12 @@ private:
     bool ethernetConnected()
     {
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE)
+#if defined(ENABLE_ETHERNET_NETWORK)
+        if (net.ethernet.conn_satatus != network_config_data::ethernet_conn_status_waits)
+            net.network_status = FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkON && validIP(FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP());
+#else
         net.network_status = FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkON && validIP(FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP());
+#endif
 #endif
         return net.network_status;
     }
@@ -1742,8 +1747,7 @@ private:
         }
         else if (net.network_data_type == firebase_network_data_ethernet_network)
         {
-            if (net.ethernet.conn_satatus != network_config_data::ethernet_conn_status_waits)
-                net.network_status = ethernetConnected();
+            net.network_status = ethernetConnected();
         }
         // also check the native network before calling external cb
         else if (net.network_data_type == firebase_network_data_default_network || WiFI_CONNECTED || ethLinkUp())

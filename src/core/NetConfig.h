@@ -104,7 +104,7 @@ private:
         ethernet_conn_status_rst_pin_selected,
         ethernet_conn_status_rst_pin_released,
         ethernet_conn_status_begin,
-        ethernet_conn_status_waits,
+        ethernet_conn_status_waits
     };
 
     // SPI Ethernet Module Data
