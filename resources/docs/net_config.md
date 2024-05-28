@@ -41,7 +41,7 @@ class DefaultNetwork
 
 2. ### 🔹 network_config_data &get()
     
-    Get the reference to the internal network_config_data.
+    Get the reference to the internal `network_config_data`.
 
     ```cpp
     network_config_data &get()
@@ -97,7 +97,7 @@ class GenericNetwork
 
 2. ### 🔹 network_config_data &get()
     
-    Get the reference to the internal network_config_data.
+    Get the reference to the internal `network_config_data`.
 
     ```cpp
     network_config_data &get()
@@ -126,9 +126,9 @@ class GSMNetwork
 
 1. ### 🔹 GSMNetwork(TinyGsm *modem, const String &pin, const String &apn, const String &user, const String &password)
 
-    This required two places of the GSM module macro definitions, one in your sketch and another in /src/Config.h or in your own defined config at src/UserConfig.h or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
+    This required two places of the GSM module macro definitions, one in your sketch and another in `/src/Config.h` or in your own defined config at `src/UserConfig.h` or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
     
-    The TinyGsm modem should be defined at the same usage scope of GSMNetwork and AsyncClientClass.
+    The TinyGsm modem should be defined at the same usage scope of `GSMNetwork` and `AsyncClientClass`.
 
     See [GSMNetwork example](/examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/) for using TinyGSM with this library.
 
@@ -156,7 +156,7 @@ class GSMNetwork
 
 2. ### 🔹 network_config_data &get()
     
-    Get the reference to the internal network_config_data.
+    Get the reference to the internal `network_config_data`.
 
     ```cpp
     network_config_data &get()
@@ -221,7 +221,7 @@ class EthernetNetwork
 
 2. ### 🔹 network_config_data &get()
     
-    Get the reference to the internal network_config_data.
+    Get the reference to the internal `network_config_data`.
 
     ```cpp
     network_config_data &get()
@@ -291,7 +291,7 @@ class DefaultEthernetNetwork
 
 2. ### 🔹 network_config_data &get()
     
-    Get the reference to the internal network_config_data.
+    Get the reference to the internal `network_config_data`.
 
     ```cpp
     network_config_data &get()
@@ -346,7 +346,7 @@ class DefaultWiFiNetwork
 
 2. ### 🔹 network_config_data &get()
     
-    Get the reference to the internal network_config_data.
+    Get the reference to the internal `network_config_data`.
 
     ```cpp
     network_config_data &get()
