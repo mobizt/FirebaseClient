@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-`2024-05-22T05:21:34Z`
+Revision `2024-05-28T01:51:36Z`
 
 ## Table of Contents
 
@@ -469,6 +469,9 @@ The async task handler will kepp the async tasks running as long as it places in
 
 > [!NOTE] 
 > Even the authentication task can run asynchronously, you can run it asynchronously by waiting until the `FirebaseApp::ready()` function returns true.
+
+> [!NOTE] 
+> Since v1.2.1, you can [set the filter](https://github.com/mobizt/FirebaseClient/blob/main/resources/docs/realtime_database.md#-void-setssefiltersconst-string-filter--) to filter the `Stream events` in `SSE mode (HTTP Streaming)` task.
 
 #### Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)
 

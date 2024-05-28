@@ -114,18 +114,17 @@ void setup()
 
     Database.url(DATABASE_URL);
 
-    // Filtering response payload from SSE mode (HTTP Streaming).
-    // This is optional to allow specific events filtering.
-
-    // The following event keywords are supported.
-    // get - Allow the http get response (first put event since stream connected).
-    // put - Allow the put event.
-    // patch - Allow the patch event.
-    // keep-alive - Allow the keep-alive event.
-    // cancel - Allow the cancel event.
-    // auth_revoked - Allow the auth_revoked event.
-    // Call RealtimeDatabase::setSSEFilters() to clear the filter to allow all events.
-    Database.setSSEFilters("get,put,patch,keep-alive,cancel,auth_revoked"); // Since v1.2.1
+    // Since v1.2.1, in SSE mode (HTTP Streaming) task, you can filter the Stream events by using RealtimeDatabase::setSSEFilters(<keywords>), 
+    // which the <keywords> is the comma separated events.
+    // The event keywords supported are: 
+    // get - To allow the http get response (first put event since stream connected).
+    // put - To allow the put event.
+    // patch - To allow the patch event.
+    // keep-alive - To allow the keep-alive event.
+    // cancel - To allow the cancel event.
+    // auth_revoked - To allow the auth_revoked event.
+    // To clear all prevousely set filter to allow all Stream events, use RealtimeDatabase::setSSEFilters().
+    Database.setSSEFilters("get,put,patch,keep-alive,cancel,auth_revoked");
 
     // The "unauthenticate" error can be occurred in this case because we don't wait
     // the app to be authenticated before connecting the stream.

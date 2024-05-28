@@ -850,14 +850,14 @@ public:
      * This is optional to allow specific events filtering.
      *
      * The following event keywords are supported.
-     * get - Allow the http get response (first put event since stream connected).
-     * put - Allow the put event.
-     * patch - Allow the patch event.
-     * keep-alive - Allow the keep-alive event.
-     * cancel - Allow the cancel event.
-     * auth_revoked - Allow the auth_revoked event.
+     * get - To allow the http get response (first put event since stream connected).
+     * put - To allow the put event.
+     * patch - To allow the patch event.
+     * keep-alive - To allow the keep-alive event.
+     * cancel - To allow the cancel event.
+     * auth_revoked - To allow the auth_revoked event.
      *
-     * Call RealtimeDatabase::setSSEFilters() to clear the filter to allow all events.
+     * To clear all prevousely set filter to allow all Stream events, use RealtimeDatabase::setSSEFilters().
      */
     void setSSEFilters(const String &filter = "")
     {
