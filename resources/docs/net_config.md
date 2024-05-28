@@ -130,7 +130,7 @@ class GSMNetwork
     
     The TinyGsm modem should be defined at the same usage scope of GSMNetwork and AsyncClientClass.
 
-    See /examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/ for using TinyGSM with this library.
+    See [GSMNetwork example](/examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/) for using TinyGSM with this library.
 
     ```cpp
     GSMNetwork(TinyGsm *modem, const String &pin, const String &apn, const String &user, const String &password)
@@ -188,7 +188,7 @@ class EthernetNetwork
 
     By default the external Ethernet module can be used with the library when the macro `ENABLE_ETHERNET_NETWORK` was defined and Ethernet library was included in the user sketch.
     
-    The user defined Ethernet class and header other than `Ethernet.h` and `Ethernet` can be used, see https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#library-build-options.
+    The user defined Ethernet class and header other than `Ethernet.h` and `Ethernet` can be used, see [Library Build Options](https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#library-build-options) for how to.
 
     ```cpp
     EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, Firebase_StaticIP *staticIP = nullptr)
@@ -273,7 +273,7 @@ class DefaultEthernetNetwork
 
     The default Ethernet class for ESP32 with native Ethernet boards.
     
-    See [ESP842 DefaultEthernetNetwork example](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/ESP32/) for using ESP32 with its native lwIP Ethernet library.
+    See [ESP32 DefaultEthernetNetwork example](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/ESP32/) for using ESP32 with its native lwIP Ethernet library.
 
     ```cpp
     DefaultEthernetNetwork(Firebase_SPI_ETH_Module &eth)
