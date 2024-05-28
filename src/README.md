@@ -16,6 +16,14 @@
 
 - [Class and Functions](/resources/docs/async_result.md).
 
+## Network Usage
+
+- [Class and Functions](/resources/docs/net_config.md).
+
+## File and BLOB Usage
+
+- [Class and Functions](/resources/docs/file_config.md).
+
 ## Realtime Database Usage
 
 - [Examples](/examples/RealtimeDatabase).

@@ -455,6 +455,14 @@ class FileConfig
 {
 
 public:
+    /**
+     * File config class.
+     *
+     * @param filename The file name of file to be read and write.
+     * @param cb The FileConfigCallback function that accepts File object, file name and file_operating_mode to be processed.
+     *
+     * The file_operating_mode enums are included file_mode_open_read, file_mode_open_write, file_mode_open_append, and file_mode_remove.
+     */
     FileConfig(const String &filename, FileConfigCallback cb)
     {
         clear();
@@ -463,8 +471,17 @@ public:
         data.initialized = true;
     }
     ~FileConfig() {}
+
+    /**
+     * Clear the internal data.
+     */
     void clear() { data.clear(); }
 
+    /**
+     * Set the file name.
+     *
+     * @param filename The file name of file to be read and write.
+     */
     FileConfig &setFilename(const String &filename)
     {
         if (filename.length() > 0 && filename[0] != '/')
@@ -473,12 +490,23 @@ public:
         return *this;
     }
 
+    /**
+     * Set the callback.
+     *
+     * @param cb The FileConfigCallback function that accepts File object, file name and file_operating_mode to be processed.
+     *
+     * The file_operating_mode enums are included file_mode_open_read, file_mode_open_write, file_mode_open_append, and file_mode_remove.
+     */
     FileConfig &setCallback(FileConfigCallback cb)
     {
         data.cb = cb;
         return *this;
     }
 
+    /**
+     * Get the reference to the internal file_config_data.
+     * @return file_config_data The reference to file_config_data.
+     */
     file_config_data &get() { return data; }
 
 private:
@@ -504,6 +532,12 @@ class BlobConfig
 {
 
 public:
+    /**
+     * BLOB config class.
+     *
+     * @param data The pointer to the uint8_t data array.
+     * @param size The size of data in bytes.
+     */
     BlobConfig(uint8_t *data = nullptr, size_t size = 0)
     {
         clear();
@@ -517,20 +551,50 @@ public:
         this->data.initialized = true;
     }
     ~BlobConfig() {}
+
+    /**
+     * Clear the internal data.
+     */
     void clear() { data.clear(); }
 
+    /**
+     * Get the pointer to the internal BLOB data.
+     * 
+     * @return uint8_t* The pointer to uint8_t data array.
+     */
     uint8_t *blob() const { return data.data; }
+
+    /**
+     * Get the data size.
+     * 
+     * @return size_t The size of data in bytes.
+     */
     size_t size() const { return data.data_size; }
 
+    /**
+     * Get the reference to the internal file_config_data.
+     * 
+     * @return file_config_data The reference to the internal file_config_data.
+     */
     file_config_data &getData() { return data; }
 
 private:
     file_config_data data;
 };
 
+/**
+ * The static function to get the reference of file_config_data from FileConfig.
+ * 
+ * @return file_config_data The reference to the internal file_config_data.
+ */
 template <typename T>
 static file_config_data &getFile(T &file) { return file.get(); }
 
+/**
+ * The static function to get the reference of file_config_data from BlobConfig.
+ * 
+ * @return file_config_data The reference to the internal file_config_data.
+ */
 template <typename T>
 static file_config_data &getBlob(T &blob) { return blob.getData(); }
 

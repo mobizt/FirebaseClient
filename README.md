@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-05-28T02:19:36Z`
+Revision `2024-05-28T08:55:05Z`
 
 ## Table of Contents
 
@@ -931,6 +931,18 @@ ServiceAuth::ServiceAuth(<TimeStatusCallback>, <file_config_data>, <expire>)
 
 The auth token need to be re-created instead of refreshing.
 
+The `CustomAuth` and `ServiceAuth` classes required the JWT token processor which is done via the function `JWTClass::loop(<auth_data_t*>)` which accepts the pointer to the `auth_data_t` from the `FirebaseApp::getAuth()`. 
+
+The examples in this library use the static object of `JWTClass` called `JWT` to save the stack memory usage which the processes data are stored in the internal `jwt_token_data_t`, which is not thread safe when using in multi-threaded operations.
+
+The following is the example code for JWT token processor that should be executed inside the main loop.
+
+```cpp
+JWT.loop(app.getAuth());
+```
+
+For thread safety, you have to define `JWTClass` for each `AsyncClientClass`'s auth task.
+
 - ### UserAuth (User Sign-In Authentication)
 
 The user name and password credentials are used for authentication. You can save the credentials to file and load it with the constructor.
@@ -1300,7 +1312,9 @@ DefaultEthernetNetwork::DefaultEthernetNetwork(<Firebase_SPI_ETH_Module>)
 
 `<Firebase_SPI_ETH_Module>` The ESP8266 core SPI ethernet driver class that work with external SPI Ethernet modules that currently supported e.g. ENC28J60, Wiznet W5100 and Wiznet 5500. This `<Firebase_SPI_ETH_Module>` should be defined at the same usage scope of `AsyncClientCalss`.
 
- To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` should be defined in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in the compiler build flags.
+ To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` should be defined in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src/UserConfig.h) or adding `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in the compiler build flags.
+
+ Use `Firebase_SPI_ETH_Module::enc28j60`, `Firebase_SPI_ETH_Module::w5100` and `Firebase_SPI_ETH_Module::w5500` to assign the pointer to `ENC28J60lwIP`, `Wiznet5100lwIP` and `Wiznet5500lwIP` classes objects respectively.
 
 In `PlatformIO IDE`, please set the `lib_ldf_mode` option in `platformio.ini` as the following.
 
@@ -1423,7 +1437,7 @@ GenericNetwork::GenericNetwork(<net_connect_callback>, <network_status_callback>
 
 `<network_status_callback>` The network status callback function.
 
-In the `<net_connect_callback>`, the complete operations for the carier (network) and internet connection should be performed and waits until the internet connection was established.
+In the `<net_connect_callback>` function, the complete operations for the carier (network) and internet connection should be performed and waits until the internet connection was established.
 
 In the `<network_status_callback>` function, the `status` (Boolean variable) that provided in the function, should set with the network status.
 
@@ -2251,6 +2265,14 @@ There is no `JSON` serialization/deserialization class in this library unless th
 - ### Async Result Usage
 
     - [Class and Functions](/resources/docs/async_result.md).
+
+- ### Network Usage
+
+    - [Class and Functions](/resources/docs/net_config.md).
+
+ - ### File and BLOB Usage
+
+    - [Class and Functions](/resources/docs/file_config.md).
 
 - ### Realtime Database Usage
 

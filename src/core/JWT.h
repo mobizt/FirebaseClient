@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created May 28, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -101,13 +101,19 @@ namespace firebase
         void sendErrCB(AsyncResultCallback cb, AsyncResult *aResult = nullptr);
         void sendErrResult(AsyncResult *refResult);
         void setAppDebug(app_debug_t *app_debug);
+        const char *token();
+        bool ready();
+        void clear();
 
     public:
         JWTClass();
         ~JWTClass();
-        const char *token();
-        bool ready();
-        void clear();
+
+        /**
+         * Process the JWT token generation and returns the status.
+         *
+         * @return boolean of JWT processor result.
+         */
         bool loop(auth_data_t *auth_data);
     };
 

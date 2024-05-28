@@ -1,5 +1,5 @@
 /**
- * Created May 22, 2024
+ * Created May 28, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -182,7 +182,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 
 #endif
 
-#if  defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
+#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
 #if !defined(FIREBASE_HAS_WIFICLIENTSECURE)
 #define FIREBASE_HAS_WIFICLIENTSECURE
 #endif
@@ -389,6 +389,15 @@ typedef struct firebase_client_static_address
     friend class AsyncClientClass;
 
 public:
+    /**
+     * The Firebase Client Static address provider class.
+     * 
+     * @param ipAddress The static IP.
+     * @param netMask The subnet IP.
+     * @param defaultGateway The default gateway IP.
+     * @param dnsServer The dns server IP.
+     * @param optional The boolean option to force use static IP only (not use DHCP).
+     */
     firebase_client_static_address(IPAddress ipAddress, IPAddress netMask, IPAddress defaultGateway, IPAddress dnsServer, bool optional)
     {
         this->ipAddress = ipAddress;
