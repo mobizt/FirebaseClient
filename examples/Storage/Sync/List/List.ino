@@ -139,7 +139,10 @@ void authHandler()
     unsigned long ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
-        // This JWT token process required for ServiceAuth and CustomAuth authentications
+        // The JWT token processor required for ServiceAuth and CustomAuth authentications.
+        // JWT is a static object of JWTClass and it's not thread safe.
+        // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp,
+        // and set it to the FirebaseApp via FirebaseApp::setJWTProcessor(<JWTClass>), before calling initializeApp.
         JWT.loop(app.getAuth());
         printResult(aResult_no_callback);
     }

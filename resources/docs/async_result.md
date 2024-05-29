@@ -102,7 +102,7 @@ RealtimeDatabaseResult &to()
 
 **Returns:**
 
-- `RealtimeDatabaseResult` - The reference to the internal RealtimeDatabaseResult object.
+- `RealtimeDatabaseResult &` - The reference to the internal RealtimeDatabaseResult object.
 
 
 9. ## 🔹  int available()
@@ -128,7 +128,7 @@ app_event_t &appEvent()
 
 **Returns:**
 
-- `app_event_t` - The reference of internal app event.
+- `app_event_t &` - The reference of internal app event.
 
 
 11. ## 🔹  bool uploadProgress()
@@ -245,4 +245,4 @@ FirebaseError &error()
 
 **Returns:**
 
-- `FirebaseError` - The internal FirebaseError object.
+- `FirebaseError &` - The internal FirebaseError object.

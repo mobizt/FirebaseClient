@@ -173,7 +173,21 @@ void setUID(const String &uid)
 
 - `uid` - The unique identifier for the authentication task.
 
-14. ## 🔹  auth_data_t *getAuth()
+14. ## 🔹  void setJWTProcessor(JWTClass &jwtClass)
+
+Set the JWT token processor object.
+
+This function should be executed before calling `initializeApp`.
+
+```cpp
+void setJWTProcessor(JWTClass &jwtClass)
+```
+
+**Params:**
+
+- `jwtClass` - The JWT token processor object.
+
+15. ## 🔹  auth_data_t *getAuth()
 
 Get the pointer to the internal auth data.
 

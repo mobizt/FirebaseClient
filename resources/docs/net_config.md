@@ -49,7 +49,7 @@ class DefaultNetwork
 
     **Returns:**
 
-    - `network_config_data` - The reference to internal `network_config_data`.
+    - `network_config_data &` - The reference to internal `network_config_data`.
 
 
 <br>
@@ -105,7 +105,7 @@ class GenericNetwork
 
     **Returns:**
 
-    - `network_config_data` - The reference to internal `network_config_data`.
+    - `network_config_data &` - The reference to internal `network_config_data`.
 
 
 <br>
@@ -164,7 +164,7 @@ class GSMNetwork
 
     **Returns:**
 
-    - `network_config_data` - The reference to internal `network_config_data`.
+    - `network_config_data &` - The reference to internal `network_config_data`.
 
 
 
@@ -201,13 +201,6 @@ class EthernetNetwork
     - `resetPin` - The Ethernet module reset pin. Assign -1 if not used.
     - `staticIP` - (Optional) The pointer to Firebase_StaticIP object that holds the static ip configuration.
 
-    The `Firebase_StaticIP` class constructor parameters for static IP are following.
-
-     - `ipAddress` - The static IP.
-     - `netMask` - The subnet IP.
-     - `defaultGateway` - The default gateway IP.
-     - `dnsServer` - The dns server IP.
-     - `optional` - The boolean option to force use static IP only (not use DHCP).
 
 ## Functions
 
@@ -229,7 +222,7 @@ class EthernetNetwork
 
     **Returns:**
 
-    - `network_config_data` - The reference to internal `network_config_data`.
+    - `network_config_data &` - The reference to internal `network_config_data`.
 
 
 <br>
@@ -299,7 +292,7 @@ class DefaultEthernetNetwork
 
     **Returns:**
 
-    - `network_config_data` - The reference to internal `network_config_data`.
+    - `network_config_data &` - The reference to internal `network_config_data`.
 
 <br>
 
@@ -354,5 +347,38 @@ class DefaultWiFiNetwork
 
     **Returns:**
 
-    - `network_config_data` - The reference to internal `network_config_data`.
+    - `network_config_data &` - The reference to internal `network_config_data`.
+
+
+<br>
+
+
+# Firebase_StaticIP
+
+## Description
+
+The Firebase Client Static address provider class.
+
+
+```cpp
+class Firebase_StaticIP
+```
+
+
+## Constructors
+
+1. ### 🔹 Firebase_StaticIP(IPAddress ipAddress, IPAddress netMask, IPAddress defaultGateway, IPAddress dnsServer, bool optional)
+
+    
+    ```cpp
+    Firebase_StaticIP(IPAddress ipAddress, IPAddress netMask, IPAddress defaultGateway, IPAddress dnsServer, bool optional)
+    ```
+
+    **Params:**
+
+    - `ipAddress` - The static IP.
+    - `netMask` - The subnet IP.
+    - `defaultGateway` - The default gateway IP.
+    - `dnsServer` - The dns server IP.
+    - `optional` - The boolean option to force use static IP only (not use DHCP).
 

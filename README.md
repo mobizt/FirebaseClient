@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.5-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.6-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-05-28T08:55:05Z`
+Revision `2024-05-29T02:58:24Z`
 
 ## Table of Contents
 
@@ -933,7 +933,7 @@ The auth token need to be re-created instead of refreshing.
 
 The `CustomAuth` and `ServiceAuth` classes required the JWT token processor which is done via the function `JWTClass::loop(<auth_data_t*>)` which accepts the pointer to the `auth_data_t` from the `FirebaseApp::getAuth()`. 
 
-The examples in this library use the static object of `JWTClass` called `JWT` to save the stack memory usage which the processes data are stored in the internal `jwt_token_data_t`, which is not thread safe when using in multi-threaded operations.
+The examples in this library, the static object of `JWTClass` called `JWT` will be used to save the stack memory usage and it is not thread safe when using in multi-threaded operations (`multi-FirebaseApp`) because of sharing internal `jwt_token_data_t`.
 
 The following is the example code for JWT token processor that should be executed inside the main loop.
 
@@ -941,7 +941,28 @@ The following is the example code for JWT token processor that should be execute
 JWT.loop(app.getAuth());
 ```
 
-For thread safety, you have to define `JWTClass` for each `AsyncClientClass`'s auth task.
+For thread safety, you have to define `JWTClass` for each `FirebaseApp` via `FirebaseApp::setJWTProcessor(<JWTClass>)`, before calling `initializeApp`.
+
+The following is the partial code example for setting the JWT token processor to the `FirebaseApp`.
+
+```cpp
+FirebaseApp app;
+
+JWTClass jwtProcessor;
+
+void setup()
+{
+    app.setJWTProcessor(jwtProcessor);
+    initializeApp(...);
+}
+
+void loop()
+{
+     jwtProcessor.loop(app.getAuth());
+     app.loop();
+}
+```
+
 
 - ### UserAuth (User Sign-In Authentication)
 
@@ -2208,7 +2229,10 @@ void authHandler()
     unsigned long ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
-        // This JWT token process required for ServiceAuth and CustomAuth authentications
+        // The JWT token processor required for ServiceAuth and CustomAuth authentications.
+        // JWT is a static object of JWTClass and it's not thread safe.
+        // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp, 
+        // and set it to the FirebaseApp via FirebaseApp::setJWTProcessor(<JWTClass>), before calling initializeApp.
         JWT.loop(app.getAuth());
         printResult(aResult_no_callback);
     }

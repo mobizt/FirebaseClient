@@ -1,5 +1,5 @@
 /**
- * Created May 20, 2024
+ * Created May 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -39,8 +39,9 @@
 namespace firebase
 {
 
+#if defined(ENABLE_JWT)
     static JWTClass JWT;
-
+#endif
     class FirebaseApp : public AppBase, public ResultBase
     {
         friend class RealtimeDatabase;
@@ -72,6 +73,9 @@ namespace firebase
         String extras, subdomain, host;
         slot_options_t sop;
         String uid;
+#if defined(ENABLE_JWT)
+        JWTClass *jwtClass = nullptr;
+#endif
 
 #if defined(ENABLE_JWT)
 
@@ -388,18 +392,18 @@ namespace firebase
 
             if (auth_data.user_auth.jwt_signing && auth_data.user_auth.jwt_ts == 0)
             {
-
+#if defined(ENABLE_JWT)
                 if (err_timer.remaining() == 0)
                 {
                     err_timer.feed(3);
-                    JWT.jwt_data.err_code = FIREBASE_ERROR_JWT_CREATION_REQUIRED;
-                    JWT.jwt_data.msg = "JWT process has not begun";
+                    jwtProcessor()->jwt_data.err_code = FIREBASE_ERROR_JWT_CREATION_REQUIRED;
+                    jwtProcessor()->jwt_data.msg = "JWT process has not begun";
                     if (getRefResult())
-                        JWT.sendErrResult(auth_data.refResult);
+                        jwtProcessor()->sendErrResult(auth_data.refResult);
                     else
-                        JWT.sendErrCB(auth_data.cb, nullptr);
+                        jwtProcessor()->sendErrCB(auth_data.cb, nullptr);
                 }
-
+#endif
                 return false;
             }
 
@@ -434,11 +438,11 @@ namespace firebase
 
                         auth_data.user_auth.jwt_signing = true;
 
-                        JWT.begin(&auth_data);
+                        jwtProcessor()->begin(&auth_data);
                     }
                     else if (auth_data.user_auth.sa.step == jwt_step_sign || auth_data.user_auth.sa.step == jwt_step_ready)
                     {
-                        if (JWT.ready())
+                        if (jwtProcessor()->ready())
                         {
                             auth_data.user_auth.jwt_signing = false;
                             setEvent(auth_event_authenticating);
@@ -467,17 +471,19 @@ namespace firebase
                     {
 #if defined(ENABLE_SERVICE_AUTH)
                         json.addObject(sData->request.val[req_hndlr_ns::payload], "grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer", true);
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "assertion", JWT.token(), true, true);
-                        JWT.clear();
+#if defined(ENABLE_JWT)
+                        json.addObject(sData->request.val[req_hndlr_ns::payload], "assertion", jwtProcessor()->token(), true, true);
+                        jwtProcessor()->clear();
+#endif
 #endif
                     }
                     else if (auth_data.user_auth.auth_type == auth_sa_custom_token || auth_data.user_auth.auth_type == auth_custom_token)
                     {
-#if defined(ENABLE_CUSTOM_AUTH)
+#if defined(ENABLE_CUSTOM_AUTH) && defined(ENABLE_JWT)
                         if (auth_data.user_auth.auth_type == auth_sa_custom_token)
                         {
-                            json.addObject(sData->request.val[req_hndlr_ns::payload], "token", JWT.token(), true);
-                            JWT.clear();
+                            json.addObject(sData->request.val[req_hndlr_ns::payload], "token", jwtProcessor()->token(), true);
+                            jwtProcessor()->clear();
                         }
 #endif
 #if defined(ENABLE_CUSTOM_TOKEN)
@@ -657,6 +663,10 @@ namespace firebase
             return true;
         }
 
+#if defined(ENABLE_JWT)
+        JWTClass *jwtProcessor() { return jwtClass ? jwtClass : &JWT; }
+#endif
+
     public:
         FirebaseApp()
         {
@@ -777,6 +787,18 @@ namespace firebase
          * The async result object set via initializeApp and FirebaseApp::setAsyncResult will not take effect.
          */
         void setUID(const String &uid) { this->uid = uid; }
+
+#if defined(ENABLE_JWT)
+        /**
+         * Set the JWT token processor object.
+         * 
+         * This function should be executed before calling initializeApp.
+         *
+         * @param jwtClass The JWT token processor object.
+         * 
+         */
+        void setJWTProcessor(JWTClass &jwtClass) { this->jwtClass = &jwtClass; }
+#endif
 
         /**
          * Get the pointer to the internal auth data.

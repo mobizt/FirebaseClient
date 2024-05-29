@@ -1,5 +1,5 @@
 /**
- * Created March 24, 2024
+ * Created May 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -505,7 +505,7 @@ public:
 
     /**
      * Get the reference to the internal file_config_data.
-     * @return file_config_data The reference to file_config_data.
+     * @return file_config_data & The reference to file_config_data.
      */
     file_config_data &get() { return data; }
 
@@ -574,7 +574,7 @@ public:
     /**
      * Get the reference to the internal file_config_data.
      * 
-     * @return file_config_data The reference to the internal file_config_data.
+     * @return file_config_data & The reference to the internal file_config_data.
      */
     file_config_data &getData() { return data; }
 
@@ -585,7 +585,7 @@ private:
 /**
  * The static function to get the reference of file_config_data from FileConfig.
  * 
- * @return file_config_data The reference to the internal file_config_data.
+ * @return file_config_data & The reference to the internal file_config_data.
  */
 template <typename T>
 static file_config_data &getFile(T &file) { return file.get(); }
@@ -593,7 +593,7 @@ static file_config_data &getFile(T &file) { return file.get(); }
 /**
  * The static function to get the reference of file_config_data from BlobConfig.
  * 
- * @return file_config_data The reference to the internal file_config_data.
+ * @return file_config_data & The reference to the internal file_config_data.
  */
 template <typename T>
 static file_config_data &getBlob(T &blob) { return blob.getData(); }

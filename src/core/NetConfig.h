@@ -1,5 +1,5 @@
 /**
- * Created May 28, 2024
+ * Created May 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -240,7 +240,7 @@ public:
     /**
      * Get the reference to the internal network_config_data.
      * 
-     * @return network_config_data The reference to internal network_config_data.
+     * @return network_config_data & The reference to internal network_config_data.
      */
     network_config_data &get() { return network_data; }
 

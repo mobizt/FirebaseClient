@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created May 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -91,8 +91,9 @@ namespace firebase
         {
             app.aClient = &aClient;
             app.aclient_addr = reinterpret_cast<uint32_t>(&aClient);
-
-            JWT.setAppDebug(getAppDebug(app.aClient));
+#if defined(ENABLE_JWT)
+            app.jwtProcessor()->setAppDebug(getAppDebug(app.aClient));
+#endif
 
             if (app.refResult)
             {

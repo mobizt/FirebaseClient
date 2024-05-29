@@ -29,10 +29,9 @@
  * To reduce the stack usage of BearSSL engine crpto function, the JWT token creation process
  * will be performed outside the FirebaseApp.
  *
- * For ServiceAuth and CustomAuth authentications, you need to check for JWT token geration process requirement,
- * before running the JWT process function in the main loop as the following.
+ * The JWT token processor required for ServiceAuth and CustomAuth authentications.
  *
- * JWT.loop(app.getAuth());
+ * JWTClass::loop(<auth_data_t *>)
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
@@ -147,7 +146,10 @@ void authHandler()
     unsigned long ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
-        // This JWT token process required for ServiceAuth and CustomAuth authentications
+        // The JWT token processor required for ServiceAuth and CustomAuth authentications.
+        // JWT is a static object of JWTClass and it's not thread safe.
+        // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp,
+        // and set it to the FirebaseApp via FirebaseApp::setJWTProcessor(<JWTClass>), before calling initializeApp.
         JWT.loop(app.getAuth());
         printResult(aResult_no_callback);
     }

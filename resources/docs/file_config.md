@@ -56,7 +56,7 @@ class FileConfig
 
     **Returns:**
 
-    - `FileConfig` - The reference to the `FileConfig` itself.
+    - `FileConfig &` - The reference to the `FileConfig` itself.
 
 3. ### 🔹 FileConfig &setFilename(const String &filename)
     
@@ -74,7 +74,7 @@ class FileConfig
 
     **Returns:**
 
-    - `FileConfig` - The reference to the `FileConfig` itself.
+    - `FileConfig &` - The reference to the `FileConfig` itself.
 
 
 4. ### 🔹 file_config_data &get()
@@ -87,7 +87,7 @@ class FileConfig
 
     **Returns:**
 
-    - `file_config_data` - The reference to `file_config_data`.
+    - `file_config_data &` - The reference to `file_config_data`.
 
 
 <br>
@@ -143,7 +143,7 @@ class BlobConfig
 
 3. ### 🔹 size_t size()
     
-    Get the reference to the internal file_config_data.
+    Get the size of data.
 
     ```cpp
     size_t size()
@@ -170,7 +170,7 @@ class BlobConfig
 
 1. ### 🔹 static file_config_data &getFile(FileConfig &file)
 
-    The static function to get the reference of file_config_data from `FileConfig`.
+    The static function to get the reference of `file_config_data` from `FileConfig`.
 
     ```cpp
     static file_config_data &getFile(FileConfig &file)

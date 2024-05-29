@@ -123,7 +123,9 @@ void loop()
     // The async task handler should run inside the main loop
     // without blocking delay or bypassing with millis code blocks.
 
-    // This JWT token process required for ServiceAuth and CustomAuth authentications
+    // The JWT token processor required for ServiceAuth and CustomAuth authentications.
+    // JWT is a static object of JWTClass and it's not thread safe.
+    // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp.
     JWT.loop(app.getAuth());
 
     app.loop();
