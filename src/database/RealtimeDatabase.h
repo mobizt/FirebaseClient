@@ -1,5 +1,5 @@
 /**
- * Created May 20, 2024
+ * Created June 2, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -253,7 +253,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, &file, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -342,7 +342,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, true, false), nullptr, nullptr, &aResult, NULL);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -363,7 +363,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, true, false), nullptr, nullptr, nullptr, cb, uid);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -484,7 +484,7 @@ public:
      */
     void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, &aResult, nullptr);
+        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
     }
 

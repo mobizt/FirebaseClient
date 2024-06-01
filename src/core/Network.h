@@ -1,5 +1,5 @@
 /**
- * Created May 28, 2024
+ * Created June 2, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -262,9 +262,9 @@ typedef void (*NetworkStatusCallback)(bool &);
 #endif
 
 #if defined(FIREBASE_WIFI_IS_AVAILABLE)
-#define WiFI_CONNECTED (WiFi.status() == WL_CONNECTED)
+#define WIFI_CONNECTED (WiFi.status() == WL_CONNECTED)
 #else
-#define WiFI_CONNECTED false
+#define WIFI_CONNECTED false
 #endif
 
 typedef struct firebase_spi_ethernet_module_t

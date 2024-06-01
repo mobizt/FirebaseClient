@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created June 2, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -297,8 +297,8 @@ bool JWTClass::create()
         // RSA private key
         PrivateKey *pk = nullptr;
         sys_idle();
-        // parse priv key
 
+        // parse priv key
         if (jwt_data.pk.length() > 0)
             pk = new PrivateKey(jwt_data.pk.c_str());
         else if (auth_data->user_auth.sa.val[sa_ns::pk].length() > 0)

@@ -123,10 +123,6 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-#if defined(ENABLE_FS)
-    SPIFFS.begin();
-#endif
-
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     Serial.println("Initializing app...");
@@ -134,6 +130,7 @@ void setup()
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
+    // if the file size to download is large (> 16k), set the rx buffer size to 16k.
     ssl_client.setBufferSizes(4096, 1024);
 #endif
 #endif
@@ -203,10 +200,10 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.downloadProgress())
     {
-        Firebase.printf("Downloaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        Firebase.printf("Download task: %s, downloaded %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
         if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
         {
-            Firebase.printf("Download task: %s, completed!", aResult.uid().c_str());
+            Firebase.printf("Download task: %s, completed!\n", aResult.uid().c_str());
 #if defined(ENABLE_FS)
             printFile();
 #endif
@@ -215,9 +212,9 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.uploadProgress())
     {
-        Firebase.printf("Uploaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        Firebase.printf("Upload task: %s, uploaded %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
         if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
-            Firebase.printf("Upload task: %s, completed!", aResult.uid().c_str());
+            Firebase.printf("Upload task: %s, completed!\n", aResult.uid().c_str());
     }
 }
 

@@ -35,6 +35,7 @@
 #include "./core/AsyncResult/AppDebug.h"
 #include "./core/AsyncResult/ResultBase.h"
 #include "./core/AsyncResult/AppData.h"
+#include "./core/AsyncResult/AppProgress.h"
 
 using namespace firebase;
 
@@ -67,13 +68,14 @@ class AsyncResult : public ResultBase, RealtimeDatabaseResult
     {
     public:
         size_t total = 0, downloaded = 0;
-        bool progress_available = false, ota = false;
+        bool ota = false;
         int progress = -1;
+        app_progress_t download_progress;
         void reset()
         {
             total = 0;
             downloaded = 0;
-            progress_available = false;
+            download_progress.reset();
             progress = -1;
             ota = false;
         }
@@ -83,14 +85,14 @@ class AsyncResult : public ResultBase, RealtimeDatabaseResult
     {
     public:
         size_t total = 0, uploaded = 0;
-        bool progress_available = false;
+        app_progress_t upload_progress;
         int progress = -1;
         String downloadUrl;
         void reset()
         {
             total = 0;
             uploaded = 0;
-            progress_available = false;
+            upload_progress.reset();
             progress = -1;
             downloadUrl.remove(0, downloadUrl.length());
         }
@@ -128,13 +130,12 @@ private:
 
     bool setDownloadProgress()
     {
-        download_data.progress_available = false;
         if (download_data.downloaded > 0)
         {
             int progress = (float)download_data.downloaded / download_data.total * 100;
             if (download_data.progress != progress && (progress == 0 || progress == 100 || download_data.progress + 2 <= progress))
             {
-                download_data.progress_available = true;
+                download_data.download_progress.setProgress(progress);
                 download_data.progress = progress;
                 return true;
             }
@@ -144,13 +145,12 @@ private:
 
     bool setUploadProgress()
     {
-        upload_data.progress_available = false;
         if (upload_data.uploaded > 0)
         {
             int progress = (float)upload_data.uploaded / upload_data.total * 100;
             if (upload_data.progress != progress && (progress == 0 || progress == 100 || upload_data.progress + 2 <= progress))
             {
-                upload_data.progress_available = true;
+                upload_data.upload_progress.setProgress(progress);
                 upload_data.progress = progress;
                 return true;
             }
@@ -223,7 +223,7 @@ public:
 
     /**
      * Get the path of the resource of the request.
-     * 
+     *
      * @return String The path of the resource of the request.
      */
     String path() const { return val[ares_ns::data_path].c_str(); }
@@ -320,12 +320,7 @@ public:
      *
      * @return bool Returns true if upload information is available.
      */
-    bool uploadProgress()
-    {
-        if (!upload_data.progress_available)
-            setUploadProgress();
-        return upload_data.progress_available;
-    }
+    bool uploadProgress() { return upload_data.upload_progress.isProgress(); }
 
     /**
      * Get the file/BLOB upload information.
@@ -339,12 +334,7 @@ public:
      *
      * @return bool The file/BLOB download status.
      */
-    bool downloadProgress()
-    {
-        if (!download_data.progress_available)
-            setDownloadProgress();
-        return download_data.progress_available;
-    }
+    bool downloadProgress() { return download_data.download_progress.isProgress(); }
 
     /**
      * Get the file/BLOB download information.

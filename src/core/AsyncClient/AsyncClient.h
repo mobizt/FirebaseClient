@@ -1,5 +1,5 @@
 /**
- * Created May 22, 2024
+ * Created June 2, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -736,6 +736,8 @@ private:
         {
             if (setData || error_notify_timeout || download_status || upload_status)
             {
+                sData->refResult->upload_data.reset();
+
                 *sData->refResult = sData->aResult;
 
                 if (setData)
@@ -753,6 +755,19 @@ private:
         {
             if (!sData->auth_used)
                 sData->cb(sData->aResult);
+        }
+
+        if (getResult(sData))
+        {
+            // In case external async result was set, when download completed,
+            // we need to set the download status again because the internal async result was deleted.
+            if (sData->aResult.download_data.progress == 100)
+                sData->refResult->download_data.download_progress.setProgress(sData->aResult.download_data.progress);
+
+            // In case external async result was set, when upload complete,
+            // we need to reset the internal async result upload status to prevent redundant complete messages.
+            if (sData->aResult.upload_data.progress == 100)
+                sData->aResult.upload_data.reset();
         }
     }
 
@@ -1476,7 +1491,6 @@ private:
 
     function_return_type gprsConnect(async_data_item_t *sData)
     {
-        bool ret = false;
 
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
         TinyGsm *gsmModem = (TinyGsm *)net.gsm.modem;
@@ -1572,7 +1586,6 @@ private:
 
     function_return_type ethernetConnect(async_data_item_t *sData)
     {
-        bool ret = false;
 
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
 
@@ -1639,7 +1652,7 @@ private:
 
             net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_idle;
 
-            ret = ethernetConnected();
+            bool ret = ethernetConnected();
 
             if (ret)
             {
@@ -1698,7 +1711,7 @@ private:
                 {
 #if defined(FIREBASE_HAS_WIFI_DISCONNECT)
                     // We can reconnect WiFi when device connected via built-in WiFi that supports reconnect
-                    if (WiFI_CONNECTED)
+                    if (WIFI_CONNECTED)
                     {
                         WiFi.reconnect();
                         return netStatus(sData) ? function_return_type_complete : function_return_type_failure;
@@ -1750,8 +1763,8 @@ private:
             net.network_status = ethernetConnected();
         }
         // also check the native network before calling external cb
-        else if (net.network_data_type == firebase_network_data_default_network || WiFI_CONNECTED || ethLinkUp())
-            net.network_status = WiFI_CONNECTED || ethLinkUp();
+        else if (net.network_data_type == firebase_network_data_default_network || WIFI_CONNECTED || ethLinkUp())
+            net.network_status = WIFI_CONNECTED || ethLinkUp();
         else if (net.network_data_type == firebase_network_data_generic_network)
         {
             if (!net.generic.net_status_cb)

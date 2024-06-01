@@ -101,7 +101,8 @@ void setup()
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
+    // The large RX buffer is required for large data.
+    ssl_client.setBufferSizes(16384, 1024);
 #endif
 #endif
 

@@ -109,7 +109,8 @@ void setup()
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
+    // The large RX buffer is required for large data.
+    ssl_client.setBufferSizes(16384, 1024);
 #endif
 #endif
 
@@ -125,7 +126,7 @@ void loop()
 
     // The JWT token processor required for ServiceAuth and CustomAuth authentications.
     // JWT is a static object of JWTClass and it's not thread safe.
-    // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp, 
+    // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp,
     // and set it to the FirebaseApp via FirebaseApp::setJWTProcessor(<JWTClass>), before calling initializeApp.
     JWT.loop(app.getAuth());
 
@@ -190,10 +191,10 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.downloadProgress())
     {
-        Firebase.printf("Downloaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
+        Firebase.printf("Download task: %s, downloaded %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
         if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
         {
-            Firebase.printf("Download task: %s, completed!", aResult.uid().c_str());
+            Firebase.printf("Download task: %s, completed!\n", aResult.uid().c_str());
             if (aResult.isOTA())
                 restart();
         }
@@ -201,10 +202,10 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.uploadProgress())
     {
-        Firebase.printf("Uploaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
+        Firebase.printf("Upload task: %s, uploaded %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
         if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
         {
-            Firebase.printf("Upload task: %s, completed!", aResult.uid().c_str());
+            Firebase.printf("Upload task: %s, completed!\n", aResult.uid().c_str());
             Serial.print("Download URL: ");
             Serial.println(aResult.uploadInfo().downloadUrl);
         }
