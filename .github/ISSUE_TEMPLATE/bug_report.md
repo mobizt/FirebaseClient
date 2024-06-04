@@ -16,9 +16,9 @@ If you have questions, use [Discussions](https://github.com/mobizt/FirebaseClien
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Create minimal, clean and clear testing code that addressed the issue.
+Create minimal, clean and clear but complete code that can be reproduced the issue.
 The third party libraries should be removed.
-And post the testing code here.
+And post the code here.
 
 
 **Expected behavior**
