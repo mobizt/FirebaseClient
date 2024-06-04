@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+Please make sure, you have read the library [documentation](https://github.com/mobizt/FirebaseClient) and [FAQ](https://github.com/mobizt/FirebaseClient/blob/main/FAQ.md) thoroughly before open the issue.
+
 **Just ask something**
 If you have questions, use [Discussions](https://github.com/mobizt/FirebaseClient/discussions) instead. 
 
