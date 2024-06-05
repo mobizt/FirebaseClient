@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created June 2, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -25,9 +25,15 @@
 #ifndef RESULT_BASE_H_
 #define RESULT_BASE_H_
 
+// Raw chunk size for TCP's read and write operations.
 #define FIREBASE_CHUNK_SIZE 2048
+
+// Base64 encoded string chunk size for TCP's read and write operations.
+// This used in Realtime database with File implementation.
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
-#define FIREBASE_SSE_TIMEOUT 40 * 1000
+
+// SSE mode time out in milliseconds.
+#define FIREBASE_SSE_TIMEOUT_MS 40 * 1000
 
 #include <Arduino.h>
 #include "./core/AsyncResult/AppEvent.h"
@@ -96,7 +102,7 @@ namespace firebase
                 event_p2 = p2;
                 p1 = p2;
                 setEventResumeStatus(event_resume_status_undefined);
-                sse_timer.feed(String(event()).indexOf("cancel") > -1 || String(event()).indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT);
+                sse_timer.feed(String(event()).indexOf("cancel") > -1 || String(event()).indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT_MS / 1000);
                 sse = true;
             }
 
@@ -241,7 +247,6 @@ namespace firebase
         ResultBase() {}
 
     protected:
-
         void updateEvent(app_event_t &app_event) { app_event.update(); }
 
         void setEventBase(app_event_t &app_event, int code, const String &msg) { app_event.setEvent(code, msg); }

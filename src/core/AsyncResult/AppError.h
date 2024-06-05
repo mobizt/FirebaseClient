@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created June 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -85,7 +85,12 @@ private:
         available = true;
     }
 
-    void reset() { errVec.clear(); }
+    void reset()
+    {
+        errVec.clear();
+        available = false;
+        last = 0;
+    }
 
     bool remaining() { return errVec.size() && !errVec[0].read; }
 
@@ -130,6 +135,10 @@ public:
 
         return getError().code;
     }
+
+    bool avail() { return available; }
+
+    bool remain() { return remaining(); }
 };
 
 #endif

@@ -37,6 +37,8 @@
 
 #define FIREBASE_TCP_WRITE_TIMEOUT_SEC 30 // Do not change
 
+#define FIREBASE_RECONNECTION_TIMEOUT_MSEC 5000
+
 #define FIREBASE_AUTH_PLACEHOLDER (const char *)FPSTR("<auth_token>")
 
 #if !defined(FIREBASE_ASYNC_QUEUE_LIMIT)

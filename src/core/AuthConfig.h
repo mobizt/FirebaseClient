@@ -309,7 +309,7 @@ namespace firebase
 #if defined(ENABLE_CUSTOM_AUTH)
         struct custom_data
         {
-            // for custom claims
+            // For custom claims
             String val[cust_ns::max_type];
             TimeStatusCallback timestatus_cb = NULL;
 

@@ -729,12 +729,16 @@ private:
             error_notify_timeout = true;
         }
 
+        bool sseTimeout = true;
+#if defined(ENABLE_DATABASE)
+        sseTimeout = sData->sse && sData->aResult.rtdbResult.eventTimeout();
+#endif
         bool download_status = sData->download && sData->aResult.setDownloadProgress();
         bool upload_status = sData->upload && sData->upload_progress_enabled && sData->aResult.setUploadProgress();
 
         if (getResult(sData))
         {
-            if (setData || error_notify_timeout || download_status || upload_status)
+            if (sseTimeout || setData || error_notify_timeout || download_status || upload_status)
             {
                 sData->refResult->upload_data.reset();
 
@@ -751,7 +755,7 @@ private:
             }
         }
 
-        if (sData->cb && (setData || error_notify_timeout || download_status || upload_status))
+        if (sData->cb && (sseTimeout || setData || error_notify_timeout || download_status || upload_status))
         {
             if (!sData->auth_used)
                 sData->cb(sData->aResult);
@@ -1358,8 +1362,7 @@ private:
     {
         if (disconnect)
             stop(sData);
-        sData->response.httpCode = 0;
-        sData->error.code = 0;
+
         sData->response.flags.reset();
         sData->state = async_state_undefined;
         sData->return_type = function_return_type_undefined;
@@ -1373,6 +1376,13 @@ private:
     {
         sData->aResult.lastError.clearError();
         lastErr.clearError();
+        clearAppData(sData->aResult.app_data);
+
+        if ((sData->auth_used || sData->sse) && (millis() - sData->aResult.conn_ms < FIREBASE_RECONNECTION_TIMEOUT_MSEC) && sData->aResult.conn_ms > 0)
+            return function_return_type_continue;
+
+        sData->aResult.conn_ms = millis();
+        resetDebug(app_debug);
 
         if (client && !client->connected() && !sData->auth_used) // This info is already show in auth task
             setDebugBase(app_debug, FPSTR("Connecting to server..."));
@@ -1862,13 +1872,19 @@ private:
 #if defined(ENABLE_DATABASE)
     void handleEventTimeout(async_data_item_t *sData)
     {
-        if (sData->sse && sData->aResult.rtdbResult.eventTimeout() && eventResumeStatus(&sData->aResult.rtdbResult) == event_resume_status_undefined)
+        if (sData->sse && sData->aResult.rtdbResult.eventTimeout())
         {
-            // In case stream time out.
-            setEventResumeStatus(&sData->aResult.rtdbResult, event_resume_status_resuming);
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEOUT, false, false);
-            returnResult(sData, false);
-            reset(sData, true);
+            if (eventResumeStatus(&sData->aResult.rtdbResult) == event_resume_status_undefined)
+            {
+                // In case stream time out.
+                // We have to clear app data (available), reset the last error and set the Stream time out error.
+                sData->aResult.lastError.reset();
+                clearAppData(sData->aResult.app_data);
+                setEventResumeStatus(&sData->aResult.rtdbResult, event_resume_status_resuming);
+                setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEOUT, false, false);
+                returnResult(sData, false);
+                reset(sData, true);
+            }
         }
     }
 #endif
@@ -2200,10 +2216,14 @@ private:
 
                 if (sData->async && !sData->response.tcpAvailable(client_type, client, async_tcp_config))
                 {
+                    if (sData->sse)
+                    {
 #if defined(ENABLE_DATABASE)
-                    handleEventTimeout(sData);
+                        handleEventTimeout(sData);
 #endif
-                    handleReadTimeout(sData);
+                    }
+                    else
+                        handleReadTimeout(sData);
                     return exitProcess(false);
                 }
                 else if (!sData->async) // wait for non async

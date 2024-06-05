@@ -17,7 +17,7 @@
 - [Q10: What should I do when I get the error `"JWT, token signing fail"`?](#q10-what-should-i-do-when-i-get-the-error-jwt-token-signing-fail)
 - [Q11: What should I do when I get the error `"too low sketch space"`?](#q11-what-should-i-do-when-i-get-the-error-too-low-sketch-space)
 - [Q12: What should I do when I get the error `"firmware write failed"` or `"firmware end failed"`?](#q12-what-should-i-do-when-i-get-the-error-firmware-write-failed-or-firmware-end-failed)
-- [Q13: What should I do when I get the error `"stream time out"` or the Stream cannot re-connect?](#q13-what-should-i-do-when-i-get-the-error-stream-time-out)
+- [Q13: What should I do when I get the error `"stream time out"`?](#q13-what-should-i-do-when-i-get-the-error-stream-time-out)
 - [Q14: What should I do when I get the error `"auth revoked"`?](#q14-what-should-i-do-when-i-get-the-error-auth-revoked)
 - [Q15: Why I get the error `"app was not assigned"`?](#q15-why-i-get-the-error-app-was-not-assigned)
 - [Q16: Why I get the error `"operation was cancelled"`?](#q16-why-i-get-the-error-operation-was-cancelled)
@@ -207,11 +207,9 @@ In case unkbown error, please verify your free flash and do not write any file t
 
 #### A13: The error can be occured when no keep-alive event received during the stream timeout period.
 
-Normally you will not get `"stream time out"` error message.
-
 To check whether Stream is timed out or not, use `AsyncResult::to<RealtimeDatabaseResult>()::eventTimeout()`.
 
-Please read [Possible WiFi issues](#possible-wifi-issues).
+For the reasons, please read [Possible WiFi issues](#possible-wifi-issues).
 
 ### Q14: What should I do when I get the error `"auth revoked"`?
 
