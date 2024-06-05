@@ -1363,6 +1363,8 @@ private:
         if (disconnect)
             stop(sData);
 
+        sData->response.httpCode = 0;
+        sData->error.code = 0;
         sData->response.flags.reset();
         sData->state = async_state_undefined;
         sData->return_type = function_return_type_undefined;
