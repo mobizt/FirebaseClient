@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created June 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -1339,7 +1339,7 @@ namespace firebase
     {
     public:
         String val[app_tk_ns::max_type];
-        uint32_t expire = 0;
+        uint32_t expire = 0, auth_ts = 0;
         bool authenticated = false;
         auth_token_type auth_type = auth_unknown_token;
         user_auth_data_type auth_data_type = user_auth_data_undefined;

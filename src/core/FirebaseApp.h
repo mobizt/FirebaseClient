@@ -1,5 +1,5 @@
 /**
- * Created May 29, 2024
+ * Created June 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -642,8 +642,9 @@ namespace firebase
                         sData->response.val[res_hndlr_ns::payload].remove(0, sData->response.val[res_hndlr_ns::payload].length());
                         auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         auth_data.app_token.authenticated = true;
+                        auth_data.app_token.auth_ts = millis();
                         if (getClient())
-                            setAuthTsBase(aClient, millis());
+                            setAuthTsBase(aClient, auth_data.app_token.auth_ts);
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
                         auth_data.app_token.auth_data_type = auth_data.user_auth.auth_data_type;
                         setEvent(auth_event_ready);

@@ -1,5 +1,5 @@
 /**
- * Created June 2, 2024
+ * Created June 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -870,11 +870,16 @@ public:
      */
     void loop()
     {
+        app_token_t *aToken = appToken();
         for (size_t i = 0; i < cVec.size(); i++)
         {
             AsyncClientClass *aClient = reinterpret_cast<AsyncClientClass *>(cVec[i]);
             if (aClient)
             {
+                // Store the auth time in all async clients.
+                // The auth time will be used to reconnect the Stream when auth changed.
+                if (aToken && aToken->auth_ts > 0 && aToken->authenticated)
+                    aClient->setAuthTs(aToken->auth_ts);
                 aClient->process(true);
                 aClient->handleRemove();
             }
