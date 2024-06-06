@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-05T10:15:04Z`
+Revision `2024-06-06T02:25:03Z`
 
 ## Table of Contents
 
@@ -348,6 +348,17 @@ The authentication classes provide the authentication data for authentication an
 The REST API client (this library) will use the short-lived token for authorization.
 
 This authorization token will be expired in 60 minutes or 3600 seconds.
+
+The authorization token will be refresh or recreated automatically as long as the async task (auth task) handler was running in the main loop without blocking from user code. The auth task handler was done by `FirebaseApp` class which will be discussued later.
+
+> [!WARNING]  
+> User cannot blame for the authorization token expiration and the Firebase sevices denied by Google. The token will be refresh/recreated automatically prior to its expiration period as long as async task (auth task) handler was running in the main loop as mentioned ealier.
+
+The library also provides the option for non-secure usage i.e. using database secret for Realtime database and no authorization token if the security rules are allowed. This topic will be mentioned later with `LegacyToken` and `NoAuth` classes usage.
+
+You can get started using this library with simple sync functions using non-secure authentication method which is similar to other legacy Firebase library. 
+
+For async and secure usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
 
 The authorization token types that can be used for Firebase/Google APIs authorization are `ID token` and `access token` which will be called shorter as `auth tokens` in this library.
 

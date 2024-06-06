@@ -1,5 +1,5 @@
 
-`2024-04-23T11:47:49Z`
+Revision `2024-06-06T02:25:03Z`
 
 # Async Firebase Client library for Arduino Frequently Asked Questions.
 
@@ -37,9 +37,21 @@
 
 ### Q1: Why I get an error `"TCP connection failed"`?
 
-#### A1: The server was disconnected or unable to connect to the server.
+#### A1: The server was disconnected or the SSL client is unable to connect to the server.
 
-There are many possible causes of this issue.
+It should be noted that the user defined SSL client that assigned with async client was used for server connection, sending and receiving the data to/from server.
+
+Library also provides the option to resume the network connection in case of network connection disconnected.
+
+In case WiFi, if the Core SDK provides reconnection function, library will reconnect to WiFi using that function otherwise the WiFi AP credentials are required.
+
+In case Ethernet, if external Ethernet client was used, library will provided the configuarations to allow Ethernet module enabling/resetting and initialization.
+
+In case GSM, it requires the configurations for initialize the TinyGSM modem.
+
+In case generic client, it required the callback function to handle the network connection/reconnection.
+
+Then there are many possible causes of connection issue that cause the SSL client fail to connect to server.
 
 #### Possible WiFi issues
 
@@ -47,9 +59,9 @@ There are many possible causes of this issue.
 
 - When the WiFi was managed for connection and reconnection by user code or third party library e.g. WiFiManager, you have to set the reconnect option in `DefaultNetwork` to false otherwise you are unable to re-connect to the WiFi due to interferences operations.
 
-- The voltage drops or noisy power supply cable can cause the server connection failure even WiFi was connected. Replace the power cable or usb cable with shorter length. Connect the large capacitor to your board Vcc and GND.
+- The voltage drops or noisy power supply cable can cause the server connection failure even WiFi was connected. Replace the power cable or usb cable with shorter length. Connect the large capacitor to your board Vcc and GND or use robust power supply.
 
-- The poor WiFi signal and many WiFi hotspot are sharing the same WiFi channels or nearby WiFi channels. In fist case you have to move your device close to the WiFi hotspot or extend the range of your WiFi. The second case, you can change the WiFi channel of your WiFi hotspot.
+- The poor WiFi signal and WiFi channels interference. In fist case you have to move your device close to the WiFi hotspot or extend the range of your WiFi. The later case, you can change the WiFi channel of your WiFi hotspot.
 
 - WiFi AP was not responding because of static IP. You can connect your device to WiFi AP using DHCP instead.
 
@@ -174,7 +186,7 @@ The memory allocation failure due to out of memory can cause the dangling pointe
 
 You have to wait for the authentication task to be ready before calling the Firebase functions.
 
-Please read [Required Operation Flows](https://github.com/mobizt/FirebaseClient#required-operation-flows) for more details.
+After [App Initialization](https://github.com/mobizt/FirebaseClien#app-initialization), you can wait (blocking operation) or checking the return value of `FirebaseApp::ready` in the loop.
 
 
 ### Q9: What should I do when I get the error `"JWT, private key parsing fail"`?
@@ -221,7 +233,7 @@ The delay function and user blocking code are used in the same loop that authent
 
 #### A15: The FirebaseApp was not applied to the Firebase Service apps.
 
-You have to apply the FirebaseApp by using `FirebaseApp::getApp`. Please read [Required Operation Flows](https://github.com/mobizt/FirebaseClient#required-operation-flows) for more details.
+You have to apply the FirebaseApp by using `FirebaseApp::getApp`. Please read [App Initialization](https://github.com/mobizt/FirebaseClien#app-initialization) for more details.
 
 ### Q16: Why I get the error `"operation was cancelled"`?
 
@@ -284,9 +296,11 @@ The memory allocation failure due to out of memory can cause the dangling pointe
 
 ### Q23: How can I restart the Realtime Database stream?
 
-#### A23: Normally Realtime Database stream task is running and stay in the queue in all network conditions.
+#### A23: Normally Realtime Database stream task is running and stay in the queue in all conditions.
 
-It can be resumed automatically (if it was stopped) without showing any notification status in the async result or async result callback.
+If network disconnected and re-connected, network connected but internet access was missing, and no events included keep-alive event received within 40 seconds, the Stream will be closed and restarted automatically as long as the async client's queue was running.
+
+The `stream time out`error will show in case time out (no events received within 40 seconds).
 
 If you are intend to totally remove the steam task from the queue, and stream is running, use `AsyncClientClass::stopAsync()`. If you are not sure that stream was running or stopped because of other tasks, use `AsyncClientClass::stopAsync(true)` to cancell all tasks and remove all tasks from the queue.
 
