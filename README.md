@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-06T03:05:08Z`
+Revision `2024-06-06T04:01:15Z`
 
 ## Table of Contents
 
@@ -352,9 +352,9 @@ This authorization token will be expired in 60 minutes or 3600 seconds.
 The authorization token will be refresh or recreated automatically as long as the async task (auth task) handler was running in the main loop without blocking from user code. The auth task handler was done by `FirebaseApp` class which will be discussued later.
 
 > [!WARNING]  
-> User cannot blame for the authorization token expiration and the Firebase sevices denied by Google. The token will be refresh/recreated automatically prior to its expiration period as long as async task (auth task) handler was running in the main loop as mentioned ealier.
+> User cannot blame for the authorization token expiration and the Firebase sevices denied by Google. The token will be refresh/recreated automatically prior to its expiration period as long as async task (auth task) handler was running in the main loop as mentioned earlier.
 >
-> The `FirebaseApp` event showing the authentication processes that are running behind. It does not interrupt your job but preparing and maintain the authorization token to be valid all the time before usage. Google will deny the access from the client that sending the request with the expired auth token.
+> The `FirebaseApp` event is showing the authentication processes that are running behind. It does not interrupt your job but it is preparing and maintaining the authorization token to be valid all the time before use. Google will deny the access from the client that sending the request with the expired auth token.
 > 
 > Anyway, library also provides the option for non-secure usage i.e. using database secret for Realtime database and no authorization token if the security rules are allowed. This topic will be mentioned later with `LegacyToken` and `NoAuth` classes usage.
 > 
