@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-06T02:42:20Z`
+Revision `2024-06-06T02:44:07Z`
 
 ## Table of Contents
 
@@ -357,8 +357,8 @@ The authorization token will be refresh or recreated automatically as long as th
 > The library also provides the option for non-secure usage i.e. using database secret for Realtime database and no authorization token if the security rules are allowed. This topic will be mentioned later with `LegacyToken` and `NoAuth` classes usage.
 > 
 > You can get started using this library with simple sync functions using non-secure authentication method which is similar to other legacy Firebase library. 
-
-For async and secure usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
+>
+> For async and secure usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
 
 The authorization token types that can be used for Firebase/Google APIs authorization are `ID token` and `access token` which will be called shorter as `auth tokens` in this library.
 
