@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-06T05:45:03Z`
+Revision `2024-06-06T11:57:47Z`
 
 ## Table of Contents
 
@@ -813,7 +813,7 @@ The user auth data that passes to the `FirebaseApp` class constructor can be obt
 
 The app token (`app_token_t`) that is the object that provided by the user auth data (`user_auth_data`), will provide the `auth tokens` that used in the authorization requests.
 
-- User call `FirebaseApp::getApp<T>(<FirebaseServiceApp>)` to apply the auth data from app token to the Service apps before use.
+- User calls `FirebaseApp::getApp<T>(<FirebaseServiceApp>)` to apply the auth data from app token to the Service apps before use.
 
 The authentication/authorization classes also mentioned in the earlier section will be discussed here.
 
