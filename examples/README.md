@@ -313,6 +313,11 @@
 │   │       ├───StreamConcurentcy
 │   │       ├───StreamGSM
 │   │       └───Update
+│   ├───Simple
+│   │   ├───SimpleDatabaseSecret
+│   │   ├───SimpleNoAuth
+│   │   ├───StreamDatabaseSecret
+│   │   └───StreamNoAuth
 │   └───Sync
 │       ├───CustomPushID
 │       ├───ETAG

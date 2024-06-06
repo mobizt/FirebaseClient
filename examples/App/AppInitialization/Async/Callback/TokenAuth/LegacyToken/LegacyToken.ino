@@ -47,10 +47,6 @@
 
 #define DATABASE_SECRET "DATABASE_SECRET"
 
-void asyncCB(AsyncResult &aResult);
-
-void printResult(AsyncResult &aResult);
-
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 LegacyToken legacy_token(DATABASE_SECRET);
@@ -101,39 +97,4 @@ void setup()
 
 void loop()
 {
-    // The async task handler should run inside the main loop
-    // without blocking delay or bypassing with millis code blocks.
-
-    app.loop();
-}
-
-void asyncCB(AsyncResult &aResult)
-{
-    // WARNING!
-    // Do not put your codes inside the callback and printResult.
-
-    printResult(aResult);
-}
-
-void printResult(AsyncResult &aResult)
-{
-    if (aResult.isEvent())
-    {
-        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isDebug())
-    {
-        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
-    }
-
-    if (aResult.isError())
-    {
-        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
-    }
-
-    if (aResult.available())
-    {
-        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
-    }
 }

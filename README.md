@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.9-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.10-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-06T04:01:15Z`
+Revision `2024-06-06T05:45:03Z`
 
 ## Table of Contents
 
@@ -358,9 +358,9 @@ The authorization token will be refresh or recreated automatically as long as th
 > 
 > Anyway, library also provides the option for non-secure usage i.e. using database secret for Realtime database and no authorization token if the security rules are allowed. This topic will be mentioned later with `LegacyToken` and `NoAuth` classes usage.
 > 
-> You can get started using this library with simple [sync functions](https://github.com/mobizt/FirebaseClient/blob/main/examples/RealtimeDatabase/Sync/Get/Get.ino) using [non-secure authentication method](https://github.com/mobizt/FirebaseClient/blob/main/examples/App/AppInitialization/Sync/TokenAuth/LegacyToken/LegacyToken.ino) which is similar to other legacy Firebase library. 
+> You can get started using this library with [Simple examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/RealtimeDatabase/Simple) using non-secure authentication method which is similar to other legacy Firebase library. 
 >
-> For async and secure usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
+> For secure and more elaborate usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
 
 The authorization token types that can be used for Firebase/Google APIs authorization are `ID token` and `access token` which will be called shorter as `auth tokens` in this library.
 
@@ -1816,6 +1816,11 @@ The examples provided by this library can be divided into two use cases i.e. `As
             * [StreamConcurentcy](/examples/RealtimeDatabase/Async/NoCallback/StreamConcurentcy/)
             * [StreamGSM](/examples/RealtimeDatabase/Async/NoCallback/StreamGSM/)
             * [Update](/examples/RealtimeDatabase/Async/NoCallback/Update/)
+    * [Simple](/examples/RealtimeDatabase/Simple/)
+        * [SimpleDatabaseSecret](/examples/RealtimeDatabase/Simple/SimpleDatabaseSecret/)
+        * [SimpleNoAuth](/examples/RealtimeDatabase/Simple/SimpleNoAuth/)
+        * [StreamDatabaseSecret](/examples/RealtimeDatabase/Simple/StreamDatabaseSecret/)
+        * [StreamNoAuth](/examples/RealtimeDatabase/Simple/StreamNoAuth/)
     * [Sync](/examples/RealtimeDatabase/Sync/)
         * [CustomPushID](/examples/RealtimeDatabase/Sync/CustomPushID/)
         * [ETAG](/examples/RealtimeDatabase/Sync/ETAG/)

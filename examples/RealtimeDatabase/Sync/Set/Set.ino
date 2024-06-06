@@ -123,23 +123,27 @@ void setup()
     Serial.println("Synchronous Set... ");
 
     // Set int
+
+    Serial.print("Set int... ");
     bool status = Database.set<int>(aClient, "/test/int", 12345);
     if (status)
-        Serial.println("Set int is ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Set bool
+    Serial.print("Set bool... ");
     status = Database.set<bool>(aClient, "/test/bool", true);
     if (status)
-        Serial.println("Set bool is ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Set string
+    Serial.print("Set String... ");
     status = Database.set<String>(aClient, "/test/string", "hello");
     if (status)
-        Serial.println("Set string is ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
@@ -151,11 +155,12 @@ void setup()
     object_t json;
     JsonWriter writer;
     writer.create(json, "test/data", 123); // -> {"test":{"data":123}}
-    // Or set the seialized JSON string to object_t as object_t("{\"test\":{\"data\":123}}")
+                                           // Or set the seialized JSON string to object_t as object_t("{\"test\":{\"data\":123}}")
 
+    Serial.print("Set JSON... ");
     status = Database.set<object_t>(aClient, "/test/json", json);
     if (status)
-        Serial.println("Set json is ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
@@ -164,25 +169,30 @@ void setup()
     object_t arr;
     arr.initArray();                                                                                      // To use as Array placeholder
     writer.join(arr, 4, object_t(1), object_t(2), object_t(string_t("test")), object_t(boolean_t(true))); // -> [1,2,"test",true]
-    // Or set the seialized JSON Array string to the object_t as object_t("[1,2,\"test\",true]")
+                                                                                                          // Or set the seialized JSON Array string to the object_t as object_t("[1,2,\"test\",true]")
 
+    Serial.print("Set Array... ");
     status = Database.set<object_t>(aClient, "/test/arr", arr);
     if (status)
-        Serial.println("Set array is ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Set float
+
+    Serial.print("Set float... ");
     status = Database.set<number_t>(aClient, "/test/float", number_t(123.456, 2));
     if (status)
-        Serial.println("Set float is ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Set double
+
+    Serial.print("Set double... ");
     status = Database.set<number_t>(aClient, "/test/double", number_t(1234.56789, 4));
     if (status)
-        Serial.println("Set double is ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 }
