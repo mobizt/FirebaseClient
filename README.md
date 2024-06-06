@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-06T02:44:07Z`
+Revision `2024-06-06T03:05:08Z`
 
 ## Table of Contents
 
@@ -354,9 +354,11 @@ The authorization token will be refresh or recreated automatically as long as th
 > [!WARNING]  
 > User cannot blame for the authorization token expiration and the Firebase sevices denied by Google. The token will be refresh/recreated automatically prior to its expiration period as long as async task (auth task) handler was running in the main loop as mentioned ealier.
 >
-> The library also provides the option for non-secure usage i.e. using database secret for Realtime database and no authorization token if the security rules are allowed. This topic will be mentioned later with `LegacyToken` and `NoAuth` classes usage.
+> The `FirebaseApp` event showing the authentication processes that are running behind. It does not interrupt your job but preparing and maintain the authorization token to be valid all the time before usage. Google will deny the access from the client that sending the request with the expired auth token.
 > 
-> You can get started using this library with simple sync functions using non-secure authentication method which is similar to other legacy Firebase library. 
+> Anyway, library also provides the option for non-secure usage i.e. using database secret for Realtime database and no authorization token if the security rules are allowed. This topic will be mentioned later with `LegacyToken` and `NoAuth` classes usage.
+> 
+> You can get started using this library with simple [sync functions](https://github.com/mobizt/FirebaseClient/blob/main/examples/RealtimeDatabase/Sync/Get/Get.ino) using [non-secure authentication method](https://github.com/mobizt/FirebaseClient/blob/main/examples/App/AppInitialization/Sync/TokenAuth/LegacyToken/LegacyToken.ino) which is similar to other legacy Firebase library. 
 >
 > For async and secure usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
 
@@ -1243,6 +1245,22 @@ When you don't use filesystems, you can exclude the related code in this library
 
 
 - ### Working with Networks
+
+It should be noted that the user defined SSL client that assigned with async client was used for server connection, sending and receiving the data to/from server.
+
+Library also provides the option to resume the network connection in case of network connection disconnected.
+
+In case WiFi, if the Core SDK provides reconnection function, library will reconnect to WiFi using that function otherwise the WiFi AP credentials are required.
+
+In case Ethernet, if external Ethernet client was used, library will provided the configuarations to allow Ethernet module enabling/resetting and initialization.
+
+In case GSM, it requires the configurations for initialize the TinyGSM modem.
+
+In case generic client, it required the callback function to handle the network connection/reconnection.
+
+> [!NOTE] 
+> In case of server connection and networking issues, please read [FAQ](/FAQ.md) for the known issue.
+
 
 The `AsyncClientClass` object requires the network config data (`network_config_data`) that obtained from one of the following networking classes via the static function called `getNetwork`.
 
