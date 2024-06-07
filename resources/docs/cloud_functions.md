@@ -11,17 +11,14 @@ class CloudFunctions
 
 ## Functions
 
-1. ## 🔹  void url(const String &url)
+1. ### 🔹 void resetApp()
 
-Set the Cloud Functions URL
+Unbind or remove FirebaseApp.
+
 
 ```cpp
-void url(const String &url)
+void resetApp()
 ```
-
-**Params:**
-
-- `url` - The Cloud Functions URL.
 
 
 1. ## 🔹  void loop()

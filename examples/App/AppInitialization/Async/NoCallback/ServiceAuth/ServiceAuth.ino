@@ -119,6 +119,8 @@ void setup()
 #endif
 #endif
 
+    // Initialize the FirebaseApp or auth task handler.
+    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(sa_auth), aResult_no_callback);
 }
 

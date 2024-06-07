@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.10-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.11-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-06T11:57:47Z`
+Revision `2024-06-07T03:49:12Z`
 
 ## Table of Contents
 
@@ -805,15 +805,13 @@ The debug information (`String`) from the async result can be obtained from `Str
 
 The Firebase app (`FirebaseApp`) is the class that used to handle the authentication task. 
 
-The process of App intitialization:
+The processes of App intitialization are the following
 
-- The `FirebaseApp` class accepts the user auth data (`user_auth_data`) which is the struct that holds the user sign-in credentials and tokens.
+- User calls `initializeApp(...)` to initialize the authentication task handler.
 
-The user auth data that passes to the `FirebaseApp` class constructor can be obtained from the authentication/authorization classes via `getAuth` function.
+- User calls `FirebaseApp::getApp<T>(<FirebaseServiceApp>)` to bind the authentication task handler with the Service apps before use.
 
-The app token (`app_token_t`) that is the object that provided by the user auth data (`user_auth_data`), will provide the `auth tokens` that used in the authorization requests.
-
-- User calls `FirebaseApp::getApp<T>(<FirebaseServiceApp>)` to apply the auth data from app token to the Service apps before use.
+User can unbind the `FirebaseApp` or authentication task handler from the Service app by calling `resetApp()` from the app.
 
 The authentication/authorization classes also mentioned in the earlier section will be discussed here.
 
@@ -877,6 +875,15 @@ initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResultC
 
 `<UID>` The Task UID. See [Async Result](#async-result) section.
 
+- ### deinitializeApp or Firebase::deinitializeApp
+
+Since v1.2.11, to deinitialize the `FirebaseApp`, call `Firebase::deinitializeApp` or static function `deinitializeApp` which the functions parameters are included the following.
+
+```cpp
+initializeApp(<FirebaseApp>);
+```
+
+`<FirebaseApp>` The `FirebaseApp` class object to handle authentication/authorization task. 
 
 - ### CustomAuth (ID Token Authorization Using Service Account)
 
@@ -1945,8 +1952,12 @@ void setup()
 #endif
 #endif
 
+    // Initialize the FirebaseApp or auth task handler.
+    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);
@@ -2085,8 +2096,12 @@ void setup()
 #endif
 #endif
 
+    // Initialize the FirebaseApp or auth task handler.
+    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
     
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);
@@ -2230,10 +2245,14 @@ void setup()
 #endif
 #endif
 
+    // Initialize the FirebaseApp or auth task handler.
+    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
-
+    
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);

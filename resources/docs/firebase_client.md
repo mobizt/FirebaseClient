@@ -72,7 +72,20 @@ static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth
 - `uid` - The user specified UID of async result (optional).
 
 
-5. ## 🔹  static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+5. ## 🔹  static void dnitializeApp(FirebaseApp &app)
+
+Deinitialize the FirebaseApp.
+
+```cpp
+static void dnitializeApp(FirebaseApp &app)
+```
+
+**Params:**
+
+- `app` - The FirebaseApp class object to handle authentication/authorization task.
+
+
+6. ## 🔹  static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
 
 Signup a new user.
 
@@ -87,7 +100,7 @@ static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &
 - `auth` - The user auth data (`user_auth_data`) which holds the user credentials from `USerAccount` class.
 
 
-6. ## 🔹  static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+7. ## 🔹  static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
 
 Signup a new user without callback.
 
@@ -102,7 +115,7 @@ static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &
 - `auth` - The user auth data (`user_auth_data`) which holds the user credentials from `USerAccount` class.
 - `aResult` - The async result (AsyncResult).
 
-7. ## 🔹  static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
+8. ## 🔹  static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
 
 Signup a new user with callback.
 
@@ -118,7 +131,7 @@ static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &
 - `cb` - The async result callback (AsyncResultCallback).
 - `uid` - The user specified UID of async result (optional).
 
-8. ## 🔹  static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+9. ## 🔹  static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
 
 Reset the user password.
 
@@ -133,7 +146,7 @@ static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth
 - `auth` - The user auth data (`user_auth_data`) which holds the user credentials from `USerAccount` class.
 
 
-9. ## 🔹  static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+10. ## 🔹  static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
 
 Reset the user password without callback.
 
@@ -149,7 +162,7 @@ static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth
 - `aResult` - The async result (AsyncResult).
 
 
-10. ## 🔹  static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
+11. ## 🔹  static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
 
 Reset the user password with callback.
 
@@ -166,7 +179,7 @@ static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth
 - `uid` - The user specified UID of async result (optional).
 
 
-11. ## 🔹  static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth) 
+12. ## 🔹  static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth) 
 
 Send the user verification link to email.
 
@@ -181,7 +194,7 @@ static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &
 - `auth` - The user auth data (`user_auth_data`) which holds the user credentials from `USerAccount` class.
 
 
-12. ## 🔹  static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+13. ## 🔹  static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
 
 Send the user verification link to email without callback.
 
@@ -197,7 +210,7 @@ static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &
 - `aResult` - The async result (AsyncResult).
 
 
-13. ## 🔹  static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
+14. ## 🔹  static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
 
 Send the user verification link to email with callback.
 
@@ -214,7 +227,7 @@ static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &
 - `uid` - The user specified UID of async result (optional).
 
 
-14. ## 🔹  static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+15. ## 🔹  static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
 
 Delete a user.
 
@@ -229,7 +242,7 @@ static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_da
 - `auth` - The user auth data (`user_auth_data`) which holds the user credentials from `USerAccount` class.
 
 
-15. ## 🔹  static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+16. ## 🔹  static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
 
 Delete a user without callback.
 
@@ -245,7 +258,7 @@ static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_da
 - `aResult` - The async result (AsyncResult).
 
 
-16. ## 🔹  static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
+17. ## 🔹  static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
 
 Delete a user with callback.
 

@@ -98,6 +98,8 @@ void setup()
 
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);

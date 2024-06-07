@@ -1,5 +1,5 @@
 
-Revision `2024-06-06T02:25:03Z`
+Revision `2024-06-07T05:35:03Z`
 
 # Async Firebase Client library for Arduino Frequently Asked Questions.
 
@@ -34,6 +34,8 @@ Revision `2024-06-06T02:25:03Z`
 - [Q27: How can I run Realtime Database task and Cloud Firestore Database task using the same async client?](#q27-how-can-i-run-realtime-database-task-and-cloud-firestore-database-task-using-the-same-async-client)
 - [Q28: Why my Arduino MKR board failed to connect to the server?](#q28-why-my-arduino-mkr-board-failed-to-connect-to-the-server)
 - [Q29: Why my SIM7600 failed to connect to the server?](#q29-why-my-sim7600-failed-to-connect-to-the-server)
+- [Q30: How to stop the authentication task?](#q30-how-to-stop-the-authentication-task)
+- [Q31: How to remove authentication task handler from Firebase service app?](#q31-how-to-remove-authentication-task-handler-from-firebase-service-app)
 
 ### Q1: Why I get an error `"TCP connection failed"`?
 
@@ -339,3 +341,13 @@ For running more tasks concurrency, see [Running Many Tasks Concurrency Using Di
 
 ### Q29: Why my SIM7600 failed to connect to the server?
 #### A29: Please see, [Possible GSM issues](#possible-gsm-issues).
+
+### Q30: How to stop the authentication task?
+#### A30: Normally the authentication task was unable to stop after initialize unless it can deinitialize.
+
+You can use `deinitializeApp(<FirebaseApp>)` to deinitalize the `FirebaseApp` that was initialized.
+
+You also can block the `FirebaseApp::loop()` from the running in loop to pause the authentication task but it is not recommended.
+
+### Q31: How to remove authentication task handler from Firebase service app?
+#### A31: You can use `<FirebaseServiceApp>::resetApp()` to unbind or remove the `FirebaseApp` from the Firebase service app.

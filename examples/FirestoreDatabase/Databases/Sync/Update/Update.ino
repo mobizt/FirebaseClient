@@ -116,6 +116,8 @@ void setup()
 
     authHandler();
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Databases.resetApp();
     app.getApp<Firestore::Databases>(Databases);
 
     // In case setting the external async result to the sync task (optional)

@@ -120,6 +120,8 @@ void setup()
 
     authHandler();
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Docs.resetApp();
     app.getApp<Firestore::Documents>(Docs);
 
     // In case setting the external async result to the sync task (optional)

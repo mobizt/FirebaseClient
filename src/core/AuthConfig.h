@@ -138,6 +138,7 @@ namespace firebase
 
     enum firebase_auth_event_type
     {
+        auth_event_error = -1,
         auth_event_uninitialized = 0,
         auth_event_initializing = 1,
         auth_event_signup = 2,
@@ -148,8 +149,7 @@ namespace firebase
         auth_event_authenticating = 7,
         auth_event_auth_request_sent = 8,
         auth_event_auth_response_received = 9,
-        auth_event_ready = 10,
-        auth_event_error = 11
+        auth_event_ready = 10
     };
 
     enum jwt_step

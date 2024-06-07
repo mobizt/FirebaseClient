@@ -11,18 +11,14 @@ class Messaging
 
 ## Functions
 
+1. ### 🔹 void resetApp()
 
-1. ## 🔹  void url(const String &url)
+Unbind or remove FirebaseApp.
 
-Set the Messaging URL
 
 ```cpp
-void url(const String &url)
+void resetApp()
 ```
-
-**Params:**
-
-- `url` - The Messaging URL.
 
 
 2. ## 🔹  void loop()

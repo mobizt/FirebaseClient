@@ -116,13 +116,15 @@ void setup()
 
     initializeApp(aClient3, app, getAuth(user_auth), asyncCB, "authTask");
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);
 
-    // Since v1.2.1, in SSE mode (HTTP Streaming) task, you can filter the Stream events by using RealtimeDatabase::setSSEFilters(<keywords>), 
+    // Since v1.2.1, in SSE mode (HTTP Streaming) task, you can filter the Stream events by using RealtimeDatabase::setSSEFilters(<keywords>),
     // which the <keywords> is the comma separated events.
-    // The event keywords supported are: 
+    // The event keywords supported are:
     // get - To allow the http get response (first put event since stream connected).
     // put - To allow the put event.
     // patch - To allow the patch event.

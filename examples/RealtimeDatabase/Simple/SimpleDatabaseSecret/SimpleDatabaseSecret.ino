@@ -54,6 +54,8 @@ void setup()
 
     initializeApp(client, app, getAuth(dbSecret));
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);
@@ -158,7 +160,6 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
-
     // Set and get Array value
 
     Serial.print("Set Array... ");
@@ -175,7 +176,6 @@ void setup()
         Serial.println(v7);
     else
         printError(client.lastError().code(), client.lastError().message());
-    
 }
 
 void loop()

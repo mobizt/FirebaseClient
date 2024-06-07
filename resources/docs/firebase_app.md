@@ -8,6 +8,8 @@ The Firebase App class that handles the authentication/authorization task.
 class FirebaseApp
 ```
 
+## Functions
+
 1. ## 🔹  bool isInitialized() const
 
 Get the app initialization status.
@@ -198,3 +200,12 @@ auth_data_t *getAuth()
 **Returns:**
 
 - `auth_data_t*` - The pointer to internal auth data.
+
+
+16. ## 🔹  void deinitializeApp()
+
+Reset or clear app (deinitailize).
+
+```cpp
+void deinitializeApp()
+```

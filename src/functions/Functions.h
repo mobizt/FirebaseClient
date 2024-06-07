@@ -1,5 +1,5 @@
 /**
- * Created May 20, 2024
+ * Created June 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -54,12 +54,13 @@ public:
     }
 
     /**
-     * Set the Cloud Functions URL
-     * @param url The Cloud Functions URL.
+     * Unbind or remove the FirebaseApp
      */
-    void url(const String &url)
+    void resetApp()
     {
-        this->service_url = url;
+        this->app_addr = 0;
+        this->app_token = nullptr;
+        this->avec_addr = 0; // AsyncClient vector (list) address
     }
 
     /**
@@ -781,6 +782,11 @@ private:
     // FirebaseApp address and FirebaseApp vector address
     uint32_t app_addr = 0, avec_addr = 0;
     app_token_t *app_token = nullptr;
+
+    void url(const String &url)
+    {
+        this->service_url = url;
+    }
 
     void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
     {

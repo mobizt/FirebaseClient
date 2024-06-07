@@ -1,5 +1,5 @@
 /**
- * Created June 5, 2024
+ * Created June 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -53,6 +53,33 @@ public:
 
     ~RealtimeDatabase()
     {
+    }
+
+    /**
+     * Set the Firebase database URL
+     * @param url The Firebase database URL.
+     */
+    void url(const String &url)
+    {
+        this->service_url = url;
+        if (this->service_url.length())
+        {
+            if (this->service_url.indexOf("://") > -1)
+                this->service_url.remove(0, this->service_url.indexOf("://") + 3);
+
+            if (this->service_url.length() && this->service_url[this->service_url.length() - 1] == '/')
+                this->service_url.remove(this->service_url.length() - 1, 1);
+        }
+    }
+
+    /**
+     * Unbind or remove the FirebaseApp
+     */
+    void resetApp()
+    {
+        this->app_addr = 0;
+        this->app_token = nullptr;
+        this->avec_addr = 0; // AsyncClient vector (list) address
     }
 
     /**
@@ -824,23 +851,6 @@ public:
     {
         async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
-    }
-
-    /**
-     * Set the Firebase database URL
-     * @param url The Firebase database URL.
-     */
-    void url(const String &url)
-    {
-        this->service_url = url;
-        if (this->service_url.length())
-        {
-            if (this->service_url.indexOf("://") > -1)
-                this->service_url.remove(0, this->service_url.indexOf("://") + 3);
-
-            if (this->service_url.length() && this->service_url[this->service_url.length() - 1] == '/')
-                this->service_url.remove(this->service_url.length() - 1, 1);
-        }
     }
 
     /**

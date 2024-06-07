@@ -12,18 +12,14 @@ class CloudStorage
 ## Functions
 
 
+1. ### 🔹 void resetApp()
 
-1. ## 🔹  void url(const String &url)
+Unbind or remove FirebaseApp.
 
-Set the Google Cloud Storage URL
 
 ```cpp
-void url(const String &url)
+void resetApp()
 ```
-
-**Params:**
-
-- `url` - The Google Cloud Storage URL.
 
 
 2. ## 🔹  void loop()

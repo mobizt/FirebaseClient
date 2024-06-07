@@ -1,5 +1,5 @@
 /**
- * Created May 20, 2024
+ * Created June 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -56,12 +56,13 @@ public:
     }
 
     /**
-     * Set the Firestore URL
-     * @param url The Firestore URL.
+     * Unbind or remove the FirebaseApp
      */
-    void url(const String &url)
+    void resetApp()
     {
-        this->service_url = url;
+        this->app_addr = 0;
+        this->app_token = nullptr;
+        this->avec_addr = 0; // AsyncClient vector (list) address
     }
 
     /**
@@ -113,6 +114,11 @@ protected:
             this->uid = uid;
         }
     };
+
+    void url(const String &url)
+    {
+        this->service_url = url;
+    }
 
     void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
     {

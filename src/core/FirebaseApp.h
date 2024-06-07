@@ -1,5 +1,5 @@
 /**
- * Created June 5, 2024
+ * Created June 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -66,6 +66,7 @@ namespace firebase
         AsyncResult *refResult = nullptr;
         uint32_t ref_result_addr = 0;
         Timer req_timer, auth_timer, err_timer, app_ready_timer;
+        bool deinit = false;
         List vec;
         bool processing = false;
         uint32_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
@@ -367,6 +368,18 @@ namespace firebase
             if (!getClient())
                 return false;
 
+            // Deinitialize
+            if (deinit && auth_data.user_auth.status._event == auth_event_uninitialized)
+            {
+                if (auth_data.user_auth.initialized)
+                {
+                    stop(aClient);
+                    deinitializeApp();
+                    auth_timer.stop();
+                }
+                return false;
+            }
+
             updateDebug(*getAppDebug(aClient));
             updateEvent(*getAppEvent(aClient));
 
@@ -664,6 +677,12 @@ namespace firebase
             return true;
         }
 
+        void deinitializeApp()
+        {
+            auth_data.app_token.clear();
+            auth_data.user_auth.clear();
+        }
+
 #if defined(ENABLE_JWT)
         JWTClass *jwtProcessor() { return jwtClass ? jwtClass : &JWT; }
 #endif
@@ -792,11 +811,11 @@ namespace firebase
 #if defined(ENABLE_JWT)
         /**
          * Set the JWT token processor object.
-         * 
+         *
          * This function should be executed before calling initializeApp.
          *
          * @param jwtClass The JWT token processor object.
-         * 
+         *
          */
         void setJWTProcessor(JWTClass &jwtClass) { this->jwtClass = &jwtClass; }
 #endif

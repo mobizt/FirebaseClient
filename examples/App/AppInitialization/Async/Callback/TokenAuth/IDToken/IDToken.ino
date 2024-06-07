@@ -103,6 +103,8 @@ void setup()
 #endif
 #endif
 
+    // Initialize the FirebaseApp or auth task handler.
+    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(id_token), asyncCB, "authToken");
 }
 
@@ -110,7 +112,7 @@ void loop()
 {
     // The async task handler should run inside the main loop
     // without blocking delay or bypassing with millis code blocks.
-    
+
     app.loop();
 
     // To get the authentication time to live in seconds before expired.

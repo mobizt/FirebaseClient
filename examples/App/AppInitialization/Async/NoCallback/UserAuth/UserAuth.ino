@@ -59,6 +59,8 @@
 
 void printResult(AsyncResult &aResult);
 
+bool verifyUser(const String &apiKey, const String &email, const String &password);
+
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<3600) */);
@@ -99,8 +101,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -108,6 +108,18 @@ void setup()
 #endif
 #endif
 
+    // You can validate or verify user before initializing the app.
+    Serial.print("Verifying user... ");
+    bool ret = verifyUser(API_KEY, USER_EMAIL, USER_PASSWORD);
+    if (ret)
+        Serial.println("ok");
+    else
+        Serial.println("failed");
+
+    Serial.println("Initializing app...");
+
+    // Initialize the FirebaseApp or auth task handler.
+    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 }
 
@@ -156,4 +168,59 @@ void printResult(AsyncResult &aResult)
     {
         Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
+}
+
+bool verifyUser(const String &apiKey, const String &email, const String &password)
+{
+    if (ssl_client.connected())
+        ssl_client.stop();
+
+    String host = "www.googleapis.com";
+    bool ret = false;
+
+    if (ssl_client.connect(host.c_str(), 443) > 0)
+    {
+        String payload = "{\"email\":\"";
+        payload += email;
+        payload += "\",\"password\":\"";
+        payload += password;
+        payload += "\",\"returnSecureToken\":true}";
+
+        String header = "POST /identitytoolkit/v3/relyingparty/verifyPassword?key=";
+        header += apiKey;
+        header += " HTTP/1.1\r\n";
+        header += "Host: ";
+        header += host;
+        header += "\r\n";
+        header += "Content-Type: application/json\r\n";
+        header += "Content-Length: ";
+        header += payload.length();
+        header += "\r\n\r\n";
+
+        if (ssl_client.print(header) == header.length())
+        {
+            if (ssl_client.print(payload) == payload.length())
+            {
+                unsigned long ms = millis();
+                while (ssl_client.connected() && ssl_client.available() == 0 && millis() - ms < 5000)
+                {
+                    delay(1);
+                }
+
+                ms = millis();
+                while (ssl_client.connected() && ssl_client.available() && millis() - ms < 5000)
+                {
+                    String line = ssl_client.readStringUntil('\n');
+                    if (line.length())
+                    {
+                        ret = line.indexOf("HTTP/1.1 200 OK") > -1;
+                        break;
+                    }
+                }
+                ssl_client.stop();
+            }
+        }
+    }
+
+    return ret;
 }

@@ -1,5 +1,5 @@
 /**
- * Created May 29, 2024
+ * Created June 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -89,6 +89,7 @@ namespace firebase
     private:
         void configApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, firebase_core_auth_task_type task_type = firebase_core_auth_task_type_undefined)
         {
+            app.deinit = false;
             app.aClient = &aClient;
             app.aclient_addr = reinterpret_cast<uint32_t>(&aClient);
 #if defined(ENABLE_JWT)
@@ -210,6 +211,8 @@ namespace firebase
             }
         }
 
+        void deinitializeApp(FirebaseApp &app) { app.deinit = true; }
+
         void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_signup);
@@ -303,6 +306,13 @@ static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth
     app.setCallback(cb);
     Firebase.initializeApp(aClient, app, auth);
 }
+
+/**
+ * Deinitialize the FirebaseApp.
+ *
+ * @param app The FirebaseApp class object to handle authentication/authorization task.
+ */
+static void deinitializeApp(FirebaseApp &app) { Firebase.deinitializeApp(app); }
 
 /**
  * Signup a new user.

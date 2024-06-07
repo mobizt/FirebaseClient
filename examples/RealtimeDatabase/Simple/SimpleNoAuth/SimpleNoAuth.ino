@@ -1,4 +1,4 @@
-/** This example requires the Realtime database security rules setup as following. 
+/** This example requires the Realtime database security rules setup as following.
  {
   "rules": {
     ".read": true,
@@ -62,6 +62,8 @@ void setup()
 
     initializeApp(client, app, getAuth(noAuth));
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);

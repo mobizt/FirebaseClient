@@ -58,50 +58,31 @@ class RealtimeDatabase
 
     - `RealtimeDatabase` reference to self instance
 
-2. ### 🔹 T get(AsyncClientClass &aClient, const String &path)
+2. ### 🔹 void url(const String &url)
 
-    Get value at the node path.
-
-    This function is sync (blocking) function. The success or error status from operation can be obtained by checking the integer value from `AsyncClientClass::lastError().code()`, 0 for success and non-zero for error.
-
+    Set the Firebase database URL
 
     ### Example
     ```cpp
-    // Get Boolean data.
-    bool boolData = Database.get<bool>(aClient, "/path/to/data");
-
-    // Get integer data.
-    int intData = Database.get<int>(aClient, "/path/to/data");
-
-    // Get float data
-    float floatData = Database.get<float>(aClient, "/path/to/data");
-
-    // Get double data
-    float doubleData = Database.get<double>(aClient, "/path/to/data");
-
-    // Get String or JSON or Array data.
-    String stringData = Database.get<String>(aClient, "/path/to/data");
-
-    // To check the operation status and error information in case of error after the task was done.   
-    if (aClient.lastError().code() == 0)
-        Serial.println("Operation is success.");
-    else
-        Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
+    Database.url("xxxxxxxxx.firebasedatabase.app");
     ```
+
+    ```cpp
+    void url(const String &url)
+    ```
+    **Params:**
+    - `url` - The Firebase database URL.
+
+3. ### 🔹 void resetApp()
+
+    Unbind or remove FirebaseApp.
 
 
     ```cpp
-    T get(AsyncClientClass &aClient, const String &path)
+    void resetApp()
     ```
-    **Params:**
-    - `aClient` - The async client.
-    - `path` - The node path to get value.
 
-    **Returns:**
-
-    - `T` - The value of type T that casts from response payload.
-
-3. ### 🔹 T get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options)
+4. ### 🔹 T get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options)
 
     Get value at the node path.
 
@@ -144,7 +125,7 @@ class RealtimeDatabase
     - `T` - The value of type T that casts from response payload.
     
     
-4. ### 🔹 void get(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, bool sse = false)
+5. ### 🔹 void get(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, bool sse = false)
 
     Get value at the node path.
 
@@ -181,7 +162,7 @@ class RealtimeDatabase
     - `sse` - The Server-sent events (Stream) mode
 
 
-5. ### 🔹 void get(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "")
+6. ### 🔹 void get(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "")
 
     Get value at the node path.
 
@@ -220,7 +201,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-6. ### 🔹 void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult)
+7. ### 🔹 void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult)
 
     Get value at the node path.
 
@@ -248,7 +229,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
 
 
-7. ### 🔹 void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "")
+8. ### 🔹 void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "")
 
     Get value at the node path.
 
@@ -277,7 +258,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-8. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
+9. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
 
     Get value at the node path.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -325,7 +306,7 @@ class RealtimeDatabase
     - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
     - `aResult` - The async result (AsyncResult)
 
-9. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
+10. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 
     Get value at the node path.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -374,7 +355,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-10. ### 🔹 bool existed(AsyncClientClass &aClient, const String &path)
+11. ### 🔹 bool existed(AsyncClientClass &aClient, const String &path)
 
     Check if data exists in database.
 
@@ -405,7 +386,7 @@ class RealtimeDatabase
     **Returns:**
     - boolean value indicates the operating status.
 
-11. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
+12. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
 
     Perform OTA update using a firmware file from the database.
     
@@ -426,7 +407,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
 
 
-12. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
+13. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
 
     Perform OTA update using a firmware file from the database.
 
@@ -447,7 +428,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-13. ### 🔹 bool set(AsyncClientClass &aClient, const String &path, T value)
+14. ### 🔹 bool set(AsyncClientClass &aClient, const String &path, T value)
 
     Set value to database.
 
@@ -483,7 +464,7 @@ class RealtimeDatabase
     - boolean value indicates the operating status.
 
 
-14. ### 🔹 void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
+15. ### 🔹 void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
 
     Set value to database.
 
@@ -511,7 +492,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
    
 
-15. ### 🔹 void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
+16. ### 🔹 void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
 
     Set value to database.
 
@@ -540,7 +521,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-16. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
+17. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
 
     Set content from file to database.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -589,7 +570,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
 
 
-17. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
+18. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 
     Set content from file to database.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -639,7 +620,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-18. ### 🔹 String push(AsyncClientClass &aClient, const String &path, T value)
+19. ### 🔹 String push(AsyncClientClass &aClient, const String &path, T value)
 
     Push value to database.
     
@@ -674,7 +655,7 @@ class RealtimeDatabase
     **Returns:**
     - String random uuid string of a new node that created.
 
-19. ### 🔹 void push(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
+20. ### 🔹 void push(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
 
     Push value to database.
     
@@ -707,7 +688,7 @@ class RealtimeDatabase
     - `value` - The value to push.
     - `aResult` - The async result (AsyncResult).
 
-20. ### 🔹 void push(AsyncClientClass &aClient, const String &path, T value,  AsyncResultCallback cb, const String &uid = "")
+21. ### 🔹 void push(AsyncClientClass &aClient, const String &path, T value,  AsyncResultCallback cb, const String &uid = "")
 
     Push value to database.
     
@@ -736,7 +717,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-21. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
+22. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
 
     Push content from file to database.
     
@@ -786,7 +767,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
 
 
-22. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
+23. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 
     Push content from file to database.
 
@@ -837,7 +818,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-23. ### 🔹 bool update(AsyncClientClass &aClient, const String &path, const T &value)
+24. ### 🔹 bool update(AsyncClientClass &aClient, const String &path, const T &value)
 
     Update (patch) JSON object to database.
     
@@ -863,7 +844,7 @@ class RealtimeDatabase
     **Returns:**
     - boolean value indicates the operating status.
 
-24. ### 🔹 void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult)
+25. ### 🔹 void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult)
 
     Update (patch) JSON object to database.
     
@@ -881,7 +862,7 @@ class RealtimeDatabase
     - `value` - The JSON object (object_t) to update.
     - `aResult` - The async result (AsyncResult).
 
-25. ### 🔹 void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "")
+26. ### 🔹 void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "")
 
     Update (patch) JSON object to database.
     
@@ -901,7 +882,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-26. ### 🔹 bool remove(AsyncClientClass &aClient, const String &path)
+27. ### 🔹 bool remove(AsyncClientClass &aClient, const String &path)
 
     Remove node from database
 
@@ -927,7 +908,7 @@ class RealtimeDatabase
     **Returns:**
     - boolean value indicates the operating status.
 
-27. ### 🔹 void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
+28. ### 🔹 void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
 
     Remove node from database
 
@@ -945,7 +926,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult).
 
 
-28. ### 🔹 void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
+29. ### 🔹 void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
 
     Remove node from database
 
@@ -963,20 +944,6 @@ class RealtimeDatabase
     - `cb` - The async result callback (AsyncResultCallback).
     - `uid` - The user specified UID of async result (optional).
 
-29. ### 🔹 void url(const String &url)
-
-    Set the Firebase database URL
-
-    ### Example
-    ```cpp
-    Database.url("xxxxxxxxx.firebasedatabase.app");
-    ```
-
-    ```cpp
-    void url(const String &url)
-    ```
-    **Params:**
-    - `url` - The Firebase database URL.
 
 30. ### 🔹 void setSSEFilters(const String &filter = "")
 

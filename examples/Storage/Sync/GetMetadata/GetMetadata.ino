@@ -107,6 +107,8 @@ void setup()
 
     authHandler();
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use storage.resetApp();
     app.getApp<Storage>(storage);
 
     // In case setting the external async result to the sync task (optional)

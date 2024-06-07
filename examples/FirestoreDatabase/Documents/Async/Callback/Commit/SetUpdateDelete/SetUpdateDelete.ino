@@ -106,6 +106,8 @@ void setup()
 
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Docs.resetApp();
     app.getApp<Firestore::Documents>(Docs);
 }
 

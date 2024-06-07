@@ -109,6 +109,8 @@ void setup()
 
     initializeApp(aClient, app, getAuth(sa_auth), aResult_no_callback);
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use indexes.resetApp();
     app.getApp<Firestore::CollectionGroups::Indexes>(indexes);
 }
 
@@ -119,7 +121,7 @@ void loop()
 
     // The JWT token processor required for ServiceAuth and CustomAuth authentications.
     // JWT is a static object of JWTClass and it's not thread safe.
-    // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp, 
+    // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp,
     // and set it to the FirebaseApp via FirebaseApp::setJWTProcessor(<JWTClass>), before calling initializeApp.
     JWT.loop(app.getAuth());
 

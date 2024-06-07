@@ -125,6 +125,8 @@ void setup()
 #endif
 #endif
 
+    // Initialize the FirebaseApp or auth task handler.
+    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(custom_auth), aResult_no_callback);
 }
 
@@ -135,7 +137,7 @@ void loop()
 
     // The JWT token processor required for ServiceAuth and CustomAuth authentications.
     // JWT is a static object of JWTClass and it's not thread safe.
-    // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp, 
+    // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp,
     // and set it to the FirebaseApp via FirebaseApp::setJWTProcessor(<JWTClass>), before calling initializeApp.
     JWT.loop(app.getAuth());
 

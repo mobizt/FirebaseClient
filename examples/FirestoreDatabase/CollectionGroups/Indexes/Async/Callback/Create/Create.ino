@@ -110,6 +110,8 @@ void setup()
 
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use indexes.resetApp();
     app.getApp<Firestore::CollectionGroups::Indexes>(indexes);
 }
 

@@ -121,6 +121,8 @@ void setup()
 
     authHandler();
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use cfunctions.resetApp();
     app.getApp<CloudFunctions>(cfunctions);
 
     // In case setting the external async result to the sync task (optional)

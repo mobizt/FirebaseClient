@@ -13,7 +13,7 @@
  * SYNTAX:
  *
  * CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>);
- * 
+ *
  * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
  * <api_key> - The web API key of project.
  * <client_email> - The service account client Email.
@@ -125,6 +125,8 @@ void setup()
 #endif
 #endif
 
+    // Initialize the FirebaseApp or auth task handler.
+    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(custom_auth), asyncCB, "authTask");
 }
 
@@ -135,7 +137,7 @@ void loop()
 
     // The JWT token processor required for ServiceAuth and CustomAuth authentications.
     // JWT is a static object of JWTClass and it's not thread safe.
-    // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp, 
+    // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp,
     // and set it to the FirebaseApp via FirebaseApp::setJWTProcessor(<JWTClass>), before calling initializeApp.
     JWT.loop(app.getAuth());
 
@@ -193,4 +195,3 @@ void printResult(AsyncResult &aResult)
         Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
     }
 }
-

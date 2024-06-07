@@ -122,6 +122,8 @@ void setup()
 
     authHandler();
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use cstorage.resetApp();
     app.getApp<CloudStorage>(cstorage);
 
     // In case setting the external async result to the sync task (optional)

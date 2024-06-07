@@ -120,6 +120,12 @@ JsonWriter  KEYWORD2
 # Methods  (KEYWORD2)
 #####################
 
+initializeApp   KEYWORD2
+deinitializeApp KEYWORD2
+signup  KEYWORD2
+resetPassword   KEYWORD2
+verify  KEYWORD2
+deleteUser  KEYWORD2
 get KEYWORD2
 ota KEYWORD2
 set KEYWORD2
@@ -272,6 +278,7 @@ eventTimeout    KEYWORD2
 isInitialized   KEYWORD2
 ready   KEYWORD2
 getApp  KEYWORD2
+resetApp    KEYWORD2
 getToken    KEYWORD2
 getRefreshToken KEYWORD2
 getUid  KEYWORD2

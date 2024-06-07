@@ -114,6 +114,8 @@ void setup()
 
     authHandler();
 
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use indexes.resetApp();
     app.getApp<Firestore::Databases::Indexes>(indexes);
 
     // In case setting the external async result to the sync task (optional)

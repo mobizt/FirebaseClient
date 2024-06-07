@@ -12,7 +12,16 @@ class Documents
 
 ## Functions
 
-1. ## 🔹 String batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions)
+1. ### 🔹 void resetApp()
+
+Unbind or remove FirebaseApp.
+
+
+```cpp
+void resetApp()
+```
+
+2. ## 🔹 String batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions)
 
  Gets multiple documents.
 
@@ -54,7 +63,7 @@ String batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, Batc
 
 - `String` - The response payload.
 
-2. ## 🔹 void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResult &aResult)
+3. ## 🔹 void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResult &aResult)
 
  Gets multiple documents.
 
@@ -94,7 +103,7 @@ void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchG
 - `aResult` - The async result (AsyncResult).
 
 
-3. ## 🔹 void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResultCallback cb, const String &uid = "")
+4. ## 🔹 void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResultCallback cb, const String &uid = "")
 
  Gets multiple documents.
 
@@ -135,7 +144,7 @@ void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchG
 - `uid` - The user specified UID of async result (optional).
 
 
-4. ## 🔹 String batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
+5. ## 🔹 String batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
 
 Applies a batch of write operations.
 
@@ -164,7 +173,7 @@ String batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Wr
 
 - `String` - The response payload.
 
-5. ## 🔹 void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
+6. ## 🔹 void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
 
 Applies a batch of write operations.
 
@@ -189,7 +198,7 @@ void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writ
 - `aResult` - The async result (AsyncResult).
 
 
-6. ## 🔹 void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
+7. ## 🔹 void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
 
 Applies a batch of write operations.
 
@@ -215,7 +224,7 @@ void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writ
 - `uid` - The user specified UID of async result (optional).
 
 
-7. ## 🔹 String beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions)
+8. ## 🔹 String beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions)
 
 Starts a new transaction.
 
@@ -252,7 +261,7 @@ String beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &pare
 
 - `String` - The response payload.
 
-8. ## 🔹 void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResult &aResult)
+9. ## 🔹 void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResult &aResult)
 
 Starts a new transaction.
 
@@ -287,7 +296,7 @@ void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent
 - `aResult` - The async result (AsyncResult).
 
 
-9. ## 🔹 void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "")
+10. ## 🔹 void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "")
 
 Starts a new transaction.
 
@@ -323,7 +332,7 @@ void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent
 - `uid` - The user specified UID of async result (optional).
 
 
-10. ## 🔹 String commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
+11. ## 🔹 String commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
 
 Commits a transaction, while optionally updating documents.
 
@@ -350,7 +359,7 @@ String commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes
 
 - `String` - The response payload.
 
-11. ## 🔹 void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
+12. ## 🔹 void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
 
 Commits a transaction, while optionally updating documents.
 
@@ -374,7 +383,7 @@ void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &
 - `aResult` - The async result (AsyncResult).
 
 
-12. ## 🔹 void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
+13. ## 🔹 void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
 
 Commits a transaction, while optionally updating documents.
 
@@ -399,7 +408,7 @@ void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &
 - `uid` - The user specified UID of async result (optional).
 
 
-13. ## 🔹 String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
+14. ## 🔹 String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document)
 
 Create a document at the defined document path.
 
@@ -427,7 +436,7 @@ String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const
 
 - `String` - The response payload.
 
-14. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
+15. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
 
 Create a document at the defined document path.
 
@@ -452,7 +461,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `aResult` - The async result (AsyncResult)
 
 
-15. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
+16. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &documentPath, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
 
 Create a document at the defined document path.
 
@@ -478,7 +487,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `uid` - The user specified UID of async result (optional).
 
 
-16. ## 🔹 String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
+17. ## 🔹 String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
 
 Create a document at the defined document path.
 
@@ -507,7 +516,7 @@ String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const
 
 - `String` - The response payload.
 
-17. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
+18. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
 
 Create a document at the defined document path.
 
@@ -534,7 +543,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `aResult` - The async result (AsyncResult)
 
 
-18. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
+19. ## 🔹 void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
 
 Create a document at the defined document path.
 
@@ -562,7 +571,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `uid` - The user specified UID of async result (optional).
 
 
-19. ## 🔹 String deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument)
+20. ## 🔹 String deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument)
 
 Delete a document at the defined path.
 
@@ -596,7 +605,7 @@ String deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 
 - `String` - The response payload.
 
-20. ## 🔹 void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult)
+21. ## 🔹 void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult)
 
 Delete a document at the defined path.
 
@@ -628,7 +637,7 @@ void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const
 - `aResult` - The async result (AsyncResult).
 
 
-21. ## 🔹 void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "")
+22. ## 🔹 void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "")
 
 Delete a document at the defined path.
 
@@ -661,7 +670,7 @@ void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const
 - `uid` - The user specified UID of async result (optional).
 
 
-22. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options)
+23. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options)
 
 Get a document at the defined path.
 
@@ -693,7 +702,7 @@ String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Str
 
 - `String` - The response payload.
 
-23. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult)
+24. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult)
 
 Get a document at the defined path.
 
@@ -722,7 +731,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 - `aResult` - The async result (AsyncResult).
 
 
-24. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "")
+25. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "")
 
 Get a document at the defined path.
 
@@ -752,7 +761,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 - `uid` - The user specified UID of async result (optional).
 
 
-25. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
+26. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
 
 List the documents in the defined documents collection.
 
@@ -786,7 +795,7 @@ String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const St
 
 - `String` - The response payload.
 
-26. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult)
+27. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult)
 
 List the documents in the defined documents collection.
 
@@ -818,7 +827,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const Stri
 - `aResult` - The async result (AsyncResult).
 
 
-27. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResultCallback cb, const String &uid = "")
+28. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResultCallback cb, const String &uid = "")
 
 List the documents in the defined documents collection.
 
@@ -851,7 +860,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const Stri
 - `uid` - The user specified UID of async result (optional).
 
 
-28. ## 🔹 String listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
+29. ## 🔹 String listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
 
 List the document collection ids in the defined document path.
 
@@ -883,7 +892,7 @@ String listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &par
 
 - `String` - The response payload.
 
-29. ## 🔹 void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult)
+30. ## 🔹 void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult)
 
 List the document collection ids in the defined document path.
 
@@ -913,7 +922,7 @@ void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &paren
 - `aResult` - The async result (AsyncResult).
 
 
-30. ## 🔹 void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
+31. ## 🔹 void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
 
 List the document collection ids in the defined document path.
 
@@ -944,7 +953,7 @@ void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &paren
 - `uid` - The user specified UID of async result (optional).
 
 
-31. ## 🔹 String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
+32. ## 🔹 String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document)
 
 Patch or update a document at the defined path.
 
@@ -987,7 +996,7 @@ String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const S
 
 - `String` - The response payload.
 
-32. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
+33. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
 
 Patch or update a document at the defined path.
 
@@ -1028,7 +1037,7 @@ void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const Str
 - `aResult` - The async result (AsyncResult).
 
 
-33. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
+34. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, patchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
 
 Patch or update a document at the defined path.
 
@@ -1070,7 +1079,7 @@ void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const Str
 - `uid` - The user specified UID of async result (optional).
 
 
-34. ## 🔹 String rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction)
+35. ## 🔹 String rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction)
 
 Rolls back a transaction.
 
@@ -1094,7 +1103,7 @@ String rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, cons
 
 - `String` - The response payload.
 
-35. ## 🔹 void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResult &aResult)
+36. ## 🔹 void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResult &aResult)
 
 Rolls back a transaction.
 
@@ -1116,7 +1125,7 @@ void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const 
 - `aResult` - The async result (AsyncResult).
 
 
-36. ## 🔹 void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "")
+37. ## 🔹 void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "")
 
 Rolls back a transaction.
 
@@ -1138,7 +1147,7 @@ void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const 
 - `uid` - The user specified UID of async result (optional).
 
 
-37. ## 🔹 String runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions)
+38. ## 🔹 String runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions)
 
 Runs a query.
 
@@ -1176,7 +1185,7 @@ String runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, cons
 
 - `String` - The response payload.
 
-38. ## 🔹 void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult)
+39. ## 🔹 void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult)
 
 Runs a query.
 
@@ -1211,7 +1220,7 @@ void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const 
 - `aResult` - The async result (AsyncResult).
 
 
-39. ## 🔹 void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResultCallback cb, const String &uid = "")
+40. ## 🔹 void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResultCallback cb, const String &uid = "")
 
 Runs a query.
 
@@ -1260,7 +1269,16 @@ class Databases
 
 ## Functions
 
-1. ## 🔹 String exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
+1. ### 🔹 void resetApp()
+
+Unbind or remove FirebaseApp.
+
+
+```cpp
+void resetApp()
+```
+
+2. ## 🔹 String exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions)
 
 Export the documents in the database to the Firebase Storage data bucket.
 
@@ -1290,7 +1308,7 @@ String exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &paren
 
 - `String` - The response payload.
 
-2. ## 🔹 void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions, AsyncResult &aResult)
+3. ## 🔹 void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions, AsyncResult &aResult)
 
 Export the documents in the database to the Firebase Storage data bucket.
 
@@ -1317,7 +1335,7 @@ void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 - `aResult` - The async result (AsyncResult)
 
 
-3. ## 🔹 void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions, AsyncResultCallback cb, const String &uid = "")
+4. ## 🔹 void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions exportOptions, AsyncResultCallback cb, const String &uid = "")
 
 Export the documents in the database to the Firebase Storage data bucket.
 
@@ -1345,7 +1363,7 @@ void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 - `uid` - The user specified UID of async result (optional).
 
 
-4. ## 🔹 String importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
+5. ## 🔹 String importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions)
 
 Import the exported documents stored in the Firebase Storage data bucket.
 
@@ -1375,7 +1393,7 @@ String importDocuments(AsyncClientClass &aClient, const Firestore::Parent &paren
 
 - `String` - The response payload.
 
-5. ## 🔹 void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions, AsyncResult &aResult)
+6. ## 🔹 void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions, AsyncResult &aResult)
 
 Import the exported documents stored in the Firebase Storage data bucket.
 
@@ -1402,7 +1420,7 @@ void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 - `aResult` - The async result (AsyncResult)
 
 
-6. ## 🔹 void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions, AsyncResultCallback cb, const String &uid = "")
+7. ## 🔹 void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, EximDocumentOptions importOptions, AsyncResultCallback cb, const String &uid = "")
 
 Import the exported documents stored in the Firebase Storage data bucket.
 
@@ -1430,7 +1448,7 @@ void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent,
 - `uid` - The user specified UID of async result (optional).
 
 
-7. ## 🔹 String create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
+8. ## 🔹 String create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database)
 
 Create a database.
 
@@ -1458,7 +1476,7 @@ String create(AsyncClientClass &aClient, const Firestore::Parent &parent, Databa
 
 - `String` - The response payload.
 
-8. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, AsyncResult &aResult)
+9. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, AsyncResult &aResult)
 
 Create a database.
 
@@ -1483,7 +1501,7 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 - `aResult` - The async result (AsyncResult).
 
 
-9. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, AsyncResultCallback cb, const String &uid = "")
+10. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, AsyncResultCallback cb, const String &uid = "")
 
 Create a database.
 
@@ -1509,7 +1527,7 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 - `uid` - The user specified UID of async result (optional).
 
 
-10. ## 🔹 String deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
+11. ## 🔹 String deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
 
 Deletes a database.
 
@@ -1535,7 +1553,7 @@ String deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent
 
 - `String` - The response payload.
 
-11. ## 🔹 void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResult &aResult)
+12. ## 🔹 void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResult &aResult)
 
 Deletes a database.
 
@@ -1558,7 +1576,7 @@ void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, 
 - `aResult` - The async result (AsyncResult).
 
 
-12. ## 🔹 void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResultCallback cb, const String &uid = "")
+13. ## 🔹 void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResultCallback cb, const String &uid = "")
 
 Deletes a database.
 
@@ -1582,7 +1600,7 @@ void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, 
 - `uid` - The user specified UID of async result (optional).
 
 
-13. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent)
+14. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
 Gets information about a database.
 
@@ -1606,7 +1624,7 @@ String get(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
 - `String` - The response payload.
 
-14. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
+15. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
 
 Gets information about a database.
 
@@ -1627,7 +1645,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult
 - `aResult` - The async result (AsyncResult).
 
 
-15. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
+16. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
 
 Gets information about a database.
 
@@ -1649,7 +1667,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult
 - `uid` - The user specified UID of async result (optional).
 
 
-16. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+17. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
 List all the databases in the project.
 
@@ -1673,7 +1691,7 @@ String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
 - `String` - The response payload.
 
-17. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
+18. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
 
 List all the databases in the project.
 
@@ -1694,7 +1712,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResul
 - `aResult` - The async result (AsyncResult).
 
 
-18. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
+19. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
 
 List all the databases in the project.
 
@@ -1716,7 +1734,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResul
 - `uid` - The user specified UID of async result (optional).
 
 
-19. ## 🔹 String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
+20. ## 🔹 String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask)
 
 Updates a database.
 
@@ -1746,7 +1764,7 @@ String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Databas
 
 - `String` - The response payload.
 
-20. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask, AsyncResult &aResult)
+21. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask, AsyncResult &aResult)
 
 Updates a database.
 
@@ -1773,7 +1791,7 @@ void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database 
 - `aResult` - The async result (AsyncResult).
 
 
-21. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
+22. ## 🔹 void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database &database, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
 
 Updates a database.
 
@@ -1801,7 +1819,7 @@ void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, Database 
 - `uid` - The user specified UID of async result (optional).
 
 
-22. ## 🔹 String create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
+23. ## 🔹 String create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index)
 
 Creates the specified index.
 
@@ -1828,7 +1846,7 @@ String create(AsyncClientClass &aClient, const Firestore::Parent &parent, Databa
 
 - `String` - The response payload.
 
-23. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index, AsyncResult &aResult)
+24. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index, AsyncResult &aResult)
 
 Creates the specified index.
 
@@ -1852,7 +1870,7 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 - `aResult` - The async result (AsyncResult).
 
 
-24. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index, AsyncResultCallback cb, const String &uid = "")
+25. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, DatabaseIndex::Index index, AsyncResultCallback cb, const String &uid = "")
 
 Creates the specified index.
 
@@ -1877,7 +1895,7 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, Database
 - `uid` - The user specified UID of async result (optional).
 
 
-25. ## 🔹 String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+26. ## 🔹 String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
 
 Deletes an index.
 
@@ -1904,7 +1922,7 @@ String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, c
 
 - `String` - The response payload.
 
-26. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
+27. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
 
 Deletes an index.
 
@@ -1928,7 +1946,7 @@ void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 - `aResult` - The async result (AsyncResult).
 
 
-27. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+28. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
 
 Deletes an index.
 
@@ -1953,7 +1971,7 @@ void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 - `uid` - The user specified UID of async result (optional).
 
 
-28. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+29. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
 
 Gets an index.
 
@@ -1980,7 +1998,7 @@ String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Str
 
 - `String` - The response payload.
 
-29. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
+30. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
 
 Gets an index.
 
@@ -2004,7 +2022,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 - `aResult` - The async result (AsyncResult).
 
 
-30. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+31. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
 
 Gets an index.
 
@@ -2029,7 +2047,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 - `uid` - The user specified UID of async result (optional).
 
 
-31. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+32. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
 Lists the indexes.
 
@@ -2055,7 +2073,7 @@ String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
 
 - `String` - The response payload.
 
-32. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
+33. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
 
 Lists the indexes.
 
@@ -2079,7 +2097,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResul
 - `aResult` - The async result (AsyncResult).
 
 
-33. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
+34. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
 
 Lists the indexes.
 
@@ -2114,8 +2132,18 @@ Google Cloud Firestore database CollectionGroups class
 class CollectionGroups
 ```
 
+## Functions
 
-1. ## 🔹 String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
+1. ### 🔹 void resetApp()
+
+Unbind or remove FirebaseApp.
+
+
+```cpp
+void resetApp()
+```
+
+2. ## 🔹 String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index)
 
 Creates a composite index.
 
@@ -2142,7 +2170,7 @@ String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const 
 
 - `String` - The response payload.
 
-2. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResult &aResult)
+3. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResult &aResult)
 
 Creates a composite index.
 
@@ -2167,7 +2195,7 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const St
 - `aResult` - The async result (AsyncResult).
 
 
-3. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResultCallback cb, const String &uid = "")
+4. ## 🔹 void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, CollectionGroupsIndex::Index index, AsyncResultCallback cb, const String &uid = "")
 
 Creates a composite index.
 
@@ -2193,7 +2221,7 @@ void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const St
 - `uid` - The user specified UID of async result (optional).
 
 
-4. ## 🔹 String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+5. ## 🔹 String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
 
 Deletes a composite index.
 
@@ -2221,7 +2249,7 @@ String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, c
 
 - `String` - The response payload.
 
-5. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
+6. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
 
 Deletes a composite index.
 
@@ -2246,7 +2274,7 @@ void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 - `aResult` - The async result (AsyncResult).
 
 
-6. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+7. ## 🔹 void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
 
 Deletes a composite index.
 
@@ -2272,7 +2300,7 @@ void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, con
 - `uid` - The user specified UID of async result (optional).
 
 
-7. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+8. ## 🔹 String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
 
 Gets a composite index.
 
@@ -2299,7 +2327,7 @@ String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Str
 
 - `String` - The response payload.
 
-8. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
+9. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
 
 Gets a composite index.
 
@@ -2324,7 +2352,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 - `aResult` - The async result (AsyncResult).
 
 
-9. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+10. ## 🔹 void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
 
 Gets a composite index.
 
@@ -2350,7 +2378,7 @@ void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const Strin
 - `uid` - The user specified UID of async result (optional).
 
 
-10. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
+11. ## 🔹 String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
 
 Lists composite indexes.
 
@@ -2376,7 +2404,7 @@ String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const St
 
 - `String` - The response payload.
 
-11. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResult &aResult)
+12. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResult &aResult)
 
 Lists composite indexes.
 
@@ -2400,7 +2428,7 @@ void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const Stri
 - `aResult` - The async result (AsyncResult).
 
 
-12. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResultCallback cb, const String &uid = "")
+13. ## 🔹 void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResultCallback cb, const String &uid = "")
 
 Lists composite indexes.
 
