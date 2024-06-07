@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-07T03:49:12Z`
+Revision `2024-06-07T06:05:58Z`
 
 ## Table of Contents
 
@@ -347,18 +347,18 @@ The authentication classes provide the authentication data for authentication an
 
 The REST API client (this library) will use the short-lived token for authorization.
 
-This authorization token will be expired in 60 minutes or 3600 seconds.
+This authorization token will be expired in 60 minutes or 3600 seconds which determined by the issuer (Google).
 
-The authorization token will be refresh or recreated automatically as long as the async task (auth task) handler was running in the main loop without blocking from user code. The auth task handler was done by `FirebaseApp` class which will be discussued later.
+The authorization token will be refresh or re-created automatically as long as the async authentication task handler (`FirebaseApp`) was running in the main loop without blocking by user code.
 
 > [!WARNING]  
-> User cannot blame for the authorization token expiration and the Firebase sevices denied by Google. The token will be refresh/recreated automatically prior to its expiration period as long as async task (auth task) handler was running in the main loop as mentioned earlier.
+> Most examples use the token for autorization. The token will be refresh/recreated automatically as mentioned above.
 >
-> The `FirebaseApp` event is showing the authentication processes that are running behind. It does not interrupt your job but it is preparing and maintaining the authorization token to be valid all the time before use. Google will deny the access from the client that sending the request with the expired auth token.
+> The `FirebaseApp` event will show the authentication processes that are running behind. The authentication task handler will prepare and maintain the authorization token to be valid. Google may deny the access from the client that sending the request with the expired authorization token.
 > 
-> Anyway, library also provides the option for non-secure usage i.e. using database secret for Realtime database and no authorization token if the security rules are allowed. This topic will be mentioned later with `LegacyToken` and `NoAuth` classes usage.
+> Anyway, library also provides the option for less or non-secure usage which no authorization tokens are involved i.e. using database secret (`LegacyToken`) for Realtime database and using no authorization token (`NoAuth`) if the security rules are allowed (see the [Project Preparation and Setup](#project-preparation-and-setup) section). 
 > 
-> You can get started using this library with [Simple examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/RealtimeDatabase/Simple) using non-secure authentication method which is similar to other legacy Firebase library. 
+> You can get started using this library with these [simple Realtime database examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/RealtimeDatabase/Simple) which using database secret and no token, which are similar to the other legacy Firebase library usage. 
 >
 > For secure and more elaborate usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
 
