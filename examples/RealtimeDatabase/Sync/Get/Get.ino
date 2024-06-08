@@ -125,8 +125,6 @@ void setup()
     // To unset, use unsetAsyncResult().
     aClient.setAsyncResult(aResult_no_callback);
 
-    Serial.println("Synchronous Get... ");
-
     // Library does not provide JSON parser library, to get JSON object, get the string and deseialize it.
 
     Serial.print("Get int... ");

@@ -107,7 +107,7 @@ void setup()
 
     if (aClient.lastError().code() == 0)
     {
-        Serial.println("Ok");
+        Serial.println("ok");
 
         Serial.println(json);
 
@@ -116,7 +116,7 @@ void setup()
         Serial.print("Set security rules... ");
         bool status = Database.set<object_t>(aClient, ".settings/rules", object_t(json));
         if (status)
-            Serial.println("Ok");
+            Serial.println("ok");
         else
             printError(aClient.lastError().code(), aClient.lastError().message());
     }

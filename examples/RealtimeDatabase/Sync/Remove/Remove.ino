@@ -111,10 +111,10 @@ void setup()
     // To unset, use unsetAsyncResult().
     aClient.setAsyncResult(aResult_no_callback);
 
-    Serial.println("Synchronous Remove node... ");
+    Serial.print("Remove... ");
     bool status = Database.remove(aClient, "/test/update/json");
     if (status)
-        Serial.println("Ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 }

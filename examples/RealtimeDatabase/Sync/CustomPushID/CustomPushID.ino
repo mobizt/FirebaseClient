@@ -132,23 +132,23 @@ void loop()
     {
         ms = millis();
 
-        Serial.println("Synchronous Push vs Set with custom UUID... ");
-
         String path = "/test/int2/" + genUUID();
 
         // Push int
+        Serial.print("Push int... ");
         String name = Database.push<int>(aClient, "/test/int", 12345);
 
         if (aClient.lastError().code() == 0)
-            Firebase.printf("Push int is ok, name: %s\n", name.c_str());
+            Firebase.printf("ok, name: %s\n", name.c_str());
         else
             printError(aClient.lastError().code(), aClient.lastError().message());
 
-        // Set int with custom UUID
+        // Set int with custom UUID.
+        Serial.print("Set int with custom UUID... ");
         bool status = Database.set<object_t>(aClient, path, 12345);
 
         if (status)
-            Serial.println("Set int is ok");
+            Serial.println("ok");
         else
             printError(aClient.lastError().code(), aClient.lastError().message());
     }
@@ -219,6 +219,8 @@ void timeStatusCB(uint32_t &ts)
 
 String genUUID()
 {
+    // This is how Firebase generate UUID when you calling Push.
+
     // Push UUID generator, https://gist.github.com/mikelehen/3596a30bd69384624c11
 
     /**

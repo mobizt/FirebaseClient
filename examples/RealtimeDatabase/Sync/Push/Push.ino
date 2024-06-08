@@ -124,23 +124,26 @@ void setup()
     aClient.setAsyncResult(aResult_no_callback);
 
     // Push int
+    Serial.print("Push int... ");
     String name = Database.push<int>(aClient, "/test/int", 12345);
     if (aClient.lastError().code() == 0)
-        Firebase.printf("Push int is ok, name: %s\n", name.c_str());
+        Firebase.printf("ok, name: %s\n", name.c_str());
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Push bool
+    Serial.print("Push bool... ");
     name = Database.push<bool>(aClient, "/test/bool", true);
     if (aClient.lastError().code() == 0)
-        Firebase.printf("Push bool is ok, name: %s\n", name.c_str());
+        Firebase.printf("ok, name: %s\n", name.c_str());
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Push string
+    Serial.print("Push String... ");
     name = Database.push<String>(aClient, "/test/string", "hello");
     if (aClient.lastError().code() == 0)
-        Firebase.printf("Push string is ok, name: %s\n", name.c_str());
+        Firebase.printf("ok, name: %s\n", name.c_str());
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
@@ -154,9 +157,10 @@ void setup()
     writer.create(json, "test/data", 123); // -> {"test":{"data":123}}
     // Or set the seialized JSON string to object_t as object_t("{\"test\":{\"data\":123}}")
 
+    Serial.print("Push JSON... ");
     name = Database.push<object_t>(aClient, "/test/json", json);
     if (aClient.lastError().code() == 0)
-        Firebase.printf("Push json is ok, name: %s\n", name.c_str());
+        Firebase.printf("ok, name: %s\n", name.c_str());
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
@@ -167,23 +171,26 @@ void setup()
     writer.join(arr, 4, object_t(1), object_t(2), object_t(string_t("test")), object_t(boolean_t(true))); // -> [1,2,"test",true]
     // Or set the seialized JSON Array string to the object_t as object_t("[1,2,\"test\",true]")
 
+    Serial.print("Push Array... ");
     name = Database.push<object_t>(aClient, "/test/arr", arr);
     if (aClient.lastError().code() == 0)
-        Firebase.printf("Push array is ok, name: %s\n", name.c_str());
+        Firebase.printf("ok, name: %s\n", name.c_str());
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Push float
+    Serial.print("Push float... ");
     name = Database.push<number_t>(aClient, "/test/float", number_t(123.456, 2));
     if (aClient.lastError().code() == 0)
-        Firebase.printf("Push float is ok, name: %s\n", name.c_str());
+        Firebase.printf("ok, name: %s\n", name.c_str());
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Push double
+    Serial.print("Push double... ");
     name = Database.push<number_t>(aClient, "/test/double", number_t(1234.56789, 4));
     if (aClient.lastError().code() == 0)
-        Firebase.printf("Push double is ok, name: %s\n", name.c_str());
+        Firebase.printf("ok, name: %s\n", name.c_str());
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 }

@@ -110,15 +110,8 @@ void setup()
     JsonWriter writer;
     writer.create(ts_json, ".sv", "timestamp"); // -> {".sv": "timestamp"}
 
-    Serial.println("Set timestamp only (sync)... ");
+    Serial.println("Set only timestamp... ");
     bool status = Database.set<object_t>(aClient, "/test/timestamp", ts_json);
-    if (status)
-        Serial.println(String("ok"));
-    else
-        printError(aClient.lastError().code(), aClient.lastError().message());
-
-    Serial.println("Set timestamp only (sync)... ");
-    status = Database.set<object_t>(aClient, "/test/timestamp", ts_json);
     if (status)
         Serial.println(String("ok"));
     else
@@ -129,7 +122,7 @@ void setup()
     writer.create(data_json, "data", "hello");        // -> {"data": "hello"}
     writer.join(ts_data_json, 2, data_json, ts_json); // -> {"data":"hello",".sv":"timestamp"}
 
-    Serial.println("Set timestamp and data (sync)... ");
+    Serial.println("Set timestamp and data... ");
     status = Database.set<object_t>(aClient, "/test/timestamp", ts_data_json);
     if (status)
         Serial.println(String("ok"));

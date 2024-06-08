@@ -102,7 +102,7 @@ void setup()
     // To unset, use unsetAsyncResult().
     aClient.setAsyncResult(aResult_no_callback);
 
-    Serial.println("Get shalow data (sync)... ");
+    Serial.println("Get shalow data... ");
 
     DatabaseOptions options;
 

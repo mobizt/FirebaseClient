@@ -104,7 +104,7 @@ void setup()
 
     Serial.println();
 
-    Serial.println("Set data with priority (sync)... ");
+    Serial.println("Set data with priority... ");
 
     // Library does not provide JSON parser library, the following JSON writer class will be used with
     // object_t for simple demonstration.
@@ -131,7 +131,7 @@ void setup()
 
     // Change priority
     Serial.println();
-    Serial.println("Set value with priority (sync)... ");
+    Serial.print("Set value with priority... ");
 
     writer.create(obj1, ".value", "item_15");
     // Set priority to primitive value.
@@ -145,7 +145,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     Serial.println();
-    Serial.println("Get priority (sync)... ");
+    Serial.println("Get priority... ");
     double v = Database.get<double>(aClient, "/test/items/priority_1/.priority");
 
     if (aClient.lastError().code() == 0)
@@ -154,7 +154,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     Serial.println();
-    Serial.println("Filtering data with priority (sync)... ");
+    Serial.println("Filtering data with priority... ");
     DatabaseOptions options;
     // Now the node priority_1 which its priority changed to 6.0 should include in the filtering result.
     options.filter.orderBy("$priority").startAt(3.0).endAt(8.0);

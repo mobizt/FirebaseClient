@@ -116,22 +116,22 @@ void setup()
     // To unset, use unsetAsyncResult().
     aClient.setAsyncResult(aResult_no_callback);
 
-    Serial.println("Set and get ETAG (sync)... ");
+    Serial.print("Set and get ETAG... ");
 
     bool result = Database.set<int>(aClient, "test/etag", 1234);
 
     if (result)
-        Firebase.printf("Set int is ok, ETag: %s\n", aClient.etag().c_str());
+        Firebase.printf("ok, ETag: %s\n", aClient.etag().c_str());
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
-    Serial.println("Set with wrong ETAG (sync)... ");
+    Serial.print("Set with wrong ETAG... ");
 
     aClient.setETag("wrong_etag");
     result = Database.set<int>(aClient, "test/etag", 5678);
 
     if (result)
-        Serial.println("Set int with wrong ETag is ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 }

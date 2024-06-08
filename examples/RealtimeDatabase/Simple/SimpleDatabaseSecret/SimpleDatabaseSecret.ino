@@ -62,12 +62,19 @@ void setup()
 
     client.setAsyncResult(result);
 
-    // Set and get integer value
+    // Set, push and get integer value
 
     Serial.print("Set int... ");
     bool status = Database.set<int>(client, "/test/int", 12345);
     if (status)
         Serial.println("ok");
+    else
+        printError(client.lastError().code(), client.lastError().message());
+
+    Serial.print("Push int... ");
+    String name = Database.push<int>(client, "/test/push", 12345);
+    if (client.lastError().code() == 0)
+        Firebase.printf("ok, name: %s\n", name.c_str());
     else
         printError(client.lastError().code(), client.lastError().message());
 
@@ -78,7 +85,7 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
-    // Set and get Boolean value
+    // Set, push and get Boolean value
 
     Serial.print("Set bool... ");
     status = Database.set<bool>(client, "/test/bool", true);
@@ -87,6 +94,11 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
+    Serial.print("Push bool... ");
+    String name = Database.push<bool>(client, "/test/push", true);
+    if (client.lastError().code() == 0)
+        Firebase.printf("ok, name: %s\n", name.c_str());
+
     Serial.print("Get bool... ");
     bool v2 = Database.get<bool>(client, "/test/bool");
     if (client.lastError().code() == 0)
@@ -94,7 +106,7 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
-    // Set and get String value
+    // Set, push, and get String value
 
     Serial.print("Set string... ");
     status = Database.set<String>(client, "/test/string", "hello");
@@ -103,6 +115,11 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
+    Serial.print("Push String... ");
+    String name = Database.push<String>(client, "/test/push", "hello");
+    if (client.lastError().code() == 0)
+        Firebase.printf("ok, name: %s\n", name.c_str());
+
     Serial.print("Get string... ");
     String v3 = Database.get<String>(client, "/test/string");
     if (client.lastError().code() == 0)
@@ -110,7 +127,7 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
-    // Set and get float value
+    // Set, push, and get float value
 
     Serial.print("Set float... ");
     status = Database.set<number_t>(client, "/test/float", number_t(123.456, 2));
@@ -119,6 +136,11 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
+    Serial.print("Push float... ");
+    String name = Database.push<number_t>(client, "/test/push", number_t(123.456, 2));
+    if (client.lastError().code() == 0)
+        Firebase.printf("ok, name: %s\n", name.c_str());
+
     Serial.print("Get float... ");
     float v4 = Database.get<float>(client, "/test/float");
     if (client.lastError().code() == 0)
@@ -126,7 +148,7 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
-    // Set and get double value
+    // Set, push, and get double value
 
     Serial.print("Set double... ");
 
@@ -136,6 +158,11 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
+    Serial.print("Push double... ");
+    String name = Database.push<number_t>(client, "/test/push", number_t(1234.56789, 4));
+    if (client.lastError().code() == 0)
+        Firebase.printf("ok, name: %s\n", name.c_str());
+
     Serial.print("Get double... ");
     double v5 = Database.get<double>(client, "/test/double");
     if (client.lastError().code() == 0)
@@ -143,7 +170,7 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
-    // Set and get JSON value
+    // Set, push, and get JSON value
 
     Serial.print("Set JSON... ");
 
@@ -153,6 +180,11 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
+    Serial.print("Push JSON... ");
+    String name = Database.push<object_t>(client, "/test/push", object_t("{\"test\":{\"data\":123}}"));
+    if (client.lastError().code() == 0)
+        Firebase.printf("ok, name: %s\n", name.c_str());
+
     Serial.print("Get JSON... ");
     String v6 = Database.get<String>(client, "/test/json");
     if (client.lastError().code() == 0)
@@ -160,7 +192,7 @@ void setup()
     else
         printError(client.lastError().code(), client.lastError().message());
 
-    // Set and get Array value
+    // Set, push and get Array value
 
     Serial.print("Set Array... ");
 
@@ -169,6 +201,11 @@ void setup()
         Serial.println("ok");
     else
         printError(client.lastError().code(), client.lastError().message());
+
+    Serial.print("Push Array... ");
+    String name = Database.push<object_t>(client, "/test/push", object_t("[1,2,\"test\",true]"));
+    if (client.lastError().code() == 0)
+        Firebase.printf("ok, name: %s\n", name.c_str());
 
     Serial.print("Get Array... ");
     String v7 = Database.get<String>(client, "/test/array");

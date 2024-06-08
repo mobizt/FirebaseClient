@@ -115,8 +115,6 @@ void setup()
     // To unset, use unsetAsyncResult().
     aClient.setAsyncResult(aResult_no_callback);
 
-    Serial.println("Synchronous Update... ");
-
     // Library does not provide JSON parser library, the following JSON writer class will be used with
     // object_t for simple demonstration.
 
@@ -125,10 +123,11 @@ void setup()
     writer.create(json, "data/value", random(1000, 2000)); //-> {"data":{"value":x}}
     // Or set the seialized JSON string to the object_t as object_t("{\"data\":{\"value\":x}}")
 
+    Serial.print("Update... ");
     bool status = Database.update(aClient, "/test/json", json);
 
     if (status)
-        Serial.println("Update is ok");
+        Serial.println("ok");
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 }

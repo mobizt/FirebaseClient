@@ -110,7 +110,7 @@ void setup()
 
     if (aClient.lastError().code() == 0)
     {
-        Serial.println("Ok");
+        Serial.println("ok");
 
         // For indexing data doc. please see https://firebase.google.com/docs/database/security/indexing-data
 

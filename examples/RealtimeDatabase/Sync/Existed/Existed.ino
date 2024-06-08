@@ -116,8 +116,7 @@ void setup()
     // To unset, use unsetAsyncResult().
     aClient.setAsyncResult(aResult_no_callback);
 
-    Serial.println("Synchronous Existed... ");
-    Serial.print("Check the path in database... ");
+    Serial.print("Path existed... ");
     bool status = Database.existed(aClient, "/test/update/json");
 
     if (aClient.lastError().code() == 0)
