@@ -239,7 +239,7 @@ namespace firebase
 
         void printf(const char *format, ...)
         {
-            int size = 2048;
+            int size = 512;
             char s[size];
             va_list va;
             va_start(va, format);
