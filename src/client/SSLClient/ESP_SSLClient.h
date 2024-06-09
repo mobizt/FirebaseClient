@@ -1,8 +1,8 @@
 /**
  *
- * The ESP SSL Client Class, ESP_SSLClient.h v2.1.7
+ * The ESP SSL Client Class, ESP_SSLClient.h v2.1.8
  *
- * Created September 2, 2023
+ * Created June 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2023 K. Suwatchai (Mobizt)

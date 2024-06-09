@@ -1,5 +1,5 @@
 /**
- * Created May 29, 2024
+ * Created June 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -159,7 +159,7 @@ private:
 
 public:
     ~network_config_data() { clear(); }
-    network_config_data &operator=(network_config_data rhs)
+    network_config_data &operator=(network_config_data &rhs)
     {
         copy(rhs);
         return *this;

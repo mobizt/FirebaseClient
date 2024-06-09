@@ -110,14 +110,15 @@ void JWTClass::sendErrCB(AsyncResultCallback cb, AsyncResult *aResult)
         {
             err_timer.feed(5);
             bool hasRes = aResult != nullptr;
+            AsyncResult *ares = aResult;
             if (!hasRes)
-                aResult = new AsyncResult();
-            aResult->error().setLastError(jwt_data.err_code, jwt_data.msg);
-            cb(*aResult);
+                ares = new AsyncResult();
+            ares->error().setLastError(jwt_data.err_code, jwt_data.msg);
+            cb(*ares);
             if (!hasRes)
             {
-                delete aResult;
-                aResult = nullptr;
+                delete ares;
+                ares = nullptr;
             }
         }
     }

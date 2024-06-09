@@ -1,7 +1,7 @@
 /**
- * BSSL_SSL_Client library v1.0.12 for Arduino devices.
+ * BSSL_SSL_Client library v1.0.13 for Arduino devices.
  *
- * Created September 2, 2003
+ * Created June 9, 2024
  *
  * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
  *
@@ -493,7 +493,7 @@ void BSSL_SSL_Client::stop()
     mFreeSSL();
 }
 
-void BSSL_SSL_Client::setTimeout(unsigned int timeoutMs) { _timeout = timeoutMs; }
+void BSSL_SSL_Client::setTimeout(unsigned int timeoutMs) { _timeout_ms = timeoutMs; }
 
 void BSSL_SSL_Client::setHandshakeTimeout(unsigned int timeoutMs) { _handshake_timeout = timeoutMs; }
 
@@ -1089,7 +1089,7 @@ BSSL_SSL_Client &BSSL_SSL_Client::operator=(const BSSL_SSL_Client &other)
     stop();
     setClient(other._basic_client);
     _use_insecure = other._use_insecure;
-    _timeout = other._timeout;
+    _timeout_ms = other._timeout_ms;
     _handshake_timeout = other._handshake_timeout;
     return *this;
 }
@@ -1099,7 +1099,7 @@ bool BSSL_SSL_Client::operator==(const BSSL_SSL_Client &rhs)
     return _basic_client == rhs._basic_client;
 }
 
-unsigned int BSSL_SSL_Client::getTimeout() const { return _timeout; }
+unsigned int BSSL_SSL_Client::getTimeout() const { return _timeout_ms; }
 
 void BSSL_SSL_Client::setSecure(const char *rootCABuff, const char *cli_cert, const char *cli_key)
 {
@@ -1982,7 +1982,7 @@ void BSSL_SSL_Client::mClearAuthenticationSettings()
 
 void BSSL_SSL_Client::mClear()
 {
-    _timeout = 15000;
+    _timeout_ms = 15000;
     _sc = nullptr;
     _eng = nullptr;
     _x509_minimal = nullptr;
@@ -2116,7 +2116,7 @@ void BSSL_SSL_Client::mFreeSSL()
     _recvapp_len = 0;
     // This connection is toast
     _handshake_done = false;
-    _timeout = 15000;
+    _timeout_ms = 15000;
     _secure = false;
     _is_connected = false;
 }

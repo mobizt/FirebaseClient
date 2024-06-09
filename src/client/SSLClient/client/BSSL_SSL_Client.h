@@ -1,7 +1,7 @@
 /**
- * BSSL_SSL_Client library v1.0.12 for Arduino devices.
+ * BSSL_SSL_Client library v1.0.13 for Arduino devices.
  *
- * Created September 2, 2003
+ * Created June 9, 2024
  *
  * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
  *
@@ -336,7 +336,8 @@ private:
     bool _oom_err = false;
     unsigned char *_recvapp_buf = nullptr;
     size_t _recvapp_len;
-    unsigned long _timeout = 15000;
+    // Renameing from _timeout which also defined in parent's Stream class.
+    unsigned long _timeout_ms = 15000;
     unsigned long _handshake_timeout = 60000;
     bool _isSSLEnabled = false;
     String _host;

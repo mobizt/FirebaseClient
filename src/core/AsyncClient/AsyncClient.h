@@ -256,7 +256,7 @@ private:
         if (!sData || ret == function_return_type_failure)
         {
             // In case TCP (network) disconnected error.
-            setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
+            setAsyncError(sData ? sData : nullptr, sData ? sData->state : async_state_undefined, FIREBASE_ERROR_TCP_DISCONNECTED, sData ? !sData->sse : true, false);
             return function_return_type_failure;
         }
 
@@ -673,6 +673,9 @@ private:
 
     void setAsyncError(async_data_item_t *sData, async_state state, int code, bool toRemove, bool toCloseFile)
     {
+        if (!sData)
+            return;
+
         sData->error.state = state;
         sData->error.code = code;
 
@@ -777,7 +780,7 @@ private:
 
     void setLastError(async_data_item_t *sData)
     {
-        if (sData->error.code < 0)
+        if (sData && sData->error.code < 0)
         {
             sData->aResult.lastError.setClientError(sData->error.code);
             lastErr.setClientError(sData->error.code);
@@ -787,7 +790,7 @@ private:
             if (!sData->async)
                 lastErr.isError();
         }
-        else if (sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
+        else if (sData && sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
         {
             sData->aResult.lastError.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
             lastErr.setResponseError(sData->response.val[res_hndlr_ns::payload], sData->response.httpCode);
@@ -2044,9 +2047,8 @@ private:
                 sData->request.addNewLine();
             }
 
-            // sData->request.val[req_hndlr_ns::header] += FPSTR("Accept-Encoding: identity;q=1,chunked;q=0.1,*;q=0");
-            //  sData->request.addNewLine();
             sData->request.addConnectionHeader(true);
+
             if (!options.sv && !options.no_etag && method != async_request_handler_t::http_patch && extras.indexOf("orderBy") == -1)
             {
                 sData->request.val[req_hndlr_ns::header] += FPSTR("X-Firebase-ETag: true");

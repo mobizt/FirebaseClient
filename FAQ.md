@@ -1,5 +1,5 @@
 
-Revision `2024-06-07T05:35:03Z`
+Revision `2024-06-09T07:13:35Z`
 
 # Async Firebase Client library for Arduino Frequently Asked Questions.
 
@@ -343,7 +343,7 @@ For running more tasks concurrency, see [Running Many Tasks Concurrency Using Di
 #### A29: Please see, [Possible GSM issues](#possible-gsm-issues).
 
 ### Q30: How to stop the authentication task?
-#### A30: Normally the authentication task was unable to stop after initialize unless it can deinitialize.
+#### A30: Normally the authentication task was unable to stop after initialized unless it can deinitialize.
 
 You can use `deinitializeApp(<FirebaseApp>)` to deinitalize the `FirebaseApp` that was initialized.
 

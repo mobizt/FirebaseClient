@@ -147,7 +147,6 @@ namespace firebase
 #if defined(ENABLE_ID_TOKEN)
 
                 app.auth_data.app_token.expire = app.expire;
-                app.auth_data.user_auth.user.val[user_ns::api_key] = app.auth_data.user_auth.user.val[user_ns::api_key];
                 app.auth_data.app_token.val[app_tk_ns::token] = app.auth_data.user_auth.id_token.val[id_tk_ns::token];
                 app.auth_data.app_token.val[app_tk_ns::refresh] = app.auth_data.user_auth.id_token.val[id_tk_ns::refresh];
                 app.auth_data.app_token.authenticated = app.auth_data.user_auth.id_token.val[id_tk_ns::token].length() ? app.auth_data.user_auth.initialized : false;

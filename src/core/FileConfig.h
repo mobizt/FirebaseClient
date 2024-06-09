@@ -1,5 +1,5 @@
 /**
- * Created May 29, 2024
+ * Created June 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -409,18 +409,23 @@ struct file_config_data
     }
 
 public:
-    file_config_data &operator=(file_config_data rhs)
+    file_config_data &operator=(file_config_data &rhs)
     {
         copy(rhs);
         return *this;
     }
 
-    void copy(file_config_data rhs)
+    void copy(file_config_data &rhs)
     {
 #if defined(ENABLE_FS)
         this->file = rhs.file;
 #endif
         this->filename = rhs.filename;
+        this->file_size = rhs.file_size;
+        this->file_status = rhs.file_status;
+        this->data_pos = rhs.data_pos;
+        this->data_size = rhs.data_size;
+        this->data = rhs.data;
 #if defined(ENABLE_FS)
         this->cb = rhs.cb;
 #endif

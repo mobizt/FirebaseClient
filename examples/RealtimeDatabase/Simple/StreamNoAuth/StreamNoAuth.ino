@@ -1,4 +1,23 @@
-/** This example requires the Realtime database security rules setup as following.
+/**
+ * This example is for new users which are familiar with other legacy Firebase libraries.
+ *
+ * The example shows how to listen the data changes in your Firebase Realtime database
+ * while the database was set periodically.
+ *
+ * This example will not use any authentication method included database secret.
+ *
+ * It needs to change the security rules to allow read and write.
+ *
+ * This example is for ESP32, ESP8266 and Raspberry Pi Pico W.
+ *
+ * You can adapt the WiFi and SSL client library that are available for your devices.
+ *
+ * For the ethernet and GSM network which are not covered by this example,
+ * you have to try another elaborate examples and read the library documentation thoroughly.
+ *
+ */
+
+/** Change your Realtime database security rules as the following.
  {
   "rules": {
     ".read": true,
@@ -8,7 +27,7 @@
 */
 
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -23,13 +42,25 @@
 #define DATABASE_SECRET "DATABASE_SECRET"
 #define DATABASE_URL "URL"
 
+// The SSL client used for secure server connection.
 WiFiClientSecure ssl1, ssl2;
+
+// The default network config object that used in this library.
 DefaultNetwork network;
+
+// The client, aka async client, is the client that handles many tasks required for each operation.
 AsyncClientClass client1(ssl1, getNetwork(network)), client2(ssl2, getNetwork(network));
 
+// The authentication task handler, aka FirebaseApp.
 FirebaseApp app;
+
+// The Realtime database class object that provides the functions.
 RealtimeDatabase Database;
+
+// The class that stores the operating result, aka AsyncResult.
 AsyncResult result1, result2;
+
+// The no-authentication provider class used for authentication initialization.
 NoAuth noAuth;
 
 unsigned long ms = 0;
@@ -100,30 +131,39 @@ void setup()
     ssl2.setBufferSizes(1024, 1024);
 #endif
 
+    // Initialize the authentication handler.
     initializeApp(client1, app, getAuth(noAuth));
 
-    // Binding the FirebaseApp for authentication handler.
-    // To unbind, use Database.resetApp();
+    // Binding the authentication handler with your Database class object.
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL
     Database.url(DATABASE_URL);
 
-    client1.setAsyncResult(result1);
-    client2.setAsyncResult(result2);
-
-    Database.get(client1, "/test/stream", result1, true);
+    // Initiate the Stream connection to listen the data changes.
+    // This function can be called once.
+    // The Stream was connected using async get function (non-blocking) which the result was assign to the function.
+    Database.get(client1, "/test/stream", result1, true /* this option is for Stream connection */);
 }
 
 void loop()
 {
+    // Polling for internal task operation
+    // This required for Stream in this case.
     Database.loop();
 
+    // We don't have to poll authentication handler task using app.loop() as seen in other examples
+    // because the database secret is the priviledge access key that never expired.
+
+    // Set the random int value to "/test/stream/int" every 20 seconds.
     if (millis() - ms > 20000 || ms == 0)
     {
         ms = millis();
-        Database.set<object_t>(client2, "/test/stream/ts", random(100, 999), result2);
+        // We set the data with this non-blocking set function (async) which the result was assign to the function.
+        Database.set<int>(client2, "/test/stream/int", random(100, 999), result2);
     }
 
+    // Polling print the result if it is available.
     printResult(result1);
     printResult(result2);
 }

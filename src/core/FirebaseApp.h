@@ -236,6 +236,7 @@ namespace firebase
         {
             // If aResult was not initiated, create and send temporary result to callback
             bool isRes = aResult != nullptr;
+            AsyncResult *ares = aResult;
 
             // Set uid from user defined async result.
             if (getRefResult())
@@ -243,15 +244,15 @@ namespace firebase
 
             if (!isRes)
             {
-                aResult = new AsyncResult();
-                resultSetEvent(aResult, getAppEvent(aClient));
-                resultSetDebug(aResult, getAppDebug(aClient));
+                ares = new AsyncResult();
+                resultSetEvent(ares, getAppEvent(aClient));
+                resultSetDebug(ares, getAppDebug(aClient));
 
                 // Store the uid;
                 if (uid.length() == 0)
-                    uid = aResult->uid();
+                    uid = ares->uid();
                 else
-                    setResultUID(aResult, uid);
+                    setResultUID(ares, uid);
             }
 
             if (!getRefResult())
@@ -260,12 +261,12 @@ namespace firebase
             setEventBase(*getAppEvent(aClient), code, msg);
 
             if (resultCb)
-                resultCb(*aResult);
+                resultCb(*ares);
 
             if (!isRes)
             {
-                delete aResult;
-                aResult = nullptr;
+                delete ares;
+                ares = nullptr;
             }
         }
 

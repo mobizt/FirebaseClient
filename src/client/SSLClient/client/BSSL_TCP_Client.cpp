@@ -1,7 +1,7 @@
 /**
- * BSSL_TCP_Client v2.0.12 for Arduino devices.
+ * BSSL_TCP_Client v2.0.13 for Arduino devices.
  *
- * Created August 27, 2023
+ * Created June 9, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2023 K. Suwatchai (Mobizt)
@@ -98,10 +98,10 @@ int BSSL_TCP_Client::connect(IPAddress ip, uint16_t port, int32_t timeout)
 
     if (timeout > 0)
     {
-        _timeout = timeout;
+        _timeout_ms = timeout;
         if (_basic_client)
-            _basic_client->setTimeout(_timeout);
-        _ssl_client.setTimeout(_timeout);
+            _basic_client->setTimeout(_timeout_ms);
+        _ssl_client.setTimeout(_timeout_ms);
     }
 
     return _ssl_client.connect(ip, port);
@@ -120,10 +120,10 @@ int BSSL_TCP_Client::connect(const char *host, uint16_t port, int32_t timeout)
 
     if (timeout > 0)
     {
-        _timeout = timeout;
+        _timeout_ms = timeout;
         if (_basic_client)
-            _basic_client->setTimeout(_timeout);
-        _ssl_client.setTimeout(_timeout);
+            _basic_client->setTimeout(_timeout_ms);
+        _ssl_client.setTimeout(_timeout_ms);
     }
 
     return _ssl_client.connect(host, port);
@@ -267,8 +267,8 @@ void BSSL_TCP_Client::stop()
 
 int BSSL_TCP_Client::setTimeout(uint32_t seconds)
 {
-    _timeout = seconds * 1000;
-    _ssl_client.setTimeout(_timeout);
+    _timeout_ms = seconds * 1000;
+    _ssl_client.setTimeout(_timeout_ms);
     return 1;
 }
 
@@ -425,9 +425,9 @@ BSSL_TCP_Client &BSSL_TCP_Client::operator=(const BSSL_TCP_Client &other)
     stop();
     setClient(other._basic_client);
     _use_insecure = other._use_insecure;
-    _timeout = other._timeout;
+    _timeout_ms = other._timeout_ms;
     _handshake_timeout = other._handshake_timeout;
-    _ssl_client.setTimeout(_timeout);
+    _ssl_client.setTimeout(_timeout_ms);
     _ssl_client.setHandshakeTimeout(_handshake_timeout);
     if (_use_insecure)
         _ssl_client.setInsecure();

@@ -1,4 +1,21 @@
-/** This example requires the Realtime database security rules setup as following.
+/**
+ * This example is for new users which are familiar with other legacy Firebase libraries.
+ *
+ * The example shows how to set, push and get the values to/from Realtime database.
+ *
+ * This example will use the database secret for priviledge Realtime database access which does not need
+ * to change the security rules or it can access Realtime database no matter what the security rules are set.
+ *
+ * This example is for ESP32, ESP8266 and Raspberry Pi Pico W.
+ *
+ * You can adapt the WiFi and SSL client library that are available for your devices.
+ *
+ * For the ethernet and GSM network which are not covered by this example,
+ * you have to try another elaborate examples and read the library documentation thoroughly.
+ *
+ */
+
+/** Change your Realtime database security rules as the following.
  {
   "rules": {
     ".read": true,
@@ -8,7 +25,7 @@
 */
 
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -60,15 +77,22 @@ void setup()
     ssl.setBufferSizes(1024, 1024);
 #endif
 
+    // Initialize the authentication handler.
     initializeApp(client, app, getAuth(noAuth));
 
-    // Binding the FirebaseApp for authentication handler.
-    // To unbind, use Database.resetApp();
+    // Binding the authentication handler with your Database class object.
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL
     Database.url(DATABASE_URL);
 
+    // Set the operating result for the the following blocking (sync) functions.
+    // The result will keep in the async result object we set to the client.
     client.setAsyncResult(result);
+
+    // The following are blocking operations which the result will store in the result object we set above.
+
+    // In the another Stream examples, we will use the non-blocking (async) functions to allow the realtime incoming data.
 
     // Set, push and get integer value
 
@@ -225,4 +249,9 @@ void setup()
 
 void loop()
 {
+    // We don't need to poll the async task using Database.loop(); as in the Stream examples because 
+    // only blocking (sync) functions were used in this example.
+
+    // We don't have to poll authentication handler task using app.loop() as seen in other examples
+    // because the database secret is the priviledge access key that never expired.
 }
