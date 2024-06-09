@@ -2,6 +2,8 @@
  * This example is for new users which are familiar with other legacy Firebase libraries.
  *
  * The example shows how to set, push and get the values to/from Realtime database.
+ * 
+ * All functions used in this example are blocking (sync) functions.
  *
  * This example will not use any authentication method included database secret.
  *
@@ -79,13 +81,8 @@ void setup()
     // Set your database URL
     Database.url(DATABASE_URL);
 
-    // Set the operating result for the the following blocking (sync) functions.
-    // The result will keep in the async result object we set to the client.
+    // In sync functions, we have to set the operating result for the client that works with the function.
     client.setAsyncResult(result);
-
-    // The following are blocking operations which the result will store in the result object we set above.
-
-    // In the another Stream examples, we will use the non-blocking (async) functions to allow the realtime incoming data. 
 
     // Set, push and get integer value
 

@@ -3,6 +3,8 @@
  *
  * The example shows how to set, push and get the values to/from Realtime database.
  *
+ * All functions used in this example are blocking (sync) functions.
+ *
  * This example will use the database secret for priviledge Realtime database access which does not need
  * to change the security rules or it can access Realtime database no matter what the security rules are set.
  *
@@ -86,13 +88,8 @@ void setup()
     // Set your database URL
     Database.url(DATABASE_URL);
 
-    // Set the operating result for the the following blocking (sync) functions.
-    // The result will keep in the async result object we set to the client.
+    // In sync functions, we have to set the operating result for the client that works with the function.
     client.setAsyncResult(result);
-
-    // The following are blocking operations which the result will store in the result object we set above.
-
-    // In the another Stream examples, we will use the non-blocking (async) functions to allow the realtime incoming data.
 
     // Set, push and get integer value
 
@@ -249,7 +246,7 @@ void setup()
 
 void loop()
 {
-    // We don't need to poll the async task using Database.loop(); as in the Stream examples because 
+    // We don't need to poll the async task using Database.loop(); as in the Stream examples because
     // only blocking (sync) functions were used in this example.
 
     // We don't have to poll authentication handler task using app.loop() as seen in other examples

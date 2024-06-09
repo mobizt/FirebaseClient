@@ -3,6 +3,8 @@
  *
  * The example shows how to listen the data changes in your Firebase Realtime database
  * while the database was set periodically.
+ * 
+ * All functions used in this example are non-blocking (async) functions.
  *
  * This example will use the database secret for priviledge Realtime database access which does not need
  * to change the security rules or it can access Realtime database no matter what the security rules are set.
@@ -132,7 +134,7 @@ void setup()
 
     // Initiate the Stream connection to listen the data changes.
     // This function can be called once.
-    // The Stream was connected using async get function (non-blocking) which the result was assign to the function.
+    // The Stream was connected using async get function (non-blocking) which the result will assign to the function in this case.
     Database.get(client1, "/test/stream", result1, true /* this option is for Stream connection */);
 }
 
