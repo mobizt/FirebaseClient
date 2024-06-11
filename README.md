@@ -567,6 +567,8 @@ In case sync task, the timeouts can be set via `AsyncClientClass::setSyncSendTim
 
 This library provides the class object called async result (`AsyncResult`) which is used as a container that provides 4 types of information: `App Events` (`app_event_t`), `Server Response and Event Data`, `Debug Information` and `Error Information` and will be discussed later.
 
+This library does not use Serial port to print any message internally. All information will be obtained from `AsyncResult` which you can choose which information you want to read or print.
+
 The information of `App Events` (`app_event_t`)'s authentication task can be obtained from `AsyncResult::appEvent()`
 
 The information of `Server Response and Event Data` included the payload, `SSE mode (HTTP Streaming)` event-data, status and header data.
@@ -1285,6 +1287,10 @@ The `AsyncClientClass` object requires the network config data (`network_config_
 
 > [!WARNING]  
 > In ESP32, [ADC2](https://docs.espressif.com/projects/esp-idf/en/v4.2/esp32/api-reference/peripherals/adc.html) (`GPIO 0`, `GPIO 2`, `GPIO 4`, `GPIO 12`, `GPIO 13`, `GPIO 14`, `GPIO 15`, `GPIO 25`, `GPIO 26` and `GPIO 27`) cannot be used while using WiFi.
+>
+> In ESP32, you can't use WiFi while using Bluetooth.
+>
+> In ESP8266/ESP32, you can't use WiFi while using ESP-Now.
 
 The default network class can be used with WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W.
 
@@ -1507,10 +1513,30 @@ See [GenericNetwork example](/examples/App/NetworkInterfaces/Async/Callback/Gene
 
 With this library, you can use async functions with or without the callback functions. The sync functions are also supported. 
 
-The examples provided by this library can be divided into two use cases i.e. `Async` (with `Callback` and `NoCallback`) and `Sync` as listed in the following tree structure.
+Because of all information from operating result, error and debug information are stored in the `AsyncResult`.  
+
+Library usage is very flexible which `AsyncResult` can be defined by user or create instantly internally and accessing from within callback, depending on the use cases, which this is how the library examples are organized. 
+
+You can choose externally provided `AsyncResult` used with sync or async without callback to save the stack memory usage.
+
+Then the examples provided by this library can be divided into two use cases i.e. `Async` (with `Callback` and `NoCallback`) and `Sync` operations.
+
+For Firebase services, inside the `Async` and `Sync` folders, the examples based on the Firebase REST APIs are located. The additional cases examples are also included in those folders.
+
+For user that ever used the other legacy Firebase library for Realtime database, the examples in the `Simple` folder under the `RealtimeDatabase` folder provide the basic usage that is enough for simple use.
+
+The examples under the `App` folder contains 4 sub folders:
+
+- `AppInitialization` folder is for authentication examples.
+
+- `NetworkInrerfaces` folder is for neiworking examples.
+
+- `UserManagement` folder is for Google authentication examples to manage user.
+
+The following section will provided the basic (bare minimum) code example and the links: for the examples, class and functions description and Google API documentation.
 
 <details>
-<summary>Library Examples Structure</summary>
+<summary>For the Library Examples Structure, please click here</summary>
 
 * [App](/examples/App/)
     * [AppInitialization](/examples/App/AppInitialization/)

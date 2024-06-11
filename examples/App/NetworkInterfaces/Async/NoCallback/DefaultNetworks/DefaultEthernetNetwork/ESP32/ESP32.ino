@@ -1,7 +1,12 @@
 
 
 /**
- * This modification and interconnection provided in this example are mostly worked as
+ * This example is for the LAN8720 module that connected with ESP32.
+ * 
+ * In case of external LAN8720 module, the following hardeare connection is recommended.
+ * Some EV board e.g. Olimex ESP32-EVB board has built with LAN8720 chip on board, the modification is not needed.
+ * 
+ * The modification and interconnection of external LAN8720 module provided in this example are mostly worked as
  * the 50 MHz clock was created internally in ESP32 which GPIO 17 is set to be output of this clock
  * and feeds to the LAN8720 chip XTAL input.
  *
@@ -62,22 +67,26 @@ AsyncResult aResult_no_callback;
 #ifdef ETH_CLK_MODE
 #undef ETH_CLK_MODE
 #endif
-#define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT // RMII clock output from GPIO17
-
-// Pin# of the enable signal for the external crystal oscillator (-1 to disable)
-#define ETH_POWER_PIN -1
 
 // Type of the Ethernet PHY (LAN8720 or TLK110)
-#define ETH_TYPE ETH_PHY_LAN8720
+#define ETH_PHY_TYPE ETH_PHY_LAN8720
 
 // I²C-address of Ethernet PHY (0 or 1 for LAN8720, 31 for TLK110)
-#define ETH_ADDR 1
+#define ETH_PHY_ADDR 1
 
 // Pin# of the I²C clock signal for the Ethernet PHY
-#define ETH_MDC_PIN 23
+#define ETH_PHY_MDC 23
 
 // Pin# of the I²C IO signal for the Ethernet PHY
-#define ETH_MDIO_PIN 18
+#define ETH_PHY_MDIO 18
+
+// Pin# of the enable signal for the external crystal oscillator (-1 to disable)
+#define ETH_PHY_POWER -1
+
+// RMII clock output from GPIO17 (for modified LAN8720 module only)
+// For LAN8720 built-in, RMII clock input at GPIO 0 from LAN8720 e.g. Olimex ESP32-EVB board
+// #define ETH_CLK_MODE ETH_CLOCK_GPIO0_IN
+#define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT 
 
 static bool eth_connected = false;
 
@@ -168,10 +177,14 @@ void setup()
 
     Serial.begin(115200);
 
+    // This delay is needed in case ETH_CLK_MODE was set to ETH_CLOCK_GPIO0_IN, 
+    // to allow the external clock source to be ready before initialize the Ethernet.
+    delay(500);
+
     Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     WiFi.onEvent(WiFiEvent);
-    ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN, ETH_TYPE, ETH_CLK_MODE);
+    ETH.begin(ETH_PHY_ADDR, ETH_PHY_POWER, ETH_PHY_MDC, ETH_PHY_MDIO, ETH_PHY_TYPE, ETH_CLK_MODE);
 }
 
 void setConfig()
