@@ -1,5 +1,5 @@
 
-Revision `2024-06-09T07:13:35Z`
+Revision `2024-06-11T01:14:40Z`
 
 # Async Firebase Client library for Arduino Frequently Asked Questions.
 
@@ -68,6 +68,10 @@ Then there are many possible causes of connection issue that cause the SSL clien
 - WiFi AP was not responding because of static IP. You can connect your device to WiFi AP using DHCP instead.
 
 - In ESP32, ADC channel 2 cannot be used while using WiFi.
+
+- ESP8266/ESP32 ESP-Now conflicts. You can't use WiFi while using ESP-Now.
+
+- ESP32 Bluetooth conflicts. You can't use WiFi while using its Bluetooth.
 
 #### Possible WiFi firmware issues
 
