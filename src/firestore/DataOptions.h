@@ -1,5 +1,5 @@
 /**
- * Created April 6, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -29,6 +29,7 @@
 #include "./Config.h"
 #include "./core/JSON.h"
 #include "./core/ObjectWriter.h"
+#include "./core/URL.h"
 
 #if defined(ENABLE_FIRESTORE)
 #include "./firestore/Values.h"
@@ -98,7 +99,7 @@ public:
      *
      * @param fieldPaths The list of field paths in the mask. See Document.fields (https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document.FIELDS.fields) for a field path syntax reference.
      */
-    DocumentMask(const String &fieldPaths = "")
+    explicit DocumentMask(const String &fieldPaths = "")
     {
         setFieldPaths(fieldPaths);
     }
@@ -158,7 +159,7 @@ namespace FieldTransform
          * @param value Adds the given value to the field's current value.
          */
         template <typename T>
-        Increment(T value) { owriter.setPair(buf, FPSTR("increment"), value.val()); }
+        explicit Increment(T value) { owriter.setPair(buf, FPSTR("increment"), value.val()); }
         const char *c_str() const { return buf.c_str(); }
         void clear() { buf.remove(0, buf.length()); }
     };
@@ -180,7 +181,7 @@ namespace FieldTransform
          * @param value Sets the field to the maximum of its current value and the given value.
          */
         template <typename T>
-        Maximum(T value) { owriter.setPair(buf, FPSTR("maximum"), value.c_str()); }
+        explicit Maximum(T value) { owriter.setPair(buf, FPSTR("maximum"), value.c_str()); }
         const char *c_str() const { return buf.c_str(); }
         void clear() { buf.remove(0, buf.length()); }
     };
@@ -202,7 +203,7 @@ namespace FieldTransform
          * @param value Sets the field to the minimum of its current value and the given value.
          */
         template <typename T>
-        Minimum(T value) { owriter.setPair(buf, FPSTR("minimum"), value.c_str()); }
+        explicit Minimum(T value) { owriter.setPair(buf, FPSTR("minimum"), value.c_str()); }
         const char *c_str() const { return buf.c_str(); }
     };
 
@@ -224,7 +225,7 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
          * @param arrayValue The array value object to append.
          */
-        AppendMissingElements(T arrayValue) { owriter.setPair(buf, FPSTR("appendMissingElements"), arrayValue.c_str()); }
+        explicit AppendMissingElements(const T &arrayValue) { owriter.setPair(buf, FPSTR("appendMissingElements"), arrayValue.c_str()); }
         const char *c_str() const { return buf.c_str(); }
         void clear() { buf.remove(0, buf.length()); }
     };
@@ -247,7 +248,7 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
          * @param arrayValue The array value object to remove.
          */
-        RemoveAllFromArray(T arrayValue) { owriter.setPair(buf, FPSTR("removeAllFromArray"), arrayValue.c_str()); }
+        explicit RemoveAllFromArray(const T &arrayValue) { owriter.setPair(buf, FPSTR("removeAllFromArray"), arrayValue.c_str()); }
         const char *c_str() const { return buf.c_str(); }
     };
 
@@ -267,7 +268,7 @@ namespace FieldTransform
          * @param enumValue The ServerValue enum
          *
          */
-        SetToServerValue(ServerValue enumValue) { owriter.setPair(buf, FPSTR("setToServerValue"), jut.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
+        explicit SetToServerValue(ServerValue enumValue) { owriter.setPair(buf, FPSTR("setToServerValue"), jut.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
         const char *c_str() const { return buf.c_str(); }
     };
 
@@ -297,7 +298,7 @@ namespace FieldTransform
          * object is a union field transform_type from one of setToServerValue, increment, maximum, minimum, appendMissingElements, and removeAllFromArray
          */
         template <typename T>
-        FieldTransform(const String &fieldPath, T object) { set(fieldPath, object); }
+        explicit FieldTransform(const String &fieldPath, T object) { set(fieldPath, object); }
 
         /**
          * @param fieldPath The path of the field.
@@ -305,16 +306,16 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
          */
 
-        FieldTransform(const String &fieldPath, AppendMissingElements<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
+        explicit FieldTransform(const String &fieldPath, AppendMissingElements<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
 
         /**
          * @param fieldPath The path of the field.
          * @param arrayValue Remove all of the given elements from the array in the field.
          * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
          */
-        FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
+        explicit FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
         const char *c_str() const { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
         void clear() { buf.remove(0, buf.length()); }
     };
 
@@ -446,7 +447,7 @@ public:
      * A Firestore document constructor with document resource name.
      * @param name The resource name of the document.
      */
-    Document(const String &name = "")
+    explicit Document(const String &name = "")
     {
         buf[1] = name;
         getBuf();
@@ -457,7 +458,7 @@ public:
      * @param key The key of an object.
      * @param value The value of an object.
      */
-    Document(const String &key, T value)
+    explicit Document(const String &key, T value)
     {
         mv.add(key, value);
         getBuf();
@@ -554,11 +555,11 @@ namespace Firestore
         firestore_database_mode_delete
     };
 
-    const struct key_str_30 _ConcurrencyMode[ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS + 1] PROGMEM = {"CONCURRENCY_MODE_UNSPECIFIED", "OPTIMISTIC", "PESSIMISTIC", "OPTIMISTIC_WITH_ENTITY_GROUPS"};
-    const struct key_str_40 _AppEngineIntegrationMode[AppEngineIntegrationMode::_DISABLED + 1] PROGMEM = {"APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", "ENABLED", "DISABLED"};
-    const struct key_str_40 _DeleteProtectionState[DeleteProtectionState::DELETE_PROTECTION_ENABLED + 1] PROGMEM = {"DELETE_PROTECTION_STATE_UNSPECIFIED", "DELETE_PROTECTION_DISABLED", "DELETE_PROTECTION_ENABLED"};
-    const struct key_str_50 _PointInTimeRecoveryEnablement[PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED + 1] PROGMEM = {"POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", "POINT_IN_TIME_RECOVERY_ENABLED", "POINT_IN_TIME_RECOVERY_DISABLED"};
-    const struct key_str_30 _DatabaseType[DatabaseType::DATASTORE_MODE + 1] PROGMEM = {"DATABASE_TYPE_UNSPECIFIED", "FIRESTORE_NATIVE", "DATASTORE_MODE"};
+    const struct firebase::key_str_30 _ConcurrencyMode[ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS + 1] PROGMEM = {"CONCURRENCY_MODE_UNSPECIFIED", "OPTIMISTIC", "PESSIMISTIC", "OPTIMISTIC_WITH_ENTITY_GROUPS"};
+    const struct firebase::key_str_40 _AppEngineIntegrationMode[AppEngineIntegrationMode::_DISABLED + 1] PROGMEM = {"APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", "ENABLED", "DISABLED"};
+    const struct firebase::key_str_40 _DeleteProtectionState[DeleteProtectionState::DELETE_PROTECTION_ENABLED + 1] PROGMEM = {"DELETE_PROTECTION_STATE_UNSPECIFIED", "DELETE_PROTECTION_DISABLED", "DELETE_PROTECTION_ENABLED"};
+    const struct firebase::key_str_50 _PointInTimeRecoveryEnablement[PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED + 1] PROGMEM = {"POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", "POINT_IN_TIME_RECOVERY_ENABLED", "POINT_IN_TIME_RECOVERY_DISABLED"};
+    const struct firebase::key_str_30 _DatabaseType[DatabaseType::DATASTORE_MODE + 1] PROGMEM = {"DATABASE_TYPE_UNSPECIFIED", "FIRESTORE_NATIVE", "DATASTORE_MODE"};
 
     /**
      * A Cloud Firestore Database.
@@ -624,7 +625,7 @@ public:
      * @param document The name of the document to transform.
      * @param fieldTransforms The list of transformations to apply to the fields of the document, in order. This must not be empty.
      */
-    DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
+    explicit DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
     {
         jut.addObject(buf, FPSTR("document"), owriter.makeResourcePath(document), true);
         jut.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), false, true);
@@ -662,7 +663,7 @@ public:
      * @param update A document to write.
      * @param currentDocument An optional precondition on the document. The write will fail if this is set and not met by the target document.
      */
-    Write(const DocumentMask &updateMask, const Document<Values::Value> &update, const Precondition &currentDocument)
+    explicit Write(const DocumentMask &updateMask, const Document<Values::Value> &update, const Precondition &currentDocument)
     {
         bool curdoc = strlen(currentDocument.c_str());
         bool updatemask = strlen(updateMask.c_str());
@@ -678,7 +679,7 @@ public:
      * A write on a document.
      * @param deletePath A document name to delete.
      */
-    Write(const String &deletePath, const Precondition &currentDocument)
+    explicit Write(const String &deletePath, const Precondition &currentDocument)
     {
         write_type = firestore_write_type_delete;
         if (strlen(currentDocument.c_str()))
@@ -691,7 +692,7 @@ public:
      * @param transform Applies a transformation to a document.
      * @param currentDocument An optional precondition on the document. The write will fail if this is set and not met by the target document.
      */
-    Write(const DocumentTransform &transform, const Precondition &currentDocument)
+    explicit Write(const DocumentTransform &transform, const Precondition &currentDocument)
     {
         write_type = firestore_write_type_transform;
         if (strlen(currentDocument.c_str()))
@@ -740,7 +741,7 @@ public:
      * @param transaction A base64-encoded string. If set, applies all writes in this transaction, and commits it.
      *
      */
-    Writes(Write write, const String &transaction = "")
+    explicit Writes(Write write, const String &transaction = "")
     {
         if (transaction.length())
             jut.addObject(buf, FPSTR("transaction"), transaction, true);
@@ -753,7 +754,7 @@ public:
      * @param labels Labels associated with this batch write.
      * An object containing a list of "key": value pairs.
      */
-    Writes(const Write &write, const Values::MapValue &labels)
+    explicit Writes(const Write &write, const Values::MapValue &labels)
     {
         if (strlen(labels.c_str()))
             jut.addObject(buf, FPSTR("labels"), labels.c_str(), false);
@@ -766,8 +767,8 @@ public:
      */
     Writes &add(const Write &write)
     {
-        ObjectWriter owriter;
-        owriter.addMember(buf, write.c_str(), false, "]}");
+        ObjectWriter owr;
+        owr.addMember(buf, write.c_str(), false, "]}");
         return *this;
     }
 };
@@ -785,7 +786,7 @@ public:
      * @param retryTransaction An optional transaction to retry.
      * A base64-encoded string.
      */
-    ReadWrite(const String &retryTransaction)
+    explicit ReadWrite(const String &retryTransaction)
     {
         if (retryTransaction.length())
             jut.addObject(buf, FPSTR("retryTransaction"), retryTransaction, true, true);
@@ -806,7 +807,7 @@ public:
     /**
      * @param readTime Timestamp. Reads documents at the given time.
      */
-    ReadOnly(const String &readTime)
+    explicit ReadOnly(const String &readTime)
     {
         if (readTime.length())
             jut.addObject(buf, "readTime", readTime, true, true);
@@ -827,7 +828,7 @@ public:
     /**
      * @param readOnly The transaction can only be used for read operations.
      */
-    TransactionOptions(const ReadOnly &readOnly)
+    explicit TransactionOptions(const ReadOnly &readOnly)
     {
         if (strlen(readOnly.c_str()))
             jut.addObject(buf, "readOnly", readOnly.c_str(), false, true);
@@ -836,7 +837,7 @@ public:
     /**
      * @param readWrite The transaction can be used for both read and write operations.
      */
-    TransactionOptions(const ReadWrite &readWrite)
+    explicit TransactionOptions(const ReadWrite &readWrite)
     {
         if (strlen(readWrite.c_str()))
             jut.addObject(buf, "readWrite", readWrite.c_str(), false, true);
@@ -850,7 +851,7 @@ private:
     JSONUtil json;
 
 public:
-    EximDocumentOptions(const String &collectionIds, const String &bucketID, const String &storagePath)
+    explicit EximDocumentOptions(const String &collectionIds, const String &bucketID, const String &storagePath)
     {
         String uriPrefix;
         uut.addGStorageURL(uriPrefix, bucketID, storagePath);
@@ -869,7 +870,7 @@ private:
 
 public:
     GetDocumentOptions() {}
-    GetDocumentOptions(DocumentMask mask, const String &transaction = "", const String &readTime = "")
+    explicit GetDocumentOptions(DocumentMask mask, const String &transaction = "", const String &readTime = "")
     {
         bool hasParam = false;
         if (strlen(mask.c_str()))
@@ -920,7 +921,7 @@ private:
     URLUtil uut;
 
 public:
-    PatchDocumentOptions(DocumentMask updateMask, DocumentMask mask, const Precondition &currentDocument)
+    explicit PatchDocumentOptions(DocumentMask updateMask, DocumentMask mask, const Precondition &currentDocument)
     {
         bool hasParam = false;
         if (strlen(updateMask.c_str()))
@@ -1125,7 +1126,7 @@ namespace DatabaseIndex
             ARRAY_CONTAINS // The field's array values are indexed so as to support membership using ARRAY_CONTAINS queries.
         };
 
-        const struct key_str_30 _Mode[ARRAY_CONTAINS + 1] PROGMEM = {"MODE_UNSPECIFIED", "ASCENDING", "DESCENDING", "ARRAY_CONTAINS"};
+        const struct firebase::key_str_30 _Mode[ARRAY_CONTAINS + 1] PROGMEM = {"MODE_UNSPECIFIED", "ASCENDING", "DESCENDING", "ARRAY_CONTAINS"};
     }
 
     /**
@@ -1150,7 +1151,7 @@ namespace DatabaseIndex
     class Index : public BaseO4
     {
     public:
-        Index(const String &collId = "")
+        explicit Index(const String &collId = "")
         {
             if (collId.length())
                 collectionId(collId);
@@ -1201,10 +1202,10 @@ namespace CollectionGroupsIndex
         CONTAINS                  // The index supports array containment queries.
     };
 
-    const struct key_str_30 _QueryScope[QueryScope::COLLECTION_RECURSIVE + 1] PROGMEM = {"QUERY_SCOPE_UNSPECIFIED", "COLLECTION", "COLLECTION_GROUP", "COLLECTION_RECURSIVE"};
-    const struct key_str_20 _ApiScope[ApiScope::DATASTORE_MODE_API + 1] PROGMEM = {"ANY_API", "DATASTORE_MODE_API"};
-    const struct key_str_30 _Order[Order::DESCENDING + 1] PROGMEM = {"ORDER_UNSPECIFIED", "ASCENDING", "DESCENDING"};
-    const struct key_str_30 _ArrayConfig[ArrayConfig::CONTAINS + 1] PROGMEM = {"ARRAY_CONFIG_UNSPECIFIED", "CONTAINS"};
+    const struct firebase::key_str_30 _QueryScope[QueryScope::COLLECTION_RECURSIVE + 1] PROGMEM = {"QUERY_SCOPE_UNSPECIFIED", "COLLECTION", "COLLECTION_GROUP", "COLLECTION_RECURSIVE"};
+    const struct firebase::key_str_20 _ApiScope[ApiScope::DATASTORE_MODE_API + 1] PROGMEM = {"ANY_API", "DATASTORE_MODE_API"};
+    const struct firebase::key_str_30 _Order[Order::DESCENDING + 1] PROGMEM = {"ORDER_UNSPECIFIED", "ASCENDING", "DESCENDING"};
+    const struct firebase::key_str_30 _ArrayConfig[ArrayConfig::CONTAINS + 1] PROGMEM = {"ARRAY_CONFIG_UNSPECIFIED", "CONTAINS"};
 
     // Ref https://firebase.google.com/docs/firestore/reference/rest/Shared.Types/FieldOperationMetadata#VectorConfig
 
@@ -1287,7 +1288,7 @@ namespace Firestore
 
     public:
         Parent() {}
-        Parent(const String &projectId, const String &databaseId = "")
+        explicit Parent(const String &projectId, const String &databaseId = "")
         {
             this->projectId = projectId;
             this->databaseId = databaseId;
@@ -1329,7 +1330,7 @@ namespace Firestore
         firebase_firestore_request_type requestType = firebase_firestore_request_type_undefined;
         unsigned long requestTime = 0;
 
-        void copy(DataOptions &rhs)
+        void copy(const DataOptions &rhs)
         {
             this->parent = rhs.parent;
             this->collectionId = rhs.collectionId;

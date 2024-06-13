@@ -1,5 +1,5 @@
 /**
- * Created April 6, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -549,7 +549,7 @@ namespace GoogleCloudFunctions
 
     public:
         Parent() {}
-        Parent(const String &projectId, const String &locationId)
+        explicit Parent(const String &projectId, const String &locationId)
         {
             this->projectId = projectId;
             this->locationId = locationId;
@@ -568,7 +568,7 @@ namespace GoogleCloudFunctions
         GoogleCloudFunctions::Parent parent;
         google_cloud_functions_request_type requestType = google_cloud_functions_request_type_undefined;
         unsigned long requestTime = 0;
-        void copy(DataOptions &rhs)
+        void copy(const DataOptions &rhs)
         {
             this->extras = rhs.extras;
             this->payload = rhs.payload;
@@ -591,7 +591,7 @@ namespace GoogleCloudFunctions
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        explicit async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;

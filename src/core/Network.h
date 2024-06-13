@@ -1,5 +1,5 @@
 /**
- * Created June 2, 2024
+ * Created June 12, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -398,7 +398,7 @@ public:
      * @param dnsServer The dns server IP.
      * @param optional The boolean option to force use static IP only (not use DHCP).
      */
-    firebase_client_static_address(IPAddress ipAddress, IPAddress netMask, IPAddress defaultGateway, IPAddress dnsServer, bool optional)
+    explicit firebase_client_static_address(IPAddress ipAddress, IPAddress netMask, IPAddress defaultGateway, IPAddress dnsServer, bool optional)
     {
         this->ipAddress = ipAddress;
         this->netMask = netMask;

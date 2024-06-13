@@ -362,7 +362,7 @@ namespace GoogleCloudStorage
 
     public:
         Parent() {}
-        Parent(const String &bucketId, const String &object = "")
+        explicit Parent(const String &bucketId, const String &object = "")
         {
             this->object = object;
             this->bucketId = bucketId;
@@ -394,7 +394,7 @@ namespace GoogleCloudStorage
         GoogleCloudStorage::Parent parent;
         google_cloud_storage_request_type requestType = google_cloud_storage_request_type_undefined;
         unsigned long requestTime = 0;
-        void copy(DataOptions &rhs)
+        void copy(const DataOptions &rhs)
         {
             this->extras = rhs.extras;
             this->payload = rhs.payload;

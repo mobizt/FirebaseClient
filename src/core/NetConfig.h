@@ -1,5 +1,5 @@
 /**
- * Created June 9, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -49,7 +49,7 @@ private:
         NetworkStatusCallback net_status_cb = NULL;
 
     public:
-        void copy(generic_data &rhs)
+        void copy(const generic_data &rhs)
         {
             this->net_con_cb = rhs.net_con_cb;
             this->net_status_cb = rhs.net_status_cb;
@@ -77,7 +77,7 @@ private:
         gsm_conn_status conn_status;
 
     public:
-        void copy(gsm_data &rhs)
+        void copy(const gsm_data &rhs)
         {
             this->modem = rhs.modem;
             this->pin = rhs.pin;
@@ -118,7 +118,7 @@ private:
         unsigned long stobe_ms = 0;
 
     public:
-        void copy(ethernet_data &rhs)
+        void copy(const ethernet_data &rhs)
         {
             this->ethernet_reset_pin = rhs.ethernet_reset_pin;
             this->ethernet_cs_pin = rhs.ethernet_cs_pin;
@@ -159,13 +159,13 @@ private:
 
 public:
     ~network_config_data() { clear(); }
-    network_config_data &operator=(network_config_data &rhs)
+    network_config_data &operator=(const network_config_data &rhs)
     {
         copy(rhs);
         return *this;
     }
 
-    void copy(network_config_data &rhs)
+    void copy(const network_config_data &rhs)
     {
         this->network_data_type = rhs.network_data_type;
         this->initialized = rhs.initialized;
@@ -221,7 +221,7 @@ public:
      *
      * @param reconnect The boolean option for network reconnection which applied for WiFi network only.
      */
-    DefaultNetwork(bool reconnect = true)
+    explicit DefaultNetwork(bool reconnect = true)
     {
         init();
         network_data.network_data_type = firebase_network_data_default_network;
@@ -239,7 +239,7 @@ public:
 
     /**
      * Get the reference to the internal network_config_data.
-     * 
+     *
      * @return network_config_data & The reference to internal network_config_data.
      */
     network_config_data &get() { return network_data; }
@@ -269,7 +269,7 @@ protected:
 class GenericNetwork : public DefaultNetwork
 {
 public:
-    GenericNetwork(NetworkConnectionCallback networkConnectionCB, NetworkStatusCallback networkStatusCB)
+    explicit GenericNetwork(NetworkConnectionCallback networkConnectionCB, NetworkStatusCallback networkStatusCB)
     {
         init();
         network_data.generic.net_con_cb = networkConnectionCB;
@@ -299,7 +299,7 @@ public:
      * See /examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/ for using TinyGSM with this library.
      *
      */
-    GSMNetwork(TinyGsm *modem, const String &pin, const String &apn, const String &user, const String &password)
+    explicit GSMNetwork(TinyGsm *modem, const String &pin, const String &apn, const String &user, const String &password)
     {
         init();
         network_data.gsm.modem = modem;
@@ -336,7 +336,7 @@ public:
      * By default the external Ethernet module can be used with the library when the macro ENABLE_ETHERNET_NETWORK was defined and Ethernet library was included in the user sketch.
      * The user defined Ethernet class and header other than `Ethernet.h` and `Ethernet` can be used, see https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#library-build-options.
      */
-    EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, Firebase_StaticIP *staticIP = nullptr)
+    explicit EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, Firebase_StaticIP *staticIP = nullptr)
     {
         init();
         network_data.ethernet.ethernet_mac = macAddress;
@@ -364,15 +364,15 @@ public:
      * To use ESP8266 native lwIP Ethernet, the one of following macros, ENABLE_ESP8266_ENC28J60_ETH, ENABLE_ESP8266_W5500_ETH
      * and ENABLE_ESP8266_W5100_ETH should be defined in src/Config.h or in your own defined config at src/UserConfig.h
      * or adding ENABLE_ESP8266_ENC28J60_ETH, ENABLE_ESP8266_W5500_ETH and ENABLE_ESP8266_W5100_ETH in the compiler build flags.
-     * 
-     * Use Firebase_SPI_ETH_Module::enc28j60, Firebase_SPI_ETH_Module::w5100 and Firebase_SPI_ETH_Module::w5500 to assign the pointer to 
+     *
+     * Use Firebase_SPI_ETH_Module::enc28j60, Firebase_SPI_ETH_Module::w5100 and Firebase_SPI_ETH_Module::w5500 to assign the pointer to
      * ENC28J60lwIP, Wiznet5100lwIP and Wiznet5500lwIP classes objects respectively.
      *
      * In PlatformIO IDE, please set the 'lib_ldf_mode = chain+' option in platformio.ini.
      *
      * See /examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/ESP8266/ for using ESP8266 with its native lwIP Ethernet library.
      */
-    DefaultEthernetNetwork(Firebase_SPI_ETH_Module &eth)
+    explicit DefaultEthernetNetwork(Firebase_SPI_ETH_Module &eth)
     {
         init();
 #if defined(FIREBASE_LWIP_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
@@ -405,7 +405,7 @@ public:
      * The FirebaseWiFi class holds the WiFi credentials list. The AP and password can be added to list with FirebaseWiFi::addAP.
      * The FirebaseWiFi object should be defined at the same usage scope of DefaultWiFiNetwork and AsyncClientClass.
      */
-    DefaultWiFiNetwork(FirebaseWiFi &wifi, bool reconnect = true)
+    explicit DefaultWiFiNetwork(FirebaseWiFi &wifi, bool reconnect = true)
     {
         init();
         network_data.wifi = &wifi;

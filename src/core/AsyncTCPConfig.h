@@ -1,5 +1,5 @@
 /**
- * Created February 9, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -112,7 +112,7 @@ public:
      * @param tcpStop Async TCP Client Connection Stop Request Callback.
      *
      */
-    AsyncTCPConfig(AsyncTCPConnect tcpConnect, AsyncTCPStatus tcpStatus, AsyncTCPSend tcpSend, AsyncTCPReceive tcpReceive, AsyncTCPStop tcpStop)
+    explicit AsyncTCPConfig(AsyncTCPConnect tcpConnect, AsyncTCPStatus tcpStatus, AsyncTCPSend tcpSend, AsyncTCPReceive tcpReceive, AsyncTCPStop tcpStop)
     {
         this->tcpConnect = tcpConnect;
         this->tcpStatus = tcpStatus;

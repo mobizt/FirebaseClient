@@ -2,7 +2,7 @@
  *
  * The ESP SSL Client Class, ESP_SSLClient.h v2.1.8
  *
- * Created June 9, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2023 K. Suwatchai (Mobizt)
@@ -47,7 +47,7 @@ public:
 class ESP_SSLClient2 : public BSSL_TCP_Client
 {
 public:
-    ESP_SSLClient2(Client &client, bool enableSSL = true) : _base_client(client)
+    explicit ESP_SSLClient2(Client &client, bool enableSSL = true) : _base_client(client)
     {
         setClient(&_base_client, enableSSL);
     };
@@ -68,7 +68,7 @@ public:
 class ESP_SSLClient2
 {
 public:
-    ESP_SSLClient2(Client &client, bool enableSSL = true) : _base_client(client){};
+    explicit ESP_SSLClient2(Client &client, bool enableSSL = true) : _base_client(client){};
     ~ESP_SSLClient2(){};
 
 private:

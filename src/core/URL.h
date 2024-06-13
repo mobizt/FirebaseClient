@@ -1,5 +1,5 @@
 /**
- * Created March 9, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -128,7 +128,7 @@ public:
     void addGAPIv1Path(String &uri) { uri += FPSTR("/v1/projects/"); }
     void addGAPIv1beta1Path(String &uri) { uri += FPSTR("/v1beta1/projects/"); }
     void addGAPIv1beta2Path(String &uri) { uri += FPSTR("/v1beta2/projects/"); }
-    void host2Url(String &url, String &host)
+    void host2Url(String &url, const String &host)
     {
         url = FPSTR("https://");
         url += host;
@@ -185,7 +185,7 @@ public:
         }
     }
 
-    String getHost(String &url, String *ext = nullptr)
+    String getHost(const String &url, String *ext = nullptr)
     {
         int p1 = url.indexOf("://");
         int p2 = -1;

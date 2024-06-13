@@ -1,5 +1,5 @@
 /**
- * Created May 20, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -60,7 +60,7 @@ protected:
 
     AsyncResult *getResultBase(AsyncClientClass *aClient) { return aClient->getResult(); }
 
-    void newRequestBase(AsyncClientClass *aClient, async_data_item_t *sData, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t &options, const String &uid) { aClient->newRequest(sData, url, path, extras, method, options, uid); }
+    void newRequestBase(AsyncClientClass *aClient, async_data_item_t *sData, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, const slot_options_t &options, const String &uid) { aClient->newRequest(sData, url, path, extras, method, options, uid); }
 
     void setAuthTsBase(AsyncClientClass *aClient, uint32_t ts) { aClient->auth_ts = ts; }
 

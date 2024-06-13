@@ -1,5 +1,5 @@
 /**
- * Created June 9, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -409,13 +409,13 @@ struct file_config_data
     }
 
 public:
-    file_config_data &operator=(file_config_data &rhs)
+    file_config_data &operator=(const file_config_data &rhs)
     {
         copy(rhs);
         return *this;
     }
 
-    void copy(file_config_data &rhs)
+    void copy(const file_config_data &rhs)
     {
 #if defined(ENABLE_FS)
         this->file = rhs.file;
@@ -468,7 +468,7 @@ public:
      *
      * The file_operating_mode enums are included file_mode_open_read, file_mode_open_write, file_mode_open_append, and file_mode_remove.
      */
-    FileConfig(const String &filename, FileConfigCallback cb)
+    explicit FileConfig(const String &filename, FileConfigCallback cb)
     {
         clear();
         setFilename(filename);
@@ -543,7 +543,7 @@ public:
      * @param data The pointer to the uint8_t data array.
      * @param size The size of data in bytes.
      */
-    BlobConfig(uint8_t *data = nullptr, size_t size = 0)
+    explicit BlobConfig(uint8_t *data = nullptr, size_t size = 0)
     {
         clear();
         if (data && size > 0)

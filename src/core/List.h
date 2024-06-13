@@ -1,5 +1,5 @@
 /**
- * Created March 31, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -52,7 +52,7 @@ namespace firebase
                 vec.push_back(addr);
         }
 
-        bool existed(std::vector<uint32_t> &vec, uint32_t addr)
+        bool existed(const std::vector<uint32_t> &vec, uint32_t addr)
         {
             for (size_t i = 0; i < vec.size(); i++)
             {

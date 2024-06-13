@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created June 12, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -98,7 +98,7 @@ public:
     {
 
         unsigned char *base64EncBuf = reinterpret_cast<unsigned char *>(mem.alloc(65));
-        strcpy_P((char *)base64EncBuf, (char *)firebase_base64_table);
+        strcpy_P(reinterpret_cast<char *>(base64EncBuf), reinterpret_cast<const char *>(firebase_base64_table));
         if (isURL)
         {
             base64EncBuf[62] = '-';
@@ -137,17 +137,17 @@ public:
         if (write == 0)
             return true;
 
-        if (out.outC && out.outC->write((uint8_t *)out.outT, write) == write)
+        if (out.outC && out.outC->write(reinterpret_cast<uint8_t *>(out.outT), write) == write)
             return true;
 #if defined(ENABLE_FS)
-        else if (out.file && out.file.write((uint8_t *)out.outT, write) == write)
+        else if (out.file && out.file.write(reinterpret_cast<uint8_t *>(out.outT), write) == write)
             return true;
 #endif
-        else if (out.outB && out.outB->write((uint8_t *)out.outT, write) == write)
+        else if (out.outB && out.outB->write(reinterpret_cast<uint8_t *>(out.outT), write) == write)
             return true;
 
 #if defined(OTA_UPDATE_ENABLED)
-        else if (out.ota && updateWrite((uint8_t *)out.outT, write))
+        else if (out.ota && updateWrite(reinterpret_cast<uint8_t *>(out.outT), write))
             return true;
 #endif
         return false;
@@ -178,7 +178,7 @@ public:
     }
 
     template <typename T>
-    bool decode(Memory &mem, unsigned char *base64DecBuf, const char *src, size_t len, firebase_base64_io_t<T> &out)
+    bool decode(Memory &mem, const unsigned char *base64DecBuf, const char *src, size_t len, firebase_base64_io_t<T> &out)
     {
         // the maximum chunk size that writes to output is limited by out.bufLen, the minimum is depending on the source length
         bool ret = false;
@@ -187,7 +187,7 @@ public:
         size_t i, count;
         int pad = 0;
         size_t extra_pad;
-        T *pos = out.outT ? (T *)&out.outT[0] : nullptr;
+        T *pos = out.outT ? reinterpret_cast<T *>(&out.outT[0]) : nullptr;
         if (len == 0)
             len = strlen(src);
 
@@ -195,7 +195,7 @@ public:
 
         for (i = 0; i < len; i++)
         {
-            if ((uint8_t)base64DecBuf[(uint8_t)src[i]] != 0x80)
+            if (base64DecBuf[(int)src[i]] != 0x80)
                 count++;
         }
 
@@ -292,7 +292,7 @@ public:
     {
         const unsigned char *end, *in;
 
-        T *pos = out.outT ? (T *)&out.outT[0] : nullptr;
+        T *pos = out.outT ? reinterpret_cast<T *>(&out.outT[0]) : nullptr;
         in = src;
         end = src + len;
 
@@ -319,7 +319,7 @@ public:
     }
 
 #if defined(ENABLE_FS)
-    bool decodeToFile(Memory &mem, FILEOBJ file, const char *src)
+    bool decodeToFile(Memory &mem, const FILEOBJ &file, const char *src)
     {
         firebase_base64_io_t<uint8_t> out;
         out.file = file;
@@ -345,7 +345,7 @@ public:
         return ret;
     }
 
-    void encodeUrl(Memory &mem, char *encoded, unsigned char *string, size_t len)
+    void encodeUrl(Memory &mem, char *encoded, const unsigned char *string, size_t len)
     {
         size_t i;
         char *p = encoded;
@@ -381,7 +381,7 @@ public:
         firebase_base64_io_t<char> out;
         out.outT = encoded;
         unsigned char *base64EncBuf = creatBase64EncBuffer(mem, false);
-        encode<char>(base64EncBuf, (uint8_t *)src, len, out);
+        encode<char>(base64EncBuf, src, len, out);
         mem.release(&base64EncBuf);
         return encoded;
     }

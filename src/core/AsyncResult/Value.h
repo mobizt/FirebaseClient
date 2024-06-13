@@ -1,5 +1,5 @@
 /**
- * Created April 10, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -52,9 +52,9 @@ private:
 
 public:
     boolean_t() {}
-    boolean_t(bool v) { buf = v ? FPSTR("true") : FPSTR("false"); }
+    explicit boolean_t(bool v) : buf(v ? FPSTR("true") : FPSTR("false")) {}
     const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
 };
 
 struct number_t : public Printable
@@ -65,11 +65,11 @@ private:
 public:
     number_t() {}
     template <typename T1 = int, typename T = int>
-    number_t(T1 v, T d) { buf = String(v, d); }
+    explicit number_t(T1 v, T d) : buf(String(v, d)) {}
     template <typename T = int>
-    number_t(T o) { buf = String(o); }
+    explicit number_t(T o) : buf(String(o)) {}
     const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
 };
 
 struct string_t : public Printable
@@ -80,7 +80,7 @@ private:
 public:
     string_t() {}
     template <typename T = const char *>
-    string_t(T v)
+    explicit string_t(T v)
     {
         aq(true);
         if (std::is_same<T, bool>::value)
@@ -89,13 +89,13 @@ public:
             buf += v;
         aq();
     }
-    string_t(number_t v)
+    explicit string_t(number_t v)
     {
         aq(true);
         buf += v.c_str();
         aq();
     }
-    string_t(boolean_t v)
+    explicit string_t(boolean_t v)
     {
         aq(true);
         buf += v.c_str();
@@ -120,7 +120,7 @@ public:
     }
 
     const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
 
 private:
@@ -149,21 +149,28 @@ private:
 
 public:
     object_t() {}
-    object_t(const String &o) { buf = o; }
+    explicit object_t(const String &o) : buf(o) {}
     const char *c_str() const { return buf.c_str(); }
     template <typename T = const char *>
-    object_t(T o) { buf = String(o); }
-    object_t(boolean_t o) { buf = o.c_str(); }
-    object_t(number_t o) { buf = o.c_str(); }
-    object_t(string_t o) { buf = o.c_str(); }
-    object_t(bool o) { buf = o ? FPSTR("true") : FPSTR("false"); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    explicit object_t(T o) : buf(String(o)) {}
+    explicit object_t(boolean_t o) : buf(o.c_str()) {}
+    explicit object_t(number_t o) : buf(o.c_str()) {}
+    explicit object_t(string_t o) : buf(o.c_str()) {}
+    explicit object_t(bool o) : buf(o ? FPSTR("true") : FPSTR("false")) {}
+    size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
     void initObject() { buf = FPSTR("{}"); };
     void initArray() { buf = FPSTR("[]"); };
 
 private:
     explicit operator bool() const { return buf.length() > 0; }
+
+    template <typename T = const char*>
+    auto operator=(const T &rval) -> typename std::enable_if<!std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, number_t>::value && !std::is_same<T, boolean_t>::value, object_t &>::type
+    {
+        buf = rval;
+        return *this;
+    }
 
     template <typename T = String>
     auto operator+=(const T &rval) -> typename std::enable_if<!std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, number_t>::value && !std::is_same<T, boolean_t>::value, object_t &>::type
@@ -180,7 +187,7 @@ private:
     }
 
     size_t length() const { return buf.length(); }
-    object_t substring(unsigned int beginIndex, unsigned int endIndex) const { return buf.substring(beginIndex, endIndex); }
+    String substring(unsigned int beginIndex, unsigned int endIndex) const { return buf.substring(beginIndex, endIndex); }
 };
 
 class ValueConverter
@@ -305,13 +312,12 @@ public:
             else
             {
                 // response here should be numberic value
-                double d = atof(payload);
                 // find the dot and check its length to determine the type
                 if (String(payload).indexOf('.') != -1)
                     return p2 <= 7 ? realtime_database_data_type_float : realtime_database_data_type_double;
                 else
                     // no dot, determine the type from its value
-                    return d > 0x7fffffff ? realtime_database_data_type_double : realtime_database_data_type_integer;
+                    return atof(payload) > 0x7fffffff ? realtime_database_data_type_double : realtime_database_data_type_integer;
             }
         }
 

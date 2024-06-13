@@ -1,7 +1,7 @@
 /**
  * BSSL_SSL_Client library v1.0.13 for Arduino devices.
  *
- * Created June 9, 2024
+ * Created June 12, 2024
  *
  * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
  *
@@ -39,6 +39,13 @@
 #include <Arduino.h>
 #include "../ESP_SSLClient_FS.h"
 #include "../ESP_SSLClient_Const.h"
+
+#if defined(USE_EMBED_SSL_ENGINE)
+#define EMBED_SSL_ENGINE_BASE_OVERRIDE override
+#else
+#define EMBED_SSL_ENGINE_BASE_OVERRIDE
+#endif
+
 #if defined(USE_LIB_SSL_ENGINE) || defined(USE_EMBED_SSL_ENGINE)
 
 #include <vector>
@@ -138,9 +145,9 @@ public:
 
     void setBufferSizes(int recv, int xmit);
 
-    operator bool() { return connected() > 0; }
+    operator bool() override { return connected() > 0; }
 
-    int availableForWrite();
+    int availableForWrite() override;
 
     void setSession(BearSSL_Session *session);
 
@@ -180,11 +187,11 @@ public:
 
     bool probeMaxFragmentLength(const String &host, uint16_t port, uint16_t len);
 
-    size_t peekAvailable();
+    size_t peekAvailable() EMBED_SSL_ENGINE_BASE_OVERRIDE;
 
-    const char *peekBuffer();
+    const char *peekBuffer() EMBED_SSL_ENGINE_BASE_OVERRIDE;
 
-    void peekConsume(size_t consume);
+    void peekConsume(size_t consume) EMBED_SSL_ENGINE_BASE_OVERRIDE;
 
     void setCACert(const char *rootCA);
 

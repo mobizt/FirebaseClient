@@ -1,5 +1,5 @@
 /**
- * Created June 5, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -80,11 +80,11 @@ namespace firebase
 
             limitQueue();
             ms = millis();
-            ev_item ev;
-            ev.code = code;
-            ev.msg = msg;
-            ev.ts = ms;
-            evntVec.push_back(ev);
+            ev_item evt;
+            evt.code = code;
+            evt.msg = msg;
+            evt.ts = ms;
+            evntVec.push_back(evt);
             available = true;
         }
 

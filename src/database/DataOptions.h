@@ -43,7 +43,7 @@ public:
     bool classicRequest = false;
     DatabaseFilter filter;
 
-    void copy(DatabaseOptions &rhs)
+    void copy(const DatabaseOptions &rhs)
     {
         this->readTimeout = rhs.readTimeout;
         this->writeSizeLimit = rhs.writeSizeLimit;

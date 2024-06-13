@@ -1,5 +1,5 @@
 /**
- * Created April 3, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -116,7 +116,7 @@ namespace FirestoreQuery
 
     public:
         // A reference to a field in a document.
-        FieldReference(const String &value) { fieldPath(value); }
+        explicit FieldReference(const String &value) { fieldPath(value); }
 
         // A reference to a field in a document.
         FieldReference &fieldPath(const String &value) { return wr.add<FieldReference &, String>(*this, value, buf, FPSTR(__func__)); }
@@ -129,7 +129,7 @@ namespace FirestoreQuery
     {
     public:
         // A reference to a field in a document.
-        Projection(const FieldReference &value) { Projection::fields(value); }
+        explicit Projection(const FieldReference &value) { Projection::fields(value); }
 
         // This value represents the item to add to an array.
         // A reference to a field in a document.
@@ -149,7 +149,7 @@ namespace FirestoreQuery
 
     public:
         Order();
-        Order(const FieldReference &field, FilterSort::Direction direction);
+        explicit Order(const FieldReference &field, FilterSort::Direction direction);
 
         // The field to order by.
         Order &field(const FieldReference &value);
@@ -166,7 +166,7 @@ namespace FirestoreQuery
 
     public:
         CollectionSelector() {}
-        CollectionSelector(const String &collectionId, bool allDescendants) { CollectionSelector::collectionId(collectionId).allDescendants(allDescendants); }
+        explicit CollectionSelector(const String &collectionId, bool allDescendants) { CollectionSelector::collectionId(collectionId).allDescendants(allDescendants); }
 
         // The collection ID. When set, selects only collections with this ID.
         CollectionSelector &collectionId(const String &value) { return wr.set<CollectionSelector &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -310,13 +310,13 @@ namespace FirestoreQuery
         Filter();
 
         // A composite filter.
-        Filter(const CompositeFilter &value);
+        explicit Filter(const CompositeFilter &value);
 
         // A filter on a document field.
-        Filter(const FieldFilter &fieldFilter);
+        explicit Filter(const FieldFilter &fieldFilter);
 
         // A filter that takes exactly one argument.
-        Filter(const UnaryFilter &unaryFilter);
+        explicit Filter(const UnaryFilter &unaryFilter);
     };
 
 }

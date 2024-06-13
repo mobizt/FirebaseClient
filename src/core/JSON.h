@@ -1,5 +1,5 @@
 /**
- * Created March 27, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -195,14 +195,25 @@ public:
         va_start(ap, nunArgs);
         object_t p = va_arg(ap, object_t);
         if (p)
-            obj += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
+        {
+            if (!arr && (p.c_str()[0] == '{' || p.c_str()[0] == '['))
+                obj += p.substring(1, p.length() - 1);
+            else
+                obj += p;
+        }
+
         for (int i = 2; i <= nunArgs; i++)
         {
             sys_idle();
             obj += ',';
             p = va_arg(ap, object_t);
             if (p)
-                obj += !arr ? p.c_str()[0] == '{' || p.c_str()[0] == '[' ? p.substring(1, p.length() - 1) : p : p;
+            {
+                if (!arr && (p.c_str()[0] == '{' || p.c_str()[0] == '['))
+                    obj += p.substring(1, p.length() - 1);
+                else
+                    obj += p;
+            }
         }
         va_end(ap);
         obj += !arr ? '}' : ']';

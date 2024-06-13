@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -200,12 +200,9 @@ public:
         if (rvec_addr > 0)
         {
             std::vector<uint32_t> *rVec = reinterpret_cast<std::vector<uint32_t> *>(rvec_addr);
-            if (rVec)
-            {
-                List vec;
-                addr = reinterpret_cast<uint32_t>(this);
-                vec.addRemoveList(*rVec, addr, false);
-            }
+            List vec;
+            addr = reinterpret_cast<uint32_t>(this);
+            vec.addRemoveList(*rVec, addr, false);
         }
     };
 

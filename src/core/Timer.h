@@ -1,5 +1,5 @@
 /**
- * Created February 7, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -40,7 +40,7 @@ private:
     uint8_t feed_count = 0;
 
 public:
-    Timer(unsigned long sec = 60) { setInterval(sec); }
+    explicit Timer(unsigned long sec = 60) { setInterval(sec); }
     ~Timer() {}
     void reset() { end = ts + period; }
     void start()

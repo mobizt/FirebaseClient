@@ -1,5 +1,5 @@
 /**
- * Created June 2, 2024
+ * Created June 12, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -151,7 +151,7 @@ public:
     bool auth_param = false;
     app_token_t *app_token = nullptr;
     slot_options_t() {}
-    slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, bool no_etag, bool auth_param = false)
+    explicit slot_options_t(bool auth_used, bool sse, bool async, bool sv, bool ota, bool no_etag, bool auth_param = false)
     {
         this->auth_used = auth_used;
         this->sse = sse;
@@ -265,10 +265,10 @@ private:
 
     function_return_type sendHeader(async_data_item_t *sData, const char *data)
     {
-        return send(sData, (uint8_t *)data, data ? strlen(data) : 0, data ? strlen(data) : 0, async_state_send_header);
+        return send(sData, reinterpret_cast<const uint8_t *>(data), data ? strlen(data) : 0, data ? strlen(data) : 0, async_state_send_header);
     }
 
-    function_return_type sendHeader(async_data_item_t *sData, uint8_t *data, size_t len)
+    function_return_type sendHeader(async_data_item_t *sData, const uint8_t *data, size_t len)
     {
         return send(sData, data, len, len, async_state_send_header);
     }
@@ -280,7 +280,7 @@ private:
 #if defined(ENABLE_FS)
 
         size_t totalLen = sData->request.file_data.file_size;
-        bool fopen = sData->request.payloadIndex == 0;
+        bool fileopen = sData->request.payloadIndex == 0;
 
 #if defined(ENABLE_CLOUD_STORAGE)
 
@@ -288,17 +288,17 @@ private:
         {
             totalLen += sData->request.file_data.multipart.getOptions().length() + sData->request.file_data.multipart.getLast().length();
             if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.getState() == file_upload_multipart_data::multipart_state_send_options_payload)
-                return send(sData, (uint8_t *)sData->request.file_data.multipart.getOptions().c_str(), sData->request.file_data.multipart.getOptions().length(), totalLen, async_state_send_payload);
+                return send(sData, reinterpret_cast<const uint8_t *>(sData->request.file_data.multipart.getOptions().c_str()), sData->request.file_data.multipart.getOptions().length(), totalLen, async_state_send_payload);
             else if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.getState() == file_upload_multipart_data::multipart_state_send_last_payload)
-                return send(sData, (uint8_t *)sData->request.file_data.multipart.getLast().c_str(), sData->request.file_data.multipart.getLast().length(), totalLen, async_state_send_payload);
+                return send(sData, reinterpret_cast<const uint8_t *>(sData->request.file_data.multipart.getLast().c_str()), sData->request.file_data.multipart.getLast().length(), totalLen, async_state_send_payload);
 
-            fopen |= sData->request.file_data.multipart.isEnabled() && sData->request.payloadIndex == sData->request.file_data.multipart.getOptions().length();
+            fileopen |= sData->request.file_data.multipart.isEnabled() && sData->request.payloadIndex == sData->request.file_data.multipart.getOptions().length();
         }
 #endif
         if (sData->upload)
             sData->upload_progress_enabled = true;
 
-        if (fopen)
+        if (fileopen)
         {
             if (sData->request.file_data.filename.length() > 0)
             {
@@ -315,7 +315,7 @@ private:
 
             if (sData->request.base64)
             {
-                ret = send(sData, (uint8_t *)"\"", 1, totalLen, async_state_send_payload);
+                ret = send(sData, reinterpret_cast<const uint8_t *>("\""), 1, totalLen, async_state_send_payload);
                 if (ret != function_return_type_continue)
                     return ret;
             }
@@ -359,9 +359,9 @@ private:
                     sData->request.file_data.data_pos += toSend;
                 }
 
-                uint8_t *temp = (uint8_t *)but.encodeToChars(mem, buf, toSend);
+                uint8_t *temp = reinterpret_cast<uint8_t *>(but.encodeToChars(mem, buf, toSend));
                 mem.release(&buf);
-                toSend = strlen((char *)temp);
+                toSend = strlen(reinterpret_cast<char *>(temp));
                 buf = temp;
             }
             else
@@ -399,7 +399,7 @@ private:
             ret = send(sData, buf, toSend, totalLen, async_state_send_payload);
         }
         else if (sData->request.base64)
-            ret = send(sData, (uint8_t *)"\"", 1, totalLen, async_state_send_payload);
+            ret = send(sData, reinterpret_cast<const uint8_t *>("\""), 1, totalLen, async_state_send_payload);
 
     exit:
 
@@ -412,10 +412,10 @@ private:
 
     function_return_type send(async_data_item_t *sData, const char *data, async_state state = async_state_send_payload)
     {
-        return send(sData, (uint8_t *)data, data ? strlen(data) : 0, data ? strlen(data) : 0, state);
+        return send(sData, reinterpret_cast<const uint8_t *>(data), data ? strlen(data) : 0, data ? strlen(data) : 0, state);
     }
 
-    function_return_type send(async_data_item_t *sData, uint8_t *data, size_t len, size_t size, async_state state = async_state_send_payload)
+    function_return_type send(async_data_item_t *sData, const uint8_t *data, size_t len, size_t size, async_state state = async_state_send_payload)
     {
         sData->state = state;
 
@@ -620,12 +620,12 @@ private:
         if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.getLocation().length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
             String ext;
-            String host = getHost(sData, false, &ext);
+            String _host = getHost(sData, false, &ext);
 
-            if (connect(sData, host.c_str(), sData->request.port) > function_return_type_failure)
+            if (connect(sData, _host.c_str(), sData->request.port) > function_return_type_failure)
             {
                 sData->request.val[req_hndlr_ns::payload].remove(0, sData->request.val[req_hndlr_ns::payload].length());
-                sData->request.file_data.resumable.getHeader(sData->request.val[req_hndlr_ns::header], host, ext);
+                sData->request.file_data.resumable.getHeader(sData->request.val[req_hndlr_ns::header], _host, ext);
                 sData->state = async_state_send_header;
                 sData->request.file_data.resumable.setHeaderState();
                 return function_return_type_continue;
@@ -638,13 +638,13 @@ private:
         if (sData->response.val[res_hndlr_ns::location].length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
             String ext;
-            String host = getHost(sData, false, &ext);
+            String _host = getHost(sData, false, &ext);
             if (client)
                 client->stop();
-            if (connect(sData, host.c_str(), sData->request.port) > function_return_type_failure)
+            if (connect(sData, _host.c_str(), sData->request.port) > function_return_type_failure)
             {
                 URLUtil uut;
-                uut.relocate(sData->request.val[req_hndlr_ns::header], host, ext);
+                uut.relocate(sData->request.val[req_hndlr_ns::header], _host, ext);
                 sData->request.val[req_hndlr_ns::payload].remove(0, sData->request.val[req_hndlr_ns::payload].length());
                 sData->state = async_state_send_header;
                 return function_return_type_continue;
@@ -1098,8 +1098,6 @@ private:
     {
         uint8_t *buf = nullptr;
         OTAUtil otaut;
-        Memory mem;
-        Base64Util but;
 
         if (sData->response.flags.payload_remaining)
         {
@@ -1182,7 +1180,7 @@ private:
                                     otaut.getPad(buf + ofs, read, sData->request.b64Pad);
                                     if (sData->request.ota)
                                     {
-                                        otaut.decodeBase64OTA(mem, &but, (const char *)buf, read - ofs, sData->request.ota_error);
+                                        otaut.decodeBase64OTA(mem, &but, reinterpret_cast<const char *>(buf), read - ofs, sData->request.ota_error);
                                         if (sData->request.ota_error != 0)
                                         {
                                             // In case OTA error.
@@ -1205,7 +1203,7 @@ private:
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                     {
 
-                                        if (!but.decodeToFile(mem, sData->request.file_data.file, (const char *)buf + ofs))
+                                        if (!but.decodeToFile(mem, sData->request.file_data.file, reinterpret_cast<const char *>(buf + ofs)))
                                         {
                                             // In case file write error.
                                             setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_FILE_WRITE, !sData->sse, true);
@@ -1214,7 +1212,7 @@ private:
                                     }
 #endif
                                     else
-                                        but.decodeToBlob(mem, &sData->request.file_data.outB, (const char *)buf + ofs);
+                                        but.decodeToBlob(mem, &sData->request.file_data.outB, reinterpret_cast<const char *>(buf + ofs));
                                 }
                                 else
                                 {
@@ -1716,7 +1714,7 @@ private:
             if (!self_connect && net.net_timer.remaining() == 0)
                 net.net_timer.feed(FIREBASE_NET_RECONNECT_TIMEOUT_SEC);
 
-            if (recon && (self_connect || (!self_connect && net.net_timer.remaining() == 0)))
+            if (recon && (self_connect || net.net_timer.remaining() == 0))
             {
 
                 if (!self_connect)
@@ -1838,7 +1836,7 @@ private:
 #if defined(ENABLE_FS)
         if ((sData->request.file_data.cb && sData->request.file_data.filename.length()) || (sData->request.file_data.data_size && sData->request.file_data.data))
         {
-            Base64Util but;
+            Base64Util b64ut;
             size_t sz = 0;
             if (sData->request.file_data.cb)
             {
@@ -1848,7 +1846,7 @@ private:
             else
                 sz = sData->request.file_data.data_size;
 
-            sData->request.file_data.file_size = sData->request.base64 ? 2 + but.getBase64Len(sz) : sz;
+            sData->request.file_data.file_size = sData->request.base64 ? 2 + b64ut.getBase64Len(sz) : sz;
             if (customHeader.length())
             {
                 sData->request.val[req_hndlr_ns::header] += customHeader;
@@ -2012,7 +2010,7 @@ private:
         return sData;
     }
 
-    void newRequest(async_data_item_t *sData, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, slot_options_t &options, const String &uid)
+    void newRequest(async_data_item_t *sData, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, const slot_options_t &options, const String &uid)
     {
         sData->async = options.async;
         sData->request.val[req_hndlr_ns::url] = url;
@@ -2028,7 +2026,7 @@ private:
         sData->request.addRequestHeaderFirst(method);
         if (path.length() == 0)
             sData->request.val[req_hndlr_ns::header] += '/';
-        else if (path.length() && path[0] != '/')
+        else if (path[0] != '/')
             sData->request.val[req_hndlr_ns::header] += '/';
         sData->request.val[req_hndlr_ns::header] += path;
         sData->request.val[req_hndlr_ns::header] += extras;
@@ -2083,9 +2081,8 @@ private:
         if (cvec_addr > 0)
         {
             std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(cvec_addr);
-            List vec;
-            if (cVec)
-                vec.addRemoveList(*cVec, this->addr, add);
+            List v;
+            v.addRemoveList(*cVec, this->addr, add);
         }
     }
 
@@ -2102,7 +2099,7 @@ private:
     {
         for (size_t slot = 0; slot < slotCount(); slot++)
         {
-            async_data_item_t *sData = getData(slot);
+            const async_data_item_t *sData = getData(slot);
             if (sData && sData->to_remove)
                 removeSlot(slot);
         }

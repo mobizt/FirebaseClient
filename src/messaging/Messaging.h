@@ -1,5 +1,5 @@
 /**
- * Created June 7, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -43,14 +43,15 @@ public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
     ~Messaging() {}
-    Messaging(const String &url = "")
+    explicit Messaging(const String &url = "")
     {
         this->service_url = url;
     };
 
-    Messaging &operator=(Messaging &rhs)
+    Messaging &operator=(const Messaging &rhs)
     {
         this->service_url = rhs.service_url;
+        this->app_token = rhs.app_token;
         return *this;
     }
 
@@ -72,11 +73,11 @@ public:
     {
         for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClientClass *aClient = reinterpret_cast<AsyncClientClass *>(cVec[i]);
-            if (aClient)
+            AsyncClientClass *client = reinterpret_cast<AsyncClientClass *>(cVec[i]);
+            if (client)
             {
-                aClient->process(true);
-                aClient->handleRemove();
+                client->process(true);
+                client->handleRemove();
             }
         }
     }
@@ -135,7 +136,6 @@ public:
     }
 
 private:
-    AsyncClientClass *aClient = nullptr;
     String service_url;
     String path;
     String uid;
@@ -159,10 +159,9 @@ private:
     {
         if (avec_addr > 0)
         {
-            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
+            const std::vector<uint32_t> *aVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
             List vec;
-            if (cVec)
-                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
+            return vec.existed(*aVec, app_addr) ? app_token : nullptr;
         }
         return nullptr;
     }
@@ -186,12 +185,12 @@ private:
     void asyncRequest(Messages::async_request_data_t &request, int beta = 0)
     {
         URLUtil uut;
-        app_token_t *app_token = appToken();
+        app_token_t *atoken = appToken();
 
-        if (!app_token)
+        if (!atoken)
             return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
-        request.opt.app_token = app_token;
+        request.opt.app_token = atoken;
         String extras;
 
         if (beta == 2)
@@ -201,7 +200,7 @@ private:
         else
             uut.addGAPIv1Path(request.path);
 
-        request.path += request.options->parent.getProjectId().length() == 0 ? app_token->val[app_tk_ns::pid] : request.options->parent.getProjectId();
+        request.path += request.options->parent.getProjectId().length() == 0 ? atoken->val[app_tk_ns::pid] : request.options->parent.getProjectId();
 
         addParams(request, extras);
 
@@ -253,7 +252,7 @@ private:
         }
     }
 
-    void addParams(Messages::async_request_data_t &request, String &extras)
+    void addParams(const Messages::async_request_data_t &request, String &extras)
     {
         extras += request.options->extras;
         extras.replace(" ", "%20");

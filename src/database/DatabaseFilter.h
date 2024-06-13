@@ -38,7 +38,7 @@ class DatabaseFilter
     friend class AsyncClientClass;
 
 private:
-    void copy(DatabaseFilter &rhs)
+    void copy(const DatabaseFilter &rhs)
     {
         this->uri = rhs.uri;
         this->complete = rhs.complete;

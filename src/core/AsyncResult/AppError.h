@@ -1,5 +1,5 @@
 /**
- * Created June 5, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -77,11 +77,11 @@ private:
         limitQueue();
 
         ms = millis();
-        err_item err;
-        err.code = code;
-        err.msg = msg;
-        err.ts = ms;
-        errVec.push_back(err);
+        err_item errt;
+        errt.code = code;
+        errt.msg = msg;
+        errt.ts = ms;
+        errVec.push_back(errt);
         available = true;
     }
 

@@ -1,5 +1,5 @@
 /**
- * Created May 20, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -73,7 +73,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        String batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions)
+        String batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, const BatchGetDocumentOptions &batchOptions)
         {
             batchGetDoc(aClient, getResultBase(&aClient), NULL, "", parent, batchOptions, false);
             return getResultBase(&aClient)->c_str();
@@ -109,7 +109,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResult &aResult)
+        void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResult &aResult)
         {
             batchGetDoc(aClient, &aResult, NULL, "", parent, batchOptions, true);
         }
@@ -145,7 +145,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, BatchGetDocumentOptions batchOptions, AsyncResultCallback cb, const String &uid = "")
+        void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResultCallback cb, const String &uid = "")
         {
             batchGetDoc(aClient, nullptr, cb, uid, parent, batchOptions, true);
         }
@@ -742,7 +742,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResultCallback cb, const String &uid = "")
+        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const ListDocumentsOptions &listDocsOptions, AsyncResultCallback cb, const String &uid = "")
         {
             listDocs(aClient, nullptr, cb, uid, parent, collectionId, listDocsOptions, true);
         }
@@ -819,7 +819,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
+        void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const ListCollectionIdsOptions &listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
         {
             listCollIds(aClient, nullptr, cb, uid, parent, documentPath, listCollectionIdsOptions, true);
         }
@@ -1077,7 +1077,7 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResultCallback cb, const String &uid = "")
+        void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const QueryOptions &queryOptions, AsyncResultCallback cb, const String &uid = "")
         {
             runQueryImpl(aClient, nullptr, cb, uid, parent, documentPath, queryOptions, true);
         }

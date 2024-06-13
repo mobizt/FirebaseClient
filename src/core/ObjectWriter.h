@@ -1,5 +1,5 @@
 /**
- * Created April 3, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -84,9 +84,9 @@ public:
     {
         if (index < size)
         {
-            if (buf[index].length() == 0)
+            if ((buf[index]).length() == 0)
             {
-                String temp;
+                String temp = "";
                 jut.addArray(temp, memberValue, isString, true);
                 jut.addObject(buf[index], key, temp, false, true);
             }
@@ -158,7 +158,7 @@ public:
         full_path += RESOURCE_PATH_BASE;
         if (path.length())
         {
-            if (path.length() && path[0] != '/')
+            if (path[0] != '/')
                 full_path += '/';
             full_path += path;
         }
@@ -296,7 +296,7 @@ protected:
 public:
     BaseO1() {}
     const char *c_str() const { return buf.c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
     void setContent(const String &content)
     {
@@ -316,7 +316,7 @@ protected:
 public:
     BaseO2() {}
     const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
     void setContent(const String &content)
     {
@@ -336,7 +336,7 @@ protected:
 public:
     BaseO4() {}
     const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
     void setContent(const String &content)
     {
@@ -356,7 +356,7 @@ protected:
 public:
     BaseO6() {}
     const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
     void setContent(const String &content)
     {
@@ -375,7 +375,7 @@ protected:
 public:
     BaseO8() {}
     const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
     void setContent(const String &content)
     {
@@ -395,7 +395,7 @@ protected:
 public:
     BaseO10() {}
     const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
     void setContent(const String &content)
     {
@@ -415,7 +415,7 @@ protected:
 public:
     BaseO12() {}
     const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
     void setContent(const String &content)
     {
@@ -434,7 +434,7 @@ protected:
 public:
     BaseO16() {}
     const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
     void setContent(const String &content)
     {
@@ -453,7 +453,7 @@ protected:
 public:
     BaseO26() {}
     const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const { return p.print(buf[0].c_str()); }
+    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
     void clear() { wr.clear(buf, bufSize); }
     void setContent(const String &content)
     {

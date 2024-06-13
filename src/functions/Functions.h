@@ -1,5 +1,5 @@
 /**
- * Created June 7, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -42,14 +42,15 @@ public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
     ~CloudFunctions() {}
-    CloudFunctions(const String &url = "")
+    explicit CloudFunctions(const String &url = "")
     {
         this->service_url = url;
     };
 
-    CloudFunctions &operator=(CloudFunctions &rhs)
+    CloudFunctions &operator=(const CloudFunctions &rhs)
     {
         this->service_url = rhs.service_url;
+        this->app_token = rhs.app_token;
         return *this;
     }
 
@@ -71,11 +72,11 @@ public:
     {
         for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClientClass *aClient = reinterpret_cast<AsyncClientClass *>(cVec[i]);
-            if (aClient)
+            AsyncClientClass *client = reinterpret_cast<AsyncClientClass *>(cVec[i]);
+            if (client)
             {
-                aClient->process(true);
-                aClient->handleRemove();
+                client->process(true);
+                client->handleRemove();
             }
         }
     }
@@ -97,7 +98,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function)
+    String create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::Function &function)
     {
         sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, function.c_str(), false);
         return aClient.getResult()->c_str();
@@ -120,7 +121,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResult &aResult)
+    void create(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::Function &function, AsyncResult &aResult)
     {
         sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_create, function.c_str(), true);
     }
@@ -167,7 +168,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask)
+    String patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::Function &function, const String &updateMask)
     {
         sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, function.c_str(), false);
         return aClient.getResult()->c_str();
@@ -192,7 +193,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, const String &updateMask, AsyncResult &aResult)
+    void patch(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::Function &function, const String &updateMask, AsyncResult &aResult)
     {
         sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, updateMask, GoogleCloudFunctions::google_cloud_functions_request_type_patch, function.c_str(), true);
     }
@@ -535,7 +536,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options)
+    String generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::UploadURLOptions &options)
     {
         sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl, options.c_str(), false);
         return aClient.getResult()->c_str();
@@ -556,7 +557,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options, AsyncResult &aResult)
+    void generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::UploadURLOptions &options, AsyncResult &aResult)
     {
         sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl, options.c_str(), true);
     }
@@ -577,7 +578,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::UploadURLOptions options, AsyncResultCallback cb, const String &uid = "")
+    void generateUploadURL(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::UploadURLOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
         sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_gen_uploadUrl, options.c_str(), true);
     }
@@ -660,7 +661,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options)
+    String setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::SetPolicyOptions &options)
     {
         sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy, options.c_str(), false);
         return aClient.getResult()->c_str();
@@ -682,7 +683,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options, AsyncResult &aResult)
+    void setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::SetPolicyOptions &options, AsyncResult &aResult)
     {
         sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy, options.c_str(), true);
     }
@@ -704,7 +705,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::SetPolicyOptions options, AsyncResultCallback cb, const String &uid = "")
+    void setIamPolicy(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::SetPolicyOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
         sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_set_iam_policy, options.c_str(), true);
     }
@@ -725,7 +726,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions)
+    String testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions)
     {
         sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_test_iam_permission, permissions.c_str(), false);
         return aClient.getResult()->c_str();
@@ -747,7 +748,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions, AsyncResult &aResult)
+    void testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions, AsyncResult &aResult)
     {
         sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_test_iam_permission, permissions.c_str(), true);
     }
@@ -769,13 +770,12 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, GoogleCloudFunctions::Permissions permissions, AsyncResultCallback cb, const String &uid = "")
+    void testIamPermissions(AsyncClientClass &aClient, const GoogleCloudFunctions::Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions, AsyncResultCallback cb, const String &uid = "")
     {
         sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::google_cloud_functions_request_type_test_iam_permission, permissions.c_str(), true);
     }
 
 private:
-    AsyncClientClass *aClient = nullptr;
     String service_url;
     String path;
     String uid;
@@ -799,15 +799,14 @@ private:
     {
         if (avec_addr > 0)
         {
-            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
+            const std::vector<uint32_t> *aVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
             List vec;
-            if (cVec)
-                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
+            return vec.existed(*aVec, app_addr) ? app_token : nullptr;
         }
         return nullptr;
     }
 
-    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudFunctions::Parent &parent, file_config_data *file, const String &functionId, GoogleCloudFunctions::ListOptions *listOptions, const String &updateMask, GoogleCloudFunctions::google_cloud_functions_request_type requestType, const String &payload, bool async)
+    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudFunctions::Parent &parent, file_config_data *file, const String &functionId, const GoogleCloudFunctions::ListOptions *listOptions, const String &updateMask, GoogleCloudFunctions::google_cloud_functions_request_type requestType, const String &payload, bool async)
     {
         GoogleCloudFunctions::DataOptions options;
         options.requestType = requestType;
@@ -868,12 +867,12 @@ private:
 
     void asyncRequest(GoogleCloudFunctions::async_request_data_t &request, GoogleCloudFunctions::google_cloud_functions_request_type requestType)
     {
-        app_token_t *app_token = appToken();
+        app_token_t *atoken = appToken();
 
-        if (!app_token)
+        if (!atoken)
             return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
-        request.opt.app_token = app_token;
+        request.opt.app_token = atoken;
         String extras;
 
         request.path = "/v";
@@ -980,14 +979,14 @@ private:
         }
     }
 
-    void addParams(GoogleCloudFunctions::async_request_data_t &request, String &extras)
+    void addParams(const GoogleCloudFunctions::async_request_data_t &request, String &extras)
     {
         extras += request.options->extras;
         extras.replace(" ", "%20");
         extras.replace(",", "%2C");
     }
 
-    void setFileStatus(async_data_item_t *sData, GoogleCloudFunctions::async_request_data_t &request)
+    void setFileStatus(async_data_item_t *sData, const GoogleCloudFunctions::async_request_data_t &request)
     {
         if ((request.file && request.file->filename.length()) || request.opt.ota)
         {

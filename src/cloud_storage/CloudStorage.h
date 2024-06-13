@@ -1,5 +1,5 @@
 /**
- * Created June 7, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -42,14 +42,15 @@ public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
     ~CloudStorage() {}
-    CloudStorage(const String &url = "")
+    explicit CloudStorage(const String &url = "")
     {
         this->service_url = url;
     };
 
-    CloudStorage &operator=(CloudStorage &rhs)
+    CloudStorage &operator=(const CloudStorage &rhs)
     {
         this->service_url = rhs.service_url;
+        this->app_token = rhs.app_token;
         return *this;
     }
 
@@ -61,7 +62,7 @@ public:
         this->app_addr = 0;
         this->app_token = nullptr;
         this->avec_addr = 0; // AsyncClient vector (list) address
-    } 
+    }
 
     /**
      * Perform the async task repeatedly.
@@ -71,11 +72,11 @@ public:
     {
         for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClientClass *aClient = reinterpret_cast<AsyncClientClass *>(cVec[i]);
-            if (aClient)
+            AsyncClientClass *client = reinterpret_cast<AsyncClientClass *>(cVec[i]);
+            if (client)
             {
-                aClient->process(true);
-                aClient->handleRemove();
+                client->process(true);
+                client->handleRemove();
             }
         }
     }
@@ -354,7 +355,7 @@ public:
      * @return Boolean value, indicates the success of the operation.
      *
      */
-    bool deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::DeleteOptions options)
+    bool deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::DeleteOptions &options)
     {
         sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_delete, false);
         return aClient.getResult()->lastError.code() == 0;
@@ -371,7 +372,7 @@ public:
      * @param aResult The async result (AsyncResult).
      *
      */
-    void deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::DeleteOptions options, AsyncResult &aResult)
+    void deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::DeleteOptions &options, AsyncResult &aResult)
     {
         sendRequest(aClient, &aResult, NULL, "", parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_delete, true);
     }
@@ -388,13 +389,12 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::DeleteOptions options, AsyncResultCallback cb, const String &uid = "")
+    void deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::DeleteOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
         sendRequest(aClient, nullptr, cb, uid, parent, nullptr, &options, nullptr, nullptr, GoogleCloudStorage::google_cloud_storage_request_type_delete, true);
     }
 
 private:
-    AsyncClientClass *aClient = nullptr;
     String service_url;
     String path;
     String uid;
@@ -419,15 +419,14 @@ private:
     {
         if (avec_addr > 0)
         {
-            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
+            const std::vector<uint32_t> *aVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
             List vec;
-            if (cVec)
-                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
+            return vec.existed(*aVec, app_addr) ? app_token : nullptr;
         }
         return nullptr;
     }
 
-    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudStorage::Parent &parent, file_config_data *file, GoogleCloudStorage::BaseOptions *baseOptions, GoogleCloudStorage::uploadOptions *uploadOptions, GoogleCloudStorage::ListOptions *listOptions, GoogleCloudStorage::google_cloud_storage_request_type requestType, bool async)
+    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const GoogleCloudStorage::Parent &parent, file_config_data *file, const GoogleCloudStorage::BaseOptions *baseOptions, GoogleCloudStorage::uploadOptions *uploadOptions, const GoogleCloudStorage::ListOptions *listOptions, GoogleCloudStorage::google_cloud_storage_request_type requestType, bool async)
     {
         GoogleCloudStorage::DataOptions options;
         options.requestType = requestType;
@@ -454,25 +453,22 @@ private:
             options.extras += "?name=";
             options.extras += uut.encode(parent.getObject());
 
-            if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_uploads)
+            options.extras += "&uploadType=";
+            if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_simple)
+                options.extras += "media";
+            else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_multipart)
+                options.extras += "multipart";
+            else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable)
             {
-                options.extras += "&uploadType=";
-                if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_simple)
-                    options.extras += "media";
-                else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_multipart)
-                    options.extras += "multipart";
-                else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable)
-                {
 #if defined(ENABLE_FS)
-                    // resumable upload is only for file bigger than 256k
-                    if (file && file->cb)
-                    {
-                        file->cb(file->file, file->filename.c_str(), file_mode_open_read);
-                        options.extras += file->file.size() < 256 * 1024 ? "multipart" : "resumable";
-                        file->file.close();
-                    }
-#endif
+                // resumable upload is only for file bigger than 256k
+                if (file && file->cb)
+                {
+                    file->cb(file->file, file->filename.c_str(), file_mode_open_read);
+                    options.extras += file->file.size() < 256 * 1024 ? "multipart" : "resumable";
+                    file->file.close();
                 }
+#endif
             }
         }
         else if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_delete)
@@ -504,12 +500,12 @@ private:
 
     void asyncRequest(GoogleCloudStorage::async_request_data_t &request, int beta = 0)
     {
-        app_token_t *app_token = appToken();
+        app_token_t *atoken = appToken();
 
-        if (!app_token)
+        if (!atoken)
             return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
-        request.opt.app_token = app_token;
+        request.opt.app_token = atoken;
         String extras;
 
         if (request.method == async_request_handler_t::http_post || request.method == async_request_handler_t::http_put)
@@ -642,14 +638,14 @@ private:
         }
     }
 
-    void addParams(GoogleCloudStorage::async_request_data_t &request, String &extras)
+    void addParams(const GoogleCloudStorage::async_request_data_t &request, String &extras)
     {
         extras += request.options->extras;
         extras.replace(" ", "%20");
         extras.replace(",", "%2C");
     }
 
-    void setFileStatus(async_data_item_t *sData, GoogleCloudStorage::async_request_data_t &request)
+    void setFileStatus(async_data_item_t *sData, const GoogleCloudStorage::async_request_data_t &request)
     {
         if ((request.file && request.file->filename.length()) || request.opt.ota)
         {

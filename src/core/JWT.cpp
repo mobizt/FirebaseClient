@@ -1,5 +1,5 @@
 /**
- * Created June 2, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -95,7 +95,7 @@ bool JWTClass::loop(auth_data_t *auth_data)
             if (auth_data->refResult)
                 sendErrResult(auth_data->refResult);
             else
-                sendErrCB(auth_data ? auth_data->cb : NULL, nullptr);
+                sendErrCB(auth_data->cb, nullptr);
         }
         return ret;
     }
@@ -180,7 +180,7 @@ bool JWTClass::create()
         if (now < FIREBASE_DEFAULT_TS)
         {
             jwt_data.err_code = FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID;
-            jwt_data.msg = (const char *)FPSTR("JWT, time was not set or not valid");
+            jwt_data.msg = FPSTR("JWT, time was not set or not valid");
             return exit(false);
         }
 
@@ -276,7 +276,7 @@ bool JWTClass::create()
 
         len = but.encodedLength(payload.length());
         char *buf = reinterpret_cast<char *>(mem.alloc(len));
-        but.encodeUrl(mem, buf, (unsigned char *)payload.c_str(), payload.length());
+        but.encodeUrl(mem, buf, reinterpret_cast<const unsigned char *>(payload.c_str()), payload.length());
         payload.remove(0, payload.length());
         jwt_data.token += '.';
         jwt_data.token += buf;
@@ -310,7 +310,7 @@ bool JWTClass::create()
         if (!pk)
         {
             jwt_data.err_code = FIREBASE_ERROR_TOKEN_PARSE_PK;
-            jwt_data.msg = (const char *)FPSTR("JWT, private key parsing fail");
+            jwt_data.msg = FPSTR("JWT, private key parsing fail");
             auth_data->user_auth.sa.step = jwt_step_error;
             return exit(false);
         }
@@ -320,7 +320,7 @@ bool JWTClass::create()
             delete pk;
             pk = nullptr;
             jwt_data.err_code = FIREBASE_ERROR_TOKEN_PARSE_PK;
-            jwt_data.msg = (const char *)FPSTR("JWT, invalid RSA private key");
+            jwt_data.msg = FPSTR("JWT, invalid RSA private key");
             auth_data->user_auth.sa.step = jwt_step_error;
             return exit(false);
         }
@@ -331,7 +331,7 @@ bool JWTClass::create()
         sys_idle();
         if (!jwt_data.signature)
             jwt_data.signature = reinterpret_cast<unsigned char *>(mem.alloc(256));
-        int ret = br_rsa_i15_pkcs1_sign(BR_HASH_OID_SHA256, (const unsigned char *)jwt_data.hash, br_sha256_SIZE, br_rsa_key, jwt_data.signature);
+        int ret = br_rsa_i15_pkcs1_sign(BR_HASH_OID_SHA256, reinterpret_cast<const unsigned char *>(jwt_data.hash), br_sha256_SIZE, br_rsa_key, jwt_data.signature);
         sys_idle();
 
         if (jwt_data.hash)
@@ -355,7 +355,7 @@ bool JWTClass::create()
         {
             mem.release(&buf);
             jwt_data.err_code = FIREBASE_ERROR_TOKEN_SIGN;
-            jwt_data.msg = (const char *)FPSTR("JWT, token signing fail");
+            jwt_data.msg = FPSTR("JWT, token signing fail");
             auth_data->user_auth.sa.step = jwt_step_error;
             return exit(false);
         }

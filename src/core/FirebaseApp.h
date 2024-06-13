@@ -1,5 +1,5 @@
 /**
- * Created June 7, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -67,7 +67,6 @@ namespace firebase
         uint32_t ref_result_addr = 0;
         Timer req_timer, auth_timer, err_timer, app_ready_timer;
         bool deinit = false;
-        List vec;
         bool processing = false;
         uint32_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
         JSONUtil json;
@@ -195,8 +194,8 @@ namespace firebase
 
         AsyncClientClass *getClient()
         {
-            List vec;
-            return vec.existed(cVec, aclient_addr) ? aClient : nullptr;
+            List v;
+            return v.existed(cVec, aclient_addr) ? aClient : nullptr;
         }
 
         void setEvent(firebase_auth_event_type event)
@@ -220,7 +219,6 @@ namespace firebase
             if (event == auth_event_error || event == auth_event_ready)
             {
                 processing = false;
-                event = auth_event_uninitialized;
                 clearLastError(sData ? &sData->aResult : nullptr);
                 if (getClient())
                     stop(aClient);
@@ -293,8 +291,8 @@ namespace firebase
 
         AsyncResult *getRefResult()
         {
-            List vec;
-            return aClient && vec.existed(getRVec(aClient), ref_result_addr) ? refResult : nullptr;
+            List v;
+            return aClient && v.existed(getRVec(aClient), ref_result_addr) ? refResult : nullptr;
         }
 
         void setRefResult(AsyncResult *refResult, uint32_t rvec_addr)
@@ -305,8 +303,8 @@ namespace firebase
             if (rvec_addr > 0)
             {
                 std::vector<uint32_t> *rVec = reinterpret_cast<std::vector<uint32_t> *>(rvec_addr);
-                List vec;
-                vec.addRemoveList(*rVec, ref_result_addr, true);
+                List v;
+                v.addRemoveList(*rVec, ref_result_addr, true);
             }
         }
 
@@ -692,7 +690,8 @@ namespace firebase
         FirebaseApp()
         {
             app_addr = reinterpret_cast<uint32_t>(this);
-            vec.addRemoveList(aVec, app_addr, true);
+            List v;
+            v.addRemoveList(aVec, app_addr, true);
         };
 
         ~FirebaseApp()
@@ -700,7 +699,8 @@ namespace firebase
             if (sData)
                 delete sData;
             sData = nullptr;
-            vec.addRemoveList(aVec, app_addr, false);
+            List v;
+            v.addRemoveList(aVec, app_addr, false);
         };
 
         /**

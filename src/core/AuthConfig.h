@@ -1,5 +1,5 @@
 /**
- * Created June 5, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -280,7 +280,7 @@ namespace firebase
         public:
             service_account() {}
             ~service_account() { clear(); }
-            void copy(service_account &rhs)
+            void copy(const service_account &rhs)
             {
                 for (size_t i = 0; i < sa_ns::max_type; i++)
                     this->val[i] = rhs.val[i];
@@ -316,7 +316,7 @@ namespace firebase
         public:
             custom_data() {}
             ~custom_data() { clear(); }
-            void copy(custom_data &rhs)
+            void copy(const custom_data &rhs)
             {
                 for (size_t i = 0; i < cust_ns::max_type; i++)
                     this->val[i] = rhs.val[i];
@@ -340,7 +340,7 @@ namespace firebase
         public:
             user_data() {}
             ~user_data() { clear(); }
-            void copy(user_data &rhs)
+            void copy(const user_data &rhs)
             {
                 for (size_t i = 0; i < user_ns::max_type; i++)
                     this->val[i] = rhs.val[i];
@@ -363,7 +363,7 @@ namespace firebase
         public:
             id_token_data() {}
             ~id_token_data() { clear(); }
-            void copy(id_token_data &rhs)
+            void copy(const id_token_data &rhs)
             {
                 for (size_t i = 0; i < id_tk_ns::max_type; i++)
                     this->val[i] = rhs.val[i];
@@ -388,7 +388,7 @@ namespace firebase
         public:
             access_token_data() {}
             ~access_token_data() { clear(); }
-            void copy(access_token_data &rhs)
+            void copy(const access_token_data &rhs)
             {
                 for (size_t i = 0; i < access_tk_ns::max_type; i++)
                     this->val[i] = rhs.val[i];
@@ -415,7 +415,7 @@ namespace firebase
         public:
             custom_token_data() {}
             ~custom_token_data() { clear(); }
-            void copy(custom_token_data &rhs)
+            void copy(const custom_token_data &rhs)
             {
                 this->val[cust_tk_ns::token] = rhs.val[cust_tk_ns::token];
                 this->expire = rhs.expire;
@@ -438,7 +438,7 @@ namespace firebase
         public:
             legacy_token_data() {}
             ~legacy_token_data() { clear(); }
-            void copy(legacy_token_data &rhs) { this->val[legacy_tk_ns::token] = rhs.val[legacy_tk_ns::token]; }
+            void copy(const legacy_token_data &rhs) { this->val[legacy_tk_ns::token] = rhs.val[legacy_tk_ns::token]; }
             void clear() { val[legacy_tk_ns::token].remove(0, val[legacy_tk_ns::token].length()); }
         };
 #endif
@@ -446,12 +446,12 @@ namespace firebase
     public:
         user_auth_data() {}
         ~user_auth_data() { clear(); }
-        user_auth_data &operator=(user_auth_data &rhs)
+        user_auth_data &operator=(const user_auth_data &rhs)
         {
             copy(rhs);
             return *this;
         }
-        void copy(user_auth_data &rhs)
+        void copy(const user_auth_data &rhs)
         {
 #if defined(ENABLE_SERVICE_AUTH)
             this->sa.copy(rhs.sa);
@@ -614,15 +614,15 @@ namespace firebase
 
                 if (type == token_type_user_data && tokenSize == 3)
                 {
-                    for (size_t i = 0; i < 3; i++)
-                        auth_data.user.val[i] = tokens[i];
+                    for (size_t j = 0; j < 3; j++)
+                        auth_data.user.val[j] = tokens[j];
                     return true;
                 }
                 else if (type == token_type_access_token && tokenSize == 5)
                 {
 #if defined(ENABLE_ACCESS_TOKEN)
-                    for (size_t i = 0; i < access_tk_ns::max_type; i++)
-                        auth_data.access_token.val[i] = tokens[i];
+                    for (size_t j = 0; j < access_tk_ns::max_type; j++)
+                        auth_data.access_token.val[j] = tokens[j];
                     auth_data.access_token.expire = atoi(tokens[4].c_str());
 #endif
                     return true;
@@ -775,7 +775,6 @@ namespace firebase
                 if (p1 > -1 && p2 > -1)
                 {
                     auth_data.sa.val[sa_ns::cid] = buf.substring(p1 + 1, p2 - 1);
-                    p1 = p2;
                 }
             }
 
@@ -793,7 +792,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        UserAuth(const String &api_key, const String &email, const String &password, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        explicit UserAuth(const String &api_key, const String &email, const String &password, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
         {
             data.clear();
             data.user.val[user_ns::api_key] = api_key;
@@ -805,7 +804,7 @@ namespace firebase
             data.initialized = true;
         };
 
-        UserAuth(file_config_data &userFile)
+        explicit UserAuth(const file_config_data &userFile)
         {
 #if defined(ENABLE_FS)
             data.clear();
@@ -862,7 +861,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        ServiceAuth(TimeStatusCallback timeCb, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        explicit ServiceAuth(TimeStatusCallback timeCb, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
         {
             data.clear();
             data.sa.val[sa_ns::cm] = clientEmail;
@@ -875,7 +874,7 @@ namespace firebase
             data.timestatus_cb = timeCb;
         };
 
-        ServiceAuth(TimeStatusCallback timeCb, file_config_data &safile, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        explicit ServiceAuth(TimeStatusCallback timeCb, const file_config_data &safile, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
         {
 #if defined(ENABLE_FS)
             data.clear();
@@ -923,7 +922,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        CustomAuth(TimeStatusCallback timeCb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        explicit CustomAuth(TimeStatusCallback timeCb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
         {
             data.clear();
             data.sa.val[sa_ns::cm] = clientEmail;
@@ -940,7 +939,7 @@ namespace firebase
             data.timestatus_cb = timeCb;
         };
 
-        CustomAuth(TimeStatusCallback timeCb, file_config_data &safile, const String &apiKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        explicit CustomAuth(TimeStatusCallback timeCb, const file_config_data &safile, const String &apiKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
         {
 #if defined(ENABLE_FS)
             data.clear();
@@ -979,7 +978,7 @@ namespace firebase
             return data;
         }
 
-        bool isInitialized() { return data.sa.val[sa_ns::pk].length() > 0 && data.sa.val[sa_ns::cm].length() > 0 && data.sa.val[sa_ns::pid].length() > 0 && data.sa.val[sa_ns::pk].length() > 0 && data.cust.val[cust_ns::uid].length() > 0; }
+        bool isInitialized() { return data.sa.val[sa_ns::pk].length() > 0 && data.sa.val[sa_ns::cm].length() > 0 && data.sa.val[sa_ns::pid].length() > 0 && data.cust.val[cust_ns::uid].length() > 0; }
 
     private:
         user_auth_data data;
@@ -993,7 +992,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        UserAccount(const String &apiKey)
+        explicit UserAccount(const String &apiKey)
         {
             data.user.val[user_ns::api_key] = apiKey;
             setType(auth_user_id_token, user_auth_data_user_data);
@@ -1037,7 +1036,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        IDToken(const String &api_key, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "")
+        explicit IDToken(const String &api_key, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "")
         {
             this->data.clear();
             this->data.user.val[user_ns::api_key] = api_key;
@@ -1049,7 +1048,7 @@ namespace firebase
             this->data.auth_data_type = user_auth_data_id_token;
         }
 
-        IDToken(file_config_data &tokenFile)
+        explicit IDToken(const file_config_data &tokenFile)
         {
 #if defined(ENABLE_FS)
             data.clear();
@@ -1110,7 +1109,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        AccessToken(const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
+        explicit AccessToken(const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
         {
             this->data.clear();
             this->data.access_token.val[access_tk_ns::token] = token;
@@ -1123,7 +1122,7 @@ namespace firebase
             this->data.auth_data_type = user_auth_data_access_token;
         }
 
-        AccessToken(file_config_data &tokenFile)
+        explicit AccessToken(const file_config_data &tokenFile)
         {
 #if defined(ENABLE_FS)
             data.clear();
@@ -1184,7 +1183,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        CustomToken(const String &api_key, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        explicit CustomToken(const String &api_key, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
         {
             this->data.clear();
             this->data.custom_token.val[cust_tk_ns::token] = token;
@@ -1195,7 +1194,7 @@ namespace firebase
             this->data.auth_data_type = user_auth_data_custom_token;
         }
 
-        CustomToken(file_config_data &tokenFile)
+        explicit CustomToken(const file_config_data &tokenFile)
         {
             data.clear();
             if (tokenFile.initialized)
@@ -1254,7 +1253,7 @@ namespace firebase
         friend class FirebaseApp;
 
     public:
-        LegacyToken(const String &token)
+        explicit LegacyToken(const String &token)
         {
             this->data.clear();
             this->data.legacy_token.val[legacy_tk_ns::token] = token;
@@ -1263,7 +1262,7 @@ namespace firebase
             this->data.auth_data_type = user_auth_data_legacy_token;
         }
 
-        LegacyToken(file_config_data &tokenFile)
+        explicit LegacyToken(const file_config_data &tokenFile)
         {
 #if defined(ENABLE_FS)
             data.clear();

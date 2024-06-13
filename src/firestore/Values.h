@@ -1,5 +1,5 @@
 /**
- * Created March 11, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -82,14 +82,10 @@ namespace Values
         /**
          * A null value.
          */
-        NullValue()
-        {
-            buf = FPSTR("null");
-            getVal();
-        }
+        NullValue() : buf(FPSTR("null")) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -110,14 +106,14 @@ namespace Values
          * A string value.
          *  @param value The string vakue
          */
-        StringValue(const String &value)
+        explicit StringValue(const String &value)
         {
             owriter.setString(buf, value);
             getVal();
         }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -137,14 +133,14 @@ namespace Values
          * A boolean value.
          *  @param value The boolean value
          */
-        BooleanValue(bool value)
+        explicit BooleanValue(bool value)
         {
             owriter.setBool(buf, value);
             getVal();
         }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -165,14 +161,10 @@ namespace Values
          * A integer value.
          *  @param value The integer value
          */
-        IntegerValue(int value)
-        {
-            buf = StringValue(String(value)).c_str();
-            getVal();
-        }
+        explicit IntegerValue(int value) : buf(StringValue(String(value)).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -193,14 +185,10 @@ namespace Values
          * A double value.
          *  @param value The double value
          */
-        DoubleValue(double value)
-        {
-            buf = String(value);
-            getVal();
-        }
+        explicit DoubleValue(double value) : buf(String(value)) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -222,14 +210,10 @@ namespace Values
          * Precise only to microseconds. When stored, any additional precision is rounded down.
          * @param value The timestamp value string
          */
-        TimestampValue(const String &value)
-        {
-            buf = StringValue(value).c_str();
-            getVal();
-        }
+        explicit TimestampValue(const String &value) : buf(StringValue(value).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -251,14 +235,10 @@ namespace Values
          * A base64-encoded string.
          * @param value The bytes value string
          */
-        BytesValue(const String &value)
-        {
-            buf = StringValue(value).c_str();
-            getVal();
-        }
+        explicit BytesValue(const String &value) : buf(StringValue(value).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -279,14 +259,10 @@ namespace Values
          * A reference to a document.
          * @param value The resource name of document
          */
-        ReferenceValue(const String &value)
-        {
-            buf = StringValue(value).c_str();
-            getVal();
-        }
+        explicit ReferenceValue(const String &value) : buf(StringValue(value).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -309,7 +285,7 @@ namespace Values
          * @param lat The latitude
          * @param lng The longitude
          */
-        GeoPointValue(double lat, double lng)
+        explicit GeoPointValue(double lat, double lng)
         {
             jut.addObject(buf, FPSTR("latitude"), String(lat), false);
             jut.addObject(buf, FPSTR("longitude"), String(lng), false, true);
@@ -317,7 +293,7 @@ namespace Values
         }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -366,7 +342,7 @@ namespace Values
          * @param value The object except for array value
          */
         template <typename T>
-        ArrayValue(T value)
+        explicit ArrayValue(T value)
         {
             memset(flags, 0, 11);
             set(value);
@@ -392,7 +368,7 @@ namespace Values
         }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -408,7 +384,7 @@ namespace Values
 
     public:
         template <typename T>
-        MAP(const String &key, T value, bool val) { owriter.setPair(buf, key, val ? value.val() : value.c_str()); }
+        explicit MAP(const String &key, T value, bool val) { owriter.setPair(buf, key, val ? value.val() : value.c_str()); }
         const char *c_str() const { return buf.c_str(); }
         void clear() { buf.remove(0, buf.length()); }
     };
@@ -434,7 +410,7 @@ namespace Values
          * @param value The map value
          */
         template <typename T>
-        MapValue(const String &key, T value)
+        explicit MapValue(const String &key, T value)
         {
             set(key, value);
             getVal();
@@ -451,7 +427,7 @@ namespace Values
         }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
-        size_t printTo(Print &p) const { return p.print(str.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
             buf.remove(0, buf.length());
@@ -473,10 +449,10 @@ namespace Values
          * @param value The object value
          */
         template <typename T>
-        Value(T value) { buf = value.val(); }
+        explicit Value(T value) : buf(value.val()) {}
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return buf.c_str(); }
-        size_t printTo(Print &p) const { return p.print(buf.c_str()); }
+        size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
         void clear() { buf.remove(0, buf.length()); }
     };
 };

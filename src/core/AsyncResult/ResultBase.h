@@ -1,5 +1,5 @@
 /**
- * Created June 5, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -152,7 +152,7 @@ namespace firebase
         void parseNodeName(RealtimeDatabaseResult *rtdbResult) { rtdbResult->parseNodeName(); }
         void parseSSE(RealtimeDatabaseResult *rtdbResult) { rtdbResult->parseSSE(); }
         void setEventResumeStatus(RealtimeDatabaseResult *rtdbResult, event_resume_status_t status) { rtdbResult->setEventResumeStatus(status); }
-        event_resume_status_t eventResumeStatus(RealtimeDatabaseResult *rtdbResult) { return rtdbResult->eventResumeStatus(); }
+        event_resume_status_t eventResumeStatus(const RealtimeDatabaseResult *rtdbResult) { return rtdbResult->eventResumeStatus(); }
 
     public:
         RealtimeDatabaseResult() {}

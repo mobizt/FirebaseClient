@@ -1,5 +1,5 @@
 /**
- * Created June 7, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -43,14 +43,15 @@ public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
     ~Storage() {}
-    Storage(const String &url = "")
+    explicit Storage(const String &url = "")
     {
         this->service_url = url;
     };
 
-    Storage &operator=(Storage &rhs)
+    Storage &operator=(const Storage &rhs)
     {
         this->service_url = rhs.service_url;
+        this->app_token = rhs.app_token;
         return *this;
     }
 
@@ -72,11 +73,11 @@ public:
     {
         for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClientClass *aClient = reinterpret_cast<AsyncClientClass *>(cVec[i]);
-            if (aClient)
+            AsyncClientClass *client = reinterpret_cast<AsyncClientClass *>(cVec[i]);
+            if (client)
             {
-                aClient->process(true);
-                aClient->handleRemove();
+                client->process(true);
+                client->handleRemove();
             }
         }
     }
@@ -359,7 +360,6 @@ public:
     }
 
 private:
-    AsyncClientClass *aClient = nullptr;
     String service_url;
     String path;
     String uid;
@@ -383,10 +383,9 @@ private:
     {
         if (avec_addr > 0)
         {
-            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
+            const std::vector<uint32_t> *aVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
             List vec;
-            if (cVec)
-                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
+            return vec.existed(*aVec, app_addr) ? app_token : nullptr;
         }
         return nullptr;
     }
@@ -429,12 +428,12 @@ private:
 
     void asyncRequest(FirebaseStorage::async_request_data_t &request, int beta = 0)
     {
-        app_token_t *app_token = appToken();
+        app_token_t *atoken = appToken();
 
-        if (!app_token)
+        if (!atoken)
             return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
-        request.opt.app_token = app_token;
+        request.opt.app_token = atoken;
         String extras;
 
         request.path = "/v0/b/";
@@ -523,14 +522,14 @@ private:
         }
     }
 
-    void addParams(FirebaseStorage::async_request_data_t &request, String &extras)
+    void addParams(const FirebaseStorage::async_request_data_t &request, String &extras)
     {
         extras += request.options->extras;
         extras.replace(" ", "%20");
         extras.replace(",", "%2C");
     }
 
-    void setFileStatus(async_data_item_t *sData, FirebaseStorage::async_request_data_t &request)
+    void setFileStatus(async_data_item_t *sData, const FirebaseStorage::async_request_data_t &request)
     {
         if ((request.file && request.file->filename.length()) || request.opt.ota)
         {

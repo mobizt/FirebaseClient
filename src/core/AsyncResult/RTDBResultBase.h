@@ -1,5 +1,5 @@
 /**
- * Created May 18, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -43,7 +43,7 @@ namespace firebase
             rtdbResult->null_etag = val;
         }
 
-        bool getNullETagOption(RealtimeDatabaseResult *rtdbResult)
+        bool getNullETagOption(const RealtimeDatabaseResult *rtdbResult)
         {
             return rtdbResult->null_etag;
         }

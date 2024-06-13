@@ -1,5 +1,5 @@
 /**
- * Created March 17, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -39,7 +39,7 @@
 
 #define FIREBASE_RECONNECTION_TIMEOUT_MSEC 5000
 
-#define FIREBASE_AUTH_PLACEHOLDER (const char *)FPSTR("<auth_token>")
+#define FIREBASE_AUTH_PLACEHOLDER FPSTR("<auth_token>")
 
 #if !defined(FIREBASE_ASYNC_QUEUE_LIMIT)
 #if defined(ESP8266)
@@ -243,7 +243,7 @@ public:
         send_timer.feed(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval);
     }
 
-    size_t tcpWrite(async_request_handler_t::tcp_client_type client_type, Client *client, void *atcp_config, uint8_t *data, size_t size)
+    size_t tcpWrite(async_request_handler_t::tcp_client_type client_type, Client *client, void *atcp_config, const uint8_t *data, size_t size)
     {
         if (client_type == tcp_client_type_sync)
             return client ? client->write(data, size) : 0;

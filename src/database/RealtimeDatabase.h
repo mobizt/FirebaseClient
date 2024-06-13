@@ -1,5 +1,5 @@
 /**
- * Created June 7, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -40,14 +40,15 @@ class RealtimeDatabase : public RTDBResultBase
 public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
-    RealtimeDatabase(const String &url = "")
+    explicit RealtimeDatabase(const String &url = "")
     {
         this->service_url = url;
     };
 
-    RealtimeDatabase &operator=(RealtimeDatabase &rhs)
+    RealtimeDatabase &operator=(const RealtimeDatabase &rhs)
     {
         this->service_url = rhs.service_url;
+        this->app_token = rhs.app_token;
         return *this;
     }
 
@@ -883,15 +884,15 @@ public:
         app_token_t *aToken = appToken();
         for (size_t i = 0; i < cVec.size(); i++)
         {
-            AsyncClientClass *aClient = reinterpret_cast<AsyncClientClass *>(cVec[i]);
-            if (aClient)
+            AsyncClientClass *client = reinterpret_cast<AsyncClientClass *>(cVec[i]);
+            if (client)
             {
                 // Store the auth time in all async clients.
                 // The auth time will be used to reconnect the Stream when auth changed.
                 if (aToken && aToken->auth_ts > 0 && aToken->authenticated)
-                    aClient->setAuthTs(aToken->auth_ts);
-                aClient->process(true);
-                aClient->handleRemove();
+                    client->setAuthTs(aToken->auth_ts);
+                client->process(true);
+                client->handleRemove();
             }
         }
     }
@@ -942,10 +943,9 @@ private:
     {
         if (avec_addr > 0)
         {
-            std::vector<uint32_t> *cVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
+            const std::vector<uint32_t> *aVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
             List vec;
-            if (cVec)
-                return vec.existed(*cVec, app_addr) ? app_token : nullptr;
+            return vec.existed(*aVec, app_addr) ? app_token : nullptr;
         }
         return nullptr;
     }
@@ -968,13 +968,13 @@ private:
 
     void asyncRequest(async_request_data_t &request, const char *payload = "")
     {
-        app_token_t *app_token = appToken();
+        app_token_t *atoken = appToken();
 
-        if (!app_token)
+        if (!atoken)
             return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
-        request.opt.app_token = app_token;
-        request.opt.auth_param = app_token->auth_data_type != user_auth_data_no_token && app_token->auth_type != auth_access_token && app_token->auth_type != auth_sa_access_token;
+        request.opt.app_token = atoken;
+        request.opt.auth_param = atoken->auth_data_type != user_auth_data_no_token && atoken->auth_type != auth_access_token && atoken->auth_type != auth_sa_access_token;
         String extras = request.opt.auth_param ? ".json?auth=" + String(FIREBASE_AUTH_PLACEHOLDER) : ".json";
 
         addParams(request.opt.auth_param, extras, request.method, request.options, request.file);
@@ -1068,7 +1068,7 @@ private:
         }
     }
 
-    void setFileStatus(async_data_item_t *sData, async_request_data_t &request)
+    void setFileStatus(async_data_item_t *sData, const async_request_data_t &request)
     {
         if ((request.file && request.file->filename.length()) || request.opt.ota)
         {

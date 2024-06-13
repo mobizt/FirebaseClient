@@ -1,5 +1,5 @@
 /**
- * Created June 5, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -80,10 +80,10 @@ namespace firebase
 
             last = msg;
             ms = millis();
-            dbg_item dbg;
-            dbg.msg = msg;
-            dbg.ts = ms;
-            dbgVec.push_back(dbg);
+            dbg_item dbgt;
+            dbgt.msg = msg;
+            dbgt.ts = ms;
+            dbgVec.push_back(dbgt);
             available = true;
         }
 

@@ -1,5 +1,5 @@
 /**
- * Created March 10, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -46,7 +46,7 @@ public:
     // Free reserved memory at pointer.
     void release(void *ptr)
     {
-        void **p = (void **)ptr;
+        void **p = reinterpret_cast<void **>(ptr);
         if (*p)
         {
             free(*p);
@@ -56,13 +56,13 @@ public:
 
     void *alloc(size_t len, bool clear = true)
     {
-        void *p;
+        void *p = nullptr;
         size_t newLen = getReservedLen(len);
 #if defined(BOARD_HAS_PSRAM)
         if (ESP.getPsramSize() > 0)
-            p = (void *)ps_malloc(newLen);
+            p = reinterpret_cast<void *>(ps_malloc(newLen));
         else
-            p = (void *)malloc(newLen);
+            p = reinterpret_cast<void *>(malloc(newLen));
 
         if (!p)
             return NULL;
@@ -71,7 +71,7 @@ public:
 #if defined(ESP8266_USE_EXTERNAL_HEAP)
         ESP.setExternalHeap();
 #endif
-        p = (void *)malloc(newLen);
+        p = reinterpret_cast<void *>(malloc(newLen));
         bool nn = p ? true : false;
 #if defined(ESP8266_USE_EXTERNAL_HEAP)
         ESP.resetHeap();

@@ -1,7 +1,7 @@
 /**
  * BSSL_TCP_Client v2.0.13 for Arduino devices.
  *
- * Created June 9, 2024
+ * Created June 12, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2023 K. Suwatchai (Mobizt)
@@ -72,7 +72,6 @@ BSSL_TCP_Client::BSSL_TCP_Client()
 
 BSSL_TCP_Client::~BSSL_TCP_Client()
 {
-    stop();
     setClient(nullptr);
 }
 
@@ -167,7 +166,7 @@ int BSSL_TCP_Client::read(uint8_t *buf, size_t size)
 
 int BSSL_TCP_Client::send(const char *data)
 {
-    return write((uint8_t *)data, strlen(data));
+    return write(reinterpret_cast<const uint8_t *>(data), strlen(data));
 }
 
 int BSSL_TCP_Client::print(const char *data)
@@ -184,7 +183,7 @@ int BSSL_TCP_Client::print(int data)
 {
     char buf[64];
     memset(buf, 0, 64);
-    sprintf(buf, (const char *)FPSTR("%d"), data);
+    sprintf(buf, "%d", data);
     int ret = send(buf);
     return ret;
 }
@@ -194,7 +193,7 @@ int BSSL_TCP_Client::println(const char *data)
     int len = send(data);
     if (len < 0)
         return len;
-    int sz = send((const char *)FPSTR("\r\n"));
+    int sz = send("\r\n");
     if (sz < 0)
         return sz;
     return len + sz;
@@ -209,7 +208,7 @@ int BSSL_TCP_Client::println(int data)
 {
     char buf[64];
     memset(buf, 0, 64);
-    sprintf(buf, (const char *)FPSTR("%d\r\n"), data);
+    sprintf(buf, "%d\r\n", data);
     int ret = send(buf);
     return ret;
 }
@@ -228,7 +227,7 @@ size_t BSSL_TCP_Client::write(uint8_t data)
 
 size_t BSSL_TCP_Client::write_P(PGM_P buf, size_t size) { return _ssl_client.write_P(buf, size); }
 
-size_t BSSL_TCP_Client::write(const char *buf) { return write((const uint8_t *)buf, strlen(buf)); }
+size_t BSSL_TCP_Client::write(const char *buf) { return write(reinterpret_cast<const uint8_t *>(buf), strlen(buf)); }
 
 size_t BSSL_TCP_Client::write(Stream &stream) { return _ssl_client.write(stream); }
 
@@ -402,7 +401,7 @@ void BSSL_TCP_Client::setPrivateKey(const char *private_key) { return _ssl_clien
 
 bool BSSL_TCP_Client::loadCACert(Stream &stream, size_t size)
 {
-    char *dest = mStreamLoad(stream, size);
+    const char *dest = mStreamLoad(stream, size);
     bool ret = false;
     if (dest)
     {
@@ -436,7 +435,7 @@ BSSL_TCP_Client &BSSL_TCP_Client::operator=(const BSSL_TCP_Client &other)
 
 char *BSSL_TCP_Client::mStreamLoad(Stream &stream, size_t size)
 {
-    char *dest = (char *)malloc(size + 1);
+    char *dest = reinterpret_cast<char *>(malloc(size + 1));
     if (!dest)
     {
         return nullptr;
