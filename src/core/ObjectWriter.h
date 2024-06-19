@@ -286,6 +286,32 @@ public:
     void clear(String *buf, size_t bufSize) { owriter.clearBuf(buf, bufSize); }
 };
 
+class BaseObjects : public Printable
+{
+
+protected:
+    size_t bufferSize = 0;
+    String *buffers = nullptr;
+    BufWriter wr;
+
+public:
+    BaseObjects() {}
+    ~BaseObjects() { clear(); }
+    void init(String *buffers, size_t size)
+    {
+        this->buffers = buffers;
+        this->bufferSize = size;
+    }
+    const char *c_str() const { return buffers[0].c_str(); }
+    size_t printTo(Print &p) const override { return p.print(buffers[0].c_str()); }
+    void clear() { wr.clear(buffers, bufferSize); }
+    void setContent(const String &content)
+    {
+        clear();
+        buffers[0] = content;
+    }
+};
+
 class BaseO1 : public Printable
 {
 
@@ -305,161 +331,86 @@ public:
     }
 };
 
-class BaseO2 : public Printable
+class BaseO2 : public BaseObjects
 {
 
 protected:
     static const size_t bufSize = 2;
     String buf[bufSize];
-    BufWriter wr;
 
 public:
-    BaseO2() {}
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
-    void clear() { wr.clear(buf, bufSize); }
-    void setContent(const String &content)
-    {
-        clear();
-        buf[0] = content;
-    }
+    BaseO2() { init(buf, bufSize); }
 };
 
-class BaseO4 : public Printable
+class BaseO4 : public BaseObjects
 {
-
 protected:
     static const size_t bufSize = 4;
     String buf[bufSize];
-    BufWriter wr;
 
 public:
-    BaseO4() {}
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
-    void clear() { wr.clear(buf, bufSize); }
-    void setContent(const String &content)
-    {
-        clear();
-        buf[0] = content;
-    }
+    BaseO4() { init(buf, bufSize); }
 };
 
-class BaseO6 : public Printable
+class BaseO6 : public BaseObjects
 {
 
 protected:
     static const size_t bufSize = 6;
     String buf[bufSize];
-    BufWriter wr;
 
 public:
-    BaseO6() {}
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
-    void clear() { wr.clear(buf, bufSize); }
-    void setContent(const String &content)
-    {
-        clear();
-        buf[0] = content;
-    }
+    BaseO6() { init(buf, bufSize); }
 };
 
-class BaseO8 : public Printable
+class BaseO8 : public BaseObjects
 {
 protected:
     static const size_t bufSize = 8;
     String buf[bufSize];
-    BufWriter wr;
 
 public:
-    BaseO8() {}
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
-    void clear() { wr.clear(buf, bufSize); }
-    void setContent(const String &content)
-    {
-        clear();
-        buf[0] = content;
-    }
+    BaseO8() { init(buf, bufSize); }
 };
 
-class BaseO10 : public Printable
+class BaseO10 : public BaseObjects
 {
-
 protected:
     static const size_t bufSize = 10;
     String buf[bufSize];
-    BufWriter wr;
 
 public:
-    BaseO10() {}
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
-    void clear() { wr.clear(buf, bufSize); }
-    void setContent(const String &content)
-    {
-        clear();
-        buf[0] = content;
-    }
+    BaseO10() { init(buf, bufSize); }
 };
 
-class BaseO12 : public Printable
+class BaseO12 : public BaseObjects
 {
-
 protected:
     static const size_t bufSize = 12;
     String buf[bufSize];
-    BufWriter wr;
 
 public:
-    BaseO12() {}
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
-    void clear() { wr.clear(buf, bufSize); }
-    void setContent(const String &content)
-    {
-        clear();
-        buf[0] = content;
-    }
+    BaseO12() { init(buf, bufSize); }
 };
 
-class BaseO16 : public Printable
+class BaseO16 : public BaseObjects
 {
 protected:
     static const size_t bufSize = 16;
     String buf[bufSize];
-    BufWriter wr;
 
 public:
-    BaseO16() {}
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
-    void clear() { wr.clear(buf, bufSize); }
-    void setContent(const String &content)
-    {
-        clear();
-        buf[0] = content;
-    }
+    BaseO16() { init(buf, bufSize); }
 };
 
-class BaseO26 : public Printable
+class BaseO26 : public BaseObjects
 {
 protected:
     static const size_t bufSize = 26;
     String buf[bufSize];
-    BufWriter wr;
 
 public:
-    BaseO26() {}
-    const char *c_str() const { return buf[0].c_str(); }
-    size_t printTo(Print &p) const override { return p.print(buf[0].c_str()); }
-    void clear() { wr.clear(buf, bufSize); }
-    void setContent(const String &content)
-    {
-        clear();
-        buf[0] = content;
-    }
+    BaseO26() { init(buf, bufSize); }
 };
 
 namespace firebase

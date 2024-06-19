@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-13T11:51:10Z`
+Revision `2024-06-19T11:47:09Z`
 
 ## Table of Contents
 
@@ -1178,7 +1178,18 @@ The `file_operating_mode` enums included the following.
 
 - `file_mode_open_remove`
 
-The following example shows how the `FileConfig` works with `SPIFFS` filesystem.
+In the `<file_callback>` function, the `File` object parameter was passed by reference which it needs to initiate by user code inside this callback function when opening the file. The `<filename>` and  `file_operating_mode` are the path of file to be opened and the opening mode.
+
+The following example shows how the `FileConfig` works with `SPIFFS` filesystem. The macros `FILE_OPEN_MODE_READ`, `FILE_OPEN_MODE_WRITE`, and `FILE_OPEN_MODE_APPEND` used in the example code are the file modes which are defined as appropiate file mode constants that are already defined in the `FS` class depending on the platforms.
+
+In some Arduino platforms, the `SPI.h` may require in the user sketch.
+
+The errors: `error opening file (-103)`, `error reading file (-104)` and `error writing file (-105)` can be occurred when file cannot be accessed.
+
+Library does not handle the `Filesystem` directly unless the `File` object that initiated by user as mentioned above.  
+
+In case of file errors, you have to verify your hardware and your code to make sure that `Filesystem` was already initiated and hardwares (card/adapters or flash storage) and wirings are ok.
+
 
 ```cpp
 
@@ -1207,6 +1218,11 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode)
 }
 
 FileConfig media_file("/media.mp4", fileCallback);
+
+void setup()
+{
+    MY_FS.begin();
+}
 
 void download()
 {
@@ -1523,9 +1539,9 @@ Then the examples provided by this library can be divided into two use cases i.e
 
 For Firebase services, inside the `Async` and `Sync` folders, the examples based on the Firebase REST APIs are located. The additional cases examples are also included in those folders.
 
-For user that ever used the other legacy Firebase library for Realtime database, the examples in the `Simple` folder under the `RealtimeDatabase` folder provide the basic usage that is enough for simple use.
+For user that ever used the other legacy Firebase library for Realtime database, the examples in the `Simple` folder under the `RealtimeDatabase` folder, provide the basic usage that is enough for simple use.
 
-The examples under the `App` folder contains 4 sub folders:
+The `App` folder contains 3 sub folders:
 
 - `AppInitialization` folder is for authentication examples.
 
@@ -1536,7 +1552,7 @@ The examples under the `App` folder contains 4 sub folders:
 The following section will provided the basic (bare minimum) code example and the links: for the examples, class and functions description and Google API documentation.
 
 <details>
-<summary>For the Library Examples Structure, please click here</summary>
+<summary>For the Library Examples Structure, please click here.</summary>
 
 * [App](/examples/App/)
     * [AppInitialization](/examples/App/AppInitialization/)
@@ -1895,7 +1911,7 @@ The following section will provided the basic (bare minimum) code example and th
 </details>
 
 
-  #### The Async Example with Callback.
+  #### The Async function with Callback Example.
 
 ```cpp
 #include <Arduino.h>
@@ -1940,6 +1956,9 @@ WiFiClientSecure ssl_client;
 WiFiSSLClient ssl_client;
 #endif
 
+// This is for shorten the name, 
+// if this AsyncClient naming conflicts with other library,
+// please change it or use AsyncClientClass directly.
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
@@ -2082,6 +2101,9 @@ WiFiClientSecure ssl_client;
 WiFiSSLClient ssl_client;
 #endif
 
+// This is for shorten the name, 
+// if this AsyncClient naming conflicts with other library,
+// please change it or use AsyncClientClass directly.
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
@@ -2234,6 +2256,9 @@ WiFiClientSecure ssl_client;
 WiFiSSLClient ssl_client;
 #endif
 
+// This is for shorten the name, 
+// if this AsyncClient naming conflicts with other library,
+// please change it or use AsyncClientClass directly.
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));

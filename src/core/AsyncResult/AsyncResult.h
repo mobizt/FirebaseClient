@@ -171,7 +171,11 @@ private:
         else
         {
             val[ares_ns::res_uid] = FPSTR("task_");
-            val[ares_ns::res_uid] += String(millis());
+            String ms = String(millis());
+            // Roll over millis counter value (0-9999).
+            if (ms.length() > 4)
+                ms.remove(0, ms.length() - 4);
+            val[ares_ns::res_uid] += ms;
         }
     }
 
