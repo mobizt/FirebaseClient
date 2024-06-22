@@ -430,7 +430,7 @@ String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const
 - `parent` - The Firestore::Parent object included project Id and database Id in its constructor.
 - `documentPath` - The relative path of document to create in the collection.
 - `mask` - The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
-- `document` - A Firestore document.
+- `document` - A Firestore document. See [Firestore document class and functions](/resources/docs/firestore_database_document.md).
 
 **Returns:**
 
@@ -457,7 +457,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `parent` - The Firestore::Parent object included project Id and database Id in its constructor.
 - `documentPath` - The relative path of document to create in the collection.
 - `mask` - The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
-- `document` - A Firestore document.
+- `document` - A Firestore document. See [Firestore document class and functions](/resources/docs/firestore_database_document.md).
 - `aResult` - The async result (AsyncResult)
 
 
@@ -482,7 +482,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `parent` - The Firestore::Parent object included project Id and database Id in its constructor.
 - `documentPath` - The relative path of document to create in the collection.
 - `mask` - The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
-- `document` - A Firestore document.
+- `document` - A Firestore document. See [Firestore document class and functions](/resources/docs/firestore_database_document.md).
 - `cb` - The async result callback (AsyncResultCallback).
 - `uid` - The user specified UID of async result (optional).
 
@@ -510,7 +510,7 @@ String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const
 - `collectionId` - The relative path of document collection id to create the document.
 - `documentId` - The document id of document to be created.
 - `mask` - The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
-- `document` - A Firestore document.
+- `document` - A Firestore document. See [Firestore document class and functions](/resources/docs/firestore_database_document.md).
 
 **Returns:**
 
@@ -539,7 +539,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `collectionId` - The relative path of document collection id to create the document.
 - `documentId` - The document id of document to be created.
 - `mask` - The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
-- `document` - A Firestore document.
+- `document` - A Firestore document. See [Firestore document class and functions](/resources/docs/firestore_database_document.md).
 - `aResult` - The async result (AsyncResult)
 
 
@@ -566,7 +566,7 @@ void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const S
 - `collectionId` - The relative path of document collection id to create the document.
 - `documentId` - The document id of document to be created.
 - `mask` - The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
-- `document` - A Firestore document.
+- `document` - A Firestore document. See [Firestore document class and functions](/resources/docs/firestore_database_document.md).
 - `cb` - The async result callback (AsyncResultCallback).
 - `uid` - The user specified UID of async result (optional).
 

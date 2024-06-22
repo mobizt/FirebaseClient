@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created June 22, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -454,9 +454,9 @@ public:
     }
 
     /**
-     * A Firestore document constructor with object.
+     * A Firestore document constructor with `Values::Value` object.
      * @param key The key of an object.
-     * @param value The value of an object.
+     * @param value The value of an `Values::Value` object.
      */
     explicit Document(const String &key, T value)
     {
@@ -465,9 +465,9 @@ public:
     }
 
     /**
-     * Add the object to Firestore document.
+     * Add the `Values::Value` object to Firestore document.
      * @param key The key of an object.
-     * @param value The value of an object.
+     * @param value The value of an `Values::Value` object.
      */
     Document &add(const String &key, T value)
     {

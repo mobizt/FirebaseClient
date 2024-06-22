@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-19T11:47:09Z`
+Revision `2024-06-22T06:00:12Z`
 
 ## Table of Contents
 
@@ -2951,17 +2951,18 @@ ENABLE_GSM_NETWORK
 The following options are not yet defined in [**Config.h**](src/Config.h) and can be defined by user.
 
 ```cpp
-FIREBASE_ETHERNET_MODULE_LIB `"EthernetLibrary.h"` // For the Ethernet library to work with external Ethernet module
-FIREBASE_ETHERNET_MODULE_CLASS EthernetClass // For the Ethernet class object of Ethernet library to work with external Ethernet module
-FIREBASE_ETHERNET_MODULE_TIMEOUT 2000 // For the time out in milliseconds to wait external Ethernet module to connect to network
-ENABLE_ESP8266_ENC28J60_ETH //  For native core library ENC28J60 Ethernet module support in ESP8266
-ENABLE_ESP8266_W5500_ETH // For native core library W5500 Ethernet module support in ESP8266
-ENABLE_ESP8266_W5100_ETH // For native core library W5100 Ethernet module support in ESP8266
-FIREBASE_DISABLE_ONBOARD_WIFI // For disabling on-board WiFI functionality in case external Client usage
-FIREBASE_DISABLE_NATIVE_ETHERNET // For disabling native (sdk) Ethernet functionality in case external Client usage
-ENABLE_ASYNC_TCP_CLIENT // For Async TCP Client usage
-FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit setting for an async client
-FIREBASE_DEFAULT_DEBUG_PORT // For Firebase.printf debug port
+FIREBASE_ETHERNET_MODULE_LIB `"EthernetLibrary.h"` // For the Ethernet library to work with external Ethernet module.
+FIREBASE_ETHERNET_MODULE_CLASS EthernetClass // For the Ethernet class object of Ethernet library to work with external Ethernet module.
+FIREBASE_ETHERNET_MODULE_TIMEOUT 2000 // For the time out in milliseconds to wait external Ethernet module to connect to network.
+ENABLE_ESP8266_ENC28J60_ETH //  For native core library ENC28J60 Ethernet module support in ESP8266.
+ENABLE_ESP8266_W5500_ETH // For native core library W5500 Ethernet module support in ESP8266.
+ENABLE_ESP8266_W5100_ETH // For native core library W5100 Ethernet module support in ESP8266.
+FIREBASE_DISABLE_ONBOARD_WIFI // For disabling on-board WiFI functionality in case external Client usage.
+FIREBASE_DISABLE_NATIVE_ETHERNET // For disabling native (sdk) Ethernet functionality in case external Client usage.
+ENABLE_ASYNC_TCP_CLIENT // For Async TCP Client usage.
+FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit setting for an async client.
+FIREBASE_PRINTF_PORT // For Firebase.printf debug port.
+FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size.
 ```
 
 You can assign the optional build options using one of the following methods.

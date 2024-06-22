@@ -100,19 +100,19 @@
  * #define FIREBASE_ETHERNET_MODULE_CLASS EthernetClass
  * #define FIREBASE_ETHERNET_MODULE_TIMEOUT 2000
  *
- * 🏷️ For native core library ENC28J60 Ethernet module support in ESP8266
+ * 🏷️ For native core library ENC28J60 Ethernet module support in ESP8266.
  * #define ENABLE_ESP8266_ENC28J60_ETH
  *
- * 🏷️ For native core library W5500 Ethernet module support in ESP8266
+ * 🏷️ For native core library W5500 Ethernet module support in ESP8266.
  * #define ENABLE_ESP8266_W5500_ETH
  *
- * 🏷️ For native core library W5100 Ethernet module support in ESP8266
+ * 🏷️ For native core library W5100 Ethernet module support in ESP8266.
  * #define ENABLE_ESP8266_W5100_ETH
  *
- * 🏷️ For disabling on-board WiFI functionality in case external Client usage
+ * 🏷️ For disabling on-board WiFI functionality in case external Client usage.
  * #define FIREBASE_DISABLE_ONBOARD_WIFI
  *
- * 🏷️ For disabling native (sdk) Ethernet functionality in case external Client usage
+ * 🏷️ For disabling native (sdk) Ethernet functionality in case external Client usage.
  * #define FIREBASE_DISABLE_NATIVE_ETHERNET
  *
  * 🏷️ For Async TCP Client usage.
@@ -121,8 +121,11 @@
  * 🏷️ For maximum async queue limit setting for an async client
  * #define FIREBASE_ASYNC_QUEUE_LIMIT 10
  * 
- * 🏷️ For Firebase.printf debug port
+ * 🏷️ For Firebase.printf debug port.
  * #define FIREBASE_PRINTF_PORT Serial
+ * 
+ * * 🏷️ For Firebase.printf buffer size.
+ * #define FIREBASE_PRINTF_BUFFER 2048
  */
 
 #if __has_include("UserConfig.h")

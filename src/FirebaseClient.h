@@ -1,5 +1,5 @@
 /**
- * Created June 7, 2024
+ * Created June 22, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -238,7 +238,12 @@ namespace firebase
 
         void printf(const char *format, ...)
         {
-            int size = 512;
+#if defined(FIREBASE_PRINTF_BUFFER)
+            int size = FIREBASE_PRINTF_BUFFER;
+#else
+            // Default buffer size for large JSON response.
+            int size = 4096;
+#endif
             char s[size];
             va_list va;
             va_start(va, format);

@@ -138,13 +138,17 @@ void loop()
         // We will create the document in the parent path "a0/b?
         // a0 is the collection id, b? is the document id in collection a0.
 
-        String documentPath = "a0/b" + String(cnt);
+        String documentPath = "a0/b";
+        documentPath += cnt;
 
         // If the document path contains space e.g. "a b c/d e f"
         // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
 
-        // double
-        Values::DoubleValue dblV(random(1, 500) / 100.0);
+        // double (obsoleted)
+        // Values::DoubleValue dblV(1234.567891);
+
+        // double value with precision.
+        Values::DoubleValue dblV(number_t(1234.567891, 6));
 
         // boolean
         Values::BooleanValue bolV(true);
@@ -179,8 +183,11 @@ void loop()
         Values::MapValue mapV("name", Values::StringValue("wrench"));
         mapV.add("mass", Values::StringValue("1.3kg")).add("count", Values::IntegerValue(3));
 
-        // lat long
-        Values::GeoPointValue geoV(1.486284, 23.678198);
+        // lat long (Obsoleated)
+        // Values::GeoPointValue geoV(1.486284, 23.678198);
+
+        // lat long with precision
+        Values::GeoPointValue geoV(number_t(1.486284, 6), number_t(23.678198, 6));
 
         Document<Values::Value> doc("myDouble", Values::Value(dblV));
         doc.add("myBool", Values::Value(bolV)).add("myInt", Values::Value(intV)).add("myNull", Values::Value(nullV));

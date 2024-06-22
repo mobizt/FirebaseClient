@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created June 22, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -104,7 +104,7 @@ namespace Values
     public:
         /**
          * A string value.
-         *  @param value The string vakue
+         *  @param value The string value.
          */
         explicit StringValue(const String &value)
         {
@@ -131,7 +131,7 @@ namespace Values
     public:
         /**
          * A boolean value.
-         *  @param value The boolean value
+         *  @param value The boolean value.
          */
         explicit BooleanValue(bool value)
         {
@@ -159,7 +159,7 @@ namespace Values
     public:
         /**
          * A integer value.
-         *  @param value The integer value
+         *  @param value The integer value.
          */
         explicit IntegerValue(int value) : buf(StringValue(String(value)).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
@@ -182,10 +182,16 @@ namespace Values
 
     public:
         /**
-         * A double value.
-         *  @param value The double value
+         * [OBSOLETED] A double value.
+         *  @param value The double value.
          */
         explicit DoubleValue(double value) : buf(String(value)) { getVal(); }
+
+        /**
+         * A double value.
+         *  @param value The `number_t` represents the double value.
+         */
+        explicit DoubleValue(const number_t &value) : buf(value.c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
@@ -208,7 +214,7 @@ namespace Values
         /**
          * A timestamp value.
          * Precise only to microseconds. When stored, any additional precision is rounded down.
-         * @param value The timestamp value string
+         * @param value The timestamp value string.
          */
         explicit TimestampValue(const String &value) : buf(StringValue(value).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
@@ -233,7 +239,7 @@ namespace Values
          * A bytes value.
          * Must not exceed 1 MiB - 89 bytes. Only the first 1,500 bytes are considered by queries.
          * A base64-encoded string.
-         * @param value The bytes value string
+         * @param value The bytes value string.
          */
         explicit BytesValue(const String &value) : buf(StringValue(value).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
@@ -257,7 +263,7 @@ namespace Values
     public:
         /**
          * A reference to a document.
-         * @param value The resource name of document
+         * @param value The resource name of document.
          */
         explicit ReferenceValue(const String &value) : buf(StringValue(value).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
@@ -281,9 +287,9 @@ namespace Values
 
     public:
         /**
-         * A geo point value representing a point on the surface of Earth.
-         * @param lat The latitude
-         * @param lng The longitude
+         * [OBSOLETED} A GeoPointValue representing a point on the surface of Earth.
+         * @param lat The latitude.
+         * @param lng The longitude.
          */
         explicit GeoPointValue(double lat, double lng)
         {
@@ -291,6 +297,19 @@ namespace Values
             jut.addObject(buf, FPSTR("longitude"), String(lng), false, true);
             getVal();
         }
+
+        /**
+         * A geo point value representing a point on the surface of Earth.
+         * @param lat The number_t represents the latitude value.
+         * @param lng The number_t represents the longitude value.
+         */
+        explicit GeoPointValue(const number_t &lat, const number_t &lng)
+        {
+            jut.addObject(buf, FPSTR("latitude"), lat.c_str(), false);
+            jut.addObject(buf, FPSTR("longitude"), lng.c_str(), false, true);
+            getVal();
+        }
+
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
@@ -339,7 +358,7 @@ namespace Values
         /**
          * An array value.
          * Cannot directly contain another array value, though can contain an map which contains another array.
-         * @param value The object except for array value
+         * @param value The object except for array value.
          */
         template <typename T>
         explicit ArrayValue(T value)
@@ -407,7 +426,8 @@ namespace Values
 
         /**
          * A map value.
-         * @param value The map value
+         * @param key The key.
+         * @param value The value.
          */
         template <typename T>
         explicit MapValue(const String &key, T value)
