@@ -128,7 +128,7 @@
  * #define FIREBASE_PRINTF_BUFFER 2048
  * 
  * * 🏷️ For TCP session timeout in seconds.
- * The default TCP session timeout is 180 seconds (3 minutes)
+ * The default TCP session timeout is 150 seconds.
  * #define FIREBASE_SESSION_TIMEOUT
  */
 

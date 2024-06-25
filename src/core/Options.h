@@ -272,4 +272,8 @@
 #define FIREBASE_ASYNC_CLIENT AsyncClient
 #endif
 
+#if !defined(FIREBASE_SESSION_TIMEOUT)
+#define FIREBASE_SESSION_TIMEOUT 150
+#endif
+
 #endif

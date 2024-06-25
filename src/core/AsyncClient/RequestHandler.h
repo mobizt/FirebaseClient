@@ -96,7 +96,7 @@ public:
     file_config_data file_data;
     bool base64 = false;
     bool ota = false;
-    uint32_t app_ota_status_addr = 0;
+    uint32_t ul_dl_task_running_addr = 0;
     uint32_t payloadLen = 0;
     uint32_t dataLen = 0;
     uint32_t payloadIndex = 0;

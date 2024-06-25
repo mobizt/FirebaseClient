@@ -1429,13 +1429,7 @@ private:
         this->port = port;
 
         if (client && client->connected())
-        {
-#if defined(FIREBASE_SESSION_TIMEOUT)
             session_timer.feed(FIREBASE_SESSION_TIMEOUT);
-#else
-            session_timer.feed(3 * 60);
-#endif
-        }
 
         return sData->return_type;
     }
@@ -2139,10 +2133,10 @@ private:
         if (sData->sse && !sse)
             return;
 
-        if (!sData->auth_used && sData->request.ota && sData->request.app_ota_status_addr > 0)
+        if (!sData->auth_used && sData->request.ota && sData->request.ul_dl_task_running_addr > 0)
         {
-            bool *ota_task_running = reinterpret_cast<bool *>(sData->request.app_ota_status_addr);
-            *ota_task_running = false;
+            bool *ul_dl_task_running = reinterpret_cast<bool *>(sData->request.ul_dl_task_running_addr);
+            *ul_dl_task_running = false;
         }
 
 #if defined(ENABLE_DATABASE)
@@ -2184,10 +2178,10 @@ private:
             updateEvent(app_event);
             sData->aResult.updateData();
 
-            if (!sData->auth_used && sData->request.ota && sData->request.app_ota_status_addr > 0)
+            if (!sData->auth_used && (sData->request.ota || sData->download || sData->upload) && sData->request.ul_dl_task_running_addr > 0)
             {
-                bool *ota_task_running = reinterpret_cast<bool *>(sData->request.app_ota_status_addr);
-                *ota_task_running = true;
+                bool *ul_dl_task_running = reinterpret_cast<bool *>(sData->request.ul_dl_task_running_addr);
+                *ul_dl_task_running = true;
             }
 
             if (networkConnect(sData) == function_return_type_failure)
