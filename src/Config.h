@@ -126,6 +126,10 @@
  * 
  * * 🏷️ For Firebase.printf buffer size.
  * #define FIREBASE_PRINTF_BUFFER 2048
+ * 
+ * * 🏷️ For TCP session timeout in seconds.
+ * The default TCP session timeout is 180 seconds (3 minutes)
+ * #define FIREBASE_SESSION_TIMEOUT
  */
 
 #if __has_include("UserConfig.h")

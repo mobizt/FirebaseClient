@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.15-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.16-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-25T01:54:21Z`
+Revision `2024-06-25T05:25:05Z`
 
 ## Table of Contents
 
@@ -507,7 +507,7 @@ In case using ESP8266 without `PSRAM` and you want to reduce the memory usage, y
 Note that, because the receive buffer size was set to minimum safe value, 1024, the large server response may not be able to handle. 
 
 > [!WARNING] 
-> In ESP32, `WiFiClient` and `WiFiClientSecure` classes are unable to detect the server disconnection in case server session time out and the TCP session was kept alive for reuse in most tasks this library.  The server session timed out will not happen if data was sent or received within the server time out period. User have to close the session manually by calling `WiFiClient::stop()` or `WiFiClientSecure::stop()` when no data was sent/received within 2-3 minutes before starting the new HTTP request.
+> In ESP32, `WiFiClient` and `WiFiClientSecure` classes are unable to detect the server disconnection in case server session time out and the TCP session was kept alive for reuse in most tasks this library.  The server session timed out will not happen if data was sent or received within the server time out period. The TCP session timeout in seconds in this library can be set via macro or build flag `FIREBASE_SESSION_TIMEOUT`.
 
 
 - ### Async Client
@@ -2963,6 +2963,7 @@ ENABLE_ASYNC_TCP_CLIENT // For Async TCP Client usage.
 FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit setting for an async client.
 FIREBASE_PRINTF_PORT // For Firebase.printf debug port.
 FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size.
+FIREBASE_SESSION_TIMEOUT // For TCP session timeout in seconds. The default TCP session timeout is 180 seconds (3 minutes)
 ```
 
 You can assign the optional build options using one of the following methods.
