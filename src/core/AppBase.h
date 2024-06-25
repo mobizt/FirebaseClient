@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created June 25, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -95,7 +95,7 @@ protected:
     }
 
     template <typename T>
-    void setAppBase(T &app, uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr) { app.setApp(app_addr, app_token, avec_addr); }
+    void setAppBase(T &app, uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t app_ota_status_addr) { app.setApp(app_addr, app_token, avec_addr, app_ota_status_addr); }
 };
 
 #endif

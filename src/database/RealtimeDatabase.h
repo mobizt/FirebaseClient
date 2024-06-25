@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created June 25, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -81,6 +81,7 @@ public:
         this->app_addr = 0;
         this->app_token = nullptr;
         this->avec_addr = 0; // AsyncClient vector (list) address
+        this->app_ota_status_addr = 0;
     }
 
     /**
@@ -903,6 +904,7 @@ private:
 
     // FirebaseApp address and FirebaseApp vector address
     uint32_t app_addr = 0, avec_addr = 0;
+    uint32_t app_ota_status_addr = 0;
     app_token_t *app_token = nullptr;
 
     struct async_request_data_t
@@ -932,11 +934,12 @@ private:
         }
     };
 
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
+    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t app_ota_status_addr)
     {
         this->app_addr = app_addr;
         this->app_token = app_token;
         this->avec_addr = avec_addr; // AsyncClient vector (list) address
+        this->app_ota_status_addr = app_ota_status_addr;
     }
 
     app_token_t *appToken()
@@ -996,6 +999,7 @@ private:
             sData->request.ota = true;
             sData->request.base64 = true;
             sData->aResult.download_data.ota = true;
+            sData->request.app_ota_status_addr = app_ota_status_addr;
         }
 
         if (request.file && sData->upload)

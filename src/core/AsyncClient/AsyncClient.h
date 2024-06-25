@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created June 25, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -605,6 +605,7 @@ private:
         if (ret != function_return_type_complete)
             return ret;
 
+        // HTTP error is allowed in case non-auth task to get its response.
         if (!readResponse(sData))
         {
             // In case HTTP or TCP read error.
@@ -788,7 +789,10 @@ private:
 
             // Required for sync task.
             if (!sData->async)
+            {
+                sData->aResult.lastError.isError();
                 lastErr.isError();
+            }
         }
         else if (sData && sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
         {
@@ -798,7 +802,10 @@ private:
 
             // Required for sync task.
             if (!sData->async)
+            {
+                sData->aResult.lastError.isError();
                 lastErr.isError();
+            }
         }
     }
 
@@ -2120,6 +2127,12 @@ private:
         if (sData->sse && !sse)
             return;
 
+        if (!sData->auth_used && sData->request.ota && sData->request.app_ota_status_addr > 0)
+        {
+            bool *ota_task_running = reinterpret_cast<bool *>(sData->request.app_ota_status_addr);
+            *ota_task_running = false;
+        }
+
 #if defined(ENABLE_DATABASE)
         clearSSE(&sData->aResult.rtdbResult);
 #endif
@@ -2158,6 +2171,12 @@ private:
             updateDebug(app_debug);
             updateEvent(app_event);
             sData->aResult.updateData();
+
+            if (!sData->auth_used && sData->request.ota && sData->request.app_ota_status_addr > 0)
+            {
+                bool *ota_task_running = reinterpret_cast<bool *>(sData->request.app_ota_status_addr);
+                *ota_task_running = true;
+            }
 
             if (networkConnect(sData) == function_return_type_failure)
             {

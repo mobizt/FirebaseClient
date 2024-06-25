@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created June 25, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -68,6 +68,7 @@ namespace firebase
         Timer req_timer, auth_timer, err_timer, app_ready_timer;
         bool deinit = false;
         bool processing = false;
+        bool ota_task_running = false;
         uint32_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
         JSONUtil json;
         String extras, subdomain, host;
@@ -366,6 +367,10 @@ namespace firebase
 
             if (!getClient())
                 return false;
+
+            // Prevent authentication task from running when OTA update is running.
+            if (ota_task_running)
+                return true;
 
             // Deinitialize
             if (deinit && auth_data.user_auth.status._event == auth_event_uninitialized)
@@ -733,7 +738,7 @@ namespace firebase
          * @param app The Firebase services calss object e.g. RealtimeDatabase, Storage, Messaging, CloudStorage and CloudFunctions.
          */
         template <typename T>
-        void getApp(T &app) { setAppBase(app, app_addr, &auth_data.app_token, reinterpret_cast<uint32_t>(&aVec)); }
+        void getApp(T &app) { setAppBase(app, app_addr, &auth_data.app_token, reinterpret_cast<uint32_t>(&aVec), reinterpret_cast<uint32_t>(&ota_task_running)); }
 
         /**
          * Get the auth token.

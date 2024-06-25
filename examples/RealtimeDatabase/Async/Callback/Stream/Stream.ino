@@ -203,6 +203,7 @@ void printResult(AsyncResult &aResult)
             float v3 = RTDB.to<float>();
             double v4 = RTDB.to<double>();
             String v5 = RTDB.to<String>();
+            
         }
         else
         {

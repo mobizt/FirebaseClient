@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created June 25, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -96,6 +96,7 @@ public:
     file_config_data file_data;
     bool base64 = false;
     bool ota = false;
+    uint32_t app_ota_status_addr = 0;
     uint32_t payloadLen = 0;
     uint32_t dataLen = 0;
     uint32_t payloadIndex = 0;

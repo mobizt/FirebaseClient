@@ -166,7 +166,7 @@ void loop()
 
         Database.set<object_t>(aClient3, "/test/stream/path1/number", json, asyncCB, "setTask1");
 
-        Database.set<object_t>(aClient3, "/test/stream/path2/number", random(100000, 200000), asyncCB, "setTask2");
+        Database.set<int>(aClient3, "/test/stream/path2/number", random(100000, 200000), asyncCB, "setTask2");
     }
 }
 

@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created June 25, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -62,6 +62,7 @@ public:
         this->app_addr = 0;
         this->app_token = nullptr;
         this->avec_addr = 0; // AsyncClient vector (list) address
+        this->app_ota_status_addr = 0;
     }
 
     /**
@@ -781,6 +782,8 @@ private:
     String uid;
     // FirebaseApp address and FirebaseApp vector address
     uint32_t app_addr = 0, avec_addr = 0;
+    // Not used but required.
+    uint32_t app_ota_status_addr = 0;
     app_token_t *app_token = nullptr;
 
     void url(const String &url)
@@ -788,11 +791,12 @@ private:
         this->service_url = url;
     }
 
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr)
+    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t app_ota_status_addr)
     {
         this->app_addr = app_addr;
         this->app_token = app_token;
         this->avec_addr = avec_addr; // AsyncClient vector (list) address
+        this->app_ota_status_addr = app_ota_status_addr;
     }
 
     app_token_t *appToken()
