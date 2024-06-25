@@ -183,10 +183,11 @@ private:
     AsyncResult *refResult = nullptr;
     AsyncResult aResult;
     int netErrState = 0;
-    uint32_t auth_ts = 0, conn_ts = 0;
+    uint32_t auth_ts = 0;
     uint32_t cvec_addr = 0;
     uint32_t result_addr = 0;
     uint32_t sync_send_timeout_sec = 0, sync_read_timeout_sec = 0;
+    Timer session_timer;
     Client *client = nullptr;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
     AsyncTCPConfig *async_tcp_config = nullptr;
@@ -234,13 +235,8 @@ private:
 
     void newCon(async_data_item_t *sData, const char *host, uint16_t port)
     {
-#if defined(FIREBASE_SESSION_TIMEOUT)
-        int session_timeout_msec = FIREBASE_SESSION_TIMEOUT * 60 * 1000;
-#else
-        int session_timeout_msec = 3 * 60 * 1000;
-#endif
 
-        if ((!sData->sse && conn_ts > 0 && millis() - conn_ts > session_timeout_msec) || (sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined) ||
+        if ((!sData->sse && session_timer.remaining() == 0) || (sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined) ||
             strcmp(this->host.c_str(), host) != 0 || this->port != port)
         {
             stop(sData);
@@ -1432,8 +1428,14 @@ private:
         this->host = host;
         this->port = port;
 
-        if (client && !client->connected())
-            conn_ts = millis();
+        if (client && client->connected())
+        {
+#if defined(FIREBASE_SESSION_TIMEOUT)
+            session_timer.feed(FIREBASE_SESSION_TIMEOUT);
+#else
+            session_timer.feed(3 * 60);
+#endif
+        }
 
         return sData->return_type;
     }
@@ -2011,7 +2013,6 @@ private:
 
         clear(host);
         port = 0;
-        conn_ts = 0;
     }
 
     async_data_item_t *createSlot(slot_options_t &options)
