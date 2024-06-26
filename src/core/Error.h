@@ -1,5 +1,5 @@
 /**
- * Created May 5, 2024
+ * Created June 26, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -143,7 +143,7 @@ private:
                 err.setError(code, FPSTR("TCP send failed"));
                 break;
             case FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT:
-                err.setError(code, FPSTR("TCP receive time out"));
+                err.setError(code, FPSTR("TCP receive timed out"));
                 break;
             case FIREBASE_ERROR_TCP_DISCONNECTED:
                 err.setError(code, FPSTR("TCP disconnected"));
@@ -176,7 +176,7 @@ private:
                 err.setError(code, FPSTR("firmware end failed"));
                 break;
             case FIREBASE_ERROR_STREAM_TIMEOUT:
-                err.setError(code, FPSTR("stream time out"));
+                err.setError(code, FPSTR("stream connection timed out"));
                 break;
             case FIREBASE_ERROR_STREAM_AUTH_REVOKED:
                 err.setError(code, FPSTR("auth revoked"));

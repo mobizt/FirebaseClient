@@ -1,5 +1,5 @@
 
-Revision `2024-06-11T01:14:40Z`
+Revision `2024-06-26T07:53:25Z`
 
 # Async Firebase Client library for Arduino Frequently Asked Questions.
 
@@ -7,7 +7,7 @@ Revision `2024-06-11T01:14:40Z`
 
 - [Q1: Why I get an error `"TCP connection failed"`?](#q1-why-i-get-an-error-tcp-connection-failed)
 - [Q2: Why I get an error `"TCP send failed"`?](#q1-why-i-get-an-error-tcp-connection-failed)
-- [Q3: Why I get an error `"TCP receive time out"`?](#q3-why-i-get-an-error-tcp-receive-time-out)
+- [Q3: Why I get an error `"TCP receive timed out"`?](#q3-why-i-get-an-error-tcp-receive-time-out)
 - [Q4: Why I get an error `"TCP disconnected"`?](#q4-why-i-get-an-error-tcp-disconnected)
 - [Q5: What should I do when I get the error `"error opening file"`?](#q5-what-should-i-do-when-i-get-the-error-error-opening-file)
 - [Q6: What should I do when I get the error `"error reading file"` or `"error writng file"`?](#q6-what-should-i-do-when-i-get-the-error-error-reading-file-or-error-writng-file)
@@ -17,12 +17,12 @@ Revision `2024-06-11T01:14:40Z`
 - [Q10: What should I do when I get the error `"JWT, token signing fail"`?](#q10-what-should-i-do-when-i-get-the-error-jwt-token-signing-fail)
 - [Q11: What should I do when I get the error `"too low sketch space"`?](#q11-what-should-i-do-when-i-get-the-error-too-low-sketch-space)
 - [Q12: What should I do when I get the error `"firmware write failed"` or `"firmware end failed"`?](#q12-what-should-i-do-when-i-get-the-error-firmware-write-failed-or-firmware-end-failed)
-- [Q13: What should I do when I get the error `"stream time out"`?](#q13-what-should-i-do-when-i-get-the-error-stream-time-out)
+- [Q13: What should I do when I get the error `"stream connection timed out"`?](#q13-what-should-i-do-when-i-get-the-error-stream-connection-timed-out)
 - [Q14: What should I do when I get the error `"auth revoked"`?](#q14-what-should-i-do-when-i-get-the-error-auth-revoked)
 - [Q15: Why I get the error `"app was not assigned"`?](#q15-why-i-get-the-error-app-was-not-assigned)
 - [Q16: Why I get the error `"operation was cancelled"`?](#q16-why-i-get-the-error-operation-was-cancelled)
 - [Q17: Why I get the error `"JWT, time was not set or not valid"`?](#q17-why-i-get-the-error-jwt-time-was-not-set-or-not-valid)
-- [Q18: Why sometimes the Reltime Database Stream does not work when WiFi was disconnected and reconnected and I get the error `"stream time out"`?](#q18-why-sometimes-the-reltime-database-stream-does-not-work-when-wifi-was-disconnected-and-reconnected-and-i-get-the-error-stream-time-out)
+- [Q18: Why sometimes the Reltime Database Stream does not work when WiFi was disconnected and reconnected and I get the error `"stream connection timed out"`?](#q18-why-sometimes-the-reltime-database-stream-does-not-work-when-wifi-was-disconnected-and-reconnected-and-i-get-the-error-stream-time-out)
 - [Q19: Can I use delay in this library?](#q19-can-i-use-delay-in-this-library)
 - [Q20: Can I change the send timeout?](#q20-can-i-change-the-send-timeout)
 - [Q21: Can I change the read timeout?](#q21-can-i-change-the-read-timeout)
@@ -122,7 +122,7 @@ Then there are many possible causes of connection issue that cause the SSL clien
 
 - The send timeout is too small. In case sync task, the send timeout can be set via `AsyncClientClass::setSyncSendTimeout`. The async task send timeout is 30 seconds and cannot be changed and you have to fix the possible issues instead of increasing the send timeout.
 
-### Q3: Why I get an error `"TCP receive time out"`?
+### Q3: Why I get an error `"TCP receive timed out"`?
 
 #### A3: The time that used while processing the server response (header or payload) is greater than the read timeout.
 
@@ -221,7 +221,7 @@ In case download process interrupted, see [Q1: Why I get an error `"TCP connecti
 
 In case unkbown error, please verify your free flash and do not write any file to the filesytem that decreased the free flash space. 
 
-### Q13: What should I do when I get the error `"stream time out"`?
+### Q13: What should I do when I get the error `"stream connection timed out"`?
 
 #### A13: The error can be occured when no keep-alive event received during the stream timeout period.
 
@@ -259,7 +259,7 @@ When no more memory to be allocated for new task. You have to reduce the memory 
 
 The timestamp that you set in the uint32_t variable of time status callback function is not valid or it was not set.
 
-### Q18: Why sometimes the Reltime Database Stream does not work when WiFi was disconnected and reconnected and I get the error `"stream time out"`?
+### Q18: Why sometimes the Reltime Database Stream does not work when WiFi was disconnected and reconnected and I get the error `"stream connection timed out"`?
 
 #### A18: The problem is due to the WiFi reconnection interferences.
 
@@ -269,7 +269,7 @@ Please read [Possible WiFi issues](#possible-wifi-issues).
 
 #### A19: Yes, but it's not recommend.
 
-If the delay was used in the loop it causes many errors e.g. read and send time out and stream time out.
+If the delay was used in the loop it causes many errors e.g. read and send timed out and stream connection timed out.
 
 ### Q20: Can I change the send timeout?
 
@@ -306,7 +306,7 @@ The memory allocation failure due to out of memory can cause the dangling pointe
 
 If network disconnected and re-connected, network connected but internet access was missing, and no events included keep-alive event received within 40 seconds, the Stream will be closed and restarted automatically as long as the async client's queue was running.
 
-The `stream time out`error will show in case time out (no events received within 40 seconds).
+The `stream connection timed out`error will show in case timed out (no events received within 40 seconds).
 
 If you are intend to totally remove the steam task from the queue, and stream is running, use `AsyncClientClass::stopAsync()`. If you are not sure that stream was running or stopped because of other tasks, use `AsyncClientClass::stopAsync(true)` to cancell all tasks and remove all tasks from the queue.
 

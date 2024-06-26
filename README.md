@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.17-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.2.18-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-25T23:50:45Z`
+Revision `2024-06-26T07:53:25Z`
 
 ## Table of Contents
 
@@ -479,7 +479,7 @@ To run multiple `SSE mode (HTTP Streaming)` tasks, you have to run each task in 
 The async task handler will kepp the async tasks running as long as it places in the main `loop` function.
 
 > [!IMPORTANT]  
-> Do not underestimate the important the async task handler location and usage. The non-async third-party library and user blocking code, `delay` function and placing the async task handler in the `millis` code blocks, will cause the async task to run slowly and the time out can of operation will be occurred. The  `SSE mode (HTTP Streaming)` task will not update in realtime.
+> Do not underestimate the important the async task handler location and usage. The non-async third-party library and user blocking code, `delay` function and placing the async task handler in the `millis` code blocks, will cause the async task to run slowly and the timed out will be occurred. The  `SSE mode (HTTP Streaming)` task will not update in realtime.
 > The async task handler i.e. `FirebaseApp::loop()`, `RealtimeDatabase::loop()`, `Storage::loop()`, `Messaging::loop()`, `CloudStorage::loop()` and `CloudFunctions` should be placed inside the main `loop` function, at the top most of the `loop`.
 
 > [!NOTE] 
@@ -507,7 +507,7 @@ In case using ESP8266 without `PSRAM` and you want to reduce the memory usage, y
 Note that, because the receive buffer size was set to minimum safe value, 1024, the large server response may not be able to handle. 
 
 > [!WARNING] 
-> In ESP32, `WiFiClient` and `WiFiClientSecure` classes are unable to detect the server disconnection in case server session time out and the TCP session was kept alive for reuse in most tasks this library.  The server session timed out will not happen if data was sent or received within the server time out period. The TCP session timeout in seconds in this library can be set via macro or build flag `FIREBASE_SESSION_TIMEOUT`.
+> In ESP32, when using `WiFiClient` with `ESP_SSLClient` classes, `WiFiClient` was unable to detect the server disconnection in case server session timed out and the TCP session was kept alive for reuse in most tasks in this library. The TCP session timeout in seconds (equal to or greater than 150 seconds) in this library can be set via `AsyncClientClass::setSessionTimeout`.
 
 
 - ### Async Client
@@ -2953,7 +2953,7 @@ The following options are not yet defined in [**Config.h**](src/Config.h) and ca
 ```cpp
 FIREBASE_ETHERNET_MODULE_LIB `"EthernetLibrary.h"` // For the Ethernet library to work with external Ethernet module.
 FIREBASE_ETHERNET_MODULE_CLASS EthernetClass // For the Ethernet class object of Ethernet library to work with external Ethernet module.
-FIREBASE_ETHERNET_MODULE_TIMEOUT 2000 // For the time out in milliseconds to wait external Ethernet module to connect to network.
+FIREBASE_ETHERNET_MODULE_TIMEOUT 2000 // For the timeout in milliseconds to wait external Ethernet module to connect to network.
 ENABLE_ESP8266_ENC28J60_ETH //  For native core library ENC28J60 Ethernet module support in ESP8266.
 ENABLE_ESP8266_W5500_ETH // For native core library W5500 Ethernet module support in ESP8266.
 ENABLE_ESP8266_W5100_ETH // For native core library W5100 Ethernet module support in ESP8266.
@@ -2963,7 +2963,6 @@ ENABLE_ASYNC_TCP_CLIENT // For Async TCP Client usage.
 FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit setting for an async client.
 FIREBASE_PRINTF_PORT // For Firebase.printf debug port.
 FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size.
-FIREBASE_SESSION_TIMEOUT // For TCP session timeout in seconds. The default TCP session timeout is 150 seconds
 ```
 
 You can assign the optional build options using one of the following methods.
@@ -2985,7 +2984,7 @@ For external Ethernet module integation used with function `setEthernetClient`, 
 
 `FIREBASE_ETHERNET_MODULE_CLASS` is the name of static object defined from class e.g. `Ethernet`.
 
-`FIREBASE_ETHERNET_MODULE_TIMEOUT` is the time out in milliseconds to wait network connection.
+`FIREBASE_ETHERNET_MODULE_TIMEOUT` is the timeout in milliseconds to wait for network connection.
 
 For disabling predefined options instead of editing the [**Config.h**](src/Config.h) or using `#undef` in `UserConfig.h`, you can define these build flags with these names or macros in `UserConfig.h`.
 

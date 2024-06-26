@@ -98,7 +98,7 @@ String data()
 
 8. ## 🔹  bool eventTimeout()
 
-Get the SSE mode (HTTP Streaming) event time out status.
+Get the SSE mode (HTTP Streaming) event timed out status.
 
 ```cpp
 bool eventTimeout()
@@ -106,7 +106,7 @@ bool eventTimeout()
 
 **Returns:**
 
-- `bool` - The SSE mode (HTTP Streaming) event time out status.
+- `bool` - The SSE mode (HTTP Streaming) event timed out status.
 
 
 9. ## 🔹  realtime_database_data_type type()

@@ -1,5 +1,5 @@
 /**
- * Created June 25, 2024
+ * Created June 26, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -186,7 +186,7 @@ private:
     uint32_t auth_ts = 0;
     uint32_t cvec_addr = 0;
     uint32_t result_addr = 0;
-    uint32_t sync_send_timeout_sec = 0, sync_read_timeout_sec = 0;
+    uint32_t sync_send_timeout_sec = 0, sync_read_timeout_sec = 0, session_timeout_sec = 0;
     Timer session_timer;
     Client *client = nullptr;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
@@ -236,7 +236,7 @@ private:
     void newCon(async_data_item_t *sData, const char *host, uint16_t port)
     {
 
-        if ((!sData->sse && session_timer.remaining() == 0) || (sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined) ||
+        if ((!sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC && session_timer.remaining() == 0) || (sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == async_state_undefined) ||
             strcmp(this->host.c_str(), host) != 0 || this->port != port)
         {
             stop(sData);
@@ -1428,8 +1428,8 @@ private:
         this->host = host;
         this->port = port;
 
-        if (client && client->connected())
-            session_timer.feed(FIREBASE_SESSION_TIMEOUT);
+        if (client && client->connected() && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC)
+            session_timer.feed(session_timeout_sec);
 
         return sData->return_type;
     }
@@ -2420,18 +2420,25 @@ public:
     void setETag(const String &etag) { reqEtag = etag; }
 
     /**
-     * Set the sync task's send time out in seconds.
+     * Set the sync task's send timeout in seconds.
      *
-     * @param timeoutSec The TCP write time out in seconds.
+     * @param timeoutSec The TCP write timeout in seconds.
      */
     void setSyncSendTimeout(uint32_t timeoutSec) { sync_send_timeout_sec = timeoutSec; }
 
     /**
-     * Set the sync task's read time out in seconds.
+     * Set the sync task's read timeout in seconds.
      *
-     * @param timeoutSec The TCP read time out in seconds.
+     * @param timeoutSec The TCP read timeout in seconds.
      */
     void setSyncReadTimeout(uint32_t timeoutSec) { sync_read_timeout_sec = timeoutSec; }
+
+    /**
+     * Set the TCP session timeout in seconds.
+     *
+     * @param timeoutSec The TCP session timeout in seconds.
+     */
+    void setSessionTimeout(uint32_t timeoutSec) { session_timeout_sec = timeoutSec; }
 };
 
 #endif

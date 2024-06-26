@@ -125,7 +125,7 @@ void setETag(const String &etag)
 
 10. ## 🔹  void setSyncSendTimeout(uint32_t timeoutSec)
 
-Set the sync task's send time out in seconds.
+Set the sync task's send timeout in seconds.
 
 ```cpp
 void setSyncSendTimeout(uint32_t timeoutSec)
@@ -133,12 +133,12 @@ void setSyncSendTimeout(uint32_t timeoutSec)
 
 **Params:**
 
-- `timeoutSec` - The TCP write time out in seconds.
+- `timeoutSec` - The TCP write timeout in seconds.
 
 
 11. ## 🔹  void setSyncReadTimeout(uint32_t timeoutSec) 
 
-Set the sync task's read time out in seconds.
+Set the sync task's read timeout in seconds.
 
 ```cpp
 void setSyncReadTimeout(uint32_t timeoutSec) 
@@ -146,5 +146,18 @@ void setSyncReadTimeout(uint32_t timeoutSec)
 
 **Params:**
 
-- `timeoutSec` - The TCP read time out in seconds.
+- `timeoutSec` - The TCP read timeout in seconds.
+
+
+12. ## 🔹  void setSessionTimeout(uint32_t timeoutSec)
+
+Set the TCP session timeout in seconds.
+
+```cpp
+void setSessionTimeout(uint32_t timeoutSec)
+```
+
+**Params:**
+
+- `timeoutSec` - The TCP session timeout in seconds.
 

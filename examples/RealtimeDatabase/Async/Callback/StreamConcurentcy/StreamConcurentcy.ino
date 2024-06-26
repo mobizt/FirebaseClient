@@ -114,6 +114,12 @@ void setup()
     ssl_client2.setDebugLevel(1);
     ssl_client3.setDebugLevel(1);
 
+    // This timeout in seconds is required for WiFiClient used with ESP_SSLClient to limit the timeout of keep-alive TCP sesssion
+    // as the WiFiClient does not detect the server disconnection, WiFiClient::connected returns true and write error can be occurred. 
+    // This timeout was not applied for Stream.
+    aClient1.setSessionTimeout(150);
+    aClient2.setSessionTimeout(150);
+
     initializeApp(aClient3, app, getAuth(user_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
