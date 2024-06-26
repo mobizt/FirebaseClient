@@ -299,6 +299,7 @@ taskCount   KEYWORD2
 unsetAsyncResult    KEYWORD2
 setSSEFilters   KEYWORD2
 setJWTProcessor KEYWORD2
+setSessionTimeout   KEYWORD2
 
 ###################
 # Struct (KEYWORD3)
