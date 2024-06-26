@@ -1,5 +1,5 @@
 /**
- * Created June 22, 2024
+ * Created June 26, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -329,26 +329,8 @@ namespace Values
         bool flags[11];
 
         template <typename T>
-        bool isExisted(T value)
-        {
-            String tmp = value.val();
-            for (size_t i = 0; i <= firestore_const_key_mapValue; i++)
-            {
-                if (tmp.indexOf(firestore_const_key[i].text) > -1)
-                {
-                    if (flags[i])
-                        return true;
-                    flags[i] = 1;
-                }
-            }
-
-            return false;
-        }
-        template <typename T>
         void set(T value)
         {
-            if (isExisted(value))
-                return;
             owriter.setPair(buf, FPSTR("values"), value.val(), true);
         }
 
@@ -375,14 +357,11 @@ namespace Values
         template <typename T>
         ArrayValue &add(T value)
         {
-            if (!isExisted(value))
-            {
-                if (buf.length() == 0)
-                    set(value);
-                else
-                    owriter.addMember(buf, value.val(), false, "]}");
-                getVal();
-            }
+            if (buf.length() == 0)
+                set(value);
+            else
+                owriter.addMember(buf, value.val(), false, "]}");
+            getVal();
             return *this;
         }
         const char *c_str() const { return buf.c_str(); }
