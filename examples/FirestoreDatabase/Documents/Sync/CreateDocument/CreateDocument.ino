@@ -10,8 +10,8 @@
  * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
  * <documentPath> - The relative path of document to create in the collection.
  * <DocumentMask> - The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
- * <collectionId> - The document id of document to be created.
- * <documentId> - The relative path of document collection id to create the document.
+ * <collectionId> - The relative path of document collection id to create the document.
+ * <documentId> - The document id of document to be created.
  * <Document> - The Firestore document.
  *
  * The Firebase project Id should be only the name without the firebaseio.com.
