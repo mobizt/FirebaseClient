@@ -148,16 +148,3 @@ void setSyncReadTimeout(uint32_t timeoutSec)
 
 - `timeoutSec` - The TCP read timeout in seconds.
 
-
-12. ## 🔹  void setSessionTimeout(uint32_t timeoutSec)
-
-Set the TCP session timeout in seconds.
-
-```cpp
-void setSessionTimeout(uint32_t timeoutSec)
-```
-
-**Params:**
-
-- `timeoutSec` - The TCP session timeout in seconds.
-

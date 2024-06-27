@@ -1,7 +1,7 @@
 /**
- * BSSL_TCP_Client v2.0.13 for Arduino devices.
+ * BSSL_TCP_Client v2.0.14 for Arduino devices.
  *
- * Created June 12, 2024
+ * Created June 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2023 K. Suwatchai (Mobizt)
@@ -298,13 +298,13 @@ public:
     void stop() override;
 
     /**
-     * Set the TCP timeout in seconds.
+     * Set the TCP connection timeout in seconds.
      * @param seconds The TCP timeout in seconds.
      */
     int setTimeout(uint32_t seconds);
 
     /**
-     * Get the TCP timeout in seconds.
+     * Get the TCP connection timeout in seconds.
      * @return The TCP timeout in seconds.
      */
     int getTimeout();
@@ -314,6 +314,21 @@ public:
      * @param handshake_timeout The SSL handshake timeout in seconds.
      */
     void setHandshakeTimeout(unsigned long handshake_timeout);
+
+    /**
+     * Set the TCP session timeout in seconds.
+     *
+     * @param seconds The TCP session timeout in seconds.
+     * 
+     * The minimum session timeout value is 60 seconds.
+     * Set 0 to disable session timed out.
+     * 
+     * If There is no data to send (write) within this period, 
+     * the current connection will be closed and reconnect.
+     * 
+     * This requires when ESP32 WiFiClient was used.
+     */
+    void setSessionTimeout(uint32_t seconds);
 
     /**
      * Wait for all receive buffer data read.
@@ -427,6 +442,7 @@ private:
     // Renameing from _timeout which also defined in parent's Stream class.
     unsigned long _timeout_ms = 15000;
     unsigned long _handshake_timeout = 60000;
+    unsigned long _tcp_session_timeout = 0;
 
     char *mStreamLoad(Stream &stream, size_t size);
 };

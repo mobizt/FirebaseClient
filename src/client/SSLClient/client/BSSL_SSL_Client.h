@@ -1,7 +1,7 @@
 /**
- * BSSL_SSL_Client library v1.0.13 for Arduino devices.
+ * BSSL_SSL_Client library v1.0.14 for Arduino devices.
  *
- * Created June 12, 2024
+ * Created June 27, 2024
  *
  * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
  *
@@ -45,6 +45,8 @@
 #else
 #define EMBED_SSL_ENGINE_BASE_OVERRIDE
 #endif
+
+#define BSSL_SSL_CLIENT_MIN_SESSION_TIMEOUT_SEC 60
 
 #if defined(USE_LIB_SSL_ENGINE) || defined(USE_EMBED_SSL_ENGINE)
 
@@ -140,6 +142,8 @@ public:
     void setTimeout(unsigned int timeoutMs);
 
     void setHandshakeTimeout(unsigned int timeoutMs);
+
+    void setSessionTimeout(uint32_t seconds);
 
     void flush() override;
 
@@ -247,6 +251,8 @@ private:
 
     bool mConnectionValidate(const char *host, IPAddress ip, uint16_t port);
 
+    bool mCheckSessionTimeout();
+
     int mRunUntil(const unsigned target, unsigned long timeout = 0);
 
     unsigned mUpdateEngine();
@@ -346,10 +352,13 @@ private:
     // Renameing from _timeout which also defined in parent's Stream class.
     unsigned long _timeout_ms = 15000;
     unsigned long _handshake_timeout = 60000;
+    unsigned long _tcp_session_timeout = 0;
+    unsigned long _session_ts = 0;
     bool _isSSLEnabled = false;
     String _host;
     uint16_t _port = 0;
     IPAddress _ip;
+    bool _connect_with_ip = false;
 };
 
 #endif

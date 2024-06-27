@@ -507,7 +507,7 @@ In case using ESP8266 without `PSRAM` and you want to reduce the memory usage, y
 Note that, because the receive buffer size was set to minimum safe value, 1024, the large server response may not be able to handle. 
 
 > [!WARNING] 
-> In ESP32, when using `WiFiClient` with `ESP_SSLClient` classes, `WiFiClient` was unable to detect the server disconnection in case server session timed out and the TCP session was kept alive for reuse in most tasks in this library. The TCP session timeout in seconds (equal to or greater than 150 seconds) in this library can be set via `AsyncClientClass::setSessionTimeout`.
+> In ESP32, when using `WiFiClient` with `ESP_SSLClient` classes, `WiFiClient` was unable to detect the server disconnection in case server session timed out and the TCP session was kept alive for reusage in most tasks in this library. The TCP session timeout in seconds (>= 60 seconds) can be set via `ESP_SSLClient::setSessionTimeout`.
 
 
 - ### Async Client

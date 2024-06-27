@@ -114,11 +114,12 @@ void setup()
     ssl_client2.setDebugLevel(1);
     ssl_client3.setDebugLevel(1);
 
-    // This timeout in seconds is required for WiFiClient used with ESP_SSLClient to limit the timeout of keep-alive TCP sesssion
-    // as the WiFiClient does not detect the server disconnection, WiFiClient::connected returns true and write error can be occurred. 
-    // This timeout was not applied for Stream.
-    aClient1.setSessionTimeout(150);
-    aClient2.setSessionTimeout(150);
+    // In ESP32, when using WiFiClient with ESP_SSLClient, the WiFiClient was unable to detect
+    // the server disconnection in case server session timed out and the TCP session was kept alive for reusage.
+    // The TCP session timeout in seconds (>= 60 seconds) can be set via `ESP_SSLClient::setSessionTimeout`.
+    ssl_client1.setSessionTimeout(150);
+    ssl_client1.setSessionTimeout(150);
+    ssl_client3.setSessionTimeout(150);
 
     initializeApp(aClient3, app, getAuth(user_auth), asyncCB, "authTask");
 

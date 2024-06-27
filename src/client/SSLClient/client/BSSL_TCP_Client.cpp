@@ -1,7 +1,7 @@
 /**
- * BSSL_TCP_Client v2.0.13 for Arduino devices.
+ * BSSL_TCP_Client v2.0.14 for Arduino devices.
  *
- * Created June 12, 2024
+ * Created June 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2023 K. Suwatchai (Mobizt)
@@ -279,6 +279,14 @@ void BSSL_TCP_Client::setHandshakeTimeout(unsigned long handshake_timeout)
     _ssl_client.setHandshakeTimeout(_handshake_timeout);
 }
 
+void BSSL_TCP_Client::setSessionTimeout(uint32_t seconds)
+{
+    if (seconds > 0 && seconds < BSSL_SSL_CLIENT_MIN_SESSION_TIMEOUT_SEC)
+        seconds = BSSL_SSL_CLIENT_MIN_SESSION_TIMEOUT_SEC;
+    _tcp_session_timeout = seconds;
+    _ssl_client.setSessionTimeout(seconds);
+}
+
 void BSSL_TCP_Client::flush()
 {
     if (!_basic_client)
@@ -426,8 +434,10 @@ BSSL_TCP_Client &BSSL_TCP_Client::operator=(const BSSL_TCP_Client &other)
     _use_insecure = other._use_insecure;
     _timeout_ms = other._timeout_ms;
     _handshake_timeout = other._handshake_timeout;
+    _tcp_session_timeout = other._tcp_session_timeout;
     _ssl_client.setTimeout(_timeout_ms);
     _ssl_client.setHandshakeTimeout(_handshake_timeout);
+    _ssl_client.setSessionTimeout(_tcp_session_timeout);
     if (_use_insecure)
         _ssl_client.setInsecure();
     return *this;

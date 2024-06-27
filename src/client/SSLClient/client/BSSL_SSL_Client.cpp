@@ -1,7 +1,7 @@
 /**
- * BSSL_SSL_Client library v1.0.13 for Arduino devices.
+ * BSSL_SSL_Client library v1.0.14 for Arduino devices.
  *
- * Created June 12, 2024
+ * Created June 27, 2024
  *
  * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
  *
@@ -132,6 +132,9 @@ int BSSL_SSL_Client::connect(IPAddress ip, uint16_t port)
     if (!mConnectBasicClient(nullptr, ip, port))
         return 0;
 
+    _connect_with_ip = true;
+    _session_ts = millis();
+
     return 1;
 }
 
@@ -142,6 +145,9 @@ int BSSL_SSL_Client::connect(const char *host, uint16_t port)
 
     if (!mConnectBasicClient(host, IPAddress(), port))
         return 0;
+
+    _connect_with_ip = false;
+    _session_ts = millis();
 
     return 1;
 }
@@ -276,15 +282,21 @@ size_t BSSL_SSL_Client::write(const uint8_t *buf, size_t size)
     if (!mIsClientInitialized(false))
         return 0;
 
+    if (!mCheckSessionTimeout())
+        return 0;
+
+    _session_ts = millis();
+
     if (!_secure)
         return _basic_client->write(buf, size);
 
-    const char *func_name = __func__;
 #if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
     // super debug
     if (_debug_level >= esp_ssl_debug_dump)
         ESP_SSLCLIENT_DEBUG_PORT.write(buf, size);
 #endif
+
+    const char *func_name = __func__;
     // check if the socket is still open and such
     if (!mSoftConnected(func_name) || !buf || !size)
         return 0;
@@ -440,6 +452,7 @@ int BSSL_SSL_Client::connectSSL(IPAddress ip, uint16_t port)
 
     _ip = ip;
     _port = port;
+    _connect_with_ip = true;
 
     return mConnectSSL(nullptr);
 }
@@ -455,6 +468,7 @@ int BSSL_SSL_Client::connectSSL(const char *host, uint16_t port)
 
     _host = host;
     _port = port;
+    _connect_with_ip = false;
 
     return mConnectSSL(host);
 }
@@ -496,6 +510,8 @@ void BSSL_SSL_Client::stop()
 void BSSL_SSL_Client::setTimeout(unsigned int timeoutMs) { _timeout_ms = timeoutMs; }
 
 void BSSL_SSL_Client::setHandshakeTimeout(unsigned int timeoutMs) { _handshake_timeout = timeoutMs; }
+
+void BSSL_SSL_Client::setSessionTimeout(uint32_t seconds) { _tcp_session_timeout = seconds; }
 
 void BSSL_SSL_Client::flush()
 {
@@ -1091,6 +1107,7 @@ BSSL_SSL_Client &BSSL_SSL_Client::operator=(const BSSL_SSL_Client &other)
     _use_insecure = other._use_insecure;
     _timeout_ms = other._timeout_ms;
     _handshake_timeout = other._handshake_timeout;
+    _tcp_session_timeout = other._tcp_session_timeout;
     return *this;
 }
 
@@ -1574,6 +1591,7 @@ int BSSL_SSL_Client::mConnectSSL(const char *host)
     _handshake_done = true;
     _is_connected = true;
     _secure = true;
+    _session_ts = millis();
 
     // Save session
     if (_session)
@@ -1598,6 +1616,52 @@ bool BSSL_SSL_Client::mConnectionValidate(const char *host, IPAddress ip, uint16
             : (ip != _ip || port != _port))
     {
         _basic_client->stop();
+    }
+
+    mCheckSessionTimeout();
+
+    return true;
+}
+
+bool BSSL_SSL_Client::mCheckSessionTimeout()
+{
+    const char *func_name = __func__;
+
+    if (_tcp_session_timeout >= BSSL_SSL_CLIENT_MIN_SESSION_TIMEOUT_SEC && _session_ts > 0 && millis() - _session_ts > _tcp_session_timeout * 1000)
+    {
+        if (_basic_client && _basic_client->connected())
+        {
+#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+            esp_ssl_debug_print(PSTR("The session was timed out. Starting new server connection."), _debug_level, esp_ssl_debug_info, func_name);
+#endif
+            int ret = 0;
+            if (!_secure)
+            {
+                _basic_client->flush();
+                _basic_client->stop();
+
+                if (_connect_with_ip)
+                    ret = connect(_ip, _port);
+                else
+                    ret = connect(_host.c_str(), _port);
+            }
+            else
+            {
+                stop();
+                if (_connect_with_ip)
+                    ret = connectSSL(_ip, _port);
+                else
+                    ret = connectSSL(_host.c_str(), _port);
+            }
+
+            if (!ret)
+            {
+#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+                esp_ssl_debug_print(PSTR("Failed while starting new server connection."), _debug_level, esp_ssl_debug_error, func_name);
+#endif
+                return false;
+            }
+        }
     }
 
     return true;
