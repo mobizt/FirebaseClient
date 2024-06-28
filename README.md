@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-28T03:02:14Z`
+Revision `2024-06-28T03:08:27Z`
 
 ## Table of Contents
 
@@ -43,18 +43,19 @@ Revision `2024-06-28T03:02:14Z`
     8. [Working with Filesystems and BLOB](#working-with-filesystems-and-blob)
     9. [Working with Networks](#working-with-networks)
     10. [Examples](#examples)
-    11. [Firebase Client Class and Static Functions Usage](#firebase-client-class-and-static-functions-usage)
-    12. [Async Client Class Usage](#async-client-class-usage)
-    13. [Firebase App Usage](#firebase-app-usage)
-    14. [Async Result Usage](#async-result-usage)
-    15. [Realtime Database Usage](#realtime-database-usage)
-    16. [Realtime Database Result Usage](#realtime-database-result-usage)
-    17. [Google Cloud Firestore Database Usage](#google-cloud-firestore-database-usage)
-    18. [Google Cloud Messaging Usage](#google-cloud-messaging-usage)
-    19. [Firebase Storage Usage](#firebase-storage-usage)
-    20. [Google Cloud Storage Usage](#google-cloud-storage-usage)
-    21. [Google Cloud Functions Usage](#google-cloud-functions-usage)
-    22. [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
+    11. [The Value Placeholders](#the-value-placeholders)
+    12. [Firebase Client Class and Static Functions Usage](#firebase-client-class-and-static-functions-usage)
+    13. [Async Client Class Usage](#async-client-class-usage)
+    14. [Firebase App Usage](#firebase-app-usage)
+    15. [Async Result Usage](#async-result-usage)
+    16. [Realtime Database Usage](#realtime-database-usage)
+    17. [Realtime Database Result Usage](#realtime-database-result-usage)
+    18. [Google Cloud Firestore Database Usage](#google-cloud-firestore-database-usage)
+    19. [Google Cloud Messaging Usage](#google-cloud-messaging-usage)
+    20. [Firebase Storage Usage](#firebase-storage-usage)
+    21. [Google Cloud Storage Usage](#google-cloud-storage-usage)
+    22. [Google Cloud Functions Usage](#google-cloud-functions-usage)
+    23. [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
 8. [Project Preparation and Setup](#project-preparation-and-setup)
     1. [Authentication Getting Started](#authentication-getting-started)
     2. [Realtime Database Getting Started](#realtime-database-getting-started)
@@ -2370,7 +2371,7 @@ void printError(int code, const String &msg)
 }
 ```
 
-- #### The Value Placeholders.
+- ### The Value Placeholders.
 
 The library provides the placeholder structs for boolean, integer, float with custom precision, double with custom precision and object represents JSON or map and Array to use as the inputs of the functions.
 
@@ -2390,31 +2391,31 @@ There is no `JSON` serialization/deserialization class in this library unless th
 
 The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `Realtime Database` functions.
 
-- #### Firebase Client Class and Static Functions Usage
+- ### Firebase Client Class and Static Functions Usage
 
     - [Class and Functions](/resources/docs/firebase_client.md).
 
-- #### Async Client Class Usage
+- ### Async Client Class Usage
 
     - [Class and Functions](/resources/docs/async_client.md).
 
-- #### Firebase App Usage
+- ### Firebase App Usage
 
     - [Class and Functions](/resources/docs/firebase_app.md).
 
-- #### Async Result Usage
+- ### Async Result Usage
 
     - [Class and Functions](/resources/docs/async_result.md).
 
-- #### Network Usage
+- ### Network Usage
 
     - [Class and Functions](/resources/docs/net_config.md).
 
- - #### File and BLOB Usage
+- ### File and BLOB Usage
 
     - [Class and Functions](/resources/docs/file_config.md).
 
-- #### Realtime Database Usage
+- ### Realtime Database Usage
 
     - [Examples](/examples/RealtimeDatabase).
 
@@ -2422,11 +2423,11 @@ The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `R
 
     - [Google Realtime Database REST API Doc](https://firebase.google.com/docs/reference/rest/database).
 
-- #### Realtime Database Result Usage
+- ### Realtime Database Result Usage
 
     - [Class and Functions](/resources/docs/realtime_database_result.md).
 
-- #### Google Cloud Firestore Database Usage
+- ### Google Cloud Firestore Database Usage
 
     - [Examples](/examples/FirestoreDatabase).
 
@@ -2434,7 +2435,7 @@ The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `R
 
     - [Google Firestore REST API Doc](https://firebase.google.com/docs/firestore/reference/rest).
 
-- #### Google Cloud Messaging Usage
+- ### Google Cloud Messaging Usage
 
     - [Examples](/examples/Messaging).
 
@@ -2442,13 +2443,13 @@ The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `R
 
     - [Google FCM REST API Doc](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages).
 
-- #### Firebase Storage Usage
+- ### Firebase Storage Usage
 
     - [Examples](/examples/Storage).
 
     - [Class and Functions](/resources/docs/storage.md).
 
-- #### Google Cloud Storage Usage
+- ### Google Cloud Storage Usage
 
     - [Examples](/examples/CloudStorage).
 
@@ -2456,7 +2457,7 @@ The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `R
 
     - [Google Cloud Storage REST API Doc](https://cloud.google.com/storage/docs/json_api/v1).
 
-- #### Google Cloud Functions Usage
+- ### Google Cloud Functions Usage
 
     - [Examples](/examples/CloudFunctions).
 
@@ -2464,11 +2465,11 @@ The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `R
 
     - [Google Cloud Functions REST API Doc](https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions).
 
-- #### The placeholder represents the primitive types values that used in this library 
+- ### The placeholder represents the primitive types values that used in this library 
 
     - [Class and Functions](/resources/docs/placeholders.md).
 
-- #### JsonWriter
+- ### JsonWriter
 
     - [Class and Functions](/resources/docs/json_writer.md).
 
