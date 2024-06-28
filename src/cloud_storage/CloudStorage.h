@@ -67,7 +67,7 @@ public:
 
     /**
      * Perform the async task repeatedly.
-     * Should be places in main loop function.
+     * Should be placed in main loop function.
      */
     void loop()
     {

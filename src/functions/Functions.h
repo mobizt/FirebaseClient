@@ -1,5 +1,5 @@
 /**
- * Created June 26, 2024
+ * Created June 28, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -67,7 +67,7 @@ public:
 
     /**
      * Perform the async task repeatedly.
-     * Should be places in main loop function.
+     * Should be placed in main loop function.
      */
     void loop()
     {

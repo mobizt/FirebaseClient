@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-27T04:42:11Z`
+Revision `2024-06-28T03:02:14Z`
 
 ## Table of Contents
 
@@ -182,6 +182,8 @@ In addition, some features are changed which included the following.
 There is no `JSON` library included in this `FirebaseClient` library. If you still prefer to use `FirebaseJson` functions as in the old library, you have to include it manually in your code.
 
 The `FirebaseJson` library can be installed via the Arduino's Library Manager and PlatformIO's Library Manager or can be download and install from the [FirebaseJson Repository](https://github.com/mobizt/FirebaseJson).
+
+For `JSON` payload, this library will use [`object_t`](/resources/docs/placeholders.md#object_t) as a `JSON` placeholder for the functions represents the `JSON` object but it does not have serialization/deserialization functionalities. See [`The Value Placeholders`](#the-value-placeholders) for more information.
 
 - ### Realtime Database
 
@@ -2368,97 +2370,105 @@ void printError(int code, const String &msg)
 }
 ```
 
-The library provides the placeholder struct for boolean, integer, float with custom precision, double with custom precision and object represents JSON or map and Array to use as the input of the functions.
+- #### The Value Placeholders.
 
-- `bool_t` is the placeholder class represents the `bool` value used in this libaray. The normal `bool` value is supported.
+The library provides the placeholder structs for boolean, integer, float with custom precision, double with custom precision and object represents JSON or map and Array to use as the inputs of the functions.
 
-- `number_t` is the placeholder class represents the `int`, `float` and `double` values used in this libaray. The normal `int`, `float` and `double` values are supported unless the default decimal places will be used for `float` and `double` values.
+- [`bool_t`](/resources/docs/placeholders.md#bool_t) is the placeholder class represents the `bool` value used in this libaray. This object is optional then use normal `bool` variable instead.
 
-- `string_t` is the placeholder class represents the string used in this libaray. The normal `String`, `const char*` are supported.
+- [`number_t`](/resources/docs/placeholders.md#number_t) is the placeholder class represents the `int`, `float` and `double` values used in this libaray. The normal `int`, `float` and `double` values are supported unless the default decimal places will be used for `float` and `double` values.
 
-- `object_t` is the placeholder class represents the `JSON` object and `JSON Array` object used in this libaray.
+The [`number_t`](/resources/docs/placeholders.md#number_t) was used mostly in `Realtime Database` and `Firestore Database` functions.
 
-There is no `JSON` serialization/deserialization class in this library unless the `JsonWriter` utility class to create the `JSON` object placeholder (`object_t`) which will be available for user and also used in the examples.
+- [`string_t`](/resources/docs/placeholders.md#string_t) is the placeholder class represents the string used in this libaray. This object is optional then use normal `String`, `const char*` instead.
 
-- ### Firebase Client Class and Static Functions Usage
+- [`object_t`](/resources/docs/placeholders.md#object_t) is the placeholder class represents the `JSON` object and `JSON Array` object used in this libaray.
+
+The string payload that contains `JSON` and `Array` sent to server will be treated as normal string instead of the JSON object. In addition, the `JSON` tags presented in the string can cause the sever interpretation confusion. That is why the [`object_t`](/resources/docs/placeholders.md#object_t) was developed and uses as `JSON` and `Array` placeholders.
+
+There is no `JSON` serialization/deserialization class in this library unless the [`JsonWriter`](/resources/docs/json_writer.md) utility class to work for the ([`object_t`](/resources/docs/placeholders.md#object_t)) which used in the examples.
+
+The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `Realtime Database` functions.
+
+- #### Firebase Client Class and Static Functions Usage
 
     - [Class and Functions](/resources/docs/firebase_client.md).
 
-- ### Async Client Class Usage
+- #### Async Client Class Usage
 
     - [Class and Functions](/resources/docs/async_client.md).
 
-- ### Firebase App Usage
+- #### Firebase App Usage
 
     - [Class and Functions](/resources/docs/firebase_app.md).
 
-- ### Async Result Usage
+- #### Async Result Usage
 
     - [Class and Functions](/resources/docs/async_result.md).
 
-- ### Network Usage
+- #### Network Usage
 
     - [Class and Functions](/resources/docs/net_config.md).
 
- - ### File and BLOB Usage
+ - #### File and BLOB Usage
 
     - [Class and Functions](/resources/docs/file_config.md).
 
-- ### Realtime Database Usage
+- #### Realtime Database Usage
 
     - [Examples](/examples/RealtimeDatabase).
 
     - [Class and Functions](/resources/docs/realtime_database.md).
 
-    - [API Doc](https://firebase.google.com/docs/reference/rest/database).
+    - [Google Realtime Database REST API Doc](https://firebase.google.com/docs/reference/rest/database).
 
-- ### Realtime Database Result Usage
+- #### Realtime Database Result Usage
 
     - [Class and Functions](/resources/docs/realtime_database_result.md).
 
-- ### Google Cloud Firestore Database Usage
+- #### Google Cloud Firestore Database Usage
 
     - [Examples](/examples/FirestoreDatabase).
 
     - [Class and Functions](/resources/docs/firestore_database.md).
 
-    - [API Doc](https://firebase.google.com/docs/firestore/reference/rest).
+    - [Google Firestore REST API Doc](https://firebase.google.com/docs/firestore/reference/rest).
 
-- ### Google Cloud Messaging Usage
+- #### Google Cloud Messaging Usage
 
     - [Examples](/examples/Messaging).
 
     - [Class and Functions](/resources/docs/messaging.md).
 
-    - [API Doc](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages).
+    - [Google FCM REST API Doc](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages).
 
-- ### Firebase Storage Usage
+- #### Firebase Storage Usage
 
     - [Examples](/examples/Storage).
 
     - [Class and Functions](/resources/docs/storage.md).
 
-- ### Google Cloud Storage Usage
+- #### Google Cloud Storage Usage
 
     - [Examples](/examples/CloudStorage).
 
     - [Class and Functions](/resources/docs/cloud_storage.md).
 
-    - [API Doc](https://cloud.google.com/storage/docs/json_api/v1).
+    - [Google Cloud Storage REST API Doc](https://cloud.google.com/storage/docs/json_api/v1).
 
-- ### Google Cloud Functions Usage
+- #### Google Cloud Functions Usage
 
     - [Examples](/examples/CloudFunctions).
 
     - [Class and Functions](/resources/docs/cloud_functions.md).
 
-    - [API Doc](https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions).
+    - [Google Cloud Functions REST API Doc](https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions).
 
-- ### The placeholder represents the primitive types values that used in this library 
+- #### The placeholder represents the primitive types values that used in this library 
 
     - [Class and Functions](/resources/docs/placeholders.md).
 
-- ### JsonWriter
+- #### JsonWriter
 
     - [Class and Functions](/resources/docs/json_writer.md).
 
