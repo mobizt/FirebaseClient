@@ -2387,7 +2387,7 @@ The [`number_t`](/resources/docs/placeholders.md#number_t) was used mostly in `R
 
 The string payload that contains `JSON` and `Array` sent to server will be treated as normal string instead of the JSON object. In addition, the `JSON` tags presented in the string can cause the sever interpretation confusion. That is why the [`object_t`](/resources/docs/placeholders.md#object_t) was developed and uses as `JSON` and `Array` placeholders.
 
-There is no `JSON` serialization/deserialization class in this library unless the [`JsonWriter`](/resources/docs/json_writer.md) utility class to work for the ([`object_t`](/resources/docs/placeholders.md#object_t)) which used in the examples.
+There is no `JSON` serialization/deserialization class in this library unless the [`JsonWriter`](/resources/docs/json_writer.md) utility class to work for the [`object_t`](/resources/docs/placeholders.md#object_t) which used in the examples.
 
 The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `Realtime Database` functions.
 
