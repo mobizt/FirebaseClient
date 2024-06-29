@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-28T03:08:27Z`
+Revision `2024-06-29T07:15:53Z`
 
 ## Table of Contents
 
@@ -97,7 +97,7 @@ This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was ct
 - The confusion of different library names from the same developer and other developers in Library Manager.
 - The different main header file name and class name issue.
 - The long path issue due to long library name with spaces leads to `VisualMicro IDE` compilation error.
-- The cental settings using only single config class can cause the usage confusion.
+- The central settings using only single config class can cause the usage confusion.
 - The system time changes causes the auth token expiry period calculation error.
 - The internal SSL Client and WiFiClient issue causes the session need to be closed at some interval.
 - The `Realtime Database` stream event data can be missing due to the sync read operation.
