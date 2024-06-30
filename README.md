@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-06-29T15:31:13Z`
+Revision `2024-06-30T03:08:19Z`
 
 ## Table of Contents
 
@@ -152,21 +152,22 @@ This library required the latest device's **platform Core SDK** to be installed.
 > - Add the `Realtime Database host root certificate` to the board firmware. Plese see [Upload SSL root certificates](https://support.arduino.cc/hc/en-us/articles/360016119219-Upload-SSL-root-certificates) for how to.
 > - Install the WiFiNINA library.
 >
-> The server certificate of Realtime database location that ends with `firebasedatabase.app` may not work. See [Realtime Database Getting Started](#realtime-database-getting-started) for more information.
+> The Realtime database URL that ends with `firebasedatabase.app`, adding the server cerificate for that URL may not work. 
+> Please see [Note for Realtime Database location selection](#note-for-realtime-database-location-selection) for more information.
 
 > [!IMPORTANT]
 > If you are using `Arduino® MKR 1000 WIFI`, please make sure you have already done the following.
 > - Add the `Realtime Database host root certificate` to the board firmware. 
 > - Install the WiFi101 library and uninstall or remove the WiFiNINA library from the libraries folder if it was installed.
 > 
-> The server certificate of Realtime database location that ends with `firebasedatabase.app` may not work. See [Realtime Database Getting Started](#realtime-database-getting-started) for more information.
+> The Realtime database URL that ends with `firebasedatabase.app`, adding the server cerificate for that URL may not work. 
+> Please see [Note for Realtime Database location selection](#note-for-realtime-database-location-selection) for more information.
 
 > [!WARNING]  
-> Known problem in `PlatformIO IDE` compilation, if you are using `Arduino® UNO R4 WiFi` board and using the `Firebase Realtime Database`, your `Arduino® UNO R4 WiFi` board will stop with the error: `"Fault on interrupt or bare metal(no OS) environment"`.
+> Known problem in `PlatformIO IDE` compilation, if you are using `Arduino® UNO R4 WiFi` board and using the `Firebase Realtime Database` and the Realtime database location ends with `firebasedatabase.app`, your `Arduino® UNO R4 WiFi` board will stop with the error: `"Fault on interrupt or bare metal(no OS) environment"`.
 > This is the error related to the `Realtime Database` server certificate issue in WiFiS3 library that compiled with `PlatformIO IDE` even you are already uploaded the SSL root certificates of `Realtime Database` server using the Arduino IDE Certificate Upload tool.
 > This problem is only specific to `Firebase Realtime Database` in `Arduino® UNO R4 WiFi` which compiled using `PlatformIO IDE` only.
 >
-> This issue was found in case the Realtime database location ends with `firebasedatabase.app`.
 
 For Arduino IDE, the ESP8266 Core SDK can be installed through **Boards Manager**. 
 
@@ -2558,9 +2559,13 @@ Set up your `Database options` and `Security rules`.
 
 ![Set Database Location](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_setup_database_step1.png)
 
+#### Note for Realtime Database location selection
+
 Refer to this [Realtime Database locations](https://firebase.google.com/docs/projects/locations#rtdb-locations), the `Database URL scheme` depends on the `Region name` (Realtime Database location) you selected.
 
-In Arduino boards that used with WiFiNINA and WiFi101 firmware, the database location that ends with `firebasedatabase.app` may not work in those Arduino boards because of server certificate issue even the server certificate was load in to the firmware. Only the database location that ends with `firebaseio.com` works in this case (SSL certificate may missing or does not load properly). Then `us-central1` region is recommended.
+In some Arduino boards that works with [`WiFiNINA`](https://github.com/arduino/nina-fw) and `WiFi101` firmwares, the database URL that ends with `firebasedatabase.app` may not work after the SSL certificate upload into the board firmware which causes Realtime Database server connection failure. 
+
+We don't investigate in to the Arduino firmwares to find root cause, then `us-central1` region for `DATABASE_NAME.firebaseio.com` URL should be selected for this case.
 
 ![Set Database Security Rules](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_setup_database_step2.png)
 
