@@ -1,6 +1,6 @@
 /**
  * Created July 1, 2024
- * 
+ *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
  *
@@ -77,6 +77,8 @@ void UpdaterArduino::apply()
 #endif
 }
 
+#if defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
 UpdaterArduino Update;
+#endif
 
 #endif

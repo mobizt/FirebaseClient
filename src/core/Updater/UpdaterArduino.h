@@ -1,6 +1,6 @@
 /**
  * Created July 1, 2024
- * 
+ *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
  *
@@ -29,7 +29,6 @@
 #include <Arduino.h>
 #include "./Config.h"
 
-
 class UpdaterArduino
 {
 
@@ -41,12 +40,13 @@ public:
     size_t write(uint8_t *data, size_t len);
 
 private:
-
     size_t write(uint8_t b);
     void close();
     void apply();
 };
 
+#if defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
 extern UpdaterArduino Update;
+#endif
 
 #endif
