@@ -1,5 +1,5 @@
 /**
- * Created March 22, 2024
+ * Created July 1, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -270,6 +270,13 @@
 
 #if !defined(FIREBASE_ASYNC_CLIENT)
 #define FIREBASE_ASYNC_CLIENT AsyncClient
+#endif
+
+#if __has_include(<InternalStorage.h>)
+#include <InternalStorage.h>
+#if defined(_INTERNAL_STORAGE_H_INCLUDED)
+#define FIREBASE_UPDATER_INTERNAL_STORAGE InternalStorage
+#endif
 #endif
 
 #endif

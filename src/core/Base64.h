@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created July 1, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -34,6 +34,8 @@
 #if __has_include(<vector>)
 #include <vector>
 #endif
+
+#include "./core/Updater/UpdaterArduino.h"
 
 static const char firebase_boundary_table[] PROGMEM = "=_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static const unsigned char firebase_base64_table[65] PROGMEM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -110,7 +112,7 @@ public:
     bool updateWrite(uint8_t *data, size_t len)
     {
 #if defined(OTA_UPDATE_ENABLED) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
-#if defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO)
+#if defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO) || defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
         return Update.write(data, len) == len;
 #endif
 #endif

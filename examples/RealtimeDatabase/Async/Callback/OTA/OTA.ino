@@ -30,6 +30,12 @@
 
 #include <FirebaseClient.h>
 
+// For Arduino SAMD21 OTA supports.
+// See https://github.com/mobizt/FirebaseClient#ota-update.
+#if __has_include(<InternalStorage.h>)
+#include <InternalStorage.h>
+#endif
+
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
@@ -180,5 +186,7 @@ void restart()
     ESP.restart();
 #elif defined(ARDUINO_RASPBERRY_PI_PICO_W)
     rp2040.restart();
+#elif defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
+    FIREBASE_UPDATER_INTERNAL_STORAGE.apply();
 #endif
 }

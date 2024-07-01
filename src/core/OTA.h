@@ -1,5 +1,5 @@
 /**
- * Created March 21, 2024
+ * Created July 1, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -82,23 +82,17 @@ public:
     void prepareDownloadOTA(size_t payloadLen, bool base64, int16_t &code)
     {
         code = 0;
-#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO))
+#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO) || defined(FIREBASE_UPDATER_INTERNAL_STORAGE))
         int size = base64 ? (3 * (payloadLen - 2) / 4) : payloadLen;
-#if defined(ESP32) || defined(CORE_ARDUINO_PICO)
         if (!Update.begin(size))
             code = FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE;
-#elif defined(ESP8266)
-        if (!Update.begin(size))
-            code = FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE;
-
-#endif
 #endif
     }
 
     bool endDownloadOTA(int pad, int16_t &code)
     {
 
-#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO))
+#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO) || defined(FIREBASE_UPDATER_INTERNAL_STORAGE))
         Base64Util but;
         // write extra pad
         if (pad > 0)
