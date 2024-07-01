@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.0-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.1-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-07-01T03:59:01Z`
+Revision `2024-07-01T09:17:48Z`
 
 ## Table of Contents
 
@@ -56,7 +56,8 @@ Revision `2024-07-01T03:59:01Z`
     21. [Google Cloud Storage Usage](#google-cloud-storage-usage)
     22. [Google Cloud Functions Usage](#google-cloud-functions-usage)
     23. [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
-8. [Project Preparation and Setup](#project-preparation-and-setup)
+8. [OTA Update](#ota-update)
+9. [Project Preparation and Setup](#project-preparation-and-setup)
     1. [Authentication Getting Started](#authentication-getting-started)
     2. [Realtime Database Getting Started](#realtime-database-getting-started)
     3. [Google Cloud Firestore Database Getting Started](#google-cloud-firestore-database-getting-started)
@@ -65,7 +66,7 @@ Revision `2024-07-01T03:59:01Z`
     6. [Cloud Messaging Getting Started](#cloud-messaging-getting-started)
     7. [Service Account](#service-account)
         1. [Service Account Permissions](#service-account-permissions)
-9. [Memory Options](#memory-options)
+10. [Memory Options](#memory-options)
     1. [Memory Options for ESP8266](#memory-options-for-esp8266)
         1. [Arduino IDE](#arduino-ide)
         2. [PlatformIO IDE](#platformio-ide)
@@ -73,10 +74,10 @@ Revision `2024-07-01T03:59:01Z`
     2. [Memory Options for ESP32](#memory-options-for-esp32)
         1. [Arduino IDE](#arduino-ide-1)
         2. [PlatformIO IDE](#platformio-ide-1)
-10. [Library Build Options](#library-build-options)
+11. [Library Build Options](#library-build-options)
     1. [Predefined Options](#predefined-options)
     2. [Optional Options](#optional-options)
-11. [License](#license)
+12. [License](#license)
 
 
 ## Introduction
@@ -2484,6 +2485,31 @@ For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the fo
 The useful of using `ESP_SSLClient` library is it uses `PSRAM` by default (if it is available), you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
 
 For using `PSRAM`, see [Memory Options](#memory-options) section.
+
+
+## OTA Update
+
+The OTA firmware update is supported using bin file stored in `Firebase Storage` and `Google Cloud Storage` buckets or base64 encoded data stored in `Realtime Database`.
+
+The Arduino devices that is natively supports OTA firmware update is `ESP8266`, `ESP32` and `Raspberry Pi Pico`.
+
+Since v1.3.1, the Arduino SAMD21 boards that use NINA firmware and WiFi101 firmware are also supported using [WiFi101OTA](https://github.com/arduino-libraries/WiFi101OTA) library.
+
+In [WiFi101OTA](https://github.com/arduino-libraries/WiFi101OTA) library, only three files e.g. `InternalStorage.h`, `InternalStorage.cpp` and `OTAStorage.h` will be used.
+
+To allow OTA update in Arduino SAMD21 boards, include `InternalStorage.h` in your sketch.
+
+```cpp
+#if __has_include(<InternalStorage.h>)
+#include <InternalStorage.h>
+#endif
+```
+
+In Arduino board that uses NINA firmware, you have to keep only those 3 files and delete all other files from [WiFi101OTA](https://github.com/arduino-libraries/WiFi101OTA)'s src folder and `WiFi101` library must be removed in this case.
+
+Some Arduino compatible OTA library that provides the `InternalStorage.h` class that derived from `OTAStorage.h` class also can be used.
+
+The macro `FIREBASE_UPDATER_INTERNAL_STORAGE` is defined as `InternalStorage` class object when [WiFi101OTA](https://github.com/arduino-libraries/WiFi101OTA) and/or Arduino compatible OTA library are installed.
 
 
 ## Project Preparation and Setup
