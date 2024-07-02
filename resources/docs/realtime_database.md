@@ -987,8 +987,19 @@ class RealtimeDatabase
     **Params:**
     - `filter` - The event keywords for filtering.
 
+31. ## 🔹  void setOTAStorage(InternalStorageClass &storage)
 
-31. ### 🔹 void loop()
+    Set Arduino OTA Storage.
+
+    ```cpp
+    void setOTAStorage(InternalStorageClass &storage)
+    ```
+
+    **Params:**
+
+    - `storage` - The Arduino InternalStorageClass object.
+
+32. ### 🔹 void loop()
 
     Perform the async task repeatedly.
     Should be places in main loop function.

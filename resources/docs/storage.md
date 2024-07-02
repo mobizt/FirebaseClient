@@ -389,3 +389,14 @@ void deleteObject(AsyncClientClass &aClient, const FirebaseStorage::Parent &pare
 - `cb` - The async result callback (AsyncResultCallback).
 - `uid` - The user specified UID of async result (optional).
 
+21. ## 🔹  void setOTAStorage(InternalStorageClass &storage)
+
+Set Arduino OTA Storage.
+
+```cpp
+void setOTAStorage(InternalStorageClass &storage)
+```
+
+**Params:**
+
+- `storage` - The Arduino InternalStorageClass object.
