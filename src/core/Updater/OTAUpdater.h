@@ -30,12 +30,13 @@
 #include "./Config.h"
 
 #if __has_include(<OTAStorage.h>)
-#include <OTAStorage.h>
-#endif
 
-#if __has_include(<InternalStorage.h>)
-#include <InternalStorage.h>
-#define FIREBASE_OTA_UPDATER_STORAGE
+#include <OTAStorage.h>
+#define FIREBASE_OTA_STORAGE
+#define FIREBASE_OTA_UPDATER OTAUpdater
+
+#elif defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO)
+#define FIREBASE_OTA_UPDATER Update
 #endif
 
 class OTAUpdaterClass
@@ -51,8 +52,8 @@ public:
     bool isInit();
 
 private:
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
-    InternalStorageClass *storage = nullptr;
+#if defined(FIREBASE_OTA_STORAGE)
+    OTAStorage *storage = nullptr;
 #endif
     uint32_t addr = 0;
     size_t write(uint8_t b);

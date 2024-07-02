@@ -99,7 +99,7 @@ public:
     bool base64 = false;
     bool ota = false;
     uint32_t ul_dl_task_running_addr = 0;
-    uint32_t ota_intnl_storage_addr = 0;
+    uint32_t ota_storage_addr = 0;
     uint32_t payloadLen = 0;
     uint32_t dataLen = 0;
     uint32_t payloadIndex = 0;

@@ -1,5 +1,5 @@
 /**
- * Created July 1, 2024
+ * Created July 2, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -36,12 +36,6 @@
 #endif
 
 #include "./core/Updater/OTAUpdater.h"
-
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
-#define FIREBASE_UPDATER OTAUpdater
-#elif defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO)
-#define FIREBASE_UPDATER Update
-#endif
 
 static const char firebase_boundary_table[] PROGMEM = "=_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static const unsigned char firebase_base64_table[65] PROGMEM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -117,8 +111,8 @@ public:
 
     bool updateWrite(uint8_t *data, size_t len)
     {
-#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_UPDATER) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
-        return FIREBASE_UPDATER.write(data, len) == len;
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
+        return FIREBASE_OTA_UPDATER.write(data, len) == len;
 #endif
         return false;
     }

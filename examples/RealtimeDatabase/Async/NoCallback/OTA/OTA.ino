@@ -33,6 +33,7 @@
 // See https://github.com/mobizt/FirebaseClient#ota-update.
 #if defined(ARDUINO_ARCH_SAMD) 
 #include <Internal_Storage_OTA.h>
+#define OTA_STORAGE InternalStorage
 #endif
 
 #define WIFI_SSID "WIFI_AP"
@@ -127,8 +128,8 @@ void loop()
 
         Serial.println("Asynchronous OTA update... ");
 
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
-        Database.setOTAStorage(InternalStorage);
+#if defined(OTA_STORAGE)
+        Database.setOTAStorage(OTA_STORAGE);
 #endif
 
         Database.ota(aClient, "/test/firmware/bin", aResult_no_callback);
@@ -177,9 +178,9 @@ void restart()
 {
     Serial.println("Update firmware completed.");
     Serial.println();
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+#if defined(OTA_STORAGE)
     Serial.println("Applying update...");
-    InternalStorage.apply();
+    OTA_STORAGE.apply();
 #elif defined(ESP32) || defined(ESP8266)
     Serial.println("Restarting...\n\n");
     ESP.restart();

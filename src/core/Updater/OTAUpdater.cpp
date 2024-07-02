@@ -34,7 +34,7 @@ OTAUpdaterClass::~OTAUpdaterClass() {}
 
 bool OTAUpdaterClass::begin(int size)
 {
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+#if defined(FIREBASE_OTA_STORAGE)
     if (storage && storage->open(size) > 0)
         return true;
 #endif
@@ -49,9 +49,9 @@ bool OTAUpdaterClass::end()
 
 void OTAUpdaterClass::setOTAStorage(uint32_t addr)
 {
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+#if defined(FIREBASE_OTA_STORAGE)
     this->addr = addr;
-    storage = reinterpret_cast<InternalStorageClass *>(addr);
+    storage = reinterpret_cast<OTAStorage *>(addr);
 #endif
 }
 
@@ -66,7 +66,7 @@ size_t OTAUpdaterClass::write(uint8_t *data, size_t len)
 
 size_t OTAUpdaterClass::write(uint8_t b)
 {
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+#if defined(FIREBASE_OTA_STORAGE)
     if (storage)
         storage->write(b);
 #endif
@@ -75,7 +75,7 @@ size_t OTAUpdaterClass::write(uint8_t b)
 
 void OTAUpdaterClass::close()
 {
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+#if defined(FIREBASE_OTA_STORAGE)
     if (storage)
         storage->close();
 #endif
@@ -83,7 +83,7 @@ void OTAUpdaterClass::close()
 
 void OTAUpdaterClass::apply()
 {
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+#if defined(FIREBASE_OTA_STORAGE)
     if (storage)
         storage->apply();
 #endif

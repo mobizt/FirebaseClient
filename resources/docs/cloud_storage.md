@@ -422,14 +422,14 @@ void deleteObject(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &p
 - `uid` - The user specified UID of async result (optional).
 
 
-21. ## 🔹  void setOTAStorage(InternalStorageClass &storage)
+21. ## 🔹  void setOTAStorage(OTAStorage &storage)
 
 Set Arduino OTA Storage.
 
 ```cpp
-void setOTAStorage(InternalStorageClass &storage)
+void setOTAStorage(OTAStorage &storage)
 ```
 
 **Params:**
 
-- `storage` - The Arduino InternalStorageClass object.
+- `storage` - The Arduino `OTAStorage` class object.

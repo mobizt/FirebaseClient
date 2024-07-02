@@ -1,5 +1,5 @@
 /**
- * Created July 1, 2024
+ * Created July 2, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -86,11 +86,11 @@ public:
     void prepareDownloadOTA(size_t payloadLen, bool base64, int16_t &code)
     {
         code = 0;
-#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_UPDATER)
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
         int size = base64 ? (3 * (payloadLen - 2) / 4) : payloadLen;
-        if (!FIREBASE_UPDATER.begin(size))
+        if (!FIREBASE_OTA_UPDATER.begin(size))
             code = FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE;
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+#if defined(FIREBASE_OTA_STORAGE)
         if (!OTAUpdater.isInit())
             code = FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE;
 #endif
@@ -99,7 +99,7 @@ public:
 
     bool endDownloadOTA(Base64Util &b64ut, int pad, int16_t &code)
     {
-#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_UPDATER)
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
         // write extra pad
         if (pad > 0)
         {
@@ -110,7 +110,7 @@ public:
 
         if (code == 0)
         {
-            if (!FIREBASE_UPDATER.end())
+            if (!FIREBASE_OTA_UPDATER.end())
                 code = FIREBASE_ERROR_FW_UPDATE_END_FAILED;
         }
 

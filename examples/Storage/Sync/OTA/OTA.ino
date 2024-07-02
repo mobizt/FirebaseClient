@@ -36,6 +36,7 @@
 // See https://github.com/mobizt/FirebaseClient#ota-update.
 #if defined(ARDUINO_ARCH_SAMD) 
 #include <Internal_Storage_OTA.h>
+#define OTA_STORAGE InternalStorage
 #endif
 
 #define WIFI_SSID "WIFI_AP"
@@ -137,8 +138,8 @@ void loop()
 
         Serial.println("OTA update download...");
 
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
-        storage.setOTAStorage(InternalStorage);
+#if defined(OTA_STORAGE)
+        storage.setOTAStorage(OTA_STORAGE);
 #endif
 
         // There is no OTA download progress available for sync OTA download.
@@ -195,9 +196,9 @@ void restart()
 {
     Serial.println("Update firmware completed.");
     Serial.println();
-#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+#if defined(OTA_STORAGE)
     Serial.println("Applying update...");
-    InternalStorage.apply();
+    OTA_STORAGE.apply();
 #elif defined(ESP32) || defined(ESP8266)
     Serial.println("Restarting...\n\n");
     ESP.restart();

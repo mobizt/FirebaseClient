@@ -1130,7 +1130,7 @@ private:
                             {
                                 if (sData->request.ota)
                                 {
-                                    otaut.setOTAStorage(sData->request.ota_intnl_storage_addr);
+                                    otaut.setOTAStorage(sData->request.ota_storage_addr);
                                     otaut.prepareDownloadOTA(sData->response.payloadLen, sData->request.base64, sData->request.ota_error);
                                     if (sData->request.ota_error != 0)
                                     {

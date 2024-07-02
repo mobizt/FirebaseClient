@@ -2,7 +2,7 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.1-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.2-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
@@ -2498,17 +2498,17 @@ Since v1.3.1, the Arduino SAMD21 boards that use NINA firmware and WiFi101 firmw
 
 The [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) is the modified version of [WiFi101OTA](http://www.arduino.cc/en/Reference/WiFi101OT) library which contains only foure files e.g. `Internal_Storage_OTA.h`, `InternalStorage.h`, `InternalStorage.cpp`and `OTAStorage.h`.
 
-The functions `OTAStorage::open` and `InternalStorageClass::open` are modified to accept an `int` parameter which will be compatible with other OTA libraries.
 
 To allow OTA update in SAMD21 Arduino boards, you have to include `Internal_Storage_OTA.h` in your sketch.
 
-Then assign the `InternalStorage` class object to be used for `Realtume Database` via `RealtumeDatabase::setOTAStorage(InternalStorage)`,  for `Google Cloud Storage` via `CloudStorage::setOTAStorage(InternalStorage)` and for `Firebase Storage` via `Storage::setOTAStorage(InternalStorage)`
+Then assign the `InternalStorage` class object to be used for `Realtume Database` via `RealtumeDatabase::setOTAStorage`,  for `Google Cloud Storage` via `CloudStorage::setOTAStorage` and for `Firebase Storage` via `Storage::setOTAStorage`
 
-If `InternalStorage` was not assigned before calling OTA function in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA), the error `OTA Storage was not set` will be occurred.
+
+In SAMD21 Arduino boards, if `OTA Storage` was not set before calling OTA function, the error `OTA Storage was not set` will be occurred.
 
 Finally, once the OTA update complete, in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA), you have to call `InternalStorage.apply()` to apply the update and then restart.
 
-Other OTA libraries that provide `InternalStorageClass` object (`InternalStorage`) that derived from the modified version of Arduino WiFi101OTA's `OTAStorage` class can also be used.
+Some OTA libraries that provide `Storage Class` object that derived from the modified version of Arduino WiFi101OTA's `OTAStorage` class can also be used.
 
 
 ## Project Preparation and Setup
@@ -3017,6 +3017,8 @@ You can assign the optional build options using one of the following methods.
 - By creating user config file `UserConfig.h` in library installed folder and define these optional options.
 
 - By adding compiler build flags with `-D name`.
+
+- By defined the macros before including the library main header file `FirebaseClient.h`.
 
 In PlatformIO IDE, using `build_flags` in PlatformIO IDE's platformio.ini is more convenient 
 
