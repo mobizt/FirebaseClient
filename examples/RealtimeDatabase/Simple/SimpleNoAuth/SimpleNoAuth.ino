@@ -180,7 +180,6 @@ void setup()
     // Set, push, and get double value
 
     Serial.print("Set double... ");
-
     status = Database.set<number_t>(client, "/test/double", number_t(1234.56789, 4));
     if (status)
         Serial.println("ok");
@@ -202,7 +201,6 @@ void setup()
     // Set, push, and get JSON value
 
     Serial.print("Set JSON... ");
-
     status = Database.set<object_t>(client, "/test/json", object_t("{\"test\":{\"data\":123}}"));
     if (status)
         Serial.println("ok");
@@ -224,7 +222,6 @@ void setup()
     // Set, push and get Array value
 
     Serial.print("Set Array... ");
-
     status = Database.set<object_t>(client, "/test/array", object_t("[1,2,\"test\",true]"));
     if (status)
         Serial.println("ok");

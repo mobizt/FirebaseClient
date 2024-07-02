@@ -145,7 +145,7 @@ void loop()
 
         // Set int with custom UUID.
         Serial.print("Set int with custom UUID... ");
-        bool status = Database.set<object_t>(aClient, path, 12345);
+        bool status = Database.set<int>(aClient, path, 12345);
 
         if (status)
             Serial.println("ok");

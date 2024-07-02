@@ -165,7 +165,7 @@ void loop()
 
         Database.set<object_t>(aClient3, "/test/stream/path1/number", json, aResult_no_callback3);
 
-        Database.set<object_t>(aClient3, "/test/stream/path2/number", random(100000, 200000), aResult_no_callback3);
+        Database.set<int>(aClient3, "/test/stream/path2/number", random(100000, 200000), aResult_no_callback3);
     }
 
     printResult(aResult_no_callback1);

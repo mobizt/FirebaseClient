@@ -138,7 +138,7 @@ void loop()
         Database.push<int>(aClient, "/test/int", 12345, aResult_no_callback);
 
         // Set int with custom UUID
-        Database.set<object_t>(aClient, path, 12345, aResult_no_callback);
+        Database.set<int>(aClient, path, 12345, aResult_no_callback);
     }
 
     printResult(aResult_no_callback);

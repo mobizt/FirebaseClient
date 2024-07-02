@@ -140,7 +140,7 @@ void loop()
         Database.push<int>(aClient, "/test/int", 12345, asyncCB, "pushIntTask");
 
         // Set int with custom UUID
-        Database.set<object_t>(aClient, path, 12345, asyncCB, "setTask");
+        Database.set<int>(aClient, path, 12345, asyncCB, "setTask");
     }
 }
 
