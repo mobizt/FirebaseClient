@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-07-02T04:31:38Z`
+Revision `2024-07-02T05:07:24Z`
 
 ## Table of Contents
 
@@ -2496,15 +2496,19 @@ The Arduino devices that is natively supports OTA firmware update is `ESP8266`, 
 Since v1.3.1, the Arduino SAMD21 boards that use NINA firmware and WiFi101 firmware are also supported using [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) library.
 
 
-To allow OTA update in Arduino SAMD21 boards, you have to include `Internal_Storage_OTA.h` in your sketch.
+The [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) is the modified version of [WiFi101OTA](http://www.arduino.cc/en/Reference/WiFi101OT) library which contains only foure files e.g. `Internal_Storage_OTA.h`, `InternalStorage.h`, `InternalStorage.cpp`and `OTAStorage.h`.
+
+The functions `OTAStorage::open` and `InternalStorageClass::open` are modified to accept an `int` parameter which will be compatible with other OTA libraries.
+
+To allow OTA update in SAMD21 Arduino boards, you have to include `Internal_Storage_OTA.h` in your sketch.
 
 Then assign the `InternalStorage` class object to be used for `Realtume Database` via `RealtumeDatabase::setOTAStorage(InternalStorage)`,  for `Google Cloud Storage` via `CloudStorage::setOTAStorage(InternalStorage)` and for `Firebase Storage` via `Storage::setOTAStorage(InternalStorage)`
 
-If `InternalStorage` was not assigned before calling OTA function in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) or Arduino compatible OTA library was included, the error `OTA Storage was not set` will be occurred.
+If `InternalStorage` was not assigned before calling OTA function in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA), the error `OTA Storage was not set` will be occurred.
 
-Finally, once the OTA update complete, in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA), you have to call `InternalStorage.apply()`.
+Finally, once the OTA update complete, in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA), you have to call `InternalStorage.apply()` to apply the update and then restart.
 
-You can use other Arduino OTA libraries that provide `InternalStorageClass` object (`InternalStorage`) that derived from modified version of Arduino WiFi101OTA's `OTAStorage` class.
+Other OTA libraries that provide `InternalStorageClass` object (`InternalStorage`) that derived from the modified version of Arduino WiFi101OTA's `OTAStorage` class can also be used.
 
 
 ## Project Preparation and Setup
