@@ -1,5 +1,5 @@
 /**
- * Created June 28, 2024
+ * Created July 1, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -360,6 +360,14 @@ public:
         sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", FirebaseStorage::firebase_storage_request_type_delete, true);
     }
 
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+    /**
+     * Set Arduino OTA Storage.
+     *  @param storage The Arduino InternalStorageClass object.
+     */
+    void setOTAStorage(InternalStorageClass &storage) { ota_intnl_storage_addr = reinterpret_cast<uint32_t>(&storage); }
+#endif
+
 private:
     String service_url;
     String path;
@@ -367,6 +375,7 @@ private:
     // FirebaseApp address and FirebaseApp vector address
     uint32_t app_addr = 0, avec_addr = 0;
     uint32_t ul_dl_task_running_addr = 0;
+    uint32_t ota_intnl_storage_addr = 0;
     app_token_t *app_token = nullptr;
 
     void url(const String &url)
@@ -472,6 +481,7 @@ private:
             sData->request.base64 = false;
             sData->aResult.download_data.ota = true;
             sData->request.ul_dl_task_running_addr = ul_dl_task_running_addr;
+            sData->request.ota_intnl_storage_addr = ota_intnl_storage_addr;
         }
 
         if (request.file && sData->upload)

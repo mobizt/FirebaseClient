@@ -32,7 +32,6 @@
 #include "./core/NetConfig.h"
 #include "./core/Memory.h"
 #include "./core/FileConfig.h"
-#include "./core/Base64.h"
 #include "./core/Error.h"
 #include "./core/OTA.h"
 #include "./core/AsyncResult/AsyncResult.h"
@@ -200,7 +199,8 @@ private:
     uint16_t port;
     std::vector<uint32_t> sVec;
     Memory mem;
-    Base64Util but;
+    Base64Util b64ut;
+    OTAUtil otaut;
     network_config_data net;
     uint32_t addr = 0;
     bool inProcess = false;
@@ -361,7 +361,7 @@ private:
                     sData->request.file_data.data_pos += toSend;
                 }
 
-                uint8_t *temp = reinterpret_cast<uint8_t *>(but.encodeToChars(mem, buf, toSend));
+                uint8_t *temp = reinterpret_cast<uint8_t *>(b64ut.encodeToChars(mem, buf, toSend));
                 mem.release(&buf);
                 toSend = strlen(reinterpret_cast<char *>(temp));
                 buf = temp;
@@ -1106,7 +1106,6 @@ private:
     bool readPayload(async_data_item_t *sData)
     {
         uint8_t *buf = nullptr;
-        OTAUtil otaut;
 
         if (sData->response.flags.payload_remaining)
         {
@@ -1131,6 +1130,7 @@ private:
                             {
                                 if (sData->request.ota)
                                 {
+                                    otaut.setOTAStorage(sData->request.ota_intnl_storage_addr);
                                     otaut.prepareDownloadOTA(sData->response.payloadLen, sData->request.base64, sData->request.ota_error);
                                     if (sData->request.ota_error != 0)
                                     {
@@ -1189,7 +1189,7 @@ private:
                                     otaut.getPad(buf + ofs, read, sData->request.b64Pad);
                                     if (sData->request.ota)
                                     {
-                                        otaut.decodeBase64OTA(mem, &but, reinterpret_cast<const char *>(buf), read - ofs, sData->request.ota_error);
+                                        otaut.decodeBase64OTA(mem, &b64ut, reinterpret_cast<const char *>(buf), read - ofs, sData->request.ota_error);
                                         if (sData->request.ota_error != 0)
                                         {
                                             // In case OTA error.
@@ -1199,7 +1199,7 @@ private:
 
                                         if (sData->request.b64Pad > -1)
                                         {
-                                            otaut.endDownloadOTA(sData->request.b64Pad, sData->request.ota_error);
+                                            otaut.endDownloadOTA(b64ut, sData->request.b64Pad, sData->request.ota_error);
                                             if (sData->request.ota_error != 0)
                                             {
                                                 // In case OTA error.
@@ -1212,7 +1212,7 @@ private:
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                     {
 
-                                        if (!but.decodeToFile(mem, sData->request.file_data.file, reinterpret_cast<const char *>(buf + ofs)))
+                                        if (!b64ut.decodeToFile(mem, sData->request.file_data.file, reinterpret_cast<const char *>(buf + ofs)))
                                         {
                                             // In case file write error.
                                             setAsyncError(sData, async_state_read_response, FIREBASE_ERROR_FILE_WRITE, !sData->sse, true);
@@ -1221,17 +1221,17 @@ private:
                                     }
 #endif
                                     else
-                                        but.decodeToBlob(mem, &sData->request.file_data.outB, reinterpret_cast<const char *>(buf + ofs));
+                                        b64ut.decodeToBlob(mem, &sData->request.file_data.outB, reinterpret_cast<const char *>(buf + ofs));
                                 }
                                 else
                                 {
                                     if (sData->request.ota)
                                     {
-                                        but.updateWrite(buf, read);
+                                        b64ut.updateWrite(buf, read);
 
                                         if (sData->response.payloadRead == sData->response.payloadLen)
                                         {
-                                            otaut.endDownloadOTA(0, sData->request.ota_error);
+                                            otaut.endDownloadOTA(b64ut, 0, sData->request.ota_error);
                                             if (sData->request.ota_error != 0)
                                             {
                                                 // In case OTA error.
@@ -1849,7 +1849,6 @@ private:
 #if defined(ENABLE_FS)
         if ((sData->request.file_data.cb && sData->request.file_data.filename.length()) || (sData->request.file_data.data_size && sData->request.file_data.data))
         {
-            Base64Util b64ut;
             size_t sz = 0;
             if (sData->request.file_data.cb)
             {

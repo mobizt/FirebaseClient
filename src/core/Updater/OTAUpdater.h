@@ -23,30 +23,43 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef UPDATER_ARDUINO_H
-#define UPDATER_ARDUINO_H
+#ifndef OTA_UPDATER_H
+#define OTA_UPDATER_H
 
 #include <Arduino.h>
 #include "./Config.h"
 
-class UpdaterArduino
+#if __has_include(<OTAStorage.h>)
+#include <OTAStorage.h>
+#endif
+
+#if __has_include(<InternalStorage.h>)
+#include <InternalStorage.h>
+#define FIREBASE_OTA_UPDATER_STORAGE
+#endif
+
+class OTAUpdaterClass
 {
 
 public:
-    UpdaterArduino();
-    ~UpdaterArduino();
+    OTAUpdaterClass();
+    ~OTAUpdaterClass();
     bool begin(int size);
     bool end();
     size_t write(uint8_t *data, size_t len);
+    void setOTAStorage(uint32_t addr);
+    bool isInit();
 
 private:
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+    InternalStorageClass *storage = nullptr;
+#endif
+    uint32_t addr = 0;
     size_t write(uint8_t b);
     void close();
     void apply();
 };
 
-#if defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
-extern UpdaterArduino Update;
-#endif
+extern OTAUpdaterClass OTAUpdater;
 
 #endif

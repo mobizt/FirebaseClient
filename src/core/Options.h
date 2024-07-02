@@ -272,11 +272,4 @@
 #define FIREBASE_ASYNC_CLIENT AsyncClient
 #endif
 
-#if __has_include(<InternalStorage.h>)
-#include <InternalStorage.h>
-#if defined(_INTERNAL_STORAGE_H_INCLUDED)
-#define FIREBASE_UPDATER_INTERNAL_STORAGE InternalStorage
-#endif
-#endif
-
 #endif

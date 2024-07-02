@@ -1,5 +1,5 @@
 /**
- * Created June 26, 2024
+ * Created July 1, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -86,6 +86,7 @@
 #define FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID -119
 #define FIREBASE_ERROR_JWT_CREATION_REQUIRED -120
 #define FIREBASE_ERROR_INVALID_DATABASE_SECRET -121
+#define FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE -122
 
 #if !defined(FPSTR)
 #define FPSTR
@@ -169,7 +170,10 @@ private:
             case FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE:
                 err.setError(code, FPSTR("too low sketch space"));
                 break;
-            case FIREBASE_ERROR_FW_UPDATE_WRITE_FAILED:
+            case FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE:
+                err.setError(code, FPSTR("OTA Storage was not set"));
+                break;
+                case FIREBASE_ERROR_FW_UPDATE_WRITE_FAILED:
                 err.setError(code, FPSTR("firmware write failed"));
                 break;
             case FIREBASE_ERROR_FW_UPDATE_END_FAILED:
@@ -191,7 +195,7 @@ private:
                 err.setError(code, FPSTR("time was not set or not valid"));
                 break;
             case FIREBASE_ERROR_INVALID_DATABASE_SECRET:
-             err.setError(code, FPSTR("invalid database secret"));
+                err.setError(code, FPSTR("invalid database secret"));
                 break;
             default:
                 err.setError(code, FPSTR("undefined"));

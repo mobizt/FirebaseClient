@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-07-01T09:17:48Z`
+Revision `2024-07-02T04:31:38Z`
 
 ## Table of Contents
 
@@ -2493,23 +2493,18 @@ The OTA firmware update is supported using bin file stored in `Firebase Storage`
 
 The Arduino devices that is natively supports OTA firmware update is `ESP8266`, `ESP32` and `Raspberry Pi Pico`.
 
-Since v1.3.1, the Arduino SAMD21 boards that use NINA firmware and WiFi101 firmware are also supported using [WiFi101OTA](https://github.com/arduino-libraries/WiFi101OTA) library.
+Since v1.3.1, the Arduino SAMD21 boards that use NINA firmware and WiFi101 firmware are also supported using [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) library.
 
-In [WiFi101OTA](https://github.com/arduino-libraries/WiFi101OTA) library, only three files e.g. `InternalStorage.h`, `InternalStorage.cpp` and `OTAStorage.h` will be used.
 
-To allow OTA update in Arduino SAMD21 boards, include `InternalStorage.h` in your sketch.
+To allow OTA update in Arduino SAMD21 boards, you have to include `Internal_Storage_OTA.h` in your sketch.
 
-```cpp
-#if __has_include(<InternalStorage.h>)
-#include <InternalStorage.h>
-#endif
-```
+Then assign the `InternalStorage` class object to be used for `Realtume Database` via `RealtumeDatabase::setOTAStorage(InternalStorage)`,  for `Google Cloud Storage` via `CloudStorage::setOTAStorage(InternalStorage)` and for `Firebase Storage` via `Storage::setOTAStorage(InternalStorage)`
 
-In Arduino board that uses NINA firmware, you have to keep only those 3 files and delete all other files from [WiFi101OTA](https://github.com/arduino-libraries/WiFi101OTA)'s src folder and `WiFi101` library must be removed in this case.
+If `InternalStorage` was not assigned before calling OTA function in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) or Arduino compatible OTA library was included, the error `OTA Storage was not set` will be occurred.
 
-Some Arduino compatible OTA library that provides the `InternalStorage.h` class that derived from `OTAStorage.h` class also can be used.
+Finally, once the OTA update complete, in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA), you have to call `InternalStorage.apply()`.
 
-The macro `FIREBASE_UPDATER_INTERNAL_STORAGE` is defined as `InternalStorage` class object when [WiFi101OTA](https://github.com/arduino-libraries/WiFi101OTA) and/or Arduino compatible OTA library are installed.
+You can use other Arduino OTA libraries that provide `InternalStorageClass` object (`InternalStorage`) that derived from modified version of Arduino WiFi101OTA's `OTAStorage` class.
 
 
 ## Project Preparation and Setup

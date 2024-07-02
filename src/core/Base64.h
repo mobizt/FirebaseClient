@@ -35,7 +35,13 @@
 #include <vector>
 #endif
 
-#include "./core/Updater/UpdaterArduino.h"
+#include "./core/Updater/OTAUpdater.h"
+
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+#define FIREBASE_UPDATER OTAUpdater
+#elif defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO)
+#define FIREBASE_UPDATER Update
+#endif
 
 static const char firebase_boundary_table[] PROGMEM = "=_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static const unsigned char firebase_base64_table[65] PROGMEM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -111,10 +117,8 @@ public:
 
     bool updateWrite(uint8_t *data, size_t len)
     {
-#if defined(OTA_UPDATE_ENABLED) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
-#if defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO) || defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
-        return Update.write(data, len) == len;
-#endif
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_UPDATER) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
+        return FIREBASE_UPDATER.write(data, len) == len;
 #endif
         return false;
     }
@@ -149,8 +153,11 @@ public:
             return true;
 
 #if defined(OTA_UPDATE_ENABLED)
-        else if (out.ota && updateWrite(reinterpret_cast<uint8_t *>(out.outT), write))
-            return true;
+        else if (out.ota)
+        {
+            if (updateWrite(reinterpret_cast<uint8_t *>(out.outT), write))
+                return true;
+        }
 #endif
         return false;
     }

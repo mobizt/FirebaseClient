@@ -34,8 +34,8 @@
 
 // For Arduino SAMD21 OTA supports.
 // See https://github.com/mobizt/FirebaseClient#ota-update.
-#if __has_include(<InternalStorage.h>)
-#include <InternalStorage.h>
+#if defined(ARDUINO_ARCH_SAMD) 
+#include <Internal_Storage_OTA.h>
 #endif
 
 #define WIFI_SSID "WIFI_AP"
@@ -137,6 +137,10 @@ void loop()
 
         Serial.println("OTA update download...");
 
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+        storage.setOTAStorage(InternalStorage);
+#endif
+
         // There is no OTA download progress available for sync OTA download.
         // To get the OTA download progress, use async OTA download instead.
 
@@ -191,13 +195,14 @@ void restart()
 {
     Serial.println("Update firmware completed.");
     Serial.println();
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+    Serial.println("Applying update...");
+    InternalStorage.apply();
+#elif defined(ESP32) || defined(ESP8266)
     Serial.println("Restarting...\n\n");
-    delay(2000);
-#if defined(ESP32) || defined(ESP8266)
     ESP.restart();
 #elif defined(ARDUINO_RASPBERRY_PI_PICO_W)
+    Serial.println("Restarting...\n\n");
     rp2040.restart();
-#elif defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
-    FIREBASE_UPDATER_INTERNAL_STORAGE.apply();
 #endif
 }

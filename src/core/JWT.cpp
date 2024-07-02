@@ -29,7 +29,6 @@
 #include "./Config.h"
 #include "./core/Memory.h"
 #include "./core/AuthConfig.h"
-#include "./core/Base64.h"
 #include "./core/URL.h"
 #include "./core/JSON.h"
 #include "./core/Error.h"

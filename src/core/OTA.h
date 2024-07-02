@@ -62,7 +62,6 @@ public:
 
     bool decodeBase64OTA(Memory &mem, Base64Util *but, const char *src, size_t len, int16_t &code)
     {
-
         bool ret = true;
         firebase_base64_io_t<uint8_t> out;
         uint8_t *buf = reinterpret_cast<uint8_t *>(mem.alloc(out.bufLen));
@@ -79,32 +78,39 @@ public:
         return ret;
     }
 
+    void setOTAStorage(uint32_t addr)
+    {
+        OTAUpdater.setOTAStorage(addr);
+    }
+
     void prepareDownloadOTA(size_t payloadLen, bool base64, int16_t &code)
     {
         code = 0;
-#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO) || defined(FIREBASE_UPDATER_INTERNAL_STORAGE))
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_UPDATER)
         int size = base64 ? (3 * (payloadLen - 2) / 4) : payloadLen;
-        if (!Update.begin(size))
+        if (!FIREBASE_UPDATER.begin(size))
             code = FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE;
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+        if (!OTAUpdater.isInit())
+            code = FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE;
+#endif
 #endif
     }
 
-    bool endDownloadOTA(int pad, int16_t &code)
+    bool endDownloadOTA(Base64Util &b64ut, int pad, int16_t &code)
     {
-
-#if defined(OTA_UPDATE_ENABLED) && (defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO) || defined(FIREBASE_UPDATER_INTERNAL_STORAGE))
-        Base64Util but;
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_UPDATER)
         // write extra pad
         if (pad > 0)
         {
             uint8_t buf[pad];
             memset(buf, 0, pad);
-            but.updateWrite(buf, pad);
+            b64ut.updateWrite(buf, pad);
         }
 
         if (code == 0)
         {
-            if (!Update.end())
+            if (!FIREBASE_UPDATER.end())
                 code = FIREBASE_ERROR_FW_UPDATE_END_FAILED;
         }
 

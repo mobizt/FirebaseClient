@@ -23,62 +23,72 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef UPDATER_ARDUINO_CPP
-#define UPDATER_ARDUINO_CPP
+#ifndef OTA_UPDATER_CPP
+#define OTA_UPDATER_CPP
 
 #include <Arduino.h>
-#include "./Config.h"
-#include "./core/Updater/UpdaterArduino.h"
+#include "./core/Updater/OTAUpdater.h"
 
-UpdaterArduino::UpdaterArduino() {}
-UpdaterArduino::~UpdaterArduino() {}
+OTAUpdaterClass::OTAUpdaterClass() {}
+OTAUpdaterClass::~OTAUpdaterClass() {}
 
-bool UpdaterArduino::begin(int size)
+bool OTAUpdaterClass::begin(int size)
 {
-#if defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
-    if (FIREBASE_UPDATER_INTERNAL_STORAGE.open(size) > 0)
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+    if (storage && storage->open(size) > 0)
         return true;
 #endif
     return false;
 }
 
-bool UpdaterArduino::end()
+bool OTAUpdaterClass::end()
 {
     close();
     return true;
 }
 
-size_t UpdaterArduino::write(uint8_t *data, size_t len)
+void OTAUpdaterClass::setOTAStorage(uint32_t addr)
+{
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+    this->addr = addr;
+    storage = reinterpret_cast<InternalStorageClass *>(addr);
+#endif
+}
+
+bool OTAUpdaterClass::isInit() { return addr > 0; }
+
+size_t OTAUpdaterClass::write(uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++)
         write(data[i]);
     return len;
 }
 
-size_t UpdaterArduino::write(uint8_t b)
+size_t OTAUpdaterClass::write(uint8_t b)
 {
-#if defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
-    FIREBASE_UPDATER_INTERNAL_STORAGE.write(b);
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+    if (storage)
+        storage->write(b);
 #endif
     return 1;
 }
 
-void UpdaterArduino::close()
+void OTAUpdaterClass::close()
 {
-#if defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
-    FIREBASE_UPDATER_INTERNAL_STORAGE.close();
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+    if (storage)
+        storage->close();
 #endif
 }
 
-void UpdaterArduino::apply()
+void OTAUpdaterClass::apply()
 {
-#if defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
-    FIREBASE_UPDATER_INTERNAL_STORAGE.apply();
+#if defined(FIREBASE_OTA_UPDATER_STORAGE)
+    if (storage)
+        storage->apply();
 #endif
 }
 
-#if defined(FIREBASE_UPDATER_INTERNAL_STORAGE)
-UpdaterArduino Update;
-#endif
+OTAUpdaterClass OTAUpdater;
 
 #endif
