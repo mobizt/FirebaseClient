@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.2-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.3-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-07-02T05:07:24Z`
+Revision `2024-07-05T02:47:30Z`
 
 ## Table of Contents
 
@@ -25,6 +25,7 @@ Revision `2024-07-02T05:07:24Z`
     3. [Async Queue](#async-queue)
         1. [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients)
     4. [Async Client](#async-client)
+        1. [Change Network Interfaces](#change-network-interfaces)
     5. [Tasks Timeout](#tasks-timeout)
     6. [Async Result](#async-result)
         1. [App Events](#app-events)
@@ -561,7 +562,55 @@ The `network_config_data` that obtained from network classes will be copied for 
 
 For the details of networking class, see [Working with Networks](#working-with-networks) section.
 
-### Tasks Timeout
+#### Change Network Interfaces
+
+Since version 1.3.3, the network interfaces that works with async client chan be changed or set.
+
+The network interface class can be changed with the function `AsyncClientClass::setNetwork`.
+
+The function parametes are included the following.
+
+```cpp
+AsyncClientClass::setNetwork(<ssl_client>, <network_config_data>);
+```
+
+The SSL client set here should work for the type of network set.
+
+The following code shows how to change the network interface in ESP device between WiFi and Ethernet.
+
+```cpp
+EthernetClient ethernet_client;
+
+ESP_SSLClient ethernet_ssl_client;
+
+WiFiClientSecure wifi_ssl_client;
+
+EthernetNetwork ethernet_network(...);
+
+DefaultNetwork wifi_network;
+
+AsyncClientClass aClient(wifi_ssl_client, getNetwork(wifi_network));
+
+void setup()
+{
+    // Connect WiFi code here
+
+    ethernet_ssl_client.setClient(&ethernet_client);
+    ethernet_ssl_client.setInsecure();
+
+    // Check network status
+    if (!aClient.networkStatus())
+    {
+        // Change to Ethernet network.
+        aClient.setNetwork(ethernet_ssl_client, getNetwork(ethernet_network));
+    }
+    
+}
+```
+
+Please see [NetworkSwitching](/examples/App/NetworkInterfaces/Async/NoCallback/NetworkSwitching) examples for more detail.
+
+- ### Tasks Timeout
 
 In case async task, the send timeout and read timeout are 30 seconds by default and it cannot be changed.
 
@@ -1306,6 +1355,9 @@ The `AsyncClientClass` object requires the network config data (`network_config_
 
 - [GenericNetwork](/examples/App/NetworkInterfaces/Async/Callback/GenericNetwork/) is used with the non-core or user defined networking.
 
+To set or change the network for the `AsyncClientClass`, please see [Change Network Interfaces](#change-network-interfaces).
+
+
 > [!WARNING]  
 > In ESP32, [ADC2](https://docs.espressif.com/projects/esp-idf/en/v4.2/esp32/api-reference/peripherals/adc.html) (`GPIO 0`, `GPIO 2`, `GPIO 4`, `GPIO 12`, `GPIO 13`, `GPIO 14`, `GPIO 15`, `GPIO 25`, `GPIO 26` and `GPIO 27`) cannot be used while using WiFi.
 >
@@ -1613,6 +1665,7 @@ The following section will provided the basic (bare minimum) code example and th
                 * [EthernetNetwork](/examples/App/NetworkInterfaces/Async/Callback/EthernetNetwork/)
                 * [GenericNetwork](/examples/App/NetworkInterfaces/Async/Callback/GenericNetwork/)
                 * [GSMNetwork](/examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/)
+                * [NetworkSwitching](/examples/App/NetworkInterfaces/Async/Callback/NetworkSwitching)
             * [NoCallback](/examples/App/NetworkInterfaces/Async/NoCallback/)
                 * [DefaultNetworks](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/)
                     * [DefaultEthernetNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultEthernetNetwork/)
@@ -1623,6 +1676,7 @@ The following section will provided the basic (bare minimum) code example and th
                 * [EthernetNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/EthernetNetwork/)
                 * [GenericNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/GenericNetwork/)
                 * [GSMNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/GSMNetwork/)
+                * [NetworkSwitching](/examples/App/NetworkInterfaces/Async/NoCallback/NetworkSwitching)
         * [Sync](/examples/App/NetworkInterfaces/Sync/)
             * [DefaultNetworks](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/)
                 * [DefaultEthernetNetwork](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultEthernetNetwork/)
@@ -1633,6 +1687,7 @@ The following section will provided the basic (bare minimum) code example and th
             * [EthernetNetwork](/examples/App/NetworkInterfaces/Sync/EthernetNetwork/)
             * [GenericNetwork](/examples/App/NetworkInterfaces/Sync/GenericNetwork/)
             * [GSMNetwork](/examples/App/NetworkInterfaces/Sync/GSMNetwork/)
+            * [NetworkSwitching](/examples/App/NetworkInterfaces/Sync/NetworkSwitching)
     * [UserManagement](/examples/App/UserManagement/)
         * [Async](/examples/App/UserManagement/Async/)
             * [Callback](/examples/App/UserManagement/Async/Callback/)

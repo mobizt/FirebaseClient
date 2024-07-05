@@ -1,5 +1,5 @@
 /**
- * Created June 26, 2024
+ * Created July 5, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -188,6 +188,7 @@ private:
     uint32_t sync_send_timeout_sec = 0, sync_read_timeout_sec = 0, session_timeout_sec = 0;
     Timer session_timer;
     Client *client = nullptr;
+    bool client_changed = false, network_changed = false;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
     AsyncTCPConfig *async_tcp_config = nullptr;
 #else
@@ -1714,7 +1715,7 @@ private:
 
     function_return_type netConnect(async_data_item_t *sData)
     {
-        if (!netStatus(sData))
+        if (!getNetworkStatus())
         {
             bool recon = net.reconnect;
 
@@ -1730,55 +1731,80 @@ private:
             if (recon && (self_connect || net.net_timer.remaining() == 0))
             {
 
-                if (!self_connect)
-                    setDebugBase(app_debug, FPSTR("Reconnecting to network..."));
-
                 if (net.network_data_type == firebase_network_data_generic_network)
                 {
-#if defined(FIREBASE_HAS_WIFI_DISCONNECT)
-                    // We can reconnect WiFi when device connected via built-in WiFi that supports reconnect
-                    if (WIFI_CONNECTED)
-                    {
-                        WiFi.reconnect();
-                        return netStatus(sData) ? function_return_type_complete : function_return_type_failure;
-                    }
-#endif
+                    if (generic_network_owner_addr > 0 && generic_network_owner_addr != reinterpret_cast<uint32_t>(this))
+                        return function_return_type_continue;
+
+                    if (generic_network_owner_addr == 0)
+                        generic_network_owner_addr = reinterpret_cast<uint32_t>(this);
+
+                    setDebugBase(app_debug, FPSTR("Reconnecting to network..."));
+
                     if (net.generic.net_con_cb)
                         net.generic.net_con_cb();
+
+                    generic_network_owner_addr = 0;
                 }
                 else if (net.network_data_type == firebase_network_data_gsm_network)
                 {
+                    if (gsm_network_owner_addr > 0 && gsm_network_owner_addr != reinterpret_cast<uint32_t>(this))
+                        return function_return_type_continue;
+
+                    if (gsm_network_owner_addr == 0)
+                        gsm_network_owner_addr = reinterpret_cast<uint32_t>(this);
+
                     if (gprsConnect(sData) == function_return_type_continue)
                         return function_return_type_continue;
+
+                    gsm_network_owner_addr = 0;
                 }
                 else if (net.network_data_type == firebase_network_data_ethernet_network)
                 {
+                    if (ethernet_network_owner_addr > 0 && ethernet_network_owner_addr != reinterpret_cast<uint32_t>(this))
+                        return function_return_type_continue;
+
+                    if (ethernet_network_owner_addr == 0)
+                        ethernet_network_owner_addr = reinterpret_cast<uint32_t>(this);
+
                     if (ethernetConnect(sData) == function_return_type_continue)
                         return function_return_type_continue;
+
+                    ethernet_network_owner_addr = 0;
                 }
                 else if (net.network_data_type == firebase_network_data_default_network)
                 {
 
+                    if (wifi_reconnection_ms == 0 || (wifi_reconnection_ms > 0 && millis() - wifi_reconnection_ms > FIREBASE_NET_RECONNECT_TIMEOUT_SEC * 1000))
+                    {
+                        wifi_reconnection_ms = millis();
+
+                        setDebugBase(app_debug, FPSTR("Reconnecting to WiFi network..."));
+
 #if defined(FIREBASE_WIFI_IS_AVAILABLE)
 #if defined(ESP32) || defined(ESP8266)
-                    if (net.wifi && net.wifi->credentials.size())
-                        net.wifi->reconnect();
-                    else
-                        WiFi.reconnect();
+
+                        if (net.wifi && net.wifi->credentials.size())
+                            net.wifi->reconnect();
+                        else
+                            WiFi.reconnect();
 #else
-                    if (net.wifi && net.wifi->credentials.size())
-                        net.wifi->reconnect();
+                        if (net.wifi && net.wifi->credentials.size())
+                            net.wifi->reconnect();
 #endif
 #endif
+                    }
                 }
             }
         }
 
-        return netStatus(sData) ? function_return_type_complete : function_return_type_failure;
+        return getNetworkStatus() ? function_return_type_complete : function_return_type_failure;
     }
 
-    bool netStatus(async_data_item_t *sData)
+    bool getNetworkStatus()
     {
+        bool net_status = net.network_status;
+
         // We will not invoke the network status request when device has built-in WiFi or Ethernet and it is connected.
         if (net.network_data_type == firebase_network_data_gsm_network)
         {
@@ -1800,6 +1826,9 @@ private:
         }
         else
             net.network_status = false;
+
+        if (net_status && !net.network_status)
+            net.disconnected_ms = millis() - 10;
 
         return net.network_status;
     }
@@ -2006,6 +2035,8 @@ private:
 
         clear(host);
         port = 0;
+        client_changed = false;
+        network_changed = false;
     }
 
     async_data_item_t *createSlot(slot_options_t &options)
@@ -2199,8 +2230,8 @@ private:
             if (sData->async && !async)
                 return exitProcess(false);
 
-            // We have to re-start sse when the authenticate changed
-            if (sData->sse && sData->auth_ts != auth_ts)
+            // Restart connection when authenticate, client or network changed
+            if ((sData->sse && sData->auth_ts != auth_ts) || client_changed || network_changed)
             {
                 stop(sData);
                 sData->state = async_state_send_header;
@@ -2372,7 +2403,7 @@ public:
      *
      * @return bool Returns true if network is connected.
      */
-    bool networkStatus() { return netStatus(nullptr); }
+    bool networkStatus() { return getNetworkStatus(); }
 
     /**
      * Stop and remove the async/sync task from the queue.
@@ -2438,6 +2469,47 @@ public:
      * @param timeoutSec The TCP session timeout in seconds.
      */
     void setSessionTimeout(uint32_t timeoutSec) { session_timeout_sec = timeoutSec; }
+
+    /**
+     * Get the network disconnection time.
+     *
+     * @return unsigned long The millisec of network disconnection since device boot.
+     */
+    unsigned long networkLastSeen() { return this->net.disconnected_ms; }
+
+    /**
+     * Return the current network type enum.
+     *
+     * @return firebase_network_data_type The firebase_network_data_type enums are firebase_network_data_default_network, firebase_network_data_generic_network, firebase_network_data_ethernet_network and firebase_network_data_gsm_network.
+     */
+    firebase_network_data_type getNetworkType() { return this->net.network_data_type; }
+
+    /**
+     * Set the network interface.
+     *
+     * The SSL client set here should work for the type of network set.
+     *
+     * @param client The SSL client that working with this type of network interface.
+     * @param net The network config data can be obtained from the networking classes via the static function called `getNetwork`.
+     */
+    void setNetwork(Client &client, network_config_data &net)
+    {
+        // Check client changes.
+        client_changed = reinterpret_cast<uint32_t>(&client) != reinterpret_cast<uint32_t>(this->client);
+        network_changed = net.network_data_type != this->net.network_data_type;
+
+        // Some changes, stop the current network client.
+        if ((client_changed || network_changed) && this->client)
+            this->client->stop();
+
+        // Change the network interface.
+        if (network_changed)
+            this->net.copy(net);
+
+        // Change the client.
+        if (client_changed)
+            this->client = &client;
+    }
 };
 
 #endif

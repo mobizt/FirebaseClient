@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created July 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -31,6 +31,11 @@
 #include "./core/Memory.h"
 
 #define FIREBASE_NET_RECONNECT_TIMEOUT_SEC 10
+
+static unsigned long wifi_reconnection_ms = 0;
+static uint32_t gsm_network_owner_addr = 0;
+static uint32_t ethernet_network_owner_addr = 0;
+static uint32_t generic_network_owner_addr = 0;
 
 struct network_config_data
 {
@@ -156,6 +161,7 @@ private:
     FirebaseWiFi *wifi = nullptr;
     Timer net_timer;
     Timer eth_timer;
+    unsigned long disconnected_ms = 0;
 
 public:
     ~network_config_data() { clear(); }

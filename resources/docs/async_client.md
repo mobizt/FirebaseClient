@@ -8,6 +8,37 @@ The async client class.
 class AsyncClientClass
 ```
 
+## Constructors
+
+1. ### 🔹 AsyncClientClass(Client &client, network_config_data &net)
+
+
+```cpp
+AsyncClientClass(Client &client, network_config_data &net)
+```
+
+**Params:**
+
+- `client` - The SSL client that working with the network interface.
+
+- `net` - The network config data can be obtained from the networking classes via the static function called `getNetwork`.
+
+2. ### 🔹 AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
+
+
+```cpp
+AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
+```
+
+**Params:**
+
+- `tcpClientConfig` - The `AsyncTCPConfig` object. See `src/core/AsyncTCPConfig.h`
+
+- `net` - The network config data can be obtained from the networking classes via the static function called `getNetwork`.
+
+
+## Functions
+
 1. ## 🔹 void setAsyncResult(AsyncResult &result)
 
 Set the external async result to use with the sync task.
@@ -38,15 +69,39 @@ void unsetAsyncResult()
 Get the network connection status.
 
 ```cpp
- bool networkStatus()
+bool networkStatus()
 ```
 
 **Returns:**
 
 - `bool` - Returns true if network is connected.
 
+4. ## 🔹   unsigned long networkLastSeen()
 
-4. ## 🔹 void stopAsync(bool all = false)
+Get the network disconnection time.
+
+```cpp
+unsigned long networkLastSeen()
+```
+
+**Returns:**
+
+- `unsigned long` - The millisec of network successfully connection since device boot.
+
+5. ## 🔹   firebase_network_data_type getNetworkType()
+
+Return the current network type.
+
+```cpp
+firebase_network_data_type getNetworkType()
+```
+
+**Returns:**
+
+- `firebase_network_data_type` - The `firebase_network_data_type` enums are `firebase_network_data_default_network`, `firebase_network_data_generic_network`, `firebase_network_data_ethernet_network` and `firebase_network_data_gsm_network`.
+
+
+6. ## 🔹 void stopAsync(bool all = false)
 
 Stop and remove the async/sync task from the queue.
 
@@ -58,7 +113,7 @@ void stopAsync(bool all = false)
 
 - `all` - The option to stop and remove all tasks. If false, only running task will be stop and removed from queue.
 
-5. ## 🔹  void stopAsync(const String &uid)
+7. ## 🔹  void stopAsync(const String &uid)
 
 Stop and remove the specific async/sync task from the queue.
 
@@ -71,7 +126,7 @@ void stopAsync(const String &uid)
 - `uid` - The task identifier of the task to stop and remove from the queue.
 
 
-6. ## 🔹  size_t taskCount() const
+8. ## 🔹  size_t taskCount() const
 
 Get the number of async/sync tasks that stored in the queue.
 
@@ -84,7 +139,7 @@ size_t taskCount() const
 - `size_t` - The total tasks in the queue.
 
 
-7. ## 🔹   FirebaseError lastError() const
+9. ## 🔹   FirebaseError lastError() const
 
 Get the last error information from async client.
 
@@ -97,7 +152,7 @@ FirebaseError lastError() const
 - `FirebaseError` - The `FirebaseError` object that contains the last error information.
 
 
-8. ## 🔹  String etag() const
+10. ## 🔹  String etag() const
 
 Get the response ETag.
 
@@ -109,7 +164,7 @@ String etag() const
 
 - `String` - The response ETag header.
 
-9. ## 🔹  void setETag(const String &etag) 
+11. ## 🔹  void setETag(const String &etag) 
 
 Set the ETag header to the task.
 
@@ -123,7 +178,7 @@ void setETag(const String &etag)
 
 - `etag` - The ETag to set to the task.
 
-10. ## 🔹  void setSyncSendTimeout(uint32_t timeoutSec)
+12. ## 🔹  void setSyncSendTimeout(uint32_t timeoutSec)
 
 Set the sync task's send timeout in seconds.
 
@@ -136,7 +191,7 @@ void setSyncSendTimeout(uint32_t timeoutSec)
 - `timeoutSec` - The TCP write timeout in seconds.
 
 
-11. ## 🔹  void setSyncReadTimeout(uint32_t timeoutSec) 
+13. ## 🔹  void setSyncReadTimeout(uint32_t timeoutSec) 
 
 Set the sync task's read timeout in seconds.
 
@@ -147,4 +202,22 @@ void setSyncReadTimeout(uint32_t timeoutSec)
 **Params:**
 
 - `timeoutSec` - The TCP read timeout in seconds.
+
+
+14. ## 🔹  void setNetwork(Client &client, network_config_data &net)
+
+Set the network interface.
+
+The SSL client set here should work for the type of network set.
+
+```cpp
+void setNetwork(Client &client, network_config_data &net)
+```
+
+**Params:**
+
+- `client` - The SSL client that working with this type of network interface.
+
+- `net` - The network config data can be obtained from the networking classes via the static function called `getNetwork`.
+
 

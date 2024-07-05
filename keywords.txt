@@ -301,6 +301,7 @@ setSSEFilters   KEYWORD2
 setJWTProcessor KEYWORD2
 setSessionTimeout   KEYWORD2
 setOTAStorage   KEYWORD2
+setNetwork  KEYWORD2
 
 ###################
 # Struct (KEYWORD3)
