@@ -164,7 +164,7 @@ void checkConnection(AsyncClientClass &a_client)
     unsigned long lastseen_timeout = 5 * 60 * 1000; // The timeout in 5 min since last seen.
     unsigned long change_timeout = 60 * 1000;       // Change network every 1 min.
 
-    // We will check the last seen network connection with functiopn networkLastSeen.
+    // We will check the last seen network connection with function networkLastSeen().
     // The function networkStatus() returns the current network connection status.
 
     if (!a_client.networkStatus() && millis() - last_change_ms > change_timeout && millis() - a_client.networkLastSeen() > lastseen_timeout)
