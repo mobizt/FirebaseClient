@@ -2503,8 +2503,8 @@ public:
             this->client->stop();
 
         // Change the network interface.
-        if (network_changed)
-            this->net.copy(net);
+        // Should not check the type changes, just overwrite
+        this->net.copy(net);
 
         // Change the client.
         if (client_changed)
