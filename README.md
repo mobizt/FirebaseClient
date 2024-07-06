@@ -78,7 +78,8 @@ Revision `2024-07-06T08:01:08Z`
 11. [Library Build Options](#library-build-options)
     1. [Predefined Options](#predefined-options)
     2. [Optional Options](#optional-options)
-12. [License](#license)
+12. [Sponsors](#sponsors)
+13. [License](#license)
 
 
 ## Introduction
@@ -3130,14 +3131,14 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
 Thank your for the following users whose supporting me.
 
-<img style="vertical-align: text-top;" class="circle avatar-user" src="https://avatars.githubusercontent.com/u/63749581?s=52&amp;v=4" width="26" height="26" alt="@jiperez11"> [jiperez11](https://github.com/jiperez11)
+<img class="circle avatar-user" src="https://avatars.githubusercontent.com/u/63749581?s=52&amp;v=4" width="26" height="26" alt="@jiperez11"> [jiperez11](https://github.com/jiperez11)
 
-<img style="vertical-align: text-top;" class="circle avatar-user" src="https://avatars.githubusercontent.com/u/13026382?s=52&amp;v=4" width="26" height="26" alt="private sponsor"> [Private sponsor](#sponsors)
+<img class="circle avatar-user" src="https://avatars.githubusercontent.com/u/13026382?s=52&amp;v=4" width="26" height="26" alt="private sponsor"> [Private sponsor](#sponsors)
 
-<img style="vertical-align: text-top;" class="circle avatar-user" src="https://avatars.githubusercontent.com/u/59456277?s=52&amp;v=4" width="26" height="26" alt="@Jagakatt"> [Jagakatt](https://github.com/Jagakatt)
+<img class="circle avatar-user" src="https://avatars.githubusercontent.com/u/59456277?s=52&amp;v=4" width="26" height="26" alt="@Jagakatt"> [Jagakatt](https://github.com/Jagakatt)
 
 If you like my works, you can give a star.
-If you can make profit from my project, you can sponsoring me.
+If you can make benefit from my project or love it, you can sponsoring me.
 
 
 
