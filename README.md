@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-07-05T02:47:30Z`
+Revision `2024-07-06T08:01:08Z`
 
 ## Table of Contents
 
@@ -3130,11 +3130,11 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
 Thank your for the following users whose supporting me.
 
-<img class="circle avatar-user" src="https://avatars.githubusercontent.com/u/63749581?s=52&amp;v=4" width="26" height="26" alt="@jiperez11"> [jiperez11](https://github.com/jiperez11)
+<img style="vertical-align: text-top;" class="circle avatar-user" src="https://avatars.githubusercontent.com/u/63749581?s=52&amp;v=4" width="26" height="26" alt="@jiperez11"> [jiperez11](https://github.com/jiperez11)
 
-<img class="circle avatar-user" src="https://avatars.githubusercontent.com/u/13026382?s=52&amp;v=4" width="26" height="26" alt="private sponsor"> [private sponsor](#sponsors)
+<img style="vertical-align: text-top;" class="circle avatar-user" src="https://avatars.githubusercontent.com/u/13026382?s=52&amp;v=4" width="26" height="26" alt="private sponsor"> [Private sponsor](#sponsors)
 
-<img class="circle avatar-user" src="https://avatars.githubusercontent.com/u/59456277?s=52&amp;v=4" width="26" height="26" alt="@Jagakatt"> [Jagakatt](https://github.com/Jagakatt)
+<img style="vertical-align: text-top;" class="circle avatar-user" src="https://avatars.githubusercontent.com/u/59456277?s=52&amp;v=4" width="26" height="26" alt="@Jagakatt"> [Jagakatt](https://github.com/Jagakatt)
 
 If you like my works, you can give a star.
 If you can make profit from my project, you can sponsoring me.
