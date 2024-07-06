@@ -1,5 +1,5 @@
 /**
- * Created July 5, 2024
+ * Created July 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -115,27 +115,58 @@ private:
     // SPI Ethernet Module Data
     struct ethernet_data
     {
+        friend class AsyncClientClass;
+
+    private:
         int ethernet_reset_pin = -1;
         int ethernet_cs_pin = -1;
         uint8_t *ethernet_mac = nullptr;
-        Firebase_StaticIP *static_ip = nullptr;
+        Firebase_StaticIP static_ip;
         ethernet_conn_status conn_satatus;
         unsigned long stobe_ms = 0;
 
     public:
+        ethernet_data() { ethernet_mac = new uint8_t[6]; }
+        ~ethernet_data() { clear(); }
         void copy(const ethernet_data &rhs)
         {
             this->ethernet_reset_pin = rhs.ethernet_reset_pin;
             this->ethernet_cs_pin = rhs.ethernet_cs_pin;
-            this->ethernet_mac = rhs.ethernet_mac;
             this->static_ip = rhs.static_ip;
+            setMac(rhs.ethernet_mac);
         }
+
+        void setMac(uint8_t *mac)
+        {
+            if (mac)
+            {
+                clearMac();
+                this->ethernet_mac = new uint8_t[6];
+                memcpy(this->ethernet_mac, mac, 6);
+            }
+        }
+
+        void setCs(int cs) { ethernet_cs_pin = cs; }
+
+        void setReset(int reset) { ethernet_reset_pin = reset; }
+
+        void setStaticIP(const Firebase_StaticIP &static_ip) { this->static_ip = static_ip; }
+
+        void clearMac()
+        {
+            if (this->ethernet_mac)
+            {
+                delete[] this->ethernet_mac;
+                this->ethernet_mac = nullptr;
+            }
+        }
+
         void clear()
         {
+            clearMac();
             ethernet_mac = nullptr;
             ethernet_cs_pin = -1;
             ethernet_reset_pin = -1;
-            static_ip = nullptr;
         }
     };
 #endif
@@ -330,7 +361,23 @@ public:
      * @param macAddress The mac address.
      * @param csPin The Ethernet module chip select/enable pin.
      * @param resetPin The Ethernet module reset pin. Assign -1 if not used.
-     * @param staticIP (Optional) The pointer to Firebase_StaticIP object that holds the static ip configuration.
+     */
+    explicit EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin)
+    {
+        init();
+        network_data.ethernet.setMac(macAddress);
+        network_data.ethernet.setCs(csPin);
+        network_data.ethernet.setReset(resetPin);
+        network_data.network_data_type = firebase_network_data_ethernet_network;
+    }
+
+    /**
+     * The Ethernet network class for generic Ethernet modules.
+     *
+     * @param macAddress The mac address.
+     * @param csPin The Ethernet module chip select/enable pin.
+     * @param resetPin The Ethernet module reset pin. Assign -1 if not used.
+     * @param staticIP TheFirebase_StaticIP object that holds the static ip configuration.
      *
      * The Firebase_StaticIP class constructor parameters for static IP are following.
      * @param ipAddress The static IP.
@@ -342,13 +389,13 @@ public:
      * By default the external Ethernet module can be used with the library when the macro ENABLE_ETHERNET_NETWORK was defined and Ethernet library was included in the user sketch.
      * The user defined Ethernet class and header other than `Ethernet.h` and `Ethernet` can be used, see https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#library-build-options.
      */
-    explicit EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, Firebase_StaticIP *staticIP = nullptr)
+    explicit EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, const Firebase_StaticIP &staticIP)
     {
         init();
-        network_data.ethernet.ethernet_mac = macAddress;
-        network_data.ethernet.ethernet_cs_pin = csPin;
-        network_data.ethernet.ethernet_reset_pin = resetPin;
-        network_data.ethernet.static_ip = staticIP;
+        network_data.ethernet.setMac(macAddress);
+        network_data.ethernet.setCs(csPin);
+        network_data.ethernet.setReset(resetPin);
+        network_data.ethernet.setStaticIP(staticIP);
         network_data.network_data_type = firebase_network_data_ethernet_network;
     }
     ~EthernetNetwork() { clear(); }

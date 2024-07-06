@@ -36,20 +36,23 @@
 
 uint8_t Eth_MAC[] = {0x02, 0xF0, 0x0D, 0xBE, 0xEF, 0x01};
 
-/* Define the static IP (Optional)
-IPAddress localIP(192, 168, 1, 104);
-IPAddress subnet(255, 255, 0, 0);
-IPAddress gateway(192, 168, 1, 1);
-IPAddress dnsServer(8, 8, 8, 8);
-bool optional = false; // Use this static IP only no DHCP
-Firebase_StaticIP staIP(localIP, subnet, gateway, dnsServer, optional);
-*/
-
 void printResult(AsyncResult &aResult);
 
 EthernetClient eth;
 
 EthernetNetwork eth_network(Eth_MAC, WIZNET_CS_PIN, WIZNET_RESET_PIN);
+
+/* Or configure the static IP with EthernetNetwork.
+
+IPAddress localIP(192, 168, 1, 104);
+IPAddress subnet(255, 255, 0, 0);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress dnsServer(8, 8, 8, 8);
+bool optional = false; // True = use this static IP only no DHCP,  false = switch to DHCP if static failed.
+Firebase_StaticIP staIP(localIP, subnet, gateway, dnsServer, optional);
+EthernetNetwork eth_network(Eth_MAC, WIZNET_CS_PIN, WIZNET_RESET_PIN, staIP);
+
+*/
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 

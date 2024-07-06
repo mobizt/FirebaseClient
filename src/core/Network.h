@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created July 6, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -387,6 +387,7 @@ typedef enum
 typedef struct firebase_client_static_address
 {
     friend class AsyncClientClass;
+    friend class network_config_data;
 
 public:
     /**
@@ -406,6 +407,8 @@ public:
         this->dnsServer = dnsServer;
         this->optional = optional;
     };
+
+    firebase_client_static_address(){};
 
 private:
     IPAddress ipAddress;

@@ -1,5 +1,5 @@
 /**
- * Created June 25, 2024
+ * Created July 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -76,6 +76,7 @@ struct async_request_handler_t
 public:
     enum tcp_client_type
     {
+        tcp_client_type_none,
         tcp_client_type_sync,
         tcp_client_type_async
     };

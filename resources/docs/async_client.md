@@ -10,7 +10,15 @@ class AsyncClientClass
 
 ## Constructors
 
-1. ### 🔹 AsyncClientClass(Client &client, network_config_data &net)
+1. ### 🔹 AsyncClientClass()
+
+Default constructor.
+
+```cpp
+AsyncClientClass()
+```
+
+2. ### 🔹 AsyncClientClass(Client &client, network_config_data &net)
 
 
 ```cpp
@@ -23,7 +31,7 @@ AsyncClientClass(Client &client, network_config_data &net)
 
 - `net` - The network config data can be obtained from the networking classes via the static function called `getNetwork`.
 
-2. ### 🔹 AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
+3. ### 🔹 AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
 
 
 ```cpp

@@ -1657,13 +1657,13 @@ private:
             net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_waits;
             setDebugBase(app_debug, FPSTR("Starting Ethernet connection..."));
 
-            if (net.ethernet.static_ip)
+            if (validIP(net.ethernet.static_ip.ipAddress))
             {
-                if (net.ethernet.static_ip->optional == false)
-                    FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
+                if (net.ethernet.static_ip.optional == false)
+                    FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip.ipAddress, net.ethernet.static_ip.dnsServer, net.ethernet.static_ip.defaultGateway, net.ethernet.static_ip.netMask);
                 else if (!FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac))
                 {
-                    FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip->ipAddress, net.ethernet.static_ip->dnsServer, net.ethernet.static_ip->defaultGateway, net.ethernet.static_ip->netMask);
+                    FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip.ipAddress, net.ethernet.static_ip.dnsServer, net.ethernet.static_ip.defaultGateway, net.ethernet.static_ip.netMask);
                 }
             }
             else
@@ -2341,6 +2341,11 @@ private:
     std::vector<uint32_t> rVec; // AsyncResult vector
 
 public:
+    AsyncClientClass()
+    {
+        client_type = async_request_handler_t::tcp_client_type_none;
+    }
+
     AsyncClientClass(Client &client, network_config_data &net) : client(&client)
     {
         this->net.copy(net);
@@ -2496,10 +2501,10 @@ public:
     {
         // Check client changes.
         client_changed = reinterpret_cast<uint32_t>(&client) != reinterpret_cast<uint32_t>(this->client);
-        network_changed = net.network_data_type != this->net.network_data_type;
+        network_changed = true;
 
         // Some changes, stop the current network client.
-        if ((client_changed || network_changed) && this->client)
+        if (client_changed && this->client)
             this->client->stop();
 
         // Change the network interface.

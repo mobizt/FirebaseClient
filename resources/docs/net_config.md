@@ -184,14 +184,14 @@ class EthernetNetwork
 
 ## Constructors
 
-1. ### 🔹 EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, Firebase_StaticIP *staticIP = nullptr)
+1. ### 🔹 EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin)
 
     By default the external Ethernet module can be used with the library when the macro `ENABLE_ETHERNET_NETWORK` was defined and Ethernet library was included in the user sketch.
     
     The user defined Ethernet class and header other than `Ethernet.h` and `Ethernet` can be used, see [Library Build Options](https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#library-build-options) for how to.
 
     ```cpp
-    EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, Firebase_StaticIP *staticIP = nullptr)
+    EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin)
     ```
 
     **Params:**
@@ -201,6 +201,22 @@ class EthernetNetwork
     - `resetPin` - The Ethernet module reset pin. Assign -1 if not used.
     - `staticIP` - (Optional) The pointer to Firebase_StaticIP object that holds the static ip configuration.
 
+2. ### 🔹 EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, const Firebase_StaticIP &staticIP)
+
+    By default the external Ethernet module can be used with the library when the macro `ENABLE_ETHERNET_NETWORK` was defined and Ethernet library was included in the user sketch.
+    
+    The user defined Ethernet class and header other than `Ethernet.h` and `Ethernet` can be used, see [Library Build Options](https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#library-build-options) for how to.
+
+    ```cpp
+    EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, const Firebase_StaticIP &staticIP)
+    ```
+
+    **Params:**
+
+    - `macAddress` - The mac address.
+    - `csPin` - The Ethernet module chip select/enable pin.
+    - `resetPin` - The Ethernet module reset pin. Assign -1 if not used.
+    - `staticIP` - The `Firebase_StaticIP` object that holds the static ip configuration. See [Firebase_StaticIP](#firebase_staticip) for more detail.
 
 ## Functions
 
@@ -240,8 +256,8 @@ class DefaultEthernetNetwork
 
 
 ## Constructors
-
-1. ### 🔹 DefaultEthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, Firebase_StaticIP *staticIP = nullptr)
+    
+1. ### 🔹 DefaultEthernetNetwork(Firebase_SPI_ETH_Module &eth)
 
     This eth should be defined at the same usage scope of AsyncClientCalss.
 
