@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created July 11, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -468,14 +468,28 @@ public:
      *
      * The file_operating_mode enums are included file_mode_open_read, file_mode_open_write, file_mode_open_append, and file_mode_remove.
      */
-    explicit FileConfig(const String &filename, FileConfigCallback cb)
+    explicit FileConfig(const String &filename = "", FileConfigCallback cb = NULL) { setFile(filename, cb); }
+
+    ~FileConfig() {}
+
+    /**
+     * Set the File config.
+     *
+     * @param filename The file name of file to be read and write.
+     * @param cb The FileConfigCallback function that accepts File object, file name and file_operating_mode to be processed.
+     *
+     * The file_operating_mode enums are included file_mode_open_read, file_mode_open_write, file_mode_open_append, and file_mode_remove.
+     */
+    void setFile(const String &filename, FileConfigCallback cb)
     {
         clear();
-        setFilename(filename);
-        setCallback(cb);
-        data.initialized = true;
+        if (cb && filename.length())
+        {
+            setFilename(filename);
+            setCallback(cb);
+            data.initialized = true;
+        }
     }
-    ~FileConfig() {}
 
     /**
      * Clear the internal data.
@@ -492,6 +506,8 @@ public:
         if (filename.length() > 0 && filename[0] != '/')
             data.filename += '/';
         data.filename += filename;
+        if (data.cb && data.filename.length())
+            data.initialized = true;
         return *this;
     }
 
@@ -505,6 +521,8 @@ public:
     FileConfig &setCallback(FileConfigCallback cb)
     {
         data.cb = cb;
+        if (data.cb && data.filename.length())
+            data.initialized = true;
         return *this;
     }
 
@@ -543,7 +561,17 @@ public:
      * @param data The pointer to the uint8_t data array.
      * @param size The size of data in bytes.
      */
-    explicit BlobConfig(uint8_t *data = nullptr, size_t size = 0)
+    explicit BlobConfig(uint8_t *data = nullptr, size_t size = 0) { setBlob(data, size); }
+
+    ~BlobConfig() {}
+
+    /**
+     * Set the BLOB config.
+     *
+     * @param data The pointer to the uint8_t data array.
+     * @param size The size of data in bytes.
+     */
+    void setBlob(uint8_t *data, size_t size)
     {
         clear();
         if (data && size > 0)
@@ -555,7 +583,6 @@ public:
 
         this->data.initialized = true;
     }
-    ~BlobConfig() {}
 
     /**
      * Clear the internal data.
@@ -564,21 +591,21 @@ public:
 
     /**
      * Get the pointer to the internal BLOB data.
-     * 
+     *
      * @return uint8_t* The pointer to uint8_t data array.
      */
     uint8_t *blob() const { return data.data; }
 
     /**
      * Get the data size.
-     * 
+     *
      * @return size_t The size of data in bytes.
      */
     size_t size() const { return data.data_size; }
 
     /**
      * Get the reference to the internal file_config_data.
-     * 
+     *
      * @return file_config_data & The reference to the internal file_config_data.
      */
     file_config_data &getData() { return data; }
@@ -589,7 +616,7 @@ private:
 
 /**
  * The static function to get the reference of file_config_data from FileConfig.
- * 
+ *
  * @return file_config_data & The reference to the internal file_config_data.
  */
 template <typename T>
@@ -597,7 +624,7 @@ static file_config_data &getFile(T &file) { return file.get(); }
 
 /**
  * The static function to get the reference of file_config_data from BlobConfig.
- * 
+ *
  * @return file_config_data & The reference to the internal file_config_data.
  */
 template <typename T>

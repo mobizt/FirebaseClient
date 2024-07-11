@@ -99,9 +99,9 @@ RealtimeDatabase Database;
 AsyncResult aResult_no_callback;
 
 #if defined(ENABLE_FS)
-FileConfig upload_data("/upload.bin", fileCallback);
+FileConfig upload_data("/upload.bin", fileCallback); // Can be set later with upload_data.setFile("/upload.bin", fileCallback);
 
-FileConfig download_data("/download.bin", fileCallback);
+FileConfig download_data("/download.bin", fileCallback); // Can be set later with download_data.setFile("/download.bin", fileCallback);
 #endif
 
 bool taskComplete = false;

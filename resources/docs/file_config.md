@@ -17,11 +17,11 @@ class FileConfig
 
 ## Constructors
 
-1. ### 🔹 FileConfig(const String &filename, FileConfigCallback cb)
+1. ### 🔹 FileConfig(const String &filename = "", FileConfigCallback cb = NULL)
 
 
     ```cpp
-    FileConfig(const String &filename, FileConfigCallback cb)
+    FileConfig(const String &filename = "", FileConfigCallback cb = NULL)
     ```
 
     **Params:**
@@ -34,7 +34,23 @@ class FileConfig
 
 ## Functions
 
-1. ### 🔹 void clear()
+1. ### 🔹 void setFile(const String &filename, FileConfigCallback cb)
+
+    Set the File config.
+
+    ```cpp
+    void setFile(const String &filename, FileConfigCallback cb)
+    ```
+
+    **Params:**
+
+    - `filename` - The file name of file to be read and write.
+
+    - `cb` - The FileConfigCallback function that accepts File object, file name and `file_operating_mode` to be processed.
+
+    The `file_operating_mode` enums are included `file_mode_open_read`, `file_mode_open_write`, `file_mode_open_append`, and `file_mode_remove`.
+
+2. ### 🔹 void clear()
     
     Clear the internal data.
 
@@ -42,7 +58,7 @@ class FileConfig
     void clear()
     ```
 
-2. ### 🔹 FileConfig &setFilename(const String &filename)
+3. ### 🔹 FileConfig &setFilename(const String &filename)
     
     Set the file name.
 
@@ -58,7 +74,7 @@ class FileConfig
 
     - `FileConfig &` - The reference to the `FileConfig` itself.
 
-3. ### 🔹 FileConfig &setFilename(const String &filename)
+4. ### 🔹 FileConfig &setFilename(const String &filename)
     
     Set the file name.
 
@@ -77,7 +93,7 @@ class FileConfig
     - `FileConfig &` - The reference to the `FileConfig` itself.
 
 
-4. ### 🔹 file_config_data &get()
+5. ### 🔹 file_config_data &get()
     
     Get the reference to the internal `file_config_data`.
 
@@ -108,8 +124,6 @@ class BlobConfig
 
 1. ### 🔹 BlobConfig(uint8_t *data = nullptr, size_t size = 0)
 
-    In the networkConnectionCB function, the complete operations for the carier (network) and internet connection should be performed
-
     ```cpp
     BlobConfig(uint8_t *data = nullptr, size_t size = 0)
     ```
@@ -121,7 +135,20 @@ class BlobConfig
 
 ## Functions
 
-1. ### 🔹 void clear()
+1. ### 🔹 void setBlob(uint8_t *data, size_t size)
+
+    Set the BLOB config.
+
+    ```cpp
+    void setBlob(uint8_t *data, size_t size)
+    ```
+
+    **Params:**
+
+    - `data` - The pointer to the uint8_t data array.
+    - `size` - The size of data in bytes.
+
+2. ### 🔹 void clear()
     
     Clear the internal data.
 
@@ -129,7 +156,7 @@ class BlobConfig
     void clear()
     ```
 
-2. ### 🔹 uint8_t *blob() const
+3. ### 🔹 uint8_t *blob() const
     
     Get the pointer to the internal BLOB data.
 
@@ -141,7 +168,7 @@ class BlobConfig
 
     - `uint8_t *` -  The pointer to uint8_t data array.
 
-3. ### 🔹 size_t size()
+4. ### 🔹 size_t size()
     
     Get the size of data.
 
@@ -153,7 +180,7 @@ class BlobConfig
 
     - `size_t` -  The size of data in bytes.
 
-4. ### 🔹 file_config_data &getData()
+5. ### 🔹 file_config_data &getData()
     
     Get the reference to the internal file_config_data.
 

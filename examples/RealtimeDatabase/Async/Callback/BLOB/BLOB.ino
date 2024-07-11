@@ -81,8 +81,8 @@ RealtimeDatabase Database;
 uint8_t source[2048];
 uint8_t dest[2048];
 
-BlobConfig upload_data(source, 2048);
-BlobConfig download_data(dest, 2048);
+BlobConfig upload_data(source, 2048); // Can be set later with upload_data.setBlob(source, 2048);
+BlobConfig download_data(dest, 2048); // Can be set later with download_data.setBlob(dest, 2048);
 
 bool taskComplete = false;
 

@@ -86,7 +86,7 @@ void printResult(AsyncResult &aResult);
 #if defined(ENABLE_FS)
 
 void fileCallback(File &file, const char *filename, file_operating_mode mode);
-FileConfig media_file("/media.mp4", fileCallback);
+FileConfig media_file("/media.mp4", fileCallback); // Can be set later with media_file.setFile("/media.mp4", fileCallback);
 
 #endif
 
