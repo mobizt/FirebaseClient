@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-07-11T01:22:56Z`
+Revision `2024-07-17T01:51:54Z`
 
 ## Table of Contents
 
@@ -443,7 +443,7 @@ All sync and async tasks are managed using `FIFO queue` in async client. The tas
 
 The queue is task based or session based which stores the HTTP request and response data which used for a task. 
  
-The memory used for a task that stores in the queue is approximately 1 k. Then in order to limit the memory usage in a async client, this library allows only 10 tasks can be stored in the queue at a time.
+The memory used for a task that stores in the queue is approximately 1 k. Then in order to limit the memory usage in an async client, this library allows 10 or 20 tasks by default that can be stored in the queue at a time.
 
 The maximum queue size can be set via the build flag `FIREBASE_ASYNC_QUEUE_LIMIT` or macro that defined in [src/Config.h](src/Config.h) or in your own defined config at [src/UserConfig.h](src/UserConfig.h).
 
