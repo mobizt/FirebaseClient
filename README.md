@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-07-17T01:51:54Z`
+Revision `2024-07-17T02:11:29Z`
 
 ## Table of Contents
 
@@ -984,6 +984,10 @@ CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <use
 This type of authentication is used when privilege (admin rights) access is needed.
 
 The service account credentials and json file can be used for authentication. 
+
+This authentication types can be used in `all Firebase services apps`. Then in case various Firebase services application, to reduce the code complexity, you can define single global `FirebaseApp` and `ServiceAuth` for all your Firebase services used in your code.
+
+The single global `FirebaseApp` with `ServiceAuth` may not meet your requirement when you want to sign in as a user. In this case you should define the `FirebaseApp`s specific for different authentication types.
 
 The [ServiceAuth](/examples/App/AppInitialization/Async/Callback/ServiceAuth/) class parameters are included the following.
 
