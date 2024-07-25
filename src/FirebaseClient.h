@@ -1,5 +1,5 @@
 /**
- * Created June 22, 2024
+ * Created July 25, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -145,12 +145,14 @@ namespace firebase
             else if (app.auth_data.user_auth.auth_data_type == user_auth_data_id_token)
             {
 #if defined(ENABLE_ID_TOKEN)
-
                 app.auth_data.app_token.expire = app.expire;
                 app.auth_data.app_token.val[app_tk_ns::token] = app.auth_data.user_auth.id_token.val[id_tk_ns::token];
                 app.auth_data.app_token.val[app_tk_ns::refresh] = app.auth_data.user_auth.id_token.val[id_tk_ns::refresh];
                 app.auth_data.app_token.authenticated = app.auth_data.user_auth.id_token.val[id_tk_ns::token].length() ? app.auth_data.user_auth.initialized : false;
-                resetTimer(app, true, app.auth_data.user_auth.id_token.expire);
+                bool forceRefresh = app.auth_data.app_token.val[app_tk_ns::token].length() == 0 && app.auth_data.app_token.val[app_tk_ns::refresh].length();
+                resetTimer(app, true, forceRefresh ? 0 : app.auth_data.user_auth.id_token.expire);
+                if (forceRefresh)
+                    app.expire = app.auth_data.user_auth.id_token.expire;
 #endif
             }
             else if (app.auth_data.user_auth.auth_type == auth_access_token || app.auth_data.user_auth.auth_type == auth_custom_token)
