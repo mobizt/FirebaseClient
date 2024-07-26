@@ -40,7 +40,7 @@ void loop()
 
 The bucketid is the Storage bucket Id of object to download.
 The object is the object in Storage bucket to download.
-
+The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
 
 
 ```cpp
@@ -50,7 +50,7 @@ bool download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, 
 **Params:**
 
 - `aClient` - The async client.
-- `parent` - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+- `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
 - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
 
 **Returns:**
@@ -62,6 +62,7 @@ bool download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, 
 
 The bucketid is the Storage bucket Id of object to download.
 The object is the object in Storage bucket to download.
+The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
 
 
 ```cpp
@@ -71,7 +72,7 @@ void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, 
 **Params:**
 
 - `aClient` - The async client.
-- `parent` - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+- `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
 - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
 - `aResult` - The async result (AsyncResult).
 
@@ -81,6 +82,7 @@ void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, 
 
 The bucketid is the Storage bucket Id of object to download.
 The object is the object in Storage bucket to download.
+The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
 
 
 ```cpp
@@ -90,7 +92,7 @@ void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, 
 **Params:**
 
 - `aClient` - The async client.
-- `parent` - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+- `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
 - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
 - `cb` - The async result callback (AsyncResultCallback).
 - `uid` - The user specified UID of async result (optional).
@@ -101,7 +103,7 @@ void download(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, 
 
 The bucketid is the Storage bucket Id of object to upload.
 The object is the object to be stored in the Storage bucket.
-
+The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
 
 
 ```cpp
@@ -154,7 +156,7 @@ void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, fi
 **Params:**
 
 - `aClient` - The async client.
-- `parent` - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+- `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
 - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
 - `mime` - The file MIME type
 - `cb` - The async result callback (AsyncResultCallback).
@@ -166,7 +168,7 @@ void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, fi
 
 The bucketid is the Storage bucket Id of object to download.
 The object is the object in Storage bucket to download.
-
+The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
 
 
 ```cpp
@@ -176,7 +178,7 @@ bool ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
 **Params:**
 
 - `aClient` - The async client.
-- `parent` - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+- `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
 
 **Returns:**
 
@@ -187,6 +189,7 @@ bool ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
 
 The bucketid is the Storage bucket Id of object to download.
 The object is the object in Storage bucket to download.
+The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
 
 
 ```cpp
@@ -196,7 +199,7 @@ void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, Async
 **Params:**
 
 - `aClient` - The async client.
-- `parent` - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+- `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
 - `aResult` - The async result (AsyncResult).
 
 
@@ -205,6 +208,7 @@ void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, Async
 
 The bucketid is the Storage bucket Id of object to download.
 The object is the object in Storage bucket to download.
+The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
 
 
 ```cpp
@@ -214,7 +218,7 @@ void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, Async
 **Params:**
 
 - `aClient` - The async client.
-- `parent` - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+- `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
 - `cb` - The async result callback (AsyncResultCallback).
 - `uid` - The user specified UID of async result (optional).
 
@@ -224,6 +228,7 @@ void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, Async
 
 The bucketid is the Storage bucket Id of object to get metadata.
 The object is the object in Storage bucket to get metadata.
+The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
 
 
 

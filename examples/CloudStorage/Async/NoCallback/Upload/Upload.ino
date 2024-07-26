@@ -175,7 +175,7 @@ void loop()
         Serial.println("Upload file...");
 
         GoogleCloudStorage::uploadOptions options;
-        options.mime = "media.mp4";
+        options.mime = "video/mp4";
         options.uploadType = GoogleCloudStorage::upload_type_resumable;
         // options.uploadType = GoogleCloudStorage::upload_type_simple;
         // options.uploadType = GoogleCloudStorage::upload_type_multipart;
@@ -228,7 +228,7 @@ void printResult(AsyncResult &aResult)
         Firebase.printf("Downloaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.downloadInfo().progress, "%", aResult.downloadInfo().downloaded, aResult.downloadInfo().total);
         if (aResult.downloadInfo().total == aResult.downloadInfo().downloaded)
         {
-            Firebase.printf("Download task: %s, completed!", aResult.uid().c_str());
+            Firebase.printf("Download task: %s, completed!n", aResult.uid().c_str());
         }
     }
 
@@ -237,7 +237,7 @@ void printResult(AsyncResult &aResult)
         Firebase.printf("Uploaded, task: %s, %d%s (%d of %d)\n", aResult.uid().c_str(), aResult.uploadInfo().progress, "%", aResult.uploadInfo().uploaded, aResult.uploadInfo().total);
         if (aResult.uploadInfo().total == aResult.uploadInfo().uploaded)
         {
-            Firebase.printf("Upload task: %s, completed!", aResult.uid().c_str());
+            Firebase.printf("Upload task: %s, completed!\n", aResult.uid().c_str());
             Serial.print("Download URL: ");
             Serial.println(aResult.uploadInfo().downloadUrl);
         }

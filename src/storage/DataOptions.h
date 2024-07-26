@@ -51,11 +51,11 @@ namespace FirebaseStorage
         friend class Storage;
 
     private:
-        String bucketId, object;
+        String bucketId, object, accessToken;
 
     public:
         Parent() {}
-        explicit Parent(const String &bucketId, const String &object = "")
+        explicit Parent(const String &bucketId, const String &object = "", const String &accessToken = "")
         {
             this->object = object;
             this->bucketId = bucketId;
@@ -74,9 +74,12 @@ namespace FirebaseStorage
 
             if (this->object.length() && this->object[0] == '/')
                 this->object.remove(0, 1);
+
+            this->accessToken = accessToken;
         }
         String getObject() const { return object; }
         String getBucketId() const { return bucketId; }
+        String getAccessToken() const { return accessToken; }
     };
 
     class DataOptions

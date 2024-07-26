@@ -4,12 +4,13 @@
  * Storage::ota(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
- * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
  *
  * The bucketid is the Storage bucket Id of object to download.
  * The object is the object in Storage bucket to download.
+ * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
@@ -136,6 +137,8 @@ void loop()
 #endif
 
         storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), asyncCB, "otaTask");
+        // You can provide the access token in case non-authentication mode (NoAuth) for priviledge access file download.
+        // storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin", "access token"), asyncCB, "otaTask");
     }
 }
 

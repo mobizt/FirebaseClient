@@ -1,5 +1,5 @@
 /**
- * Created July 2, 2024
+ * Created July 26, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -480,6 +480,10 @@ private:
                     options.extras += file->file.size() < 256 * 1024 ? "multipart" : "resumable";
                     file->file.close();
                 }
+                else if (file && file->data_size)
+                {
+                    options.extras += file->data_size < 256 * 1024 ? "multipart" : "resumable";
+                }
 #endif
             }
         }
@@ -576,7 +580,7 @@ private:
                     request.aClient->setContentType(sData, "application/json; charset=UTF-8");
                     request.aClient->setContentLength(sData, request.options->payload.length());
 
-                    sData->request.file_data.resumable.setSize(sData->request.file_data.file_size);
+                    sData->request.file_data.resumable.setSize(sData->request.file_data.file_size ? sData->request.file_data.file_size : sData->request.file_data.data_size);
                     sData->request.file_data.resumable.updateRange();
                 }
                 else if (request.options->extras.indexOf("uploadType=multipart") > -1)
@@ -594,7 +598,7 @@ private:
                     request.options->payload.remove(0, request.options->payload.length());
                     request.aClient->setFileContentLength(sData, sData->request.file_data.multipart.getOptions().length() + sData->request.file_data.multipart.getLast().length(), "Content-Length");
                     sData->request.val[req_hndlr_ns::header] += "\r\n";
-                    sData->request.file_data.multipart.setSize(sData->request.file_data.file_size);
+                    sData->request.file_data.multipart.setSize(sData->request.file_data.file_size ? sData->request.file_data.file_size : sData->request.file_data.data_size);
                     sData->request.file_data.multipart.updateState(0);
                 }
 #endif
@@ -661,7 +665,7 @@ private:
 
     void setFileStatus(async_data_item_t *sData, const GoogleCloudStorage::async_request_data_t &request)
     {
-        if ((request.file && request.file->filename.length()) || request.opt.ota)
+        if ((request.file && (request.file->filename.length() || request.file->data_size)) || request.opt.ota)
         {
             sData->download = request.method == async_request_handler_t::http_get;
             sData->upload = request.method == async_request_handler_t::http_post ||

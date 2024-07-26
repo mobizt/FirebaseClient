@@ -4,10 +4,11 @@
  * bool Storage::ota(<AsyncClient>, <FirebaseStorage::Parent>);
  *
  * <AsyncClient> - The async client.
- * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
  *
  * The bucketid is the Storage bucket Id of object to download.
  * The object is the object in Storage bucket to download.
+ * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
  *
  * This function returns bool status when task is complete.
  *
@@ -34,7 +35,7 @@
 
 // For Arduino SAMD21 OTA supports.
 // See https://github.com/mobizt/FirebaseClient#ota-update.
-#if defined(ARDUINO_ARCH_SAMD) 
+#if defined(ARDUINO_ARCH_SAMD)
 #include <Internal_Storage_OTA.h>
 #define OTA_STORAGE InternalStorage
 #endif
@@ -146,6 +147,8 @@ void loop()
         // To get the OTA download progress, use async OTA download instead.
 
         bool result = storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"));
+        // You can provide the access token in case non-authentication mode (NoAuth) for priviledge access file download.
+        // bool result = storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin", "access token"));
 
         if (result)
             restart();

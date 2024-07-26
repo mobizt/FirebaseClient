@@ -437,7 +437,7 @@ private:
 #if defined(ENABLE_FS)
                 if (sData->upload && sData->upload_progress_enabled && sData->request.file_data.file_size)
                 {
-                    sData->aResult.upload_data.total = size;
+                    sData->aResult.upload_data.total = sData->request.file_data.file_size > size ? sData->request.file_data.file_size : size;
                     sData->aResult.upload_data.uploaded = sData->request.payloadIndex;
                     returnResult(sData, false);
                 }

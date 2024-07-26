@@ -16,11 +16,12 @@
  * bool Storage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>);
  *
  * <AsyncClient> - The async client.
- * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+ * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
  * <file_config_data> - The filesystem data (file_config_data) obtained from FileConfig class object.
  *
  * The bucketid is the Storage bucket Id of object to download.
  * The object is the object in Storage bucket to download.
+ * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
  *
  * This function returns bool status when task is complete.
  *
@@ -172,6 +173,8 @@ void loop()
         // There is no download progress available for sync download.
         // To get the download progress, use async download instead.
         bool result = storage.download(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file));
+        // You can provide the access token in case non-authentication mode (NoAuth) for priviledge access file download.
+        // bool result = storage.download(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4", "access token"), getFile(media_file));
 
         if (result)
             Serial.println("Object downloaded.");

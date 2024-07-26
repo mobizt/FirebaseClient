@@ -1,5 +1,5 @@
 /**
- * Created July 2, 2024
+ * Created July 26, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -86,9 +86,10 @@ public:
     /** Download object from the Firebase Storage.
      *
      * @param aClient The async client.
-     * @param parent The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+     * @param parent The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
      * The bucketid is the Storage bucket Id of object to download.
      * The object is the object in Storage bucket to download.
+     * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
      *
      * @return Boolean value, indicates the success of the operation.
@@ -103,9 +104,10 @@ public:
     /** Download object from the Firebase Storage.
      *
      * @param aClient The async client.
-     * @param parent The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+     * @param parent The FirebaseStorage::Parent object included Storage bucket IdThe FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
      * The bucketid is the Storage bucket Id of object to download.
      * The object is the object in Storage bucket to download.
+     * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
      * @param aResult The async result (AsyncResult).
      *
@@ -118,9 +120,10 @@ public:
     /** Download object from the Firebase Storage.
      *
      * @param aClient The async client.
-     * @param parent The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+     * @param parent The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
      * The bucketid is the Storage bucket Id of object to download.
      * The object is the object in Storage bucket to download.
+     * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
@@ -169,9 +172,10 @@ public:
     /** Upload file to the Firebase Storage.
      *
      * @param aClient The async client.
-     * @param parent The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+     * @param parent The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
      * The bucketid is the Storage bucket Id of object to upload.
      * The object is the object to be stored in the Storage bucket.
+     * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
      * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
      * @param mime The file MIME type
      * @param cb The async result callback (AsyncResultCallback).
@@ -189,6 +193,7 @@ public:
      * @param parent The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
      * The bucketid is the Storage bucket Id of object to download.
      * The object is the object in Storage bucket to download.
+     * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
      *
      * @return Boolean value, indicates the success of the operation.
      *
@@ -202,9 +207,10 @@ public:
     /** Perform OTA update using a firmware (object) from the Firebase Storage.
      *
      * @param aClient The async client.
-     * @param parent The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+     * @param parent The FirebaseStorage::Parent object included Storage bucket IdThe FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
      * The bucketid is the Storage bucket Id of object to download.
      * The object is the object in Storage bucket to download.
+     * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
      * @param aResult The async result (AsyncResult).
      *
      */
@@ -216,9 +222,10 @@ public:
     /** Perform OTA update using a firmware (object) from the Firebase Storage.
      *
      * @param aClient The async client.
-     * @param parent The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
+     * @param parent The FirebaseStorage::Parent object included Storage bucket IdThe FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor. 
      * The bucketid is the Storage bucket Id of object to download.
      * The object is the object in Storage bucket to download.
+     * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      *
@@ -418,7 +425,14 @@ private:
             method = async_request_handler_t::http_get;
             if (requestType == FirebaseStorage::firebase_storage_request_type_download ||
                 requestType == FirebaseStorage::firebase_storage_request_type_download_ota)
+            {
                 options.extras += "?alt=media";
+                if (options.parent.getAccessToken().length())
+                {
+                    options.extras += "&token=";
+                    options.extras += options.parent.getAccessToken();
+                }
+            }
         }
         else if (requestType == FirebaseStorage::firebase_storage_request_type_upload || requestType == FirebaseStorage::firebase_storage_request_type_delete)
         {
@@ -545,7 +559,7 @@ private:
 
     void setFileStatus(async_data_item_t *sData, const FirebaseStorage::async_request_data_t &request)
     {
-        if ((request.file && request.file->filename.length()) || request.opt.ota)
+        if ((request.file && (request.file->filename.length() || request.file->data_size)) || request.opt.ota)
         {
             sData->download = request.method == async_request_handler_t::http_get;
             sData->upload = request.method == async_request_handler_t::http_post ||
