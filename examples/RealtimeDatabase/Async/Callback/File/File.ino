@@ -43,20 +43,19 @@
 #include <WiFi.h>
 #endif
 
-#include <FirebaseClient.h>
+// In ESP32 Core SDK v3.x.x, to use filesystem in this library,
+// the File object should be defined globally 
+// and the library's internal defined FS object should be set with
+// this global FS object in fileCallback function.
+#include <FS.h>
+File myFile;
 
-#if defined(ENABLE_FS)      // Defined in this library
-#if defined(FLASH_SUPPORTS) // Defined in this library
 #if defined(ESP32)
 #include <SPIFFS.h>
 #endif
 #define MY_FS SPIFFS
-#else
-#include <SPI.h>
-#include <SD.h>
-#define MY_FS SD
-#endif
-#endif
+
+#include <FirebaseClient.h>
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
@@ -227,27 +226,27 @@ void printResult(AsyncResult &aResult)
 }
 
 #if defined(ENABLE_FS)
-void fileCallback(File &file, const char *filename, file_operating_mode mode)
-{
-    // FILE_OPEN_MODE_READ, FILE_OPEN_MODE_WRITE and FILE_OPEN_MODE_APPEND are defined in this library
-    // MY_FS is defined in this example
-    switch (mode)
-    {
+void fileCallback(File &file, const char *filename, file_operating_mode mode) {
+  // FILE_OPEN_MODE_READ, FILE_OPEN_MODE_WRITE and FILE_OPEN_MODE_APPEND are defined in this library
+  // MY_FS is defined in this example
+  switch (mode) {
     case file_mode_open_read:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_READ);
-        break;
+      myFile = MY_FS.open(filename, FILE_OPEN_MODE_READ);
+      break;
     case file_mode_open_write:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
-        break;
+      myFile = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
+      break;
     case file_mode_open_append:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
-        break;
+      myFile = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
+      break;
     case file_mode_remove:
-        MY_FS.remove(filename);
-        break;
+      MY_FS.remove(filename);
+      break;
     default:
-        break;
-    }
+      break;
+  }
+  // Set the internal FS object with global File object.
+  file = myFile;
 }
 
 void printFile()

@@ -1,5 +1,5 @@
 /**
- * Created July 11, 2024
+ * Created July 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -192,169 +192,6 @@ public:
     String getLocation() { return location.c_str(); }
 };
 
-struct file_upload_multipart_data
-{
-    enum multipart_state
-    {
-        multipart_state_undefined,
-        multipart_state_send_header,
-        multipart_state_send_options_payload,
-        multipart_state_send_data_payload,
-        multipart_state_send_last_payload,
-        multipart_state_read_response
-    };
-
-private:
-    bool enable = false;
-    int index = 0;
-    int size = 0;
-    int read = 0;
-    String boaundary, options_part, last_part;
-    multipart_state state = multipart_state_undefined;
-
-public:
-    file_upload_multipart_data() {}
-    bool isEnabled() { return enable; }
-    void setSize(size_t size)
-    {
-        this->size = size;
-        enable = size > 0;
-    }
-    int getChunkSize(int size, int payloadIndex, int dataIndex)
-    {
-        int chunkSize = size - dataIndex < FIREBASE_CHUNK_SIZE ? size - dataIndex : FIREBASE_CHUNK_SIZE;
-
-        if (state == multipart_state_send_options_payload && options_part.length() && payloadIndex + chunkSize > index + (int)options_part.length())
-        {
-            chunkSize = index + options_part.length() - payloadIndex;
-        }
-        else if (state == multipart_state_send_data_payload && size && payloadIndex + chunkSize > index + size)
-        {
-            chunkSize = index + size - payloadIndex;
-        }
-        else if (state == multipart_state_send_last_payload && last_part.length() && payloadIndex + chunkSize > index + (int)last_part.length())
-        {
-            chunkSize = index + last_part.length() - payloadIndex;
-        }
-
-        return chunkSize;
-    }
-    bool isUpload() { return state == multipart_state_send_options_payload || state == multipart_state_send_data_payload || state == multipart_state_send_last_payload; }
-    void updateState(uint32_t payloadIndex)
-    {
-        if (enable)
-        {
-            if (state == multipart_state_undefined)
-            {
-                state = multipart_state_send_header;
-            }
-            else if (state == multipart_state_send_header)
-            {
-                state = multipart_state_send_options_payload;
-            }
-            else if (state == multipart_state_send_options_payload)
-            {
-                if (options_part.length() && payloadIndex == index + options_part.length())
-                {
-                    state = multipart_state_send_data_payload;
-                    index += options_part.length();
-                }
-            }
-            else if (state == multipart_state_send_data_payload)
-            {
-                if (size && (int)payloadIndex >= index + size)
-                {
-                    state = multipart_state_send_last_payload;
-                    index += size;
-                }
-            }
-            else if (state == multipart_state_send_last_payload)
-            {
-                if (last_part.length() && payloadIndex == index + last_part.length())
-                {
-                    state = multipart_state_read_response;
-                    index += last_part.length();
-                }
-            }
-        }
-    }
-
-    multipart_state getState() { return state; }
-
-    void clear()
-    {
-        boaundary.remove(0, boaundary.length());
-        options_part.remove(0, options_part.length());
-        last_part.remove(0, last_part.length());
-        enable = false;
-        size = 0;
-        index = 0;
-        state = multipart_state_undefined;
-    }
-
-    void setOptions(const String &options)
-    {
-        options_part = "--";
-        options_part += getBoundary();
-        options_part += "\r\n";
-        options_part += FPSTR("Content-Type: application/json; charset=UTF-8\r\n\r\n");
-        options_part += options;
-        options_part += "\r\n\r\n";
-        options_part += "--";
-        options_part += getBoundary();
-        options_part += "\r\n\r\n";
-    }
-
-    String getOptions()
-    {
-        return options_part;
-    }
-
-    void setLast()
-    {
-        last_part = "\r\n--";
-        last_part += getBoundary();
-        last_part += "--";
-    }
-
-    String getLast()
-    {
-        setLast();
-        return last_part;
-    }
-
-    String getBoundary(bool newLine = false)
-    {
-        if (boaundary.length() == 0)
-            boaundary = makeBoundary(15);
-        if (newLine)
-            return String(boaundary + "\r\n");
-        return boaundary;
-    }
-
-    String makeBoundary(size_t len)
-    {
-        Memory mem;
-        String temp = FPSTR("=_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        char *buf = reinterpret_cast<char *>(mem.alloc(len));
-        if (len)
-        {
-            --len;
-            buf[0] = temp[0];
-            buf[1] = temp[1];
-            for (size_t n = 2; n < len; n++)
-            {
-                int key = rand() % (int)(temp.length() - 1);
-                buf[n] = temp[key];
-            }
-            buf[len] = '\0';
-        }
-        String out = buf;
-        mem.release(&buf);
-        return out;
-    }
-};
-
 #endif
 
 struct file_config_data
@@ -372,7 +209,6 @@ struct file_config_data
 
 #if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
     file_upload_resumable_data resumable;
-    file_upload_multipart_data multipart;
 #endif
 #if defined(ENABLE_FS)
     FileConfigCallback cb = NULL;

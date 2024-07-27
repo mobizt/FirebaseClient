@@ -47,20 +47,19 @@
 #include <WiFi.h>
 #endif
 
-#include <FirebaseClient.h>
+// In ESP32 Core SDK v3.x.x, to use filesystem in this library,
+// the File object should be defined globally
+// and the library's internal defined FS object should be set with
+// this global FS object in fileCallback function.
+#include <FS.h>
+File myFile;
 
-#if defined(ENABLE_FS)      // Defined in this library
-#if defined(FLASH_SUPPORTS) // Defined in this library
 #if defined(ESP32)
 #include <SPIFFS.h>
 #endif
 #define MY_FS SPIFFS
-#else
-#include <SPI.h>
-#include <SD.h>
-#define MY_FS SD
-#endif
-#endif
+
+#include <FirebaseClient.h>
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
@@ -179,7 +178,6 @@ void loop()
         options.mime = "video/mp4";
         options.uploadType = GoogleCloudStorage::upload_type_resumable;
         // options.uploadType = GoogleCloudStorage::upload_type_simple;
-        // options.uploadType = GoogleCloudStorage::upload_type_multipart;
 
 #if defined(ENABLE_FS)
         cstorage.upload(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options, asyncCB, "uploadTask");
@@ -259,13 +257,13 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode)
     switch (mode)
     {
     case file_mode_open_read:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_READ);
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_READ);
         break;
     case file_mode_open_write:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
         break;
     case file_mode_open_append:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
         break;
     case file_mode_remove:
         MY_FS.remove(filename);
@@ -273,5 +271,7 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode)
     default:
         break;
     }
+    // Set the internal FS object with global File object.
+    file = myFile;
 }
 #endif

@@ -1,5 +1,5 @@
 /**
- * Created July 26, 2024
+ * Created July 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -507,7 +507,7 @@ private:
 
             request.aClient->setFileContentLength(sData, 0);
 
-            if (sData->request.file_data.file_size == 0)
+            if (sData->request.file_data.filename.length() > 0 && sData->request.file_data.file_size == 0)
                 return setClientError(request, FIREBASE_ERROR_FILE_READ);
 
             URLUtil uut;

@@ -267,20 +267,23 @@ class RealtimeDatabase
 
     ### Example
     ```cpp
+    #include <FS.h>
+    File myFile; // Define the File object globally.
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        file = SPIFFS.open(filename, "r");
+        myFile = SPIFFS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        file = SPIFFS.open(filename, "w");
+        myFile = SPIFFS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        file = SPIFFS.open(filename, "a");
+        myFile = SPIFFS.open(filename, "a");
         break;
         
         case file_mode_remove:
@@ -290,6 +293,9 @@ class RealtimeDatabase
         default:
         break;
       }
+
+      // Set the internal FS object with global File object.
+      file = myFile;
     }
 
     FileConfig fileConfig("/example.txt", fileCallback);
@@ -315,20 +321,23 @@ class RealtimeDatabase
 
     ### Example
     ```cpp
+    #include <FS.h>
+    File myFile; // Define the File object globally.
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        file = SPIFFS.open(filename, "r");
+        myFile = SPIFFS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        file = SPIFFS.open(filename, "w");
+        myFile = SPIFFS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        file = SPIFFS.open(filename, "a");
+        myFile = SPIFFS.open(filename, "a");
         break;
         
         case file_mode_remove:
@@ -338,6 +347,9 @@ class RealtimeDatabase
         default:
         break;
       }
+
+      // Set the internal FS object with global File object.
+      file = myFile;
     }
 
     FileConfig fileConfig("/example.txt", fileCallback);
@@ -530,20 +542,23 @@ class RealtimeDatabase
 
     ### Example
     ```cpp
+    #include <FS.h>
+    File myFile; // Define the File object globally.
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        file = SPIFFS.open(filename, "r");
+        myFile = SPIFFS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        file = SPIFFS.open(filename, "w");
+        myFile = SPIFFS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        file = SPIFFS.open(filename, "a");
+        myFile = SPIFFS.open(filename, "a");
         break;
         
         case file_mode_remove:
@@ -553,6 +568,9 @@ class RealtimeDatabase
         default:
         break;
       }
+
+      // Set the internal FS object with global File object.
+      file = myFile;
     }
 
     FileConfig fileConfig("/example.txt", fileCallback);
@@ -579,20 +597,23 @@ class RealtimeDatabase
 
     ### Example
     ```cpp
+    #include <FS.h>
+    File myFile; // Define the File object globally.
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        file = SPIFFS.open(filename, "r");
+        myFile = SPIFFS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        file = SPIFFS.open(filename, "w");
+        myFile = SPIFFS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        file = SPIFFS.open(filename, "a");
+        myFile = SPIFFS.open(filename, "a");
         break;
         
         case file_mode_remove:
@@ -602,6 +623,9 @@ class RealtimeDatabase
         default:
         break;
       }
+
+      // Set the internal FS object with global File object.
+      file = myFile;
     }
 
     FileConfig fileConfig("/example.txt", fileCallback);
@@ -727,20 +751,23 @@ class RealtimeDatabase
     
     ### Example
     ```cpp
+    #include <FS.h>
+    File myFile; // Define the File object globally.
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        file = SPIFFS.open(filename, "r");
+        myFile = SPIFFS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        file = SPIFFS.open(filename, "w");
+        myFile = SPIFFS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        file = SPIFFS.open(filename, "a");
+        myFile = SPIFFS.open(filename, "a");
         break;
         
         case file_mode_remove:
@@ -750,6 +777,9 @@ class RealtimeDatabase
         default:
         break;
       }
+
+      // Set the internal FS object with global File object.
+      file = myFile;
     }
 
     FileConfig fileConfig("/example.txt", fileCallback);
@@ -777,20 +807,23 @@ class RealtimeDatabase
     
     ### Example
     ```cpp
+    #include <FS.h>
+    File myFile; // Define the File object globally.
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        file = SPIFFS.open(filename, "r");
+        myFile = SPIFFS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        file = SPIFFS.open(filename, "w");
+        myFile = SPIFFS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        file = SPIFFS.open(filename, "a");
+        myFile = SPIFFS.open(filename, "a");
         break;
         
         case file_mode_remove:
@@ -800,6 +833,9 @@ class RealtimeDatabase
         default:
         break;
       }
+
+      // Set the internal FS object with global File object.
+      file = myFile;
     }
 
     FileConfig fileConfig("/example.txt", fileCallback);

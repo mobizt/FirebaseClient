@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.7-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.8-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-07-26T08:35:39Z`
+Revision `2024-07-27T09:57:58Z`
 
 ## Table of Contents
 
@@ -1260,21 +1260,25 @@ In case of file errors, you have to verify your hardware and your code to make s
 
 ```cpp
 
+#include <FS.h>
+File myFile; // Define the File object globally.
+
 #define MY_FS SPIFFS
 
 void fileCallback(File &file, const char *filename, file_operating_mode mode)
 {
     // FILE_OPEN_MODE_READ, FILE_OPEN_MODE_WRITE and FILE_OPEN_MODE_APPEND are defined in this library
+    // MY_FS is defined in this example
     switch (mode)
     {
     case file_mode_open_read:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_READ);
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_READ);
         break;
     case file_mode_open_write:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
         break;
     case file_mode_open_append:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
         break;
     case file_mode_remove:
         MY_FS.remove(filename);
@@ -1282,6 +1286,8 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode)
     default:
         break;
     }
+    // Set the internal FS object with global File object.
+    file = myFile;
 }
 
 FileConfig media_file("/media.mp4", fileCallback);

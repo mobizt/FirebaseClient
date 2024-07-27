@@ -285,19 +285,6 @@ private:
         size_t totalLen = sData->request.file_data.file_size;
         bool fileopen = sData->request.payloadIndex == 0;
 
-#if defined(ENABLE_CLOUD_STORAGE)
-
-        if (sData->request.file_data.multipart.isEnabled())
-        {
-            totalLen += sData->request.file_data.multipart.getOptions().length() + sData->request.file_data.multipart.getLast().length();
-            if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.getState() == file_upload_multipart_data::multipart_state_send_options_payload)
-                return send(sData, reinterpret_cast<const uint8_t *>(sData->request.file_data.multipart.getOptions().c_str()), sData->request.file_data.multipart.getOptions().length(), totalLen, async_state_send_payload);
-            else if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.getState() == file_upload_multipart_data::multipart_state_send_last_payload)
-                return send(sData, reinterpret_cast<const uint8_t *>(sData->request.file_data.multipart.getLast().c_str()), sData->request.file_data.multipart.getLast().length(), totalLen, async_state_send_payload);
-
-            fileopen |= sData->request.file_data.multipart.isEnabled() && sData->request.payloadIndex == sData->request.file_data.multipart.getOptions().length();
-        }
-#endif
         if (sData->upload)
             sData->upload_progress_enabled = true;
 
@@ -372,8 +359,6 @@ private:
 #if defined(ENABLE_CLOUD_STORAGE)
                 if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.isUpload())
                     toSend = sData->request.file_data.resumable.getChunkSize(totalLen, sData->request.payloadIndex, sData->request.file_data.data_pos);
-                else if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.getState() == file_upload_multipart_data::multipart_state_send_data_payload)
-                    toSend = sData->request.file_data.multipart.getChunkSize(totalLen, sData->request.payloadIndex, sData->request.file_data.data_pos);
                 else
 #endif
                     toSend = totalLen - sData->request.file_data.data_pos < FIREBASE_CHUNK_SIZE ? totalLen - sData->request.file_data.data_pos : FIREBASE_CHUNK_SIZE;
@@ -466,15 +451,6 @@ private:
                         return sData->return_type;
                     }
                 }
-                else if (sData->request.file_data.multipart.isEnabled() && sData->request.file_data.multipart.isUpload())
-                {
-                    sData->request.file_data.multipart.updateState(sData->request.payloadIndex);
-                    if (sData->request.file_data.multipart.isUpload())
-                    {
-                        sData->return_type = function_return_type_continue;
-                        return sData->return_type;
-                    }
-                }
                 else if (sData->request.payloadIndex < size)
                 {
                     sData->return_type = function_return_type_continue;
@@ -518,8 +494,6 @@ private:
             {
                 if (sData->request.file_data.resumable.isEnabled())
                     sData->request.file_data.resumable.updateState(sData->request.payloadIndex);
-                else if (sData->request.file_data.multipart.isEnabled())
-                    sData->request.file_data.multipart.updateState(sData->request.payloadIndex);
             }
 #endif
 

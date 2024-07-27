@@ -1,5 +1,5 @@
 /**
- * Created July 26, 2024
+ * Created July 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -444,7 +444,7 @@ private:
         options.requestType = requestType;
         options.parent = parent;
 
-        if (uploadOptions && strlen(uploadOptions->insertProps.c_str()) && (uploadOptions->uploadType == GoogleCloudStorage::upload_type_multipart || uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable))
+        if (uploadOptions && strlen(uploadOptions->insertProps.c_str()) && uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable)
             options.payload = uploadOptions->insertProps.c_str();
 
         async_request_handler_t::http_request_method method = async_request_handler_t::http_post;
@@ -465,26 +465,28 @@ private:
             options.extras += "?name=";
             options.extras += uut.encode(parent.getObject());
 
-            options.extras += "&uploadType=";
-            if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_simple)
-                options.extras += "media";
-            else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_multipart)
-                options.extras += "multipart";
-            else if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable)
+            size_t sz = 0;
+
+            if (file && file->cb && file->filename.length())
             {
 #if defined(ENABLE_FS)
-                // resumable upload is only for file bigger than 256k
-                if (file && file->cb)
-                {
-                    file->cb(file->file, file->filename.c_str(), file_mode_open_read);
-                    options.extras += file->file.size() < 256 * 1024 ? "multipart" : "resumable";
-                    file->file.close();
-                }
-                else if (file && file->data_size)
-                {
-                    options.extras += file->data_size < 256 * 1024 ? "multipart" : "resumable";
-                }
+                file->cb(file->file, file->filename.c_str(), file_mode_open_read);
+                sz = file->file.size();
+                file->file.close();
 #endif
+            }
+            else if (file && file->data_size)
+                sz = file->data_size;
+
+            options.extras += "&uploadType=";
+
+            // resumable upload is only for file bigger than 256k
+            if (uploadOptions && uploadOptions->uploadType == GoogleCloudStorage::upload_type_resumable && sz >= 256 * 1024)
+                options.extras += "resumable";
+            else
+            {
+                options.extras += "media";
+                options.payload.remove(0, options.payload.length());
             }
         }
         else if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_delete)
@@ -583,24 +585,6 @@ private:
                     sData->request.file_data.resumable.setSize(sData->request.file_data.file_size ? sData->request.file_data.file_size : sData->request.file_data.data_size);
                     sData->request.file_data.resumable.updateRange();
                 }
-                else if (request.options->extras.indexOf("uploadType=multipart") > -1)
-                {
-                    request.aClient->setContentType(sData, "multipart/related; boundary=" + sData->request.file_data.multipart.getBoundary());
-
-                    ObjectWriter owriter;
-                    JSONUtil jut;
-                    String name, mime;
-                    jut.addObject(name, "name", request.options->parent.getObject(), true, true);
-                    jut.addObject(mime, "contentType", request.mime, true, true);
-                    owriter.addMember(request.options->payload, name, false, "}");
-                    owriter.addMember(request.options->payload, mime, false, "}");
-                    sData->request.file_data.multipart.setOptions(request.options->payload);
-                    request.options->payload.remove(0, request.options->payload.length());
-                    request.aClient->setFileContentLength(sData, sData->request.file_data.multipart.getOptions().length() + sData->request.file_data.multipart.getLast().length(), "Content-Length");
-                    sData->request.val[req_hndlr_ns::header] += "\r\n";
-                    sData->request.file_data.multipart.setSize(sData->request.file_data.file_size ? sData->request.file_data.file_size : sData->request.file_data.data_size);
-                    sData->request.file_data.multipart.updateState(0);
-                }
 #endif
             }
             else
@@ -610,7 +594,7 @@ private:
                 request.aClient->setFileContentLength(sData, 0);
             }
 
-            if (sData->request.file_data.file_size == 0)
+            if (sData->request.file_data.filename.length() > 0 && sData->request.file_data.file_size == 0)
                 return setClientError(request, FIREBASE_ERROR_FILE_READ);
 
             if (request.options->extras.indexOf("uploadType=media") == -1)
