@@ -1,5 +1,5 @@
 /**
- * Created July 27, 2024
+ * Created July 30, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -82,7 +82,7 @@ private:
 typedef void (*FileConfigCallback)(FILEOBJ &file, const char *filename, file_operating_mode mode);
 #endif
 
-#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+#if defined(ENABLE_CLOUD_STORAGE)
 
 struct file_upload_resumable_data
 {
@@ -207,7 +207,7 @@ struct file_config_data
     String filename;
     size_t file_size = 0;
 
-#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+#if defined(ENABLE_CLOUD_STORAGE)
     file_upload_resumable_data resumable;
 #endif
 #if defined(ENABLE_FS)

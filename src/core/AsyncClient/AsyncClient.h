@@ -280,8 +280,6 @@ private:
     {
         function_return_type ret = function_return_type_continue;
 
-#if defined(ENABLE_FS)
-
         size_t totalLen = sData->request.file_data.file_size;
         bool fileopen = sData->request.payloadIndex == 0;
 
@@ -290,6 +288,7 @@ private:
 
         if (fileopen)
         {
+#if defined(ENABLE_FS)
             if (sData->request.file_data.filename.length() > 0)
             {
                 if (sData->request.file_data.file_status == file_config_data::file_status_closed)
@@ -302,7 +301,7 @@ private:
                     }
                 }
             }
-
+#endif
             if (sData->request.base64)
             {
                 ret = send(sData, reinterpret_cast<const uint8_t *>("\""), 1, totalLen, async_state_send_payload);
@@ -313,25 +312,32 @@ private:
 
         uint8_t *buf = nullptr;
         int toSend = 0;
+#if defined(ENABLE_FS)
         if (sData->request.file_data.filename.length() > 0 ? sData->request.file_data.file.available() : sData->request.file_data.data_pos < sData->request.file_data.data_size)
+#else
+        if (sData->request.file_data.data_pos < sData->request.file_data.data_size)
+#endif
         {
             if (sData->request.base64)
             {
 
                 toSend = FIREBASE_BASE64_CHUNK_SIZE;
 
+#if defined(ENABLE_FS)
                 if (sData->request.file_data.filename.length() > 0)
                 {
                     if (sData->request.file_data.file.available() < toSend)
                         toSend = sData->request.file_data.file.available();
                 }
-                else
+#endif
+                if (sData->request.file_data.data && sData->request.file_data.data_size)
                 {
                     if ((int)(sData->request.file_data.data_size - sData->request.file_data.data_pos) < toSend)
                         toSend = sData->request.file_data.data_size - sData->request.file_data.data_pos;
                 }
 
                 buf = reinterpret_cast<uint8_t *>(mem.alloc(toSend));
+#if defined(ENABLE_FS)
                 if (sData->request.file_data.filename.length() > 0)
                 {
                     toSend = sData->request.file_data.file.read(buf, toSend);
@@ -343,7 +349,8 @@ private:
                         goto exit;
                     }
                 }
-                else if (sData->request.file_data.data)
+#endif
+                if (sData->request.file_data.data && sData->request.file_data.data_size)
                 {
                     memcpy(buf, sData->request.file_data.data + sData->request.file_data.data_pos, toSend);
                     sData->request.file_data.data_pos += toSend;
@@ -365,6 +372,7 @@ private:
 
                 buf = reinterpret_cast<uint8_t *>(mem.alloc(toSend));
 
+#if defined(ENABLE_FS)
                 if (sData->request.file_data.filename.length() > 0)
                 {
                     toSend = sData->request.file_data.file.read(buf, toSend);
@@ -376,7 +384,8 @@ private:
                         goto exit;
                     }
                 }
-                else if (sData->request.file_data.data)
+#endif
+                if (sData->request.file_data.data && sData->request.file_data.data_size)
                 {
                     memcpy(buf, sData->request.file_data.data + sData->request.file_data.data_pos, toSend);
                 }
@@ -393,7 +402,6 @@ private:
 
         if (buf)
             mem.release(&buf);
-#endif
 
         return ret;
     }
@@ -419,19 +427,17 @@ private:
                 sData->request.dataIndex += toSend;
                 sData->request.payloadIndex += toSend;
 
-#if defined(ENABLE_FS)
                 if (sData->upload && sData->upload_progress_enabled && sData->request.file_data.file_size)
                 {
                     sData->aResult.upload_data.total = sData->request.file_data.file_size > size ? sData->request.file_data.file_size : size;
                     sData->aResult.upload_data.uploaded = sData->request.payloadIndex;
                     returnResult(sData, false);
                 }
-#endif
 
                 if (sData->request.dataIndex == len)
                     sData->request.dataIndex = 0;
 
-#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+#if defined(ENABLE_CLOUD_STORAGE)
 
                 if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.isUpload())
                 {
@@ -489,7 +495,7 @@ private:
             else if (state == async_state_send_payload)
                 sData->state = async_state_read_response;
 
-#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+#if defined(ENABLE_CLOUD_STORAGE)
             if (sData->upload)
             {
                 if (sData->request.file_data.resumable.isEnabled())
@@ -593,7 +599,7 @@ private:
         if (sData->response.httpCode == 0)
             return function_return_type_continue;
 
-#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+#if defined(ENABLE_CLOUD_STORAGE)
 
         if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.getLocation().length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
@@ -944,7 +950,7 @@ private:
                 sData->response.flags.http_response = true;
                 clear(sData->response.val[res_hndlr_ns::etag]);
                 String temp[5];
-#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+#if defined(ENABLE_CLOUD_STORAGE)
                 if (sData->upload)
                     parseRespHeader(sData, sData->response.val[res_hndlr_ns::header], sData->request.file_data.resumable.getLocationRef(), "Location");
 #else
@@ -977,7 +983,7 @@ private:
 
                 clear(sData);
 
-#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+#if defined(ENABLE_CLOUD_STORAGE)
                 if (sData->upload && sData->request.file_data.resumable.isEnabled())
                 {
                     sData->request.file_data.resumable.setHeaderState();
@@ -1849,18 +1855,20 @@ private:
 
     void setFileContentLength(async_data_item_t *sData, int headerLen = 0, const String &customHeader = "")
     {
-#if defined(ENABLE_FS)
-        if ((sData->request.file_data.cb && sData->request.file_data.filename.length()) || (sData->request.file_data.data_size && sData->request.file_data.data))
-        {
-            size_t sz = 0;
-            if (sData->request.file_data.cb)
-            {
-                sData->request.file_data.cb(sData->request.file_data.file, sData->request.file_data.filename.c_str(), file_mode_open_read);
-                sz = sData->request.file_data.file.size();
-            }
-            else
-                sz = sData->request.file_data.data_size;
+        size_t sz = 0;
 
+#if defined(ENABLE_FS)
+        if (sData->request.file_data.cb && sData->request.file_data.filename.length())
+        {
+            sData->request.file_data.cb(sData->request.file_data.file, sData->request.file_data.filename.c_str(), file_mode_open_read);
+            sz = sData->request.file_data.file.size();
+        }
+#endif
+        if (sData->request.file_data.data_size && sData->request.file_data.data)
+            sz = sData->request.file_data.data_size;
+
+        if (sz > 0)
+        {
             sData->request.file_data.file_size = sData->request.base64 ? 2 + b64ut.getBase64Len(sz) : sz;
             if (customHeader.length())
             {
@@ -1874,7 +1882,6 @@ private:
 
             closeFile(sData);
         }
-#endif
     }
 
     uint8_t slotCount() const { return sVec.size(); }
@@ -1947,7 +1954,7 @@ private:
 
     String getHost(async_data_item_t *sData, bool fromReq, String *ext = nullptr)
     {
-#if defined(ENABLE_FS) && defined(ENABLE_CLOUD_STORAGE)
+#if defined(ENABLE_CLOUD_STORAGE)
         String url = fromReq ? sData->request.val[req_hndlr_ns::url] : sData->request.file_data.resumable.getLocation();
 #else
         String url = fromReq ? sData->request.val[req_hndlr_ns::url] : sData->response.val[res_hndlr_ns::location];

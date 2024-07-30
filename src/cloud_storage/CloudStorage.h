@@ -1,5 +1,5 @@
 /**
- * Created July 27, 2024
+ * Created July 30, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -466,16 +466,15 @@ private:
             options.extras += uut.encode(parent.getObject());
 
             size_t sz = 0;
-
+#if defined(ENABLE_FS)
             if (file && file->cb && file->filename.length())
             {
-#if defined(ENABLE_FS)
                 file->cb(file->file, file->filename.c_str(), file_mode_open_read);
                 sz = file->file.size();
                 file->file.close();
-#endif
             }
-            else if (file && file->data_size)
+#endif
+            if (file && file->data_size)
                 sz = file->data_size;
 
             options.extras += "&uploadType=";
@@ -571,7 +570,6 @@ private:
 
             if (request.options->payload.length())
             {
-#if defined(ENABLE_FS)
                 if (request.options->extras.indexOf("uploadType=resumable") > -1)
                 {
                     sData->request.val[req_hndlr_ns::payload] = request.options->payload;
@@ -585,7 +583,6 @@ private:
                     sData->request.file_data.resumable.setSize(sData->request.file_data.file_size ? sData->request.file_data.file_size : sData->request.file_data.data_size);
                     sData->request.file_data.resumable.updateRange();
                 }
-#endif
             }
             else
             {
