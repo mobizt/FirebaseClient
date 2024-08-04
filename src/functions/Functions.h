@@ -1,5 +1,5 @@
 /**
- * Created June 28, 2024
+ * Created August 4, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,7 +27,6 @@
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
 #include "./functions/DataOptions.h"
-using namespace std;
 
 using namespace firebase;
 
