@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-08-02T08:45:58Z`
+Revision `2024-08-13T03:35:04Z`
 
 ## Table of Contents
 
@@ -1354,7 +1354,7 @@ Library also provides the option to resume the network connection in case of net
 
 In case WiFi, if the Core SDK provides reconnection function, library will reconnect to WiFi using that function otherwise the WiFi AP credentials are required.
 
-In case Ethernet, if external Ethernet client was used, library will provided the configuarations to allow Ethernet module enabling/resetting and initialization.
+In case Ethernet, if external Ethernet client was used, library will provide the configuarations to allow Ethernet module enabling/resetting and initialization.
 
 In case GSM, it requires the configurations for initialize the TinyGSM modem.
 
@@ -1629,7 +1629,7 @@ The `App` folder contains 3 sub folders:
 
 - `UserManagement` folder is for Google authentication examples to manage user.
 
-The following section will provided the basic (bare minimum) code example and the links: for the examples, class and functions description and Google API documentation.
+The following section will provide the basic (bare minimum) code example and the links: for the examples, class and functions description and Google API documentation.
 
 <details>
 <summary>For the Library Examples Structure, please click here.</summary>
