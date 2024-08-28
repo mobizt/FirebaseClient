@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-08-13T03:35:04Z`
+Revision `2024-08-28T03:53:41Z`
 
 ## Table of Contents
 
@@ -186,7 +186,7 @@ In addition, some features are changed which included the following.
 
 There is no `JSON` library included in this `FirebaseClient` library. If you still prefer to use `FirebaseJson` functions as in the old library, you have to include it manually in your code.
 
-The `FirebaseJson` library can be installed via the Arduino's Library Manager and PlatformIO's Library Manager or can be download and install from the [FirebaseJson Repository](https://github.com/mobizt/FirebaseJson).
+The `FirebaseJson` library can be installed via the Arduino's Library Manager and PlatformIO's Library Manager or can be downloaded and install from the [FirebaseJson Repository](https://github.com/mobizt/FirebaseJson).
 
 For `JSON` payload, this library will use [`object_t`](/resources/docs/placeholders.md#object_t) as a `JSON` placeholder for the functions represents the `JSON` object but it does not have serialization/deserialization functionalities. See [`The Value Placeholders`](#the-value-placeholders) for more information.
 
