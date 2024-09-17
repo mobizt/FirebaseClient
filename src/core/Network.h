@@ -1,5 +1,5 @@
 /**
- * Created July 6, 2024
+ * Created Sepyember 17, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -152,7 +152,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 
 #define FIREBASE_WIFI_IS_AVAILABLE
 
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_PORTENTA_H7_M4)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_H7_M7) || defined(ARDUINO_PORTENTA_H7_M4) || defined(ARDUINO_OPTA)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -174,7 +174,8 @@ typedef void (*NetworkStatusCallback)(bool &);
     defined(ARDUINO_PORTENTA_C33) ||   \
     defined(ARDUINO_PORTENTA_H7_M7) || \
     defined(ARDUINO_PORTENTA_H7_M4) || \
-    defined(ARDUINO_PORTENTA_X8)
+    defined(ARDUINO_PORTENTA_X8) ||    \
+    defined(ARDUINO_OPTA)
 
 #if !defined(FIREBASE_HAS_ARDUINO_WIFISSLCLIENT)
 #define FIREBASE_HAS_ARDUINO_WIFISSLCLIENT
@@ -196,7 +197,9 @@ typedef void (*NetworkStatusCallback)(bool &);
     !defined(ARDUINO_NANO_RP2040_CONNECT) && \
     !defined(ARDUINO_GIGA) &&                \
     !defined(ARDUINO_PORTENTA_H7_M7) &&      \
-    !defined(ARDUINO_PORTENTA_H7_M4)
+    !defined(ARDUINO_PORTENTA_H7_M4) &&      \
+    !defined(ARDUINO_OPTA)
+
 #define FIREBASE_HAS_WIFI_DISCONNECT
 #endif
 
@@ -392,7 +395,7 @@ typedef struct firebase_client_static_address
 public:
     /**
      * The Firebase Client Static address provider class.
-     * 
+     *
      * @param ipAddress The static IP.
      * @param netMask The subnet IP.
      * @param defaultGateway The default gateway IP.
@@ -408,7 +411,7 @@ public:
         this->optional = optional;
     };
 
-    firebase_client_static_address(){};
+    firebase_client_static_address() {};
 
 private:
     IPAddress ipAddress;
