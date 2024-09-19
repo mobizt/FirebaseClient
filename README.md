@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-08-28T03:53:41Z`
+Revision `2024-09-19T05:28:10Z`
 
 ## Table of Contents
 
@@ -128,6 +128,7 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
  * Arduino® Portenta C33
  * Arduino® Nano RP2040
  * Arduino® GIGA R1 WiFi
+ * Arduino® OPTA
  * Raspberry Pi Pico (RP2040)
  * STM32 MCU based boards (minimum 256k Flash memory)
  * Teensy 3.1, 3.2, 3.5, 3.6, 4.0 and 4.1
@@ -987,7 +988,7 @@ This type of authentication is used when privilege (admin rights) access is need
 
 The service account credentials and json file can be used for authentication. 
 
-This authentication types can be used in `all Firebase services apps`. Then in case various Firebase services application, to reduce the code complexity, you can define single global `FirebaseApp` and `ServiceAuth` for all your Firebase services used in your code.
+This authentication type can be used in `all Firebase services apps`. Then in case various Firebase services application, to reduce the code complexity, you can define single global `FirebaseApp` and `ServiceAuth` for all your Firebase services used in your code.
 
 The single global `FirebaseApp` with `ServiceAuth` may not meet your requirement when you want to sign in as a user. In this case you should define the `FirebaseApp`s specific for different authentication types.
 
@@ -1190,7 +1191,7 @@ IDToken::save(<file_config_data>)
 
 The database secret was used for authorization. You can save the credentials to file and load it with the constructor.
 
-The [LegacyToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/LegacyToken/) class parameters aer included the following.
+The [LegacyToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/LegacyToken/) class parameters are included the following.
 
 ```cpp
 LegacyToken::LegacyToken(<database_secret>)
@@ -1998,7 +1999,7 @@ The following section will provide the basic (bare minimum) code example and the
 
 ```cpp
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -2034,7 +2035,7 @@ FirebaseApp app;
 #if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
+#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
@@ -2143,7 +2144,7 @@ void asyncCB(AsyncResult &aResult)
 
 ```cpp
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -2179,7 +2180,7 @@ FirebaseApp app;
 #if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
+#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
@@ -2290,7 +2291,7 @@ void printResult(AsyncResult &aResult)
 
 ```cpp
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
+#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA)
 #include <WiFi.h>
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
@@ -2334,7 +2335,7 @@ FirebaseApp app;
 #if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
 #include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
+#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
 #include <WiFiSSLClient.h>
 WiFiSSLClient ssl_client;
 #endif
@@ -2569,12 +2570,12 @@ For using `PSRAM`, see [Memory Options](#memory-options) section.
 
 The OTA firmware update is supported using bin file stored in `Firebase Storage` and `Google Cloud Storage` buckets or base64 encoded data stored in `Realtime Database`.
 
-The Arduino devices that is natively supports OTA firmware update is `ESP8266`, `ESP32` and `Raspberry Pi Pico`.
+The Arduino devices that natively supported OTA firmware update are `ESP8266`, `ESP32` and `Raspberry Pi Pico`.
 
-Since v1.3.1, the Arduino SAMD21 boards that use NINA firmware and WiFi101 firmware are also supported using [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) library.
+Since FirebaseClient v1.3.1, the OTA update in Arduino SAMD21 boards that use NINA firmware and WiFi101 firmware was supported using [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) library.
 
 
-The [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) is the modified version of [WiFi101OTA](http://www.arduino.cc/en/Reference/WiFi101OT) library which contains only foure files e.g. `Internal_Storage_OTA.h`, `InternalStorage.h`, `InternalStorage.cpp`and `OTAStorage.h`.
+The [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) is the modified version of [WiFi101OTA](http://www.arduino.cc/en/Reference/WiFi101OT) library which contains only four required files e.g. `Internal_Storage_OTA.h`, `InternalStorage.h`, `InternalStorage.cpp`and `OTAStorage.h`.
 
 
 To allow OTA update in SAMD21 Arduino boards, you have to include `Internal_Storage_OTA.h` in your sketch.
@@ -2584,7 +2585,7 @@ Then assign the `InternalStorage` class object to be used for `Realtume Database
 
 In SAMD21 Arduino boards, if `OTA Storage` was not set before calling OTA function, the error `OTA Storage was not set` will be occurred.
 
-Finally, once the OTA update complete, in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA), you have to call `InternalStorage.apply()` to apply the update and then restart.
+Finally, once the OTA update was finished, in case [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA), you have to call `InternalStorage.apply()` to apply the update and then restart.
 
 Some OTA libraries that provide `Storage Class` object that derived from the modified version of Arduino WiFi101OTA's `OTAStorage` class can also be used.
 
