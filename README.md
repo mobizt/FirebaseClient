@@ -493,7 +493,7 @@ The async task handler will kepp the async tasks running as long as it places in
 > The async task handler i.e. `FirebaseApp::loop()`, `RealtimeDatabase::loop()`, `Storage::loop()`, `Messaging::loop()`, `CloudStorage::loop()` and `CloudFunctions` should be placed inside the main `loop` function, at the top most of the `loop`.
 
 > [!NOTE] 
-> Even the authentication task can run asynchronously, you can run it asynchronously by waiting until the `FirebaseApp::ready()` function returns true.
+> Even the authentication task can run asynchronously, you can run it synchronously by waiting until the `FirebaseApp::ready()` function returns true.
 
 > [!NOTE] 
 > Since v1.2.1, you can [set the filter](https://github.com/mobizt/FirebaseClient/blob/main/resources/docs/realtime_database.md#-void-setssefiltersconst-string-filter--) to filter the `Stream events` in `SSE mode (HTTP Streaming)` task.
