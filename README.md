@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.11-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.3.12-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-09-19T05:28:10Z`
+Revision `2024-10-02T12:03:28Z`
 
 ## Table of Contents
 
@@ -112,11 +112,14 @@ This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was ct
 > [!IMPORTANT]  
 > For ESP8266 device usage, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section for heap selection.
 
+> [!NOTE]  
+> The Cloud Firestore Database data change listening does not support by REST API.
+
 ## Frequently Asked Questions
 
 For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
-## Supported Devices.
+## Supported Devices
 
  * ESP8266 MCUs based boards
  * ESP32 MCUs based boards
@@ -139,6 +142,11 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
  * W5100 SPI Ethernet module
  * W5500 SPI Ethernet module
  * SIMCom Modules with [TinyGSM](https://github.com/vshymanskyy/TinyGSM)
+
+
+ # Unsuppored Devices
+
+ * All Atmega (AVR) devices
 
 
  ## Dependencies

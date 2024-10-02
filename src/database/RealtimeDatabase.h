@@ -1,5 +1,5 @@
 /**
- * Created July 2, 2024
+ * Created October 2, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -1044,6 +1044,7 @@ private:
     void addParams(bool hasQueryParams, String &extras, async_request_handler_t::http_request_method method, DatabaseOptions *options, bool isFile)
     {
         URLUtil uut;
+        bool hasParam = hasQueryParams;
 
         if (options)
         {
@@ -1060,7 +1061,10 @@ private:
             uut.addParam(extras, "print", "silent", hasQueryParams, true);
 
         if (options && options->filter.complete)
+        {
+            options->filter.uri[0] = !hasParam ? '?' : '&';
             extras += options->filter.uri;
+        }
     }
 
     void setClientError(async_request_data_t &request, int code)
