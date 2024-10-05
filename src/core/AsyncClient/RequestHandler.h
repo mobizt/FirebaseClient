@@ -1,5 +1,5 @@
 /**
- * Created July 6, 2024
+ * Created October 6, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -237,7 +237,7 @@ public:
         val[req_hndlr_ns::header] += FPSTR("Authorization: ");
         if (type == auth_access_token || type == auth_sa_access_token)
             val[req_hndlr_ns::header] += FPSTR("Bearer ");
-        else if (type == auth_user_id_token || type == auth_id_token || type == auth_custom_token)
+        else if (type == auth_user_id_token || type == auth_id_token || type == auth_custom_token || type == auth_sa_custom_token)
             val[req_hndlr_ns::header] += FPSTR("Firebase ");
         else
             val[req_hndlr_ns::header] += FPSTR("key=");

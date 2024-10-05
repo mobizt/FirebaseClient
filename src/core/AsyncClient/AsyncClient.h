@@ -1,5 +1,5 @@
 /**
- * Created July 30, 2024
+ * Created October 6, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -86,7 +86,6 @@ public:
     bool auth_used = false;
     bool complete = false;
     bool async = false;
-    bool cancel = false;
     bool sse = false;
     bool path_not_existed = false;
     bool download = false;
@@ -130,7 +129,6 @@ public:
         auth_used = false;
         complete = false;
         async = false;
-        cancel = false;
         sse = false;
         path_not_existed = false;
         cb = NULL;
@@ -1916,7 +1914,7 @@ private:
 
     bool handleSendTimeout(async_data_item_t *sData)
     {
-        if (sData->request.send_timer.remaining() == 0 || sData->cancel)
+        if (sData->request.send_timer.remaining() == 0)
         {
             // In case TCP write error.
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
@@ -1930,7 +1928,7 @@ private:
 
     bool handleReadTimeout(async_data_item_t *sData)
     {
-        if (!sData->sse && (sData->response.read_timer.remaining() == 0 || sData->cancel))
+        if (!sData->sse && sData->response.read_timer.remaining() == 0)
         {
             // In case TCP read error.
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
@@ -1976,16 +1974,21 @@ private:
             {
                 sys_idle();
                 async_data_item_t *sData = getData(i);
-                if (sData && sData->async && !sData->auth_used && !sData->cancel)
+                if (sData && sData->async && !sData->auth_used && !sData->to_remove)
                 {
+                    // Reset the app data to reset clear the available status when the task was canceled.
+                    sData->aResult.reset(sData->aResult.app_data);
+                    if (getResult(sData))
+                        getResult(sData)->reset(getResult(sData)->app_data);
+
                     if (uid.length())
                     {
                         if (strcmp(sData->aResult.uid().c_str(), uid.c_str()) == 0)
-                            sData->cancel = true;
+                            sData->to_remove = true;
                     }
                     else
                     {
-                        sData->cancel = true;
+                        sData->to_remove = true;
                         if (!all)
                             break;
                     }
@@ -2062,7 +2065,7 @@ private:
         if (!options.auth_used)
         {
             sData->request.app_token = options.app_token;
-            if (options.app_token && !options.auth_param && (options.app_token->auth_type == auth_id_token || options.app_token->auth_type == auth_user_id_token || options.app_token->auth_type == auth_access_token || options.app_token->auth_type == auth_sa_access_token))
+            if (options.app_token && !options.auth_param && (options.app_token->auth_type > auth_unknown_token && options.app_token->auth_type < auth_refresh_token))
             {
                 sData->request.addAuthHeaderFirst(options.app_token->auth_type);
                 sData->request.val[req_hndlr_ns::header] += FIREBASE_AUTH_PLACEHOLDER;
