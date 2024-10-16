@@ -3168,6 +3168,9 @@ Thank your for the following users whose supporting me.
 
 <img class="circle avatar-user" src="https://github.com/Jagakatt.png" width="26" height="26" alt="@Jagakatt"> [Jagakatt](https://github.com/Jagakatt)
 
+<img class="circle avatar-user" src="https://avatars.githubusercontent.com/u/166620797?s=52&amp;v=4" width="26" height="26" alt="private sponsor"> [Private sponsor](#sponsors)
+
+
 If you like my works, you can give a star.
 If you can make benefit from my project or love it, you can sponsoring me.
 
