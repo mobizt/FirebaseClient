@@ -1,5 +1,5 @@
 /**
- * Created October 6, 2024
+ * Created October 25, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -396,7 +396,9 @@ private:
         else if (sData->request.base64)
             ret = send(sData, reinterpret_cast<const uint8_t *>("\""), 1, totalLen, async_state_send_payload);
 
+#if defined(ENABLE_FS)
     exit:
+#endif
 
         if (buf)
             mem.release(&buf);

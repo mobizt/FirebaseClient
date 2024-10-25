@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created October 25, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,6 +27,7 @@
 #include <Arduino.h>
 #include <string>
 
+
 enum realtime_database_data_type
 {
     realtime_database_data_type_undefined = -1,
@@ -38,6 +39,83 @@ enum realtime_database_data_type
     realtime_database_data_type_string = 5,
     realtime_database_data_type_json = 6,
     realtime_database_data_type_array = 7
+};
+
+
+// https://github.com/djGrrr/Int64String
+#ifdef base16char
+#undef base16char
+#endif
+
+#define base16char(i) ("0123456789ABCDEF"[i])
+
+class NumToString
+{
+public:
+    NumToString() {}
+
+    template <typename T = uint64_t>
+    auto val(T value, bool sign = false) -> typename std::enable_if<(std::is_same<T, uint64_t>::value), String>::type
+    {
+
+        // start at position 64 (65th byte) and work backwards
+        uint8_t i = 64;
+        // 66 buffer for 64 characters (binary) + B prefix + \0
+        char buffer[66] = {0};
+
+        if (value == 0)
+            buffer[i--] = '0';
+        else
+        {
+            uint8_t base_multiplied = 4;
+            uint16_t multiplier = 10000;
+
+            // Five 64 bit devisions max
+            while (value > multiplier)
+            {
+                uint64_t q = value / multiplier;
+                // get remainder without doing another division with %
+                uint16_t r = value - q * multiplier;
+
+                for (uint8_t j = 0; j < base_multiplied; j++)
+                {
+                    uint16_t rq = r / 10;
+                    buffer[i--] = base16char(r - rq * 10);
+                    r = rq;
+                }
+
+                value = q;
+            }
+
+            uint16_t remaining = value;
+            while (remaining > 0)
+            {
+                uint16_t q = remaining / 10;
+                buffer[i--] = base16char(remaining - q * 10);
+                remaining = q;
+            }
+        }
+
+        if (sign)
+            buffer[i--] = '-';
+
+        // return String starting at position i + 1
+        return String(&buffer[i + 1]);
+    }
+
+    template <typename T = int64_t>
+    auto val(T value) -> typename std::enable_if<(std::is_same<T, int64_t>::value), String>::type
+    {
+        // if signed, make it positive
+        uint64_t uvalue = value < 0 ? -value : value;
+        return val(uvalue, value < 0);
+    }
+
+    template <typename T = int>
+    auto val(T value) -> typename std::enable_if<(!std::is_same<T, uint64_t>::value && !std::is_same<T, int64_t>::value), String>::type
+    {
+        return String(value);
+    }
 };
 
 struct boolean_t : public Printable
@@ -61,13 +139,14 @@ struct number_t : public Printable
 {
 private:
     String buf;
+    NumToString num2Str;
 
 public:
     number_t() {}
     template <typename T1 = int, typename T = int>
     explicit number_t(T1 v, T d) : buf(String(v, d)) {}
     template <typename T = int>
-    explicit number_t(T o) : buf(String(o)) {}
+    explicit number_t(T o) : buf(num2Str.val(o)) {}
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
 };
@@ -165,7 +244,7 @@ public:
 private:
     explicit operator bool() const { return buf.length() > 0; }
 
-    template <typename T = const char*>
+    template <typename T = const char *>
     auto operator=(const T &rval) -> typename std::enable_if<!std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, number_t>::value && !std::is_same<T, boolean_t>::value, object_t &>::type
     {
         buf = rval;
@@ -228,7 +307,10 @@ public:
         {
             if (v_sring<T>::value)
                 buf += '\"';
-            buf += value;
+
+            NumToString num2Str;
+            buf += num2Str.val(value);
+
             if (v_sring<T>::value)
                 buf += '\"';
         }
