@@ -158,10 +158,10 @@ namespace Values
 
     public:
         /**
-         * A integer value.
-         *  @param value The integer value.
+         * A 64-bit signed integer value.
+         *  @param value The 64-bit signed integer value.
          */
-        explicit IntegerValue(int value) : buf(StringValue(String(value)).c_str()) { getVal(); }
+        explicit IntegerValue(int64_t value) : buf(StringValue(String(value)).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }

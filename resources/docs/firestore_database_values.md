@@ -122,7 +122,7 @@ BooleanValue(bool value)
 
 ## Description
 
-A integer value.
+A 64-bit signed integer value.
 
 This class is in the `Values` namespace.
 
@@ -134,15 +134,15 @@ class IntegerValue
 
 1. ### 🔹 IntegerValue(int value)
 
-The constructor with integer value.
+The constructor with a 64-bit signed integer value.
 
 ```cpp
-IntegerValue(int value)
+IntegerValue(int64_t value)
 ```
 
 **Params:**
 
-- `value` - The integer value.
+- `value` - The 64-bit signed integer value.
 
 
 
