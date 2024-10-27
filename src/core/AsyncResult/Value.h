@@ -27,7 +27,6 @@
 #include <Arduino.h>
 #include <string>
 
-
 enum realtime_database_data_type
 {
     realtime_database_data_type_undefined = -1,
@@ -41,72 +40,56 @@ enum realtime_database_data_type
     realtime_database_data_type_array = 7
 };
 
-
-// https://github.com/djGrrr/Int64String
-#ifdef base16char
-#undef base16char
-#endif
-
-#define base16char(i) ("0123456789ABCDEF"[i])
-
 class NumToString
 {
 public:
     NumToString() {}
 
     template <typename T = uint64_t>
-    auto val(T value, bool sign = false) -> typename std::enable_if<(std::is_same<T, uint64_t>::value), String>::type
+    auto val(T value, bool neg = false) -> typename std::enable_if<(std::is_same<T, uint64_t>::value), String>::type
     {
 
-        // start at position 64 (65th byte) and work backwards
-        uint8_t i = 64;
-        // 66 buffer for 64 characters (binary) + B prefix + \0
-        char buffer[66] = {0};
+        uint8_t i = 21;
+        char buff[23] = {0};
 
         if (value == 0)
-            buffer[i--] = '0';
+            buff[i--] = '0';
         else
         {
-            uint8_t base_multiplied = 4;
-            uint16_t multiplier = 10000;
-
-            // Five 64 bit devisions max
-            while (value > multiplier)
+            uint16_t r = 0;
+            while (value > 10000)
             {
-                uint64_t q = value / multiplier;
-                // get remainder without doing another division with %
-                uint16_t r = value - q * multiplier;
+                uint64_t q = value / 10000;
+                r = value - (q * 10000);
 
-                for (uint8_t j = 0; j < base_multiplied; j++)
+                for (uint8_t j = 0; j < 4; j++)
                 {
                     uint16_t rq = r / 10;
-                    buffer[i--] = base16char(r - rq * 10);
+                    buff[i--] = r - (rq * 10) + '0';
                     r = rq;
                 }
 
                 value = q;
             }
 
-            uint16_t remaining = value;
-            while (remaining > 0)
+            r = value;
+            while (r > 0)
             {
-                uint16_t q = remaining / 10;
-                buffer[i--] = base16char(remaining - q * 10);
-                remaining = q;
+                uint16_t q = r / 10;
+                buff[i--] = r - (q * 10) + '0';
+                r = q;
             }
         }
 
-        if (sign)
-            buffer[i--] = '-';
+        if (neg)
+            buff[i--] = '-';
 
-        // return String starting at position i + 1
-        return String(&buffer[i + 1]);
+        return String(&buff[i + 1]);
     }
 
     template <typename T = int64_t>
     auto val(T value) -> typename std::enable_if<(std::is_same<T, int64_t>::value), String>::type
     {
-        // if signed, make it positive
         uint64_t uvalue = value < 0 ? -value : value;
         return val(uvalue, value < 0);
     }
