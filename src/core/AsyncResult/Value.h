@@ -44,11 +44,9 @@ class NumToString
 {
 public:
     NumToString() {}
-
     template <typename T = uint64_t>
     auto val(T value, bool neg = false) -> typename std::enable_if<(std::is_same<T, uint64_t>::value), String>::type
     {
-
         uint8_t i = 21;
         char buff[23] = {0};
 
