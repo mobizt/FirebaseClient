@@ -1,5 +1,5 @@
 
-Revision `2024-06-26T07:53:25Z`
+Revision `2024-10-27T20:40:15Z`
 
 # Async Firebase Client library for Arduino Frequently Asked Questions.
 
@@ -7,7 +7,7 @@ Revision `2024-06-26T07:53:25Z`
 
 - [Q1: Why I get an error `"TCP connection failed"`?](#q1-why-i-get-an-error-tcp-connection-failed)
 - [Q2: Why I get an error `"TCP send failed"`?](#q1-why-i-get-an-error-tcp-connection-failed)
-- [Q3: Why I get an error `"TCP receive timed out"`?](#q3-why-i-get-an-error-tcp-receive-time-out)
+- [Q3: Why I get an error `"TCP receive timed out"`?](#q3-why-i-get-an-error-tcp-receive-timed-out)
 - [Q4: Why I get an error `"TCP disconnected"`?](#q4-why-i-get-an-error-tcp-disconnected)
 - [Q5: What should I do when I get the error `"error opening file"`?](#q5-what-should-i-do-when-i-get-the-error-error-opening-file)
 - [Q6: What should I do when I get the error `"error reading file"` or `"error writng file"`?](#q6-what-should-i-do-when-i-get-the-error-error-reading-file-or-error-writng-file)
@@ -22,7 +22,7 @@ Revision `2024-06-26T07:53:25Z`
 - [Q15: Why I get the error `"app was not assigned"`?](#q15-why-i-get-the-error-app-was-not-assigned)
 - [Q16: Why I get the error `"operation was cancelled"`?](#q16-why-i-get-the-error-operation-was-cancelled)
 - [Q17: Why I get the error `"JWT, time was not set or not valid"`?](#q17-why-i-get-the-error-jwt-time-was-not-set-or-not-valid)
-- [Q18: Why sometimes the Reltime Database Stream does not work when WiFi was disconnected and reconnected and I get the error `"stream connection timed out"`?](#q18-why-sometimes-the-reltime-database-stream-does-not-work-when-wifi-was-disconnected-and-reconnected-and-i-get-the-error-stream-time-out)
+- [Q18: Why sometimes the Realtime Database Stream does not work when WiFi was disconnected and reconnected and I get the error `"stream connection timed out"`?](#q18-why-sometimes-the-realtime-database-stream-does-not-work-when-wifi-was-disconnected-and-reconnected-and-i-get-the-error-stream-connection-timed-out)
 - [Q19: Can I use delay in this library?](#q19-can-i-use-delay-in-this-library)
 - [Q20: Can I change the send timeout?](#q20-can-i-change-the-send-timeout)
 - [Q21: Can I change the read timeout?](#q21-can-i-change-the-read-timeout)
@@ -192,7 +192,7 @@ The memory allocation failure due to out of memory can cause the dangling pointe
 
 You have to wait for the authentication task to be ready before calling the Firebase functions.
 
-After [App Initialization](https://github.com/mobizt/FirebaseClien#app-initialization), you can wait (blocking operation) or checking the return value of `FirebaseApp::ready` in the loop.
+After [App Initialization](https://github.com/mobizt/FirebaseClient#app-initialization), you can wait (blocking operation) or checking the return value of `FirebaseApp::ready` in the loop.
 
 
 ### Q9: What should I do when I get the error `"JWT, private key parsing fail"`?
@@ -239,7 +239,7 @@ The delay function and user blocking code are used in the same loop that authent
 
 #### A15: The FirebaseApp was not applied to the Firebase Service apps.
 
-You have to apply the FirebaseApp by using `FirebaseApp::getApp`. Please read [App Initialization](https://github.com/mobizt/FirebaseClien#app-initialization) for more details.
+You have to apply the FirebaseApp by using `FirebaseApp::getApp`. Please read [App Initialization](https://github.com/mobizt/FirebaseClient#app-initialization) for more details.
 
 ### Q16: Why I get the error `"operation was cancelled"`?
 
@@ -259,7 +259,7 @@ When no more memory to be allocated for new task. You have to reduce the memory 
 
 The timestamp that you set in the uint32_t variable of time status callback function is not valid or it was not set.
 
-### Q18: Why sometimes the Reltime Database Stream does not work when WiFi was disconnected and reconnected and I get the error `"stream connection timed out"`?
+### Q18: Why sometimes the Realtime Database Stream does not work when WiFi was disconnected and reconnected and I get the error `"stream connection timed out"`?
 
 #### A18: The problem is due to the WiFi reconnection interferences.
 
