@@ -1,7 +1,7 @@
 /**
- * BSSL_SSL_Client library v1.0.14 for Arduino devices.
+ * BSSL_SSL_Client library v1.0.17 for Arduino devices.
  *
- * Created June 27, 2024
+ * Created October 29, 2024
  *
  * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
  *
@@ -40,7 +40,7 @@
 #include "../ESP_SSLClient_FS.h"
 #include "../ESP_SSLClient_Const.h"
 
-#if defined(USE_EMBED_SSL_ENGINE)
+#if defined(USE_EMBED_SSL_ENGINE) && !defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_NANO_RP2040_CONNECT)
 #define EMBED_SSL_ENGINE_BASE_OVERRIDE override
 #else
 #define EMBED_SSL_ENGINE_BASE_OVERRIDE
