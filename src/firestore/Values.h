@@ -1,5 +1,5 @@
 /**
- * Created October 25, 2024
+ * Created October 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -153,7 +153,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
-        NumToString num2Str;
+        StringUtil sut;
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_integerValue].text, buf); }
 
     public:
@@ -161,7 +161,7 @@ namespace Values
          * A 64-bit signed integer value.
          *  @param value The 64-bit signed integer value.
          */
-        explicit IntegerValue(int64_t value) : buf(StringValue(num2Str.val(value)).c_str()) { getVal(); }
+        explicit IntegerValue(int64_t value) : buf(StringValue(sut.num2Str(value)).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }

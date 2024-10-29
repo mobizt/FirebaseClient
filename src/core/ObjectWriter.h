@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created October 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -173,6 +173,7 @@ class BufWriter
 private:
     ObjectWriter owriter;
     JSONUtil jut;
+    StringUtil sut;
 
     template <typename T>
     struct v_number
@@ -207,7 +208,7 @@ public:
     auto add(T1 ret, const T2 &value, String &buf, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
     {
         clear(buf);
-        jut.addObject(buf, name, String(value), false, true);
+        jut.addObject(buf, name, sut.num2Str(value), false, true);
         return ret;
     }
 
@@ -237,7 +238,7 @@ public:
     template <typename T1, typename T2>
     auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
     {
-        setObject(buf, bufSize, index, name, String(value), false, true);
+        setObject(buf, bufSize, index, name, sut.num2Str(value), false, true);
         return ret;
     }
 
@@ -265,7 +266,7 @@ public:
     template <typename T1, typename T2>
     auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
     {
-        owriter.addMapArrayMember(buf, bufSize, index, name, String(value), false);
+        owriter.addMapArrayMember(buf, bufSize, index, name, sut.num2Str(value), false);
         return ret;
     }
 

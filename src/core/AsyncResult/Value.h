@@ -1,5 +1,5 @@
 /**
- * Created October 25, 2024
+ * Created October 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -40,65 +40,6 @@ enum realtime_database_data_type
     realtime_database_data_type_array = 7
 };
 
-class NumToString
-{
-public:
-    NumToString() {}
-    template <typename T = uint64_t>
-    auto val(T value, bool neg = false) -> typename std::enable_if<(std::is_same<T, uint64_t>::value), String>::type
-    {
-        uint8_t i = 21;
-        char buff[23] = {0};
-
-        if (value == 0)
-            buff[i--] = '0';
-        else
-        {
-            uint16_t r = 0;
-            while (value > 10000)
-            {
-                uint64_t q = value / 10000;
-                r = value - (q * 10000);
-
-                for (uint8_t j = 0; j < 4; j++)
-                {
-                    uint16_t rq = r / 10;
-                    buff[i--] = r - (rq * 10) + '0';
-                    r = rq;
-                }
-
-                value = q;
-            }
-
-            r = value;
-            while (r > 0)
-            {
-                uint16_t q = r / 10;
-                buff[i--] = r - (q * 10) + '0';
-                r = q;
-            }
-        }
-
-        if (neg)
-            buff[i--] = '-';
-
-        return String(&buff[i + 1]);
-    }
-
-    template <typename T = int64_t>
-    auto val(T value) -> typename std::enable_if<(std::is_same<T, int64_t>::value), String>::type
-    {
-        uint64_t uvalue = value < 0 ? -value : value;
-        return val(uvalue, value < 0);
-    }
-
-    template <typename T = int>
-    auto val(T value) -> typename std::enable_if<(!std::is_same<T, uint64_t>::value && !std::is_same<T, int64_t>::value), String>::type
-    {
-        return String(value);
-    }
-};
-
 struct boolean_t : public Printable
 {
 private:
@@ -120,14 +61,14 @@ struct number_t : public Printable
 {
 private:
     String buf;
-    NumToString num2Str;
+    StringUtil sut;
 
 public:
     number_t() {}
     template <typename T1 = int, typename T = int>
     explicit number_t(T1 v, T d) : buf(String(v, d)) {}
     template <typename T = int>
-    explicit number_t(T o) : buf(num2Str.val(o)) {}
+    explicit number_t(T o) : buf(sut.num2Str(o)) {}
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
 };
@@ -289,8 +230,8 @@ public:
             if (v_sring<T>::value)
                 buf += '\"';
 
-            NumToString num2Str;
-            buf += num2Str.val(value);
+            StringUtil sut;
+            buf += sut.num2Str(value);
 
             if (v_sring<T>::value)
                 buf += '\"';
