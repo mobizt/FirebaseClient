@@ -1,5 +1,5 @@
 /**
- * Created April 4, 2024
+ * Created October 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -103,31 +103,31 @@ namespace GoogleCloudStorage
     public:
         BaseOptions &generation(uint64_t value)
         {
-            buf[1] = "generation=" + sut.u64Str(value);
+            buf[1] = "generation=" + sut.num2Str(value);
             return setBuf();
         }
 
         BaseOptions &ifGenerationMatch(uint64_t value)
         {
-            buf[2] = "ifGenerationMatch=" + sut.u64Str(value);
+            buf[2] = "ifGenerationMatch=" + sut.num2Str(value);
             return setBuf();
         }
 
         BaseOptions &ifGenerationNotMatch(uint64_t value)
         {
-            buf[3] = "ifGenerationNotMatch=" + sut.u64Str(value);
+            buf[3] = "ifGenerationNotMatch=" + sut.num2Str(value);
             return setBuf();
         }
 
         BaseOptions &ifMetagenerationMatch(uint64_t value)
         {
-            buf[4] = "ifMetagenerationMatch=" + sut.u64Str(value);
+            buf[4] = "ifMetagenerationMatch=" + sut.num2Str(value);
             return setBuf();
         }
 
         BaseOptions &ifMetagenerationNotMatch(uint64_t value)
         {
-            buf[5] = "ifMetagenerationNotMatch=" + sut.u64Str(value);
+            buf[5] = "ifMetagenerationNotMatch=" + sut.num2Str(value);
             return setBuf();
         }
     };
@@ -185,25 +185,25 @@ namespace GoogleCloudStorage
 
         InsertOptions &ifGenerationMatch(uint64_t value)
         {
-            buf[2] = "ifGenerationMatch=" + sut.u64Str(value);
+            buf[2] = "ifGenerationMatch=" + sut.num2Str(value);
             return setBuf();
         }
 
         InsertOptions &ifGenerationNotMatch(uint64_t value)
         {
-            buf[3] = "ifGenerationNotMatch=" + sut.u64Str(value);
+            buf[3] = "ifGenerationNotMatch=" + sut.num2Str(value);
             return setBuf();
         }
 
         InsertOptions &ifMetagenerationMatch(uint64_t value)
         {
-            buf[4] = "ifMetagenerationMatch=" + sut.u64Str(value);
+            buf[4] = "ifMetagenerationMatch=" + sut.num2Str(value);
             return setBuf();
         }
 
         InsertOptions &ifMetagenerationNotMatch(uint64_t value)
         {
-            buf[5] = "ifMetagenerationNotMatch=" + sut.u64Str(value);
+            buf[5] = "ifMetagenerationNotMatch=" + sut.num2Str(value);
             return setBuf();
         }
 

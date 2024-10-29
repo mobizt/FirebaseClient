@@ -98,22 +98,6 @@ public:
 
     void addSp(String &buf) { buf += ' '; }
 
-    String u64Str(uint64_t val)
-    {
-        // Some cores do not provide 64-bit integer to string conversion.
-        String v;
-        char buffer[21];
-        char *ndx = &buffer[sizeof(buffer) - 1];
-        *ndx = '\0';
-        do
-        {
-            *--ndx = val % 10 + '0';
-            val = val / 10;
-        } while (val != 0);
-        v = ndx;
-        return v;
-    }
-
     // Some cores do not provide 64-bit integer to string conversion.
     template <typename T = uint64_t>
     auto num2Str(T val, bool negative = false) -> typename std::enable_if<(std::is_same<T, uint64_t>::value), String>::type

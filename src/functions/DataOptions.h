@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created October 29, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -466,7 +466,7 @@ namespace GoogleCloudFunctions
         // Maximum number of functions to return per call. The largest allowed pageSize is 1,000, if the pageSize is omitted or specified as greater than 1,000 then it will be replaced as 1,000. The size of the list response can be less than specified when used with filters.
         ListOptions &pageSize(uint64_t value)
         {
-            buf[1] = "pageSize=" + sut.u64Str(value);
+            buf[1] = "pageSize=" + sut.num2Str(value);
             return setBuf();
         }
 
