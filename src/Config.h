@@ -124,7 +124,8 @@
  * 🏷️ For Firebase.printf debug port.
  * #define FIREBASE_PRINTF_PORT Serial
  * 
- * * 🏷️ For Firebase.printf buffer size.
+ * * 🏷️ For Firebase.printf buffer size. 
+ * The default printf buffer size is 1024 for ESP8266 and SAMD otherwise 4096.
  * #define FIREBASE_PRINTF_BUFFER 2048
  */
 

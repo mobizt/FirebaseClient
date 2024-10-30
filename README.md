@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.4.5-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.4.6-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-10-30T08:28:24Z`
+Revision `2024-10-30T03:51:10Z`
 
 ## Table of Contents
 
@@ -3096,7 +3096,7 @@ FIREBASE_DISABLE_NATIVE_ETHERNET // For disabling native (sdk) Ethernet function
 ENABLE_ASYNC_TCP_CLIENT // For Async TCP Client usage.
 FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit setting for an async client.
 FIREBASE_PRINTF_PORT // For Firebase.printf debug port.
-FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size.
+FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size. The default printf buffer size is 1024 for ESP8266 and SAMD otherwise 4096. Some debug message may be truncated for larger text.
 ```
 
 You can assign the optional build options using one of the following methods.

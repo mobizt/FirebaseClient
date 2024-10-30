@@ -253,8 +253,12 @@ namespace firebase
 #if defined(FIREBASE_PRINTF_BUFFER)
             int size = FIREBASE_PRINTF_BUFFER;
 #else
-            // Default buffer size for large JSON response.
+// Default buffer size for large JSON response.
+#if defined(ARDUINO_ARCH_SAMD) || defined(ESP8266)
+            int size = 1024;
+#else
             int size = 4096;
+#endif
 #endif
             char s[size];
             va_list va;
