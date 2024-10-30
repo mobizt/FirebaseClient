@@ -1,5 +1,5 @@
 /**
- * Created June 26, 2024
+ * Created October 30, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -33,6 +33,7 @@
 #if defined(ENABLE_JWT)
 #include "./core/JWT.h"
 #endif
+#include "./core/JSON.h"
 #include "./core/Timer.h"
 #include "./core/AppBase.h"
 
@@ -78,14 +79,10 @@ namespace firebase
         JWTClass *jwtClass = nullptr;
 #endif
 
-#if defined(ENABLE_JWT)
-
         void setLastError(AsyncResult *aResult, int code, const String &message)
         {
             setLastErrorBase(aResult, code, message);
         }
-
-#endif
 
         bool parseItem(StringUtil &sut, const String &src, String &dest, const String &name, const String &delim, int &p1, int &p2)
         {
@@ -189,7 +186,9 @@ namespace firebase
 
             auth_data.app_token.val[app_tk_ns::token] = token;
             auth_data.app_token.val[app_tk_ns::refresh] = refresh;
+#if defined(ENABLE_SERVICE_AUTH)
             auth_data.app_token.val[app_tk_ns::pid] = auth_data.user_auth.sa.val[sa_ns::pid];
+#endif
             return token.length() > 0;
         }
 

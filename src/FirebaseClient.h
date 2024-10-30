@@ -1,5 +1,5 @@
 /**
- * Created July 25, 2024
+ * Created October 30, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -203,7 +203,17 @@ namespace firebase
             else if (app.auth_data.user_auth.auth_type == auth_sa_access_token || app.auth_data.user_auth.auth_type == auth_sa_custom_token || app.auth_data.user_auth.auth_type == auth_user_id_token)
             {
                 app.auth_data.app_token.authenticated = false;
-                uint32_t exp = app.auth_data.user_auth.auth_type == auth_user_id_token ? app.auth_data.user_auth.user.expire : app.auth_data.user_auth.sa.expire;
+                uint32_t exp = 0;
+
+#if defined(ENABLE_SERVICE_AUTH)
+                if (app.auth_data.user_auth.auth_type == auth_sa_access_token || app.auth_data.user_auth.auth_type == auth_sa_custom_token)
+                    exp = app.auth_data.user_auth.sa.expire;
+#endif
+
+#if defined(ENABLE_USER_AUTH)
+                if (app.auth_data.user_auth.auth_type == auth_user_id_token)
+                    exp = app.auth_data.user_auth.user.expire;
+#endif
                 resetTimer(app, true, 0, exp);
             }
             else
