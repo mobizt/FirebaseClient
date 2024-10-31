@@ -487,7 +487,8 @@ private:
         {
             if (state == async_state_send_header)
             {
-                if (sData->request.val[req_hndlr_ns::header].indexOf("Content-Length: 0\r\n") > -1)
+                // No payload when Content-Length is 0, or not set.
+                if (sData->request.val[req_hndlr_ns::header].indexOf("Content-Length: 0\r\n") > -1 || sData->request.val[req_hndlr_ns::header].indexOf("Content-Length") == -1)
                     sData->state = async_state_read_response;
                 else
                     sData->state = async_state_send_payload;
