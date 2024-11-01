@@ -1984,7 +1984,7 @@ private:
         {
             if (sData->async)
                 returnResult(sData, false);
-            reset(sData, false);
+            reset(sData, true);
         }
     }
 
