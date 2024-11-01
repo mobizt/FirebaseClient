@@ -945,7 +945,7 @@ private:
         if (sData->response.flags.header_remaining)
         {
             int read = readLine(sData, sData->response.val[res_hndlr_ns::header]);
-            if ((read == 1 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\r') ||
+            if ((read == 1 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\n') ||
                 (read == 2 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 2] == '\r' && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\n'))
             {
                 sData->response.flags.http_response = true;
