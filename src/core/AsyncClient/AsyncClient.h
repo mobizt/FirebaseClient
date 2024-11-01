@@ -2350,7 +2350,7 @@ private:
             handleEventTimeout(sData);
 #endif
 
-            if (!sData->sse && sData->return_type == function_return_type_complete)
+            if (!sData->sse && sData->return_type == function_return_type_complete && sData->state != async_state_send_payload)
                 sData->to_remove = true;
 
             if (sData->to_remove)
