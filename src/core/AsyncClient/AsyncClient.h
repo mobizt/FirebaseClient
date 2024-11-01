@@ -487,7 +487,8 @@ private:
         {
             if (state == async_state_send_header)
             {
-                if (sData->request.val[req_hndlr_ns::header].indexOf("Content-Length: 0\r\n") > -1)
+                // No payload when Content-Length is 0, or not set.
+                if (sData->request.val[req_hndlr_ns::header].indexOf("Content-Length: 0\r\n") > -1 || sData->request.val[req_hndlr_ns::header].indexOf("Content-Length") == -1)
                     sData->state = async_state_read_response;
                 else
                     sData->state = async_state_send_payload;
@@ -944,7 +945,7 @@ private:
         if (sData->response.flags.header_remaining)
         {
             int read = readLine(sData, sData->response.val[res_hndlr_ns::header]);
-            if ((read == 1 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\r') ||
+            if ((read == 1 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\n') ||
                 (read == 2 && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 2] == '\r' && sData->response.val[res_hndlr_ns::header][sData->response.val[res_hndlr_ns::header].length() - 1] == '\n'))
             {
                 sData->response.flags.http_response = true;
@@ -1045,6 +1046,13 @@ private:
             return 0;
         int res = 0;
 
+        // because chunks might span multiple reads, we need to keep track of where we are in the chunk
+        // chunkInfo.dataLen is our current position in the chunk
+        // chunkInfo.chunkSize is the total size of the chunk
+
+        // readline() only reads while there is data available, so it might return early
+        // when available() is less than the remaining amount of data in the chunk
+
         // read chunk-size, chunk-extension (if any) and CRLF
         if (sData->response.chunkInfo.phase == async_response_handler_t::READ_CHUNK_SIZE)
         {
@@ -1058,26 +1066,54 @@ private:
         // append chunk-data to entity-body
         else
         {
-            if (sData->response.chunkInfo.chunkSize > -1)
+            // if chunk-size is 0, it's the last chunk, and can be skipped
+            if (sData->response.chunkInfo.chunkSize > 0)
             {
                 String chunk;
                 int read = readLine(sData, chunk);
-                if (read && chunk[0] != '\r')
-                    *out += chunk;
+                
+                // if we read till a CRLF, we have a chunk (or the rest of it)
+                // if the last two bytes are NOT CRLF, we have a partial chunk
+                // if we read 0 bytes, read next chunk size
+
+                // check for \n and \r, remove them if present (they're part of the protocol, not the data)
+                if (read >= 2 && chunk[read - 2] == '\r' && chunk[read - 1] == '\n')
+                {
+                    // remove the \r\n
+                    chunk.remove(chunk.length() - 2);
+                    read -= 2;
+                }
+
+                // if we still have data, append it and update the chunkInfo
                 if (read)
                 {
+                    *out += chunk;
                     sData->response.chunkInfo.dataLen += read;
                     sData->response.payloadRead += read;
-                    // chunk may contain trailing
-                    if (sData->response.chunkInfo.dataLen - 2 >= sData->response.chunkInfo.chunkSize)
+
+                    // check if we're done reading this chunk
+                    if (sData->response.chunkInfo.dataLen == sData->response.chunkInfo.chunkSize)
                     {
-                        sData->response.chunkInfo.dataLen = sData->response.chunkInfo.chunkSize;
                         sData->response.chunkInfo.phase = async_response_handler_t::READ_CHUNK_SIZE;
                     }
                 }
-                // if all chunks read, returns -1
-                else if (sData->response.chunkInfo.dataLen == sData->response.chunkInfo.chunkSize)
+                // if we read 0 bytes, read next chunk size
+                else
+                {
+                    sData->response.chunkInfo.phase = async_response_handler_t::READ_CHUNK_SIZE;
+                }
+            } 
+            else
+            {
+                // last chunk, read until the final CRLF so the rest of the logic based on available() works
+                String chunk;
+                int read = readLine(sData, chunk);
+
+                // if we read a CRLF, we're done
+                if (read == 2 && chunk[0] == '\r' && chunk[1] == '\n')
+                {
                     res = -1;
+                }
             }
         }
 
@@ -1948,7 +1984,7 @@ private:
         {
             if (sData->async)
                 returnResult(sData, false);
-            reset(sData, false);
+            reset(sData, true);
         }
     }
 
@@ -2314,7 +2350,7 @@ private:
             handleEventTimeout(sData);
 #endif
 
-            if (!sData->sse && sData->return_type == function_return_type_complete)
+            if (!sData->sse && sData->return_type == function_return_type_complete && sData->state != async_state_send_payload)
                 sData->to_remove = true;
 
             if (sData->to_remove)
