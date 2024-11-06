@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-10-30T03:51:10Z`
+Revision `2024-11-06T01:34:47Z`
 
 ## Table of Contents
 
@@ -2673,7 +2673,7 @@ Refer to this [Realtime Database locations](https://firebase.google.com/docs/pro
 
 In some Arduino boards that works with [`WiFiNINA`](https://github.com/arduino/nina-fw) and `WiFi101` firmwares, the database URL that ends with `firebasedatabase.app` may not work after the SSL certificate was upload into the board firmware which causes Realtime Database server connection failure. 
 
-This issue was found on MKR 1000 WiFi board wuth `WiFi101`firmware at the moment while MKR WiFi 1010 with with [`WiFiNINA`](https://github.com/arduino/nina-fw) firmware does not have certificate issue.
+This issue was found on MKR 1000 WiFi board with `WiFi101`firmware at the moment while MKR WiFi 1010 with [`WiFiNINA`](https://github.com/arduino/nina-fw) firmware does not have certificate issue.
 
 We don't investigate in to the Arduino firmwares to find the root cause, then `us-central1` region for `DATABASE_NAME.firebaseio.com` URL should be selected for this case.
 

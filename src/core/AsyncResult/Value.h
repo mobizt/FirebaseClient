@@ -230,7 +230,6 @@ public:
             if (v_sring<T>::value)
                 buf += '\"';
 
-            StringUtil sut;
             buf += sut.num2Str(value);
 
             if (v_sring<T>::value)
@@ -359,6 +358,7 @@ private:
     };
 
     String buf;
+    StringUtil sut;
     bool trim = false;
     bool useLength = false;
 
