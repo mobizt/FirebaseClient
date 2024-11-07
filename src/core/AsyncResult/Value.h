@@ -276,7 +276,7 @@ public:
     template <typename T>
     auto to(const char *payload) -> typename std::enable_if<v_number<T>::value || std::is_same<T, bool>::value, T>::type
     {
-        if (!useLength && strlen(payload) > 0)
+        if (strlen(payload) > 0)
         {
             if (getType(payload) == realtime_database_data_type_boolean)
                 setBool(strcmp(payload, "true") == 0);
@@ -396,7 +396,6 @@ private:
     String buf;
     StringUtil sut;
     bool trim = false;
-    bool useLength = false;
 
     IVal iVal = {0};
     FVal fVal;
