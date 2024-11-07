@@ -1,5 +1,5 @@
 /**
- * Created October 29, 2024
+ * Created November 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -75,8 +75,6 @@ public:
 
 struct string_t : public Printable
 {
-private:
-    String buf;
 
 public:
     string_t() {}
@@ -86,6 +84,8 @@ public:
         aq(true);
         if (std::is_same<T, bool>::value)
             buf += v ? FPSTR("true") : FPSTR("false");
+        else if (v_number<T>::value)
+            buf += sut.num2Str(v);
         else
             buf += v;
         aq();
@@ -125,6 +125,22 @@ public:
     void clear() { buf.remove(0, buf.length()); }
 
 private:
+    String buf;
+    StringUtil sut;
+
+    template <typename T>
+    struct v_string
+    {
+        static bool const value = std::is_same<T, const char *>::value || std::is_same<T, std::string>::value || std::is_same<T, String>::value;
+    };
+
+    template <typename T>
+    struct v_number
+    {
+        static bool const value = std::is_same<T, uint64_t>::value || std::is_same<T, int64_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+                                  std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value ||
+                                  std::is_same<T, double>::value || std::is_same<T, float>::value || std::is_same<T, int>::value;
+    };
     void sap()
     {
         String temp;
@@ -145,25 +161,45 @@ struct object_t : public Printable
 {
     friend class JsonWriter;
 
-private:
-    String buf;
-
 public:
     object_t() {}
     explicit object_t(const String &o) : buf(o) {}
     const char *c_str() const { return buf.c_str(); }
     template <typename T = const char *>
-    explicit object_t(T o) : buf(String(o)) {}
+    explicit object_t(T o)
+    {
+        if (std::is_same<T, bool>::value)
+            buf += o ? FPSTR("true") : FPSTR("false");
+        else if (v_number<T>::value)
+            buf += sut.num2Str(o);
+        else
+            buf += o;
+    }
     explicit object_t(boolean_t o) : buf(o.c_str()) {}
     explicit object_t(number_t o) : buf(o.c_str()) {}
     explicit object_t(string_t o) : buf(o.c_str()) {}
-    explicit object_t(bool o) : buf(o ? FPSTR("true") : FPSTR("false")) {}
     size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
     void clear() { buf.remove(0, buf.length()); }
     void initObject() { buf = FPSTR("{}"); };
     void initArray() { buf = FPSTR("[]"); };
 
 private:
+    String buf;
+    StringUtil sut;
+
+    template <typename T>
+    struct v_string
+    {
+        static bool const value = std::is_same<T, const char *>::value || std::is_same<T, std::string>::value || std::is_same<T, String>::value;
+    };
+
+    template <typename T>
+    struct v_number
+    {
+        static bool const value = std::is_same<T, uint64_t>::value || std::is_same<T, int64_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
+                                  std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value || std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value ||
+                                  std::is_same<T, double>::value || std::is_same<T, float>::value || std::is_same<T, int>::value;
+    };
     explicit operator bool() const { return buf.length() > 0; }
 
     template <typename T = const char *>
@@ -198,7 +234,7 @@ public:
     ~ValueConverter() {}
 
     template <typename T>
-    struct v_sring
+    struct v_string
     {
         static bool const value = std::is_same<T, const char *>::value || std::is_same<T, std::string>::value || std::is_same<T, String>::value;
     };
@@ -218,7 +254,7 @@ public:
     }
 
     template <typename T = const char *>
-    auto getVal(String &buf, T value) -> typename std::enable_if<(v_number<T>::value || v_sring<T>::value || std::is_same<T, bool>::value) && !std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, boolean_t>::value && !std::is_same<T, number_t>::value, void>::type
+    auto getVal(String &buf, T value) -> typename std::enable_if<(v_number<T>::value || v_string<T>::value || std::is_same<T, bool>::value) && !std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, boolean_t>::value && !std::is_same<T, number_t>::value, void>::type
     {
         buf.remove(0, buf.length());
         if (std::is_same<T, bool>::value)
@@ -227,12 +263,12 @@ public:
         }
         else
         {
-            if (v_sring<T>::value)
+            if (v_string<T>::value)
                 buf += '\"';
 
             buf += sut.num2Str(value);
 
-            if (v_sring<T>::value)
+            if (v_string<T>::value)
                 buf += '\"';
         }
     }
@@ -282,7 +318,7 @@ public:
     }
 
     template <typename T>
-    auto to(const char *payload) -> typename std::enable_if<v_sring<T>::value, T>::type
+    auto to(const char *payload) -> typename std::enable_if<v_string<T>::value, T>::type
     {
         if (payload && payload[0] == '"' && payload[strlen(payload) - 1] == '"')
         {

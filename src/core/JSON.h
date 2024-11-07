@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created November 7, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -170,10 +170,10 @@ public:
     auto create(object_t &obj, const String &path, T value) -> typename std::enable_if<!std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, number_t>::value && !std::is_same<T, boolean_t>::value, void>::type
     {
         int i = prek(obj, path);
-        if (ValueConverter::v_sring<T>::value)
+        if (ValueConverter::v_string<T>::value)
             obj += "\"";
         obj += value;
-        if (ValueConverter::v_sring<T>::value)
+        if (ValueConverter::v_string<T>::value)
             obj += "\"";
         ek(obj, i);
     }
