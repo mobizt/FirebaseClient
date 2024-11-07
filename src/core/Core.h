@@ -7,7 +7,7 @@
 #undef FIREBASE_CLIENT_VERSION
 #endif
 
-#define FIREBASE_CLIENT_VERSION "1.4.6"
+#define FIREBASE_CLIENT_VERSION "1.4.7"
 
 static void sys_idle()
 {
