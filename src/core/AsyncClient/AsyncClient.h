@@ -1,5 +1,5 @@
 /**
- * Created October 25, 2024
+ * Created November 19, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -1026,10 +1026,10 @@ private:
         }
     }
 
-    int getChunkSize(async_data_item_t *sData, Client *client)
+    int getChunkSize(async_data_item_t *sData, Client *client, String &line)
     {
-        String line;
-        readLine(sData, line);
+        if (line.length() == 0)
+            readLine(sData, line);
         int p = line.indexOf(";");
         if (p == -1)
             p = line.indexOf("\r\n");
@@ -1044,7 +1044,8 @@ private:
     {
         if (!client || !sData || !out)
             return 0;
-        int res = 0;
+        int res = 0, read = 0;
+        String line;
 
         // because chunks might span multiple reads, we need to keep track of where we are in the chunk
         // chunkInfo.dataLen is our current position in the chunk
@@ -1059,7 +1060,7 @@ private:
             sData->response.chunkInfo.phase = async_response_handler_t::READ_CHUNK_DATA;
             sData->response.chunkInfo.chunkSize = -1;
             sData->response.chunkInfo.dataLen = 0;
-            res = getChunkSize(sData, client);
+            res = getChunkSize(sData, client, line);
             sData->response.payloadLen += res > -1 ? res : 0;
         }
         // read chunk-data and CRLF
@@ -1069,51 +1070,47 @@ private:
             // if chunk-size is 0, it's the last chunk, and can be skipped
             if (sData->response.chunkInfo.chunkSize > 0)
             {
-                String chunk;
-                int read = readLine(sData, chunk);
-                
+                read = readLine(sData, line);
+
                 // if we read till a CRLF, we have a chunk (or the rest of it)
                 // if the last two bytes are NOT CRLF, we have a partial chunk
                 // if we read 0 bytes, read next chunk size
 
                 // check for \n and \r, remove them if present (they're part of the protocol, not the data)
-                if (read >= 2 && chunk[read - 2] == '\r' && chunk[read - 1] == '\n')
+                if (read >= 2 && line[read - 2] == '\r' && line[read - 1] == '\n')
                 {
                     // remove the \r\n
-                    chunk.remove(chunk.length() - 2);
+                    line.remove(line.length() - 2);
                     read -= 2;
                 }
 
                 // if we still have data, append it and update the chunkInfo
                 if (read)
                 {
-                    *out += chunk;
+                    *out += line;
                     sData->response.chunkInfo.dataLen += read;
                     sData->response.payloadRead += read;
 
                     // check if we're done reading this chunk
                     if (sData->response.chunkInfo.dataLen == sData->response.chunkInfo.chunkSize)
-                    {
                         sData->response.chunkInfo.phase = async_response_handler_t::READ_CHUNK_SIZE;
-                    }
                 }
                 // if we read 0 bytes, read next chunk size
                 else
                 {
                     sData->response.chunkInfo.phase = async_response_handler_t::READ_CHUNK_SIZE;
                 }
-            } 
+            }
             else
             {
                 // last chunk, read until the final CRLF so the rest of the logic based on available() works
-                String chunk;
-                int read = readLine(sData, chunk);
+                read = readLine(sData, line);
 
                 // if we read a CRLF, we're done
-                if (read == 2 && chunk[0] == '\r' && chunk[1] == '\n')
-                {
+                if (read == 2 && line[0] == '\r' && line[1] == '\n')
                     res = -1;
-                }
+                else // that could be a last chunk size, continue to read the last chunk-data and CRLF
+                    getChunkSize(sData, client, line);
             }
         }
 
