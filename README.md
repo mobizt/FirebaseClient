@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-11-18T18:48:41Z`
+Revision `2024-11-19T08:17:19Z`
 
 ## Table of Contents
 
@@ -3162,7 +3162,7 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
 ## Sponsors
 
-Thank your for the following users whose supporting me.
+Thank your for the following users whose supporting me via [Github sponsors](https://github.com/sponsors/mobizt).
 
 <a href="https://github.com/jiperez11"><img src="https://github.com/jiperez11.png" width="35" height="35" alt="@jiperez11"></a>
 <a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/13026382?s=35&v=4" width="35" height="35" alt="private sponsor"></a>
@@ -3171,9 +3171,12 @@ Thank your for the following users whose supporting me.
 <a href="https://github.com/chris-gunawardena"><img src="https://github.com/chris-gunawardena.png" width="35" height="35" alt="@chris-gunawardena"></a>
 
 ### Buy Me a Coffee
-Giulio, Stepinside, Liew Wuttipat, Keith Le Breton, Etan Hayik, Nikolaj Nøhr-Rasmussen, bjdshp, Francis Hsueh, tjozsef, dkalliv, Allan Green, Forrest Milner, Someone, @Engine1992, Vasanth, and Jason Duhamell.
 
-If you like my works, you can give a star. If you can make benefit from my project or love it, you can sponsoring me.
+Thank your for the following users for donation via [Buy Me a Coffee](https://www.buymeacoffee.com/Mobizt).
+
+Giulio, Stepinside, Liew Wuttipat, Keith Le Breton, Etan Hayik, Nikolaj Nøhr-Rasmussen, bjdshp, Francis Hsueh, tjozsef, dkalliv, Allan Green, Forrest Milner, Someone, @Engine1992, Vasanth, Jason Duhamell and Yochaing.
+
+If you like my works, you can give a star. If you can make benefit from my project or love it, you can sponsoring me or [Buy Me a Coffee](https://www.buymeacoffee.com/Mobizt).
 
 
 ## License
