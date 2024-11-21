@@ -1030,6 +1030,7 @@ private:
     {
         if (line.length() == 0)
             readLine(sData, line);
+
         int p = line.indexOf(";");
         if (p == -1)
             p = line.indexOf("\r\n");
@@ -1079,6 +1080,10 @@ private:
                 // check for \n and \r, remove them if present (they're part of the protocol, not the data)
                 if (read >= 2 && line[read - 2] == '\r' && line[read - 1] == '\n')
                 {
+                    // last chunk?
+                    if (line[0] == '0') // last-chunk , chunk-extension (if any) and CRLF
+                        goto next;
+
                     // remove the \r\n
                     line.remove(line.length() - 2);
                     read -= 2;
@@ -1103,13 +1108,14 @@ private:
             }
             else
             {
-                // last chunk, read until the final CRLF so the rest of the logic based on available() works
+
+            next:
                 read = readLine(sData, line);
 
-                // if we read a CRLF, we're done
+                // CRLF (end of chunked body)
                 if (read == 2 && line[0] == '\r' && line[1] == '\n')
                     res = -1;
-                else // that could be a last chunk size, continue to read the last chunk-data and CRLF
+                else // another chunk?
                     getChunkSize(sData, client, line);
             }
         }

@@ -1,6 +1,6 @@
 {
   "name": "FirebaseClient",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "keywords": "communication, REST, esp32, esp8266, arduino",
   "description": "Async Firebase Client library for Arduino.",
   "repository": {
