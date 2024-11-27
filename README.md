@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-11-21T07:02:31Z`
+Revision `2024-11-27T01:58:03Z`
 
 ## Table of Contents
 
@@ -3164,7 +3164,6 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
 Thanks for the following users whose supporting me via [Github sponsors](https://github.com/sponsors/mobizt).
 
-<a href="https://github.com/jiperez11"><img src="https://github.com/jiperez11.png" width="35" height="35" alt="@jiperez11"></a>
 <a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/13026382?s=35&v=4" width="35" height="35" alt="private sponsor"></a>
 <a href="https://github.com/Jagakatt"><img src="https://github.com/Jagakatt.png" width="35" height="35" alt="@Jagakatt"></a>
 <a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/166620797?s=35&v=4" width="35" height="35" alt="private sponsor"></a>
