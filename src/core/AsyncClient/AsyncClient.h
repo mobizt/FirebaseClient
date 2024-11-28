@@ -1,5 +1,5 @@
 /**
- * Created November 21, 2024
+ * Created November 28, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -1150,7 +1150,10 @@ private:
                             {
                                 if (sData->request.ota)
                                 {
+#if defined(FIREBASE_OTA_STORAGE)
                                     otaut.setOTAStorage(sData->request.ota_storage_addr);
+#endif
+
                                     otaut.prepareDownloadOTA(sData->response.payloadLen, sData->request.base64, sData->request.ota_error);
                                     if (sData->request.ota_error != 0)
                                     {

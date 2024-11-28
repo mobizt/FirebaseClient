@@ -1,5 +1,5 @@
 /**
- * Created July 1, 2024
+ * Created November 28, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -29,6 +29,7 @@
 #include <Arduino.h>
 #include "./Config.h"
 
+
 #if __has_include(<OTAStorage.h>)
 
 #include <OTAStorage.h>
@@ -38,6 +39,8 @@
 #elif defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO)
 #define FIREBASE_OTA_UPDATER Update
 #endif
+
+#if defined(FIREBASE_OTA_STORAGE)
 
 class OTAUpdaterClass
 {
@@ -52,9 +55,8 @@ public:
     bool isInit();
 
 private:
-#if defined(FIREBASE_OTA_STORAGE)
     OTAStorage *storage = nullptr;
-#endif
+
     uint32_t addr = 0;
     size_t write(uint8_t b);
     void close();
@@ -62,5 +64,7 @@ private:
 };
 
 extern OTAUpdaterClass OTAUpdater;
+
+#endif
 
 #endif

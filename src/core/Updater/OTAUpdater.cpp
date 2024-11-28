@@ -1,5 +1,5 @@
 /**
- * Created July 1, 2024
+ * Created November 28, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -29,6 +29,8 @@
 #include <Arduino.h>
 #include "./core/Updater/OTAUpdater.h"
 
+#if defined(FIREBASE_OTA_STORAGE)
+
 OTAUpdaterClass::OTAUpdaterClass() {}
 OTAUpdaterClass::~OTAUpdaterClass() {}
 
@@ -49,10 +51,8 @@ bool OTAUpdaterClass::end()
 
 void OTAUpdaterClass::setOTAStorage(uint32_t addr)
 {
-#if defined(FIREBASE_OTA_STORAGE)
     this->addr = addr;
     storage = reinterpret_cast<OTAStorage *>(addr);
-#endif
 }
 
 bool OTAUpdaterClass::isInit() { return addr > 0; }
@@ -66,29 +66,25 @@ size_t OTAUpdaterClass::write(uint8_t *data, size_t len)
 
 size_t OTAUpdaterClass::write(uint8_t b)
 {
-#if defined(FIREBASE_OTA_STORAGE)
     if (storage)
         storage->write(b);
-#endif
     return 1;
 }
 
 void OTAUpdaterClass::close()
 {
-#if defined(FIREBASE_OTA_STORAGE)
     if (storage)
         storage->close();
-#endif
 }
 
 void OTAUpdaterClass::apply()
 {
-#if defined(FIREBASE_OTA_STORAGE)
     if (storage)
         storage->apply();
-#endif
 }
 
 OTAUpdaterClass OTAUpdater;
+
+#endif
 
 #endif
