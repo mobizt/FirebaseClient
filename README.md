@@ -179,7 +179,7 @@ Some Arduino MKR devices have the problem when connecting to the Realtime databa
 
 For Arduino IDE, the ESP8266 Core SDK can be installed through **Boards Manager**. 
 
-For PlatfoemIO IDE, the ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
+For PlatformIO IDE, the ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
 
 The RP2040 boards required [Arduino-Pico SDK](https://github.com/earlephilhower/arduino-pico) from Earle F. Philhower to be installed.
 
