@@ -95,7 +95,7 @@ This library is the `REST APIs Firebase Client` that supports the following `Fir
 - `Google Cloud Functions`
 - `Google Cloud Storage`
 
-This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was cteated to solve the following issues in the old Firebase library.
+This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was created to solve the following issues in the old Firebase library.
 
 - The confusion of different library names from the same developer and other developers in Library Manager.
 - The different main header file name and class name issue.
@@ -179,7 +179,7 @@ Some Arduino MKR devices have the problem when connecting to the Realtime databa
 
 For Arduino IDE, the ESP8266 Core SDK can be installed through **Boards Manager**. 
 
-For PlatfoemIO IDE, the ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
+For PlatformIO IDE, the ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
 
 The RP2040 boards required [Arduino-Pico SDK](https://github.com/earlephilhower/arduino-pico) from Earle F. Philhower to be installed.
 
