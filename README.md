@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-11-27T01:58:03Z`
+Revision `2024-12-02T06:55:11Z`
 
 ## Table of Contents
 
@@ -367,10 +367,10 @@ The REST API client (this library) will use the short-lived token for authorizat
 
 This authorization token will be expired in 60 minutes or 3600 seconds which determined by the issuer (Google).
 
-The authorization token will be refresh or re-created automatically as long as the async authentication task handler (`FirebaseApp`) was running in the main loop without blocking by user code.
+The authorization token will be refreshed or re-created automatically as long as the async authentication task handler (`FirebaseApp`) was running in the main loop without blocking by user code.
 
 > [!WARNING]  
-> Most examples use the token for autorization. The token will be refresh/recreated automatically as mentioned above.
+> Most examples use the token for autorization. The token will be refreshed/recreated automatically as mentioned above.
 >
 > The `FirebaseApp` event will show the authentication processes that are running behind. The authentication task handler will prepare and maintain the authorization token to be valid. Google may deny the access from the client that sending the request with the expired authorization token.
 > 
@@ -1163,7 +1163,7 @@ AccessToken::save(<file_config_data>)
 
 `<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of file that the `AccessToken` credentials will be saved to or read from.
 
-Normally `<refresh_token>` is not needed, if it is provided, the token will be refresh immediately when calling `FirebaseApp`'s  `initializeApp`.
+Normally `<refresh_token>` is not needed, if it is provided, the token will be refreshed immediately when calling `FirebaseApp`'s  `initializeApp`.
 
 The Client ID and Client Secret are OAuth 2.0 credentials that can be taken from the [developer console](https://console.developers.google.com/apis/credentials).
 
@@ -2610,7 +2610,7 @@ For new Firebase user, go to the [Google Firebase Console](https://console.fireb
 
 ![Ignore the Google Analytics](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/create_a_project_step2.png)
 
-Click the button `All products`.
+Click `All products` button.
 
 ![All products](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_all_products.png)
 
@@ -2633,7 +2633,7 @@ Select `Enable` check option in `Email/Password` section, and click `Save` butto
 
 ![Authentication Enable Email/Password](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step2.png)
 
-Then click at `Users` tab, click `Add user` button.
+Then click `Users` tab, click `Add user` button.
 
 ![Authentication Add User](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step3.png)
 
@@ -2649,7 +2649,7 @@ See [API Keys Overview](https://cloud.google.com/api-keys/docs/overview) and [Au
 
 At the `Authentication` page, under `Sign-in method` tab, other Sign-in providers can be added.
 
-To add `Anonymous` sign-in provider, click at `Add new provider` button.
+To add `Anonymous` sign-in provider, click `Add new provider` button.
 
 ![Authentication Anonymous Provider](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_authentication_get_started_step5.png)
 
@@ -2681,7 +2681,7 @@ We don't investigate in to the Arduino firmwares to find the root cause, then `u
 
 You can choose `Start in locked mode` or `Start in test mode` for `Security rules`.
 
-Once the database was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
+Once the database was created, click the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
 
 ```yaml
 {
@@ -2709,7 +2709,7 @@ The database secret is the secret key for privileged accessing the `Realtime Dat
 
 The database secret is now currently deprecated. Alternatively, to use the `Realtime Database` with the same privileged access as database secret but secured, the `OAuth2.0 access token authentication using service account` via `ServiceAuth` provider class is recommended.  
 
-To get the database secret, in the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), under the `Service accounts` Tab click `Database secret`.
+To get the database secret, in the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), under the `Service accounts` Tab, click `Database secret`.
 
 ![Realtime Database Database Secret on Service Accounts Tab](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_rtdb_secret_key_step1.png)
 
@@ -2732,7 +2732,7 @@ Set up your database `Name and Location` and `Security rules`.
 
 ![Set Security Rules](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_firestore_create_database_step2.png)
 
-Once the database was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
+Once the database was created, click the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
 
 ```yaml
 rules_version = '2';
@@ -2760,7 +2760,7 @@ Then set the `Secure Rules for Cloud Storage` and `Cloud Storage location`.
 
 ![Set Cloud Storage location](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_storage_get_started_step2.png)
 
-Once the storage bucket was created, click on the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
+Once the storage bucket was created, click the `Rules` tab and change the `Security rules` as following to allow the basic authentication, click `Publish` button to apply the changes.
 
 ```yaml
 rules_version = '2';
@@ -2871,7 +2871,7 @@ The `Service Account` credentials are required for `OAuth2.0 access token authen
 
 The `Service Account` private key contains the `Service Account` credentials which used for initialize the Firebase mobile app.
 
-To generate and download `Service Account` private key file, in the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), click at `Service accounts` tab and `Generate new private key`. 
+To generate and download `Service Account` private key file, in the `Project Settings` page in the [`Google Firebase Console`](https://console.firebase.google.com/), click `Service accounts` tab and `Generate new private key`. 
 
 To use `Service Account` in your sketch, open the .json file that is already downloaded with the text editor.
 
@@ -2915,7 +2915,7 @@ To add the Basic's `Owner` or `Editor` roles, go to the [Identity and Access Man
 
 Then choose the project, and select the `VIEW BY PRINCIPALS` tab.
 
-From the table displayed, look at the `firebase-adminsdk` in the `Name` column, then click on the pencil icon on the right side in this table row to `Edit principal`. 
+From the table displayed, look at the `firebase-adminsdk` in the `Name` column, then click the pencil icon on the right side in this table row to `Edit principal`. 
 
 ![IAM Add Permission](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/iam_add_permission_step1.png)
 
