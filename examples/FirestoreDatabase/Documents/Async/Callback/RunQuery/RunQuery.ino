@@ -144,7 +144,7 @@ void loop()
         // Or shorter form
         // query.select(Projection(FieldReference("myDouble")).add(FieldReference("myInteger")).add(FieldReference("myTimestamp")));
 
-        query.from(CollectionSelector("a0", false));
+        query.from(CollectionSelector("a0", true));
 
         Order order;
         order.field(FieldReference("myInteger"));
