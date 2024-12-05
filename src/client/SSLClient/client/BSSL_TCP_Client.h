@@ -1,7 +1,7 @@
 /**
- * BSSL_TCP_Client v2.0.14 for Arduino devices.
+ * BSSL_TCP_Client v2.0.15 for Arduino devices.
  *
- * Created June 27, 2024
+ * Created December 5, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2023 K. Suwatchai (Mobizt)
@@ -108,7 +108,7 @@ public:
      * @param timeout The connection time out in miiliseconds.
      * @return 1 for success or 0 for error.
      */
-    int connect(IPAddress ip, uint16_t port, int32_t timeout);
+    int connect(IPAddress ip, uint16_t port, int32_t timeout) ESP32_ARDUINO_CORE_CLIENT_CONNECT_OVERRRIDE;
 
     /**
      * Connect to server.
@@ -125,7 +125,7 @@ public:
      * @param timeout The connection time out in miiliseconds.
      * @return 1 for success or 0 for error.
      */
-    int connect(const char *host, uint16_t port, int32_t timeout);
+    int connect(const char *host, uint16_t port, int32_t timeout) ESP32_ARDUINO_CORE_CLIENT_CONNECT_OVERRRIDE;
 
     /**
      * Get TCP connection status.
@@ -319,13 +319,13 @@ public:
      * Set the TCP session timeout in seconds.
      *
      * @param seconds The TCP session timeout in seconds.
-     * 
+     *
      * The minimum session timeout value is 60 seconds.
      * Set 0 to disable session timed out.
-     * 
-     * If There is no data to send (write) within this period, 
+     *
+     * If There is no data to send (write) within this period,
      * the current connection will be closed and reconnect.
-     * 
+     *
      * This requires when ESP32 WiFiClient was used.
      */
     void setSessionTimeout(uint32_t seconds);

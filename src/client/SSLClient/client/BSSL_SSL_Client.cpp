@@ -1,7 +1,7 @@
 /**
- * BSSL_SSL_Client library v1.0.17 for Arduino devices.
+ * BSSL_SSL_Client library v1.0.18 for Arduino devices.
  *
- * Created October 29, 2024
+ * Created December 5, 2024
  *
  * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
  *
@@ -150,6 +150,22 @@ int BSSL_SSL_Client::connect(const char *host, uint16_t port)
 
     return 1;
 }
+
+#if defined(ESP32_ARDUINO_CORE_CLIENT_CONNECT_HAS_TMO)
+int BSSL_SSL_Client::connect(IPAddress ip, uint16_t port, int32_t timeout)
+{
+    if (timeout > 0)
+        setTimeout(timeout);
+    return connect(ip, port);
+}
+
+int BSSL_SSL_Client::connect(const char *host, uint16_t port, int32_t timeout)
+{
+    if (timeout > 0)
+        setTimeout(timeout);
+    return connect(host, port);
+}
+#endif
 
 uint8_t BSSL_SSL_Client::connected()
 {
