@@ -78,8 +78,8 @@ TinyGsm modem(SerialAT);
 TinyGsmClient gsm_client1(modem, 0);
 TinyGsmClient gsm_client2(modem, 1);
 
-// This is the library internal SSL clients.
-// You can use any SSL Client that works with Ethernet library.
+// This is the library's internal SSL clients.
+// You can use any SSL Client that works with GSM library.
 // The ESP_SSLClient uses PSRAM by default (if it is available), for PSRAM usage, see https://github.com/mobizt/FirebaseClient#memory-options
 // For ESP_SSLClient documentation, see https://github.com/mobizt/ESP_SSLClient
 ESP_SSLClient ssl_client1, ssl_client2;
