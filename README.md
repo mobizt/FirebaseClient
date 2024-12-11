@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-12-05T05:35:29Z`
+Revision `2024-12-11T12:02:01Z`
 
 ## Table of Contents
 
@@ -3162,16 +3162,27 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
 ## Sponsors
 
-Thanks for the following users whose supporting me via [Github sponsors](https://github.com/sponsors/mobizt).
+Sponsors via [Github sponsors](https://github.com/sponsors/mobizt).
 
-<a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/13026382?s=35&v=4" width="35" height="35" alt="private sponsor"></a>
-<a href="https://github.com/Jagakatt"><img src="https://github.com/Jagakatt.png" width="35" height="35" alt="@Jagakatt"></a>
-<a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/166620797?s=35&v=4" width="35" height="35" alt="private sponsor"></a>
-<a href="https://github.com/chris-gunawardena"><img src="https://github.com/chris-gunawardena.png" width="35" height="35" alt="@chris-gunawardena"></a>
+Current sponsors
+
+<a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/13026382?s=35&v=4" width="30" height="30" alt="private sponsor"></a>
+<a href="https://github.com/Jagakatt"><img src="https://github.com/Jagakatt.png" width="30" height="30" alt="@Jagakatt"></a>
+<a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/166620797?s=35&v=4" width="30" height="30" alt="private sponsor"></a>
+
+Past sponsors
+
+<img src="https://avatars.githubusercontent.com/u/5763108?s=60&amp;v=4" width="30" height="30" alt="past_sponsor">
+<img src="https://avatars.githubusercontent.com/u/57544850?s=60&amp;v=4" width="30" height="30" alt="past_sponsor">
+<img src="https://avatars.githubusercontent.com/u/63749581?s=60&amp;v=4" width="30" height="30" alt="past_sponsor">
+<img src="https://avatars.githubusercontent.com/u/83292822?s=60&amp;v=4" width="30" height="30" alt="past_sponsor">
+<img src="https://avatars.githubusercontent.com/u/31892707?s=60&amp;v=4" width="30" height="30" alt="past_sponsor">
+<img src="https://avatars.githubusercontent.com/u/96478986?s=60&amp;v=4" width="30" height="30" alt="past_sponsor">
+
 
 ### Buy Me a Coffee
 
-Thanks for the following users for donation via [Buy Me a Coffee](https://www.buymeacoffee.com/Mobizt).
+Donors via [Buy Me a Coffee](https://www.buymeacoffee.com/Mobizt).
 
 Giulio, Stepinside, Liew Wuttipat, Keith Le Breton, Etan Hayik, Nikolaj Nøhr-Rasmussen, bjdshp, Francis Hsueh, tjozsef, dkalliv, Allan Green, Forrest Milner, Someone, @Engine1992, Vasanth, Jason Duhamell and Yochaing.
 
