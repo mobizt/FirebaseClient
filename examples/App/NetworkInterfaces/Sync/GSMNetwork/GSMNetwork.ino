@@ -8,6 +8,9 @@
  * <apn> - The GPRS APN (Access Point Name).
  * <user> - The GPRS user.
  * <password> - The GPRS password.
+ * 
+ * In ESP32 Core v3.x.x, PPP devices are natively supported.
+ * See examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultPPPNetwork/ESP32
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  *

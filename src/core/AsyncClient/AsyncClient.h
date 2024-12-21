@@ -1,5 +1,5 @@
 /**
- * Created November 28, 2024
+ * Created December 21, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -1837,8 +1837,8 @@ private:
             net.network_status = ethernetConnected();
         }
         // also check the native network before calling external cb
-        else if (net.network_data_type == firebase_network_data_default_network || WIFI_CONNECTED || ethLinkUp())
-            net.network_status = WIFI_CONNECTED || ethLinkUp();
+        else if (net.network_data_type == firebase_network_data_default_network || WIFI_CONNECTED || ethLinkUp() || PPP_CONNECTED)
+            net.network_status = WIFI_CONNECTED || ethLinkUp() || PPP_CONNECTED;
         else if (net.network_data_type == firebase_network_data_generic_network)
         {
             if (!net.generic.net_status_cb)

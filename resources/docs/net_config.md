@@ -313,6 +313,55 @@ class DefaultEthernetNetwork
 <br>
 
 
+# DefaultPPPtNetwork
+
+## Description
+
+The default Ethernet class for ESP32 with PPP supports.
+
+
+```cpp
+class DefaultPPPtNetwork
+```
+
+
+## Constructors
+
+    1. ### 🔹 DefaultPPPtNetwork()
+
+    The default PPP network class for ESP32 with native PPP ptotocols supports.
+    
+    See [ESP32 DefaultPPPNetwork example](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/ESP32/) for using ESP32 with its native PPP library.
+
+    ```cpp
+    DefaultPPPtNetwork()
+    ```
+
+## Functions
+
+1. ### 🔹 void clear()
+    
+    Clear the internal network data.
+
+    ```cpp
+    void clear()
+    ```
+
+2. ### 🔹 network_config_data &get()
+    
+    Get the reference to the internal `network_config_data`.
+
+    ```cpp
+    network_config_data &get()
+    ```
+
+    **Returns:**
+
+    - `network_config_data &` - The reference to internal `network_config_data`.
+
+<br>
+
+
 # DefaultWiFiNetwork
 
 ## Description

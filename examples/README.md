@@ -52,6 +52,7 @@
 │   │   │   │   │   │   ├───ESP32
 │   │   │   │   │   │   └───ESP8266
 │   │   │   │   │   ├───DefaultNetwork
+│   │   │   │   │   ├───DefaultPPPNetwork
 │   │   │   │   │   └───DefaultWiFiNetwork
 │   │   │   │   ├───EthernetNetwork
 │   │   │   │   ├───GenericNetwork
@@ -62,6 +63,7 @@
 │   │   │       │   │   ├───ESP32
 │   │   │       │   │   └───ESP8266
 │   │   │       │   ├───DefaultNetwork
+│   │   │       │   ├───DefaultPPPNetwork
 │   │   │       │   └───DefaultWiFiNetwork
 │   │   │       ├───EthernetNetwork
 │   │   │       ├───GenericNetwork
@@ -72,6 +74,7 @@
 │   │       │   │   ├───ESP32
 │   │       │   │   └───ESP8266
 │   │       │   ├───DefaultNetwork
+│   │       │   ├───DefaultPPPNetwork
 │   │       │   └───DefaultWiFiNetwork
 │   │       ├───EthernetNetwork
 │   │       ├───GenericNetwork

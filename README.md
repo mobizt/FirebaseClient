@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.4.10-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.4.11-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-12-11T12:02:01Z`
+Revision `2024-12-21T04:55:10Z`
 
 ## Table of Contents
 
@@ -133,6 +133,7 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
  * Arduino® GIGA R1 WiFi
  * Arduino® OPTA
  * Raspberry Pi Pico (RP2040)
+ * Raspberry Pi Pico 2 (RP2350)
  * STM32 MCU based boards (minimum 256k Flash memory)
  * Teensy 3.1, 3.2, 3.5, 3.6, 4.0 and 4.1
  * LAN8720 Ethernet PHY
@@ -142,7 +143,7 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
  * W5100 SPI Ethernet module
  * W5500 SPI Ethernet module
  * SIMCom Modules with [TinyGSM](https://github.com/vshymanskyy/TinyGSM)
-
+ * PPP Modules with ESP32 Core v3.x.x 
 
  # Unsuppored Devices
 
@@ -327,7 +328,7 @@ Rename folder from **FirebaseClient-main** to **FirebaseClient**.
 Go to menu **Files** -> **Examples** -> **FirebaseClient** and choose one from examples.
 
 
-- ### RP2040 Arduino SDK installation
+- ### RP2040/RP2350 Arduino SDK installation
 
 For Arduino IDE, the Arduino-Pico SDK can be installed from Boards Manager by searching pico and choose Raspberry Pi Pico/RP2040 to install.
 
@@ -508,7 +509,7 @@ The async task handler will kepp the async tasks running as long as it places in
 
 #### Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)
 
-In Raspberry Pi Pico W, its `WiFiClientSecure` memory used for the transmit and receive buffers are adjustable (512 to 16384) and you have enough memory to run many tasks concurrency using different async clients.
+In Raspberry Pi Pico W/2W, its `WiFiClientSecure` memory used for the transmit and receive buffers are adjustable (512 to 16384) and you have enough memory to run many tasks concurrency using different async clients.
 
 In ESP32 device, its `WiFiClientSecure` memory usage cannot be adjusted, it requires at least 50 k per connection (37 k used for `mbedTLS` memory allocation) and only three `WiFiClientSecure`(s) can be defined.
 
@@ -1377,6 +1378,8 @@ The `AsyncClientClass` object requires the network config data (`network_config_
 
 - [DefaultNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultNetwork/) is used with the core WiFi enabled networking.
 
+- [DefaultPPPNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/) is used with the ESP32 core v3.x.x with PPP networking supports.
+
 - [DefaultWiFiNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultWiFiNetwork/) is used with the core WiFi Multi enabled networking or non-core WiFi networking.
 
 - [DefaultEthernetNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/) is used with the core Ethernet enabled networking.
@@ -1397,7 +1400,7 @@ To set or change the network for the `AsyncClientClass`, please see [Change Netw
 >
 > In ESP8266/ESP32, you can't use WiFi while using ESP-Now.
 
-The default network class can be used with WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W.
+The default network class can be used with WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W/2W.
 
 The boolean parameter passed to the default network class constructor is the option for how the network (WiFi) reconnection can be done automatically or manually.
 
@@ -1435,6 +1438,19 @@ When you define `DefaultNetwork` with no parameter, the WiFi reconnection will b
 > If you are using ESP32 device, and `<reconnect_option>` was enabled. The bugs in the outdated ESP32 Core WiFi will cause unknown network connection issue when library is trying to reconnect your WiFi using `WiFi.reconnect()`.
 > You have to update the ESP32 Arduino Core SDK to the latest version or at least v2.x.x.
 
+- `DefaultPPPNetwork`
+
+The `DefaultPPPNetwork` class constructor.
+
+```cpp
+DefaultPPPNetwork::DefaultPPNetwork()
+```
+
+This DefaultPPPNetwork class is for ESP32 v3.x.x with PPP network supports.
+
+See [ESP32 DefaultPPPNetwork example](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/ESP32/) for using ESP32 with its PPP library.
+
+
 - `DefaultWiFiNetwork`
 
 This `DefaultWiFiNetwork` class required some parameter for reconnection using WiFi credentials.
@@ -1467,6 +1483,7 @@ void setup()
     wifimulti.addAP("wifi_ssid3", "password3");
 }
 ```
+
 
 - `DefaultEthernetNetwork`
 
@@ -1693,6 +1710,8 @@ The following section will provide the basic (bare minimum) code example and the
                         * [ESP32](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/ESP32/)
                         * [ESP8266](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultEthernetNetwork/ESP8266/)
                     * [DefaultNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultNetwork/)
+                    * [DefaultPPPNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/)
+                        * [ESP32](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/ESP32/)
                     * [DefaultWiFiNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultWiFiNetwork/)
                 * [EthernetNetwork](/examples/App/NetworkInterfaces/Async/Callback/EthernetNetwork/)
                 * [GenericNetwork](/examples/App/NetworkInterfaces/Async/Callback/GenericNetwork/)
@@ -1704,6 +1723,8 @@ The following section will provide the basic (bare minimum) code example and the
                         * [ESP32](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultEthernetNetwork/ESP32/)
                         * [ESP8266](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultEthernetNetwork/ESP8266/)
                     * [DefaultNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultNetwork/)
+                    * [DefaultPPPNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultPPPNetwork/)
+                        * [ESP32](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultPPPNetwork/ESP32/)
                     * [DefaultWiFiNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultWiFiNetwork/)
                 * [EthernetNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/EthernetNetwork/)
                 * [GenericNetwork](/examples/App/NetworkInterfaces/Async/NoCallback/GenericNetwork/)
@@ -1715,6 +1736,8 @@ The following section will provide the basic (bare minimum) code example and the
                     * [ESP32](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultEthernetNetwork/ESP32/)
                     * [ESP8266](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultEthernetNetwork/ESP8266/)
                 * [DefaultNetwork](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultNetwork/)
+                * [DefaultPPPNetwork](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultPPPNetwork/)
+                        * [ESP32](/examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultPPPNetwork/ESP32/)
                 * [DefaultWiFiNetwork](/examples/App/NetworkInterfaces/Sync//DefaultNetworks/DefaultWiFiNetwork/)
             * [EthernetNetwork](/examples/App/NetworkInterfaces/Sync/EthernetNetwork/)
             * [GenericNetwork](/examples/App/NetworkInterfaces/Sync/GenericNetwork/)
@@ -3093,6 +3116,7 @@ ENABLE_ESP8266_W5500_ETH // For native core library W5500 Ethernet module suppor
 ENABLE_ESP8266_W5100_ETH // For native core library W5100 Ethernet module support in ESP8266.
 FIREBASE_DISABLE_ONBOARD_WIFI // For disabling on-board WiFI functionality in case external Client usage.
 FIREBASE_DISABLE_NATIVE_ETHERNET // For disabling native (sdk) Ethernet functionality in case external Client usage.
+FIREBASE_DISABLE_NATIVE_PPP // For disabling native ESP32 (sdk) PPP functionality.
 ENABLE_ASYNC_TCP_CLIENT // For Async TCP Client usage.
 FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit setting for an async client.
 FIREBASE_PRINTF_PORT // For Firebase.printf debug port.

@@ -1,5 +1,5 @@
 /**
- * Created July 6, 2024
+ * Created December 21, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -43,6 +43,7 @@ struct network_config_data
     friend class GenericNetwork;
     friend class EthernetNetwork;
     friend class GSMNetwork;
+    friend class DefaultPPPNetwork;
     friend class DefaultEthernetNetwork;
     friend class DefaultWiFiNetwork;
     friend class AsyncClientClass;
@@ -444,6 +445,22 @@ public:
         network_data.network_data_type = firebase_network_data_default_network;
     }
     ~DefaultEthernetNetwork() { clear(); }
+};
+
+class DefaultPPPNetwork : public DefaultNetwork
+{
+
+public:
+    /**
+     * The default PPP network class for ESP32 with native PPP ptotocols supports.
+     * See /examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/ESP32/ for using ESP32 with its native PPP library.
+     */
+    DefaultPPPNetwork()
+    {
+        init();
+        network_data.network_data_type = firebase_network_data_default_network;
+    }
+    ~DefaultPPPNetwork() { clear(); }
 };
 
 class DefaultWiFiNetwork : public DefaultNetwork

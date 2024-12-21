@@ -114,6 +114,9 @@
  *
  * 🏷️ For disabling native (sdk) Ethernet functionality in case external Client usage.
  * #define FIREBASE_DISABLE_NATIVE_ETHERNET
+ * 
+ * 🏷️ For disabling native ESP32 (sdk) PPP functionality.
+ * #define FIREBASE_DISABLE_NATIVE_PPP
  *
  * 🏷️ For Async TCP Client usage.
  * #define ENABLE_ASYNC_TCP_CLIENT
