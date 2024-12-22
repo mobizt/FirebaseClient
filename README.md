@@ -902,7 +902,7 @@ The following classes provide the privilege access to the Firebase/Google APIs.
 
  - [LegacyToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/LegacyToken/)
 
- The following class provides for non-authentication acesss.
+ The following class is for non-authentication acesss.
  
  - [NoAuth](/examples/App/AppInitialization/Async/Callback/NoAuth/)
 
