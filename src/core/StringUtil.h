@@ -68,7 +68,7 @@ public:
         if (p1 > -1)
         {
             p2 = str.indexOf(':', p1);
-            if (p1 > -1 && str.substring(p1, p2) == name)
+            if (p2 > -1 && str.substring(p1, p2) == name)
             {
                 p1 = p2 + 1;
                 while (str[p1] == ' ')
