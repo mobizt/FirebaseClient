@@ -1,5 +1,5 @@
 /**
- * Created December 21, 2024
+ * Created December 25, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -269,18 +269,7 @@ typedef void (*NetworkStatusCallback)(bool &);
 
 #if __has_include(<PPP.h>)
 #include <PPP.h>
-#endif
-
 #define FIREBASE_NATIVE_PPP_IS_AVAILABLE
-//  ESP32 Core Enum
-//  PPP_MODEM_GENERIC
-//  PPP_MODEM_SIM7600
-//  PPP_MODEM_SIM7070
-//  PPP_MODEM_SIM7000
-//  PPP_MODEM_BG96
-//  PPP_MODEM_SIM800
-#if defined(CONFIG_ESP_MODEM_ADD_CUSTOM_MODULE)
-//  PPP_MODEM_CUSTOM
 #endif
 
 #endif

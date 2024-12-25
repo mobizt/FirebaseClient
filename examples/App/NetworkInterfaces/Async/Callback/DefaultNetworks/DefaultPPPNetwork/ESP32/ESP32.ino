@@ -30,6 +30,8 @@
 
 #include <Arduino.h>
 
+#include <PPP.h>
+
 #include <FirebaseClient.h>
 
 #include <NetworkClientSecure.h>
