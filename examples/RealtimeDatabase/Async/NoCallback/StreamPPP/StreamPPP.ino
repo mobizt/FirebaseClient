@@ -1,37 +1,21 @@
 
-
 /**
- * This example is for ESP32 Core v3.x.x and the SIM modules.
+ * This example is for ESP32 Core v3.x.x and the SIM/GSM modules.
  *
- * WaveShare SIM7600 with hardware Flow Control
+ * SYNTAX:
  *
- * ESP32    WaveShare SIM7600
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
  *
- * GPIO25   RST
- * GPIO21   TX
- * GPIO22   RX
- * GPIO26   RTS
- * GPIO27   CTS
- * GND      GND
+ * RealtimeDatabase::get(<AsyncClient>, <path>, <DatabaseOption>, <AsyncResultCallback>, <uid>);
  *
- * LilyGO TTGO T-A7670 development board (ESP32 with SIMCom A7670)
- * GPIO5    RST
- * GPIO26   TX
- * GPIO27   RX
- * GND      GND
- *
- * SIM800 basic module with just TX,RX and RST
- *
- * GPIO0   RST
- * GPIO2   TX
- * GPIO19   RX
- * GND      GND
- *
- * The PPP ESP32 example was taken from
- * https://github.com/espressif/arduino-esp32/blob/master/libraries/PPP/examples/PPP_Basic/PPP_Basic.ino
+ * <AsyncClient> - The async client.
+ * <path> - The node path to get/watch the value.
+ * <DatabaseOption> - The database options (DatabaseOptions).
+ * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
+ * <uid> - The user specified UID of async result (optional).
+ * <SSE> - The Server-sent events (HTTP Streaming) mode.
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
  */
 
 #include <Arduino.h>
@@ -41,29 +25,6 @@
 #include <FirebaseClient.h>
 
 #include <NetworkClientSecure.h>
-
-// The API key can be obtained from Firebase console > Project Overview > Project settings.
-#define API_KEY "Web_API_KEY"
-
-// User Email and password that already registerd or added in your project.
-#define USER_EMAIL "USER_EMAIL"
-#define USER_PASSWORD "USER_PASSWORD"
-
-void asyncCB(AsyncResult &aResult);
-
-void printResult(AsyncResult &aResult);
-
-DefaultPPPNetwork default_network;
-
-UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
-
-FirebaseApp app;
-
-NetworkClientSecure ssl_client;
-
-using AsyncClient = AsyncClientClass;
-
-AsyncClient aClient(ssl_client, getNetwork(default_network));
 
 #define PPP_MODEM_APN "YourAPN"
 #define PPP_MODEM_PIN "0000" // or NULL
@@ -100,7 +61,41 @@ AsyncClient aClient(ssl_client, getNetwork(default_network));
 // #define PPP_MODEM_FC      ESP_MODEM_FLOW_CONTROL_NONE
 // #define PPP_MODEM_MODEL   PPP_MODEM_SIM800
 
-bool firebaseConfigReady = false;
+// The API key can be obtained from Firebase console > Project Overview > Project settings.
+#define API_KEY "Web_API_KEY"
+
+// User Email and password that already registerd or added in your project.
+#define USER_EMAIL "USER_EMAIL"
+#define USER_PASSWORD "USER_PASSWORD"
+#define DATABASE_URL "URL"
+
+void asyncCB(AsyncResult &aResult);
+
+void printResult(AsyncResult &aResult);
+
+DefaultPPPNetwork default_network;
+
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
+
+FirebaseApp app;
+
+NetworkClientSecure ssl_client1, ssl_client2;
+
+// Or use NetworkClient and ESP_SSLClient for lower memory usage
+// NetworkClient net_client1, net_client2;
+// ESP_SSLClient ssl_client1, ssl_client2;
+
+using AsyncClient = AsyncClientClass;
+
+AsyncClient aClient1(ssl_client1, getNetwork(default_network)), aClient2(ssl_client2, getNetwork(default_network));
+
+void printResult(AsyncResult &aResult);
+
+RealtimeDatabase Database;
+
+AsyncResult aResult_no_callback1, aResult_no_callback2;
+
+unsigned long ms = 0;
 
 void onEvent(arduino_event_id_t event, arduino_event_info_t info)
 {
@@ -142,8 +137,6 @@ void setup()
     delay(3000);
     digitalWrite(PPP_MODEM_RST, PPP_MODEM_RST_LOW);
 #endif
-
-    Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     // Listen for modem events
     Network.onEvent(onEvent);
@@ -217,44 +210,78 @@ void setup()
     {
         Serial.println("Failed to connect to network!");
     }
-}
 
-void setConfig()
-{
-    if (firebaseConfigReady)
-        return;
+    Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    firebaseConfigReady = true;
+    ssl_client1.setInsecure();
+
+    // In case ESP_SSLClient
+    // ssl_client1.setDebugLevel(1);
+    // ssl_client1.setBufferSizes(2048 /* rx */, 1024 /* tx */);
+    // ssl_client1.setClient(&net_client1);
+
+    ssl_client2.setInsecure();
+
+    // In case ESP_SSLClient
+    // ssl_client2.setDebugLevel(1);
+    // ssl_client2.setBufferSizes(2048 /* rx */, 1024 /* tx */);
+    // ssl_client2.setClient(&net_client2);
 
     Serial.println("Initializing app...");
 
-    ssl_client.setInsecure();
+    initializeApp(aClient1, app, getAuth(user_auth), aResult_no_callback1);
 
-    initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
+    // Binding the FirebaseApp for authentication handler.
+    // To unbind, use Database.resetApp();
+    app.getApp<RealtimeDatabase>(Database);
+
+    Database.url(DATABASE_URL);
+
+    // Since v1.2.1, in SSE mode (HTTP Streaming) task, you can filter the Stream events by using RealtimeDatabase::setSSEFilters(<keywords>),
+    // which the <keywords> is the comma separated events.
+    // The event keywords supported are:
+    // get - To allow the http get response (first put event since stream connected).
+    // put - To allow the put event.
+    // patch - To allow the patch event.
+    // keep-alive - To allow the keep-alive event.
+    // cancel - To allow the cancel event.
+    // auth_revoked - To allow the auth_revoked event.
+    // To clear all prevousely set filter to allow all Stream events, use RealtimeDatabase::setSSEFilters().
+    Database.setSSEFilters("get,put,patch,keep-alive,cancel,auth_revoked");
+
+    // The "unauthenticate" error can be occurred in this case because we don't wait
+    // the app to be authenticated before connecting the stream.
+    // This is ok as stream task will be reconnected automatically when the app is authenticated.
+
+    Database.get(aClient2, "/test/stream", aResult_no_callback2, true /* SSE mode */);
 }
 
 void loop()
 {
-    if (PPP.connected())
-    {
-        setConfig();
-    }
-
     // The async task handler should run inside the main loop
     // without blocking delay or bypassing with millis code blocks.
 
     app.loop();
 
-    // To get the authentication time to live in seconds before expired.
-    // app.ttl();
-}
+    Database.loop();
 
-void asyncCB(AsyncResult &aResult)
-{
-    // WARNING!
-    // Do not put your codes inside the callback and printResult.
+    if (millis() - ms > 20000 && app.ready())
+    {
+        ms = millis();
 
-    printResult(aResult);
+        JsonWriter writer;
+
+        object_t json, obj1, obj2;
+
+        writer.create(obj1, "ms", ms);
+        writer.create(obj2, "rand", random(10000, 30000));
+        writer.join(json, 2, obj1, obj2);
+
+        Database.set<object_t>(aClient1, "/test/stream/number", json, aResult_no_callback1);
+    }
+
+    printResult(aResult_no_callback1);
+    printResult(aResult_no_callback2);
 }
 
 void printResult(AsyncResult &aResult)
@@ -276,6 +303,28 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.available())
     {
-        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+        RealtimeDatabaseResult &RTDB = aResult.to<RealtimeDatabaseResult>();
+        if (RTDB.isStream())
+        {
+            Serial.println("----------------------------");
+            Firebase.printf("task: %s\n", aResult.uid().c_str());
+            Firebase.printf("event: %s\n", RTDB.event().c_str());
+            Firebase.printf("path: %s\n", RTDB.dataPath().c_str());
+            Firebase.printf("data: %s\n", RTDB.to<const char *>());
+            Firebase.printf("type: %d\n", RTDB.type());
+
+            // The stream event from RealtimeDatabaseResult can be converted to the values as following.
+            bool v1 = RTDB.to<bool>();
+            int v2 = RTDB.to<int>();
+            float v3 = RTDB.to<float>();
+            double v4 = RTDB.to<double>();
+            String v5 = RTDB.to<String>();
+        }
+        else
+        {
+            Serial.println("----------------------------");
+            Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+        }
+        Firebase.printf("Free Heap: %d\n", ESP.getFreeHeap());
     }
 }

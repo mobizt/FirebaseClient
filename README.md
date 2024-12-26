@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.4.12-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.4.13-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-12-25T03:00:36Z`
+Revision `2024-12-26T07:18:45Z`
 
 ## Table of Contents
 
@@ -1368,6 +1368,8 @@ In case Ethernet, if external Ethernet client was used, library will provide the
 
 In case GSM, it requires the configurations for initialize the TinyGSM modem.
 
+In ESP32 Core v3.x.x, SIM devices are natively supported, the SIM or GSM module connected with ESP32 device can work without TinyGSMClient library.
+
 In case generic client, it required the callback function to handle the network connection/reconnection.
 
 > [!NOTE] 
@@ -1378,7 +1380,7 @@ The `AsyncClientClass` object requires the network config data (`network_config_
 
 - [DefaultNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultNetwork/) is used with the core WiFi enabled networking.
 
-- [DefaultPPPNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/) is used with the ESP32 core v3.x.x with PPP networking supports.
+- [DefaultPPPNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/) is used with the ESP32 core v3.x.x with PPP networking supports which allows us to use SIM or GSM module with ESP32 device without TinyGSMClient library.
 
 - [DefaultWiFiNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultWiFiNetwork/) is used with the core WiFi Multi enabled networking or non-core WiFi networking.
 
@@ -1386,7 +1388,7 @@ The `AsyncClientClass` object requires the network config data (`network_config_
 
 - [EthernetNetwork](/examples/App/NetworkInterfaces/Async/Callback/EthernetNetwork/) is used with the non-core Ethernet networking.
 
-- [GSMNetwork](/examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/) is used with the non-core GSM networking.
+- [GSMNetwork](/examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/) is used with the non-core GSM networking. In case ESP32, please use [DefaultPPPNetwork](/examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/) instead.
 
 - [GenericNetwork](/examples/App/NetworkInterfaces/Async/Callback/GenericNetwork/) is used with the non-core or user defined networking.
 
@@ -1577,6 +1579,8 @@ See [EthernetNetwork example](/examples/App/NetworkInterfaces/Async/Callback/Eth
 - `GSMNetwork`
 
 The `GSMNetwork` class can be used only with [TinyGSM](https://github.com/vshymanskyy/TinyGSM) library.
+
+In case ESP32 Core v3.x.x, SIM/GSM devices are natively supported which allows us to use SIM or GSM module with ESP32 device without TinyGSMClient library, see `DefaultPPPNetwork` class which mentioned earlier.
 
 As [TinyGSM](https://github.com/vshymanskyy/TinyGSM) library requirement, one of GSM module macro should be defined in the sketch. 
 

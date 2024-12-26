@@ -14,6 +14,12 @@
  * GPIO27   CTS
  * GND      GND
  *
+ * LilyGO TTGO T-A7670 development board (ESP32 with SIMCom A7670)
+ * GPIO5    RST
+ * GPIO26   TX
+ * GPIO27   RX
+ * GND      GND
+ *
  * SIM800 basic module with just TX,RX and RST
  *
  * GPIO0   RST
@@ -73,6 +79,17 @@ AsyncResult aResult_no_callback;
 #define PPP_MODEM_FC ESP_MODEM_FLOW_CONTROL_HW
 #define PPP_MODEM_MODEL PPP_MODEM_SIM7600
 
+// LilyGO TTGO T-A7670 development board (ESP32 with SIMCom A7670)
+// #define PPP_MODEM_RST 5
+// #define PPP_MODEM_RST_LOW false // active HIGH
+// #define PPP_MODEM_RST_DELAY 200
+// #define PPP_MODEM_TX 26
+// #define PPP_MODEM_RX 27
+// #define PPP_MODEM_RTS -1
+// #define PPP_MODEM_CTS -1
+// #define PPP_MODEM_FC ESP_MODEM_FLOW_CONTROL_NONE
+// #define PPP_MODEM_MODEL PPP_MODEM_SIM7600
+
 // SIM800 basic module with just TX,RX and RST
 // #define PPP_MODEM_RST     0
 // #define PPP_MODEM_RST_LOW true //active LOW
@@ -116,9 +133,15 @@ void setup()
 {
     Serial.begin(115200);
 
-    // This delay is needed in case ETH_CLK_MODE was set to ETH_CLOCK_GPIO0_IN,
-    // to allow the external clock source to be ready before initialize the Ethernet.
-    delay(500);
+    // Resetting the modem
+#if defined(PPP_MODEM_RST)
+    pinMode(PPP_MODEM_RST, PPP_MODEM_RST_LOW ? OUTPUT_OPEN_DRAIN : OUTPUT);
+    digitalWrite(PPP_MODEM_RST, PPP_MODEM_RST_LOW);
+    delay(100);
+    digitalWrite(PPP_MODEM_RST, !PPP_MODEM_RST_LOW);
+    delay(3000);
+    digitalWrite(PPP_MODEM_RST, PPP_MODEM_RST_LOW);
+#endif
 
     Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 

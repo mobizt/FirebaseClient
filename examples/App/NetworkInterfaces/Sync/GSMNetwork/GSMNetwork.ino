@@ -8,9 +8,9 @@
  * <apn> - The GPRS APN (Access Point Name).
  * <user> - The GPRS user.
  * <password> - The GPRS password.
- * 
+ *
  * In ESP32 Core v3.x.x, PPP devices are natively supported.
- * See examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultPPPNetwork/ESP32
+ * See examples/App/NetworkInterfaces/Sync/DefaultNetworks/DefaultPPPNetwork/ESP32/ESP32.ino
  *
  * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  *
@@ -47,24 +47,14 @@ const char apn[] = "YourAPN";
 const char gprsUser[] = "";
 const char gprsPass[] = "";
 
-#define uS_TO_S_FACTOR 1000000ULL // Conversion factor for micro seconds to seconds
-#define TIME_TO_SLEEP 600         // Time ESP32 will go to sleep (in seconds)
-
 #define UART_BAUD 115200
-#define PIN_DTR 25
-#define PIN_TX 26
-#define PIN_RX 27
-#define PWR_PIN 4
-#define BAT_ADC 35
-#define BAT_EN 12
-#define PIN_RI 33
-#define PIN_DTR 25
-#define RESET 5
 
-#define SD_MISO 2
-#define SD_MOSI 15
-#define SD_SCLK 14
-#define SD_CS 13
+// LilyGO TTGO T-A7670 development board (ESP32 with SIMCom A7670)
+#define SIM_MODEM_RST 5
+#define SIM_MODEM_RST_LOW false // active HIGH
+#define SIM_MODEM_RST_DELAY 200
+#define SIM_MODEM_TX 26
+#define SIM_MODEM_RX 27
 
 // Include TinyGsmClient.h first and followed by FirebaseClient.h
 #include <TinyGsmClient.h>
@@ -107,32 +97,22 @@ void setup()
 {
 
     Serial.begin(115200);
-    Serial.begin(115200);
 
-    delay(10);
-    pinMode(BAT_EN, OUTPUT);
-    digitalWrite(BAT_EN, HIGH);
-
-    // A7670 Reset
-    pinMode(RESET, OUTPUT);
-    digitalWrite(RESET, LOW);
+    // Resetting the modem
+#if defined(SIM_MODEM_RST)
+    pinMode(SIM_MODEM_RST, SIM_MODEM_RST_LOW ? OUTPUT_OPEN_DRAIN : OUTPUT);
+    digitalWrite(SIM_MODEM_RST, SIM_MODEM_RST_LOW);
     delay(100);
-    digitalWrite(RESET, HIGH);
+    digitalWrite(SIM_MODEM_RST, !SIM_MODEM_RST_LOW);
     delay(3000);
-    digitalWrite(RESET, LOW);
-
-    pinMode(PWR_PIN, OUTPUT);
-    digitalWrite(PWR_PIN, LOW);
-    delay(100);
-    digitalWrite(PWR_PIN, HIGH);
-    delay(1000);
-    digitalWrite(PWR_PIN, LOW);
+    digitalWrite(SIM_MODEM_RST, SIM_MODEM_RST_LOW);
+#endif
 
     DBG("Wait...");
 
     delay(3000);
 
-    SerialAT.begin(UART_BAUD, SERIAL_8N1, PIN_RX, PIN_TX);
+    SerialAT.begin(UART_BAUD, SERIAL_8N1, SIM_MODEM_RX, SIM_MODEM_TX);
 
     // Restart takes quite some time
     // To skip it, call init() instead of restart()
