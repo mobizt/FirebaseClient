@@ -1,5 +1,5 @@
 /**
- * Created March 17, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,6 +27,7 @@
 #include <Arduino.h>
 #include <Client.h>
 #include "RequestHandler.h"
+#include "./core/StringUtil.h"
 
 #define FIREBASE_TCP_READ_TIMEOUT_SEC 30 // Do not change
 
@@ -44,6 +45,9 @@ namespace res_hndlr_ns
 
 struct async_response_handler_t
 {
+private:
+    StringUtil sut;
+
 public:
     enum chunk_phase
     {
@@ -53,6 +57,7 @@ public:
 
     struct response_flags
     {
+
     public:
         bool header_remaining = false;
         bool payload_remaining = false;
@@ -119,14 +124,14 @@ public:
         payloadLen = 0;
         payloadRead = 0;
         error.resp_code = 0;
-        error.string.remove(0, error.string.length());
+        sut.clear(error.string);
         if (toFill)
             delete toFill;
         toFill = nullptr;
         toFillLen = 0;
         toFillIndex = 0;
         for (size_t i = 0; i < res_hndlr_ns::max_type; i++)
-            val[i].remove(0, val[i].length());
+            sut.clear(val[i]);
         chunkInfo.chunkSize = 0;
         chunkInfo.dataLen = 0;
         chunkInfo.phase = READ_CHUNK_SIZE;

@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -27,6 +27,7 @@
 
 #include <Arduino.h>
 #include <vector>
+#include "./core/StringUtil.h"
 
 namespace firebase
 {
@@ -37,6 +38,7 @@ namespace firebase
         friend class JWTClass;
 
     private:
+        StringUtil sut;
         struct dbg_item
         {
             String msg;
@@ -61,7 +63,7 @@ namespace firebase
             }
 
             if (dbgVec.size() == 0 && last.length())
-                last.remove(0, last.length());
+                sut.clear(last);
         }
 
         void limitQueue()
@@ -91,7 +93,7 @@ namespace firebase
         {
             dbgVec.clear();
             available = false;
-            last.remove(0, last.length());
+            sut.clear(last);
         }
 
         bool remaining() { return dbgVec.size() && !dbgVec[0].read && dbgVec[0].msg.length(); }

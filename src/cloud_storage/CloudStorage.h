@@ -1,5 +1,5 @@
 /**
- * Created July 30, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -26,6 +26,7 @@
 #define ASYNC_CLOUD_STORAGE_H
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
+#include "./core/StringUtil.h"
 
 using namespace firebase;
 
@@ -404,6 +405,7 @@ public:
 #endif
 
 private:
+    StringUtil sut;
     String service_url;
     String path;
     String uid;
@@ -485,7 +487,7 @@ private:
             else
             {
                 options.extras += "media";
-                options.payload.remove(0, options.payload.length());
+                sut.clear(options.payload);
             }
         }
         else if (requestType == GoogleCloudStorage::google_cloud_storage_request_type_delete)

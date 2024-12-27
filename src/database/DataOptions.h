@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -28,12 +28,16 @@
 #include <Arduino.h>
 #include "./Config.h"
 #include "./database/DatabaseFilter.h"
+#include "./core/StringUtil.h"
 
 #if defined(ENABLE_DATABASE)
 
 class DatabaseOptions
 {
     friend class RealtimeDatabase;
+
+private:
+    StringUtil sut;
 
 public:
     uint32_t readTimeout = 0;
@@ -58,7 +62,7 @@ public:
     void clear()
     {
         readTimeout = 0;
-        writeSizeLimit.remove(0, writeSizeLimit.length());
+        sut.clear(writeSizeLimit);
         shallow = false;
         silent = false;
         classicRequest = false;

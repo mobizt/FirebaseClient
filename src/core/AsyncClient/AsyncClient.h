@@ -1,5 +1,5 @@
 /**
- * Created December 21, 2024
+ * Created December 27, 2024
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -41,6 +41,7 @@
 #include "./core/List.h"
 #include "./core/Core.h"
 #include "./core/URL.h"
+#include "./core/StringUtil.h"
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncTCPConfig.h"
@@ -173,6 +174,7 @@ class AsyncClientClass : public ResultBase, RTDBResultBase
     friend class CloudStorage;
 
 private:
+    StringUtil sut;
     app_debug_t app_debug;
     app_event_t app_event;
     FirebaseError lastErr;
@@ -554,7 +556,7 @@ private:
                 header = sData->request.val[req_hndlr_ns::header];
                 header.replace(FIREBASE_AUTH_PLACEHOLDER, sData->request.app_token->val[app_tk_ns::token]);
                 ret = sendHeader(sData, header.c_str());
-                header.remove(0, header.length());
+                sut.clear(header);
                 return ret;
             }
             return sendHeader(sData, sData->request.val[req_hndlr_ns::header].c_str());
@@ -609,7 +611,7 @@ private:
 
             if (connect(sData, _host.c_str(), sData->request.port) > function_return_type_failure)
             {
-                sData->request.val[req_hndlr_ns::payload].remove(0, sData->request.val[req_hndlr_ns::payload].length());
+                sut.clear(sData->request.val[req_hndlr_ns::payload]);
                 sData->request.file_data.resumable.getHeader(sData->request.val[req_hndlr_ns::header], _host, ext);
                 sData->state = async_state_send_header;
                 sData->request.file_data.resumable.setHeaderState();
@@ -630,7 +632,7 @@ private:
             {
                 URLUtil uut;
                 uut.relocate(sData->request.val[req_hndlr_ns::header], _host, ext);
-                sData->request.val[req_hndlr_ns::payload].remove(0, sData->request.val[req_hndlr_ns::payload].length());
+                sut.clear(sData->request.val[req_hndlr_ns::payload]);
                 sData->state = async_state_send_header;
                 return function_return_type_continue;
             }
@@ -831,7 +833,7 @@ private:
         return val;
     }
 
-    void clear(String &str) { str.remove(0, str.length()); }
+    void clear(String &str) { sut.clear(str); }
 
     bool readResponse(async_data_item_t *sData)
     {
@@ -993,7 +995,7 @@ private:
                 }
 #endif
                 for (size_t i = 0; i < 5; i++)
-                    temp[i].remove(0, temp[i].length());
+                    sut.clear(temp[i]);
 
                 if (sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
                     sData->response.flags.payload_remaining = true;
@@ -2070,7 +2072,7 @@ private:
     async_data_item_t *createSlot(slot_options_t &options)
     {
         if (!options.auth_used)
-            sse_events_filter.remove(0, sse_events_filter.length());
+            sut.clear(sse_events_filter);
 
         int slot_index = sMan(options);
         // Only one SSE mode is allowed

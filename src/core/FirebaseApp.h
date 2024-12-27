@@ -1,5 +1,5 @@
 /**
- * Created December 23, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -72,6 +72,7 @@ namespace firebase
         bool ul_dl_task_running = false;
         uint32_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
         JSONUtil json;
+        StringUtil sut;
         String extras, subdomain, host;
         slot_options_t sop;
         String uid;
@@ -520,9 +521,8 @@ namespace firebase
 
                     if (getClient())
                         newRequest(aClient, sop, subdomain, extras, resultCb, uid);
-
-                    extras.remove(0, extras.length());
-                    host.remove(0, host.length());
+                    sut.clear(extras);
+                    sut.clear(host);
                     setEvent(auth_event_auth_request_sent);
                 }
             }
@@ -594,8 +594,8 @@ namespace firebase
                     if (getClient())
                         newRequest(aClient, sop, subdomain, extras, resultCb, uid);
 
-                    extras.remove(0, extras.length());
-                    host.remove(0, host.length());
+                    sut.clear(extras);
+                    sut.clear(host);
                     setEvent(auth_event_auth_request_sent);
                     return true;
                 }
@@ -639,7 +639,7 @@ namespace firebase
 
                     if (parseToken(sData->response.val[res_hndlr_ns::payload].c_str()))
                     {
-                        sData->response.val[res_hndlr_ns::payload].remove(0, sData->response.val[res_hndlr_ns::payload].length());
+                        sut.clear(sData->response.val[res_hndlr_ns::payload]);
                         auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         auth_data.app_token.authenticated = true;
                         auth_data.app_token.auth_ts = millis();

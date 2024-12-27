@@ -1,5 +1,5 @@
 /**
- * Created October 29, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -36,6 +36,7 @@ class ObjectWriter
 {
 private:
     JSONUtil jut;
+    StringUtil sut;
 
 public:
     void addMember(String &buf, const String &v, bool isString, const String &token = "}}")
@@ -70,7 +71,7 @@ public:
     void addObject(String &buf, const String &object, const String &token, bool clear = false)
     {
         if (clear)
-            buf.remove(0, buf.length());
+            sut.clear(buf);
         if (object.length() > 0)
         {
             if (buf.length() == 0)
@@ -123,11 +124,11 @@ public:
             clear(buf[i]);
     }
 
-    void clear(String &buf) { buf.remove(0, buf.length()); }
+    void clear(String &buf) { sut.clear(buf); }
 
     const char *setPair(String &buf, const String &key, const String &value, bool isArrayValue = false)
     {
-        buf.remove(0, buf.length());
+        sut.clear(buf);
         jut.addObject(buf, key, isArrayValue ? getArrayStr(value) : value, false, true);
         return buf.c_str();
     }
@@ -283,7 +284,7 @@ public:
         owriter.addMapArrayMember(buf, bufSize, index, name, value.c_str(), false);
         return ret;
     }
-    void clear(String &buf) { buf.remove(0, buf.length()); }
+    void clear(String &buf) { sut.clear(buf); }
     void clear(String *buf, size_t bufSize) { owriter.clearBuf(buf, bufSize); }
 };
 
@@ -319,12 +320,13 @@ class BaseO1 : public Printable
 protected:
     String buf;
     BufWriter wr;
+    StringUtil sut;
 
 public:
     BaseO1() {}
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
+    void clear() { sut.clear(buf); }
     void setContent(const String &content)
     {
         clear();

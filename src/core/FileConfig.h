@@ -1,5 +1,5 @@
 /**
- * Created July 30, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -28,6 +28,7 @@
 #include <Arduino.h>
 #include "./Config.h"
 #include "./core/Memory.h"
+#include "./core/StringUtil.h"
 
 #if defined(ENABLE_FS)
 #include <FS.h>
@@ -101,6 +102,7 @@ private:
     String location;
     int len = 0;
     resume_state state = resume_state_undefined;
+    StringUtil sut;
 
 public:
     file_upload_resumable_data() {}
@@ -181,7 +183,7 @@ public:
     }
     void clear()
     {
-        location.remove(0, location.length());
+        sut.clear(location);
         index = 0;
         size = 0;
         read = 0;
@@ -220,6 +222,7 @@ struct file_config_data
     bool internal_data = false;
     firebase_blob_writer outB;
     bool initialized = false;
+    StringUtil sut;
 
     void clearInternalData()
     {
@@ -279,7 +282,7 @@ public:
     void clear()
     {
         clearInternalData();
-        filename.remove(0, filename.length());
+        sut.clear(filename);
 #if defined(ENABLE_FS)
         cb = NULL;
 #endif

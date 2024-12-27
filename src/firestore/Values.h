@@ -1,5 +1,5 @@
 /**
- * Created October 29, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -75,6 +75,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        StringUtil sut;
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_nullValue].text, buf); }
 
     public:
@@ -87,8 +88,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -96,6 +97,7 @@ namespace Values
     {
 
     private:
+        StringUtil sut;
         String buf, str;
         ObjectWriter owriter;
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_stringValue].text, buf); }
@@ -115,8 +117,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -125,6 +127,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        StringUtil sut;
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_booleanValue].text, buf); }
 
     public:
@@ -142,8 +145,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -167,8 +170,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -178,6 +181,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        StringUtil sut;
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_doubleValue].text, buf); }
 
     public:
@@ -197,8 +201,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -208,6 +212,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        StringUtil sut;
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_timestampValue].text, buf); }
 
     public:
@@ -222,8 +227,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -232,6 +237,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        StringUtil sut;
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_bytesValue].text, buf); }
 
     public:
@@ -247,8 +253,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -258,6 +264,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        StringUtil sut;
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_referenceValue].text, buf); }
 
     public:
@@ -271,8 +278,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -282,7 +289,7 @@ namespace Values
         String buf, str;
         ObjectWriter owriter;
         JSONUtil jut;
-
+        StringUtil sut;
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_geoPointValue].text, buf); }
 
     public:
@@ -315,8 +322,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -326,6 +333,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        StringUtil sut;
         bool flags[11];
 
         template <typename T>
@@ -369,8 +377,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
 
@@ -379,12 +387,13 @@ namespace Values
     private:
         String buf;
         ObjectWriter owriter;
+        StringUtil sut;
 
     public:
         template <typename T>
         explicit MAP(const String &key, T value, bool val) { owriter.setPair(buf, key, val ? value.val() : value.c_str()); }
         const char *c_str() const { return buf.c_str(); }
-        void clear() { buf.remove(0, buf.length()); }
+        void clear() { sut.clear(buf); }
     };
 
     /**
@@ -396,6 +405,7 @@ namespace Values
     private:
         String buf, str;
         ObjectWriter owriter;
+        StringUtil sut;
         template <typename T>
         void set(const String &key, T value) { owriter.setPair(buf, FPSTR("fields"), MAP(key, value, true).c_str()); }
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_mapValue].text, buf); }
@@ -429,8 +439,8 @@ namespace Values
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
         void clear()
         {
-            buf.remove(0, buf.length());
-            str.remove(0, str.length());
+            sut.clear(buf);
+            sut.clear(str);
         }
     };
     /**
@@ -440,6 +450,7 @@ namespace Values
     {
     private:
         String buf;
+        StringUtil sut;
 
     public:
         Value() {}
@@ -452,7 +463,7 @@ namespace Values
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return buf.c_str(); }
         size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
-        void clear() { buf.remove(0, buf.length()); }
+        void clear() { sut.clear(buf); }
     };
 };
 

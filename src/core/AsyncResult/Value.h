@@ -1,5 +1,5 @@
 /**
- * Created November 7, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -26,6 +26,7 @@
 #define VALUE_CONVERTER_H
 #include <Arduino.h>
 #include <string>
+#include "./core/StringUtil.h"
 
 enum realtime_database_data_type
 {
@@ -122,7 +123,7 @@ public:
 
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
+    void clear() { sut.clear(buf); }
 
 private:
     String buf;
@@ -152,7 +153,7 @@ private:
     void aq(bool clear = false)
     {
         if (clear)
-            buf.remove(0, buf.length());
+            sut.clear(buf);
         buf += '"';
     }
 };
@@ -179,7 +180,7 @@ public:
     explicit object_t(number_t o) : buf(o.c_str()) {}
     explicit object_t(string_t o) : buf(o.c_str()) {}
     size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
-    void clear() { buf.remove(0, buf.length()); }
+    void clear() { sut.clear(buf); }
     void initObject() { buf = FPSTR("{}"); };
     void initArray() { buf = FPSTR("[]"); };
 
@@ -256,7 +257,7 @@ public:
     template <typename T = const char *>
     auto getVal(String &buf, T value) -> typename std::enable_if<(v_number<T>::value || v_string<T>::value || std::is_same<T, bool>::value) && !std::is_same<T, object_t>::value && !std::is_same<T, string_t>::value && !std::is_same<T, boolean_t>::value && !std::is_same<T, number_t>::value, void>::type
     {
-        buf.remove(0, buf.length());
+        sut.clear(buf);
         if (std::is_same<T, bool>::value)
         {
             buf = value ? "true" : "false";

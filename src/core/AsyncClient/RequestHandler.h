@@ -1,5 +1,5 @@
 /**
- * Created October 6, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -30,6 +30,7 @@
 #include "./core/Timer.h"
 #include "Client.h"
 #include "./core/AuthConfig.h"
+#include "./core/StringUtil.h"
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncTCPConfig.h"
@@ -73,6 +74,9 @@ namespace req_hndlr_ns
 
 struct async_request_handler_t
 {
+private:
+    StringUtil sut;
+
 public:
     enum tcp_client_type
     {
@@ -118,7 +122,7 @@ public:
     {
 
         for (size_t i = 0; i < req_hndlr_ns::max_type; i++)
-            val[i].remove(0, val[i].length());
+            sut.clear(val[i]);
         port = 443;
         if (data)
             delete data;

@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -83,6 +83,9 @@ class AsyncResult : public ResultBase, RealtimeDatabaseResult
 
     struct upload_data_t
     {
+    private:
+        StringUtil sut;
+
     public:
         size_t total = 0, uploaded = 0;
         app_progress_t upload_progress;
@@ -94,11 +97,12 @@ class AsyncResult : public ResultBase, RealtimeDatabaseResult
             uploaded = 0;
             upload_progress.reset();
             progress = -1;
-            downloadUrl.remove(0, downloadUrl.length());
+            sut.clear(downloadUrl);
         }
     };
 
 private:
+    StringUtil sut;
     uint32_t addr = 0;
     uint32_t rvec_addr = 0;
     String val[ares_ns::max_type];
@@ -263,7 +267,7 @@ public:
     void clear()
     {
         for (size_t i = 0; i < ares_ns::max_type; i++)
-            val[i].remove(0, val[i].length());
+            sut.clear(val[i]);
 
         lastError.reset();
 

@@ -1,5 +1,5 @@
 /**
- * Created June 22, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -152,6 +152,7 @@ namespace FieldTransform
     private:
         String buf;
         ObjectWriter owriter;
+        StringUtil sut;
 
     public:
         /**
@@ -161,7 +162,7 @@ namespace FieldTransform
         template <typename T>
         explicit Increment(T value) { owriter.setPair(buf, FPSTR("increment"), value.val()); }
         const char *c_str() const { return buf.c_str(); }
-        void clear() { buf.remove(0, buf.length()); }
+        void clear() { sut.clear(buf); }
     };
 
     /**
@@ -174,6 +175,7 @@ namespace FieldTransform
     private:
         String buf;
         ObjectWriter owriter;
+        StringUtil sut;
 
     public:
         /**
@@ -183,7 +185,7 @@ namespace FieldTransform
         template <typename T>
         explicit Maximum(T value) { owriter.setPair(buf, FPSTR("maximum"), value.c_str()); }
         const char *c_str() const { return buf.c_str(); }
-        void clear() { buf.remove(0, buf.length()); }
+        void clear() { sut.clear(buf); }
     };
 
     /**
@@ -218,6 +220,7 @@ namespace FieldTransform
     private:
         String buf;
         ObjectWriter owriter;
+        StringUtil sut;
 
     public:
         /**
@@ -227,7 +230,7 @@ namespace FieldTransform
          */
         explicit AppendMissingElements(const T &arrayValue) { owriter.setPair(buf, FPSTR("appendMissingElements"), arrayValue.c_str()); }
         const char *c_str() const { return buf.c_str(); }
-        void clear() { buf.remove(0, buf.length()); }
+        void clear() { sut.clear(buf); }
     };
 
     /**
@@ -281,6 +284,8 @@ namespace FieldTransform
         String buf;
         JSONUtil jut;
         ObjectWriter owriter;
+        StringUtil sut;
+
         template <typename T>
         void set(const String &fieldPath, T v)
         {
@@ -316,7 +321,7 @@ namespace FieldTransform
         explicit FieldTransform(const String &fieldPath, RemoveAllFromArray<Values::ArrayValue> arrayvalue) { set(fieldPath, arrayvalue); }
         const char *c_str() const { return buf.c_str(); }
         size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
-        void clear() { buf.remove(0, buf.length()); }
+        void clear() { sut.clear(buf); }
     };
 
 };
@@ -331,10 +336,11 @@ class Precondition : public BaseO4
 private:
     ObjectWriter owriter;
     JSONUtil jut;
+    StringUtil sut;
 
     String getQuery(const String &mask)
     {
-        buf[1].remove(0, buf[1].length());
+        sut.clear(buf[1]);
         if (buf[2].length())
         {
             buf[1] = FPSTR("?");
@@ -422,11 +428,12 @@ private:
     Values::MapValue mv;
     ObjectWriter owriter;
     JSONUtil jut;
+    StringUtil sut;
 
     Document &getBuf()
     {
         buf[2] = mv.c_str();
-        buf[3].remove(0, buf[3].length());
+        sut.clear(buf[3]);
         if (buf[1].length())
             jut.addObject(buf[3], FPSTR("name"), owriter.makeResourcePath(buf[1]), true, true);
         else

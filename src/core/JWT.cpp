@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -66,9 +66,9 @@ const char *JWTClass::token() { return jwt_data.token.c_str(); }
 
 void JWTClass::clear()
 {
-    jwt_data.token.remove(0, jwt_data.token.length());
-    jwt_data.pk.remove(0, jwt_data.pk.length());
-    payload.remove(0, payload.length());
+    sut.clear(jwt_data.token);
+    sut.clear(jwt_data.pk);
+    sut.clear(payload);
     if (this->auth_data)
     {
         this->auth_data->user_auth.sa.step = jwt_step_begin;
@@ -209,36 +209,36 @@ bool JWTClass::create()
         }
 
         json.addObject(payload, "aud", t, true);
-        t.remove(0, t.length());
+        sut.clear(t);
         json.addObject(payload, "iat", String(now), false);
         json.addObject(payload, "exp", String((int)(now + 3600)), false);
 
         if (auth_data->user_auth.auth_type == auth_sa_access_token)
         {
-            String buri;
+            String base_uri;
             String host;
             jwt_add_gapis_host(host, "www");
-            uut.host2Url(buri, host);
-            buri += FPSTR("/auth/");
+            uut.host2Url(base_uri, host);
+            base_uri += FPSTR("/auth/");
 
-            String s = buri; // https://www.googleapis.com/auth/
+            String s = base_uri; // https://www.googleapis.com/auth/
             s += FPSTR("devstorage.full_control");
             jwt_add_sp(s);
-            s += buri; // https://www.googleapis.com/auth/
+            s += base_uri; // https://www.googleapis.com/auth/
             s += FPSTR("datastore");
             jwt_add_sp(s);
-            s += buri; // https://www.googleapis.com/auth/
+            s += base_uri; // https://www.googleapis.com/auth/
             s += FPSTR("userinfo.email");
             jwt_add_sp(s);
-            s += buri; // https://www.googleapis.com/auth/
+            s += base_uri; // https://www.googleapis.com/auth/
             s += FPSTR("firebase.database");
             jwt_add_sp(s);
-            s += buri; // https://www.googleapis.com/auth/
+            s += base_uri; // https://www.googleapis.com/auth/
             s += FPSTR("cloud-platform");
             jwt_add_sp(s);
-            s += buri; // https://www.googleapis.com/auth/
+            s += base_uri; // https://www.googleapis.com/auth/
             s += FPSTR("iam");
-            buri.remove(0, buri.length());
+            sut.clear(base_uri);
 
             if (auth_data->user_auth.cust.val[cust_ns::scope].length() > 0)
             {
@@ -276,7 +276,7 @@ bool JWTClass::create()
         len = but.encodedLength(payload.length());
         char *buf = reinterpret_cast<char *>(mem.alloc(len));
         but.encodeUrl(mem, buf, reinterpret_cast<const unsigned char *>(payload.c_str()), payload.length());
-        payload.remove(0, payload.length());
+        sut.clear(payload);
         jwt_data.token += '.';
         jwt_data.token += buf;
         mem.release(&buf);
@@ -304,7 +304,7 @@ bool JWTClass::create()
         else if (auth_data->user_auth.sa.val[sa_ns::pk].length() > 0)
             pk = new PrivateKey(auth_data->user_auth.sa.val[sa_ns::pk].c_str());
 
-        jwt_data.pk.remove(0, jwt_data.pk.length());
+        sut.clear(jwt_data.pk);
 
         if (!pk)
         {

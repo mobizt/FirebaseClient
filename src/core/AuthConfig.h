@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -277,6 +277,9 @@ namespace firebase
             friend class JWTClass;
             friend class FirebaseClient;
 
+        private:
+            StringUtil sut;
+
         public:
             service_account() {}
             ~service_account() { clear(); }
@@ -292,7 +295,7 @@ namespace firebase
             void clear()
             {
                 for (size_t i = 0; i < sa_ns::max_type; i++)
-                    val[i].remove(0, val[i].length());
+                    sut.clear(val[i]);
                 timestatus_cb = NULL;
                 expire = FIREBASE_DEFAULT_TOKEN_TTL;
                 step = jwt_step_begin;
@@ -313,6 +316,9 @@ namespace firebase
             String val[cust_ns::max_type];
             TimeStatusCallback timestatus_cb = NULL;
 
+        private:
+            StringUtil sut;
+
         public:
             custom_data() {}
             ~custom_data() { clear(); }
@@ -326,7 +332,7 @@ namespace firebase
             void clear()
             {
                 for (size_t i = 0; i < cust_ns::max_type; i++)
-                    val[i].remove(0, val[i].length());
+                    sut.clear(val[i]);
                 timestatus_cb = NULL;
             }
         };
@@ -336,6 +342,9 @@ namespace firebase
         {
             String val[user_ns::max_type];
             size_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
+
+        private:
+            StringUtil sut;
 
         public:
             user_data() {}
@@ -349,7 +358,7 @@ namespace firebase
             void clear()
             {
                 for (size_t i = 0; i < user_ns::max_type; i++)
-                    val[i].remove(0, val[i].length());
+                    sut.clear(val[i]);
                 expire = FIREBASE_DEFAULT_TOKEN_TTL;
             }
         };
@@ -359,6 +368,9 @@ namespace firebase
         {
             String val[id_tk_ns::max_type];
             size_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
+
+        private:
+            StringUtil sut;
 
         public:
             id_token_data() {}
@@ -372,7 +384,7 @@ namespace firebase
             void clear()
             {
                 for (size_t i = 0; i < id_tk_ns::max_type; i++)
-                    val[i].remove(0, val[i].length());
+                    sut.clear(val[i]);
                 expire = FIREBASE_DEFAULT_TOKEN_TTL;
             }
         };
@@ -384,6 +396,9 @@ namespace firebase
             String val[access_tk_ns::max_type];
             size_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
             TimeStatusCallback timestatus_cb = NULL;
+
+        private:
+            StringUtil sut;
 
         public:
             access_token_data() {}
@@ -398,7 +413,7 @@ namespace firebase
             void clear()
             {
                 for (size_t i = 0; i < access_tk_ns::max_type; i++)
-                    val[i].remove(0, val[i].length());
+                    sut.clear(val[i]);
                 expire = FIREBASE_DEFAULT_TOKEN_TTL;
                 timestatus_cb = NULL;
             }
@@ -412,6 +427,9 @@ namespace firebase
             size_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
             TimeStatusCallback timestatus_cb = NULL;
 
+        private:
+            StringUtil sut;
+
         public:
             custom_token_data() {}
             ~custom_token_data() { clear(); }
@@ -423,7 +441,7 @@ namespace firebase
             }
             void clear()
             {
-                val[cust_tk_ns::token].remove(0, val[cust_tk_ns::token].length());
+                sut.clear(val[cust_tk_ns::token]);
                 expire = FIREBASE_DEFAULT_TOKEN_TTL;
                 timestatus_cb = NULL;
             }
@@ -435,11 +453,14 @@ namespace firebase
         {
             String val[legacy_tk_ns::max_type];
 
+        private:
+            StringUtil sut;
+
         public:
             legacy_token_data() {}
             ~legacy_token_data() { clear(); }
             void copy(const legacy_token_data &rhs) { this->val[legacy_tk_ns::token] = rhs.val[legacy_tk_ns::token]; }
-            void clear() { val[legacy_tk_ns::token].remove(0, val[legacy_tk_ns::token].length()); }
+            void clear() { sut.clear(val[legacy_tk_ns::token]); }
         };
 #endif
 
@@ -1336,6 +1357,9 @@ namespace firebase
 
     struct app_token_t
     {
+    private:
+        StringUtil sut;
+
     public:
         String val[app_tk_ns::max_type];
         uint32_t expire = 0, auth_ts = 0;
@@ -1345,7 +1369,7 @@ namespace firebase
         void clear()
         {
             for (size_t i = 0; i < app_tk_ns::max_type; i++)
-                val[i].remove(0, val[i].length());
+                sut.clear(val[i]);
             expire = FIREBASE_DEFAULT_TOKEN_TTL;
             authenticated = false;
             auth_type = auth_unknown_token;

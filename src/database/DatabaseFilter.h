@@ -1,5 +1,5 @@
 /**
- * Created March 13, 2024
+ * Created December 27, 2024
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -28,6 +28,7 @@
 #include <Arduino.h>
 #include "./Config.h"
 #include "./core/URL.h"
+#include "./core/StringUtil.h"
 
 #if defined(ENABLE_DATABASE)
 
@@ -38,6 +39,7 @@ class DatabaseFilter
     friend class AsyncClientClass;
 
 private:
+    StringUtil sut;
     void copy(const DatabaseFilter &rhs)
     {
         this->uri = rhs.uri;
@@ -130,7 +132,7 @@ public:
 
     DatabaseFilter &clear()
     {
-        uri.remove(0, uri.length());
+        sut.clear(uri);
         complete = false;
         return *this;
     }
