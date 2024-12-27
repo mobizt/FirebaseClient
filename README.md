@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-12-26T07:18:45Z`
+Revision `2024-12-27T17:04:04Z`
 
 ## Table of Contents
 
@@ -3184,6 +3184,8 @@ FIREBASE_DISABLE_ALL_OPTIONS // For disabling all predefined build options above
 This `UserConfig.h` will not change or overwrite when update the library.
 
 The library code size is varied from 80k - 110k (WiFi and WiFiClientSecure excluded) depends on the build options.
+
+The code size is 170k lesser than old Firebase library when perform the same operations.
 
 ## Frequently Asked Questions
 
