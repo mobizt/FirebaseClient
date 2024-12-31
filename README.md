@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2024-12-27T17:04:04Z`
+Revision `2024-12-31T17:50:08Z`
 
 ## Table of Contents
 
@@ -3220,7 +3220,7 @@ If you like my works, you can give a star. If you can make benefit from my proje
 
 The MIT License (MIT)
 
-Copyright (c) 2024 K. Suwatchai (Mobizt)
+Copyright (c) 2025 K. Suwatchai (Mobizt)
 
 
 Permission is hereby granted, free of charge, to any person returning a copy of
