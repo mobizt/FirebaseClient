@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-01-06T05:00:54Z`
+Revision `2025-01-06T13:42:50Z`
 
 ## Table of Contents
 
@@ -391,7 +391,22 @@ The following authentication/authorization classes generate and hold the `ID tok
 
 - The `CustomAuth` class is for `ID token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `ID token` that uses in the authorization requests. This allows the client to acess the services on behalf of user with custom `UID`.
 
-- The `CustomToken` class is for `ID token authorization using custom token`, which the custom claims signed `JWT` token obtained from the user authentication process in other applications will be used in the authorization requests.
+The `CustomAuth` class and `ServiceAuth` class which will discus later required the crypto library to sign the JWT token.
+
+The `BearSSL` engine library that includes in `ESP_SSLClient` library that comes with this FirebaseClient library will be used to handle this cryptographic tasks.
+
+This `BearSSL` and `ESP_SSLClient`libraries are enabled or included by default with `ENABLE_SERVICE_AUTH` or `ENABLE_CUSTOM_AUTH` macros defined in [src/Config.h](src/Config.h) which requires more program space.
+
+If you want to authenticate with Custom Token using custom claims signed `JWT` token via `CustomToken` class below or never use the `ServiceAuth` and `CustomAuth` classes and `ESP_SSLClient` library, you can disable `BearSSL` inclusion by defining the macros/build flags `DISABLE_CUSTOM_AUTH` and `DISABLE_SERVICE_AUTH` in  [src/Config.h](src/Config.h) or `src/UserConfig.h`, see [Library Build Options](#library-build-options) section.
+
+
+- The `CustomToken` class is for `ID token authorization using custom token`, which the custom claims signed `JWT` token obtained from the user authentication process in other applications e.g. NodeJS server side app that runs Firebase Admin SDK and working with the Service Account JSON file
+, will be used in the authorization requests.
+
+For crating Custom token using Service Account JSON file and Firebase Admin SDK in server side app, visit [Create Custom Tokens](https://firebase.google.com/docs/auth/admin/create-custom-tokens) documentation from Firebase for more information.
+
+For creating Custom token using [Application Default Credentials (ADC)](https://cloud.google.com/docs/authentication/provide-credentials-adc), see [this Blog](https://hiranya911.medium.com/firebase-create-custom-tokens-without-service-account-credentials-d6049c2d2d85) for how to.
+ 
 
 The following authentication/authorization classes generate and hold the `access token` and `secret key` for Firebase/Google APIs privilege access.
 

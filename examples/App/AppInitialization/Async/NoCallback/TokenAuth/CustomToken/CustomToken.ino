@@ -17,7 +17,7 @@
  * CustomToken::save(<file_config_data>);
  *
  * <api_key> - API key can be obtained from Firebase console > Project Overview > Project settings.
- * <custom_token> - The custom token (jwt signed token).
+ * <custom_token> - The custom token (custom claims with uid header in signed JWT token).
  * <expire_in_seconds> - Expire period in seconds (less than 3600), 3300 is the default value.
  * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the CustomToken credentials will be saved to or read from.
  *
