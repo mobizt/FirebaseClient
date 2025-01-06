@@ -86,10 +86,6 @@ Firestore::Documents Docs;
 
 AsyncResult aResult_no_callback;
 
-int counter = 0;
-
-unsigned long dataMillis = 0;
-
 bool taskCompleted = false;
 
 void setup()
@@ -139,37 +135,32 @@ void loop()
 
     Docs.loop();
 
-    if (app.ready() && (millis() - dataMillis > 60000 || dataMillis == 0))
+    if (app.ready() && !taskCompleted)
     {
-        dataMillis = millis();
+        taskCompleted = true;
 
-        if (!taskCompleted)
-        {
-            taskCompleted = true;
+        // collection id > document id.
+        String documentPath = "test_doc_deletion/my_doc";
 
-            // aa is the collection id, bb is the document id in collection aa.
-            String documentPath = "aa/bb";
+        Serial.println("Creating a document... ");
 
-            Serial.println("Create a document... ");
+        Document<Values::Value> doc("myDouble", Values::Value(Values::DoubleValue(123.456)));
 
-            Document<Values::Value> doc("myDouble", Values::Value(Values::DoubleValue(123.456)));
+        String payload = Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc);
 
-            String payload = Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc);
+        if (aClient.lastError().code() == 0)
+            Serial.println(payload);
+        else
+            printError(aClient.lastError().code(), aClient.lastError().message());
 
-            if (aClient.lastError().code() == 0)
-                Serial.println(payload);
-            else
-                printError(aClient.lastError().code(), aClient.lastError().message());
+        Serial.println("Deleting a document... ");
 
-            Serial.println("Delete a document... ");
+        payload = Docs.deleteDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */);
 
-            payload = Docs.deleteDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */);
-
-            if (aClient.lastError().code() == 0)
-                Serial.println(payload);
-            else
-                printError(aClient.lastError().code(), aClient.lastError().message());
-        }
+        if (aClient.lastError().code() == 0)
+            Serial.println(payload);
+        else
+            printError(aClient.lastError().code(), aClient.lastError().message());
     }
 }
 

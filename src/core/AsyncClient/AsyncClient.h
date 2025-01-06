@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 6, 2025
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -1336,8 +1336,11 @@ private:
                 sData->aResult.download_data.downloaded = sData->response.payloadRead;
                 returnResult(sData, false);
             }
+            
+            // Don't reset the payload remaining flag in case chunked
+            if (!sData->response.flags.chunks)
+                sData->response.flags.payload_remaining = false;
 
-            sData->response.flags.payload_remaining = false;
             closeFile(sData);
 
             if (sData->auth_used)

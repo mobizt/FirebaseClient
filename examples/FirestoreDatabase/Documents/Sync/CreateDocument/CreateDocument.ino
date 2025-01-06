@@ -82,9 +82,9 @@ Firestore::Documents Docs;
 
 AsyncResult aResult_no_callback;
 
-bool taskCompleted = false;
+int data_count = 0;
 
-int cnt = 0;
+unsigned long dataMillis = 0;
 
 void setup()
 {
@@ -133,29 +133,39 @@ void loop()
 
     Docs.loop();
 
-    if (app.ready() && !taskCompleted)
+    if (app.ready() && (millis() - dataMillis > 20000 || dataMillis == 0))
     {
-        taskCompleted = true;
+        dataMillis = millis();
 
-        // Note: If new document created under non-existent ancestor documents, that document will not appear in queries and snapshot
+        // We will create the documents in this parent path "test_doc_creation/doc_1/col_1/data_?"
+        // (collection > document > collection > documents that contains fields).
+
+        // Note: If new document created under non-existent ancestor documents as in this example
+        // which the document "test_doc_creation/doc_1" does not exist, that document (doc_1) will not appear in queries and snapshot
         // https://cloud.google.com/firestore/docs/using-console#non-existent_ancestor_documents.
 
-        // We will create the document in the parent path "a0/b?
-        // a0 is the collection id, b? is the document id in collection a0.
+        // In the console, you can create the ancestor document "test_doc_creation/doc_1" before running this example
+        // to avoid non-existent ancestor documents case.
 
-        String documentPath = "a0/b" + String(cnt);
+        String documentPath = "test_doc_creation/doc_1/col_1/data_";
+
+        documentPath += data_count;
+        data_count++;
 
         // If the document path contains space e.g. "a b c/d e f"
         // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
 
-        // double
-        Values::DoubleValue dblV(random(1, 500) / 100.0);
+        // double (obsoleted)
+        // Values::DoubleValue dblV(1234.567891);
+
+        // double value with precision.
+        Values::DoubleValue dblV(number_t(1234.567891, 6));
 
         // boolean
         Values::BooleanValue bolV(true);
 
         // integer
-        Values::IntegerValue intV(random(500, 1000));
+        Values::IntegerValue intV(data_count);
 
         // null
         Values::NullValue nullV;
@@ -184,8 +194,11 @@ void loop()
         Values::MapValue mapV("name", Values::StringValue("wrench"));
         mapV.add("mass", Values::StringValue("1.3kg")).add("count", Values::IntegerValue(3));
 
-        // lat long
-        Values::GeoPointValue geoV(1.486284, 23.678198);
+        // lat long (Obsoleated)
+        // Values::GeoPointValue geoV(1.486284, 23.678198);
+
+        // lat long with precision
+        Values::GeoPointValue geoV(number_t(1.486284, 6), number_t(23.678198, 6));
 
         Document<Values::Value> doc("myDouble", Values::Value(dblV));
         doc.add("myBool", Values::Value(bolV)).add("myInt", Values::Value(intV)).add("myNull", Values::Value(nullV));
@@ -195,7 +208,7 @@ void loop()
 
         // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
-        Serial.println("Create document... ");
+        Serial.println("Creating a document... ");
 
         String payload = Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc);
 

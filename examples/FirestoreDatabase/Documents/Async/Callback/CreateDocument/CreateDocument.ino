@@ -80,9 +80,9 @@ AsyncClient aClient(ssl_client, getNetwork(network));
 
 Firestore::Documents Docs;
 
-bool taskCompleted = false;
+int data_count = 0;
 
-int cnt = 0;
+unsigned long dataMillis = 0;
 
 void setup()
 {
@@ -128,18 +128,25 @@ void loop()
 
     Docs.loop();
 
-    if (app.ready() && !taskCompleted)
+    if (app.ready() && (millis() - dataMillis > 20000 || dataMillis == 0))
     {
-        taskCompleted = true;
+        dataMillis = millis();
 
-        // Note: If new document created under non-existent ancestor documents, that document will not appear in queries and snapshot
+        // We will create the documents in this parent path "test_doc_creation/doc_1/col_1/data_?"
+        // (collection > document > collection > documents that contains fields).
+
+        // Note: If new document created under non-existent ancestor documents as in this example 
+        // which the document "test_doc_creation/doc_1" does not exist, that document (doc_1) will not appear in queries and snapshot
         // https://cloud.google.com/firestore/docs/using-console#non-existent_ancestor_documents.
 
-        // We will create the document in the parent path "a0/b?
-        // a0 is the collection id, b? is the document id in collection a0.
+        // In the console, you can create the ancestor document "test_doc_creation/doc_1" before running this example 
+        // to avoid non-existent ancestor documents case.
 
-        String documentPath = "a0/b";
-        documentPath += cnt;
+
+        String documentPath = "test_doc_creation/doc_1/col_1/data_";
+
+        documentPath += data_count;
+        data_count++;
 
         // If the document path contains space e.g. "a b c/d e f"
         // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
@@ -154,7 +161,7 @@ void loop()
         Values::BooleanValue bolV(true);
 
         // integer
-        Values::IntegerValue intV(random(500, 1000));
+        Values::IntegerValue intV(data_count);
 
         // null
         Values::NullValue nullV;
@@ -197,7 +204,7 @@ void loop()
 
         // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
-        Serial.println("Create document... ");
+        Serial.println("Creating a document... ");
 
         Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB, "createDocumentTask");
     }

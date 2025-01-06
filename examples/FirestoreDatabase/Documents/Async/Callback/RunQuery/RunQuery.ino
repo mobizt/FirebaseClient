@@ -128,41 +128,55 @@ void loop()
 
     Docs.loop();
 
-    if (app.ready() && (millis() - dataMillis > 60000 || dataMillis == 0))
+    if (app.ready() && (millis() - dataMillis > 20000 || dataMillis == 0))
     {
         dataMillis = millis();
 
-        Serial.println("Query a Firestore database... ");
+        Serial.println("Querying a Firestore database... ");
+
+        // You can run the CreateDocument.ino example to create the data before querying.
 
         StructuredQuery query;
 
         Projection projection(FieldReference("myDouble"));
-        // This change in v1.0.7 from add to fields to correspond to the Firestore documentation.
-        projection.fields(FieldReference("myInteger"));
+        projection.fields(FieldReference("myBool"));
+        projection.fields(FieldReference("myInt"));
         projection.fields(FieldReference("myTimestamp"));
+        projection.fields(FieldReference("myBytes"));
+        projection.fields(FieldReference("myString"));
+        projection.fields(FieldReference("myArr"));
+        projection.fields(FieldReference("myMap"));
+        projection.fields(FieldReference("myGeo"));
         query.select(projection);
+
         // Or shorter form
-        // query.select(Projection(FieldReference("myDouble")).add(FieldReference("myInteger")).add(FieldReference("myTimestamp")));
+        // query.select(Projection(FieldReference("myDouble")).add(FieldReference("myBool")).add(FieldReference("myInt")));
 
-        query.from(CollectionSelector("a0", true));
+        query.from(CollectionSelector("col_1", false));
 
-        Order order;
-        order.field(FieldReference("myInteger"));
-        order.direction(FilterSort::DESCENDING);
-        query.orderBy(order);
+        // This ordering requires index
+        // Order order;
+        // order.field(FieldReference("myInt"));
+        // order.direction(FilterSort::DESCENDING);
+        // query.orderBy(order);
         // Or shorter form
-        // query.orderBy(Order(FieldReference("myInteger"), FilterSort::DESCENDING));
+        // query.orderBy(Order(FieldReference("myInt"), FilterSort::DESCENDING));
 
-        query.limit(3);
+        FieldFilter fieldFilter;
+        Values::StringValue stringValue("hello");
+        Values::Value val(stringValue);
+        fieldFilter.field(FieldReference("myString")).op(FieldFilterOperator::EQUAL).value(val);
+        Filter filter(fieldFilter);
+        query.where(filter);
+
+        query.limit(4);
 
         QueryOptions queryOptions;
         queryOptions.structuredQuery(query);
 
         query.clear();
-        projection.clear();
-        order.clear();
 
-        String documentPath = "/"; // Query from all collections under root
+        String documentPath = "test_doc_creation/doc_1";
 
         // You can set the content of queryOptions object directly with queryOptions.setContent("your content")
 
@@ -201,5 +215,7 @@ void printResult(AsyncResult &aResult)
     if (aResult.available())
     {
         Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+        // The information printed from Firebase.printf may be truncated because of limited buffer memory to reduce the stack usage,
+        // use Serial.println(aResult.c_str()) to print entire content.
     }
 }
