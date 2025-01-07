@@ -1,5 +1,5 @@
 /**
- * Created January 6, 2025
+ * Created January 7, 2025
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -1083,8 +1083,8 @@ private:
                 if (read >= 2 && line[read - 2] == '\r' && line[read - 1] == '\n')
                 {
                     // last chunk?
-                    if (line[0] == '0') // last-chunk , chunk-extension (if any) and CRLF
-                        goto next;
+                    if (line[0] == '0')
+                        return -1;
 
                     // remove the \r\n
                     line.remove(line.length() - 2);
@@ -1111,7 +1111,6 @@ private:
             else
             {
 
-            next:
                 read = readLine(sData, line);
 
                 // CRLF (end of chunked body)
@@ -1336,8 +1335,9 @@ private:
                 sData->aResult.download_data.downloaded = sData->response.payloadRead;
                 returnResult(sData, false);
             }
-            
-            // Don't reset the payload remaining flag in case chunked
+
+            // Don't reset the payload remaining flag in case of chunked.
+            // It should set in readPayload when decodeChunks return -1.
             if (!sData->response.flags.chunks)
                 sData->response.flags.payload_remaining = false;
 
