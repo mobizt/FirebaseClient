@@ -198,6 +198,7 @@ private:
     bool sse = false;
     String host;
     uint16_t port;
+    bool connected = false;
     std::vector<uint32_t> sVec;
     Memory mem;
     Base64Util b64ut;
@@ -526,7 +527,7 @@ private:
         {
             newCon(sData, getHost(sData, true).c_str(), sData->request.port);
 
-            if ((client_type == async_request_handler_t::tcp_client_type_sync && !client->connected()) || client_type == async_request_handler_t::tcp_client_type_async)
+            if ((client_type == async_request_handler_t::tcp_client_type_sync && !isConnected()) || client_type == async_request_handler_t::tcp_client_type_async)
             {
                 ret = connect(sData, getHost(sData, true).c_str(), sData->request.port);
 
@@ -627,7 +628,10 @@ private:
             String ext;
             String _host = getHost(sData, false, &ext);
             if (client)
+            {
                 client->stop();
+                this->connected = false;
+            }
             if (connect(sData, _host.c_str(), sData->request.port) > function_return_type_failure)
             {
                 URLUtil uut;
@@ -1424,10 +1428,10 @@ private:
         sData->aResult.conn_ms = millis();
         resetDebug(app_debug);
 
-        if (client && !client->connected() && !sData->auth_used) // This info is already show in auth task
+        if (!isConnected() && !sData->auth_used) // This info is already show in auth task
             setDebugBase(app_debug, FPSTR("Connecting to server..."));
 
-        if (client && !client->connected() && client_type == async_request_handler_t::tcp_client_type_sync)
+        if (!isConnected() && client_type == async_request_handler_t::tcp_client_type_sync)
             sData->return_type = client->connect(host, port) > 0 ? function_return_type_complete : function_return_type_failure;
         else if (client_type == async_request_handler_t::tcp_client_type_async)
         {
@@ -1455,8 +1459,9 @@ private:
 
         this->host = host;
         this->port = port;
+        this->connected = sData->return_type == function_return_type_complete;
 
-        if (client && client->connected() && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC)
+        if (isConnected() && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC)
             session_timer.feed(session_timeout_sec);
 
         return sData->return_type;
@@ -2048,9 +2053,31 @@ private:
         inStopAsync = false;
     }
 
+    bool isConnected()
+    {
+        // Re-check the client status only when the connected flag was set.
+        // This prevents calling client's connected() if it was not yet connected.
+        // This also prevents ESP32 Arduino Core v3.x.x's WiFiClientSecure connected() method
+        // (error) warning when it was trying to read 0 byte from, and set the socket option to
+        // the unopen socket.
+        if (this->connected)
+        {
+            if (client_type == async_request_handler_t::tcp_client_type_sync)
+                this->connected = client && client->connected();
+            else if (client_type == async_request_handler_t::tcp_client_type_async)
+            {
+#if defined(ENABLE_ASYNC_TCP_CLIENT)
+                if (async_tcp_config && async_tcp_config->tcpStatus)
+                    async_tcp_config->tcpStatus(this->connected);
+#endif
+            }
+        }
+        return this->connected;
+    }
+
     void stop(async_data_item_t *sData)
     {
-        if (client && client->connected())
+        if (isConnected())
             setDebugBase(app_debug, FPSTR("Terminating the server connection..."));
 
         if (client_type == async_request_handler_t::tcp_client_type_sync)
@@ -2067,7 +2094,8 @@ private:
         }
 
         clear(host);
-        port = 0;
+        this->port = 0;
+        this->connected = false;
         client_changed = false;
         network_changed = false;
     }
@@ -2538,7 +2566,10 @@ public:
 
         // Some changes, stop the current network client.
         if (client_changed && this->client)
+        {
             this->client->stop();
+            this->connected = false;
+        }
 
         // Change the network interface.
         // Should not check the type changes, just overwrite

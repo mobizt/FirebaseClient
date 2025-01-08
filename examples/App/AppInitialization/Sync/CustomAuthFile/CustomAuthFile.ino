@@ -98,6 +98,7 @@ DefaultNetwork network; // initilize with boolean parameter to enable/disable ne
 
 FileConfig sa_file("/sa_file.json", fileCallback);
 
+// Don't forget to call firebase::JWTClass::loop() in the main loop(), otherwise the JWT token process cannot be started.
 CustomAuth sa_file_auth(timeStatusCB, getFile(sa_file), API_KEY, "myId");
 
 FirebaseApp app;

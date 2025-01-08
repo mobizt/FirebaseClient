@@ -90,6 +90,7 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode);
 
 FileConfig sa_file("/sa_file.json", fileCallback);
 
+// Don't forget to call firebase::JWTClass::loop() in the main loop(), otherwise the JWT token process cannot be started.
 ServiceAuth sa_file_auth(timeStatusCB, getFile(sa_file));
 #endif
 

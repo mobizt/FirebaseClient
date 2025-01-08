@@ -73,6 +73,7 @@ void printResult(AsyncResult &aResult);
 
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
+// Don't forget to call firebase::JWTClass::loop() in the main loop(), otherwise the JWT token process cannot be started.
 ServiceAuth sa_auth(timeStatusCB, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, 3000 /* expire period in seconds (<3600) */);
 
 FirebaseApp app;
