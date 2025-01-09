@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.4.16-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.4.17-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-01-08T04:07:12Z`
+Revision `2025-01-09T02:03:14Z`
 
 ## Table of Contents
 
@@ -105,6 +105,7 @@ This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was cr
 - The internal SSL Client and WiFiClient issue causes the session need to be closed at some interval.
 - The `Realtime Database` stream event data can be missing due to the sync read operation.
 - The async operation is not truely impremented.
+- The library's code size is quite large. This new library code size is 170k smaller which requires only 80k - 110k program space.
 
 > [!IMPORTANT]  
 > If you are new to `Firebase Products`, please read the [Project Preparation and Setup](#project-preparation-and-setup) section first.
