@@ -1,10 +1,10 @@
 /**
- * Created January 8, 2025
+ * Created January 14, 2025
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
  * The MIT License (MIT)
- * Copyright (c) 2024 K. Suwatchai (Mobizt)
+ * Copyright (c) 2025 K. Suwatchai (Mobizt)
  *
  *
  * Permission is hereby granted, free of charge, to any person returning a copy of
@@ -2309,11 +2309,17 @@ private:
                 while (sData->state == async_state_send_header || sData->state == async_state_send_payload)
                 {
                     sData->return_type = send(sData);
-                    sData->response.feedTimer(!sData->async && sync_read_timeout_sec > 0 ? sync_read_timeout_sec : -1);
                     handleSendTimeout(sData);
                     if (sData->async || sData->return_type == function_return_type_failure)
                         break;
                 }
+
+                // The response time-out timer should be initiated here with appropriate timeout
+                // when the request was sucessfully sent (with or without payload).
+                // Without this initialization, the subsequent sData->response.feedTimer may not execute in case
+                // no server response returns because of server is out of reach or network/router is not responding.
+                if (sData->state == async_state_read_response)
+                    sData->response.feedTimer(!sData->async && sync_read_timeout_sec > 0 ? sync_read_timeout_sec : -1);
             }
 
             if (sending)

@@ -4,7 +4,7 @@
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
  * The MIT License (MIT)
- * Copyright (c) 2024 K. Suwatchai (Mobizt)
+ * Copyright (c) 2025 K. Suwatchai (Mobizt)
  *
  *
  * Permission is hereby granted, free of charge, to any person returning a copy of
