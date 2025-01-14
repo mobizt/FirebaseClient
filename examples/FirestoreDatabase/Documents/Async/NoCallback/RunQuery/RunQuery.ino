@@ -181,8 +181,6 @@ void loop()
 
         Docs.runQuery(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, queryOptions, aResult_no_callback);
         queryOptions.clear();
-
-        // Note that in this case the document path is the root ("/") because the collection a0 is at the root.
     }
 
     printResult(aResult_no_callback);

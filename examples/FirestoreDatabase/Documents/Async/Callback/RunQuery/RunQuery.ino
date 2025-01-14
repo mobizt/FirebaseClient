@@ -182,8 +182,6 @@ void loop()
 
         Docs.runQuery(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, queryOptions, asyncCB, "runQueryTask");
         queryOptions.clear();
-
-        // Note that in this case the document path is the root ("/") because the collection a0 is at the root.
     }
 }
 
