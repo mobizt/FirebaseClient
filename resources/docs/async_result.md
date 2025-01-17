@@ -29,11 +29,19 @@ Get the copy of server response payload string.
 String payload() const
 ```
 
+3. ## 🔹  size_t length() const
+
+Get the length of response payload string.
+
+```cpp
+size_t length() const
+```
+
 **Returns:**
 
 - `String` - The copy of payload string.
 
-3. ## 🔹  String path() const
+4. ## 🔹  String path() const
 
 Get the path of the resource of the request.
 
@@ -46,7 +54,7 @@ String path() const
 - `String` - The path of the resource of the request.
 
 
-4. ## 🔹  String etag() const
+5. ## 🔹  String etag() const
 
 Get the Etag of the server response headers.
 
@@ -59,7 +67,7 @@ String etag() const
 - `String` - The ETag of response header.
 
 
-5. ## 🔹   String uid() const
+6. ## 🔹   String uid() const
 
 Get the unique identifier of async task.
 
@@ -72,7 +80,7 @@ String uid() const
 - `String` - The UID of async task.
 
 
-6. ## 🔹  String debug()
+7. ## 🔹  String debug()
 
 Get the debug information.
 
@@ -84,7 +92,7 @@ String debug()
 
 - `String` - The debug information.
 
-7. ## 🔹  void clear()
+8. ## 🔹  void clear()
 
 Clear the async result.
 
@@ -92,7 +100,7 @@ Clear the async result.
 void clear()
 ```
 
-8. ## 🔹  RealtimeDatabaseResult &to()
+9. ## 🔹  RealtimeDatabaseResult &to()
 
 Get the reference to the internal RealtimeDatabaseResult object.
 
@@ -105,7 +113,7 @@ RealtimeDatabaseResult &to()
 - `RealtimeDatabaseResult &` - The reference to the internal RealtimeDatabaseResult object.
 
 
-9. ## 🔹  int available()
+10. ## 🔹  int available()
 
 Get the number of bytes of available response payload.
 
@@ -118,7 +126,7 @@ int available()
 - `int` - The number of bytes available.
 
 
-10. ## 🔹  app_event_t &appEvent()
+11. ## 🔹  app_event_t &appEvent()
 
 Get the reference of internal app event information.
 
@@ -131,7 +139,7 @@ app_event_t &appEvent()
 - `app_event_t &` - The reference of internal app event.
 
 
-11. ## 🔹  bool uploadProgress()
+12. ## 🔹  bool uploadProgress()
 
 Check if file/BLOB upload information is available.
 
@@ -144,7 +152,7 @@ bool uploadProgress()
 - `bool` - Returns true if upload information is available.
 
 
-12. ## 🔹  upload_data_t uploadInfo() const
+13. ## 🔹  upload_data_t uploadInfo() const
 
 Get the file/BLOB upload information.
 
@@ -157,7 +165,7 @@ upload_data_t uploadInfo() const
 - `upload_data_t` - The file/BLOB upload information.
 
 
-13. ## 🔹  bool downloadProgress()
+14. ## 🔹  bool downloadProgress()
 
 Check if the file/BLOB download information is availablle.
 
@@ -170,7 +178,7 @@ bool downloadProgress()
 - `bool` - Returns true if download information is available.
 
 
-14. ## 🔹  download_data_t downloadInfo() const
+15. ## 🔹  download_data_t downloadInfo() const
 
 Get the file/BLOB download information.
 
@@ -183,7 +191,7 @@ download_data_t downloadInfo() const
 - `download_data_t` - The file/BLOB download information.
 
 
-15. ## 🔹  bool isOTA() const
+16. ## 🔹  bool isOTA() const
 
 Check if the result is from OTA download task.
 
@@ -196,7 +204,7 @@ bool isOTA() const
 - `bool` - Returns true if the result is from OTA download task.
 
 
-16. ## 🔹  bool isError()
+17. ## 🔹  bool isError()
 
 Check if the error occurred in async task.
 
@@ -209,7 +217,7 @@ bool isError()
 - `bool` - Returns true if error occurred.
 
 
-17. ## 🔹  bool isDebug()
+18. ## 🔹  bool isDebug()
 
 Check if the debug information in available.
 
@@ -222,7 +230,7 @@ bool isDebug()
 - `bool` - Returns true if debug information in available.
 
 
-18. ## 🔹  bool isEvent()
+19. ## 🔹  bool isEvent()
 
 Check if the app event information in available.
 
@@ -235,7 +243,7 @@ bool isEvent()
 - `bool` - Returns true if app event information in available.
 
 
-19. ## 🔹  FirebaseError &error()
+20. ## 🔹  FirebaseError &error()
 
 Get the reference of internal FirebaseError object.
 

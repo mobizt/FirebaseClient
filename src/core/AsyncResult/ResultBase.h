@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 17, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -65,7 +65,8 @@ namespace firebase
         bool sse = false;
         event_resume_status_t event_resume_status = event_resume_status_undefined;
         String node_name, etag;
-        uint16_t data_path_p1 = 0, data_path_p2 = 0, event_p1 = 0, event_p2 = 0, data_p1 = 0, data_p2 = 0;
+        // Large data supports
+        uint32_t data_path_p1 = 0, data_path_p2 = 0, event_p1 = 0, event_p2 = 0, data_p1 = 0, data_p2 = 0;
         bool null_etag = false;
         String *ref_payload = nullptr;
 
@@ -90,6 +91,8 @@ namespace firebase
                 node_name = ref_payload->substring(p1 + 1, p2 - 1);
             }
         }
+
+        void feed() { sse_timer.feed(FIREBASE_SSE_TIMEOUT_MS / 1000); }
 
         void parseSSE()
         {
@@ -151,6 +154,7 @@ namespace firebase
         void clearSSE(RealtimeDatabaseResult *rtdbResult) { rtdbResult->clearSSE(); }
         void parseNodeName(RealtimeDatabaseResult *rtdbResult) { rtdbResult->parseNodeName(); }
         void parseSSE(RealtimeDatabaseResult *rtdbResult) { rtdbResult->parseSSE(); }
+        void feedSSETimer(RealtimeDatabaseResult *rtdbResult) { rtdbResult->feed(); }
         void setEventResumeStatus(RealtimeDatabaseResult *rtdbResult, event_resume_status_t status) { rtdbResult->setEventResumeStatus(status); }
         event_resume_status_t eventResumeStatus(const RealtimeDatabaseResult *rtdbResult) { return rtdbResult->eventResumeStatus(); }
 
@@ -191,14 +195,14 @@ namespace firebase
          *
          * @return String The relative path of data that has been changed.
          */
-        String dataPath() const { return ref_payload ? ref_payload->substring(data_path_p1, data_path_p2).c_str() : ""; }
+        String dataPath() const { return ref_payload ? ref_payload->substring(data_path_p1, data_path_p2).c_str() : String(); }
 
         /**
          * Get the `SSE mode (HTTP Streaming)` event type string.
          *
          * @return String The event type string e.g. `put`, `patch`, `keep-alive`, `cancel` and `auth_revoked`.
          */
-        String event() { return ref_payload ? ref_payload->substring(event_p1, event_p2).c_str() : ""; }
+        String event() { return ref_payload ? ref_payload->substring(event_p1, event_p2).c_str() : String(); }
 
         /**
          * Get the SSE mode (HTTP Streaming) event data that has been changed.
@@ -208,8 +212,8 @@ namespace firebase
         String data()
         {
             if (data_p1 > 0)
-                return ref_payload->substring(data_p1, data_p2).c_str();
-            return ref_payload ? ref_payload->c_str() : "";
+                return ref_payload->substring(data_p1, data_p2);
+            return ref_payload ? ref_payload->c_str() : String();
         }
 
         /**

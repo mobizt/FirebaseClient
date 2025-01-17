@@ -1,5 +1,5 @@
 /**
- * Created January 14, 2025
+ * Created January 17, 2025
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -858,11 +858,14 @@ private:
                     if (!readPayload(sData))
                         return false;
 
+                    String *payload = &sData->response.val[res_hndlr_ns::payload];
+
                     if (sData->response.flags.sse || !sData->response.flags.payload_remaining)
                     {
                         if (!sData->auth_used)
                         {
-                            sData->aResult.setPayload(sData->response.val[res_hndlr_ns::payload]);
+                            if (!sData->response.flags.sse)
+                                sData->aResult.setPayload(*payload);
 
                             if (sData->aResult.download_data.total > 0)
                                 clearAppData(sData->aResult.app_data);
@@ -872,37 +875,43 @@ private:
                             if (sData->request.method == async_request_handler_t::http_post)
                                 parseNodeName(&sData->aResult.rtdbResult);
 
-                            // data available from sse event
-                            if (sData->response.flags.sse && sData->response.val[res_hndlr_ns::payload].length())
+                            // Data available from sse event
+                            if (sData->response.flags.sse && payload->length())
                             {
-                                // order of checking: event, data, newline
-                                if (sData->response.val[res_hndlr_ns::payload].indexOf("event: ") > -1 && sData->response.val[res_hndlr_ns::payload].indexOf("data: ") > -1 && sData->response.val[res_hndlr_ns::payload].indexOf("\n") > -1)
+
+                                if (payload->indexOf("event: ") > -1 && payload->indexOf("data: ") > -1 && payload->indexOf("\n") > -1)
                                 {
+                                    // Prevent sse timeout due to large sse Stream playload
+                                    feedSSETimer(&sData->aResult.rtdbResult);
 
-                                    parseSSE(&sData->aResult.rtdbResult);
-
-                                    // Event filtering.
-                                    String event = sData->aResult.rtdbResult.event();
-                                    if (sse_events_filter.length() == 0 ||
-                                        (sData->response.flags.http_response && sse_events_filter.indexOf("get") > -1 && event.indexOf("put") > -1) ||
-                                        (!sData->response.flags.http_response && sse_events_filter.indexOf("put") > -1 && event.indexOf("put") > -1) ||
-                                        (sse_events_filter.indexOf("patch") > -1 && event.indexOf("patch") > -1) ||
-                                        (sse_events_filter.indexOf("keep-alive") > -1 && event.indexOf("keep-alive") > -1) ||
-                                        (sse_events_filter.indexOf("cancel") > -1 && event.indexOf("cancel") > -1) ||
-                                        (sse_events_filter.indexOf("auth_revoked") > -1 && event.indexOf("auth_revoked") > -1))
+                                    if ((*payload)[payload->length() - 1] == '\n' && sData->response.tcpAvailable(client_type, client, async_tcp_config) == 0)
                                     {
-                                        // save payload to slot result
-                                        sData->aResult.setPayload(sData->response.val[res_hndlr_ns::payload]);
-                                        clear(sData->response.val[res_hndlr_ns::payload]);
-                                        sData->response.flags.payload_available = true;
-                                        returnResult(sData, true);
-                                    }
-                                    else
-                                    {
-                                        clear(sData->response.val[res_hndlr_ns::payload]);
-                                    }
+                                        setRefPayload(&sData->aResult.rtdbResult, payload);
+                                        parseSSE(&sData->aResult.rtdbResult);
 
-                                    sData->response.flags.http_response = false;
+                                        // Event filtering.
+                                        String event = sData->aResult.rtdbResult.event();
+                                        if (sse_events_filter.length() == 0 ||
+                                            (sData->response.flags.http_response && sse_events_filter.indexOf("get") > -1 && event.indexOf("put") > -1) ||
+                                            (!sData->response.flags.http_response && sse_events_filter.indexOf("put") > -1 && event.indexOf("put") > -1) ||
+                                            (sse_events_filter.indexOf("patch") > -1 && event.indexOf("patch") > -1) ||
+                                            (sse_events_filter.indexOf("keep-alive") > -1 && event.indexOf("keep-alive") > -1) ||
+                                            (sse_events_filter.indexOf("cancel") > -1 && event.indexOf("cancel") > -1) ||
+                                            (sse_events_filter.indexOf("auth_revoked") > -1 && event.indexOf("auth_revoked") > -1))
+                                        {
+                                            // save payload to slot result
+                                            sData->aResult.setPayload(*payload);
+                                            clear(*payload);
+                                            sData->response.flags.payload_available = true;
+                                            returnResult(sData, true);
+                                        }
+                                        else
+                                        {
+                                            clear(*payload);
+                                        }
+
+                                        sData->response.flags.http_response = false;
+                                    }
                                 }
                             }
 #endif
@@ -1142,7 +1151,16 @@ private:
 
                 if (sData->response.flags.chunks)
                 {
-                    if (decodeChunks(sData, client, &sData->response.val[res_hndlr_ns::payload]) == -1)
+                    // Use temporary String buffer for decodeChunks
+                    String temp;
+                    int res = decodeChunks(sData, client, &temp);
+                    if (temp.length())
+                    {
+                        reserveString(sData);
+                        sData->response.val[res_hndlr_ns::payload] += temp;
+                    }
+
+                    if (res == -1)
                         sData->response.flags.payload_remaining = false;
                 }
                 else
@@ -1294,7 +1312,14 @@ private:
                         }
                     }
                     else
-                        sData->response.payloadRead += readLine(sData, sData->response.val[res_hndlr_ns::payload]);
+                    {
+                        // Use temporary String buffer for readLine
+                        String temp;
+                        size_t len = readLine(sData, temp);
+                        sData->response.payloadRead += len;
+                        reserveString(sData);
+                        sData->response.val[res_hndlr_ns::payload] += temp;
+                    }
                 }
             }
         }
@@ -1352,6 +1377,17 @@ private:
         }
 
         return sData->error.code == 0;
+    }
+
+    void reserveString(async_data_item_t *sData)
+    {
+        // String memory reservation is needed to hadle large data in external memory.
+#if defined(ENABLE_PSRAM) && ((defined(ESP8266) && defined(MMU_EXTERNAL_HEAP)) || (defined(ESP32) && defined(BOARD_HAS_PSRAM)))
+        String old = sData->response.val[res_hndlr_ns::payload];
+        sData->response.val[res_hndlr_ns::payload].remove(0, sData->response.val[res_hndlr_ns::payload].length());
+        sData->response.val[res_hndlr_ns::payload].reserve(sData->response.payloadRead + 1);
+        sData->response.val[res_hndlr_ns::payload] = old;
+#endif
     }
 
     // non-block memory buffer for collecting the multiple of 4 data prepared for base64 decoding

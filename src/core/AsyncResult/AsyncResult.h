@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 17, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -227,6 +227,13 @@ public:
      * @return String The copy of payload string.
      */
     String payload() const { return val[ares_ns::data_payload].c_str(); }
+
+    /**
+     * Get the length of response payload string.
+     *
+     * @return The payload string length.
+     */
+    size_t length() const { return val[ares_ns::data_payload].length(); }
 
     /**
      * Get the path of the resource of the request.
