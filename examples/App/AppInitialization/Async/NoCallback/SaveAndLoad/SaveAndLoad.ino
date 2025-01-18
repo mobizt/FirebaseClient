@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for storing the authentication credentials to file and load it for later use.
+ *
+ * This example uses the DefaultNetwork class for network interface configuration.
+ * See examples/App/NetworkInterfaces for more network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *
@@ -10,7 +21,7 @@
  * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
  * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
  *
- * SYNTAX:
+ * 2.------------------------
  *
  * FileConfig::FileConfig(<file_name>, <file_callback>);
  *
@@ -22,7 +33,7 @@
  *
  * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
- * SYNTAX:
+ * 3.------------------------
  *
  * UserAuth user_auth(<api_key>, <user_email>, <user_password>, <expire>);
  *
@@ -30,8 +41,6 @@
  * <user_password> - The user password in the project.
  * <api_key> - API key can be obtained from Firebase console > Project Overview > Project settings.
  * <expire> - The expiry period in seconds (less than or equal to 3600).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -53,18 +62,17 @@
 
 #include <FirebaseClient.h>
 
-#if defined(ENABLE_FS)      // Defined in this library
-#if defined(FLASH_SUPPORTS) // Defined in this library
+// In ESP32 Core SDK v3.x.x, to use filesystem in this library,
+// the File object should be defined globally
+// and the library's internal defined FS object should be set with
+// this global FS object in fileCallback function.
+#include <FS.h>
+File myFile;
+
 #if defined(ESP32)
 #include <SPIFFS.h>
 #endif
 #define MY_FS SPIFFS
-#else
-#include <SPI.h>
-#include <SD.h>
-#define MY_FS SD
-#endif
-#endif
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
@@ -127,8 +135,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -142,11 +148,13 @@ void setup()
     {
         // Load auth config from file.
         UserAuth user_auth_file(getFile(user_auth_file));
+        Serial.println("Initializing the app...");
         initializeApp(aClient, app, getAuth(user_auth_file), aResult_no_callback);
     }
     else
     {
         // Load auth from data.
+        Serial.println("Initializing the app...");
         initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
         // Save auth to file.
         user_auth.save(getFile(user_auth_file));
@@ -200,13 +208,13 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode)
     switch (mode)
     {
     case file_mode_open_read:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_READ);
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_READ);
         break;
     case file_mode_open_write:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
         break;
     case file_mode_open_append:
-        file = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
         break;
     case file_mode_remove:
         MY_FS.remove(filename);
@@ -214,5 +222,7 @@ void fileCallback(File &file, const char *filename, file_operating_mode mode)
     default:
         break;
     }
+    // Set the internal FS object with global File object.
+    file = myFile;
 }
 #endif

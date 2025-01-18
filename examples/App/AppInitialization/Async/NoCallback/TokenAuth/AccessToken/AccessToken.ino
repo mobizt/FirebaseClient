@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for Firebase OAuth2.0 authentication using access token.
+ *
+ * This example uses the DefaultNetwork class for network interface configuration.
+ * See examples/App/NetworkInterfaces for more network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *
@@ -10,7 +21,7 @@
  * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
  * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
  *
- * SYNTAX:
+ * 2.------------------------
  *
  * AccessToken::AccessToken(<access_token>, <expire_in_seconds>, <refresh_token>, <client_id>, <client_secret>);
  * AccessToken::AccessToken(<file_config_data>);
@@ -24,8 +35,6 @@
  * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the AccessToken credentials will be saved to or read from.
  *
  * By leaving auth_token empty and assign the refresh token, the auth token will be re-authenticated when calling initializeApp.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 #include <Arduino.h>
 #if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA)
@@ -93,8 +102,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -104,6 +111,7 @@ void setup()
 
     // Initialize the FirebaseApp or auth task handler.
     // To deinitialize, use deinitializeApp(app).
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(access_token), aResult_no_callback);
 }
 

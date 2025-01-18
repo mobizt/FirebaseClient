@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum blocking (sync) example for Firebase Realtime Database legacy token authorization using database secret.
+ *
+ * This example uses the DefaultNetwork class for network interface configuration.
+ * See examples/App/NetworkInterfaces for more network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *
@@ -10,7 +21,7 @@
  * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
  * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
  *
- * SYNTAX:
+ * 2.------------------------
  *
  * LegacyToken::LegacyToken(<database_secret>);
  * LegacyToken::LegacyToken(<file_config_data>);
@@ -18,9 +29,6 @@
  *
  * <database_secret> - The Realtime Database secret.
  * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the LegacyToken credentials will be saved to or read from.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
  */
 
 #include <Arduino.h>
@@ -94,6 +102,7 @@ void setup()
     // Initialize the FirebaseApp or auth task handler.
     // To deinitialize, use deinitializeApp(app).
     // The async result and async result callback are not needed for legacy token.
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(legacy_token));
 }
 

@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for non-authentication usage for temporary testing purpose only.
+ * 
+ * The security rules for the Firebase services should allow public read and write access for testing.
+ *
+ * This example uses the DefaultNetwork class for network interface configuration.
+ * See examples/App/NetworkInterfaces for more network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *
@@ -10,7 +23,7 @@
  * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
  * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
  *
- * SYNTAX:
+ * 2.------------------------
  *
  * NoAuth::NoAuth();
  *
@@ -91,7 +104,8 @@ void setup()
 
     // Initialize the FirebaseApp or auth task handler.
     // To deinitialize, use deinitializeApp(app).
-    // The async result and async result callback are not needed for no authentication.
+    // The async result and async result callback are not needed for non-authentication.
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(no_auth));
 }
 

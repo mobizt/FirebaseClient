@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for Firebase user authentication using email and password.
+ *
+ * This example uses the DefaultNetwork class for network interface configuration.
+ * See examples/App/NetworkInterfaces for more network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *
@@ -10,7 +21,7 @@
  * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
  * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
  *
- * SYNTAX:
+ * 2.------------------------
  *
  * UserAuth::UserAuth(<api_key>, <user_email>, <user_password>, <expire>);
  * UserAuth::UserAuth(<file_config_data>);
@@ -24,8 +35,6 @@
  *
  * To use other network interfaces, network data from one of the following Network classes
  * can be assigned.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -116,10 +125,9 @@ void setup()
     else
         Serial.println("failed");
 
-    Serial.println("Initializing app...");
-
     // Initialize the FirebaseApp or auth task handler.
     // To deinitialize, use deinitializeApp(app).
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 }
 

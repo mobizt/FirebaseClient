@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for Firebase custom user authentication with UID, scopes and claims.
+ * 
+ * The service account JSON key file path should be set via FileConfig.
+ *
+ * This example uses the DefaultNetwork class for network interface configuration.
+ * See examples/App/NetworkInterfaces for more network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>);
  *
@@ -10,7 +23,7 @@
  * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
  * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
  *
- * SYNTAX:
+ * 2.------------------------
  *
  * CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>);
  *
@@ -33,8 +46,6 @@
  * The JWT token processor required for ServiceAuth and CustomAuth authentications.
  *
  * JWTClass::loop(<auth_data_t *>)
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -140,8 +151,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -151,6 +160,7 @@ void setup()
 
     // Initialize the FirebaseApp or auth task handler.
     // To deinitialize, use deinitializeApp(app).
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_file_auth), aResult_no_callback);
 }
 
