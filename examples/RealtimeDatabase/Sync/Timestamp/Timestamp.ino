@@ -1,6 +1,13 @@
 
 /**
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
+ * ABOUT:
+ *
+ * The blocking (sync) example to set the server value (timestamp) with data or to the existing data stores in your the database.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -80,8 +87,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -89,6 +94,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -97,6 +103,7 @@ void setup()
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 
     // In case setting the external async result to the sync task (optional)
@@ -110,7 +117,7 @@ void setup()
     JsonWriter writer;
     writer.create(ts_json, ".sv", "timestamp"); // -> {".sv": "timestamp"}
 
-    Serial.println("Set only timestamp... ");
+    Serial.println("Setting only timestamp... ");
     bool status = Database.set<object_t>(aClient, "/test/timestamp", ts_json);
     if (status)
         Serial.println(String("ok"));
@@ -122,7 +129,7 @@ void setup()
     writer.create(data_json, "data", "hello");        // -> {"data": "hello"}
     writer.join(ts_data_json, 2, data_json, ts_json); // -> {"data":"hello",".sv":"timestamp"}
 
-    Serial.println("Set timestamp and data... ");
+    Serial.println("Setting timestamp and data... ");
     status = Database.set<object_t>(aClient, "/test/timestamp", ts_data_json);
     if (status)
         Serial.println(String("ok"));

@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to get the data from the database.
+ *
+ * This example also shows how to use the query to filter your data.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * RealtimeDatabase::get(<AsyncClient>, <path>, <AsyncResult>, <SSE>);
  *
@@ -10,8 +23,6 @@
  * <DatabaseOption> - The database options (DatabaseOptions).
  * <AsyncResult> - The async result (AsyncResult).
  * <SSE> - The Server-sent events (HTTP Streaming) mode.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -89,8 +100,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -98,12 +107,14 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     // Binding the FirebaseApp for authentication handler.
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 }
 
@@ -120,8 +131,10 @@ void loop()
     {
         taskComplete = true;
 
+        Serial.println("Getting the value (task1)... ");
         Database.get(aClient, "/test/int", aResult_no_callback);
 
+        Serial.println("Getting the value (task2)... ");
         Database.get(aClient, "/test/string", aResult_no_callback);
 
         // Filtering data
@@ -129,6 +142,7 @@ void loop()
         DatabaseOptions options;
         options.filter.orderBy("Data").startAt(105).endAt(120).limitToLast(8);
 
+        Serial.println("Getting the value with query options (task3)... ");
         Database.get(aClient, "/test/filter/json", options, aResult_no_callback);
     }
 

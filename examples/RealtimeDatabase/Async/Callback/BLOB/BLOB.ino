@@ -1,6 +1,26 @@
 
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to store your binary data to the database and read it back.
+ *
+ * With the BlobConfig object provides with the set function, the binary data will be converted to base64
+ * encoded string on-the-fly when storing to your database.
+ *
+ * And when the BlobConfig object provides with the get function, the data in your database
+ * (assumed that it is base64 encoded string) will be converted to binary data
+ * on-the-fly when reading from your database.
+ *
+ * See the BlobConfig class constructor syntax below.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * BlobConfig::BlobConfig(<data>, <size>);
  *
@@ -9,7 +29,7 @@
  *
  * The data can be a source (input) and target (output) data that used in upload and download.
  *
- * SYNTAX:
+ * 2.------------------------
  *
  * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
  *
@@ -20,8 +40,6 @@
  * <file_config_data> - The file config data which in case of BLOB, it will be obtained from BlobConfig via getBlob.
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -105,8 +123,6 @@ void setup()
 
   Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-  Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
   ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -114,12 +130,14 @@ void setup()
 #endif
 #endif
 
+  Serial.println("Initializing the app...");
   initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
   // Binding the FirebaseApp for authentication handler.
   // To unbind, use Database.resetApp();
   app.getApp<RealtimeDatabase>(Database);
 
+  // Set your database URL (requires only for Realtime Database)
   Database.url(DATABASE_URL);
 
   // Prepare BLOB data
@@ -140,10 +158,14 @@ void loop()
   {
     taskComplete = true;
 
-    Serial.println("Set blob... ");
+    Serial.println("Setting the blob data... ");
+
+    // Binary data -> Base64 encoding on-the-fly -> Base64 encoded string stores in your database
     Database.set(aClient, "/test/blob", getBlob(upload_data), asyncCB, "uploadTask");
 
-    Serial.println("Get blob... ");
+    Serial.println("Getting the blob data... ");
+
+    // Base64 encoded string stores in your database -> Base64 decoding on-the-fly -> Binary data
     Database.get(aClient, "/test/blob", getBlob(download_data), asyncCB, "downloadTask");
   }
 }

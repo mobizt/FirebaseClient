@@ -1,5 +1,25 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to store your file data to the database and read it back.
+ *
+ * With the FileConfig object provides with the set function, the file data will be converted to base64
+ * encoded string on-the-fly when storing to your database.
+ *
+ * And when the FileConfig object provides with the get function, the data in your database
+ * (assumed that it is base64 encoded string) will be converted to binary data
+ * on-the-fly and stores as file when reading from your database.
+ *
+ * See the FileConfig class constructor syntax below.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * FileConfig::FileConfig(<file_name>, <file_callback>);
  *
@@ -11,7 +31,7 @@
  *
  * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
- * SYNTAX:
+ * 2.------------------------
  *
  * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResult>);
  *
@@ -21,8 +41,6 @@
  * <path> - The node path to set/get the file data.
  * <file_config_data> - The file config data which in case of filesystem data, it will be obtained from FileConfig via getFile.
  * <AsyncResult> - The async result (AsyncResult).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -43,7 +61,7 @@
 #endif
 
 // In ESP32 Core SDK v3.x.x, to use filesystem in this library,
-// the File object should be defined globally 
+// the File object should be defined globally
 // and the library's internal defined FS object should be set with
 // this global FS object in fileCallback function.
 #include <FS.h>
@@ -124,8 +142,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -134,12 +150,14 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     // Binding the FirebaseApp for authentication handler.
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 
     // Prepare file data
@@ -171,10 +189,15 @@ void loop()
     {
         taskComplete = true;
 #if defined(ENABLE_FS)
-        Serial.println("Set file... ");
+
+        Serial.println("Setting the file data... ");
+
+        // Binary data from file -> Base64 encoding on-the-fly -> Base64 encoded string stores in your database
         Database.set(aClient, "/test/file", getFile(upload_data), aResult_no_callback);
 
-        Serial.println("Get file... ");
+        Serial.println("Getting the file data... ");
+
+        // Base64 encoded string stores in your database -> Base64 decoding on-the-fly -> Binary data stores as a file
         Database.get(aClient, "/test/file", getFile(download_data), aResult_no_callback);
 #endif
     }
@@ -220,27 +243,29 @@ void printResult(AsyncResult &aResult)
 }
 
 #if defined(ENABLE_FS)
-void fileCallback(File &file, const char *filename, file_operating_mode mode) {
-  // FILE_OPEN_MODE_READ, FILE_OPEN_MODE_WRITE and FILE_OPEN_MODE_APPEND are defined in this library
-  // MY_FS is defined in this example
-  switch (mode) {
+void fileCallback(File &file, const char *filename, file_operating_mode mode)
+{
+    // FILE_OPEN_MODE_READ, FILE_OPEN_MODE_WRITE and FILE_OPEN_MODE_APPEND are defined in this library
+    // MY_FS is defined in this example
+    switch (mode)
+    {
     case file_mode_open_read:
-      myFile = MY_FS.open(filename, FILE_OPEN_MODE_READ);
-      break;
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_READ);
+        break;
     case file_mode_open_write:
-      myFile = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
-      break;
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_WRITE);
+        break;
     case file_mode_open_append:
-      myFile = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
-      break;
+        myFile = MY_FS.open(filename, FILE_OPEN_MODE_APPEND);
+        break;
     case file_mode_remove:
-      MY_FS.remove(filename);
-      break;
+        MY_FS.remove(filename);
+        break;
     default:
-      break;
-  }
-  // Set the internal FS object with global File object.
-  file = myFile;
+        break;
+    }
+    // Set the internal FS object with global File object.
+    file = myFile;
 }
 
 void printFile()

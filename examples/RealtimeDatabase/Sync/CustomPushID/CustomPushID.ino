@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to push the data to the database.
+ *
+ * This example also shows how to simulate the push operation with the custom UUID.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * bool RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>);
  *
@@ -9,14 +22,14 @@
  * <value> - The value to set.
  * <AsyncResult> - The async result (AsyncResult).
  *
+ * 2.------------------------
+ *
  * String RealtimeDatabase::push<T>(<AsyncClient>, <path>, <value>, <AsyncResult>);
  *
  * T - The type of value to push.
  * <AsyncClient> - The async client.
  * <path> - The node path to push the value.
  * <value> - The value to push.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -102,8 +115,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -111,6 +122,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -119,6 +131,7 @@ void setup()
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 }
 
@@ -134,8 +147,9 @@ void loop()
 
         String path = "/test/int2/" + genUUID();
 
-        // Push int
-        Serial.print("Push int... ");
+        // Push the int value
+
+        Serial.print("Pushing the int value... ");
         String name = Database.push<int>(aClient, "/test/int", 12345);
 
         if (aClient.lastError().code() == 0)
@@ -143,8 +157,9 @@ void loop()
         else
             printError(aClient.lastError().code(), aClient.lastError().message());
 
-        // Set int with custom UUID.
-        Serial.print("Set int with custom UUID... ");
+        Serial.print("Pushing (setting) the int value with custom UUID... ");
+
+        // Set the int value with custom UUID (your simulate push operation)
         bool status = Database.set<int>(aClient, path, 12345);
 
         if (status)

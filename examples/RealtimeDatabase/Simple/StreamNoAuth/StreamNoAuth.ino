@@ -1,9 +1,11 @@
 /**
+ * ABOUT:
+ *
  * This example is for new users which are familiar with other legacy Firebase libraries.
  *
  * The example shows how to listen the data changes in your Firebase Realtime database
  * while the database was set periodically.
- * 
+ *
  * All functions used in this example are non-blocking (async) functions.
  *
  * This example will not use any authentication method included database secret.
@@ -134,12 +136,13 @@ void setup()
 #endif
 
     // Initialize the authentication handler.
+    Serial.println("Initializing the app...");
     initializeApp(client1, app, getAuth(noAuth));
 
     // Binding the authentication handler with your Database class object.
     app.getApp<RealtimeDatabase>(Database);
 
-    // Set your database URL
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 
     // Initiate the Stream connection to listen the data changes.

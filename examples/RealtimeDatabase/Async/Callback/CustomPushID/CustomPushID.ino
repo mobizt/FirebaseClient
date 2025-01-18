@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to push the data to the database.
+ *
+ * This example also shows how to simulate the push operation with the custom UUID.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
  *
@@ -10,6 +23,8 @@
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
  *
+ * 2.------------------------
+ *
  * RealtimeDatabase::push<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>);
  *
  * T - The type of value to push.
@@ -18,8 +33,6 @@
  * <value> - The value to push.
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -101,8 +114,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -110,12 +121,14 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 }
 
@@ -132,14 +145,16 @@ void loop()
     {
         ms = millis();
 
-        Serial.println("Asynchronous Push vs Set with custom UUID... ");
-
         String path = "/test/int2/" + genUUID();
 
-        // Push int
+        // Push the int value
+
+        Serial.println("Pushing the int value... ");
         Database.push<int>(aClient, "/test/int", 12345, asyncCB, "pushIntTask");
 
-        // Set int with custom UUID
+        Serial.println("Pushing (setting) the int value with custom UUID... ");
+
+        // Set the int value with custom UUID (your simulate push operation)
         Database.set<int>(aClient, path, 12345, asyncCB, "setTask");
     }
 }

@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to update the data to the database.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * bool RealtimeDatabase::update(<AsyncClient>, <path>, <object_t>);
  *
@@ -11,8 +24,6 @@
  *
  * In case of error, the operation error information can be obtain from AsyncClient via aClient.lastError().message() and
  * aClient.lastError().code().
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -92,8 +103,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -101,6 +110,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -109,6 +119,7 @@ void setup()
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 
     // In case setting the external async result to the sync task (optional)
@@ -123,7 +134,7 @@ void setup()
     writer.create(json, "data/value", random(1000, 2000)); //-> {"data":{"value":x}}
     // Or set the seialized JSON string to the object_t as object_t("{\"data\":{\"value\":x}}")
 
-    Serial.print("Update... ");
+    Serial.print("Updating data (JSON object only)... ");
     bool status = Database.update(aClient, "/test/json", json);
 
     if (status)

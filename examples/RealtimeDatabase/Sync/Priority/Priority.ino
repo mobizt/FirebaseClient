@@ -1,6 +1,16 @@
 
 /**
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
+ * ABOUT:
+ *
+ * The blocking (sync) example to set the value's priority.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  */
 
 #include <Arduino.h>
@@ -79,8 +89,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -88,6 +96,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -96,6 +105,7 @@ void setup()
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 
     // In case setting the external async result to the sync task (optional)
@@ -104,7 +114,7 @@ void setup()
 
     Serial.println();
 
-    Serial.println("Set data with priority... ");
+    Serial.println("Setting the data (JSON object) with priority... ");
 
     // Library does not provide JSON parser library, the following JSON writer class will be used with
     // object_t for simple demonstration.
@@ -131,7 +141,7 @@ void setup()
 
     // Change priority
     Serial.println();
-    Serial.print("Set value with priority... ");
+    Serial.print("Setting the primitive value with priority... ");
 
     writer.create(obj1, ".value", "item_15");
     // Set priority to primitive value.
@@ -145,7 +155,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     Serial.println();
-    Serial.println("Get priority... ");
+    Serial.println("Getting the priority... ");
     double v = Database.get<double>(aClient, "/test/items/priority_1/.priority");
 
     if (aClient.lastError().code() == 0)
@@ -154,7 +164,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     Serial.println();
-    Serial.println("Filtering data with priority... ");
+    Serial.println("Filtering the data based on its priority... ");
     DatabaseOptions options;
     // Now the node priority_1 which its priority changed to 6.0 should include in the filtering result.
     options.filter.orderBy("$priority").startAt(3.0).endAt(8.0);

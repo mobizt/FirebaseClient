@@ -1,8 +1,20 @@
 
 /**
- * This example is for ESP32 Core v3.x.x and the SIM/GSM modules.
+ * ABOUT:
+ *
+ * The non-blocking (async) example to listen to the changes of value (from a node) stores in your database
+ * via SSE Streaming connection.
+ *
+ * This example requires PPP.h from ESP32 Core v3.x.x.
+ *
+ * This example uses the UserAuth class for authentication.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * RealtimeDatabase::get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
  *
@@ -14,8 +26,6 @@
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
  * <SSE> - The Server-sent events (HTTP Streaming) mode.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -227,14 +237,14 @@ void setup()
     // ssl_client2.setBufferSizes(2048 /* rx */, 1024 /* tx */);
     // ssl_client2.setClient(&net_client2);
 
-    Serial.println("Initializing app...");
-
+    Serial.println("Initializing the app...");
     initializeApp(aClient1, app, getAuth(user_auth), aResult_no_callback1);
 
     // Binding the FirebaseApp for authentication handler.
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 
     // Since v1.2.1, in SSE mode (HTTP Streaming) task, you can filter the Stream events by using RealtimeDatabase::setSSEFilters(<keywords>),

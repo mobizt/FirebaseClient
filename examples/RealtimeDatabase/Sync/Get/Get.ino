@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to to get the data from the database.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * T RealtimeDatabase::get<T>(<AsyncClient>, <path>);
  * T RealtimeDatabase::get<T>(<AsyncClient>, <path>, <DatabaseOptions>);
@@ -21,8 +32,6 @@
  *
  * Note that the objects used as placeholder (input) that introduced to use in Push, Update and Set i.e.
  * bool_t, number_t, string_t and object_t cannot be used to keep the output value.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -102,8 +111,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -111,6 +118,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -119,6 +127,7 @@ void setup()
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 
     // In case setting the external async result to the sync task (optional)
@@ -127,35 +136,35 @@ void setup()
 
     // Library does not provide JSON parser library, to get JSON object, get the string and deseialize it.
 
-    Serial.print("Get int... ");
+    Serial.print("Getting the int value... ");
     int v1 = Database.get<int>(aClient, "/test/int");
     if (aClient.lastError().code() == 0)
         Serial.println(v1);
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
-    Serial.print("Get bool... ");
+    Serial.print("Getting the bool value... ");
     bool v2 = Database.get<bool>(aClient, "/test/bool");
     if (aClient.lastError().code() == 0)
         Serial.println(v2);
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
-    Serial.print("Get string... ");
+    Serial.print("Getting the String value... ");
     String v3 = Database.get<String>(aClient, "/test/string");
     if (aClient.lastError().code() == 0)
         Serial.println(v3);
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
-    Serial.print("Get float... ");
+    Serial.print("Getting the float value... ");
     float v4 = Database.get<float>(aClient, "/test/float");
     if (aClient.lastError().code() == 0)
         Serial.println(v4);
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
 
-    Serial.print("Get double... ");
+    Serial.print("Getting the double value... ");
     double v5 = Database.get<double>(aClient, "/test/double");
     if (aClient.lastError().code() == 0)
         Serial.println(v5);

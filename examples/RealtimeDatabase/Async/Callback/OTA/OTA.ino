@@ -1,5 +1,22 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to perform OTA firmware update using data stores in your database.
+ *
+ * Assume that your firmware bin file was converted to base64 encoded string and stores in your database before running
+ * this example.
+ *
+ * See examples/RealtimeDatabase/Async/Callback/File/File.ino for how to upload your bin file.
+ *
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * RealtimeDatabase::ota(<AsyncClient>, <path>, <AsyncResultCallback>, <uid>);
  *
@@ -7,8 +24,6 @@
  * <path> - The node path that store the base64 encoded string of firmware (bin) file.
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -32,7 +47,7 @@
 
 // For Arduino SAMD21 OTA supports.
 // See https://github.com/mobizt/FirebaseClient#ota-update.
-#if defined(ARDUINO_ARCH_SAMD) 
+#if defined(ARDUINO_ARCH_SAMD)
 #include <Internal_Storage_OTA.h>
 #define OTA_STORAGE InternalStorage
 #endif
@@ -95,8 +110,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -105,12 +118,14 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 }
 
@@ -127,12 +142,14 @@ void loop()
     {
         taskComplete = true;
 
-        Serial.println("Asynchronous OTA update... ");
+        Serial.println("Updating your firmware (OTA)... ");
 
 #if defined(OTA_STORAGE)
         Database.setOTAStorage(OTA_STORAGE);
 #endif
 
+        // Assume that your firmware bin file was converted to base64 encoded string
+        // and stores at "/test/firmware/bin"
         Database.ota(aClient, "/test/firmware/bin", asyncCB, "otaTask");
     }
 }

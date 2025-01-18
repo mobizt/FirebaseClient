@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to update the data to the database.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * RealtimeDatabase::update(<AsyncClient>, <path>, <object_t>, <AsyncResult>);
  * RealtimeDatabase::update(<AsyncClient>, <path>, <object_t>, <AsyncResultCallback>, <uid>);
@@ -10,8 +21,6 @@
  * <AsyncResult> - The async result (AsyncResult).
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -89,8 +98,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -98,12 +105,14 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 }
 
@@ -126,8 +135,9 @@ void loop()
         object_t json;
         JsonWriter writer;
         writer.create(json, "data/value", random(1000, 2000)); //-> {"data":{"value":x}}
-        // Or set the seialized JSON string to the object_t as object_t("{\"data\":{\"value\":x}}")
+                                                               // Or set the seialized JSON string to the object_t as object_t("{\"data\":{\"value\":x}}")
 
+        Serial.println("Updating data (JSON object only)...");
         Database.update(aClient, "/test/json", json, asyncCB, "updateTask");
     }
 }

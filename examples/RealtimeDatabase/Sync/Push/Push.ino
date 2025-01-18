@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to push the data to the database.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * String RealtimeDatabase::push<T>(<AsyncClient>, <path>, <value>);
  *
@@ -19,8 +32,6 @@
  *
  * In case of error, the operation error information can be obtain from AsyncClient via aClient.lastError().message() and
  * aClient.lastError().code().
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -109,6 +120,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -117,6 +129,7 @@ void setup()
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 
     // In case setting the external async result to the sync task (optional)
@@ -124,7 +137,7 @@ void setup()
     aClient.setAsyncResult(aResult_no_callback);
 
     // Push int
-    Serial.print("Push int... ");
+    Serial.print("Pushing the int value... ");
     String name = Database.push<int>(aClient, "/test/int", 12345);
     if (aClient.lastError().code() == 0)
         Firebase.printf("ok, name: %s\n", name.c_str());
@@ -132,7 +145,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Push bool
-    Serial.print("Push bool... ");
+    Serial.print("Pushing the bool value... ");
     name = Database.push<bool>(aClient, "/test/bool", true);
     if (aClient.lastError().code() == 0)
         Firebase.printf("ok, name: %s\n", name.c_str());
@@ -140,7 +153,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Push string
-    Serial.print("Push String... ");
+    Serial.print("Pushing the String value... ");
     name = Database.push<String>(aClient, "/test/string", "hello");
     if (aClient.lastError().code() == 0)
         Firebase.printf("ok, name: %s\n", name.c_str());
@@ -157,7 +170,7 @@ void setup()
     writer.create(json, "test/data", 123); // -> {"test":{"data":123}}
     // Or set the seialized JSON string to object_t as object_t("{\"test\":{\"data\":123}}")
 
-    Serial.print("Push JSON... ");
+    Serial.print("Pushing the JSON object... ");
     name = Database.push<object_t>(aClient, "/test/json", json);
     if (aClient.lastError().code() == 0)
         Firebase.printf("ok, name: %s\n", name.c_str());
@@ -171,7 +184,7 @@ void setup()
     writer.join(arr, 4, object_t(1), object_t(2), object_t(string_t("test")), object_t(boolean_t(true))); // -> [1,2,"test",true]
     // Or set the seialized JSON Array string to the object_t as object_t("[1,2,\"test\",true]")
 
-    Serial.print("Push Array... ");
+    Serial.print("Pushing the Array object... ");
     name = Database.push<object_t>(aClient, "/test/arr", arr);
     if (aClient.lastError().code() == 0)
         Firebase.printf("ok, name: %s\n", name.c_str());
@@ -179,7 +192,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Push float
-    Serial.print("Push float... ");
+    Serial.print("Pushing the float value... ");
     name = Database.push<number_t>(aClient, "/test/float", number_t(123.456, 2));
     if (aClient.lastError().code() == 0)
         Firebase.printf("ok, name: %s\n", name.c_str());
@@ -187,7 +200,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Push double
-    Serial.print("Push double... ");
+    Serial.print("Pushing the double value... ");
     name = Database.push<number_t>(aClient, "/test/double", number_t(1234.56789, 4));
     if (aClient.lastError().code() == 0)
         Firebase.printf("ok, name: %s\n", name.c_str());

@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to to set the data to the database.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * bool RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>);
  *
@@ -18,8 +29,6 @@
  *
  * In case of error, the operation error information can be obtain from AsyncClient via aClient.lastError().message() and
  * aClient.lastError().code().
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -99,8 +108,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -108,6 +115,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -116,17 +124,16 @@ void setup()
     // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
+    // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
 
     // In case setting the external async result to the sync task (optional)
     // To unset, use unsetAsyncResult().
     aClient.setAsyncResult(aResult_no_callback);
 
-    Serial.println("Synchronous Set... ");
-
     // Set int
 
-    Serial.print("Set int... ");
+    Serial.print("Setting the int value... ");
     bool status = Database.set<int>(aClient, "/test/int", 12345);
     if (status)
         Serial.println("ok");
@@ -134,7 +141,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Set bool
-    Serial.print("Set bool... ");
+    Serial.print("Setting the bool value... ");
     status = Database.set<bool>(aClient, "/test/bool", true);
     if (status)
         Serial.println("ok");
@@ -142,7 +149,7 @@ void setup()
         printError(aClient.lastError().code(), aClient.lastError().message());
 
     // Set string
-    Serial.print("Set String... ");
+    Serial.print("Setting the String value... ");
     status = Database.set<String>(aClient, "/test/string", "hello");
     if (status)
         Serial.println("ok");
@@ -159,7 +166,7 @@ void setup()
     writer.create(json, "test/data", 123); // -> {"test":{"data":123}}
                                            // Or set the seialized JSON string to object_t as object_t("{\"test\":{\"data\":123}}")
 
-    Serial.print("Set JSON... ");
+    Serial.print("Setting the JSON object... ");
     status = Database.set<object_t>(aClient, "/test/json", json);
     if (status)
         Serial.println("ok");
@@ -173,7 +180,7 @@ void setup()
     writer.join(arr, 4, object_t(1), object_t(2), object_t(string_t("test")), object_t(boolean_t(true))); // -> [1,2,"test",true]
                                                                                                           // Or set the seialized JSON Array string to the object_t as object_t("[1,2,\"test\",true]")
 
-    Serial.print("Set Array... ");
+    Serial.print("Setting the Array object... ");
     status = Database.set<object_t>(aClient, "/test/arr", arr);
     if (status)
         Serial.println("ok");
@@ -182,7 +189,7 @@ void setup()
 
     // Set float
 
-    Serial.print("Set float... ");
+    Serial.print("Setting the float value... ");
     status = Database.set<number_t>(aClient, "/test/float", number_t(123.456, 2));
     if (status)
         Serial.println("ok");
@@ -191,7 +198,7 @@ void setup()
 
     // Set double
 
-    Serial.print("Set double... ");
+    Serial.print("Setting the double value... ");
     status = Database.set<number_t>(aClient, "/test/double", number_t(1234.56789, 4));
     if (status)
         Serial.println("ok");
