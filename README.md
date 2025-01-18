@@ -3216,7 +3216,7 @@ Current sponsors
 
 <a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/13026382?s=35&v=4" width="30" height="30" alt="private sponsor"></a>
 <a href="https://github.com/Jagakatt"><img src="https://github.com/Jagakatt.png" width="30" height="30" alt="@Jagakatt"></a>
-<a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/166620797?s=35&v=4" width="30" height="30" alt="private sponsor"></a> <a href="https://github.com/Jagakatt"><img src="https://avatars.githubusercontent.com/u/42665078?s=60&v=4" width="30" height="30" alt="@siz0001"></a>
+<a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/166620797?s=35&v=4" width="30" height="30" alt="private sponsor"></a> <a href="https://github.com/siz0001"><img src="https://avatars.githubusercontent.com/u/42665078?s=60&v=4" width="30" height="30" alt="@siz0001"></a>
 
 Past sponsors
 
