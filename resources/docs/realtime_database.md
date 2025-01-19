@@ -270,24 +270,26 @@ class RealtimeDatabase
     #include <FS.h>
     File myFile; // Define the File object globally.
 
+    #defined FILESYSTEMS SPIFFS
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        myFile = SPIFFS.open(filename, "r");
+        myFile = FILESYSTEMS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        myFile = SPIFFS.open(filename, "w");
+        myFile = FILESYSTEMS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        myFile = SPIFFS.open(filename, "a");
+        myFile = FILESYSTEMS.open(filename, "a");
         break;
         
         case file_mode_remove:
-        SPIFFS.remove(filename);
+        FILESYSTEMS.remove(filename);
         break;
         
         default:
@@ -324,24 +326,26 @@ class RealtimeDatabase
     #include <FS.h>
     File myFile; // Define the File object globally.
 
+    #defined FILESYSTEMS SPIFFS
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        myFile = SPIFFS.open(filename, "r");
+        myFile = FILESYSTEMS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        myFile = SPIFFS.open(filename, "w");
+        myFile = FILESYSTEMS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        myFile = SPIFFS.open(filename, "a");
+        myFile = FILESYSTEMS.open(filename, "a");
         break;
         
         case file_mode_remove:
-        SPIFFS.remove(filename);
+        FILESYSTEMS.remove(filename);
         break;
         
         default:
@@ -545,24 +549,26 @@ class RealtimeDatabase
     #include <FS.h>
     File myFile; // Define the File object globally.
 
+    #defined FILESYSTEMS SPIFFS
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        myFile = SPIFFS.open(filename, "r");
+        myFile = FILESYSTEMS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        myFile = SPIFFS.open(filename, "w");
+        myFile = FILESYSTEMS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        myFile = SPIFFS.open(filename, "a");
+        myFile = FILESYSTEMS.open(filename, "a");
         break;
         
         case file_mode_remove:
-        SPIFFS.remove(filename);
+        FILESYSTEMS.remove(filename);
         break;
         
         default:
@@ -600,24 +606,26 @@ class RealtimeDatabase
     #include <FS.h>
     File myFile; // Define the File object globally.
 
+    #defined FILESYSTEMS SPIFFS
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        myFile = SPIFFS.open(filename, "r");
+        myFile = FILESYSTEMS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        myFile = SPIFFS.open(filename, "w");
+        myFile = FILESYSTEMS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        myFile = SPIFFS.open(filename, "a");
+        myFile = FILESYSTEMS.open(filename, "a");
         break;
         
         case file_mode_remove:
-        SPIFFS.remove(filename);
+        FILESYSTEMS.remove(filename);
         break;
         
         default:
@@ -754,24 +762,26 @@ class RealtimeDatabase
     #include <FS.h>
     File myFile; // Define the File object globally.
 
+    #defined FILESYSTEMS SPIFFS
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        myFile = SPIFFS.open(filename, "r");
+        myFile = FILESYSTEMS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        myFile = SPIFFS.open(filename, "w");
+        myFile = FILESYSTEMS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        myFile = SPIFFS.open(filename, "a");
+        myFile = FILESYSTEMS.open(filename, "a");
         break;
         
         case file_mode_remove:
-        SPIFFS.remove(filename);
+        FILESYSTEMS.remove(filename);
         break;
         
         default:
@@ -810,24 +820,26 @@ class RealtimeDatabase
     #include <FS.h>
     File myFile; // Define the File object globally.
 
+    #defined FILESYSTEMS SPIFFS
+
     void fileCallback(File &file, const char *filename, file_operating_mode mode)
     {
       switch (mode)
       {
         case file_mode_open_read:
-        myFile = SPIFFS.open(filename, "r");
+        myFile = FILESYSTEMS.open(filename, "r");
         break;
 
         case file_mode_open_write:
-        myFile = SPIFFS.open(filename, "w");
+        myFile = FILESYSTEMS.open(filename, "w");
         break;
         
         case file_mode_open_append:
-        myFile = SPIFFS.open(filename, "a");
+        myFile = FILESYSTEMS.open(filename, "a");
         break;
         
         case file_mode_remove:
-        SPIFFS.remove(filename);
+        FILESYSTEMS.remove(filename);
         break;
         
         default:
