@@ -1366,7 +1366,7 @@ private:
             }
 
             // Don't reset the payload remaining flag in case of chunked.
-            // It should set in readPayload when decodeChunks return -1.
+            // It should set in readPayload when decodeChunks returns -1.
             if (!sData->response.flags.chunks)
                 sData->response.flags.payload_remaining = false;
 

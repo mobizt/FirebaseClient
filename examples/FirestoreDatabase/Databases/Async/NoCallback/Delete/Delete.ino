@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to delete a Firestore database.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The OAuth2.0 authentication or access token authorization is required for deleting a Firestore database.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Databases::deleteDatabase(<AsyncClient>, <Firestore::Parent>, <etag>, <AsyncResult>);
  *
@@ -13,8 +26,6 @@
  *
  * If an etag is provided and does not match the current etag of the database,
  * deletion will be blocked and a FAILED_PRECONDITION error will be returned.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -102,8 +113,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -111,6 +120,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -137,10 +147,9 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Deletes a database... ");
-
         String etag;
 
+        Serial.println("Deleteing a database... ");
         Databases.deleteDatabase(aClient, Firestore::Parent(FIREBASE_PROJECT_ID, "myDb" /* database Id */), etag, asyncCB, "deleteTask");
     }
 }

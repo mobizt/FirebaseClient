@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to perform batch write the Firestore documents.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The OAuth2.0 authentication or access token authorization is required for performing batch write the Firestore documents.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::batchWrite(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResultCallback>, <uid>);
  *
@@ -11,8 +24,6 @@
  *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -100,8 +111,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -109,6 +118,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -135,8 +145,6 @@ void loop()
     {
         dataMillis = millis();
         counter++;
-
-        Serial.println("Batch write documents... ");
 
         String documentPath = "test_collection/test_document_map_value";
 
@@ -167,6 +175,7 @@ void loop()
 
         // You can set the content of write and writes objects directly with write.setContent("your content") and writes.setContent("your content")
 
+        Serial.println("Batch writing the documents... ");
         Docs.batchWrite(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, asyncCB, "batchWriteTask");
     }
 }

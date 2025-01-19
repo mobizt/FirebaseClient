@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to create a Firestore composite index.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ * 
+ * The OAuth2.0 authentication or access token authorization is required for indexing operations.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::CollectionGroups::Indexes::create(<AsyncClient>, <Firestore::Parent>, <collectionId>, <Index>, <AsyncResultCallback>, <uid>);
  *
@@ -12,8 +25,6 @@
  *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -99,8 +110,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -108,6 +117,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -133,8 +143,6 @@ void loop()
     if (app.ready() && !taskCompleted)
     {
         taskCompleted = true;
-
-        Serial.println("Creates a composite index... ");
 
         String collectionId = "a0", fieldPath1 = "myInt", fieldPath2 = "myDouble";
 
@@ -171,6 +179,7 @@ void loop()
 
         // You can set the content of index object directly with index.setContent("your content")
 
+        Serial.println("Creating a composite index... ");
         indexes.create(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, index, asyncCB, "createTask");
     }
 }

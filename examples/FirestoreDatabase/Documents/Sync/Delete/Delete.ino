@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to delete the Firestore document.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>);
  *
@@ -22,8 +33,6 @@
  * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
  *
  * The request will fail if Precondition is set and not met by the target document.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -107,8 +116,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -116,6 +123,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -142,10 +150,9 @@ void loop()
         // collection id > document id.
         String documentPath = "test_doc_deletion/my_doc";
 
-        Serial.println("Creating a document... ");
-
         Document<Values::Value> doc("myDouble", Values::Value(Values::DoubleValue(123.456)));
 
+        Serial.println("Creating a document... ");
         String payload = Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc);
 
         if (aClient.lastError().code() == 0)
@@ -154,7 +161,6 @@ void loop()
             printError(aClient.lastError().code(), aClient.lastError().message());
 
         Serial.println("Deleting a document... ");
-
         payload = Docs.deleteDoc(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, Precondition() /* Precondition (currentocument) */);
 
         if (aClient.lastError().code() == 0)

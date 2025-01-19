@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to import the documents from the Storage bucket.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ * 
+ * The OAuth2.0 authentication or access token authorization is required for importing the document operation.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Databases::importDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
  *
@@ -16,8 +29,6 @@
  *
  * Unspecified the collection ids means all collections included in the import.
  * Use comma (,) to separate between the collection ids.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -106,8 +117,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -115,6 +124,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -142,13 +152,13 @@ void loop()
         taskCompleted = true;
 
         // Assume that the document was already exported to the Storage bucket at test_path as in the example ExportDocuments.ino
-        Serial.println("Import documents from the Storage bucket... ");
 
         // This required the Owner and Editor permissions for the account.
         // See how to add permission here, https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
 
         EximDocumentOptions importOptions("" /* Which collection ids to import. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket that store the exported data */);
 
+        Serial.println("Importing the documents from the Storage bucket... ");
         Databases.importDocuments(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), importOptions, asyncCB, "importDocumentsTask");
     }
 }

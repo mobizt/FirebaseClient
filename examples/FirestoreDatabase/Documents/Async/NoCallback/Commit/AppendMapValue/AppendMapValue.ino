@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to append the map value in the Firestore document using commit.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::commit(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResult>);
  *
@@ -10,8 +21,6 @@
  *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -93,8 +102,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -102,6 +109,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     // Binding the FirebaseApp for authentication handler.
@@ -123,8 +131,6 @@ void loop()
         dataMillis = millis();
         counter++;
 
-        Serial.println("Commit a document (append map value in document)... ");
-
         // test_collection is the collection id, test_document is the document id.
         String documentPath = "test_collection/test_document";
 
@@ -144,6 +150,7 @@ void loop()
 
         // You can set the content of write and writes objects directly with write.setContent("your content") and writes.setContent("your content")
 
+        Serial.println("Appending the map value in the document... ");
         Docs.commit(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, aResult_no_callback);
     }
 

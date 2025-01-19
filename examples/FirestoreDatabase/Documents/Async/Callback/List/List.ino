@@ -1,7 +1,18 @@
 
 
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to list the Firestore document.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::list(<AsyncClient>, <Firestore::Parent>, <collectionId>, <ListDocumentsOptions>, <AsyncResultCallback>, <uid>);
  *
@@ -24,8 +35,6 @@
  * If a document has a field that is not present in this mask, that field will not be returned in the response.
  * ListDocumentsOptions::showMissing - Setting if the list should show missing documents.
  * A missing document is a document that does not exist but has sub-documents.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -109,8 +118,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -118,6 +125,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -149,11 +157,10 @@ void loop()
             // If the collection Id path contains space e.g. "a b/c d/e f"
             // It should encode the space as %20 then the collection Id will be "a%20b/c%20d/e%20f"
 
-            Serial.println("List the documents in a collection... ");
-
             ListDocumentsOptions listDocsOptions;
             listDocsOptions.pageSize(3).mask(DocumentMask("count")).showMissing(false);
 
+            Serial.println("Listing the documents in a collection... ");
             Docs.list(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, listDocsOptions, asyncCB, "listTask");
         }
     }

@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to list the Firestore collections.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The OAuth2.0 authentication or access token authorization is required for listing the Firestore collections.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>, <AsyncResultCallback>, <uid>);
  *
@@ -19,8 +32,6 @@
  * ListCollectionIdsOptions::readTime - The timestamp for reading the documents as they were at the given time.
  * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled,
  * can additionally be a whole minute timestamp within the past 7 days.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -105,8 +116,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -114,6 +123,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -143,12 +153,11 @@ void loop()
         // root collection
         String documentPath = "/";
 
-        Serial.print("List CollectionIds in a document... ");
-
         ListCollectionIdsOptions listCollectionIdsOptions;
 
         listCollectionIdsOptions.pageSize(3).pageToken("");
 
+        Serial.print("Listing the CollectionIds in a document... ");
         Docs.listCollectionIds(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, listCollectionIdsOptions, asyncCB, "listCollectionIdsTask");
     }
 }

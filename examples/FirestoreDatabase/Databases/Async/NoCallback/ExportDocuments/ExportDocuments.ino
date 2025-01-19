@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to export the Firestore documents.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The OAuth2.0 authentication or access token authorization is required for exporting the Firestore documents.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Databases::exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResult>);
  *
@@ -15,8 +28,6 @@
  *
  * Unspecified the collection ids means all collections will be exported.
  * Use comma (,) to separate between the collection ids.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -107,8 +118,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -116,6 +125,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -142,13 +152,12 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Export documents to the Storage bucket... ");
-
         // This required the Owner and Editor permissions for the account.
         // See how to add permission here, https://github.com/mobizt/Firebase-ESP-Client#iam-permission-and-api-enable
 
         EximDocumentOptions exportOptions("" /* Which collection ids to export. Unspecified means all collections. */, STORAGE_BUCKET_ID, "test_path" /* The path in the Firebase Storage bucket to store the data */);
 
+        Serial.println("Exporting the documents to the Storage bucket... ");
         Databases.exportDocuments(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), exportOptions, asyncCB, "exportDocumentsTask");
     }
 }

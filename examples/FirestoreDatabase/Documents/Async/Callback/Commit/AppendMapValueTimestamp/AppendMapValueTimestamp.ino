@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to append the map value timestamp in the document using commit.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::commit(<AsyncClient>, <Firestore::Parent>, <Writes>, <AsyncResultCallback>, <uid>);
  *
@@ -11,8 +22,6 @@
  *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -125,8 +134,6 @@ void loop()
         dataMillis = millis();
         counter++;
 
-        Serial.println("Commit a document (append map value in document)... ");
-
         // test_collection is the collection id, test_document is the document id.
         String documentPath = "test_collection/test_document_map_value_timestamp";
 
@@ -157,6 +164,7 @@ void loop()
 
         // You can set the content of write and writes objects directly with write.setContent("your content") and writes.setContent("your content")
 
+        Serial.println("Appending the map value timestamp in the document... ");
         Docs.commit(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, asyncCB, "commitTask");
     }
 }

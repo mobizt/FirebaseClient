@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to get the Firestore document.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>, <AsyncResult>);
  *
@@ -18,8 +29,6 @@
  * If the document has a field that is not present in this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
  * GetDocumentOptions::transaction - A base64-encoded string. If set, reads the document in a transaction.
  * GetDocumentOptions::readTime - A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -103,8 +112,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -112,6 +119,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     // Binding the FirebaseApp for authentication handler.
@@ -166,8 +174,7 @@ void loop()
         // If the document path contains space e.g. "a b c/d e f"
         // It should encode the space as %20 then the path will be "a%20b%20c/d%20e%20f"
 
-        Serial.println("Get a document... ");
-
+        Serial.println("Getting a document... ");
         Docs.get(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, GetDocumentOptions(DocumentMask("Singapore")), aResult_no_callback);
     }
 

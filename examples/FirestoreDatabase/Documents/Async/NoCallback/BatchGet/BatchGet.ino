@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to perform batch get multiple Firestore documents.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The OAuth2.0 authentication or access token authorization is required for performing the batch get multiple Firestore documents.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::batchGet(<AsyncClient>, <Firestore::Parent>, <BatchGetDocumentOptions>, <AsyncResult>);
  *
@@ -23,8 +36,6 @@
  * BatchGetDocumentOptions::transaction - Rreading the document in a transaction. A base64-encoded string.
  * BatchGetDocumentOptions::newTransaction - Creating the transaction.
  * BatchGetDocumentOptions::readTime - Setting the documents as they were at the given time. This may not be older than 270 seconds.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -110,8 +121,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -119,6 +128,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), aResult_no_callback);
 
     // Binding the FirebaseApp for authentication handler.
@@ -145,8 +155,6 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Get multiple documents...");
-
         BatchGetDocumentOptions options;
         options.documents("info/countries");
         options.documents("a0/b0");
@@ -155,6 +163,7 @@ void loop()
 
         // You can set the content of options object directly with options.setContent("your content")
 
+        Serial.println("Getting multiple documents...");
         Docs.batchGet(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), options, aResult_no_callback);
     }
 

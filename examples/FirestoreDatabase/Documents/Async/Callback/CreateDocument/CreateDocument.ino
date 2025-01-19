@@ -1,6 +1,17 @@
 
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to create the Firestore document.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::createDocument(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask>, <Document>, <AsyncResultCallback>, <uid>);
  *
@@ -18,8 +29,6 @@
  *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The Firestore database id should be (default) or empty "".
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -103,8 +112,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -112,6 +119,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -135,13 +143,12 @@ void loop()
         // We will create the documents in this parent path "test_doc_creation/doc_1/col_1/data_?"
         // (collection > document > collection > documents that contains fields).
 
-        // Note: If new document created under non-existent ancestor documents as in this example 
+        // Note: If new document created under non-existent ancestor documents as in this example
         // which the document "test_doc_creation/doc_1" does not exist, that document (doc_1) will not appear in queries and snapshot
         // https://cloud.google.com/firestore/docs/using-console#non-existent_ancestor_documents.
 
-        // In the console, you can create the ancestor document "test_doc_creation/doc_1" before running this example 
+        // In the console, you can create the ancestor document "test_doc_creation/doc_1" before running this example
         // to avoid non-existent ancestor documents case.
-
 
         String documentPath = "test_doc_creation/doc_1/col_1/data_";
 
@@ -205,7 +212,6 @@ void loop()
         // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
         Serial.println("Creating a document... ");
-
         Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc, asyncCB, "createDocumentTask");
     }
 }

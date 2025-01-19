@@ -1,6 +1,16 @@
-
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to query a Firestore database using run query.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Firestore::Documents::runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>);
  *
@@ -18,8 +28,6 @@
  * QueryOptions::newTransaction used for starting a new transaction and reads the documents. Defaults to a read-only transaction.
  * The new transaction ID will be returned as the first response in the stream.
  * QueryOptions::readTime used for reading the documents as they were at the given time.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -107,8 +115,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -116,6 +122,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -138,8 +145,6 @@ void loop()
     if (app.ready() && (millis() - dataMillis > 20000 || dataMillis == 0))
     {
         dataMillis = millis();
-
-        Serial.println("Querying a Firestore database... ");
 
         // You can run the CreateDocument.ino example to create the data before querying.
 
@@ -187,6 +192,7 @@ void loop()
 
         // You can set the content of queryOptions object directly with queryOptions.setContent("your content")
 
+        Serial.println("Querying a Firestore database... ");
         String payload = Docs.runQuery(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, queryOptions);
         queryOptions.clear();
 

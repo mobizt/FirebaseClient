@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to delete a Firestore composite index.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ * 
+ * The OAuth2.0 authentication or access token authorization is required for indexing operations.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * String Firestore::CollectionGroups::Indexes::deleteIndex(<AsyncClient>, <Firestore::Parent>, <collectionId>, <indexId>);
  *
@@ -12,8 +25,6 @@
  * The Firestore database id should be (default) or empty "".
  *
  * This function returns response payload when task is complete.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -103,8 +114,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -112,6 +121,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), aResult_no_callback);
 
     authHandler();
@@ -135,13 +145,12 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Deletes a composite index... ");
-
         // This index Id is obtained from the index of the result of index creation payload.
         // e.g. projects/xxxxxxxx/databases/(default)/collectionGroups/yyyyy/indexes/zzzzz
         String collectionId = "a0";
         String indexId = "zzzzz";
 
+        Serial.println("Deleting a composite index... ");
         String payload = indexes.deleteIndex(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), collectionId, indexId);
 
         if (aClient.lastError().code() == 0)

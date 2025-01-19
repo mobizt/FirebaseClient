@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to update a Firestore document using patch.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * String Firestore::Documents::patch(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask(updateMask)>, <DocumentMask(mask)>, <Document>, <Precondition(currentDocument)>);
  *
@@ -16,8 +27,6 @@
  * The Firestore database id should be (default) or empty "".
  *
  * This function returns response payload when task is complete.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -105,8 +114,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -114,6 +121,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -155,8 +163,7 @@ void loop()
 
             // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
-            Serial.println("Create a document... ");
-
+            Serial.println("Creating a document... ");
             String payload = Docs.createDocument(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, DocumentMask(), doc);
 
             if (aClient.lastError().code() == 0)
@@ -174,8 +181,6 @@ void loop()
 
         // The value of Values::xxxValue, Values::Value and Document can be printed on Serial.
 
-        Serial.println("Update a document... ");
-
         /** if updateMask contains the field name that exists in the remote document and
          * this field name does not exist in the document (content), that field will be deleted from remote document
          */
@@ -184,6 +189,7 @@ void loop()
 
         // You can set the content of doc object directly with doc.setContent("your content")
 
+        Serial.println("Updating a document... ");
         String payload = Docs.patch(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), documentPath, patchOptions, doc);
 
         if (aClient.lastError().code() == 0)
