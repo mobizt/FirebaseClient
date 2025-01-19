@@ -1,7 +1,20 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to get the object metadata.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ * 
+ * The OAuth2.0 authentication or access token authorization is required for Cloud Storage operations.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
  *
- * CloudStorage::getMetadata(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
+ * 1.------------------------
+ *
+ * CloudStorage::getMetadata(<AsyncClient>, <GoogleCloudStorage::Parent>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
  * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
@@ -11,9 +24,7 @@
  * <uid> - The user specified UID of async result (optional).
  *
  * The bucketid is the Storage bucket Id of object to get metadata.
- * The object is the object in Storage bucket to get metadata.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
+ * The object is the object in Cloud Storage bucket to get metadata.
  */
 
 #include <Arduino.h>
@@ -102,8 +113,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -111,6 +120,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -137,10 +147,9 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Get object metadata...");
-
         GoogleCloudStorage::GetOptions options;
 
+        Serial.println("Getting the object metadata...");
         cstorage.getMetadata(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), options, asyncCB, "getMetadataTask");
     }
 }

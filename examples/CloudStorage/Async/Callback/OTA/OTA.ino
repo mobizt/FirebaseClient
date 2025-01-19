@@ -1,7 +1,20 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to perform OTA firmware update using object (bin file) stores in Cloud Storage bucket.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ * 
+ * The OAuth2.0 authentication or access token authorization is required for Cloud Storage operations.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
  *
- * CloudStorage::ota(<AsyncClient>, <FirebaseStorage::Parent>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
+ * 1.------------------------
+ *
+ * CloudStorage::ota(<AsyncClient>, <GoogleCloudStorage::Parent>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
  *
  * <AsyncClient> - The async client.
  * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
@@ -11,9 +24,7 @@
  * <uid> - The user specified UID of async result (optional).
  *
  * The bucketid is the Storage bucket Id of object to download.
- * The object is the object to be downloaded in the Storage bucket.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
+ * The object is the object to be downloaded in the Cloud Storage bucket.
  */
 
 #include <Arduino.h>
@@ -37,7 +48,7 @@
 
 // For Arduino SAMD21 OTA supports.
 // See https://github.com/mobizt/FirebaseClient#ota-update.
-#if defined(ARDUINO_ARCH_SAMD) 
+#if defined(ARDUINO_ARCH_SAMD)
 #include <Internal_Storage_OTA.h>
 #define OTA_STORAGE InternalStorage
 #endif
@@ -111,8 +122,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -121,6 +130,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -147,14 +157,13 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("OTA update download...");
-
 #if defined(OTA_STORAGE)
         cstorage.setOTAStorage(OTA_STORAGE);
 #endif
 
         GoogleCloudStorage::GetOptions options;
 
+        Serial.println("Updating your firmware (OTA)... ");
         cstorage.ota(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), options, asyncCB, "otaTask");
     }
 }

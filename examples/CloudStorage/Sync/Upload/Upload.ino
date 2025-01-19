@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to upload object (file) to Cloud Storage bucket.
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ * 
+ * The OAuth2.0 authentication or access token authorization is required for Cloud Storage operations.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * FileConfig::FileConfig(<file_name>, <file_callback>);
  *
@@ -11,9 +24,9 @@
  *
  * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
- * SYNTAX:
+ * 2.------------------------
  *
- * bool CloudStorage::upload(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <GoogleCloudStorage::uploadOptions>);
+ * bool CloudStorage::upload(<AsyncClient>, <GoogleCloudStorage::Parent>, <file_config_data>, <GoogleCloudStorage::uploadOptions>);
  *
  * <AsyncClient> - The async client.
  * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
@@ -23,11 +36,9 @@
  * For insert properties (options.insertProps), see https://cloud.google.com/storage/docs/json_api/v1/objects/insert#optional-properties
  *
  * The bucketid is the Storage bucket Id of object to upload.
- * The object is the object to be stored in the Storage bucket.
+ * The object is the object to be stored in the Cloud Storage bucket.
  *
  * This function returns bool status when task is complete.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -140,8 +151,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -149,6 +158,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), aResult_no_callback);
 
     authHandler();
@@ -176,8 +186,6 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Upload file...");
-
         GoogleCloudStorage::uploadOptions options;
         options.mime = "media.mp4";
         options.uploadType = GoogleCloudStorage::upload_type_resumable;
@@ -188,6 +196,7 @@ void loop()
         // There is no upload progress available for sync upload.
         // To get the upload progress, use async upload instead.
 
+        Serial.println("Uploading file...");
         bool result = cstorage.upload(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options);
 
         if (result)
