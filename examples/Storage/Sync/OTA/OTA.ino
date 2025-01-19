@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to perform OTA firmware update using object (bin file) stores in Storage bucket.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * bool Storage::ota(<AsyncClient>, <FirebaseStorage::Parent>);
  *
@@ -11,8 +22,6 @@
  * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
  *
  * This function returns bool status when task is complete.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA)
@@ -104,8 +113,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -114,6 +121,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
@@ -137,8 +145,6 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("OTA update download...");
-
 #if defined(OTA_STORAGE)
         storage.setOTAStorage(OTA_STORAGE);
 #endif
@@ -146,6 +152,7 @@ void loop()
         // There is no OTA download progress available for sync OTA download.
         // To get the OTA download progress, use async OTA download instead.
 
+        Serial.println("Updating your firmware (OTA)... ");
         bool result = storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"));
         // You can provide the access token in case non-authentication mode (NoAuth) for priviledge access file download.
         // bool result = storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin", "access token"));

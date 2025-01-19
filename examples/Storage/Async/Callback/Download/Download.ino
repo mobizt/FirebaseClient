@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to download the object (file) from the Storage bucket.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * FileConfig::FileConfig(<file_name>, <file_callback>);
  *
@@ -11,7 +22,7 @@
  *
  * The file name can be a name of source (input) and target (output) file that used in upload and download.
  *
- * SYNTAX:
+ * 2.------------------------
  *
  * Storage::download(<AsyncClient>, <FirebaseStorage::Parent>, <file_config_data>, <AsyncResultCallback>, <uid>);
  *
@@ -24,8 +35,6 @@
  * The bucketid is the Storage bucket Id of object to download.
  * The object is the object in Storage bucket to download.
  * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -125,8 +134,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -134,6 +141,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -158,9 +166,8 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Download object...");
-
 #if defined(ENABLE_FS)
+        Serial.println("Downloading the object...");
         storage.download(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), asyncCB, "downloadTask");
         // You can provide the access token in case non-authentication mode (NoAuth) for priviledge access file download.
         // storage.download(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4", "access token"), getFile(media_file), asyncCB, "downloadTask");

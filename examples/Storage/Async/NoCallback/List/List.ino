@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to list all objects in Storage bucket.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Storage::list(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResult>);
  *
@@ -8,8 +19,6 @@
  * <AsyncResult> - The async result (AsyncResult).
  *
  * The bucketid is the Storage bucket Id to list all objects.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA)
@@ -87,8 +96,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -96,6 +103,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     // Binding the FirebaseApp for authentication handler.
@@ -116,8 +124,7 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("List all objects...");
-
+        Serial.println("Listing all objects...");
         storage.list(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID), aResult_no_callback);
     }
 

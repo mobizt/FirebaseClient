@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to get the object metadata.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * Storage::getMetadata(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResultCallback>, <uid>);
  *
@@ -10,8 +21,6 @@
  *
  * The bucketid is the Storage bucket Id of object to get metadata.
  * The object is the object in Storage bucket to get metadata.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -90,8 +99,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -99,6 +106,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -119,8 +127,7 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("Get object metadata...");
-
+        Serial.println("Getting object metadata...");
         storage.getMetadata(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), asyncCB, "getMetadataTask");
     }
 }

@@ -1,5 +1,18 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to List the functions that belong to a project (Cloud Functions).
+ *
+ * This example uses the ServiceAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The OAuth2.0 authentication or access token authorization is required for Cloud Functions operations.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * CloudFunctions::list(<AsyncClient>, <GoogleCloudFunctions::Parent>, <GoogleCloudFunctions::ListOptions>, <AsyncResultCallback>, <uid>);
  *
@@ -12,9 +25,6 @@
  *
  * The Firebase project Id should be only the name without the firebaseio.com.
  * The location name is the project location.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
  */
 
 #include <Arduino.h>
@@ -103,8 +113,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -112,6 +120,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(sa_auth), asyncCB, "authTask");
 
     // Binding the FirebaseApp for authentication handler.
@@ -138,8 +147,6 @@ void loop()
     {
         taskCompleted = true;
 
-        Serial.println("List of functions that belong to a project...");
-
         GoogleCloudFunctions::ListOptions options;
         String filter = "name:projects/";
         filter += FIREBASE_PROJECT_ID;
@@ -149,6 +156,7 @@ void loop()
 
         options.filter(filter).pageSize(1);
 
+        Serial.println("Listing the functions that belong to a project...");
         cfunctions.list(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), options, asyncCB, "listTask");
     }
 }
