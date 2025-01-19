@@ -1,5 +1,15 @@
-/** 
+/**
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for working mobile GSM/4G/5G network using TinyGsmClient.h.
+ *
+ * The divices used in this example are LilyGO TTGO T-A7670 development board (SIMA7670) and ESP32.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * GSMNetwork::GSMNetwork(<modem>, <gsm_pin>, <apn>, <user>, <password>);
  *
@@ -11,9 +21,6 @@
  *
  * In ESP32 Core v3.x.x, PPP devices are natively supported.
  * See examples/App/NetworkInterfaces/Async/NoCallback/DefaultNetworks/DefaultPPPNetwork/ESP32/ESP32.ino
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
  */
 
 #include <Arduino.h>
@@ -149,8 +156,7 @@ void setup()
 
     ssl_client.setClient(&gsm_client);
 
-    Serial.println("Initializing app...");
-
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 }
 

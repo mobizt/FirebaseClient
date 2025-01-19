@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to send the user verification email.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * verify(<AsyncClient>, <FirebaseApp>, <user_auth_data>, <AsyncResult>);
  *
@@ -7,9 +18,6 @@
  * <FirebaseApp> - The FirebaseApp class object to handle authentication/authorization task.
  * <user_auth_data> - The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
  * <AsyncResult> - The async result (AsyncResult).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
  */
 
 #include <Arduino.h>
@@ -88,8 +96,7 @@ void setup()
 #endif
 #endif
 
-    Serial.println("Send verifying email...");
-
+    Serial.println("Sending user verification email...");
     verify(aClient, app, getAuth(user.email("user@gmail.com").idToken(idtoken)), aResult_no_callback);
 }
 

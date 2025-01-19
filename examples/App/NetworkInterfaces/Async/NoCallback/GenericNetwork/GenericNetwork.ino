@@ -1,13 +1,20 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for working with any networks.
+ *
+ * The divices used in this example are WIZnet W5500 SPI Ethernet module and ESP32.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * GenericNetwork::GenericNetwork(<net_connect_callback>, <network_status_callback>);
  *
  * <net_connect_callback> - The network connection callback function.
  * <network_status_callback> - The network status callback function.
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
  */
 
 #include <Arduino.h>
@@ -72,8 +79,6 @@ void setup()
 
   Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-  Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
   ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -81,6 +86,7 @@ void setup()
 #endif
 #endif
 
+  Serial.println("Initializing the app...");
   initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 }
 

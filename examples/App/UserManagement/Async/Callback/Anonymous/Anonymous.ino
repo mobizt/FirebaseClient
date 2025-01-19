@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The non-blocking (async) example to sign up anonymously as guest.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * signup(<AsyncClient>, <FirebaseApp>, <user_auth_data>, <AsyncResultCallback>, <uid>);
  *
@@ -8,9 +19,6 @@
  * <user_auth_data> - The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
  * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
  * <uid> - The user specified UID of async result (optional).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
  */
 
 #include <Arduino.h>

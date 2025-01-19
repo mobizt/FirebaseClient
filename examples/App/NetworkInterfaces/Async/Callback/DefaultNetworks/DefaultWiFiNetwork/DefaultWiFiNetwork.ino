@@ -1,5 +1,14 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for working with multi-AP WiFi network 
+ * on any WiFi capable devices.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * DefaultWiFiNetwork::DefaultWiFiNetwork(<FirebaseWiFi>, <re_connect_option>);
  *
@@ -9,7 +18,6 @@
  * This type of network class is for WiFi Multi or device that use WiFi class that does not support WiFi reconnection.
  *
  * For normal WiFi, see examples/NetworkInterfaces/DefaultNetwork/DefaultNetwork.ino
- *
  */
 
 #include <Arduino.h>
@@ -82,8 +90,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -91,6 +97,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 }
 

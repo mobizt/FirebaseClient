@@ -1,6 +1,11 @@
 /**
- * This example shows how to switch the network interfaces between WiFi and Ethernet.
- * The ESP32 and W5500 Ethernet module are used in this example.
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for how to switch the network interfaces between WiFi and Ethernet.
+ *
+ * The divices used in this example are WIZnet W5500 SPI Ethernet module and ESP32.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -64,14 +69,13 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
     wifi_ssl_client.setInsecure();
 
     ethernet_ssl_client.setInsecure();
     ethernet_ssl_client.setBufferSizes(1024, 512);
     ethernet_ssl_client.setClient(&ethernet_client);
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 }
 

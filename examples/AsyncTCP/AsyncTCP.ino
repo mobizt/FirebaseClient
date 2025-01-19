@@ -1,4 +1,8 @@
 /**
+ * ABOUT:
+ * 
+ * The bare minimum non-blocking (async) example for working with async TCP Client.
+ * 
  * This example does not include any async TCP client library, you have to include it prior to use and
  * async TCP should support SSL.
  *
@@ -79,7 +83,7 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
+    Serial.println("Initializing the app...");
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");

@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum non-blocking (async) example for working with the Ethernet network 
+ * using Ethernet.h.
+ * 
+ * The divices used in this example are WIZnet W5500 SPI Ethernet module and ESP32.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * EthernetNetwork::EthernetNetwork(<mac>, <cs_pin>, <reset_pin>);
  * EthernetNetwork::EthernetNetwork(<mac>, <cs_pin>, <reset_pin>, <static_ip>);
@@ -13,8 +24,6 @@
  *
  * <local_ip>, <subnet>, <gateway> and <dns_server> - The static IP, subnet, default gateway and dns server IPs.
  * <optional> - The boolean option to force use static ip only (not use DHCP)
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -77,8 +86,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
     ssl_client.setClient(&eth);
 
     ssl_client.setInsecure();
@@ -86,6 +93,7 @@ void setup()
     ssl_client.setBufferSizes(4096, 1024);
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 }
 

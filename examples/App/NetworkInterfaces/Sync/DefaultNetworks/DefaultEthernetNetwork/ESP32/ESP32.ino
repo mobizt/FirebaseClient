@@ -1,11 +1,15 @@
 
 
 /**
- * This example is for the LAN8720 module that connected with ESP32.
- * 
+ * ABOUT:
+ *
+ * The bare minimum blocking (sync) example for working with the ESP32 Arduino Core Ethernet network using ETH.h.
+ *
+ * The divices used in this example are LAN8720 Ethernet module and ESP32.
+ *
  * In case of external LAN8720 module, the following hardeare connection is recommended.
  * Some EV board e.g. Olimex ESP32-EVB board has built with LAN8720 chip on board, the modification is not needed.
- * 
+ *
  * The modification and interconnection of external LAN8720 module provided in this example are mostly worked as
  * the 50 MHz clock was created internally in ESP32 which GPIO 17 is set to be output of this clock
  * and feeds to the LAN8720 chip XTAL input.
@@ -30,7 +34,8 @@
  * GND                          GND
  * 3V3                          VCC
  *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  *
  */
 
@@ -88,7 +93,7 @@ AsyncResult aResult_no_callback;
 // RMII clock output from GPIO17 (for modified LAN8720 module only)
 // For LAN8720 built-in, RMII clock input at GPIO 0 from LAN8720 e.g. Olimex ESP32-EVB board
 // #define ETH_CLK_MODE ETH_CLOCK_GPIO0_IN
-#define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT 
+#define ETH_CLK_MODE ETH_CLOCK_GPIO17_OUT
 
 static bool eth_connected = false;
 
@@ -179,7 +184,7 @@ void setup()
 
     Serial.begin(115200);
 
-    // This delay is needed in case ETH_CLK_MODE was set to ETH_CLOCK_GPIO0_IN, 
+    // This delay is needed in case ETH_CLK_MODE was set to ETH_CLOCK_GPIO0_IN,
     // to allow the external clock source to be ready before initialize the Ethernet.
     delay(500);
 
@@ -196,10 +201,9 @@ void setConfig()
 
     firebaseConfigReady = true;
 
-    Serial.println("Initializing app...");
-
     ssl_client.setInsecure();
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 }
 

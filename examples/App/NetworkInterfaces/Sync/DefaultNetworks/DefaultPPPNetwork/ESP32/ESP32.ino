@@ -1,7 +1,11 @@
 
 
 /**
- * This example is for ESP32 Core v3.x.x and the SIM modules.
+ * ABOUT:
+ *
+ * The bare minimum blocking (sync) example for working with the ESP32 Arduino Core (v3.x.x) PPP network.
+ *
+ * The divices used in this example are WaveShare SIM7600 GSM module and ESP32.
  *
  * WaveShare SIM7600 with hardware Flow Control
  *
@@ -30,8 +34,7 @@
  * The PPP ESP32 example was taken from
  * https://github.com/espressif/arduino-esp32/blob/master/libraries/PPP/examples/PPP_Basic/PPP_Basic.ino
  *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #include <Arduino.h>
@@ -228,10 +231,9 @@ void setConfig()
 
     firebaseConfigReady = true;
 
-    Serial.println("Initializing app...");
-
     ssl_client.setInsecure();
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 }
 

@@ -1,7 +1,11 @@
 
 
 /**
- * This example is for the LAN8720 module that connected with ESP32.
+ * ABOUT:
+ * 
+ * The bare minimum non-blocking (async) example for working with the ESP32 Arduino Core Ethernet network using ETH.h.
+ * 
+ * The divices used in this example are LAN8720 Ethernet module and ESP32.
  * 
  * In case of external LAN8720 module, the following hardeare connection is recommended.
  * Some EV board e.g. Olimex ESP32-EVB board has built with LAN8720 chip on board, the modification is not needed.
@@ -31,7 +35,7 @@
  * 3V3                          VCC
  * 
  *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  *
  */
 
@@ -194,10 +198,9 @@ void setConfig()
 
     firebaseConfigReady = true;
 
-    Serial.println("Initializing app...");
-
     ssl_client.setInsecure();
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 }
 

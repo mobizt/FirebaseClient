@@ -1,5 +1,16 @@
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to sign up a new user.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * signup(<AsyncClient>, <FirebaseApp>, <user_auth_data>, <AsyncResult>);
  *
@@ -7,9 +18,6 @@
  * <FirebaseApp> - The FirebaseApp class object to handle authentication/authorization task.
  * <user_auth_data> - The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
  * <AsyncResult> - The async result (AsyncResult).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
  */
 
 #include <Arduino.h>
@@ -90,7 +98,6 @@ void setup()
 #endif
 
     Serial.println("Signing up...");
-
     signup(aClient, app, getAuth(user.email("user@gmail.com").password("user_password")), aResult_no_callback);
 
     authHandler();

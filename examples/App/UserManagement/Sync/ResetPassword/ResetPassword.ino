@@ -1,6 +1,17 @@
 
 /**
+ * ABOUT:
+ *
+ * The blocking (sync) example to reset the user password.
+ *
+ * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * resetPassword(<AsyncClient>, <FirebaseApp>, <user_auth_data>, <AsyncResult>);
  *
@@ -8,9 +19,6 @@
  * <FirebaseApp> - The FirebaseApp class object to handle authentication/authorization task.
  * <user_auth_data> - The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
  * <AsyncResult> - The async result (AsyncResult).
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
- *
  */
 
 #include <Arduino.h>
@@ -87,11 +95,10 @@ void setup()
 #endif
 #endif
 
-    Serial.println("Resetting password...");
-
     // The id token obtained from app.token() when initialize app with UserAuth
     const char *idtoken = "id token";
 
+    Serial.println("Resetting password...");
     resetPassword(aClient, app, getAuth(user.email("user@gmail.com").idToken(idtoken)), aResult_no_callback);
 
     authHandler();

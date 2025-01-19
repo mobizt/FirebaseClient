@@ -1,11 +1,10 @@
 /**
- * SYNTAX:
+ * ABOUT:
  *
- * DefaultEthernetNetwork::DefaultEthernetNetwork(<Firebase_SPI_ETH_Module>);
- *
- * <Firebase_SPI_ETH_Module> - The Firebase_SPI_ETH_Module class object that keeping the pointer to lwip driver for each
- * SPI Ethernet module (e.g. ENC28J60lwIP, W5100lwIP and W5500lwIP).
- *
+ * The bare minimum non-blocking (async) example for working with the ESP8266 Arduino Core Ethernet network
+ * using ENC28J60lwIP.h, Wiznet5100lwIP.h and Wiznet5500lwIP.h.
+ * 
+ * The divices used in this example are ENC28J60 Ethernet module and ESP8266.
  *
  * The ENC28J60 Ethernet module and ESP8266 board, SPI port wiring connection.
  *
@@ -18,8 +17,16 @@
  * GND                                       GND
  * 3V3                                       VCC
  *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  *
+ * SYNTAX:
+ *
+ * 1.------------------------
+ *
+ * DefaultEthernetNetwork::DefaultEthernetNetwork(<Firebase_SPI_ETH_Module>);
+ *
+ * <Firebase_SPI_ETH_Module> - The Firebase_SPI_ETH_Module class object that keeping the pointer to lwip driver for each
+ * SPI Ethernet module (e.g. ENC28J60lwIP, W5100lwIP and W5500lwIP).
  */
 
 #include <Arduino.h>
@@ -113,11 +120,10 @@ void setup()
 
     Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
     ssl_client.setInsecure();
     ssl_client.setBufferSizes(4096, 1024);
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 }
 

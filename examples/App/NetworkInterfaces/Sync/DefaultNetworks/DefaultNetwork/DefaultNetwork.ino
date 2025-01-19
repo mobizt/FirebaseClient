@@ -1,5 +1,14 @@
 /**
+ * ABOUT:
+ *
+ * The bare minimum blocking (sync) example for working with the native WiFi network
+ * on any WiFi capable devices.
+ *
+ * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ *
  * SYNTAX:
+ *
+ * 1.------------------------
  *
  * DefaultNetwork::DefaultNetwork(<re_connect_option>);
  *
@@ -82,8 +91,6 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
-
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
 #if defined(ESP8266)
@@ -91,6 +98,7 @@ void setup()
 #endif
 #endif
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
