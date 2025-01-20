@@ -42,9 +42,7 @@ private:
 public:
     uint32_t readTimeout = 0;
     String writeSizeLimit;
-    bool shallow = false;
-    bool silent = false;
-    bool classicRequest = false;
+    bool shallow = false, silent = false, classicRequest = false;
     DatabaseFilter filter;
 
     void copy(const DatabaseOptions &rhs)
@@ -70,8 +68,7 @@ public:
     }
 
 private:
-    bool base64 = false;
-    bool ota = false;
+    bool base64 = false, ota = false;
 };
 
 #endif

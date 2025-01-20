@@ -1,5 +1,5 @@
 /**
- * Created June 25, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -49,9 +49,9 @@ protected:
 
     app_event_t *getAppEvent(AsyncClientClass *aClient) { return &aClient->app_event; }
 
-    void stopAsync(AsyncClientClass *aClient, async_data_item_t *sData) { aClient->stop(sData); }
+    void stopAsync(AsyncClientClass *aClient, async_data *sData) { aClient->stop(sData); }
 
-    async_data_item_t *createSlotBase(AsyncClientClass *aClient, slot_options_t &soption)
+    async_data *createSlotBase(AsyncClientClass *aClient, slot_options_t &soption)
     {
         if (aClient)
             return aClient->createSlot(soption);
@@ -60,13 +60,13 @@ protected:
 
     AsyncResult *getResultBase(AsyncClientClass *aClient) { return aClient->getResult(); }
 
-    void newRequestBase(AsyncClientClass *aClient, async_data_item_t *sData, const String &url, const String &path, const String &extras, async_request_handler_t::http_request_method method, const slot_options_t &options, const String &uid) { aClient->newRequest(sData, url, path, extras, method, options, uid); }
+    void newRequestBase(AsyncClientClass *aClient, async_data *sData, const String &url, const String &path, const String &extras, reqns::http_request_method method, const slot_options_t &options, const String &uid) { aClient->newRequest(sData, url, path, extras, method, options, uid); }
 
     void setAuthTsBase(AsyncClientClass *aClient, uint32_t ts) { aClient->auth_ts = ts; }
 
     void addRemoveClientVecBase(AsyncClientClass *aClient, uint32_t cvec_addr, bool add) { aClient->addRemoveClientVec(cvec_addr, add); }
 
-    void setContentLengthBase(AsyncClientClass *aClient, async_data_item_t *sData, size_t len) { aClient->setContentLength(sData, len); }
+    void setContentLengthBase(AsyncClientClass *aClient, async_data *sData, size_t len) { aClient->setContentLength(sData, len); }
 
     void handleRemoveBase(AsyncClientClass *aClient) { aClient->handleRemove(); }
 

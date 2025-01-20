@@ -1,5 +1,5 @@
 /**
- * Created October 29, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -41,20 +41,20 @@ namespace GoogleCloudFunctions
 {
     enum google_cloud_functions_request_type
     {
-        google_cloud_functions_request_type_undefined,
-        google_cloud_functions_request_type_create,
-        google_cloud_functions_request_type_delete,
-        google_cloud_functions_request_type_call,
-        google_cloud_functions_request_type_deploy,
-        google_cloud_functions_request_type_download,
-        google_cloud_functions_request_type_list,
-        google_cloud_functions_request_type_get,
-        google_cloud_functions_request_type_patch,
-        google_cloud_functions_request_type_gen_downloadUrl,
-        google_cloud_functions_request_type_gen_uploadUrl,
-        google_cloud_functions_request_type_get_iam_policy,
-        google_cloud_functions_request_type_set_iam_policy,
-        google_cloud_functions_request_type_test_iam_permission
+        fn_undefined,
+        fn_create,
+        fn_delete,
+        fn_call,
+        fn_deploy,
+        fn_download,
+        fn_list,
+        fn_get,
+        fn_patch,
+        fn_gen_downloadUrl,
+        fn_gen_uploadUrl,
+        fn_get_iam_policy,
+        fn_set_iam_policy,
+        fn_test_iam_permission
     };
 
     // Severity of the state message.
@@ -566,7 +566,7 @@ namespace GoogleCloudFunctions
     public:
         String payload, extras;
         GoogleCloudFunctions::Parent parent;
-        google_cloud_functions_request_type requestType = google_cloud_functions_request_type_undefined;
+        google_cloud_functions_request_type requestType = fn_undefined;
         unsigned long requestTime = 0;
         void copy(const DataOptions &rhs)
         {
@@ -577,21 +577,21 @@ namespace GoogleCloudFunctions
     private:
     };
 
-    struct async_request_data_t
+    struct req_data
     {
     public:
         AsyncClientClass *aClient = nullptr;
         String path;
         String uid;
         String mime;
-        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
+        reqns::http_request_method method = reqns::http_undefined;
         slot_options_t opt;
         DataOptions *options = nullptr;
         file_config_data *file = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
-        async_request_data_t() {}
-        explicit async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        req_data() {}
+        explicit req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;

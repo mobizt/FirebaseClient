@@ -1,5 +1,5 @@
 /**
- * Created August 4, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -96,7 +96,7 @@ public:
      */
     String send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message)
     {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, message.c_str(), Messages::firebase_cloud_messaging_request_type_send, false);
+        sendRequest(aClient, aClient.getResult(), NULL, "", parent, message.c_str(), Messages::fcm_send, false);
         return aClient.getResult()->c_str();
     }
 
@@ -114,7 +114,7 @@ public:
      */
     void send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message, AsyncResult &aResult)
     {
-        sendRequest(aClient, &aResult, NULL, "", parent, message.c_str(), Messages::firebase_cloud_messaging_request_type_send, true);
+        sendRequest(aClient, &aResult, NULL, "", parent, message.c_str(), Messages::fcm_send, true);
     }
 
     /** Send a message to specified target (a registration token, topic or condition) with HTTP v1 API.
@@ -132,17 +132,13 @@ public:
      */
     void send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message, AsyncResultCallback cb, const String &uid = "")
     {
-        sendRequest(aClient, nullptr, cb, uid, parent, message.c_str(), Messages::firebase_cloud_messaging_request_type_send, true);
+        sendRequest(aClient, nullptr, cb, uid, parent, message.c_str(), Messages::fcm_send, true);
     }
 
 private:
-    String service_url;
-    String path;
-    String uid;
+    String service_url, path, uid;
     // FirebaseApp address and FirebaseApp vector address
-    uint32_t app_addr = 0, avec_addr = 0;
-    // Not used but required.
-    uint32_t ul_dl_task_running_addr = 0;
+    uint32_t app_addr = 0, avec_addr = 0, ul_dl_task_running_addr = 0;
     app_token_t *app_token = nullptr;
 
     void url(const String &url)
@@ -171,21 +167,22 @@ private:
 
     void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Messages::Parent &parent, const String &payload, Messages::firebase_cloud_messaging_request_type requestType, bool async)
     {
-        Messages::DataOptions options;
+        using namespace Messages;
+        DataOptions options;
         options.requestType = requestType;
         options.parent = parent;
-        if (requestType == Messages::firebase_cloud_messaging_request_type_send)
+        if (requestType == fcm_send)
         {
             JSONUtil jut;
             jut.addObject(options.payload, "message", payload, false, true);
             options.extras += FPSTR("/messages:send");
         }
 
-        Messages::async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
+        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
     }
 
-    void asyncRequest(Messages::async_request_data_t &request, int beta = 0)
+    void asyncRequest(Messages::req_data &request, int beta = 0)
     {
         URLUtil uut;
         app_token_t *atoken = appToken();
@@ -209,7 +206,7 @@ private:
 
         url(FPSTR("fcm.googleapis.com"));
 
-        async_data_item_t *sData = request.aClient->createSlot(request.opt);
+        async_data *sData = request.aClient->createSlot(request.opt);
 
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
@@ -218,7 +215,7 @@ private:
 
         if (request.options->payload.length())
         {
-            sData->request.val[req_hndlr_ns::payload] = request.options->payload;
+            sData->request.val[reqns::payload] = request.options->payload;
             request.aClient->setContentLength(sData, request.options->payload.length());
         }
 
@@ -230,13 +227,13 @@ private:
         if (request.aResult)
             sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->rVec)));
 
-        sData->download = request.method == async_request_handler_t::http_get && sData->request.file_data.filename.length();
+        sData->download = request.method == reqns::http_get && sData->request.file_data.filename.length();
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
     }
 
-    void setClientError(Messages::async_request_data_t &request, int code)
+    void setClientError(Messages::req_data &request, int code)
     {
         AsyncResult *aResult = request.aResult;
 
@@ -255,7 +252,7 @@ private:
         }
     }
 
-    void addParams(const Messages::async_request_data_t &request, String &extras)
+    void addParams(const Messages::req_data &request, String &extras)
     {
         extras += request.options->extras;
         extras.replace(" ", "%20");

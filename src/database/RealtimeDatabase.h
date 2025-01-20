@@ -1,5 +1,5 @@
 /**
- * Created January 19, 2025
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -99,7 +99,7 @@ public:
     template <typename T = int>
     auto get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL);
         asyncRequest(aReq);
         return aClient.getResult()->rtdbResult.to<T>();
     }
@@ -142,7 +142,7 @@ public:
     template <typename T = int>
     auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, false, false, false, options.shallow), &options, nullptr, aClient.getResult(), NULL);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, false, false, false, options.shallow), &options, nullptr, aClient.getResult(), NULL);
         asyncRequest(aReq);
         return aClient.getResult()->rtdbResult.to<T>();
     }
@@ -162,7 +162,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, bool sse = false)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, &aResult, NULL);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -182,7 +182,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -208,7 +208,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, &aResult, NULL);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -235,7 +235,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb, uid);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -249,7 +249,7 @@ public:
      * #include <FS.h>
      * File myFile; // Define the File object globally.
      * #defined FILESYSTEMS SPIFFS
-     * 
+     *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
      *   switch (mode)
@@ -287,7 +287,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, NULL);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -301,7 +301,7 @@ public:
      * #include <FS.h>
      * File myFile; // Define the File object globally.
      * #defined FILESYSTEMS SPIFFS
-     * 
+     *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
      *   switch (mode)
@@ -340,7 +340,7 @@ public:
      */
     void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), nullptr, &file, nullptr, cb, uid);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -360,7 +360,7 @@ public:
     {
         DatabaseOptions options;
         options.silent = true;
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(), &options, nullptr, aClient.getResult(), NULL);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(), &options, nullptr, aClient.getResult(), NULL);
         asyncRequest(aReq);
         return !getNullETagOption(&aClient.getResult()->rtdbResult);
     }
@@ -381,7 +381,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, &aResult, NULL);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq);
     }
 
@@ -402,7 +402,7 @@ public:
      */
     void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, nullptr, cb, uid);
+        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -428,7 +428,7 @@ public:
     template <typename T = const char *>
     bool set(AsyncClientClass &aClient, const String &path, T value)
     {
-        return storeAsync(aClient, path, value, async_request_handler_t::http_put, false, aClient.getResult(), NULL, "");
+        return storeAsync(aClient, path, value, reqns::http_put, false, aClient.getResult(), NULL, "");
     }
 
     /**
@@ -453,7 +453,7 @@ public:
     template <typename T = const char *>
     void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
     {
-        storeAsync(aClient, path, value, async_request_handler_t::http_put, true, &aResult, NULL, "");
+        storeAsync(aClient, path, value, reqns::http_put, true, &aResult, NULL, "");
     }
 
     /**
@@ -479,7 +479,7 @@ public:
     template <typename T = const char *>
     void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
     {
-        storeAsync(aClient, path, value, async_request_handler_t::http_put, true, nullptr, cb, uid);
+        storeAsync(aClient, path, value, reqns::http_put, true, nullptr, cb, uid);
     }
 
     /**
@@ -492,7 +492,7 @@ public:
      * #include <FS.h>
      * File myFile; // Define the File object globally.
      * #defined FILESYSTEMS SPIFFS
-     * 
+     *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
      *   switch (mode)
@@ -514,7 +514,7 @@ public:
      *   }
      *   file = myFile;
      * }
-     * 
+     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
      * Database.set(aClient, "/path/to/data", getFile(fileConfig), aResult);
@@ -529,7 +529,7 @@ public:
      */
     void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
+        req_data aReq(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -543,7 +543,7 @@ public:
      * #include <FS.h>
      * File myFile; // Define the File object globally.
      * #defined FILESYSTEMS SPIFFS
-     * 
+     *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
      *   switch (mode)
@@ -565,7 +565,7 @@ public:
      *   }
      *   file = myFile;
      * }
-     * 
+     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
      * Database.set(aClient, "/path/to/data", getFile(fileConfig), cb);
@@ -581,7 +581,7 @@ public:
      */
     void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid);
+        req_data aReq(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -611,7 +611,7 @@ public:
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL);
+        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL);
         asyncRequest(aReq, payload.c_str());
         return aClient.getResult()->rtdbResult.name();
     }
@@ -641,7 +641,7 @@ public:
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, NULL);
+        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, NULL);
         asyncRequest(aReq, payload.c_str());
     }
 
@@ -671,7 +671,7 @@ public:
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
+        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq, payload.c_str());
     }
 
@@ -685,7 +685,7 @@ public:
      * #include <FS.h>
      * File myFile; // Define the File object globally.
      * #defined FILESYSTEMS SPIFFS
-     * 
+     *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
      *   switch (mode)
@@ -707,7 +707,7 @@ public:
      *   }
      *   file = myFile;
      * }
-     * 
+     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
      * Database.push(aClient, "/path/to/data", getFile(fileConfig), aResult);
@@ -723,7 +723,7 @@ public:
      */
     void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
+        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -737,7 +737,7 @@ public:
      * #include <FS.h>
      * File myFile; // Define the File object globally.
      * #defined FILESYSTEMS SPIFFS
-     * 
+     *
      * void fileCallback(File &file, const char *filename, file_operating_mode mode)
      * {
      *   switch (mode)
@@ -759,7 +759,7 @@ public:
      *   }
      *   file = myFile;
      * }
-     * 
+     *
      * FileConfig fileConfig("/example.txt", fileCallback);
      *
      * Database.push(aClient, "/path/to/data", getFile(fileConfig), cb);
@@ -774,7 +774,7 @@ public:
      */
     void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, nullptr, cb, uid);
+        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -794,7 +794,7 @@ public:
     template <typename T = object_t>
     bool update(AsyncClientClass &aClient, const String &path, const T &value)
     {
-        return storeAsync(aClient, path, value, async_request_handler_t::http_patch, false, aClient.getResult(), NULL, "");
+        return storeAsync(aClient, path, value, reqns::http_patch, false, aClient.getResult(), NULL, "");
     }
 
     /**
@@ -812,7 +812,7 @@ public:
     template <typename T = object_t>
     void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult)
     {
-        storeAsync(aClient, path, value, async_request_handler_t::http_patch, true, &aResult, NULL, "");
+        storeAsync(aClient, path, value, reqns::http_patch, true, &aResult, NULL, "");
     }
 
     /**
@@ -831,7 +831,7 @@ public:
     template <typename T = object_t>
     void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "")
     {
-        storeAsync(aClient, path, value, async_request_handler_t::http_patch, true, nullptr, cb, uid);
+        storeAsync(aClient, path, value, reqns::http_patch, true, nullptr, cb, uid);
     }
 
     /**
@@ -848,7 +848,7 @@ public:
      */
     bool remove(AsyncClientClass &aClient, const String &path)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(), nullptr, nullptr, aClient.getResult(), nullptr);
+        req_data aReq(&aClient, path, reqns::http_delete, slot_options_t(), nullptr, nullptr, aClient.getResult(), nullptr);
         asyncRequest(aReq);
         return getNullETagOption(&aClient.getResult()->rtdbResult) && String(aClient.getResult()->rtdbResult.data()).indexOf("null") > -1;
     }
@@ -867,7 +867,7 @@ public:
      */
     void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, nullptr);
+        req_data aReq(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, nullptr);
         asyncRequest(aReq);
     }
 
@@ -885,7 +885,7 @@ public:
      */
     void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
     {
-        async_request_data_t aReq(&aClient, path, async_request_handler_t::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
+        req_data aReq(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
         asyncRequest(aReq);
     }
 
@@ -941,29 +941,25 @@ public:
     }
 
 private:
-    String service_url;
-    String sse_events_filter;
+    String service_url, sse_events_filter;
 
     // FirebaseApp address and FirebaseApp vector address
-    uint32_t app_addr = 0, avec_addr = 0;
-    uint32_t ul_dl_task_running_addr = 0;
-    uint32_t ota_storage_addr = 0;
+    uint32_t app_addr = 0, avec_addr = 0, ul_dl_task_running_addr = 0, ota_storage_addr = 0;
     app_token_t *app_token = nullptr;
 
-    struct async_request_data_t
+    struct req_data
     {
     public:
         AsyncClientClass *aClient = nullptr;
-        String path;
-        String uid;
-        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
+        String path, uid;
+        reqns::http_request_method method = reqns::http_undefined;
         slot_options_t opt;
         DatabaseOptions *options = nullptr;
         file_config_data *file = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
-        async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        req_data() {}
+        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;
@@ -997,7 +993,7 @@ private:
     }
 
     template <typename T = object_t>
-    bool storeAsync(AsyncClientClass &aClient, const String &path, const T &value, async_request_handler_t::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb, const String &uid)
+    bool storeAsync(AsyncClientClass &aClient, const String &path, const T &value, reqns::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb, const String &uid)
     {
         ValueConverter vcon;
         String payload;
@@ -1005,14 +1001,14 @@ private:
         DatabaseOptions options;
         if (!async && aClient.reqEtag.length() == 0)
             options.silent = true;
-        async_request_data_t aReq(&aClient, path, mode, slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid);
+        req_data aReq(&aClient, path, mode, slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid);
         asyncRequest(aReq, payload.c_str());
         if (!async)
             return aResult->lastError.code() == 0;
         return true;
     }
 
-    void asyncRequest(async_request_data_t &request, const char *payload = "")
+    void asyncRequest(req_data &request, const char *payload = "")
     {
         app_token_t *atoken = appToken();
 
@@ -1025,7 +1021,7 @@ private:
 
         addParams(request.opt.auth_param, extras, request.method, request.options, request.file);
 
-        async_data_item_t *sData = request.aClient->createSlot(request.opt);
+        async_data *sData = request.aClient->createSlot(request.opt);
 
         if (!sData)
             return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
@@ -1056,7 +1052,7 @@ private:
         }
         else if (strlen(payload))
         {
-            sData->request.val[req_hndlr_ns::payload] = payload;
+            sData->request.val[reqns::payload] = payload;
             request.aClient->setContentLength(sData, strlen(payload));
         }
 
@@ -1075,7 +1071,7 @@ private:
         request.aClient->handleRemove();
     }
 
-    void addParams(bool hasQueryParams, String &extras, async_request_handler_t::http_request_method method, DatabaseOptions *options, bool isFile)
+    void addParams(bool hasQueryParams, String &extras, reqns::http_request_method method, DatabaseOptions *options, bool isFile)
     {
         URLUtil uut;
         bool hasParam = hasQueryParams;
@@ -1091,7 +1087,7 @@ private:
                 uut.addParam(extras, "shallow", "true", hasQueryParams, true);
         }
 
-        if ((options && options->silent) || ((method == async_request_handler_t::http_put || method == async_request_handler_t::http_post || method == async_request_handler_t::http_patch) && isFile))
+        if ((options && options->silent) || ((method == reqns::http_put || method == reqns::http_post || method == reqns::http_patch) && isFile))
             uut.addParam(extras, "print", "silent", hasQueryParams, true);
 
         if (options && options->filter.complete)
@@ -1101,7 +1097,7 @@ private:
         }
     }
 
-    void setClientError(async_request_data_t &request, int code)
+    void setClientError(req_data &request, int code)
     {
         AsyncResult *aResult = request.aResult;
 
@@ -1120,14 +1116,13 @@ private:
         }
     }
 
-    void setFileStatus(async_data_item_t *sData, const async_request_data_t &request)
+    void setFileStatus(async_data *sData, const req_data &request)
     {
+        using namespace reqns;
         if ((request.file && request.file->filename.length()) || request.opt.ota)
         {
-            sData->download = request.method == async_request_handler_t::http_get;
-            sData->upload = request.method == async_request_handler_t::http_post ||
-                            request.method == async_request_handler_t::http_put ||
-                            request.method == async_request_handler_t::http_patch;
+            sData->download = request.method == http_get;
+            sData->upload = request.method == http_post || request.method == http_put || request.method == http_patch;
         }
     }
 };

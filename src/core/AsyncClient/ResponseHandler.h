@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -31,7 +31,7 @@
 
 #define FIREBASE_TCP_READ_TIMEOUT_SEC 30 // Do not change
 
-namespace res_hndlr_ns
+namespace resns
 {
     enum data_item_type_t
     {
@@ -43,7 +43,7 @@ namespace res_hndlr_ns
     };
 }
 
-struct async_response_handler_t
+struct res_handler
 {
 private:
     StringUtil sut;
@@ -59,13 +59,8 @@ public:
     {
 
     public:
-        bool header_remaining = false;
-        bool payload_remaining = false;
-        bool keep_alive = false;
-        bool sse = false;
-        bool http_response = false;
-        bool chunks = false;
-        bool payload_available = false;
+        bool header_remaining = false, payload_remaining = false, keep_alive = false;
+        bool sse = false, http_response = false, chunks = false, payload_available = false;
 
         void reset()
         {
@@ -93,22 +88,20 @@ public:
 
     int httpCode = 0;
     response_flags flags;
-    size_t payloadLen = 0;
-    size_t payloadRead = 0;
+    size_t payloadLen = 0, payloadRead = 0;
     auth_error_t error;
     uint8_t *toFill = nullptr;
-    uint16_t toFillLen = 0;
-    uint16_t toFillIndex = 0;
-    String val[res_hndlr_ns::max_type];
+    uint16_t toFillLen = 0, toFillIndex = 0;
+    String val[resns::max_type];
     chunk_info_t chunkInfo;
     Timer read_timer;
     bool auth_data_available = false;
 
-    async_response_handler_t()
+    res_handler()
     {
     }
 
-    ~async_response_handler_t()
+    ~res_handler()
     {
         if (toFill)
             free(toFill);
@@ -130,7 +123,7 @@ public:
         toFill = nullptr;
         toFillLen = 0;
         toFillIndex = 0;
-        for (size_t i = 0; i < res_hndlr_ns::max_type; i++)
+        for (size_t i = 0; i < resns::max_type; i++)
             sut.clear(val[i]);
         chunkInfo.chunkSize = 0;
         chunkInfo.dataLen = 0;
@@ -142,9 +135,9 @@ public:
         read_timer.feed(interval == -1 ? FIREBASE_TCP_READ_TIMEOUT_SEC : interval);
     }
 
-    int tcpAvailable(async_request_handler_t::tcp_client_type client_type, Client *client, void *atcp_config)
+    int tcpAvailable(reqns::tcp_client_type client_type, Client *client, void *atcp_config)
     {
-        if (client_type == async_request_handler_t::tcp_client_type_sync)
+        if (client_type == reqns::tcpc_sync)
             return client ? client->available() : 0;
         else
         {
@@ -169,9 +162,9 @@ public:
         return 0;
     }
 
-    int tcpRead(async_request_handler_t::tcp_client_type client_type, Client *client, void *atcp_config)
+    int tcpRead(reqns::tcp_client_type client_type, Client *client, void *atcp_config)
     {
-        if (client_type == async_request_handler_t::tcp_client_type_sync)
+        if (client_type == reqns::tcpc_sync)
             return client ? client->read() : -1;
         else
         {
@@ -204,9 +197,9 @@ public:
         return 0;
     }
 
-    int tcpRead(async_request_handler_t::tcp_client_type client_type, Client *client, void *atcp_config, uint8_t *buf, size_t size)
+    int tcpRead(reqns::tcp_client_type client_type, Client *client, void *atcp_config, uint8_t *buf, size_t size)
     {
-        if (client_type == async_request_handler_t::tcp_client_type_sync)
+        if (client_type == reqns::tcpc_sync)
             return client ? client->read(buf, size) : -1;
         else
         {

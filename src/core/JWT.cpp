@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -309,7 +309,7 @@ bool JWTClass::create()
         if (!pk)
         {
             jwt_data.err_code = FIREBASE_ERROR_TOKEN_PARSE_PK;
-            jwt_data.msg = FPSTR("JWT, private key parsing fail");
+            jwt_data.msg = FPSTR("JWT, private key parsing failed");
             auth_data->user_auth.sa.step = jwt_step_error;
             return exit(false);
         }
@@ -354,7 +354,7 @@ bool JWTClass::create()
         {
             mem.release(&buf);
             jwt_data.err_code = FIREBASE_ERROR_TOKEN_SIGN;
-            jwt_data.msg = FPSTR("JWT, token signing fail");
+            jwt_data.msg = FPSTR("JWT, token signing failed");
             auth_data->user_auth.sa.step = jwt_step_error;
             return exit(false);
         }

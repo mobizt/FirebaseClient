@@ -26,12 +26,12 @@
  *
  * 2.------------------------
  *
- * bool CloudStorage::upload(<AsyncClient>, <GoogleCloudStorage::Parent>, <file_config_data>, <GoogleCloudStorage::uploadOptions>);
+ * bool CloudStorage::upload(<AsyncClient>, <GoogleCloudStorage::Parent>, <file_config_data>, <GoogleCloudStorage::UploadOptions>);
  *
  * <AsyncClient> - The async client.
  * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
  * <file_config_data> - The filesystem data (file_config_data) obtained from FileConfig class object.
- * <GoogleCloudStorage::uploadOptions> - The GoogleCloudStorage::uploadOptions that holds the information for insert options, properties and types of upload.
+ * <GoogleCloudStorage::UploadOptions> - The GoogleCloudStorage::UploadOptions that holds the information for insert options, properties and types of upload.
  * For the insert options (options.insertOptions), see https://cloud.google.com/storage/docs/json_api/v1/objects/insert#optional-parameters
  * For insert properties (options.insertProps), see https://cloud.google.com/storage/docs/json_api/v1/objects/insert#optional-properties
  *
@@ -186,7 +186,7 @@ void loop()
     {
         taskCompleted = true;
 
-        GoogleCloudStorage::uploadOptions options;
+        GoogleCloudStorage::UploadOptions options;
         options.mime = "media.mp4";
         options.uploadType = GoogleCloudStorage::upload_type_resumable;
         // options.uploadType = GoogleCloudStorage::upload_type_simple;

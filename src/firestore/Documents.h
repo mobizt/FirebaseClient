@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -43,6 +43,8 @@ namespace Firestore
         friend class AppBase;
 
     public:
+        using Parent = Firestore::Parent;
+
         /** Gets multiple documents.
          *
          * @param aClient The async client.
@@ -73,7 +75,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        String batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, const BatchGetDocumentOptions &batchOptions)
+        String batchGet(AsyncClientClass &aClient, const Parent &parent, const BatchGetDocumentOptions &batchOptions)
         {
             batchGetDoc(aClient, getResultBase(&aClient), NULL, "", parent, batchOptions, false);
             return getResultBase(&aClient)->c_str();
@@ -109,7 +111,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResult &aResult)
+        void batchGet(AsyncClientClass &aClient, const Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResult &aResult)
         {
             batchGetDoc(aClient, &aResult, NULL, "", parent, batchOptions, true);
         }
@@ -145,7 +147,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        void batchGet(AsyncClientClass &aClient, const Firestore::Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResultCallback cb, const String &uid = "")
+        void batchGet(AsyncClientClass &aClient, const Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResultCallback cb, const String &uid = "")
         {
             batchGetDoc(aClient, nullptr, cb, uid, parent, batchOptions, true);
         }
@@ -167,7 +169,7 @@ namespace Firestore
          * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
          *
          */
-        String batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
+        String batchWrite(AsyncClientClass &aClient, const Parent &parent, Writes &writes)
         {
             batchWriteDoc(aClient, getResultBase(&aClient), NULL, "", parent, writes, false);
             return getResultBase(&aClient)->c_str();
@@ -188,7 +190,7 @@ namespace Firestore
          * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
          *
          */
-        void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
+        void batchWrite(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResult &aResult)
         {
             batchWriteDoc(aClient, &aResult, NULL, "", parent, writes, true);
         }
@@ -209,7 +211,7 @@ namespace Firestore
          * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
          *
          */
-        void batchWrite(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
+        void batchWrite(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
         {
             batchWriteDoc(aClient, nullptr, cb, uid, parent, writes, true);
         }
@@ -239,7 +241,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        String beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions)
+        String beginTransaction(AsyncClientClass &aClient, const Parent &parent, const TransactionOptions &transOptions)
         {
             beginTrans(aClient, getResultBase(&aClient), NULL, "", parent, transOptions, false);
             return getResultBase(&aClient)->c_str();
@@ -270,7 +272,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResult &aResult)
+        void beginTransaction(AsyncClientClass &aClient, const Parent &parent, const TransactionOptions &transOptions, AsyncResult &aResult)
         {
             beginTrans(aClient, &aResult, NULL, "", parent, transOptions, true);
         }
@@ -301,7 +303,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void beginTransaction(AsyncClientClass &aClient, const Firestore::Parent &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "")
+        void beginTransaction(AsyncClientClass &aClient, const Parent &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "")
         {
             beginTrans(aClient, nullptr, cb, uid, parent, transOptions, true);
         }
@@ -321,7 +323,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes)
+        String commit(AsyncClientClass &aClient, const Parent &parent, Writes &writes)
         {
             commitDoc(aClient, getResultBase(&aClient), NULL, "", parent, writes, false);
             return getResultBase(&aClient)->c_str();
@@ -341,7 +343,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResult &aResult)
+        void commit(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResult &aResult)
         {
             commitDoc(aClient, &aResult, NULL, "", parent, writes, true);
         }
@@ -361,7 +363,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void commit(AsyncClientClass &aClient, const Firestore::Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
+        void commit(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
         {
             commitDoc(aClient, nullptr, cb, uid, parent, writes, true);
         }
@@ -528,7 +530,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument)
+        String deleteDoc(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const Precondition &currentDocument)
         {
             deleteDocBase(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, currentDocument, false);
             return getResultBase(&aClient)->c_str();
@@ -556,7 +558,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult)
+        void deleteDoc(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult)
         {
             deleteDocBase(aClient, &aResult, NULL, "", parent, documentPath, currentDocument, true);
         }
@@ -584,7 +586,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void deleteDoc(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "")
+        void deleteDoc(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "")
         {
             deleteDocBase(aClient, nullptr, cb, uid, parent, documentPath, currentDocument, true);
         }
@@ -609,7 +611,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options)
+        String get(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const GetDocumentOptions &options)
         {
             getDoc(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, options, false);
             return getResultBase(&aClient)->c_str();
@@ -634,7 +636,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult)
+        void get(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult)
         {
             getDoc(aClient, &aResult, NULL, "", parent, documentPath, options, true);
         }
@@ -659,7 +661,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "")
+        void get(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "")
         {
             getDoc(aClient, nullptr, cb, uid, parent, documentPath, options, true);
         }
@@ -686,7 +688,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
+        String list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
         {
             listDocs(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, listDocsOptions, false);
             return getResultBase(&aClient)->c_str();
@@ -714,7 +716,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult)
+        void list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult)
         {
             listDocs(aClient, &aResult, NULL, "", parent, collectionId, listDocsOptions, true);
         }
@@ -742,7 +744,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const ListDocumentsOptions &listDocsOptions, AsyncResultCallback cb, const String &uid = "")
+        void list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const ListDocumentsOptions &listDocsOptions, AsyncResultCallback cb, const String &uid = "")
         {
             listDocs(aClient, nullptr, cb, uid, parent, collectionId, listDocsOptions, true);
         }
@@ -767,7 +769,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        String listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
+        String listCollectionIds(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
         {
             listCollIds(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, listCollectionIdsOptions, false);
             return getResultBase(&aClient)->c_str();
@@ -793,7 +795,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult)
+        void listCollectionIds(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult)
         {
             listCollIds(aClient, &aResult, NULL, "", parent, documentPath, listCollectionIdsOptions, true);
         }
@@ -819,7 +821,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        void listCollectionIds(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const ListCollectionIdsOptions &listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
+        void listCollectionIds(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const ListCollectionIdsOptions &listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
         {
             listCollIds(aClient, nullptr, cb, uid, parent, documentPath, listCollectionIdsOptions, true);
         }
@@ -855,7 +857,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document)
+        String patch(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document)
         {
             patchDoc(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, patchOptions, document, false);
             return getResultBase(&aClient)->c_str();
@@ -892,7 +894,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
+        void patch(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
         {
             patchDoc(aClient, &aResult, NULL, "", parent, documentPath, patchOptions, document, true);
         }
@@ -929,7 +931,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
+        void patch(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
         {
             patchDoc(aClient, nullptr, cb, uid, parent, documentPath, patchOptions, document, true);
         }
@@ -946,7 +948,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        String rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction)
+        String rollback(AsyncClientClass &aClient, const Parent &parent, const String &transaction)
         {
             transRollback(aClient, getResultBase(&aClient), NULL, "", parent, transaction, false);
             return getResultBase(&aClient)->c_str();
@@ -964,7 +966,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResult &aResult)
+        void rollback(AsyncClientClass &aClient, const Parent &parent, const String &transaction, AsyncResult &aResult)
         {
             transRollback(aClient, &aResult, NULL, "", parent, transaction, true);
         }
@@ -982,7 +984,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void rollback(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "")
+        void rollback(AsyncClientClass &aClient, const Parent &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "")
         {
             transRollback(aClient, nullptr, cb, uid, parent, transaction, true);
         }
@@ -1015,7 +1017,7 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        String runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions)
+        String runQuery(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, QueryOptions queryOptions)
         {
             runQueryImpl(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, queryOptions, false);
             return getResultBase(&aClient)->c_str();
@@ -1046,7 +1048,7 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult)
+        void runQuery(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult)
         {
             runQueryImpl(aClient, &aResult, NULL, "", parent, documentPath, queryOptions, true);
         }
@@ -1077,7 +1079,7 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        void runQuery(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &documentPath, const QueryOptions &queryOptions, AsyncResultCallback cb, const String &uid = "")
+        void runQuery(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const QueryOptions &queryOptions, AsyncResultCallback cb, const String &uid = "")
         {
             runQueryImpl(aClient, nullptr, cb, uid, parent, documentPath, queryOptions, true);
         }

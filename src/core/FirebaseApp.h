@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -57,7 +57,7 @@ namespace firebase
 
     private:
         uint16_t slot = 0;
-        async_data_item_t *sData = nullptr;
+        async_data *sData = nullptr;
         auth_data_t auth_data;
         AsyncClientClass *aClient = nullptr;
         uint32_t aclient_addr = 0, app_addr = 0, ref_ts = 0;
@@ -303,10 +303,10 @@ namespace firebase
             if (sData)
             {
                 addGAPIsHost(host, subdomain.c_str());
-                newRequestBase(aClient, sData, host, extras, "", async_request_handler_t::http_post, soption, uid);
+                newRequestBase(aClient, sData, host, extras, "", reqns::http_post, soption, uid);
 
-                addContentTypeHeader(sData->request.val[req_hndlr_ns::header], "application/json");
-                setContentLengthBase(aClient, sData, sData->request.val[req_hndlr_ns::payload].length());
+                addContentTypeHeader(sData->request.val[reqns::header], "application/json");
+                setContentLengthBase(aClient, sData, sData->request.val[reqns::payload].length());
                 req_timer.feed(FIREBASE_TCP_READ_TIMEOUT_SEC);
                 slot = slotCountBase(aClient) - 1;
 
@@ -471,9 +471,9 @@ namespace firebase
                     if (auth_data.user_auth.auth_type == auth_sa_access_token)
                     {
 #if defined(ENABLE_SERVICE_AUTH)
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer", true);
+                        json.addObject(sData->request.val[reqns::payload], "grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer", true);
 #if defined(ENABLE_JWT)
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "assertion", jwtProcessor()->token(), true, true);
+                        json.addObject(sData->request.val[reqns::payload], "assertion", jwtProcessor()->token(), true, true);
                         jwtProcessor()->clear();
 #endif
 #endif
@@ -483,24 +483,24 @@ namespace firebase
 #if defined(ENABLE_CUSTOM_AUTH) && defined(ENABLE_JWT)
                         if (auth_data.user_auth.auth_type == auth_sa_custom_token)
                         {
-                            json.addObject(sData->request.val[req_hndlr_ns::payload], "token", jwtProcessor()->token(), true);
+                            json.addObject(sData->request.val[reqns::payload], "token", jwtProcessor()->token(), true);
                             jwtProcessor()->clear();
                         }
 #endif
 #if defined(ENABLE_CUSTOM_TOKEN)
                         if (auth_data.user_auth.auth_type == auth_custom_token)
-                            json.addObject(sData->request.val[req_hndlr_ns::payload], "token", auth_data.user_auth.custom_token.val[cust_tk_ns::token], true);
+                            json.addObject(sData->request.val[reqns::payload], "token", auth_data.user_auth.custom_token.val[cust_tk_ns::token], true);
 #endif
 
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "returnSecureToken", "true", false, true);
+                        json.addObject(sData->request.val[reqns::payload], "returnSecureToken", "true", false, true);
                     }
                     else if (auth_data.user_auth.auth_type == auth_access_token && auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
                     {
 #if defined(ENABLE_ACCESS_TOKEN)
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "client_id", auth_data.user_auth.access_token.val[access_tk_ns::cid], true);
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "client_secret", auth_data.user_auth.access_token.val[access_tk_ns::csec], true);
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "grant_type", "refresh_token", true);
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "refresh_token", auth_data.user_auth.access_token.val[access_tk_ns::refresh], true, true);
+                        json.addObject(sData->request.val[reqns::payload], "client_id", auth_data.user_auth.access_token.val[access_tk_ns::cid], true);
+                        json.addObject(sData->request.val[reqns::payload], "client_secret", auth_data.user_auth.access_token.val[access_tk_ns::csec], true);
+                        json.addObject(sData->request.val[reqns::payload], "grant_type", "refresh_token", true);
+                        json.addObject(sData->request.val[reqns::payload], "refresh_token", auth_data.user_auth.access_token.val[access_tk_ns::refresh], true, true);
 #endif
                     }
 
@@ -549,36 +549,36 @@ namespace firebase
                     {
                         if (auth_data.user_auth.task_type == firebase_core_auth_task_type_send_verify_email)
                         {
-                            json.addObject(sData->request.val[req_hndlr_ns::payload], "requestType", "VERIFY_EMAIL", true);
-                            json.addObject(sData->request.val[req_hndlr_ns::payload], "idToken", auth_data.user_auth.user.val[user_ns::id_token].length() > 0 ? auth_data.user_auth.user.val[user_ns::id_token] : auth_data.app_token.val[app_tk_ns::token], true, true);
+                            json.addObject(sData->request.val[reqns::payload], "requestType", "VERIFY_EMAIL", true);
+                            json.addObject(sData->request.val[reqns::payload], "idToken", auth_data.user_auth.user.val[user_ns::id_token].length() > 0 ? auth_data.user_auth.user.val[user_ns::id_token] : auth_data.app_token.val[app_tk_ns::token], true, true);
                         }
                         else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_reset_password)
                         {
-                            json.addObject(sData->request.val[req_hndlr_ns::payload], "requestType", "PASSWORD_RESET", true);
-                            json.addObject(sData->request.val[req_hndlr_ns::payload], "email", auth_data.user_auth.user.val[user_ns::em], true, true);
+                            json.addObject(sData->request.val[reqns::payload], "requestType", "PASSWORD_RESET", true);
+                            json.addObject(sData->request.val[reqns::payload], "email", auth_data.user_auth.user.val[user_ns::em], true, true);
                         }
 
                         extras = FPSTR("/v1/accounts:sendOobCode?key=");
                     }
                     else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user)
                     {
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "idToken", auth_data.user_auth.user.val[user_ns::id_token].length() ? auth_data.user_auth.user.val[user_ns::id_token] : auth_data.app_token.val[app_tk_ns::token], true, true);
+                        json.addObject(sData->request.val[reqns::payload], "idToken", auth_data.user_auth.user.val[user_ns::id_token].length() ? auth_data.user_auth.user.val[user_ns::id_token] : auth_data.app_token.val[app_tk_ns::token], true, true);
                         extras = FPSTR("/v1/accounts:delete?key=");
                     }
                     else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
                     {
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "grantType", "refresh_token", true);
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "refreshToken", auth_data.app_token.val[app_tk_ns::refresh], true, true);
+                        json.addObject(sData->request.val[reqns::payload], "grantType", "refresh_token", true);
+                        json.addObject(sData->request.val[reqns::payload], "refreshToken", auth_data.app_token.val[app_tk_ns::refresh], true, true);
                         extras = FPSTR("/v1/token?key=");
                     }
                     else
                     {
                         if (auth_data.user_auth.user.val[user_ns::em].length() && auth_data.user_auth.user.val[user_ns::psw].length())
                         {
-                            json.addObject(sData->request.val[req_hndlr_ns::payload], "email", auth_data.user_auth.user.val[user_ns::em], true);
-                            json.addObject(sData->request.val[req_hndlr_ns::payload], "password", auth_data.user_auth.user.val[user_ns::psw], true);
+                            json.addObject(sData->request.val[reqns::payload], "email", auth_data.user_auth.user.val[user_ns::em], true);
+                            json.addObject(sData->request.val[reqns::payload], "password", auth_data.user_auth.user.val[user_ns::psw], true);
                         }
-                        json.addObject(sData->request.val[req_hndlr_ns::payload], "returnSecureToken", "true", false, true);
+                        json.addObject(sData->request.val[reqns::payload], "returnSecureToken", "true", false, true);
                         extras = auth_data.user_auth.task_type == firebase_core_auth_task_type_signup ? FPSTR("/v1/accounts:signUp?key=") : FPSTR("/v1/accounts:signInWithPassword?key=");
                     }
 
@@ -637,9 +637,9 @@ namespace firebase
                     if (auth_data.user_auth.task_type == firebase_core_auth_task_type_signup)
                         auth_data.user_auth.anonymous = auth_data.user_auth.user.val[user_ns::em].length() == 0 && auth_data.user_auth.user.val[user_ns::psw].length() == 0;
 
-                    if (parseToken(sData->response.val[res_hndlr_ns::payload].c_str()))
+                    if (parseToken(sData->response.val[resns::payload].c_str()))
                     {
-                        sut.clear(sData->response.val[res_hndlr_ns::payload]);
+                        sut.clear(sData->response.val[resns::payload]);
                         auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         auth_data.app_token.authenticated = true;
                         auth_data.app_token.auth_ts = millis();

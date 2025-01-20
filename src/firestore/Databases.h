@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -44,6 +44,9 @@ namespace Firestore
         friend class AppBase;
 
     public:
+    
+        using Parent = Firestore::Parent;
+
         ~Databases() {}
 
         Databases() {}
@@ -71,7 +74,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        String exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, const EximDocumentOptions &exportOptions)
+        String exportDocuments(AsyncClientClass &aClient, const Parent &parent, const EximDocumentOptions &exportOptions)
         {
             eximDocs(aClient, getResultBase(&aClient), NULL, "", parent, exportOptions, false, false);
             return getResultBase(&aClient)->c_str();
@@ -94,7 +97,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, const EximDocumentOptions &exportOptions, AsyncResult &aResult)
+        void exportDocuments(AsyncClientClass &aClient, const Parent &parent, const EximDocumentOptions &exportOptions, AsyncResult &aResult)
         {
             eximDocs(aClient, &aResult, NULL, "", parent, exportOptions, false, true);
         }
@@ -117,7 +120,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void exportDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, const EximDocumentOptions &exportOptions, AsyncResultCallback cb, const String &uid = "")
+        void exportDocuments(AsyncClientClass &aClient, const Parent &parent, const EximDocumentOptions &exportOptions, AsyncResultCallback cb, const String &uid = "")
         {
             eximDocs(aClient, nullptr, cb, uid, parent, exportOptions, false, true);
         }
@@ -140,7 +143,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        String importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, const EximDocumentOptions &importOptions)
+        String importDocuments(AsyncClientClass &aClient, const Parent &parent, const EximDocumentOptions &importOptions)
         {
             eximDocs(aClient, getResultBase(&aClient), NULL, "", parent, importOptions, true, false);
             return getResultBase(&aClient)->c_str();
@@ -163,7 +166,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, const EximDocumentOptions &importOptions, AsyncResult &aResult)
+        void importDocuments(AsyncClientClass &aClient, const Parent &parent, const EximDocumentOptions &importOptions, AsyncResult &aResult)
         {
             eximDocs(aClient, &aResult, NULL, "", parent, importOptions, true, true);
         }
@@ -186,7 +189,7 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void importDocuments(AsyncClientClass &aClient, const Firestore::Parent &parent, const EximDocumentOptions &importOptions, AsyncResultCallback cb, const String &uid = "")
+        void importDocuments(AsyncClientClass &aClient, const Parent &parent, const EximDocumentOptions &importOptions, AsyncResultCallback cb, const String &uid = "")
         {
             eximDocs(aClient, nullptr, cb, uid, parent, importOptions, true, true);
         }
@@ -207,9 +210,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const Database &database)
+        String create(AsyncClientClass &aClient, const Parent &parent, const Database &database)
         {
-            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, database.c_str(), "", Firestore::firestore_database_mode_create, false);
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, database.c_str(), "", Firestore::cf_mode_create, false);
             return getResultBase(&aClient)->c_str();
         }
 
@@ -228,9 +231,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const Database &database, AsyncResult &aResult)
+        void create(AsyncClientClass &aClient, const Parent &parent, const Database &database, AsyncResult &aResult)
         {
-            manageDatabase(aClient, &aResult, NULL, "", parent, database.c_str(), "", Firestore::firestore_database_mode_create, true);
+            manageDatabase(aClient, &aResult, NULL, "", parent, database.c_str(), "", Firestore::cf_mode_create, true);
         }
 
         /** Create a database.
@@ -249,9 +252,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const Database &database, AsyncResultCallback cb, const String &uid = "")
+        void create(AsyncClientClass &aClient, const Parent &parent, const Database &database, AsyncResultCallback cb, const String &uid = "")
         {
-            manageDatabase(aClient, nullptr, cb, uid, parent, database.c_str(), "", Firestore::firestore_database_mode_create, true);
+            manageDatabase(aClient, nullptr, cb, uid, parent, database.c_str(), "", Firestore::cf_mode_create, true);
         }
 
         /** Deletes a database.
@@ -268,9 +271,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        String deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag)
+        String deleteDatabase(AsyncClientClass &aClient, const Parent &parent, const String &etag)
         {
-            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, "", etag, Firestore::firestore_database_mode_delete, false);
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, "", etag, Firestore::cf_mode_delete, false);
             return getResultBase(&aClient)->c_str();
         }
 
@@ -287,9 +290,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResult &aResult)
+        void deleteDatabase(AsyncClientClass &aClient, const Parent &parent, const String &etag, AsyncResult &aResult)
         {
-            manageDatabase(aClient, &aResult, NULL, "", parent, "", etag, Firestore::firestore_database_mode_delete, true);
+            manageDatabase(aClient, &aResult, NULL, "", parent, "", etag, Firestore::cf_mode_delete, true);
         }
 
         /** Deletes a database.
@@ -306,9 +309,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void deleteDatabase(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &etag, AsyncResultCallback cb, const String &uid = "")
+        void deleteDatabase(AsyncClientClass &aClient, const Parent &parent, const String &etag, AsyncResultCallback cb, const String &uid = "")
         {
-            manageDatabase(aClient, nullptr, cb, uid, parent, "", etag, Firestore::firestore_database_mode_delete, true);
+            manageDatabase(aClient, nullptr, cb, uid, parent, "", etag, Firestore::cf_mode_delete, true);
         }
 
         /** Gets information about a database.
@@ -323,9 +326,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        String get(AsyncClientClass &aClient, const Firestore::Parent &parent)
+        String get(AsyncClientClass &aClient, const Parent &parent)
         {
-            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, "", "", Firestore::firestore_database_mode_get, false);
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, "", "", Firestore::cf_mode_get, false);
             return getResultBase(&aClient)->c_str();
         }
 
@@ -340,9 +343,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
+        void get(AsyncClientClass &aClient, const Parent &parent, AsyncResult &aResult)
         {
-            manageDatabase(aClient, &aResult, NULL, "", parent, "", "", Firestore::firestore_database_mode_get, true);
+            manageDatabase(aClient, &aResult, NULL, "", parent, "", "", Firestore::cf_mode_get, true);
         }
 
         /** Gets information about a database.
@@ -357,9 +360,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
+        void get(AsyncClientClass &aClient, const Parent &parent, AsyncResultCallback cb, const String &uid = "")
         {
-            manageDatabase(aClient, nullptr, cb, uid, parent, "", "", Firestore::firestore_database_mode_get, true);
+            manageDatabase(aClient, nullptr, cb, uid, parent, "", "", Firestore::cf_mode_get, true);
         }
 
         /** List all the databases in the project.
@@ -374,9 +377,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+        String list(AsyncClientClass &aClient, const Parent &parent)
         {
-            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, "", "", Firestore::firestore_database_mode_list, false);
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, "", "", Firestore::cf_mode_list, false);
             return getResultBase(&aClient)->c_str();
         }
 
@@ -391,9 +394,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
+        void list(AsyncClientClass &aClient, const Parent &parent, AsyncResult &aResult)
         {
-            manageDatabase(aClient, &aResult, NULL, "", parent, "", "", Firestore::firestore_database_mode_list, true);
+            manageDatabase(aClient, &aResult, NULL, "", parent, "", "", Firestore::cf_mode_list, true);
         }
 
         /** List all the databases in the project.
@@ -408,9 +411,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
+        void list(AsyncClientClass &aClient, const Parent &parent, AsyncResultCallback cb, const String &uid = "")
         {
-            manageDatabase(aClient, nullptr, cb, uid, parent, "", "", Firestore::firestore_database_mode_list, true);
+            manageDatabase(aClient, nullptr, cb, uid, parent, "", "", Firestore::cf_mode_list, true);
         }
 
         /** Updates a database.
@@ -431,9 +434,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        String patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const Database &database, const String &updateMask)
+        String patch(AsyncClientClass &aClient, const Parent &parent, const Database &database, const String &updateMask)
         {
-            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, database.c_str(), updateMask, Firestore::firestore_database_mode_patch, false);
+            manageDatabase(aClient, getResultBase(&aClient), NULL, "", parent, database.c_str(), updateMask, Firestore::cf_mode_patch, false);
             return getResultBase(&aClient)->c_str();
         }
 
@@ -454,9 +457,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const Database &database, const String &updateMask, AsyncResult &aResult)
+        void patch(AsyncClientClass &aClient, const Parent &parent, const Database &database, const String &updateMask, AsyncResult &aResult)
         {
-            manageDatabase(aClient, &aResult, NULL, "", parent, database.c_str(), updateMask, Firestore::firestore_database_mode_patch, true);
+            manageDatabase(aClient, &aResult, NULL, "", parent, database.c_str(), updateMask, Firestore::cf_mode_patch, true);
         }
 
         /** Updates a database.
@@ -477,9 +480,9 @@ namespace Firestore
          * This function requires ServiceAuth or AccessToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const Firestore::Parent &parent, const Database &database, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
+        void patch(AsyncClientClass &aClient, const Parent &parent, const Database &database, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
         {
-            manageDatabase(aClient, nullptr, cb, uid, parent, database.c_str(), updateMask, Firestore::firestore_database_mode_patch, true);
+            manageDatabase(aClient, nullptr, cb, uid, parent, database.c_str(), updateMask, Firestore::cf_mode_patch, true);
         }
 
         class Indexes : public FirestoreBase
@@ -502,7 +505,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const DatabaseIndex::Index &index)
+            String create(AsyncClientClass &aClient, const Parent &parent, const DatabaseIndex::Index &index)
             {
                 databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, "", false, false);
                 return getResultBase(&aClient)->c_str();
@@ -522,7 +525,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const DatabaseIndex::Index &index, AsyncResult &aResult)
+            void create(AsyncClientClass &aClient, const Parent &parent, const DatabaseIndex::Index &index, AsyncResult &aResult)
             {
                 databaseIndexManager(aClient, &aResult, NULL, "", parent, index, "", false, true);
             }
@@ -542,7 +545,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const DatabaseIndex::Index &index, AsyncResultCallback cb, const String &uid = "")
+            void create(AsyncClientClass &aClient, const Parent &parent, const DatabaseIndex::Index &index, AsyncResultCallback cb, const String &uid = "")
             {
                 databaseIndexManager(aClient, nullptr, cb, uid, parent, index, "", false, true);
             }
@@ -562,7 +565,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+            String deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &indexId)
             {
                 DatabaseIndex::Index idx("");
                 databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, idx, indexId, true, false);
@@ -583,7 +586,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
+            void deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResult &aResult)
             {
                 DatabaseIndex::Index idx("");
                 databaseIndexManager(aClient, &aResult, NULL, "", parent, idx, indexId, true, true);
@@ -604,7 +607,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+            void deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
             {
                 DatabaseIndex::Index idx("");
                 databaseIndexManager(aClient, nullptr, cb, uid, parent, idx, indexId, true, true);
@@ -625,7 +628,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId)
+            String get(AsyncClientClass &aClient, const Parent &parent, const String &indexId)
             {
                 DatabaseIndex::Index idx("");
                 databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, idx, indexId, false, false);
@@ -646,7 +649,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResult &aResult)
+            void get(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResult &aResult)
             {
                 DatabaseIndex::Index idx("");
                 databaseIndexManager(aClient, &aResult, NULL, "", parent, idx, indexId, false, true);
@@ -667,7 +670,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+            void get(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
             {
                 DatabaseIndex::Index idx("");
                 databaseIndexManager(aClient, nullptr, cb, uid, parent, idx, indexId, false, true);
@@ -687,7 +690,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String list(AsyncClientClass &aClient, const Firestore::Parent &parent)
+            String list(AsyncClientClass &aClient, const Parent &parent)
             {
                 DatabaseIndex::Index idx("");
                 databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, idx, "", false, false);
@@ -708,7 +711,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResult &aResult)
+            void list(AsyncClientClass &aClient, const Parent &parent, AsyncResult &aResult)
             {
                 DatabaseIndex::Index idx("");
                 databaseIndexManager(aClient, &aResult, NULL, "", parent, idx, "", false, true);
@@ -728,7 +731,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void list(AsyncClientClass &aClient, const Firestore::Parent &parent, AsyncResultCallback cb, const String &uid = "")
+            void list(AsyncClientClass &aClient, const Parent &parent, AsyncResultCallback cb, const String &uid = "")
             {
                 DatabaseIndex::Index idx("");
                 databaseIndexManager(aClient, nullptr, cb, uid, parent, idx, "", false, true);

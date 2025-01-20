@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -38,8 +38,8 @@ namespace Messages
 {
     enum firebase_cloud_messaging_request_type
     {
-        firebase_cloud_messaging_request_type_undefined,
-        firebase_cloud_messaging_request_type_send
+        fcm_undefined,
+        fcm_send
     };
 
     // Priority of a message to send to Android devices. Note this priority is an FCM concept that controls when the message is delivered. See FCM guides. Additionally, you can determine notification display priority on targeted Android devices using AndroidNotification.NotificationPriority.
@@ -108,7 +108,7 @@ namespace Messages
         // This means that a value of 1.0 corresponds to a solid color, whereas a value of 0.0 corresponds to a completely transparent color.
         Color &alpha(float value) { return wr.set<Color &, float>(*this, UnityRange().val(value), buf, bufSize, 4, FPSTR(__func__)); }
     };
-    
+
     /**
      * Settings to control notification LED.
      */
@@ -406,7 +406,7 @@ namespace Messages
     public:
         String payload, extras;
         Messages::Parent parent;
-        firebase_cloud_messaging_request_type requestType = firebase_cloud_messaging_request_type_undefined;
+        firebase_cloud_messaging_request_type requestType = fcm_undefined;
         unsigned long requestTime = 0;
 
         void copy(const DataOptions &rhs)
@@ -418,19 +418,18 @@ namespace Messages
     private:
     };
 
-    struct async_request_data_t
+    struct req_data
     {
     public:
         AsyncClientClass *aClient = nullptr;
-        String path;
-        String uid;
-        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
+        String path, uid;
+        reqns::http_request_method method = reqns::http_undefined;
         slot_options_t opt;
         DataOptions *options = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
-        async_request_data_t() {}
-        explicit async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DataOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        req_data() {}
+        explicit req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DataOptions *options, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;

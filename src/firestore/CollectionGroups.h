@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -39,6 +39,9 @@ namespace Firestore
     class CollectionGroups : public FirestoreBase
     {
     public:
+
+     using Parent = Firestore::Parent;
+     
         CollectionGroups() {}
 
         class Indexes : public FirestoreBase
@@ -62,7 +65,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const CollectionGroupsIndex::Index &index)
+            String create(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const CollectionGroupsIndex::Index &index)
             {
                 collectionGroupIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, index, collectionId, "", false, false);
                 return getResultBase(&aClient)->c_str();
@@ -83,7 +86,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const CollectionGroupsIndex::Index &index, AsyncResult &aResult)
+            void create(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const CollectionGroupsIndex::Index &index, AsyncResult &aResult)
             {
                 collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, index, collectionId, "", false, true);
             }
@@ -104,7 +107,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void create(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const CollectionGroupsIndex::Index &index, AsyncResultCallback cb, const String &uid = "")
+            void create(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const CollectionGroupsIndex::Index &index, AsyncResultCallback cb, const String &uid = "")
             {
                 collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, index, collectionId, "", false, true);
             }
@@ -125,7 +128,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+            String deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const String &indexId)
             {
                 CollectionGroupsIndex::Index idx;
                 collectionGroupIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, idx, collectionId, indexId, true, false);
@@ -147,7 +150,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
+            void deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
             {
                 CollectionGroupsIndex::Index idx;
                 collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, idx, collectionId, indexId, true, true);
@@ -169,7 +172,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void deleteIndex(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+            void deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
             {
                 CollectionGroupsIndex::Index idx;
                 collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, idx, collectionId, indexId, true, true);
@@ -191,7 +194,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId)
+            String get(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const String &indexId)
             {
                 CollectionGroupsIndex::Index idx;
                 collectionGroupIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, idx, collectionId, indexId, false, false);
@@ -213,7 +216,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
+            void get(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const String &indexId, AsyncResult &aResult)
             {
                 CollectionGroupsIndex::Index idx;
                 collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, idx, collectionId, indexId, false, true);
@@ -235,7 +238,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void get(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
+            void get(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const String &indexId, AsyncResultCallback cb, const String &uid = "")
             {
                 CollectionGroupsIndex::Index idx;
                 collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, idx, collectionId, indexId, false, true);
@@ -255,7 +258,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId)
+            String list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId)
             {
                 CollectionGroupsIndex::Index idx;
                 collectionGroupIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, idx, collectionId, "", false, false);
@@ -276,7 +279,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResult &aResult)
+            void list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, AsyncResult &aResult)
             {
                 CollectionGroupsIndex::Index idx;
                 collectionGroupIndexManager(aClient, &aResult, NULL, "", parent, idx, collectionId, "", false, true);
@@ -296,7 +299,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void list(AsyncClientClass &aClient, const Firestore::Parent &parent, const String &collectionId, AsyncResultCallback cb, const String &uid = "")
+            void list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, AsyncResultCallback cb, const String &uid = "")
             {
                 CollectionGroupsIndex::Index idx;
                 collectionGroupIndexManager(aClient, nullptr, cb, uid, parent, idx, collectionId, "", false, true);

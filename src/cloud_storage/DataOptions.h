@@ -38,20 +38,20 @@ namespace GoogleCloudStorage
 {
     enum google_cloud_storage_request_type
     {
-        google_cloud_storage_request_type_undefined,
-        google_cloud_storage_request_type_uploads,
-        google_cloud_storage_request_type_upload_simple,
-        google_cloud_storage_request_type_upload_multipart,
-        google_cloud_storage_request_type_upload_resumable_init,
-        google_cloud_storage_request_type_upload_resumable_run,
-        google_cloud_storage_request_type_download,
-        google_cloud_storage_request_type_patch,
-        google_cloud_storage_request_type_get_meta,
-        google_cloud_storage_request_type_set_meta,
-        google_cloud_storage_request_type_update_meta,
-        google_cloud_storage_request_type_delete,
-        google_cloud_storage_request_type_list,
-        google_cloud_storage_request_type_download_ota
+        cs_undefined,
+        cs_uploads,
+        cs_upload_simple,
+        cs_upload_multipart,
+        cs_upload_resumable_init,
+        cs_upload_resumable_run,
+        cs_download,
+        cs_patch,
+        cs_get_meta,
+        cs_set_meta,
+        cs_update_meta,
+        cs_delete,
+        cs_list,
+        cs_download_ota
     };
 
     enum upload_type
@@ -391,8 +391,8 @@ namespace GoogleCloudStorage
 
     public:
         String payload, extras;
-        GoogleCloudStorage::Parent parent;
-        google_cloud_storage_request_type requestType = google_cloud_storage_request_type_undefined;
+        Parent parent;
+        google_cloud_storage_request_type requestType = cs_undefined;
         unsigned long requestTime = 0;
         void copy(const DataOptions &rhs)
         {
@@ -403,29 +403,27 @@ namespace GoogleCloudStorage
     private:
     };
 
-    struct uploadOptions
+    struct UploadOptions
     {
         String mime;
-        GoogleCloudStorage::upload_type uploadType;
-        GoogleCloudStorage::InsertOptions insertOptions;
-        GoogleCloudStorage::InsertProperties insertProps;
+        upload_type uploadType;
+        InsertOptions insertOptions;
+        InsertProperties insertProps;
     };
 
-    struct async_request_data_t
+    struct req_data
     {
     public:
         AsyncClientClass *aClient = nullptr;
-        String path;
-        String uid;
-        String mime;
-        async_request_handler_t::http_request_method method = async_request_handler_t::http_undefined;
+        String path, uid, mime;
+        reqns::http_request_method method = reqns::http_undefined;
         slot_options_t opt;
         DataOptions *options = nullptr;
         file_config_data *file = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
-        async_request_data_t() {}
-        async_request_data_t(AsyncClientClass *aClient, const String &path, async_request_handler_t::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        req_data() {}
+        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
             this->path = path;

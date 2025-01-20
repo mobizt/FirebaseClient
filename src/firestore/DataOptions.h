@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -42,30 +42,30 @@ using namespace FirestoreQuery;
 
 enum firebase_firestore_request_type
 {
-    firebase_firestore_request_type_undefined,
-    firebase_firestore_request_type_rollback = 200,
-    firebase_firestore_request_type_begin_transaction,
-    firebase_firestore_request_type_commit_document,
-    firebase_firestore_request_type_batch_write_doc,
-    firebase_firestore_request_type_run_query,
-    firebase_firestore_request_type_list_collection,
-    firebase_firestore_request_type_export_docs,
-    firebase_firestore_request_type_import_docs,
-    firebase_firestore_request_type_create_doc,
-    firebase_firestore_request_type_batch_get_doc,
-    firebase_firestore_request_type_create_composite_index,
-    firebase_firestore_request_type_create_field_index,
-    firebase_firestore_request_type_manage_database,
+    cf_undefined,
+    cf_rollback = 200,
+    cf_begin_transaction,
+    cf_commit_document,
+    cf_batch_write_doc,
+    cf_run_query,
+    cf_list_collection,
+    cf_export_docs,
+    cf_import_docs,
+    cf_create_doc,
+    cf_batch_get_doc,
+    cf_create_composite_index,
+    cf_create_field_index,
+    cf_manage_database,
 
-    firebase_firestore_request_type_get_doc = 300,
-    firebase_firestore_request_type_list_doc,
-    firebase_firestore_request_type_list_index,
-    firebase_firestore_request_type_get_index,
+    cf_get_doc = 300,
+    cf_list_doc,
+    cf_list_index,
+    cf_get_index,
 
-    firebase_firestore_request_type_patch_doc = 400,
+    cf_patch_doc = 400,
 
-    firebase_firestore_request_type_delete_doc = 500,
-    firebase_firestore_request_type_delete_index
+    cf_delete_doc = 500,
+    cf_delete_index
 };
 
 /**
@@ -555,11 +555,11 @@ namespace Firestore
 
     enum firestore_database_mode
     {
-        firestore_database_mode_create,
-        firestore_database_mode_get,
-        firestore_database_mode_list,
-        firestore_database_mode_patch,
-        firestore_database_mode_delete
+        cf_mode_create,
+        cf_mode_get,
+        cf_mode_list,
+        cf_mode_patch,
+        cf_mode_delete
     };
 
     const struct firebase::key_str_30 _ConcurrencyMode[ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS + 1] PROGMEM = {"CONCURRENCY_MODE_UNSPECIFIED", "OPTIMISTIC", "PESSIMISTIC", "OPTIMISTIC_WITH_ENTITY_GROUPS"};
@@ -1334,7 +1334,7 @@ namespace Firestore
         String documentId;
         String extras;
         String payload;
-        firebase_firestore_request_type requestType = firebase_firestore_request_type_undefined;
+        firebase_firestore_request_type requestType = cf_undefined;
         unsigned long requestTime = 0;
 
         void copy(const DataOptions &rhs)

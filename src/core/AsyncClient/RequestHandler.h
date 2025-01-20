@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 20, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -59,7 +59,7 @@ typedef void (*NetworkReconnect)(void);
 
 using namespace firebase;
 
-namespace req_hndlr_ns
+namespace reqns
 {
     enum data_item_type_t
     {
@@ -70,19 +70,12 @@ namespace req_hndlr_ns
         payload,
         max_type
     };
-}
 
-struct async_request_handler_t
-{
-private:
-    StringUtil sut;
-
-public:
     enum tcp_client_type
     {
-        tcp_client_type_none,
-        tcp_client_type_sync,
-        tcp_client_type_async
+        tcpc_none,
+        tcpc_sync,
+        tcpc_async
     };
 
     enum http_request_method
@@ -94,34 +87,37 @@ public:
         http_patch,
         http_delete,
     };
+}
 
-    String val[req_hndlr_ns::max_type];
+struct req_handler
+{
+private:
+    StringUtil sut;
+
+public:
+    String val[reqns::max_type];
     String location;
     app_token_t *app_token = nullptr;
     uint16_t port = 443;
     uint8_t *data = nullptr;
     file_config_data file_data;
-    bool base64 = false;
-    bool ota = false;
-    uint32_t ul_dl_task_running_addr = 0;
-    uint32_t ota_storage_addr = 0;
-    uint32_t payloadLen = 0;
-    uint32_t dataLen = 0;
-    uint32_t payloadIndex = 0;
+    bool base64 = false, ota = false;
+    uint32_t ul_dl_task_running_addr = 0, ota_storage_addr = 0, payloadLen = 0;
+    uint32_t dataLen = 0, payloadIndex = 0;
     uint16_t dataIndex = 0;
     int8_t b64Pad = 0;
     int16_t ota_error = 0;
-    http_request_method method = http_undefined;
+    reqns::http_request_method method = reqns::http_undefined;
     Timer send_timer;
 
-    async_request_handler_t()
+    req_handler()
     {
     }
 
     void clear()
     {
 
-        for (size_t i = 0; i < req_hndlr_ns::max_type; i++)
+        for (size_t i = 0; i < reqns::max_type; i++)
             sut.clear(val[i]);
         port = 443;
         if (data)
@@ -136,12 +132,12 @@ public:
         dataIndex = 0;
         b64Pad = 0;
         ota_error = 0;
-        method = http_undefined;
+        method = reqns::http_undefined;
     }
 
     void addNewLine()
     {
-        val[req_hndlr_ns::header] += "\r\n";
+        val[reqns::header] += "\r\n";
     }
 
     void addGAPIsHost(String &str, PGM_P sub)
@@ -154,77 +150,77 @@ public:
 
     void addGAPIsHostHeader(PGM_P sub)
     {
-        val[req_hndlr_ns::header] += FPSTR("Host: ");
-        addGAPIsHost(val[req_hndlr_ns::header], sub);
+        val[reqns::header] += FPSTR("Host: ");
+        addGAPIsHost(val[reqns::header], sub);
         addNewLine();
     }
 
     void addHostHeader(PGM_P host)
     {
-        val[req_hndlr_ns::header] += FPSTR("Host: ");
-        val[req_hndlr_ns::header] += host;
+        val[reqns::header] += FPSTR("Host: ");
+        val[reqns::header] += host;
         addNewLine();
     }
 
     void addContentTypeHeader(PGM_P v)
     {
-        val[req_hndlr_ns::header] += FPSTR("Content-Type: ");
-        val[req_hndlr_ns::header] += v;
+        val[reqns::header] += FPSTR("Content-Type: ");
+        val[reqns::header] += v;
         addNewLine();
     }
 
     void addContentLengthHeader(size_t len)
     {
-        val[req_hndlr_ns::header] += FPSTR("Content-Length: ");
-        val[req_hndlr_ns::header] += len;
+        val[reqns::header] += FPSTR("Content-Length: ");
+        val[reqns::header] += len;
         addNewLine();
     }
 
     void addUAHeader()
     {
-        val[req_hndlr_ns::header] += FPSTR("User-Agent: ESP");
+        val[reqns::header] += FPSTR("User-Agent: ESP");
         addNewLine();
     }
 
     void addConnectionHeader(bool keepAlive)
     {
-        val[req_hndlr_ns::header] += keepAlive ? FPSTR("Connection: keep-alive") : FPSTR("Connection: close");
+        val[reqns::header] += keepAlive ? FPSTR("Connection: keep-alive") : FPSTR("Connection: close");
         addNewLine();
     }
 
     /* Append the string with first request line (HTTP method) */
-    bool addRequestHeaderFirst(async_request_handler_t::http_request_method method)
+    bool addRequestHeaderFirst(reqns::http_request_method method)
     {
         bool post = false;
         switch (method)
         {
-        case async_request_handler_t::http_get:
-            val[req_hndlr_ns::header] += FPSTR("GET");
+        case reqns::http_get:
+            val[reqns::header] += FPSTR("GET");
             break;
-        case async_request_handler_t::http_post:
-            val[req_hndlr_ns::header] += FPSTR("POST");
+        case reqns::http_post:
+            val[reqns::header] += FPSTR("POST");
             post = true;
             break;
 
-        case async_request_handler_t::http_patch:
-            val[req_hndlr_ns::header] += FPSTR("PATCH");
+        case reqns::http_patch:
+            val[reqns::header] += FPSTR("PATCH");
             post = true;
             break;
 
-        case async_request_handler_t::http_delete:
-            val[req_hndlr_ns::header] += FPSTR("DELETE");
+        case reqns::http_delete:
+            val[reqns::header] += FPSTR("DELETE");
             break;
 
-        case async_request_handler_t::http_put:
-            val[req_hndlr_ns::header] += FPSTR("PUT");
+        case reqns::http_put:
+            val[reqns::header] += FPSTR("PUT");
             break;
 
         default:
             break;
         }
 
-        if (method == async_request_handler_t::http_get || method == async_request_handler_t::http_post || method == async_request_handler_t::http_patch || method == async_request_handler_t::http_delete || method == async_request_handler_t::http_put)
-            val[req_hndlr_ns::header] += FPSTR(" ");
+        if (method == reqns::http_get || method == reqns::http_post || method == reqns::http_patch || method == reqns::http_delete || method == reqns::http_put)
+            val[reqns::header] += FPSTR(" ");
 
         return post;
     }
@@ -232,19 +228,19 @@ public:
     /* Append the string with last request line (HTTP version) */
     void addRequestHeaderLast()
     {
-        val[req_hndlr_ns::header] += FPSTR(" HTTP/1.1\r\n");
+        val[reqns::header] += FPSTR(" HTTP/1.1\r\n");
     }
 
     /* Append the string with first part of Authorization header */
     void addAuthHeaderFirst(auth_token_type type)
     {
-        val[req_hndlr_ns::header] += FPSTR("Authorization: ");
+        val[reqns::header] += FPSTR("Authorization: ");
         if (type == auth_access_token || type == auth_sa_access_token)
-            val[req_hndlr_ns::header] += FPSTR("Bearer ");
+            val[reqns::header] += FPSTR("Bearer ");
         else if (type == auth_user_id_token || type == auth_id_token || type == auth_custom_token || type == auth_sa_custom_token)
-            val[req_hndlr_ns::header] += FPSTR("Firebase ");
+            val[reqns::header] += FPSTR("Firebase ");
         else
-            val[req_hndlr_ns::header] += FPSTR("key=");
+            val[reqns::header] += FPSTR("key=");
     }
 
     void feedTimer(int interval = -1)
@@ -252,9 +248,9 @@ public:
         send_timer.feed(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval);
     }
 
-    size_t tcpWrite(async_request_handler_t::tcp_client_type client_type, Client *client, void *atcp_config, const uint8_t *data, size_t size)
+    size_t tcpWrite(reqns::tcp_client_type client_type, Client *client, void *atcp_config, const uint8_t *data, size_t size)
     {
-        if (client_type == tcp_client_type_sync)
+        if (client_type == reqns::tcpc_sync)
             return client ? client->write(data, size) : 0;
         else
         {
