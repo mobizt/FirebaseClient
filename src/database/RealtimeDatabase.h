@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -1013,7 +1013,7 @@ private:
         app_token_t *atoken = appToken();
 
         if (!atoken)
-            return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
+            return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = atoken;
         request.opt.auth_param = atoken->auth_data_type != user_auth_data_no_token && atoken->auth_type != auth_access_token && atoken->auth_type != auth_sa_access_token;
@@ -1024,7 +1024,7 @@ private:
         async_data *sData = request.aClient->createSlot(request.opt);
 
         if (!sData)
-            return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
+            return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
         request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
@@ -1048,7 +1048,7 @@ private:
             request.aClient->setFileContentLength(sData, 0);
 
             if (sData->request.file_data.file_size == 0)
-                return setClientError(request, FIREBASE_ERROR_FILE_READ);
+                return request.aClient->setClientError(request, FIREBASE_ERROR_FILE_READ);
         }
         else if (strlen(payload))
         {
@@ -1094,25 +1094,6 @@ private:
         {
             options->filter.uri[0] = !hasParam ? '?' : '&';
             extras += options->filter.uri;
-        }
-    }
-
-    void setClientError(req_data &request, int code)
-    {
-        AsyncResult *aResult = request.aResult;
-
-        if (!aResult)
-            aResult = new AsyncResult();
-
-        aResult->lastError.setClientError(code);
-
-        if (request.cb)
-            request.cb(*aResult);
-
-        if (!request.aResult)
-        {
-            delete aResult;
-            aResult = nullptr;
         }
     }
 

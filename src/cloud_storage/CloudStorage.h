@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -49,10 +49,7 @@ public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
     ~CloudStorage() {}
-    explicit CloudStorage(const String &url = "")
-    {
-        this->service_url = url;
-    };
+    explicit CloudStorage(const String &url = "") { this->service_url = url; }
 
     CloudStorage &operator=(const CloudStorage &rhs)
     {
@@ -412,20 +409,13 @@ public:
 
 private:
     StringUtil sut;
-    String service_url;
-    String path;
-    String uid;
+    String service_url, path, uid;
     // FirebaseApp address and FirebaseApp vector address
-    uint32_t app_addr = 0, avec_addr = 0;
-    uint32_t ul_dl_task_running_addr = 0;
-    uint32_t ota_storage_addr = 0;
+    uint32_t app_addr = 0, avec_addr = 0, ul_dl_task_running_addr = 0, ota_storage_addr = 0;
     app_token_t *app_token = nullptr;
     Memory mem;
 
-    void url(const String &url)
-    {
-        this->service_url = url;
-    }
+    void url(const String &url) { this->service_url = url; }
 
     void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t ul_dl_task_running_addr)
     {
@@ -528,7 +518,7 @@ private:
         app_token_t *atoken = appToken();
 
         if (!atoken)
-            return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
+            return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = atoken;
         String extras;
@@ -554,7 +544,7 @@ private:
         async_data *sData = request.aClient->createSlot(request.opt);
 
         if (!sData)
-            return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
+            return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
         request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
@@ -600,7 +590,7 @@ private:
             }
 
             if (sData->request.file_data.filename.length() > 0 && sData->request.file_data.file_size == 0)
-                return setClientError(request, FIREBASE_ERROR_FILE_READ);
+                return request.aClient->setClientError(request, FIREBASE_ERROR_FILE_READ);
 
             if (request.options->extras.indexOf("uploadType=media") == -1)
             {
@@ -624,25 +614,6 @@ private:
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
-    }
-
-    void setClientError(GoogleCloudStorage::req_data &request, int code)
-    {
-        AsyncResult *aResult = request.aResult;
-
-        if (!aResult)
-            aResult = new AsyncResult();
-
-        aResult->lastError.setClientError(code);
-
-        if (request.cb)
-            request.cb(*aResult);
-
-        if (!request.aResult)
-        {
-            delete aResult;
-            aResult = nullptr;
-        }
     }
 
     void addParams(const GoogleCloudStorage::req_data &request, String &extras)

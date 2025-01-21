@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -146,7 +146,7 @@ protected:
         app_token_t *atoken = appToken();
 
         if (!atoken)
-            return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
+            return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = atoken;
         String extras;
@@ -170,7 +170,7 @@ protected:
         async_data *sData = createSlotBase(request.aClient, request.opt);
 
         if (!sData)
-            return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
+            return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
         newRequestBase(request.aClient, sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
@@ -199,25 +199,6 @@ protected:
         extras += request.options->extras;
         extras.replace(" ", "%20");
         extras.replace(",", "%2C");
-    }
-
-    void setClientError(req_data &request, int code)
-    {
-        AsyncResult *aResult = request.aResult;
-
-        if (!aResult)
-            aResult = new AsyncResult();
-
-        aResult->lastError.setClientError(code);
-
-        if (request.cb)
-            request.cb(*aResult);
-
-        if (!request.aResult)
-        {
-            delete aResult;
-            aResult = nullptr;
-        }
     }
 
     void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const EximDocumentOptions &eximOptions, bool isImport, bool async)

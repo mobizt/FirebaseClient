@@ -158,6 +158,7 @@ class AsyncClientClass : public ResultBase, RTDBResultBase
     friend class Messaging;
     friend class Storage;
     friend class CloudStorage;
+    friend class FirestoreBase;
 
 private:
     StringUtil sut;
@@ -657,6 +658,26 @@ private:
             closeFile(sData);
 
         setLastError(sData);
+    }
+
+    template <typename T>
+    void setClientError(T &request, int code)
+    {
+        AsyncResult *aResult = request.aResult;
+
+        if (!aResult)
+            aResult = new AsyncResult();
+
+        aResult->lastError.setClientError(code);
+
+        if (request.cb)
+            request.cb(*aResult);
+
+        if (!request.aResult)
+        {
+            delete aResult;
+            aResult = nullptr;
+        }
     }
 
     async_data *getData(uint8_t slot)

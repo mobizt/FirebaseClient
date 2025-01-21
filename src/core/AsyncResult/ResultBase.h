@@ -142,7 +142,6 @@ namespace firebase
         }
         void setEventResumeStatus(event_resume_status_t status) { event_resume_status = status; }
         event_resume_status_t eventResumeStatus() const { return event_resume_status; }
-
     protected:
         void setRefPayload(RealtimeDatabaseResult *rtdbResult, String *payload) { rtdbResult->ref_payload = payload; }
         void clearSSE(RealtimeDatabaseResult *rtdbResult) { rtdbResult->clearSSE(); }

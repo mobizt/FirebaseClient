@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -39,7 +39,6 @@ class Storage
     friend class AppBase;
 
 public:
-
     using Parent = FirebaseStorage::Parent;
 
     std::vector<uint32_t> cVec; // AsyncClient vector
@@ -453,7 +452,7 @@ private:
         app_token_t *atoken = appToken();
 
         if (!atoken)
-            return setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
+            return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = atoken;
         String extras;
@@ -476,7 +475,7 @@ private:
         async_data *sData = request.aClient->createSlot(request.opt);
 
         if (!sData)
-            return setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
+            return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
         request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
 
@@ -504,7 +503,7 @@ private:
             request.aClient->setFileContentLength(sData, 0);
 
             if (sData->request.file_data.filename.length() > 0 && sData->request.file_data.file_size == 0)
-                return setClientError(request, FIREBASE_ERROR_FILE_READ);
+                return request.aClient->setClientError(request, FIREBASE_ERROR_FILE_READ);
 
             URLUtil uut;
             sData->aResult.upload_data.downloadUrl = uut.downloadURL(request.options->parent.getBucketId(), request.options->parent.getObject());
@@ -525,25 +524,6 @@ private:
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
-    }
-
-    void setClientError(FirebaseStorage::req_data &request, int code)
-    {
-        AsyncResult *aResult = request.aResult;
-
-        if (!aResult)
-            aResult = new AsyncResult();
-
-        aResult->lastError.setClientError(code);
-
-        if (request.cb)
-            request.cb(*aResult);
-
-        if (!request.aResult)
-        {
-            delete aResult;
-            aResult = nullptr;
-        }
     }
 
     void addParams(const FirebaseStorage::req_data &request, String &extras)
