@@ -100,6 +100,14 @@
 │           ├───SignUp
 │           └───Verify
 ├───AsyncTCP
+├───BareMinimum
+│   ├───Async
+│   │   ├───RealtimeDatabase
+│   │   │   
+│   │   └───RealtimeDatabaseMessaging
+│   └───Sync
+│       ├───RealtimeDatabase
+│       └───RealtimeDatabaseMessaging
 ├───CloudFunctions
 │   ├───Async
 │   │   ├───Callback

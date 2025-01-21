@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-01-18T04:10:44Z`
+Revision `2025-01-21T014:04:33Z`
 
 ## Table of Contents
 
@@ -1784,6 +1784,13 @@ The following section will provide the basic (bare minimum) code example and the
             * [SignUp](/examples/App/UserManagement/Sync/SignUp/)
             * [Verify](/examples/App/UserManagement/Sync/Verify/)
 * [AsyncTCP](/examples/AsyncTCP/)
+* [BareMinimum](/examples/BareMinimum/)
+    * [Async](examples/BareMinimum/Async/)
+        * [RealtimeDatabase](examples/BareMinimum/Async/RealtimeDatabase/)
+        * [RealtimeDatabaseMessaging](examples/BareMinimum/Async/RealtimeDatabaseMessaging/)
+    * [Sync](examples/BareMinimum//Sync/)
+        * [RealtimeDatabase](examples/BareMinimum/Sync/RealtimeDatabase/)
+        * [RealtimeDatabaseMessaging](examples/BareMinimum/Sync/RealtimeDatabaseMessaging/)
 * [CloudFunctions](/examples/CloudFunctions/)
     * [Async](/examples/CloudFunctions/Async/)
         * [Callback](/examples/CloudFunctions/Async/Callback/)
