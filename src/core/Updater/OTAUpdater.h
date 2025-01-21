@@ -56,7 +56,6 @@ public:
 
 private:
     OTAStorage *storage = nullptr;
-
     uint32_t addr = 0;
     size_t write(uint8_t b);
     void close();

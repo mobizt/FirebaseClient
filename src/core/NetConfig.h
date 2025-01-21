@@ -1,5 +1,5 @@
 /**
- * Created December 21, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -29,6 +29,7 @@
 #include "./Config.h"
 #include "./core/Network.h"
 #include "./core/Memory.h"
+#include "./core/Timer.h"
 
 #define FIREBASE_NET_RECONNECT_TIMEOUT_SEC 10
 
@@ -94,10 +95,10 @@ private:
         void clear()
         {
             modem = nullptr;
-            pin.clear();
-            apn.clear();
-            user.clear();
-            password.clear();
+            pin.remove(0, pin.length());
+            apn.remove(0, apn.length());
+            user.remove(0, user.length());
+            password.remove(0, password.length());
         }
     };
 #endif
@@ -119,8 +120,7 @@ private:
         friend class AsyncClientClass;
 
     private:
-        int ethernet_reset_pin = -1;
-        int ethernet_cs_pin = -1;
+        int ethernet_reset_pin = -1, ethernet_cs_pin = -1;
         uint8_t *ethernet_mac = nullptr;
         Firebase_StaticIP static_ip;
         ethernet_conn_status conn_satatus;
@@ -172,7 +172,7 @@ private:
     };
 #endif
 
-    firebase_network_data_type network_data_type = firebase_network_data_undefined;
+    firebase_network_type network_type = firebase_network_undefined;
 
     generic_data generic;
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE) && defined(ENABLE_GSM_NETWORK)
@@ -205,7 +205,7 @@ public:
 
     void copy(const network_config_data &rhs)
     {
-        this->network_data_type = rhs.network_data_type;
+        this->network_type = rhs.network_type;
         this->initialized = rhs.initialized;
         this->reconnect = rhs.reconnect;
         generic.copy(rhs.generic);
@@ -237,7 +237,7 @@ public:
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         ethernet.clear();
 #endif
-        network_data_type = firebase_network_data_undefined;
+        network_type = firebase_network_undefined;
         initialized = false;
         network_status = false;
         reconnect = true;
@@ -262,7 +262,7 @@ public:
     explicit DefaultNetwork(bool reconnect = true)
     {
         init();
-        network_data.network_data_type = firebase_network_data_default_network;
+        network_data.network_type = firebase_network_default;
         network_data.reconnect = reconnect;
     }
     ~DefaultNetwork() { clear(); }
@@ -312,7 +312,7 @@ public:
         init();
         network_data.generic.net_con_cb = networkConnectionCB;
         network_data.generic.net_status_cb = networkStatusCB;
-        network_data.network_data_type = firebase_network_data_generic_network;
+        network_data.network_type = firebase_network_generic;
     }
     ~GenericNetwork() { clear(); }
 };
@@ -345,7 +345,7 @@ public:
         network_data.gsm.apn = apn;
         network_data.gsm.user = user;
         network_data.gsm.password = password;
-        network_data.network_data_type = firebase_network_data_gsm_network;
+        network_data.network_type = firebase_network_gsm;
     }
     ~GSMNetwork() { clear(); }
 };
@@ -369,7 +369,7 @@ public:
         network_data.ethernet.setMac(macAddress);
         network_data.ethernet.setCs(csPin);
         network_data.ethernet.setReset(resetPin);
-        network_data.network_data_type = firebase_network_data_ethernet_network;
+        network_data.network_type = firebase_network_ethernet_network;
     }
 
     /**
@@ -397,7 +397,7 @@ public:
         network_data.ethernet.setCs(csPin);
         network_data.ethernet.setReset(resetPin);
         network_data.ethernet.setStaticIP(staticIP);
-        network_data.network_data_type = firebase_network_data_ethernet_network;
+        network_data.network_type = firebase_network_ethernet_network;
     }
     ~EthernetNetwork() { clear(); }
 };
@@ -432,7 +432,7 @@ public:
 #if defined(FIREBASE_LWIP_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         network_data.eth = &eth;
 #endif
-        network_data.network_data_type = firebase_network_data_default_network;
+        network_data.network_type = firebase_network_default;
     }
 
     /**
@@ -442,7 +442,7 @@ public:
     DefaultEthernetNetwork()
     {
         init();
-        network_data.network_data_type = firebase_network_data_default_network;
+        network_data.network_type = firebase_network_default;
     }
     ~DefaultEthernetNetwork() { clear(); }
 };
@@ -458,7 +458,7 @@ public:
     DefaultPPPNetwork()
     {
         init();
-        network_data.network_data_type = firebase_network_data_default_network;
+        network_data.network_type = firebase_network_default;
     }
     ~DefaultPPPNetwork() { clear(); }
 };
@@ -480,7 +480,7 @@ public:
         init();
         network_data.wifi = &wifi;
         network_data.reconnect = reconnect;
-        network_data.network_data_type = firebase_network_data_default_network;
+        network_data.network_type = firebase_network_default;
     }
     ~DefaultWiFiNetwork() { clear(); }
 };

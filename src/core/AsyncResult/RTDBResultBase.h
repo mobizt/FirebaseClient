@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -30,7 +30,7 @@
 
 namespace firebase
 {
-    class RTDBResultBase: public RealtimeDatabaseResult
+    class RTDBResultBase : public RealtimeDatabaseResult
     {
         friend class AsyncResult;
 
@@ -38,20 +38,9 @@ namespace firebase
         RTDBResultBase() {}
 
     protected:
-        void setNullETagOption(RealtimeDatabaseResult *rtdbResult, bool val)
-        {
-            rtdbResult->null_etag = val;
-        }
-
-        bool getNullETagOption(const RealtimeDatabaseResult *rtdbResult)
-        {
-            return rtdbResult->null_etag;
-        }
-
-        void setRefPayload(RealtimeDatabaseResult *rtdbResult, String *payload)
-        {
-            rtdbResult->ref_payload = payload;
-        }
+        void setNullETagOption(RealtimeDatabaseResult *rtdbResult, bool val) { rtdbResult->null_etag = val; }
+        bool getNullETagOption(const RealtimeDatabaseResult *rtdbResult) { return rtdbResult->null_etag; }
+        void setRefPayload(RealtimeDatabaseResult *rtdbResult, String *payload) { rtdbResult->ref_payload = payload; }
     };
 
 }

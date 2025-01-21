@@ -1,5 +1,5 @@
 /**
- * Created July 2, 2024
+ * Created January 21, 2025
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -49,7 +49,7 @@ struct firebase_base64_io_t
     size_t bufLen = 1024;
 // for file to write
 #if defined(ENABLE_FS)
-    FILEOBJ file;
+    File file;
 #endif
     // for T array
     T *outT = nullptr;
@@ -79,10 +79,7 @@ public:
         return pLen - uLen;
     }
 
-    size_t encodedLength(size_t len) const
-    {
-        return ((len + 2) / 3 * 4) + 1;
-    }
+    size_t encodedLength(size_t len) const { return ((len + 2) / 3 * 4) + 1; }
 
     int decodedLen(const char *src)
     {
@@ -98,7 +95,6 @@ public:
 
     unsigned char *creatBase64EncBuffer(Memory &mem, bool isURL)
     {
-
         unsigned char *base64EncBuf = reinterpret_cast<unsigned char *>(mem.alloc(65));
         strcpy_P(reinterpret_cast<char *>(base64EncBuf), reinterpret_cast<const char *>(firebase_base64_table));
         if (isURL)
@@ -119,7 +115,6 @@ public:
 
     unsigned char *creatBase64DecBuffer(Memory &mem)
     {
-
         unsigned char *base64DecBuf = reinterpret_cast<unsigned char *>(mem.alloc(256, false));
         memset(base64DecBuf, 0x80, 256);
         for (size_t i = 0; i < sizeof(firebase_base64_table) - 1; i++)
@@ -228,9 +223,7 @@ public:
             count++;
             if (count == 4)
             {
-
                 setOutput((block[0] << 2) | (block[1] >> 4), out, &pos);
-
                 count = 0;
                 if (pad)
                 {
@@ -322,7 +315,7 @@ public:
     }
 
 #if defined(ENABLE_FS)
-    bool decodeToFile(Memory &mem, const FILEOBJ &file, const char *src)
+    bool decodeToFile(Memory &mem, const File &file, const char *src)
     {
         firebase_base64_io_t<uint8_t> out;
         out.file = file;

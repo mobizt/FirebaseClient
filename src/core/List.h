@@ -31,7 +31,6 @@ namespace firebase
 {
     class List
     {
-    private:
     public:
         List() {}
         ~List() {}

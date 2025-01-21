@@ -56,34 +56,29 @@ namespace firebase
         friend class CloudStorage;
 
     private:
+        String extras, subdomain, host, uid;
+        bool deinit = false, processing = false, ul_dl_task_running = false;
         uint16_t slot = 0;
-        async_data *sData = nullptr;
-        auth_data_t auth_data;
-        AsyncClientClass *aClient = nullptr;
-        uint32_t aclient_addr = 0, app_addr = 0, ref_ts = 0;
-        std::vector<uint32_t> aVec; // FirebaseApp vector
-        std::vector<uint32_t> cVec; // AsyncClient vector
-        AsyncResultCallback resultCb = NULL;
-        AsyncResult *refResult = nullptr;
-        uint32_t ref_result_addr = 0;
-        Timer req_timer, auth_timer, err_timer, app_ready_timer;
-        bool deinit = false;
-        bool processing = false;
-        bool ul_dl_task_running = false;
-        uint32_t expire = FIREBASE_DEFAULT_TOKEN_TTL;
-        JSONUtil json;
-        StringUtil sut;
-        String extras, subdomain, host;
-        slot_options_t sop;
-        String uid;
+        uint32_t ref_result_addr = 0, expire = FIREBASE_DEFAULT_TOKEN_TTL, aclient_addr = 0, app_addr = 0, ref_ts = 0;
+
 #if defined(ENABLE_JWT)
         JWTClass *jwtClass = nullptr;
 #endif
+        async_data *sData = nullptr;
+        AsyncClientClass *aClient = nullptr;
+        AsyncResult *refResult = nullptr;
+        AsyncResultCallback resultCb = NULL;
 
-        void setLastError(AsyncResult *aResult, int code, const String &message)
-        {
-            setLastErrorBase(aResult, code, message);
-        }
+        auth_data_t auth_data;
+        std::vector<uint32_t> aVec; // FirebaseApp vector
+        std::vector<uint32_t> cVec; // AsyncClient vector
+
+        Timer req_timer, auth_timer, err_timer, app_ready_timer;
+        JSONUtil json;
+        StringUtil sut;
+        slot_options_t sop;
+
+        void setLastError(AsyncResult *aResult, int code, const String &message) { setLastErrorBase(aResult, code, message); }
 
         bool parseItem(StringUtil &sut, const String &src, String &dest, const String &name, const String &delim, int &p1, int &p2)
         {
@@ -210,10 +205,7 @@ namespace firebase
             }
         }
 
-        void clearLastError(AsyncResult *aResult)
-        {
-            clearLastErrorBase(aResult);
-        }
+        void clearLastError(AsyncResult *aResult) { clearLastErrorBase(aResult); }
 
         void setEventResult(AsyncResult *aResult, const String &msg, int code)
         {

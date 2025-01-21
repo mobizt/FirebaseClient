@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -47,8 +47,7 @@ namespace firebase
         std::vector<ev_item> evntVec;
         uint32_t ms = 0, last_ms = 0;
         int current_code = 0, new_code = 0;
-        bool available = false;
-        bool isEventChecked = false;
+        bool available = false, isEventChecked = false;
         int last = 0;
         ev_item ev;
 
@@ -96,7 +95,6 @@ namespace firebase
         }
 
         bool remaining() { return evntVec.size() && !evntVec[0].read; }
-
         bool isEvent()
         {
             isEventChecked = true;
@@ -124,7 +122,6 @@ namespace firebase
 
     public:
         String message() { return getEvent().msg; }
-
         int code()
         {
             // The workaround when isEvent() was not executed.
@@ -133,7 +130,6 @@ namespace firebase
                 isEventChecked = true;
                 return 0;
             }
-
             return getEvent().code;
         }
     };

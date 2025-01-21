@@ -1,5 +1,5 @@
 /**
- * Created December 25, 2024
+ * Created January 21, 2025
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -396,13 +396,12 @@ private:
 
 typedef enum
 {
-    firebase_network_data_undefined,
-    firebase_network_data_default_network,
-    firebase_network_data_generic_network,
-    firebase_network_data_gsm_network,
-    firebase_network_data_ethernet_network
-
-} firebase_network_data_type;
+    firebase_network_undefined,
+    firebase_network_default,
+    firebase_network_generic,
+    firebase_network_gsm,
+    firebase_network_ethernet
+} firebase_network_type;
 
 typedef struct firebase_client_static_address
 {
@@ -431,10 +430,7 @@ public:
     firebase_client_static_address() {};
 
 private:
-    IPAddress ipAddress;
-    IPAddress netMask;
-    IPAddress defaultGateway;
-    IPAddress dnsServer;
+    IPAddress ipAddress, netMask, defaultGateway, dnsServer;
     bool optional = false;
 } Firebase_StaticIP;
 

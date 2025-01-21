@@ -1,5 +1,5 @@
 /**
- * Created July 1, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -109,12 +109,7 @@ class FirebaseError
 
 private:
     app_error_t err;
-
-    void clearError()
-    {
-        err.reset();
-    }
-
+    void clearError() { err.reset(); }
     void setResponseError(const String &message, int code)
     {
         if (code == FIREBASE_ERROR_HTTP_CODE_PRECONDITION_FAILED)
@@ -130,7 +125,6 @@ private:
             err.setError(code, buf);
         }
     }
-
     void setClientError(int code)
     {
         if (code < 0)
@@ -173,7 +167,7 @@ private:
             case FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE:
                 err.setError(code, FPSTR("OTA Storage was not set"));
                 break;
-                case FIREBASE_ERROR_FW_UPDATE_WRITE_FAILED:
+            case FIREBASE_ERROR_FW_UPDATE_WRITE_FAILED:
                 err.setError(code, FPSTR("firmware write failed"));
                 break;
             case FIREBASE_ERROR_FW_UPDATE_END_FAILED:
@@ -208,13 +202,9 @@ public:
     FirebaseError() {}
     ~FirebaseError() {}
     String message() { return err.message(); }
-
     int code() { return err.code(); }
-
     void setLastError(int code, const String &msg) { err.setError(code, msg); }
-
     void reset() { err.reset(); }
-
     bool isError() { return err.isError(); }
 };
 

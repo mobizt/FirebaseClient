@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -32,9 +32,6 @@
 
 #if defined(ENABLE_FS)
 #include <FS.h>
-#define FILEOBJ File
-#else
-
 #endif
 
 #define FIREBASE_CHUNK_SIZE 2048
@@ -80,7 +77,7 @@ private:
 };
 
 #if defined(ENABLE_FS)
-typedef void (*FileConfigCallback)(FILEOBJ &file, const char *filename, file_operating_mode mode);
+typedef void (*FileConfigCallback)(File &file, const char *filename, file_operating_mode mode);
 #endif
 
 #if defined(ENABLE_CLOUD_STORAGE)
@@ -95,12 +92,10 @@ private:
         resume_state_send_payload,
         resume_state_read_response
     };
-    int index = 0;
-    int size = 0;
-    int read = 0;
+    
+    int index = 0, size = 0, read = 0, len = 0;
     bool enable = false;
     String location;
-    int len = 0;
     resume_state state = resume_state_undefined;
     StringUtil sut;
 
@@ -203,34 +198,29 @@ struct file_config_data
         file_status_closed,
         file_status_opened
     };
+
 #if defined(ENABLE_FS)
-    FILEOBJ file;
+    File file;
+    FileConfigCallback cb = NULL;
 #endif
-    String filename;
-    size_t file_size = 0;
 
 #if defined(ENABLE_CLOUD_STORAGE)
     file_upload_resumable_data resumable;
 #endif
-#if defined(ENABLE_FS)
-    FileConfigCallback cb = NULL;
-#endif
+
+    String filename;
     file_operating_status file_status = file_status_closed;
     uint8_t *data = nullptr;
-    size_t data_pos = 0;
-    size_t data_size = 0;
-    bool internal_data = false;
+    size_t data_pos = 0, data_size = 0, file_size = 0;
+    bool internal_data = false, initialized = false;
     firebase_blob_writer outB;
-    bool initialized = false;
     StringUtil sut;
+    Memory mem;
 
     void clearInternalData()
     {
         if (internal_data && data && data_size > 0)
-        {
-            delete data;
-            data = nullptr;
-        }
+            mem.release(&data);
         data_size = 0;
         internal_data = false;
     }
@@ -238,7 +228,7 @@ struct file_config_data
     void initBlobWriter(size_t size)
     {
         clearInternalData();
-        data = new uint8_t[size];
+        data = (uint8_t *)mem.alloc(size);
         if (data)
         {
             data_size = size;
@@ -256,8 +246,10 @@ public:
 
     void copy(const file_config_data &rhs)
     {
+
 #if defined(ENABLE_FS)
         this->file = rhs.file;
+        this->cb = rhs.cb;
 #endif
         this->filename = rhs.filename;
         this->file_size = rhs.file_size;
@@ -265,9 +257,7 @@ public:
         this->data_pos = rhs.data_pos;
         this->data_size = rhs.data_size;
         this->data = rhs.data;
-#if defined(ENABLE_FS)
-        this->cb = rhs.cb;
-#endif
+
         if (!rhs.internal_data && rhs.data && rhs.data_size > 0)
         {
             clearInternalData();
@@ -281,11 +271,12 @@ public:
 
     void clear()
     {
-        clearInternalData();
-        sut.clear(filename);
+
 #if defined(ENABLE_FS)
         cb = NULL;
 #endif
+        clearInternalData();
+        sut.clear(filename);
         data = nullptr;
         data_size = 0;
         internal_data = false;

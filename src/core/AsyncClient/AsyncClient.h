@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * Created January 21, 2025
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -168,8 +168,7 @@ private:
     AsyncResult *refResult = nullptr;
     AsyncResult aResult;
     int netErrState = 0;
-    uint32_t auth_ts = 0, cvec_addr = 0, result_addr = 0, sync_send_timeout_sec = 0, sync_read_timeout_sec = 0, session_timeout_sec = 0;
-    uint32_t addr = 0;
+    uint32_t addr = 0, auth_ts = 0, cvec_addr = 0, result_addr = 0, sync_send_timeout_sec = 0, sync_read_timeout_sec = 0, session_timeout_sec = 0;
     Timer session_timer;
     Client *client = nullptr;
     bool client_changed = false, network_changed = false;
@@ -1772,7 +1771,7 @@ private:
                 recon = true;
 
             // Self network connection controls.
-            bool self_connect = net.network_data_type == firebase_network_data_gsm_network || net.network_data_type == firebase_network_data_ethernet_network;
+            bool self_connect = net.network_type == firebase_network_gsm || net.network_type == firebase_network_ethernet;
 
             if (!self_connect && net.net_timer.remaining() == 0)
                 net.net_timer.feed(FIREBASE_NET_RECONNECT_TIMEOUT_SEC);
@@ -1780,7 +1779,7 @@ private:
             if (recon && (self_connect || net.net_timer.remaining() == 0))
             {
 
-                if (net.network_data_type == firebase_network_data_generic_network)
+                if (net.network_type == firebase_network_generic)
                 {
                     if (generic_network_owner_addr > 0 && generic_network_owner_addr != reinterpret_cast<uint32_t>(this))
                         return ret_continue;
@@ -1795,7 +1794,7 @@ private:
 
                     generic_network_owner_addr = 0;
                 }
-                else if (net.network_data_type == firebase_network_data_gsm_network)
+                else if (net.network_type == firebase_network_gsm)
                 {
                     if (gsm_network_owner_addr > 0 && gsm_network_owner_addr != reinterpret_cast<uint32_t>(this))
                         return ret_continue;
@@ -1808,7 +1807,7 @@ private:
 
                     gsm_network_owner_addr = 0;
                 }
-                else if (net.network_data_type == firebase_network_data_ethernet_network)
+                else if (net.network_type == firebase_network_ethernet)
                 {
                     if (ethernet_network_owner_addr > 0 && ethernet_network_owner_addr != reinterpret_cast<uint32_t>(this))
                         return ret_continue;
@@ -1821,7 +1820,7 @@ private:
 
                     ethernet_network_owner_addr = 0;
                 }
-                else if (net.network_data_type == firebase_network_data_default_network)
+                else if (net.network_type == firebase_network_default)
                 {
 
                     if (wifi_reconnection_ms == 0 || (wifi_reconnection_ms > 0 && millis() - wifi_reconnection_ms > FIREBASE_NET_RECONNECT_TIMEOUT_SEC * 1000))
@@ -1855,18 +1854,18 @@ private:
         bool net_status = net.network_status;
 
         // We will not invoke the network status request when device has built-in WiFi or Ethernet and it is connected.
-        if (net.network_data_type == firebase_network_data_gsm_network)
+        if (net.network_type == firebase_network_gsm)
         {
             net.network_status = gprsConnected();
         }
-        else if (net.network_data_type == firebase_network_data_ethernet_network)
+        else if (net.network_type == firebase_network_ethernet)
         {
             net.network_status = ethernetConnected();
         }
         // also check the native network before calling external cb
-        else if (net.network_data_type == firebase_network_data_default_network || WIFI_CONNECTED || ethLinkUp() || PPP_CONNECTED)
+        else if (net.network_type == firebase_network_default || WIFI_CONNECTED || ethLinkUp() || PPP_CONNECTED)
             net.network_status = WIFI_CONNECTED || ethLinkUp() || PPP_CONNECTED;
-        else if (net.network_data_type == firebase_network_data_generic_network)
+        else if (net.network_type == firebase_network_generic)
         {
             if (!net.generic.net_status_cb)
                 netErrState = 1;
@@ -2569,9 +2568,9 @@ public:
     /**
      * Return the current network type enum.
      *
-     * @return firebase_network_data_type The firebase_network_data_type enums are firebase_network_data_default_network, firebase_network_data_generic_network, firebase_network_data_ethernet_network and firebase_network_data_gsm_network.
+     * @return firebase_network_type The firebase_network_type enums are firebase_network_default, firebase_network_generic, firebase_network_ethernet and firebase_network_gsm.
      */
-    firebase_network_data_type getNetworkType() { return this->net.network_data_type; }
+    firebase_network_type getNetworkType() { return this->net.network_type; }
 
     /**
      * Set the network interface.

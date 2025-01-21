@@ -1,5 +1,5 @@
 /**
- * Created January 17, 2025
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -131,7 +131,6 @@ private:
 
     void setETag(const String &etag) { val[ares_ns::res_etag] = etag; }
     void setPath(const String &path) { val[ares_ns::data_path] = path; }
-
     bool setDownloadProgress()
     {
         if (download_data.downloaded > 0)
@@ -146,7 +145,6 @@ private:
         }
         return false;
     }
-
     bool setUploadProgress()
     {
         if (upload_data.uploaded > 0)
@@ -161,13 +159,11 @@ private:
         }
         return false;
     }
-
     void setDebug(const String &msg)
     {
         if (app_debug)
             setDebugBase(*app_debug, msg);
     }
-
     void setUID(const String &uid = "")
     {
         if (uid.length())
@@ -185,12 +181,10 @@ private:
 
     app_debug_t *app_debug = nullptr;
     app_event_t *app_event = nullptr;
-
     // This required by appEvent() that returns the reference to the app_event object which is not yet initialized.
     app_event_t ev;
     FirebaseError lastError;
     app_data_t app_data;
-
     uint32_t conn_ms = 0;
 
 public:
@@ -265,7 +259,7 @@ public:
     {
         if (app_debug)
             return app_debug->message();
-        return "";
+        return String();
     }
 
     /**

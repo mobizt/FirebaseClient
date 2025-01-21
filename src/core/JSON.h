@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -90,8 +90,7 @@ public:
         char *p = new char[value.length() + 1];
         memset(p, 0, value.length() + 1);
         strcpy(p, value.c_str());
-        char *pp = p;
-        char *end = p;
+        char *pp = p, *end = p;
         String tmp;
         if (value.length() == 0)
             tmp += '[';
@@ -129,8 +128,7 @@ private:
         char *p = new char[path.length() + 1];
         memset(p, 0, path.length() + 1);
         strcpy(p, path.c_str());
-        char *pp = p;
-        char *end = p;
+        char *pp = p, *end = p;
         String tmp;
         int i = 0;
         obj = "{";

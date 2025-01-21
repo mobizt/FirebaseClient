@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -132,10 +132,7 @@ public:
         return String(val);
     }
 
-    void clear(String &s)
-    {
-       s.remove(0, s.length());
-    }
+    void clear(String &s) { s.remove(0, s.length()); }
 };
 
 #endif

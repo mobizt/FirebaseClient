@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -60,10 +60,8 @@ namespace firebase
     struct jwt_token_data_t
     {
     public:
-        String token;
+        String token, msg, pk;
         int err_code = 0;
-        String msg;
-        String pk;
         char *hash = nullptr;               // SHA256 size (256 bits or 32 bytes)
         unsigned char *signature = nullptr; // 256 bytes
     };
@@ -83,8 +81,8 @@ namespace firebase
         jwt_token_data_t jwt_data;
         Timer err_timer;
         auth_data_t *auth_data = nullptr;
-        bool processing = false;
         app_debug_t *app_debug = nullptr;
+        bool processing = false;
 
         bool exit(bool ret)
         {

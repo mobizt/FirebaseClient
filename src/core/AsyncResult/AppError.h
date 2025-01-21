@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -44,8 +44,7 @@ private:
     std::vector<err_item> errVec;
     uint32_t ms = 0, last_ms = 0;
     int current_code = 0, new_code = 0;
-    bool available = false;
-    bool isErrorChecked = false;
+    bool available = false, isErrorChecked = false;
     int last = 0;
     err_item err;
 
@@ -137,7 +136,6 @@ public:
     }
 
     bool avail() { return available; }
-
     bool remain() { return remaining(); }
 };
 

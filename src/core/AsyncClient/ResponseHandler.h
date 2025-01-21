@@ -97,10 +97,7 @@ public:
     Timer read_timer;
     bool auth_data_available = false;
 
-    res_handler()
-    {
-    }
-
+    res_handler() {}
     ~res_handler()
     {
         if (toFill)
@@ -130,10 +127,7 @@ public:
         chunkInfo.phase = READ_CHUNK_SIZE;
     }
 
-    void feedTimer(int interval = -1)
-    {
-        read_timer.feed(interval == -1 ? FIREBASE_TCP_READ_TIMEOUT_SEC : interval);
-    }
+    void feedTimer(int interval = -1) { read_timer.feed(interval == -1 ? FIREBASE_TCP_READ_TIMEOUT_SEC : interval); }
 
     int tcpAvailable(reqns::tcp_client_type client_type, Client *client, void *atcp_config)
     {

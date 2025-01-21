@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -125,10 +125,7 @@ namespace firebase
         }
 
     public:
-        String message()
-        {
-            return getDebug().msg;
-        }
+        String message() { return getDebug().msg; }
     };
 }
 #endif

@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -38,7 +38,6 @@
 
 class Memory
 {
-private:
 public:
     Memory() {}
     ~Memory() {}

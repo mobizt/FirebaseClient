@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -397,7 +397,6 @@ private:
     String buf;
     StringUtil sut;
     bool trim = false;
-
     IVal iVal = {0};
     FVal fVal;
 

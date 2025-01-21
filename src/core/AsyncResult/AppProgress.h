@@ -1,5 +1,5 @@
 /**
- * Created June 2, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -59,13 +59,11 @@ private:
                 progressVec.erase(progressVec.begin() + i);
         }
     }
-
     void limitQueue()
     {
         if (progressVec.size() > 5)
             progressVec.erase(progressVec.begin());
     }
-
     void setProgress(int value)
     {
         limitQueue();
@@ -80,16 +78,13 @@ private:
 
         this->value = value;
     }
-
     void reset()
     {
         progressVec.clear();
         value = -1;
         available = false;
     }
-
     bool remaining() { return progressVec.size() && !progressVec[0].read; }
-
     bool isProgress()
     {
         if (available && last_ms < ms && ms > 0)
@@ -102,7 +97,6 @@ private:
         // remaining to read?
         return false;
     }
-
     void getProgress()
     {
         last_ms = millis();

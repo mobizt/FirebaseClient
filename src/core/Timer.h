@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -31,11 +31,7 @@
 class Timer
 {
 private:
-    unsigned long ts = 0;
-    unsigned long end = 0;
-    unsigned long period = 0;
-    unsigned long now = 0;
-    unsigned long ms = 0;
+    unsigned long ts = 0, end = 0, period = 0, now = 0, ms = 0;
     bool enable = false;
     uint8_t feed_count = 0;
 

@@ -1,5 +1,5 @@
 /**
- * Created January 17, 2025
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -65,7 +65,6 @@ namespace firebase
         bool sse = false;
         event_resume_status_t event_resume_status = event_resume_status_undefined;
         String node_name, etag;
-        // Large data supports
         uint32_t data_path_p1 = 0, data_path_p2 = 0, event_p1 = 0, event_p2 = 0, data_p1 = 0, data_p2 = 0;
         bool null_etag = false;
         String *ref_payload = nullptr;
@@ -81,7 +80,6 @@ namespace firebase
             sse = false;
             event_resume_status = event_resume_status_undefined;
         }
-
         void parseNodeName()
         {
             int p1 = 0, p2 = 0;
@@ -91,9 +89,7 @@ namespace firebase
                 node_name = ref_payload->substring(p1 + 1, p2 - 1);
             }
         }
-
         void feed() { sse_timer.feed(FIREBASE_SSE_TIMEOUT_MS / 1000); }
-
         void parseSSE()
         {
             clearSSE();
@@ -144,9 +140,7 @@ namespace firebase
                 }
             }
         }
-
         void setEventResumeStatus(event_resume_status_t status) { event_resume_status = status; }
-
         event_resume_status_t eventResumeStatus() const { return event_resume_status; }
 
     protected:
@@ -252,21 +246,13 @@ namespace firebase
 
     protected:
         void updateEvent(app_event_t &app_event) { app_event.update(); }
-
         void setEventBase(app_event_t &app_event, int code, const String &msg) { app_event.setEvent(code, msg); }
-
         void resetEvent(app_event_t &app_event) { app_event.reset(); }
-
         void updateDebug(app_debug_t &app_debug) { app_debug.update(); }
-
         void setDebugBase(app_debug_t &app_debug, const String &msg) { app_debug.setDebug(msg); }
-
         void resetDebug(app_debug_t &app_debug) { app_debug.reset(); }
-
         bool isDebugBase(app_debug_t &app_debug) { return app_debug.isDebug(); }
-
         bool isEventBase(app_event_t &app_event) { return app_event.isEvent(); }
-
         void clearAppData(app_data_t &app_data) { reset(app_data); }
     };
 

@@ -1,5 +1,5 @@
 /**
- * Created July 1, 2024
+ * Created January 21, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -184,11 +184,9 @@
 #if defined(ENABLE_FS)
 #if __has_include(<FS.h>)
 #include <FS.h>
-#define FILEOBJ File
 #elif __has_include(<SD.h>) && __has_include(<SPI.h>)
 #include <SPI.h>
 #include <SD.h>
-#define FILEOBJ File
 #else
 #undef ENABLE_FS
 #endif

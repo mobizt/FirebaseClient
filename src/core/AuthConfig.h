@@ -592,7 +592,7 @@ namespace firebase
             token_type_legacy_token
         };
 
-        static bool parseUserFile(token_type type, FILEOBJ userfile, user_auth_data &auth_data)
+        static bool parseUserFile(token_type type, File userfile, user_auth_data &auth_data)
         {
             String buff;
 
@@ -676,7 +676,7 @@ namespace firebase
             return false;
         }
 
-        static bool saveUserFile(token_type type, FILEOBJ userfile, user_auth_data &auth_data)
+        static bool saveUserFile(token_type type, File userfile, user_auth_data &auth_data)
         {
             String buff;
 
@@ -747,7 +747,7 @@ namespace firebase
     class SAParser
     {
     public:
-        static bool parseSAFile(FILEOBJ safile, user_auth_data &auth_data)
+        static bool parseSAFile(File safile, user_auth_data &auth_data)
         {
             bool ret = false;
 
