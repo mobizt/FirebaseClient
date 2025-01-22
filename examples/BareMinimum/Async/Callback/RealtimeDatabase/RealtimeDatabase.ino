@@ -1,4 +1,5 @@
 /**
+ * ABOUT:
  * The beare minimum code example for Realtime Database in async mode with callback function.
  */
 
@@ -102,8 +103,9 @@ void loop()
 
     // 14. Maintain the Firebase service async tasks in the loop.
     // ==========================================================
-    // This is not neccessary if the same AsyncClient or aClient provides for 
-    // all authentication processes and Firebase services functions.
+    // This is not neccessary if the same AsyncClient or aClient provided for 
+    // all authentication processes and Firebase services functions, calling app.loop()
+    // is enough.
     Database.loop();
 
     // 15. Checking the authentication status before calling Firebase services API.

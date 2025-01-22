@@ -1,4 +1,5 @@
 /**
+ * ABOUT:
  * The beare minimum code example for Realtime Database in sync mode.
  */
 
