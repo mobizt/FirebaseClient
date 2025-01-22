@@ -43,9 +43,8 @@ private:
 
     std::vector<err_item> errVec;
     uint32_t ms = 0, last_ms = 0;
-    int current_code = 0, new_code = 0;
+    int current_code = 0, new_code = 0, last = 0;
     bool available = false, isErrorChecked = false;
-    int last = 0;
     err_item err;
 
     void update()

@@ -116,10 +116,7 @@ protected:
         }
     };
 
-    void url(const String &url)
-    {
-        this->service_url = url;
-    }
+    void url(const String &url) { this->service_url = url; }
 
     void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t ul_dl_task_running_addr)
     {

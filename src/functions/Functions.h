@@ -45,10 +45,7 @@ public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
     ~CloudFunctions() {}
-    explicit CloudFunctions(const String &url = "")
-    {
-        this->service_url = url;
-    };
+    explicit CloudFunctions(const String &url = "") { this->service_url = url; }
 
     CloudFunctions &operator=(const CloudFunctions &rhs)
     {
@@ -785,10 +782,7 @@ private:
     uint32_t app_addr = 0, avec_addr = 0, ul_dl_task_running_addr = 0;
     app_token_t *app_token = nullptr;
 
-    void url(const String &url)
-    {
-        this->service_url = url;
-    }
+    void url(const String &url) { this->service_url = url; }
 
     void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t ul_dl_task_running_addr)
     {

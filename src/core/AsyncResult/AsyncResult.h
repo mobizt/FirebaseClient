@@ -103,8 +103,7 @@ class AsyncResult : public ResultBase, RealtimeDatabaseResult
 
 private:
     StringUtil sut;
-    uint32_t addr = 0;
-    uint32_t rvec_addr = 0;
+    uint32_t addr = 0, rvec_addr = 0;
     String val[ares_ns::max_type];
     download_data_t download_data;
     upload_data_t upload_data;

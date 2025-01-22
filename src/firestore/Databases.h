@@ -51,11 +51,6 @@ namespace Firestore
 
         Databases() {}
 
-        Databases &operator=(Databases &rhs)
-        {
-            return *this;
-        }
-
         /** Export the documents in the database to the Firebase Storage data bucket.
          *
          * @param aClient The async client.

@@ -392,10 +392,7 @@ namespace Messages
 
     public:
         Parent() {}
-        explicit Parent(const String &projectId)
-        {
-            this->projectId = projectId;
-        }
+        explicit Parent(const String &projectId) { this->projectId = projectId; }
         String getProjectId() const { return projectId; }
     };
 

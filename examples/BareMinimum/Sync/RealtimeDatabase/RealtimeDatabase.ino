@@ -82,9 +82,9 @@ void setup()
     // Skip certificate verification
     ssl_client.setInsecure();
 
-    // 11. Start authenticate process.
+    // 11. Start the authenticate process.
     // ===============================
-    // It actually add the authentication task in the AsyncClient queue which will be processed later.
+    // It actually adds the authentication task to the AsyncClient queue which will be processed later.
     // The result/status will store in AsyncResult(authResult).
     initializeApp(aClient, app, getAuth(user_auth), authResult);
 
@@ -96,7 +96,7 @@ void setup()
 
     // 13. Transfer or bind the authentication credentials
     // ====================================================
-    // The auth credentials from will FirebaseApp will be applied to the Firebase/Google Cloud services classes
+    // The auth credentials from FirebaseApp will be applied to the Firebase/Google Cloud services classes
     // that defined in Step 8.
     app.getApp<RealtimeDatabase>(Database);
 

@@ -46,9 +46,8 @@ namespace firebase
 
         std::vector<ev_item> evntVec;
         uint32_t ms = 0, last_ms = 0;
-        int current_code = 0, new_code = 0;
+        int current_code = 0, new_code = 0, last = 0;
         bool available = false, isEventChecked = false;
-        int last = 0;
         ev_item ev;
 
         void update()

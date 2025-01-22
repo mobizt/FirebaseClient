@@ -48,10 +48,8 @@ namespace firebase
 
         std::vector<dbg_item> dbgVec;
         uint32_t ms = 0, last_ms = 0;
-        String current_msg, new_msg;
-        bool available = false;
-        bool isDebugChecked = false;
-        String last;
+        String current_msg, new_msg, last;
+        bool available = false, isDebugChecked = false;
         dbg_item dbg;
 
         void update()

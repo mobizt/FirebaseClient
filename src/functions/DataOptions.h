@@ -581,9 +581,7 @@ namespace GoogleCloudFunctions
     {
     public:
         AsyncClientClass *aClient = nullptr;
-        String path;
-        String uid;
-        String mime;
+        String path, uid, mime;
         reqns::http_request_method method = reqns::http_undefined;
         slot_options_t opt;
         DataOptions *options = nullptr;

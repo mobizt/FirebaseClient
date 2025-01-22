@@ -259,9 +259,7 @@ public:
     {
         sut.clear(buf);
         if (std::is_same<T, bool>::value)
-        {
             buf = value ? "true" : "false";
-        }
         else
         {
             if (v_string<T>::value)

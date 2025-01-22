@@ -562,11 +562,7 @@ namespace firebase
         legacy_token_data legacy_token;
 #endif
 
-        bool anonymous = false;
-        bool initialized = false;
-        bool jwt_signing = false;
-        bool jwt_loop = false;
-        bool jwt_time_debug = false;
+        bool anonymous = false, initialized = false, jwt_signing = false, jwt_loop = false, jwt_time_debug = false;
         uint32_t jwt_ts = 0;
         auth_token_type auth_type = auth_unknown_token;
         user_auth_data_type auth_data_type = user_auth_data_undefined;
@@ -612,12 +608,10 @@ namespace firebase
                         tokenSize++;
                 }
 
-                String tokens[tokenSize];
+                String tokens[tokenSize], tmp;
                 char *p = reinterpret_cast<char *>(mem.alloc(buff.length()));
                 strcpy(p, buff.c_str());
-                char *pp = p;
-                char *end = p;
-                String tmp;
+                char *pp = p, *end = p;
                 int i = 0;
                 while (pp != NULL)
                 {
@@ -830,9 +824,7 @@ namespace firebase
 #if defined(ENABLE_FS)
             data.clear();
             if (userFile.initialized)
-            {
                 data.file_data.copy(userFile);
-            }
 #endif
         }
 
@@ -1074,9 +1066,7 @@ namespace firebase
 #if defined(ENABLE_FS)
             data.clear();
             if (tokenFile.initialized)
-            {
                 data.file_data.copy(tokenFile);
-            }
 #endif
         }
 
@@ -1148,9 +1138,7 @@ namespace firebase
 #if defined(ENABLE_FS)
             data.clear();
             if (tokenFile.initialized)
-            {
                 data.file_data.copy(tokenFile);
-            }
 #endif
         }
 
@@ -1288,9 +1276,7 @@ namespace firebase
 #if defined(ENABLE_FS)
             data.clear();
             if (tokenFile.initialized)
-            {
                 data.file_data.copy(tokenFile);
-            }
 #endif
         }
 

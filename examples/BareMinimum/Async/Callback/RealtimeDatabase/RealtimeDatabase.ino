@@ -79,13 +79,13 @@ void setup()
 
     // 10. Start authenticate process.
     // ===============================
-    // It actually add the authentication task in the AsyncClient queue which will be processed later.
+    // It actually adds the authentication task to the AsyncClient queue which will be processed later.
     // The result/status will send to the callback function "asyncCB".
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
     // 11. Transfer or bind the authentication credentials
     // ==================================================== 
-    // The auth credentials from will FirebaseApp will be applied to the Firebase/Google Cloud services classes
+    // The auth credentials from FirebaseApp will be applied to the Firebase/Google Cloud services classes
     // that defined in Step 8.
     app.getApp<RealtimeDatabase>(Database);
 

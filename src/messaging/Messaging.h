@@ -42,10 +42,7 @@ public:
     std::vector<uint32_t> cVec; // AsyncClient vector
 
     ~Messaging() {}
-    explicit Messaging(const String &url = "")
-    {
-        this->service_url = url;
-    };
+    explicit Messaging(const String &url = "") { this->service_url = url; }
 
     Messaging &operator=(const Messaging &rhs)
     {
