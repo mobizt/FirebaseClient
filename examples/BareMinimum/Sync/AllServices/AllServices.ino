@@ -1,5 +1,5 @@
 /**
- * The beare minimum code example for Realtime Database in sync mode.
+ * The beare minimum code example for all Firebase services in sync mode.
  */
 
 // 1. Include the network, SSL client and Firebase libraries.
@@ -11,11 +11,13 @@
 
 // 2. Define the function prototypes of functions we will use.
 // ===========================================================
+void timeStatusCB(uint32_t &ts);
 void authHandler();
 void printResult(AsyncResult &aResult);
+void getMsg(Messages::Message &msg);
 
-// 3. Define the network config (identifier) class for your network type.
-// ======================================================================
+// 3. Define the network config (identifier) class.
+// ================================================
 // The DefaultNetwork class object will provide the WiFi network identifier for ESP32/ESP8266 and
 // any WiFi capable devices.
 // Why we have to define this? It is because this library supports many types of network interfaces.
@@ -25,13 +27,16 @@ DefaultNetwork network;
 
 // 4. Define the authentication config (identifier) class.
 // =======================================================
-// The UserAuth (user authentication) is the basic for Realtime Database authentication.
-UserAuth user_auth("Web_API_KEY", "USER_EMAIL", "USER_PASSWORD");
+// In this case the ServiceAuth class (OAuth2.0 authen) can be used for all services
+// especially Cloud Storage and Cloud Functions required this authentication type.
+// The timeStatusCB is the callback function to set the library timestamp for internal process.
+ServiceAuth sa_auth(timeStatusCB, "CLIENT_EMAIL", "PROJECT_ID", "PRIVATE_KEY", 3000);
 
 // 5. Define the authentication handler class.
 // ===========================================
 // It handles and maintains (re-authenticate in case auth token was expired in 60 min)
 // the Firebase authentication process for you.
+// Actually you can define different FirebaseApps for each Firebase/Google Cloud services.
 FirebaseApp app;
 
 // 6. Define the SSL client.
@@ -50,6 +55,11 @@ AsyncClient aClient(ssl_client, getNetwork(network));
 // 8. Define the class that provides the Firebase service API.
 // ===========================================================
 RealtimeDatabase Database;
+Messaging messaging;
+Firestore::Documents Docs;
+Storage storage;
+CloudStorage cstorage;
+CloudFunctions cfunctions;
 
 // 9. Define the AsyncResult class
 // ===============================
@@ -85,7 +95,7 @@ void setup()
     // ===============================
     // It actually add the authentication task in the AsyncClient queue which will be processed later.
     // The result/status will store in AsyncResult(authResult).
-    initializeApp(aClient, app, getAuth(user_auth), authResult);
+    initializeApp(aClient, app, getAuth(sa_auth), authResult);
 
     // 12. Process the authentication task
     // ===================================
@@ -98,6 +108,11 @@ void setup()
     // The auth credentials from will FirebaseApp will be applied to the Firebase/Google Cloud services classes
     // that defined in Step 8.
     app.getApp<RealtimeDatabase>(Database);
+    app.getApp<Messaging>(messaging);
+    app.getApp<Firestore::Documents>(Docs);
+    app.getApp<Storage>(storage);
+    app.getApp<CloudStorage>(cstorage);
+    app.getApp<CloudFunctions>(cfunctions);
 
     // 14. Set your database URL (requires only for Realtime Database)
     // ===============================================================
@@ -107,16 +122,56 @@ void setup()
     // ============================================================================
     if (app.ready())
     {
-        // Testing with Realtime Datanbase set and get.
+
+        // Realtime Database set value.
         bool result = Database.set<String>(aClient, "/data", "Hello");
 
         if (!result)
             Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
 
-        String value = Database.get<String>(aClient, "/data");
+        Messages::Message msg;
+        getMsg(msg);
+
+        // Cloud Messaging send message.
+        String payload = messaging.send(aClient, Messages::Parent("PROJECT_ID"), msg);
 
         if (aClient.lastError().code() == 0)
-            Serial.println(value);
+            Serial.println(payload);
+        else
+            Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
+
+        // Firestore get document.
+        payload = Docs.get(aClient, Firestore::Parent("PROJECT_ID"), "info/countries", GetDocumentOptions(DocumentMask("Singapore")));
+
+        if (aClient.lastError().code() == 0)
+            Serial.println(payload);
+        else
+            Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
+
+        // Firebase Storage get object metadata
+        payload = storage.getMetadata(aClient, FirebaseStorage::Parent("STORAGE_BUCKET_ID", "media.mp4"));
+
+        if (aClient.lastError().code() == 0)
+            Serial.println(payload);
+        else
+            Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
+
+        // Cloud Storage list objects.
+        GoogleCloudStorage::ListOptions options;
+        options.maxResults(3);
+        options.prefix("media");
+        payload = cstorage.list(aClient, GoogleCloudStorage::Parent("STORAGE_BUCKET_ID"), options);
+
+        if (aClient.lastError().code() == 0)
+            Serial.println(payload);
+        else
+            Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
+
+        // Cloud Functions call function.
+        payload = cfunctions.call(aClient, GoogleCloudFunctions::Parent("PROJECT_ID", "PROJECT_LOCATION"), "helloWorld", "test");
+
+        if (aClient.lastError().code() == 0)
+            Serial.println(payload);
         else
             Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
     }
@@ -128,11 +183,33 @@ void loop()
     // ======================================================
     authHandler();
 
-    // In only sync mode application (unless used both sync and async), this is not necessary to run in the loop.
+    // In only sync mode application (unless used both sync and async), the foolowing functions
+    // are not necessary to run in the loop.
     // Database.loop();
+    // messaging.loop();
+    // Docs.loop();
+    // storage.loop();
+    // cstorage.loop();
+    // cfunctions.loop();
 }
 
-// 17. Define the function that provides the loop for authentication processing.
+// 17. Defined the auxiliary function required to get the timestamp for internal JWT token signing process.
+// ========================================================================================================
+void timeStatusCB(uint32_t &ts)
+{
+    if (time(nullptr) < FIREBASE_DEFAULT_TS)
+    {
+
+        configTime(3 * 3600, 0, "pool.ntp.org");
+        while (time(nullptr) < FIREBASE_DEFAULT_TS)
+        {
+            delay(100);
+        }
+    }
+    ts = time(nullptr);
+}
+
+// 18. Define the function that provides the loop for authentication processing.
 // =============================================================================
 void authHandler()
 {
@@ -145,9 +222,9 @@ void authHandler()
     }
 }
 
-// 18. Optional function for debugging.
+// 19. Optional function for debugging.
 // ====================================
-// The auxiliary function that we will print all information that obtained from the authentication processes.
+// The auxiliary function that we will print all information that obtained from the processes.
 void printResult(AsyncResult &aResult)
 {
     if (aResult.isEvent())
@@ -158,4 +235,19 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.isError())
         Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+
+    if (aResult.available())
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
+}
+
+// 20 The auxiliary function to create the message to send.
+// ========================================================
+void getMsg(Messages::Message &msg)
+{
+    msg.topic("test");
+
+    Messages::Notification notification;
+    notification.body("Notification body").title("Notification title");
+
+    msg.notification(notification);
 }

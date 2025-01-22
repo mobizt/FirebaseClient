@@ -1,5 +1,5 @@
 /**
- * The beare minimum code example for Realtime Database in sync mode.
+ * The beare minimum code example for Realtime Database in async mode without callback function.
  */
 
 // 1. Include the network, SSL client and Firebase libraries.
@@ -11,7 +11,7 @@
 
 // 2. Define the function prototypes of functions we will use.
 // ===========================================================
-void authHandler();
+void asyncCB(AsyncResult &aResult);
 void printResult(AsyncResult &aResult);
 
 // 3. Define the network config (identifier) class for your network type.
@@ -30,7 +30,7 @@ UserAuth user_auth("Web_API_KEY", "USER_EMAIL", "USER_PASSWORD");
 
 // 5. Define the authentication handler class.
 // ===========================================
-// It handles and maintains (re-authenticate in case auth token was expired in 60 min)
+// It handles and maintains (re-authenticate in case auth token was expired in 60 min) 
 // the Firebase authentication process for you.
 FirebaseApp app;
 
@@ -53,10 +53,10 @@ RealtimeDatabase Database;
 
 // 9. Define the AsyncResult class
 // ===============================
-// This keeps all information/debug/error from auth processes.
-// Don't be confused with its name. It can be used for sync and
-// async tasks to keep the task result when it assigned to any functions.
-AsyncResult authResult;
+// This keeps the processing result when it assigned to any functions.
+AsyncResult myResult;
+
+bool onetimeTest = false;
 
 void setup()
 {
@@ -64,7 +64,7 @@ void setup()
     Serial.begin(115200);
 
     // 10. Setup network and connect
-    // =============================
+    // ============================
     WiFi.begin("WIFI_AP", "WIFI_PASSWORD");
 
     Serial.print("Connecting to Wi-Fi");
@@ -84,70 +84,58 @@ void setup()
     // 11. Start authenticate process.
     // ===============================
     // It actually add the authentication task in the AsyncClient queue which will be processed later.
-    // The result/status will store in AsyncResult(authResult).
-    initializeApp(aClient, app, getAuth(user_auth), authResult);
+    // The result/status will store in AsyncResult(myResult).
+    initializeApp(aClient, app, getAuth(user_auth), myResult);
 
-    // 12. Process the authentication task
-    // ===================================
-    // This function required for sync mode usage.
-    // The authHandler function in this example provides the loop for authentication processing.
-    authHandler();
-
-    // 13. Transfer or bind the authentication credentials
-    // ====================================================
+    // 12. Transfer or bind the authentication credentials
+    // ==================================================== 
     // The auth credentials from will FirebaseApp will be applied to the Firebase/Google Cloud services classes
     // that defined in Step 8.
     app.getApp<RealtimeDatabase>(Database);
 
-    // 14. Set your database URL (requires only for Realtime Database)
+    // 13. Set your database URL (requires only for Realtime Database)
     // ===============================================================
     Database.url("DATABASE_URL");
-
-    // 15. Checking the authentication status before calling Firebase services API.
-    // ============================================================================
-    if (app.ready())
-    {
-        // Testing with Realtime Datanbase set and get.
-        bool result = Database.set<String>(aClient, "/data", "Hello");
-
-        if (!result)
-            Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
-
-        String value = Database.get<String>(aClient, "/data");
-
-        if (aClient.lastError().code() == 0)
-            Serial.println(value);
-        else
-            Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
-    }
 }
 
 void loop()
 {
-    // 16. Maintain the authentication processes in the loop.
-    // ======================================================
-    authHandler();
+    // 14. Maintain the authentication (async) task in the loop
+    // ========================================================
+    // This required for authentication/re-authentication.
+    app.loop();
 
-    // In only sync mode application (unless used both sync and async), this is not necessary to run in the loop.
-    // Database.loop();
-}
+    // 15. Maintain the Firebase service async tasks in the loop.
+    // ==========================================================
+    // This is not neccessary if the same AsyncClient or aClient provides for 
+    // all authentication processes and Firebase services functions.
+    Database.loop();
 
-// 17. Define the function that provides the loop for authentication processing.
-// =============================================================================
-void authHandler()
-{
-    // Blocking authentication handler with timeout
-    unsigned long ms = millis();
-    while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
+    // 16. Checking the authentication status before calling Firebase services API.
+    // ============================================================================
+    if (app.ready() && !onetimeTest)
     {
-        JWT.loop(app.getAuth());
-        printResult(authResult);
+        onetimeTest = true;
+
+        // Testing with Realtime Database set and get.
+        Database.set<int>(aClient, "/data", 9999, myResult);
+
+        Database.get(aClient, "/data", myResult);
     }
+     
+     // 17. Processing the result from async tasks.
+     // ===========================================
+     printResult(myResult);
 }
 
-// 18. Optional function for debugging.
-// ====================================
-// The auxiliary function that we will print all information that obtained from the authentication processes.
+// 18. The callback function that will be called when the information/error/data 
+// from the auth and Firebase processes are available.
+// =============================================================================
+void asyncCB(AsyncResult &aResult) { printResult(aResult); }
+
+// 19. Optional for debugging.
+// ===========================
+// The auxiliary function that we will print all information that obtained from the processes.
 void printResult(AsyncResult &aResult)
 {
     if (aResult.isEvent())
@@ -158,4 +146,7 @@ void printResult(AsyncResult &aResult)
 
     if (aResult.isError())
         Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
+
+    if (aResult.available())
+        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
 }
