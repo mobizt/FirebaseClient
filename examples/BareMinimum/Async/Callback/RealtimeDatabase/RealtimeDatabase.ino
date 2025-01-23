@@ -3,7 +3,7 @@
  *
  * The beare minimum code example for Realtime Database in async mode with callback function.
  *
-  * The steps which are generally required and explained below.
+ * The steps which are generally required and explained below.
  *
  * Step 1. Include the network, SSL client and Firebase libraries.
  * ===============================================================
@@ -55,18 +55,20 @@
  *
  * Step 6. Define the SSL client.
  * ==============================
- * It handles server connection and data transfer.
+ * It handles server connection and data transfer works.
  *
- * In this beare minimum examples we use only one SSL client for all process.
+ * In this beare minimum example we use only one SSL client for all process.
  * In some use cases e.g. Realtime Database Stream connection, you may have to define the SSL client for it separately.
  *
  * Step 7. Define the Async Client.
  * ================================
  * This is the class that is used with the functions where the server data transfer is involved.
- * It stores all sync/async taks in its queue.
+ * It stores all sync/async taks in its queue. 
  *
- * It requires the SSL client and network config (identifier) data for its class constructor for
- * server connection and data transfer.
+ * It requires the SSL client and network config (identifier) data for its class constructor for its network re-connection 
+ * (e.g. WiFi and GSM), network connection status checking, server connection, and data transfer processes.
+ * 
+ * This makes this library reliable and operates precisely under various server and network conditions. 
  *
  * Step 8. Define the class that provides the Firebase/Google Cloud services.
  * ==========================================================================
@@ -80,13 +82,16 @@
  * ========================================
  * In this step, it actually adds the authentication task to the AsyncClient queue which will be processed later.
  * The result/status will send to the callback function in case of async with callback usage or stores in the AsyncResult object
- * in case asynce without callback and sync usages.
+ * in case async without callback and sync usages.
  *
  * This allows us to use different authentications for each Firebase/Google Cloud services with different
- * FirebaseApp (authentication handler).
- *
- * Please avoid placing your code that uses large memory and cpu time inside the callback function to prevent the stack overflow and
- * nested callback calls.
+ * FirebaseApps (authentication handler)s.
+ * 
+ * The workflow of authentication process.
+ * 
+ * FirebaseApp [holds unauthenticate data] ───> InitializeApp [prepares the authentication process] ───> 
+ * FirebaseApp [holds authenticated data] ───> FirebaseApp::getApp ───> Firebase Service Class [uses authenticated data]
+ *                                        └──> FirebaseApp::loop [maintains the (re)authentication process]
  *
  * Step 11. Bind the FirebaseApp (authentication handler) with your Firebase/Google Cloud services classes.
  * ========================================================================================================
@@ -174,6 +179,10 @@ void setup()
 
     // Skip certificate verification
     ssl_client.setInsecure();
+
+    // Set timeout
+    ssl_client.setConnectionTimeout(1000);
+    ssl_client.setHandshakeTimeout(5);
 
     // Step 10
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
