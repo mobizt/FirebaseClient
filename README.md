@@ -361,7 +361,7 @@ For the concept and basic usage understanding, you should read this documentatio
 > [!IMPORTANT]  
 > For new `Firebase` users, please read the [Project Preparation and Setup](#project-preparation-and-setup) section.
 
-The [beare minimun examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/BareMinimum/) provides the minimum code that requires by this library.
+The [bare minimun examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/BareMinimum/) provides the minimum code that requires by this library.
 
 - ### Authentication
 
@@ -380,7 +380,7 @@ The authorization token will be refreshed or re-created automatically as long as
 > 
 > Anyway, library also provides the option for less or non-secure usage which no authorization tokens are involved i.e. using database secret (`LegacyToken`) for Realtime database and using no authorization token (`NoAuth`) if the security rules are allowed (see the [Project Preparation and Setup](#project-preparation-and-setup) section). 
 > 
-> You can get started using this library with these [beare minimun examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/BareMinimum/) or these [simple Realtime database examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/RealtimeDatabase/Simple) which using database secret and no token, which are similar to the other legacy Firebase library usage. 
+> You can get started using this library with these [bare minimun examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/BareMinimum/) or these [simple Realtime database examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/RealtimeDatabase/Simple) which using database secret and no token, which are similar to the other legacy Firebase library usage. 
 >
 > For secure and more elaborate usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
 
