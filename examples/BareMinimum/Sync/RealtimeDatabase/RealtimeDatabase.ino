@@ -87,11 +87,17 @@
  * This allows us to use different authentications for each Firebase/Google Cloud services with different
  * FirebaseApps (authentication handler)s.
  * 
- * The workflow of authentication process.
+ * The workflow of sync (blocking) authentication process.
  * 
- * FirebaseApp [holds unauthenticate data] ───> InitializeApp [prepares the authentication process] ───> 
- * FirebaseApp [holds authenticated data] ───> FirebaseApp::getApp ───> Firebase Service Class [uses authenticated data]
- *                                        └──> FirebaseApp::loop [maintains the (re)authentication process]
+ * -----------------------------------------------------------------------------------------------------------
+ *          |    FirebaseApp [account credentials/tokens] ───> InitializeApp ───> Authentication Handler ───>
+ *  Setup   |    FirebaseApp::getApp ───> FirebaseApp::ready ───> Firebase Service API [auth token]
+ * -----------------------------------------------------------------------------------------------------------
+ *  Loop    |    Authentication Handler  ───> FirebaseApp::ready ───> Firebase Service API [auth token]
+ * -----------------------------------------------------------------------------------------------------------
+ * 
+ * Authentication Handler in the workflow is the function or code block that runs FirebaseApp::ready in the finite loop 
+ * while it returns false and exit the loop when it returns true or timed out.
  *
  * Step 11. Waits the authentication task to be complete.
  * ======================================================
