@@ -3,7 +3,7 @@
  *
  * The beare minimum code example for Realtime Database in sync mode.
  *
-  * The steps which are generally required and explained below.
+  * The steps which are generally required are explained below.
  *
  * Step 1. Include the network, SSL client and Firebase libraries.
  * ===============================================================
@@ -90,8 +90,8 @@
  * The workflow of sync (blocking) authentication process.
  * 
  * -----------------------------------------------------------------------------------------------------------
- *          |    FirebaseApp [account credentials/tokens] ───> InitializeApp ───> Authentication Handler ───>
- *  Setup   |    FirebaseApp::getApp ───> FirebaseApp::ready ───> Firebase Service API [auth token]
+ *  Setup   |    FirebaseApp [account credentials/tokens] ───> InitializeApp ───> Authentication Handler ───>
+ *          |    FirebaseApp::getApp ───> FirebaseApp::ready ───> Firebase Service API [auth token]
  * -----------------------------------------------------------------------------------------------------------
  *  Loop    |    Authentication Handler  ───> FirebaseApp::ready ───> Firebase Service API [auth token]
  * -----------------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@
  * ========================================================================================================
  * This allows us to use different authentications for each Firebase/Google Cloud services.
  *
- * It is easy to bind/unbind/chanhe the authentication for authentication for different Firebase/Google Cloud services APIs.
+ * It is easy to bind/unbind/change the authentication method for different Firebase/Google Cloud services APIs.
  *
  * Step 13. Set the Realtime Database URL (for Realtime Database only)
  * ===================================================================
@@ -226,7 +226,8 @@ void loop()
 
 void authHandler()
 {
-    // This function maintains the authentication process by calling app.ready() in the finite loop that exits when timed out.
+    // This function maintains the authentication process by calling FirebaseApp::ready() in the finite loop that exits 
+    // when authenticate or timed out.
     unsigned long ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {

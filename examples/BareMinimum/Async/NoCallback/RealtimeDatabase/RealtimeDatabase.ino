@@ -3,7 +3,7 @@
  * 
  * The beare minimum code example for Realtime Database in async mode without callback function.
  * 
- * The steps which are generally required and explained below.
+ * The steps which are generally required are explained below.
  *
  * Step 1. Include the network, SSL client and Firebase libraries.
  * ===============================================================
@@ -99,7 +99,7 @@
  * ========================================================================================================
  * This allows us to use different authentications for each Firebase/Google Cloud services.
  *
- * It is easy to bind/unbind/chanhe the authentication for authentication for different Firebase/Google Cloud services APIs.
+ * It is easy to bind/unbind/change the authentication method for different Firebase/Google Cloud services APIs.
  *
  * Step 12. Set the Realtime Database URL (for Realtime Database only)
  * ===================================================================

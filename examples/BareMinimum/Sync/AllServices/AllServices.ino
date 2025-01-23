@@ -3,7 +3,7 @@
  *
  * The beare minimum code example for all Firebase services in sync mode.
  *
- * The steps which are generally required and explained below.
+ * The steps which are generally required are explained below.
  *
  * Step 1. Include the network, SSL client and Firebase libraries.
  * ===============================================================
@@ -65,10 +65,10 @@
  * This is the class that is used with the functions where the server data transfer is involved.
  * It stores all sync/async taks in its queue.
  *
- * It requires the SSL client and network config (identifier) data for its class constructor for its network re-connection 
+ * It requires the SSL client and network config (identifier) data for its class constructor for its network re-connection
  * (e.g. WiFi and GSM), network connection status checking, server connection, and data transfer processes.
- * 
- * This makes this library reliable and operates precisely under various server and network conditions. 
+ *
+ * This makes this library reliable and operates precisely under various server and network conditions.
  *
  * Step 8. Define the class that provides the Firebase/Google Cloud services.
  * ==========================================================================
@@ -86,17 +86,17 @@
  *
  * This allows us to use different authentications for each Firebase/Google Cloud services with different
  * FirebaseApps (authentication handler)s.
- * 
+ *
  * The workflow of sync (blocking) authentication process.
- * 
+ *
  * -----------------------------------------------------------------------------------------------------------
- *          |    FirebaseApp [account credentials/tokens] ───> InitializeApp ───> Authentication Handler ───>
- *  Setup   |    FirebaseApp::getApp ───> FirebaseApp::ready ───> Firebase Service API [auth token]
+ *  Setup   |    FirebaseApp [account credentials/tokens] ───> InitializeApp ───> Authentication Handler ───>
+ *          |    FirebaseApp::getApp ───> FirebaseApp::ready ───> Firebase Service API [auth token]
  * -----------------------------------------------------------------------------------------------------------
  *  Loop    |    Authentication Handler  ───> FirebaseApp::ready ───> Firebase Service API [auth token]
  * -----------------------------------------------------------------------------------------------------------
- * 
- * Authentication Handler in the workflow is the function or code block that runs FirebaseApp::ready in the finite loop 
+ *
+ * Authentication Handler in the workflow is the function or code block that runs FirebaseApp::ready in the finite loop
  * while it returns false and exit the loop when it returns true or timed out.
  *
  * Step 11. Waits the authentication task to be complete.
@@ -107,7 +107,7 @@
  * ========================================================================================================
  * This allows us to use different authentications for each Firebase/Google Cloud services.
  *
- * It is easy to bind/unbind/chanhe the authentication for authentication for different Firebase/Google Cloud services APIs.
+ * It is easy to bind/unbind/change the authentication method for different Firebase/Google Cloud services APIs.
  *
  * Step 13. Set the Realtime Database URL (for Realtime Database only)
  * ===================================================================
@@ -184,7 +184,7 @@ void setup()
 
     // Skip certificate verification
     ssl_client.setInsecure();
-    
+
     // Set timeout
     ssl_client.setConnectionTimeout(1000);
     ssl_client.setHandshakeTimeout(5);
@@ -298,7 +298,8 @@ void timeStatusCB(uint32_t &ts)
 
 void authHandler()
 {
-    // This function maintains the authentication process by calling app.ready() in the finite loop that exits when timed out.
+    // This function maintains the authentication process by calling FirebaseApp::ready() in the finite loop that exits
+    // when authenticate or timed out.
     unsigned long ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
