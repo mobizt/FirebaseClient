@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-01-24T09:51:37Z`
+Revision `2025-01-24T18:25:17Z`
 
 ## Table of Contents
 
@@ -86,7 +86,7 @@ Revision `2025-01-24T09:51:37Z`
 
 Async Firebase Client library for Arduino Documentation.
 
-This library is the `REST APIs Firebase Client` that supports the following `Firebase Products` and `Google Cloud Products`.
+This library is the `REST APIs Firebase Client` that supports the following `Firebase` and `Google Cloud` products` in one places.
 
 - `Firebase Realtime Database`
 - `Cloud Firestore Database`
@@ -115,6 +115,18 @@ This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was cr
 
 > [!NOTE]  
 > The Cloud Firestore Database data change listening does not support by REST API.
+
+This library provides the usage flexibilities. You can chose what you only want to use (see [Library Build Options](#library-build-options)) and you can use with any network interfaces and authentications.
+
+In addition, this library provides the sync and async usage modes which can be mixed. The async mode provides your code more dynamic with zero delay usage excepts only small delays used during SPI Ethernet module initializing.
+
+The powerful debugding system allows you to understand what is going on when it is running or failed.
+
+The network identifier classe, authentication classe and the SSL client class can be plug and play. They can be on-the-fly switchable.
+
+The [bare minimum code examples](/examples/BareMinimum/) provide the basic guidelines for library usage concepts. Even though it contains more lines of code, it is still simple but efficient.
+
+You can create your own wrapper class as you want that provides the callback-less, cleaner and simpler API but well managed, powerfull and reliable. See the [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to.
 
 ## Frequently Asked Questions
 
@@ -361,7 +373,7 @@ For the concept and basic usage understanding, you should read this documentatio
 > [!IMPORTANT]  
 > For new `Firebase` users, please read the [Project Preparation and Setup](#project-preparation-and-setup) section.
 
-The [bare minimun examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/BareMinimum/) provides the minimum code that requires by this library.
+The [bare minimun examples](/examples/BareMinimum/) provides the minimum code that requires by this library.
 
 - ### Authentication
 
