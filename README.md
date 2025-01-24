@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-01-23T06:30:53Z`
+Revision `2025-01-24T09:51:37Z`
 
 ## Table of Contents
 
@@ -984,12 +984,21 @@ The [CustomAuth](/examples/App/AppInitialization/Async/Callback/CustomAuth/) cla
 CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
 ```
 
-
 ```cpp
 CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>)
 ```
 
+```cpp
+CustomAuth::CustomAuth(<timestamp>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
+```
+
+```cpp
+CustomAuth::CustomAuth(<timestamp>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>)
+```
+
 `<TimeStatusCallback>` The time status callback that provides the UNIX timestamp used to set the issue time and expiration time in the JWT token payload.
+
+`<timestamp>` The current UNiX timestamp (seonds since Jan 1, 1970 midnight).
 
 `<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of service account key file.
 
@@ -1029,7 +1038,17 @@ ServiceAuth::ServiceAuth(<TimeStatusCallback>, <client_email>, <project_id>, <pr
 ServiceAuth::ServiceAuth(<TimeStatusCallback>, <file_config_data>, <expire>)
 ```
 
+```cpp
+ServiceAuth::ServiceAuth(<timestamp>, <client_email>, <project_id>, <private_key>, <expire>)
+```
+
+```cpp
+ServiceAuth::ServiceAuth(<timestamp>, <file_config_data>, <expire>)
+```
+
 `<TimeStatusCallback>` The time status callback that provides the UNIX timestamp used to set the issue time and expiration time in the JWT token payload.
+
+`<timestamp>` The current UNiX timestamp (seonds since Jan 1, 1970 midnight).
 
 `<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of service account key file.
 

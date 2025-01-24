@@ -32,6 +32,16 @@
  * <project_id> - The service account project ID.
  * <private_key> - The service account private key.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
+ * 
+ * 3.------------------------
+ *
+ * ServiceAuth::ServiceAuth(<timestamp>, <client_email>, <project_id>, <private_key>, <expire>);
+ *
+ * <timestamp> - The current UNiX timestamp (seonds since Jan 1, 1970 midnight).
+ * <client_email> - The service account client Email.
+ * <project_id> - The service account project ID.
+ * <private_key> - The service account private key.
+ * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
  *
  * NOTE:
  *

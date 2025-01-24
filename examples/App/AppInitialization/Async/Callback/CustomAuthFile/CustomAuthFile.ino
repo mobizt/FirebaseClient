@@ -37,6 +37,21 @@
  * <scope> - The OAuth scopes.
  * <claims> - The OAuth claims.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
+ * 
+  * 3.------------------------
+ *
+ * CustomAuth::CustomAuth(<timestamp>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>);
+ *
+ * <timestamp> - The current UNiX timestamp (seonds since Jan 1, 1970 midnight).
+ * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of service account key file.
+ * <api_key> - The web API key of project.
+ * <client_email> - The service account client Email.
+ * <project_id> - The service account project ID.
+ * <private_key> - The service account private key.
+ * <user_id> - The user ID.
+ * <scope> - The OAuth scopes.
+ * <claims> - The OAuth claims.
+ * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
  *
  * NOTE:
  *

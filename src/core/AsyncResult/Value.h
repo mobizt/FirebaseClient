@@ -1,5 +1,5 @@
 /**
- * Created January 21, 2025
+ * Created January 24, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2024 K. Suwatchai (Mobizt)
@@ -66,8 +66,8 @@ private:
 
 public:
     number_t() {}
-    template <typename T1 = int, typename T = int>
-    explicit number_t(T1 v, T d) : buf(String(v, d)) {}
+    template <typename T1 = int>
+    explicit number_t(T1 v, int d) : buf(String(v, d)) {}
     template <typename T = int>
     explicit number_t(T o) : buf(sut.num2Str(o)) {}
     const char *c_str() const { return buf.c_str(); }

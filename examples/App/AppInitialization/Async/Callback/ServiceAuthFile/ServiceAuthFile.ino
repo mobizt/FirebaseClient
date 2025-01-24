@@ -30,6 +30,14 @@
  * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
  * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of service account key file.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
+ * 
+ * 3.------------------------
+ *
+ * ServiceAuth::ServiceAuth(<timestamp>, <file_config_data>, <expire>);
+ *
+ * <timestamp> - The current UNiX timestamp (seonds since Jan 1, 1970 midnight).
+ * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of service account key file.
+ * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
  *
  * NOTE:
  *

@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * Created January 24, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -504,6 +504,7 @@ namespace firebase
             this->anonymous = rhs.anonymous;
             this->initialized = rhs.initialized;
             this->timestatus_cb = rhs.timestatus_cb;
+            this->ts = rhs.ts;
         }
 
         void clear()
@@ -537,6 +538,7 @@ namespace firebase
             timestatus_cb = NULL;
             anonymous = false;
             initialized = false;
+            ts = 0;
         }
 
     protected:
@@ -569,6 +571,7 @@ namespace firebase
         firebase_core_auth_task_type task_type = firebase_core_auth_task_type_undefined;
         auth_status status;
         TimeStatusCallback timestatus_cb = NULL;
+        uint32_t ts = 0;
         file_config_data file_data;
     };
 
@@ -900,6 +903,20 @@ namespace firebase
 #endif
         }
 
+        explicit ServiceAuth(uint32_t ts, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        {
+            ServiceAuth(nullptr, clientEmail, projectId, privateKey, expire);
+            data.ts = ts;
+        };
+
+        explicit ServiceAuth(uint32_t ts, const file_config_data &safile, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        {
+#if defined(ENABLE_FS)
+            ServiceAuth(nullptr, safile, expire);
+            data.ts = ts;
+#endif
+        }
+
         ~ServiceAuth() { data.clear(); };
         void clear() { data.clear(); }
         user_auth_data &get()
@@ -966,6 +983,20 @@ namespace firebase
                 data.cust.val[cust_ns::claims] = claims;
                 data.timestatus_cb = timeCb;
             }
+#endif
+        }
+
+        explicit CustomAuth(uint32_t ts, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        {
+            CustomAuth(nullptr, apiKey, clientEmail, projectId, privateKey, uid, scope, claims, expire);
+            data.ts = ts;
+        };
+
+        explicit CustomAuth(uint32_t ts, const file_config_data &safile, const String &apiKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        {
+#if defined(ENABLE_FS)
+            CustomAuth(nullptr, safile, apiKey, uid, scope, claims, expire);
+            data.ts = ts;
 #endif
         }
 

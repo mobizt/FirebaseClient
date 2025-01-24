@@ -1,5 +1,5 @@
 /**
- * Created January 21, 2025
+ * Created January 24, 2025
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -163,7 +163,7 @@ bool JWTClass::create()
     if (auth_data->user_auth.sa.step == jwt_step_create_jwt)
     {
 
-        uint32_t now = 0;
+        uint32_t now = auth_data->user_auth.ts;
         if (auth_data->user_auth.timestatus_cb)
         {
 

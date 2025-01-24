@@ -2447,7 +2447,8 @@ private:
 public:
     AsyncClientClass()
     {
-        client_type = reqns::tcpc_none;
+        this->addr = reinterpret_cast<uint32_t>(this);
+        client_type = reqns::tcpc_sync;
     }
 
     AsyncClientClass(Client &client, network_config_data &net) : client(&client)
