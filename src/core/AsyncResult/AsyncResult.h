@@ -1,5 +1,5 @@
 /**
- * Created January 21, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -37,7 +37,7 @@
 #include "./core/AsyncResult/AppData.h"
 #include "./core/AsyncResult/AppProgress.h"
 
-using namespace firebase;
+using namespace firebase_ns;
 
 namespace ares_ns
 {

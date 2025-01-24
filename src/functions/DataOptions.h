@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -119,12 +119,12 @@ namespace GoogleCloudFunctions
         SECURE_OPTIONAL             //	Both HTTP and HTTPS requests with URLs that match the handler succeed without redirects. The application can examine the request to determine which protocol was used and respond accordingly.
     };
 
-    const struct firebase::key_str_30 _DockerRegistry[DockerRegistry::ARTIFACT_REGISTRY + 1] PROGMEM = {"DOCKER_REGISTRY_UNSPECIFIED", "CONTAINER_REGISTRY", "RETRY_POLICY_RETRY"};
-    const struct firebase::key_str_50 _VpcConnectorEgressSettings[VpcConnectorEgressSettings::ALL_TRAFFIC + 1] PROGMEM = {"VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED", "PRIVATE_RANGES_ONLY", "ALL_TRAFFIC"};
-    const struct firebase::key_str_30 _IngressSettings[IngressSettings::ALLOW_INTERNAL_AND_GCLB + 1] PROGMEM = {"INGRESS_SETTINGS_UNSPECIFIED", "ALLOW_ALL", "ALLOW_INTERNAL_ONLY", "ALLOW_INTERNAL_AND_GCLB"};
-    const struct firebase::key_str_30 _SecurityLevel[SecurityLevel::SECURE_OPTIONAL + 1] PROGMEM = {"SECURITY_LEVEL_UNSPECIFIED", "SECURE_ALWAYS", "SECURE_OPTIONAL"};
-    const struct firebase::key_str_30 _RetryPolicy[RetryPolicy::RETRY_POLICY_RETRY + 1] PROGMEM = {"RETRY_POLICY_UNSPECIFIED", "RETRY_POLICY_DO_NOT_RETRY", "RETRY_POLICY_RETRY"};
-    const struct firebase::key_str_30 _Environment[Environment::GEN_2 + 1] PROGMEM = {"ENVIRONMENT_UNSPECIFIED", "GEN_1", "GEN_2"};
+    const struct firebase_ns::key_str_30 _DockerRegistry[DockerRegistry::ARTIFACT_REGISTRY + 1] PROGMEM = {"DOCKER_REGISTRY_UNSPECIFIED", "CONTAINER_REGISTRY", "RETRY_POLICY_RETRY"};
+    const struct firebase_ns::key_str_50 _VpcConnectorEgressSettings[VpcConnectorEgressSettings::ALL_TRAFFIC + 1] PROGMEM = {"VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED", "PRIVATE_RANGES_ONLY", "ALL_TRAFFIC"};
+    const struct firebase_ns::key_str_30 _IngressSettings[IngressSettings::ALLOW_INTERNAL_AND_GCLB + 1] PROGMEM = {"INGRESS_SETTINGS_UNSPECIFIED", "ALLOW_ALL", "ALLOW_INTERNAL_ONLY", "ALLOW_INTERNAL_AND_GCLB"};
+    const struct firebase_ns::key_str_30 _SecurityLevel[SecurityLevel::SECURE_OPTIONAL + 1] PROGMEM = {"SECURITY_LEVEL_UNSPECIFIED", "SECURE_ALWAYS", "SECURE_OPTIONAL"};
+    const struct firebase_ns::key_str_30 _RetryPolicy[RetryPolicy::RETRY_POLICY_RETRY + 1] PROGMEM = {"RETRY_POLICY_UNSPECIFIED", "RETRY_POLICY_DO_NOT_RETRY", "RETRY_POLICY_RETRY"};
+    const struct firebase_ns::key_str_30 _Environment[Environment::GEN_2 + 1] PROGMEM = {"ENVIRONMENT_UNSPECIFIED", "GEN_1", "GEN_2"};
 
     /**
      * Location of the source in a Google Cloud Source Repository.

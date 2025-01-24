@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -32,7 +32,7 @@
 
 #if defined(ENABLE_FIRESTORE)
 
-using namespace firebase;
+using namespace firebase_ns;
 
 #include "./firestore/Query.h"
 namespace Firestore

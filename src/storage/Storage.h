@@ -1,5 +1,5 @@
 /**
- * Created January 21, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -27,7 +27,7 @@
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
 
-using namespace firebase;
+using namespace firebase_ns;
 
 #if defined(ENABLE_STORAGE)
 

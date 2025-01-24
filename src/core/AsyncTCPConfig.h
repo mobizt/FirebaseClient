@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)

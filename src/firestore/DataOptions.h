@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -562,11 +562,11 @@ namespace Firestore
         cf_mode_delete
     };
 
-    const struct firebase::key_str_30 _ConcurrencyMode[ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS + 1] PROGMEM = {"CONCURRENCY_MODE_UNSPECIFIED", "OPTIMISTIC", "PESSIMISTIC", "OPTIMISTIC_WITH_ENTITY_GROUPS"};
-    const struct firebase::key_str_40 _AppEngineIntegrationMode[AppEngineIntegrationMode::_DISABLED + 1] PROGMEM = {"APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", "ENABLED", "DISABLED"};
-    const struct firebase::key_str_40 _DeleteProtectionState[DeleteProtectionState::DELETE_PROTECTION_ENABLED + 1] PROGMEM = {"DELETE_PROTECTION_STATE_UNSPECIFIED", "DELETE_PROTECTION_DISABLED", "DELETE_PROTECTION_ENABLED"};
-    const struct firebase::key_str_50 _PointInTimeRecoveryEnablement[PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED + 1] PROGMEM = {"POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", "POINT_IN_TIME_RECOVERY_ENABLED", "POINT_IN_TIME_RECOVERY_DISABLED"};
-    const struct firebase::key_str_30 _DatabaseType[DatabaseType::DATASTORE_MODE + 1] PROGMEM = {"DATABASE_TYPE_UNSPECIFIED", "FIRESTORE_NATIVE", "DATASTORE_MODE"};
+    const struct firebase_ns::key_str_30 _ConcurrencyMode[ConcurrencyMode::OPTIMISTIC_WITH_ENTITY_GROUPS + 1] PROGMEM = {"CONCURRENCY_MODE_UNSPECIFIED", "OPTIMISTIC", "PESSIMISTIC", "OPTIMISTIC_WITH_ENTITY_GROUPS"};
+    const struct firebase_ns::key_str_40 _AppEngineIntegrationMode[AppEngineIntegrationMode::_DISABLED + 1] PROGMEM = {"APP_ENGINE_INTEGRATION_MODE_UNSPECIFIED", "ENABLED", "DISABLED"};
+    const struct firebase_ns::key_str_40 _DeleteProtectionState[DeleteProtectionState::DELETE_PROTECTION_ENABLED + 1] PROGMEM = {"DELETE_PROTECTION_STATE_UNSPECIFIED", "DELETE_PROTECTION_DISABLED", "DELETE_PROTECTION_ENABLED"};
+    const struct firebase_ns::key_str_50 _PointInTimeRecoveryEnablement[PointInTimeRecoveryEnablement::POINT_IN_TIME_RECOVERY_DISABLED + 1] PROGMEM = {"POINT_IN_TIME_RECOVERY_ENABLEMENT_UNSPECIFIED", "POINT_IN_TIME_RECOVERY_ENABLED", "POINT_IN_TIME_RECOVERY_DISABLED"};
+    const struct firebase_ns::key_str_30 _DatabaseType[DatabaseType::DATASTORE_MODE + 1] PROGMEM = {"DATABASE_TYPE_UNSPECIFIED", "FIRESTORE_NATIVE", "DATASTORE_MODE"};
 
     /**
      * A Cloud Firestore Database.
@@ -1133,7 +1133,7 @@ namespace DatabaseIndex
             ARRAY_CONTAINS // The field's array values are indexed so as to support membership using ARRAY_CONTAINS queries.
         };
 
-        const struct firebase::key_str_30 _Mode[ARRAY_CONTAINS + 1] PROGMEM = {"MODE_UNSPECIFIED", "ASCENDING", "DESCENDING", "ARRAY_CONTAINS"};
+        const struct firebase_ns::key_str_30 _Mode[ARRAY_CONTAINS + 1] PROGMEM = {"MODE_UNSPECIFIED", "ASCENDING", "DESCENDING", "ARRAY_CONTAINS"};
     }
 
     /**
@@ -1209,10 +1209,10 @@ namespace CollectionGroupsIndex
         CONTAINS                  // The index supports array containment queries.
     };
 
-    const struct firebase::key_str_30 _QueryScope[QueryScope::COLLECTION_RECURSIVE + 1] PROGMEM = {"QUERY_SCOPE_UNSPECIFIED", "COLLECTION", "COLLECTION_GROUP", "COLLECTION_RECURSIVE"};
-    const struct firebase::key_str_20 _ApiScope[ApiScope::DATASTORE_MODE_API + 1] PROGMEM = {"ANY_API", "DATASTORE_MODE_API"};
-    const struct firebase::key_str_30 _Order[Order::DESCENDING + 1] PROGMEM = {"ORDER_UNSPECIFIED", "ASCENDING", "DESCENDING"};
-    const struct firebase::key_str_30 _ArrayConfig[ArrayConfig::CONTAINS + 1] PROGMEM = {"ARRAY_CONFIG_UNSPECIFIED", "CONTAINS"};
+    const struct firebase_ns::key_str_30 _QueryScope[QueryScope::COLLECTION_RECURSIVE + 1] PROGMEM = {"QUERY_SCOPE_UNSPECIFIED", "COLLECTION", "COLLECTION_GROUP", "COLLECTION_RECURSIVE"};
+    const struct firebase_ns::key_str_20 _ApiScope[ApiScope::DATASTORE_MODE_API + 1] PROGMEM = {"ANY_API", "DATASTORE_MODE_API"};
+    const struct firebase_ns::key_str_30 _Order[Order::DESCENDING + 1] PROGMEM = {"ORDER_UNSPECIFIED", "ASCENDING", "DESCENDING"};
+    const struct firebase_ns::key_str_30 _ArrayConfig[ArrayConfig::CONTAINS + 1] PROGMEM = {"ARRAY_CONFIG_UNSPECIFIED", "CONTAINS"};
 
     // Ref https://firebase.google.com/docs/firestore/reference/rest/Shared.Types/FieldOperationMetadata#VectorConfig
 

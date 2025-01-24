@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -37,7 +37,7 @@
 #include "./core/Timer.h"
 #include "./core/AppBase.h"
 
-namespace firebase
+namespace firebase_ns
 {
 
 #if defined(ENABLE_JWT)

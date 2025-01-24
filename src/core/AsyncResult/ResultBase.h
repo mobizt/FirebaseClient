@@ -1,5 +1,5 @@
 /**
- * Created January 21, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -40,7 +40,7 @@
 #include "./core/AsyncResult/AppDebug.h"
 #include "./core/AsyncResult/AppData.h"
 
-namespace firebase
+namespace firebase_ns
 {
 
 #if defined(ENABLE_DATABASE)

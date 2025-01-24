@@ -1,5 +1,5 @@
 /**
- * Created January 24, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -123,7 +123,7 @@ namespace app_tk_ns
     };
 }
 
-namespace firebase
+namespace firebase_ns
 {
     enum firebase_core_auth_task_type
     {

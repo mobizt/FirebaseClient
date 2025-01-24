@@ -1,5 +1,5 @@
 /**
- * Created April 3, 2024
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -47,7 +47,7 @@ namespace IAMPolicy
         DATA_READ             //	Data reads. Example: CloudSQL Users list
     };
 
-    const struct firebase::key_str_30 _LogType[LogType::DATA_READ + 1] PROGMEM = {"LOG_TYPE_UNSPECIFIED", "ADMIN_READ", "DATA_WRITE", "DATA_READ"};
+    const struct firebase_ns::key_str_30 _LogType[LogType::DATA_READ + 1] PROGMEM = {"LOG_TYPE_UNSPECIFIED", "ADMIN_READ", "DATA_WRITE", "DATA_READ"};
     
     /**
      * Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec.

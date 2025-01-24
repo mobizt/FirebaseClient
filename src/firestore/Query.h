@@ -1,5 +1,5 @@
 /**
- * Created June 12, 2024
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -48,7 +48,7 @@ namespace FirestoreQuery
             OR                    // Documents are required to satisfy at least one of the combined filters.
         };
 
-        const struct firebase::key_str_30 _OPERATOR_TYPE[OPERATOR_TYPE::OR + 1] PROGMEM = {"OPERATOR_UNSPECIFIED", "AND", "OR"};
+        const struct firebase_ns::key_str_30 _OPERATOR_TYPE[OPERATOR_TYPE::OR + 1] PROGMEM = {"OPERATOR_UNSPECIFIED", "AND", "OR"};
     }
 
     namespace UnaryFilterOperator
@@ -66,7 +66,7 @@ namespace FirestoreQuery
 
         };
 
-        const struct firebase::key_str_30 _OPERATOR_TYPE[OPERATOR_TYPE::IS_NOT_NULL + 1] PROGMEM = {"OPERATOR_UNSPECIFIED", "IS_NAN", "IS_NULL", "IS_NOT_NAN", "IS_NOT_NULL"};
+        const struct firebase_ns::key_str_30 _OPERATOR_TYPE[OPERATOR_TYPE::IS_NOT_NULL + 1] PROGMEM = {"OPERATOR_UNSPECIFIED", "IS_NAN", "IS_NULL", "IS_NOT_NAN", "IS_NOT_NULL"};
 
     }
 
@@ -90,7 +90,7 @@ namespace FirestoreQuery
             NOT_IN                 // The value of the field is not in the given array.
         };
 
-        const struct firebase::key_str_30 _OPERATOR_TYPE[OPERATOR_TYPE::NOT_IN + 1] PROGMEM = {"OPERATOR_UNSPECIFIED", "LESS_THAN", "LESS_THAN_OR_EQUAL", "GREATER_THAN", "GREATER_THAN_OR_EQUAL", "EQUAL", "NOT_EQUAL", "ARRAY_CONTAINS", "IN", "ARRAY_CONTAINS_ANY", "NOT_IN"};
+        const struct firebase_ns::key_str_30 _OPERATOR_TYPE[OPERATOR_TYPE::NOT_IN + 1] PROGMEM = {"OPERATOR_UNSPECIFIED", "LESS_THAN", "LESS_THAN_OR_EQUAL", "GREATER_THAN", "GREATER_THAN_OR_EQUAL", "EQUAL", "NOT_EQUAL", "ARRAY_CONTAINS", "IN", "ARRAY_CONTAINS_ANY", "NOT_IN"};
 
     }
 
@@ -105,7 +105,7 @@ namespace FirestoreQuery
             ASCENDING,             // Ascending.
             DESCENDING             // Descending.
         };
-        const struct firebase::key_str_30 _Direction[Direction::DESCENDING + 1] PROGMEM = {"DIRECTION_UNSPECIFIED", "ASCENDING", "DESCENDING"};
+        const struct firebase_ns::key_str_30 _Direction[Direction::DESCENDING + 1] PROGMEM = {"DIRECTION_UNSPECIFIED", "ASCENDING", "DESCENDING"};
     }
 
     /**

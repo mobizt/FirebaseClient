@@ -5,96 +5,12 @@
 #include <FirebaseClient.h>
 
 /**
- * The example custom Realtime Database class that wraps everything inside. 
-*/
+ * The simple, reliable and efficient Firebase wrapper class example.  
+ * 
+ * Powered by FirebaseClient library.
+ */
 class MyFirebase
 {
-private:
-    static const int max_stream_client_num = 2;
-    int current_stream_index = 0;
-    Client *client = nullptr, *stream_client[max_stream_client_num];
-    DefaultNetwork net;
-    AsyncClientClass aClient, streamClient[max_stream_client_num];
-
-    FirebaseApp app;
-    RealtimeDatabase Database;
-    AsyncResult authResult, streamResult;
-    bool is_authenticated = false, is_enabled = true, is_jwt = false;
-    bool is_event = false, is_debug = false, is_error = false, is_payload = false, is_stream = false;
-    String task_id, payload_str, stream_payload, stream_event, stream_data_path, debug_str, event_str, err_str;
-    int event_code = 0, err_code = 0, stream_data_type = 0;
-
-    void clearData()
-    {
-        is_stream = false;
-        is_debug = false;
-        is_event = false;
-        is_error = false;
-        is_payload = false;
-        stream_data_type = false;
-        debug_str.remove(0, debug_str.length());
-        payload_str.remove(0, payload_str.length());
-        event_str.remove(0, event_str.length());
-        err_str.remove(0, err_str.length());
-        stream_payload.remove(0, stream_payload.length());
-        stream_event.remove(0, stream_event.length());
-        stream_data_path.remove(0, stream_data_path.length());
-        task_id.remove(0, task_id.length());
-    }
-
-    bool available(AsyncResult &res)
-    {
-        // Once AsyncResult::isXXX was called, the information should be kept in
-        // the temporary buffer because that information is gone
-        // in the next run.
-
-        bool event_status = res.isEvent();
-        if (event_status)
-        {
-            event_str = res.appEvent().message();
-            event_code = res.appEvent().code();
-        }
-
-        bool debug_status = res.isDebug();
-        if (debug_status)
-            debug_str = res.debug();
-
-        bool error_status = res.isError();
-        if (error_status)
-        {
-            err_str = res.error().message();
-            err_code = res.error().code();
-        }
-
-        bool payload_status = res.available();
-        if (payload_status)
-            payload_str = res.c_str();
-
-        is_event |= event_status;
-        is_debug |= debug_status;
-        is_error |= error_status;
-        is_payload |= payload_status;
-
-        if (payload_status)
-        {
-            RealtimeDatabaseResult &RTDB = res.to<RealtimeDatabaseResult>();
-            is_stream |= RTDB.isStream();
-
-            if (is_stream)
-            {
-                stream_payload = RTDB.to<const char *>();
-                stream_data_type = RTDB.type();
-                stream_data_path = RTDB.dataPath();
-                stream_event = RTDB.event();
-            }
-        }
-
-        if (event_status || debug_status || error_status || payload_status)
-            task_id = res.uid();
-
-        return is_event || is_debug || is_error || is_payload;
-    }
-
 public:
     MyFirebase()
     {
@@ -105,82 +21,62 @@ public:
     void begin(Client &client, const String &databaseUrl)
     {
         NoAuth no_auth;
-        is_jwt = false;
-        is_enabled = true;
-        this->client = &client;
-        aClient.setNetwork(client, getNetwork(net));
-        Database.url(databaseUrl);
-        initializeApp(aClient, app, getAuth(no_auth), authResult);
-        app.getApp<RealtimeDatabase>(Database);
+        beginInternal(client, getNetwork(net), getAuth(no_auth), databaseUrl);
     }
 
     void userBegin(Client &client, const String &databaseUrl, const String &apiKey, const String &email, const String &password)
     {
         UserAuth user_auth(apiKey, email, password);
-        is_jwt = false;
-        is_enabled = true;
-        this->client = &client;
-        aClient.setNetwork(client, getNetwork(net));
-        Database.url(databaseUrl);
-        initializeApp(aClient, app, getAuth(user_auth), authResult);
-        app.getApp<RealtimeDatabase>(Database);
-    }
-
-    void legacyBegin(Client &client, const String &databaseUrl, const String &databaseSecret)
-    {
-        LegacyToken legacy_token(databaseSecret);
-        is_jwt = false;
-        is_enabled = true;
-        this->client = &client;
-        aClient.setNetwork(client, getNetwork(net));
-        Database.url(databaseUrl);
-        initializeApp(aClient, app, getAuth(legacy_token), authResult);
-        app.getApp<RealtimeDatabase>(Database);
+        beginInternal(client, getNetwork(net), getAuth(user_auth), databaseUrl);
     }
 
     void serviceBegin(Client &client, const String &databaseUrl, uint32_t timestamp, const String &clientEmail, const String &projectId, const String &privateKey)
     {
-        ServiceAuth sa_auth(timestamp, clientEmail, projectId, privateKey, 3000);
-        is_jwt = true;
-        is_enabled = true;
-        this->client = &client;
-        aClient.setNetwork(client, getNetwork(net));
-        Database.url(databaseUrl);
-        initializeApp(aClient, app, getAuth(sa_auth), authResult);
-        app.getApp<RealtimeDatabase>(Database);
+        ServiceAuth service_auth(timestamp, clientEmail, projectId, privateKey, 3000);
+        beginInternal(client, getNetwork(net), getAuth(service_auth), databaseUrl);
     }
 
     void customBegin(Client &client, const String &databaseUrl, uint32_t timestamp, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &scope = "", const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
     {
         CustomAuth custom_auth(timestamp, apiKey, clientEmail, projectId, privateKey, uid, scope, claims, 3000);
-        is_jwt = true;
-        is_enabled = true;
-        this->client = &client;
-        aClient.setNetwork(client, getNetwork(net));
-        Database.url(databaseUrl);
-        initializeApp(aClient, app, getAuth(custom_auth), authResult);
-        app.getApp<RealtimeDatabase>(Database);
+        beginInternal(client, getNetwork(net), getAuth(custom_auth), databaseUrl);
+    }
+
+    void accessBegin(Client &client, const String &databaseUrl, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
+    {
+        AccessToken access_token(token, expire, refresh, client_id, client_secret);
+        beginInternal(client, getNetwork(net), getAuth(access_token), databaseUrl);
+    }
+
+    void idBegin(Client &client, const String &databaseUrl, const String &api_key, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "")
+    {
+        IDToken id_token(api_key, token, expire, refresh);
+        beginInternal(client, getNetwork(net), getAuth(id_token), databaseUrl);
+    }
+
+    void legacyBegin(Client &client, const String &databaseUrl, const String &databaseSecret)
+    {
+        LegacyToken legacy_token(databaseSecret);
+        beginInternal(client, getNetwork(net), getAuth(legacy_token), databaseUrl);
     }
 
     bool ready()
     {
-        is_authenticated = is_enabled && app.isInitialized() && app.ready();
-
-        if (is_enabled && is_jwt)
+        if (app.isInitialized())
+        {
             JWT.loop(app.getAuth());
+            app.loop();
+            Database.loop();
+        }
 
-        // Required for async tasks (auth and stream).
-        app.loop();
-        Database.loop();
-
-        return is_authenticated;
+        return app.isInitialized() && app.ready();
     }
 
     bool available()
     {
         clearData();
-        bool res = available(authResult);
-        res |= available(streamResult);
+        bool res = availableInternal(authResult);
+        res |= availableInternal(streamResult);
         return res;
     }
 
@@ -246,8 +142,6 @@ public:
 
     void pause(bool enable)
     {
-        is_enabled = enable;
-
         if (enable)
             app.getApp<RealtimeDatabase>(Database);
         else
@@ -267,6 +161,100 @@ public:
                     stream_client[i]->stop();
             }
         }
+    }
+
+private:
+    static const int max_stream_client_num = 2;
+    Client *client = nullptr, *stream_client[max_stream_client_num];
+    AsyncClientClass aClient, streamClient[max_stream_client_num];
+
+    DefaultNetwork net;
+    FirebaseApp app;
+    RealtimeDatabase Database;
+    AsyncResult authResult, streamResult;
+
+    bool is_event = false, is_debug = false, is_error = false, is_payload = false, is_stream = false;
+    String task_id, payload_str, stream_payload, stream_event, stream_data_path, debug_str, event_str, err_str;
+    int event_code = 0, err_code = 0, stream_data_type = 0, current_stream_index = 0;
+
+    void beginInternal(Client &client, network_config_data &net, user_auth_data &auth, const String &databaseUrl)
+    {
+        this->client = &client;
+        aClient.setNetwork(client, net);
+        Database.url(databaseUrl);
+        initializeApp(aClient, app, auth, authResult);
+        app.getApp<RealtimeDatabase>(Database);
+    }
+
+    bool availableInternal(AsyncResult &res)
+    {
+        // Once AsyncResult::isXXX was called, the information should be kept in
+        // the temporary buffer because that information is gone
+        // in the next loop running.
+
+        bool event_status = res.isEvent();
+        if (event_status)
+        {
+            event_str = res.appEvent().message();
+            event_code = res.appEvent().code();
+        }
+
+        bool debug_status = res.isDebug();
+        if (debug_status)
+            debug_str = res.debug();
+
+        bool error_status = res.isError();
+        if (error_status)
+        {
+            err_str = res.error().message();
+            err_code = res.error().code();
+        }
+
+        bool payload_status = res.available();
+        if (payload_status)
+            payload_str = res.c_str();
+
+        is_event |= event_status;
+        is_debug |= debug_status;
+        is_error |= error_status;
+        is_payload |= payload_status;
+
+        if (payload_status)
+        {
+            RealtimeDatabaseResult &RTDB = res.to<RealtimeDatabaseResult>();
+            is_stream |= RTDB.isStream();
+
+            if (is_stream)
+            {
+                stream_payload = RTDB.to<const char *>();
+                stream_data_type = RTDB.type();
+                stream_data_path = RTDB.dataPath();
+                stream_event = RTDB.event();
+            }
+        }
+
+        if (event_status || debug_status || error_status || payload_status)
+            task_id = res.uid();
+
+        return is_event || is_debug || is_error || is_payload;
+    }
+
+    void clearData()
+    {
+        is_stream = false;
+        is_debug = false;
+        is_event = false;
+        is_error = false;
+        is_payload = false;
+        stream_data_type = false;
+        debug_str.remove(0, debug_str.length());
+        payload_str.remove(0, payload_str.length());
+        event_str.remove(0, event_str.length());
+        err_str.remove(0, err_str.length());
+        stream_payload.remove(0, stream_payload.length());
+        stream_event.remove(0, stream_event.length());
+        stream_data_path.remove(0, stream_data_path.length());
+        task_id.remove(0, task_id.length());
     }
 };
 

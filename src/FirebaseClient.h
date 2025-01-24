@@ -1,5 +1,5 @@
 /**
- * Created October 30, 2024
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -80,9 +80,9 @@
 #endif
 #endif
 
-using namespace firebase;
+using namespace firebase_ns;
 
-namespace firebase
+namespace firebase_ns
 {
     class FirebaseClient : public AppBase
     {

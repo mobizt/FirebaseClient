@@ -1,5 +1,5 @@
 /**
- * Created January 24, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -44,9 +44,9 @@
 #include "./client/SSLClient/ESP_SSLClient.h"
 #endif
 
-using namespace firebase;
+using namespace firebase_ns;
 
-namespace firebase
+namespace firebase_ns
 {
     static void jwt_add_gapis_host(String &str, PGM_P sub)
     {

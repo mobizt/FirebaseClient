@@ -1,5 +1,5 @@
 /**
- * Created December 27, 2024
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -416,7 +416,7 @@ public:
     BaseO26() { init(buf, bufSize); }
 };
 
-namespace firebase
+namespace firebase_ns
 {
     struct key_str_10
     {

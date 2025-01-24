@@ -1,5 +1,5 @@
 /**
- * Created January 21, 2025
+ * 2025-01-25
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -47,7 +47,7 @@
 #include "./core/AsyncTCPConfig.h"
 #endif
 
-using namespace firebase;
+using namespace firebase_ns;
 
 enum async_state
 {

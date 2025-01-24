@@ -1,5 +1,5 @@
 /**
- * Created January 20, 2025
+ * 2025-01-25
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -69,9 +69,9 @@ namespace Messages
         SECRET                  //	Do not reveal any part of this notification on a secure lockscreen.
     };
 
-    const struct firebase::key_str_30 _NotificationPriority[NotificationPriority::PRIORITY_MAX + 1] PROGMEM = {"PRIORITY_UNSPECIFIED", "PRIORITY_MIN", "PRIORITY_LOW", "PRIORITY_DEFAULT", "PRIORITY_HIGH", "PRIORITY_MAX"};
-    const struct firebase::key_str_30 _Visibility[Visibility::SECRET + 1] PROGMEM = {"VISIBILITY_UNSPECIFIED", "PRIVATE", "PUBLIC", "SECRET"};
-    const struct firebase::key_str_30 _AndroidMessagePriority[AndroidMessagePriority::_HIGH + 1] PROGMEM = {"NORMAL", "HIGH"};
+    const struct firebase_ns::key_str_30 _NotificationPriority[NotificationPriority::PRIORITY_MAX + 1] PROGMEM = {"PRIORITY_UNSPECIFIED", "PRIORITY_MIN", "PRIORITY_LOW", "PRIORITY_DEFAULT", "PRIORITY_HIGH", "PRIORITY_MAX"};
+    const struct firebase_ns::key_str_30 _Visibility[Visibility::SECRET + 1] PROGMEM = {"VISIBILITY_UNSPECIFIED", "PRIVATE", "PUBLIC", "SECRET"};
+    const struct firebase_ns::key_str_30 _AndroidMessagePriority[AndroidMessagePriority::_HIGH + 1] PROGMEM = {"NORMAL", "HIGH"};
 
     // Basic notification template to use across all platforms.
     struct Notification : public BaseO4
