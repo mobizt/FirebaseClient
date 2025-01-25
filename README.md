@@ -190,17 +190,17 @@ Some Arduino MKR devices have the problem when connecting to the Realtime databa
 > This problem is only specific to `Firebase Realtime Database` with `Arduino® UNO R4 WiFi` that compiled using `PlatformIO IDE` only.
 
 
-## Incompatability Between Old Firebase Library and This Firebase Library.
+## Change from the ancestor library.
 
-This library APIs are not compattible with the Firebase-ESP8266, Firebase-ESP32 and Firebase-ESP-Client libraries.
+The library APIs are not compattible with the ancestor libraries.
 
-If you are using those libraries, the code should be rewritten.
+If you are using those libraries, the code should be rewritten or cleate the wrapper class (see [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to do this).
 
 In addition, some features are changed which included the following.
 
 - ### FirebaseJson
 
-There is no `JSON` library included in this `FirebaseClient` library. If you still prefer to use `FirebaseJson` functions as in the old library, you have to include it manually in your code.
+There is no `JSON` library included in this `FirebaseClient` library. If you still prefer to use `FirebaseJson` functions as in the ancestor library, you have to include it manually in your code.
 
 The `FirebaseJson` library can be installed via the Arduino's Library Manager and PlatformIO's Library Manager or can be downloaded and install from the [FirebaseJson Repository](https://github.com/mobizt/FirebaseJson).
 
@@ -208,13 +208,9 @@ For `JSON` payload, this library will use [`object_t`](/resources/docs/placehold
 
 - ### Realtime Database
 
-The blob and file upload via set, push and update, the byte data will be converted to base64 encoded string and store to the database without the signature string (`file,` and `blob,`) prepended to the base64 string as in the old library.
+There are no base64 signature string (`file,` and `blob,`) prepended to the base64 encoded string when working with Blob and File upload.
 
-The data on the database that read using the async get function which the blob and file config data assign to the function, will treat as base64 encoded string and will be decoded to byte array using base64 decoder.
-
-Then get the data that contains signature string (`file,` and `blob,`) created by old library will lead to the error after base64 decoding.
-
-Due to some pitfalls in the old library's `Multipath Stream` usage. User is only looking for the `JSON` parsing data without checking the actual received stream event data, and this library does not include the JSON parser, then this feature will not be implemented in this `FirebaseClient` library. 
+The `MultipathStream`is support supported. You can use multi-Stream instead. Please see the [StreamConcurentcy](/examples/RealtimeDatabase/Async/Callback/StreamConcurentcy/) examples for how to.
 
 - ### Cloud Messaging
 
@@ -232,7 +228,7 @@ The TCP KeepAlive is currently not available in ESP8266 v3.1.2 at the time of th
 
 If you use the core SSL client e.g. `WiFiClientSecure` or `WiFiSSLClient`, sush feature is not available.
 
-In the old Firebase library, this feature was done internally by the internal SSL client and `WiFiClient` integration.
+In the ancestor Firebase libraries, this feature was done internally by the internal SSL client and `WiFiClient` integration.
 
 If you want to use this feature and if you use ESP32, you can use `ESP_SSLClient` library that included in this library and set the `WiFiClient` as the client.
 
@@ -295,12 +291,12 @@ The PSRAM in this library was enabled by default but it was only used partly in 
 
 - ### Server Authorization
 
-The server certificate verification can be done with the SSL Client on user side.
+The server certificate verification can be done via the SSL Client setup that assigned to the `AsyncClient` class constructor.
 
 
 - ### Filesystems
 
-The filesystem features e.g. types (SD/Flash), initialization and operations should be done on user side.
+The filesystems operations were done in user file callback function that assigned to the `FileConfig` class constructor..
 
 
 ## Installation
@@ -316,16 +312,18 @@ Click **"Install"** button.
 
 
 
-For PlatformIO IDE, using the following command.
+For `PlatformIO` IDE, using the following command.
 
 **pio lib install "FirebaseClient""**
 
 Or at **PIO Home** -> **Library** -> **Registry** then search **FirebaseClient**.
 
+In case ESP32, PlatformIO's platform-espressif32 core is outdated. You should use [pioarduino](https://github.com/pioarduino) platform instead. 
+
 
 - ### Manual installation
 
-For Arduino IDE, download zip file from the repository (Github page) by select **Code** dropdown at the top of repository, select **Download ZIP** 
+For `Arduino IDE`, download the zip file from the repository (Github page) by select **Code** dropdown at the top of repository, select **Download ZIP** 
 
 From Arduino IDE, select menu **Sketch** -> **Include Library** -> **Add .ZIP Library...**.
 
@@ -359,7 +357,7 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 
 ## Usages
 
-Based on the async library design , there are no central configuration class (`FirebaseConfig`) and all-in-one data containter class (`FirebaseData`) as in the old Firebase library. 
+Based on the async library design , there are no central configuration class (`FirebaseConfig`) and all-in-one data containter class (`FirebaseData`) as in the ancestor Firebase libraries. 
 
 This library provides the managed classes that are used in different purposes i.e. the classes that used to hadle the sync and async tasks and to use as a container (data provider) for authentication credentials, networking and filesystems configurations, and async task result.
 
@@ -474,27 +472,11 @@ The Firebase and Google Services classes that are available in this library are 
 - ### Async Queue
 
 
-All sync and async tasks are managed using `FIFO queue` in async client. The task in the queue will refer to `slot` in this library.
+All sync and async tasks are managed using `FIFO queue` in async client. The task in the queue will refer to the `slot` in this library.
 
-The queue is task based or session based which stores the HTTP request and response data which used for a task. 
+The queue is task based or session based which stores the HTTP request and response data which will be used for a task. 
  
 The memory used for a task that stores in the queue is approximately 1 k. Then in order to limit the memory usage in an async client, this library allows 10 or 20 tasks by default that can be stored in the queue at a time.
-
-The maximum queue size can be set via the build flag `FIREBASE_ASYNC_QUEUE_LIMIT` or macro that defined in [src/Config.h](src/Config.h) or in your own defined config at [src/UserConfig.h](src/UserConfig.h).
-
-The below image shows the ordering of tasks that are inserted or added to the queue. Only the first task in the queue will be executed.
-
-![Async Task Queue](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue.png)
-
-When the authentication task was required, it will insert to the first slot of the queue and all tasks are cancelled and removed from queue to reduce the menory usage unless the `SSE mode (HTTP Streaming)`task that stopped and waiting for restarting.
-
-The authentication task has the highest priority and `SSE mode (HTTP Streaming)` task has the lowest priority in the queue.
-
-![Async Task Queue Running](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/async_task_queue_running.png)
-
-The sync task will be inserted to the first slot in the queue but above the authentication task.
-
-When `SSE mode (HTTP Streaming)` task was currently stored in the queue, the new sync and async tasks will be inserted below it in the queue.
 
 The new task can be cancelled in case the queue is full or the another `SSE mode (HTTP Streaming)` task is already stored in the queue. 
 
@@ -504,11 +486,9 @@ The number of tasks that currently stored in the queue can be obtained from `Asy
  
 The running task will be removed from the queue when operation is finished or error occurred.
 
-The `SSE mode (HTTP Streaming)` task will run continuously and repeatedly as long as the async task handler e.g. `<FirebaseServices>::loop()` and/or `FirebaseApp::loop()` (if it used the same async client) are running in the loop function.
+The `SSE mode (HTTP Streaming)` task will run continuously and repeatedly as long as the async task handler e.g. `<FirebaseServices>::loop()` and/or `FirebaseApp::loop()` are running in the loop function.
 
 The `SSE mode (HTTP Streaming)` is a kind of `infinite task` which the server connection was kept alive and waiting for the incoming event data.
-
-When `SSE mode (HTTP Streaming)` task is currently running and new sync or async task is added to the queue, the `SSE mode (HTTP Streaming)` task will be stopped (but remains in the queue) as another task was inserted in to the first slot, the `SSE mode (HTTP Streaming)` task will be restart when another task is finished.
 
 When the `SSE mode (HTTP Streaming)` task was timed out because of network or any delay or blocking operation, `"stream timed out"` error will show, it will reconnect automatically.
 
@@ -520,19 +500,15 @@ To run multiple `SSE mode (HTTP Streaming)` tasks, you have to run each task in 
 
 The async task handler will kepp the async tasks running as long as it places in the main `loop` function.
 
-> [!IMPORTANT]  
-> Do not underestimate the important the async task handler location and usage. The non-async third-party library and user blocking code, `delay` function and placing the async task handler in the `millis` code blocks, will cause the async task to run slowly and the timed out will be occurred. The  `SSE mode (HTTP Streaming)` task will not update in realtime.
-> The async task handler i.e. `FirebaseApp::loop()`, `RealtimeDatabase::loop()`, `Storage::loop()`, `Messaging::loop()`, `CloudStorage::loop()` and `CloudFunctions` should be placed inside the main `loop` function, at the top most of the `loop`.
-
-> [!NOTE] 
-> Even the authentication task can run asynchronously, you can run it synchronously by waiting until the `FirebaseApp::ready()` function returns true.
+> [!WARNING] 
+> In `SSE mode (HTTP Streaming)`, the timed out can be occurred continuously when you place some blocking code in the main loop. The the new Stream connection will be started and stopped continuously. Then please avoid using delay/blocking code in the main loop or printing large data on Serial continuously in the main loop when working with `SSE mode (HTTP Streaming)` connection.
 
 > [!NOTE] 
 > Since v1.2.1, you can [set the filter](https://github.com/mobizt/FirebaseClient/blob/main/resources/docs/realtime_database.md#-void-setssefiltersconst-string-filter--) to filter the `Stream events` in `SSE mode (HTTP Streaming)` task.
 
-#### Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)
+#### Running Many Tasks Concurrency Using Different Async Clients (different SSL clients)
 
-In Raspberry Pi Pico W/2W, its `WiFiClientSecure` memory used for the transmit and receive buffers are adjustable (512 to 16384) and you have enough memory to run many tasks concurrency using different async clients.
+In Raspberry Pi Pico W/2W, its `WiFiClientSecure` memory used for the io buffers are adjustable (512 to 16384) and you have enough memory to run many tasks concurrency using different async clients.
 
 In ESP32 device, its `WiFiClientSecure` memory usage cannot be adjusted, it requires at least 50 k per connection (37 k used for `mbedTLS` memory allocation) and only three `WiFiClientSecure`(s) can be defined.
 
@@ -669,6 +645,10 @@ The `Error Information` (`FirebaseError`) can be obtained from `AsyncResult::err
 
 The `Debug Information` (`String`) can be obtained from `AsyncResult::debug()`.
 
+<details>
+<summary>For more AsyncResult usage details, please click here.</summary>
+
+
 There are four use cases of async result: async task with callback function, async task without callback function, sync task with external async result and sync task with internal default async result.
 
    1. User provided async result in case async task (without callback function).
@@ -751,6 +731,8 @@ You can get the `UID` from `AsyncResult` via `AsyncResult::uid()`.
 
 > [!CAUTION]
 > Please don't run your code inside the async callback function because it uses stack memory.
+
+</details>
 
 - ### App Events
 
@@ -3238,7 +3220,7 @@ This `UserConfig.h` will not change or overwrite when update the library.
 
 The library code size is varied from 80k - 110k (WiFi and WiFiClientSecure excluded) depends on the build options.
 
-The code size is 170k lesser than old Firebase library when perform the same operations.
+The code size is 170k lesser than ancestor Firebase libraries when perform the same task.
 
 ## Frequently Asked Questions
 
