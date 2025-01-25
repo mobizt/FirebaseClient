@@ -122,7 +122,7 @@ In addition, this library provides the sync and async usage modes which can be m
 
 The powerful debugding system allows you to understand what is going on when it is running or failed.
 
-The network identifier classe, authentication classe and the SSL client class can be plug and play. They can be on-the-fly switchable.
+The network identifier class, authentication class and the SSL client class can be plug and play. They can be on-the-fly switchable.
 
 The [bare minimum code examples](/examples/BareMinimum/) provide the basic guidelines for library usage concepts. Even though it contains more lines of code, it is still simple but efficient.
 
