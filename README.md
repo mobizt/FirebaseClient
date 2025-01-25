@@ -21,7 +21,7 @@ Revision `2025-01-25`
     3. [RP2040 Arduino SDK installation](#rp2040-arduino-sdk-installation)
 7. [Usages](#usages)
     1. [Authentication](#authentication)
-    2. [Firebase and Google Services](#firebase-and-google-services)
+    2. [Firebase and Google Cloud Services](#firebase-and-google-cloud-services)
     3. [Async Queue](#async-queue)
         1. [Running Many Tasks Concurrency Using Different Async Clients (In Different SSL Clients)](#running-many-tasks-concurrency-using-different-async-clients-in-different-ssl-clients)
     4. [Async Client](#async-client)
@@ -448,9 +448,9 @@ The details for these authentication classes will be discussed later in the [App
 This library used the internal millis timer to handle the token time to live. Then device time setting is not requierd in most authentication types. Only `ServiceAuth` and `CustomAuth` that required the valid time through the time status callback function.
 
 
-- ### Firebase and Google Services
+- ### Firebase and Google Cloud Services
 
-The Firebase and Google Services classes that are available in this library are included the following. 
+The Firebase and Google Cloud Services classes that are available in this library are included the following. 
 
 - [RealtimeDatabase](examples/RealtimeDatabase/) class provides the `Realtime Database` functions.
 
