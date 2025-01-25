@@ -95,7 +95,7 @@ This is the `REST APIs Firebase Client` library that supports the following `Fir
 - `Google Cloud Functions`
 - `Google Cloud Storage`
 
-This Firebase library is comprehensive and provides more usage flexibilities. You can chose what you only want to use (see [Library Build Options](#library-build-options)) and you can work with any network interfaces and authentications.
+This Firebase library is comprehensive and provides more usage flexibilities. You can choose what you only want to use (see [Library Build Options](#library-build-options)) and you can work with any network interfaces and authentications.
 
 In addition, this library provides the sync and async usage modes which they can be mixed. The async mode provides responsive application with zero delay.
 
