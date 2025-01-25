@@ -80,24 +80,24 @@ public:
         return res;
     }
 
-    bool isStream() { return is_stream; }
-    bool isEvent() { return is_event; }
-    bool isDebug() { return is_debug; }
-    bool isError() { return is_error; }
-    bool isPayload() { return is_payload; }
+    bool isStream() const { return is_stream; }
+    bool isEvent() const { return is_event; }
+    bool isDebug() const { return is_debug; }
+    bool isError() const { return is_error; }
+    bool isPayload() const { return is_payload; }
 
-    String taskId() { return task_id; }
-    String eventString() { return event_str; }
-    int eventCode() { return event_code; }
-    String debugString() { return debug_str; }
-    String errorString() { return err_str; }
+    String taskId() const { return task_id; }
+    String eventString() const { return event_str; }
+    int eventCode() const { return event_code; }
+    String debugString() const { return debug_str; }
+    String errorString() const { return err_str; }
     int errorCode() { return err_code; }
-    String payload() { return payload_str; }
+    String payload() const { return payload_str; }
 
-    String StreamData() { return stream_payload; }
-    String StreamDataPath() { return stream_data_path; }
-    String StreamEvent() { return stream_event; }
-    int StreamDataType() { return stream_data_type; }
+    String StreamData() const { return stream_payload; }
+    String StreamDataPath() const { return stream_data_path; }
+    String StreamEvent() const { return stream_event; }
+    int StreamDataType() const { return stream_data_type; }
 
     String getString(const String &path) { return Database.get<String>(aClient, path); }
     int getInt(const String &path) { return Database.get<int>(aClient, path); }
