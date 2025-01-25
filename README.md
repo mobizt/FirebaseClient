@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-01-24T18:25:17Z`
+Revision `2025-01-25`
 
 ## Table of Contents
 
@@ -86,7 +86,7 @@ Revision `2025-01-24T18:25:17Z`
 
 Async Firebase Client library for Arduino Documentation.
 
-This library is the `REST APIs Firebase Client` that supports the following `Firebase` and `Google Cloud` products in one place.
+This is the `REST APIs Firebase Client` library that supports the following `Firebase` and `Google Cloud` products in one place.
 
 - `Firebase Realtime Database`
 - `Cloud Firestore Database`
@@ -95,38 +95,26 @@ This library is the `REST APIs Firebase Client` that supports the following `Fir
 - `Google Cloud Functions`
 - `Google Cloud Storage`
 
-This [`FirebaseClient`](https://github.com/mobizt/FirebaseClient) library was created to solve the following issues in the old Firebase library.
+This Firebase library is comprehensive and provides more usage flexibilities. You can chose what you only want to use (see [Library Build Options](#library-build-options)) and you can work with any network interfaces and authentications.
 
-- The confusion of different library names from the same developer and other developers in Library Manager.
-- The different main header file name and class name issue.
-- The long path issue due to long library name with spaces leads to `VisualMicro IDE` compilation error.
-- The central settings using only single config class can cause the usage confusion.
-- The system time changes causes the auth token expiry period calculation error.
-- The internal SSL Client and WiFiClient issue causes the session need to be closed at some interval.
-- The `Realtime Database` stream event data can be missing due to the sync read operation.
-- The async operation is not truely impremented.
-- The library's code size is quite large. This new library code size is 170k smaller which requires only 80k - 110k program space.
+In addition, this library provides the sync and async usage modes which they can be mixed. The async mode provides responsive application with zero delay.
 
-> [!IMPORTANT]  
-> If you are new to `Firebase Products`, please read the [Project Preparation and Setup](#project-preparation-and-setup) section first.
+The library's powerful debugding system allows you to understand what is going on when it is running or failed.
 
-> [!IMPORTANT]  
-> For ESP8266 device usage, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section for heap selection.
+The network configuration (identifier) class, authentication configuration class and the SSL client class can be plug and play. They can be changed on-the-fly.
 
-> [!NOTE]  
-> The Cloud Firestore Database data change listening does not support by REST API.
-
-This library provides the usage flexibilities. You can chose what you only want to use (see [Library Build Options](#library-build-options)) and you can use with any network interfaces and authentications.
-
-In addition, this library provides the sync and async usage modes which can be mixed. The async mode provides your code more dynamic with zero delay usage excepts only small delays used during SPI Ethernet module initializing.
-
-The powerful debugding system allows you to understand what is going on when it is running or failed.
-
-The network identifier class, authentication class and the SSL client class can be plug and play. They can be on-the-fly switchable.
-
-The [bare minimum code examples](/examples/BareMinimum/) provide the basic guidelines for library usage concepts. Even though it contains more lines of code, it is still simple but efficient.
+The [bare minimum code examples](/examples/BareMinimum/) provide the basic guidelines for library usage concepts. Even though it contains more lines of code, it is still simple and understandable but efficient.
 
 You can create your own wrapper class as you want that provides the callback-less, cleaner and simpler API but well managed, powerfull and reliable. See the [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to.
+
+> [!IMPORTANT]  
+> If you are new to `Firebase` products, please read the [Project Preparation and Setup](#project-preparation-and-setup) section first.
+
+> [!IMPORTANT]  
+> For ESP8266 device user, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section for heap selection.
+
+> [!NOTE]  
+> The Firestore data change listening and Realtime Database disconnected event are not support by the Firebase REST API.
 
 ## Frequently Asked Questions
 
@@ -168,34 +156,35 @@ For the FAQ (Frequently Asked Questions), please visit [here](/FAQ.md).
 
 This library required the latest device's **platform Core SDK** to be installed.
 
-> [!IMPORTANT]  
-> Please make sure that the `Arduino IDE's Board Manager URL` is up to date before you update your device's `platform Core SDK`. Any issue due to using out dated `platform Core SDK` is your own risk and does not support by library.
->
-> In case the library compile status showed here is passing and your code compilation is error, you should check your libary installation, `platform Core SDK` installation and the library usage. You cannot install library in the cloud storage virtual folder or sandbox e.g. `Microsoft's OneDrive`.
-
-> [!IMPORTANT]
-> If you are using `Arduino UNO R4 WiFi`, `Arduino Portenta C33`, `Arduino MKR WiFi 1010`, `Arduino NANO 33 IoT`, and `Arduino Nano RP2040`, please make sure you have already done the following.
-> - Add the `Realtime Database host root certificate` to the board firmware. Plese see [Upload SSL root certificates](https://support.arduino.cc/hc/en-us/articles/360016119219-Upload-SSL-root-certificates) for how to.
-> - Install the WiFiNINA library.
-
-> [!IMPORTANT]
-> If you are using `Arduino® MKR 1000 WIFI`, please make sure you have already done the following.
-> - Add the `Realtime Database host root certificate` to the board firmware. 
-> - Install the WiFi101 library and uninstall or remove the WiFiNINA library from the libraries folder if it was installed.
-
-Some Arduino MKR devices have the problem when connecting to the Realtime database URL that ends with `firebasedatabase.app`. Please see [Note for Realtime Database location selection](#note-for-realtime-database-location-selection) for more information.
-
-> [!WARNING]  
-> Known problem in `PlatformIO IDE` compilation, if you are using `Arduino® UNO R4 WiFi` board and using the `Firebase Realtime Database`, your `Arduino® UNO R4 WiFi` board will stop with the error: `"Fault on interrupt or bare metal(no OS) environment"`.
-> This is the error related to the `Realtime Database` server certificate issue in WiFiS3 library that compiled with `PlatformIO IDE` even you are already uploaded the SSL root certificates of `Realtime Database` server using the Arduino IDE Certificate Upload tool.
-> This problem is only specific to `Firebase Realtime Database` in `Arduino® UNO R4 WiFi` which compiled using `PlatformIO IDE` only.
->
 
 For Arduino IDE, the ESP8266 Core SDK can be installed through **Boards Manager**. 
 
 For PlatformIO IDE, the ESP8266 Core SDK can be installed through **PIO Home** > **Platforms** > **Espressif 8266 or Espressif 32**.
 
 The RP2040 boards required [Arduino-Pico SDK](https://github.com/earlephilhower/arduino-pico) from Earle F. Philhower to be installed.
+
+> [!IMPORTANT]  
+> Please make sure that the `Arduino IDE's Board Manager URL` is up to date before you update your device's `platform Core SDK`. Any issue due to using out dated `platform Core SDK` is your own risk and does not support by library.
+>
+> In case the library compile status showed here is passing and your code compilation is error, you should check your libary installation, `platform Core SDK` installation and the library usage. You cannot install library in the cloud storage virtual folder or sandbox e.g. `Microsoft's OneDrive`.
+
+> [!IMPORTANT]
+> If you are using `Arduino® MKR 1000 WIFI`, please make sure you have already done the following steps.
+> - Add the `Realtime Database host root certificate` to the board firmware. 
+> - Install the WiFi101 library and uninstall or remove the WiFiNINA library from the libraries folder if it was installed.
+
+> [!IMPORTANT]
+> If you are using `Arduino UNO R4 WiFi`, `Arduino Portenta C33`, `Arduino MKR WiFi 1010`, `Arduino NANO 33 IoT`, and `Arduino Nano RP2040`, please make sure you have already done the following.
+> - Add the `Realtime Database host root certificate` to the board firmware. Plese see [Upload SSL root certificates](https://support.arduino.cc/hc/en-us/articles/360016119219-Upload-SSL-root-certificates) for how to.
+> - Install the WiFiNINA library.
+
+Some Arduino MKR devices have the problem when connecting to the Realtime database URL that ends with `firebasedatabase.app`. Please see [Note for Realtime Database location selection](#note-for-realtime-database-location-selection) for more information.
+
+> [!WARNING]  
+> Known problem in `PlatformIO IDE` compilation, if you are using `Arduino® UNO R4 WiFi` board and using the `Firebase Realtime Database`, your `Arduino® UNO R4 WiFi` board will stop with the error: `"Fault on interrupt or bare metal(no OS) environment"`.
+> This is the error related to the `Realtime Database` server certificate handling in WiFiS3 library that compiled with `PlatformIO IDE` even you are already uploaded the SSL root certificates of `Realtime Database` server using the Arduino IDE Certificate Upload tool.
+> This problem is only specific to `Firebase Realtime Database` with `Arduino® UNO R4 WiFi` that compiled using `PlatformIO IDE` only.
+
 
 ## Incompatability Between Old Firebase Library and This Firebase Library.
 
@@ -243,7 +232,8 @@ In the old Firebase library, this feature was done internally by the internal SS
 
 If you want to use this feature and if you use ESP32, you can use `ESP_SSLClient` library that included in this library and set the `WiFiClient` as the client.
 
-The following example code is for using `TCP KeepAlive` with `WiFiClient` and built-in `ESP_SSLClient` in ESP32.
+<details>
+<summary>For using TCP KeepAlive with WiFiClient and built-in ESP_SSLClient in ESP32, please click here.</summary>
 
 ```cpp
 
@@ -293,6 +283,7 @@ void loop()
 }
 
 ```
+</details>
 
 - ### PSRAM
 
@@ -385,28 +376,27 @@ This authorization token will be expired in 60 minutes or 3600 seconds which det
 
 The authorization token will be refreshed or re-created automatically as long as the async authentication task handler (`FirebaseApp`) was running in the main loop without blocking by user code.
 
-> [!WARNING]  
-> Most examples use the token for autorization. The token will be refreshed/recreated automatically as mentioned above.
->
-> The `FirebaseApp` event will show the authentication processes that are running behind. The authentication task handler will prepare and maintain the authorization token to be valid. Google may deny the access from the client that sending the request with the expired authorization token.
-> 
-> Anyway, library also provides the option for less or non-secure usage which no authorization tokens are involved i.e. using database secret (`LegacyToken`) for Realtime database and using no authorization token (`NoAuth`) if the security rules are allowed (see the [Project Preparation and Setup](#project-preparation-and-setup) section). 
-> 
-> You can get started using this library with these [bare minimun examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/BareMinimum/) or these [simple Realtime database examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/RealtimeDatabase/Simple) which using database secret and no token, which are similar to the other legacy Firebase library usage. 
->
-> For secure and more elaborate usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
+Most examples use the token for autorization. The token will be refreshed/recreated automatically as mentioned above.
+
+The `FirebaseApp` event will show the authentication processes that are running behind. The authentication task handler will prepare and maintain the authorization token to be valid. Google may deny the access from the client that sending the request with the expired authorization token.
+
+Anyway, library also provides the option for less or non-secure usage which no authorization tokens are involved i.e. using database secret (`LegacyToken`) for Realtime database and using no authorization token (`NoAuth`) if the security rules are allowed (see the [Project Preparation and Setup](#project-preparation-and-setup) section). 
+
+You can get started using this library with these [bare minimun examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/BareMinimum/) or these [simple Realtime database examples](https://github.com/mobizt/FirebaseClient/blob/main/examples/RealtimeDatabase/Simple) which using database secret and no token, which are similar to the other legacy Firebase library usage. 
+
+For secure and more elaborate usages, you have to read the documentation thouroughly and follow the library provided examples to get familiar with the library usage.
 
 The authorization token types that can be used for Firebase/Google APIs authorization are `ID token` and `access token` which will be called shorter as `auth tokens` in this library.
 
-The following authentication/authorization classes generate and hold the `ID token` to be used in the authorization requests.
+The following authentication/authorization classes hold the credentials for use in the intermediate process (token generator) for providing the `ID token` for authorization requests.
 
 - The `UserAuth` class is for `User Sign-in authentication` which is the only authentication method that allows user to sign in for confirming the identity of a user and it provides the `ID token` to use in the authorization requests.
 
 - The `IDToken` class is for `ID token authorization`, which the `ID token` that obtained from the user authentication process in other applications will be used for authorization request. 
 
-- The `CustomAuth` class is for `ID token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `ID token` that uses in the authorization requests. This allows the client to acess the services on behalf of user with custom `UID`.
+- The `CustomAuth` class is for `ID token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `ID token` that uses in the authorization requests. This allows the client to acess the services on behalf of user with custom `UID`, claims and scopes.
 
-The `CustomAuth` class and `ServiceAuth` class which will discus later required the crypto library to sign the JWT token.
+The `CustomAuth` class and `ServiceAuth` class which will discus later use the crypto library to sign the JWT token.
 
 The `BearSSL` engine library that includes in `ESP_SSLClient` library that comes with this FirebaseClient library will be used to handle this cryptographic tasks.
 
@@ -415,8 +405,7 @@ This `BearSSL` and `ESP_SSLClient`libraries are enabled or included by default w
 If you want to authenticate with Custom Token using custom claims signed `JWT` token via `CustomToken` class below or never use the `ServiceAuth` and `CustomAuth` classes and `ESP_SSLClient` library, you can disable `BearSSL` inclusion by defining the macros/build flags `DISABLE_CUSTOM_AUTH` and `DISABLE_SERVICE_AUTH` in  [src/Config.h](src/Config.h) or `src/UserConfig.h`, see [Library Build Options](#library-build-options) section.
 
 
-- The `CustomToken` class is for `ID token authorization using custom token`, which the custom claims signed `JWT` token obtained from the user authentication process in other applications e.g. NodeJS server side app that runs Firebase Admin SDK and working with the Service Account JSON file
-, will be used in the authorization requests.
+- The `CustomToken` class is for `ID token authorization using custom token`, which the custom claims signed `JWT` token obtained from the user authentication process in other applications e.g. NodeJS server side app that runs Firebase Admin SDK and working with the Service Account JSON file, will be used in the authorization requests.
 
 For crating Custom token using Service Account JSON file and Firebase Admin SDK in server side app, visit [Create Custom Tokens](https://firebase.google.com/docs/auth/admin/create-custom-tokens) documentation from Firebase for more information.
 
@@ -1175,7 +1164,7 @@ CustomToken::save(<file_config_data>)
 The expire period should be less than the remaining time to live of your signed `JWT` token.
 
 > [!NOTE]  
-> Only valid `RS256` signed `JWT` token can be used with Firebase Products and Google Cloud Product that provided in this library. 
+> Only valid `RS256` signed `JWT` token can be used with Firebase and Google Cloud products that provided in this library. 
 
 Some Arduino boards that have built-in crypto chip e.g. [ATECC608A](https://www.microchip.com/en-us/product/atecc608a) do not support RSA-256 algorithm and its crypto library cannot use to create the signed JWT token used in this library.
 
@@ -2946,7 +2935,7 @@ A service account is a special kind of account (bot or application account) that
 
 #### Types of service accounts
 
-In Google Cloud, there are several different types of service accounts:
+In Google Cloud services, there are several different types of service accounts:
 
 - User-managed service accounts: Service accounts that you create and manage. These service accounts are often used as identities for workloads.
 
