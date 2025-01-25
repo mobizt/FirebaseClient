@@ -2071,23 +2071,9 @@ The following section will provide the basic (bare minimum) code example and the
 
 ```cpp
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA)
 #include <WiFi.h>
-#elif defined(ESP8266)
-#include <ESP8266WiFi.h>
-#elif __has_include(<WiFiNINA.h>) || defined(ARDUINO_NANO_RP2040_CONNECT)
-#include <WiFiNINA.h>
-#elif __has_include(<WiFi101.h>)
-#include <WiFi101.h>
-#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
-#include <WiFiS3.h>
-#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
-#include <WiFiC3.h>
-#elif __has_include(<WiFi.h>)
-#include <WiFi.h>
-#endif
-
 #include <FirebaseClient.h>
+#include <WiFiClientSecure.h>
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
@@ -2104,17 +2090,8 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000);
 
 FirebaseApp app;
 
-#if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
-#include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
-#include <WiFiSSLClient.h>
-WiFiSSLClient ssl_client;
-#endif
 
-// This is for shorten the name, 
-// if this AsyncClient naming conflicts with other library,
-// please change it or use AsyncClientClass directly.
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
@@ -2144,21 +2121,12 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
+    Serial.println("Initializing the app...");
 
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
-#if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
-#endif
-#endif
 
-    // Initialize the FirebaseApp or auth task handler.
-    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
 
-    // Binding the FirebaseApp for authentication handler.
-    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);
@@ -2167,18 +2135,12 @@ void setup()
 
 void loop()
 {
-    // The async task handler should run inside the main loop
-    // without blocking delay or bypassing with millis code blocks.
-
     app.loop();
     Database.loop();
 
     if (app.ready() && millis() - tmo > 3000)
     {
-      
        tmo = millis();
-       
-       // User code can be put here
        Database.get(aClient, "/test/int", asyncCB, "someTask");
     }
 
@@ -2186,9 +2148,6 @@ void loop()
 
 void asyncCB(AsyncResult &aResult)
 {
-    // WARNING!
-    // Do not put your codes inside the callback.
-
     if (aResult.isEvent())
     {
         Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
@@ -2216,23 +2175,9 @@ void asyncCB(AsyncResult &aResult)
 
 ```cpp
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA)
 #include <WiFi.h>
-#elif defined(ESP8266)
-#include <ESP8266WiFi.h>
-#elif __has_include(<WiFiNINA.h>) || defined(ARDUINO_NANO_RP2040_CONNECT)
-#include <WiFiNINA.h>
-#elif __has_include(<WiFi101.h>)
-#include <WiFi101.h>
-#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
-#include <WiFiS3.h>
-#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
-#include <WiFiC3.h>
-#elif __has_include(<WiFi.h>)
-#include <WiFi.h>
-#endif
-
 #include <FirebaseClient.h>
+#include <WiFiClientSecure.h>
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
@@ -2249,17 +2194,8 @@ UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000);
 
 FirebaseApp app;
 
-#if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
-#include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
-#include <WiFiSSLClient.h>
-WiFiSSLClient ssl_client;
-#endif
 
-// This is for shorten the name, 
-// if this AsyncClient naming conflicts with other library,
-// please change it or use AsyncClientClass directly.
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
@@ -2291,21 +2227,12 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
+    Serial.println("Initializing the app...");
 
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
-#if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
-#endif
-#endif
 
-    // Initialize the FirebaseApp or auth task handler.
-    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
     
-    // Binding the FirebaseApp for authentication handler.
-    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);
@@ -2314,21 +2241,16 @@ void setup()
 
 void loop()
 {
-    // The async task handler should run inside the main loop
-    // without blocking delay or bypassing with millis code blocks.
     
     app.loop();
     Database.loop();
 
     if (app.ready() && millis() - tmo > 3000)
     {
-      
        tmo = millis();
-    
        Database.get(aClient, "/test/int", aResult_no_callback);
     }
     
-    // Print the task result 
     printResult(aResult_no_callback);
 
 }
@@ -2363,31 +2285,15 @@ void printResult(AsyncResult &aResult)
 
 ```cpp
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA)
 #include <WiFi.h>
-#elif defined(ESP8266)
-#include <ESP8266WiFi.h>
-#elif __has_include(<WiFiNINA.h>) || defined(ARDUINO_NANO_RP2040_CONNECT)
-#include <WiFiNINA.h>
-#elif __has_include(<WiFi101.h>)
-#include <WiFi101.h>
-#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
-#include <WiFiS3.h>
-#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
-#include <WiFiC3.h>
-#elif __has_include(<WiFi.h>)
-#include <WiFi.h>
-#endif
-
 #include <FirebaseClient.h>
+#include <WiFiClientSecure.h>
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
-// The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
 
-// User Email and password that already registerd or added in your project.
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
@@ -2398,23 +2304,14 @@ void printError(int code, const String &msg);
 
 void printResult(AsyncResult &aResult);
 
-DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
+DefaultNetwork network;
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 
 FirebaseApp app;
 
-#if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W)
-#include <WiFiClientSecure.h>
 WiFiClientSecure ssl_client;
-#elif defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_GIGA) || defined(ARDUINO_OPTA) || defined(ARDUINO_PORTENTA_C33) || defined(ARDUINO_NANO_RP2040_CONNECT)
-#include <WiFiSSLClient.h>
-WiFiSSLClient ssl_client;
-#endif
 
-// This is for shorten the name, 
-// if this AsyncClient naming conflicts with other library,
-// please change it or use AsyncClientClass directly.
 using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
@@ -2443,34 +2340,21 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing app...");
+    Serial.println("Initializing the app...");
 
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     ssl_client.setInsecure();
-#if defined(ESP8266)
-    ssl_client.setBufferSizes(4096, 1024);
-#endif
-#endif
 
-    // Initialize the FirebaseApp or auth task handler.
-    // To deinitialize, use deinitializeApp(app).
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
 
     authHandler();
     
-    // Binding the FirebaseApp for authentication handler.
-    // To unbind, use Database.resetApp();
     app.getApp<RealtimeDatabase>(Database);
 
     Database.url(DATABASE_URL);
 
-    // In case setting the external async result to the sync task (optional)
-    // To unset, use unsetAsyncResult().
     aClient.setAsyncResult(aResult_no_callback);
 
-    Serial.println("Synchronous Get... ");
-
-    Serial.print("Get int... ");
+    Serial.print("Getting int vakue... ");
     int v1 = Database.get<int>(aClient, "/test/int");
     if (aClient.lastError().code() == 0)
         Serial.println(v1);
@@ -2487,14 +2371,9 @@ void loop()
 
 void authHandler()
 {
-    // Blocking authentication handler with timeout
     unsigned long ms = millis();
     while (app.isInitialized() && !app.ready() && millis() - ms < 120 * 1000)
     {
-        // The JWT token processor required for ServiceAuth and CustomAuth authentications.
-        // JWT is a static object of JWTClass and it's not thread safe.
-        // In multi-threaded operations (multi-FirebaseApp), you have to define JWTClass for each FirebaseApp, 
-        // and set it to the FirebaseApp via FirebaseApp::setJWTProcessor(<JWTClass>), before calling initializeApp.
         JWT.loop(app.getAuth());
         printResult(aResult_no_callback);
     }
