@@ -107,9 +107,9 @@ The [bare minimum code examples](/examples/BareMinimum/) provide the basic guide
 
 You can create your own wrapper class as you want that provides the callback-free, cleaner and simpler API but well managed, powerfull and reliable. See the [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to.
 
-The well managed authentication task handler allows you to access Firebase and Google Cloud services smoothly and seemlessly. Managing the authentication levels for varous apps/users under the same device is so easy with this library similarly to Firebase SDK client.
+The well managed authentication task handler allows you to access Firebase and Google Cloud services smoothly and seemlessly. Managing the authentication levels for various apps/users under the same device is so easy as the Firebase SDK client.
 
-The zero-copy access token makes this library uses less memory when dealing with large access token API request.
+This library is worth trusty and intensively tested 24/7 for its functionality, reliability and performance. 
 
 > [!IMPORTANT]  
 > If you are new to `Firebase` products, please read the [Project Preparation and Setup](#project-preparation-and-setup) section first.
