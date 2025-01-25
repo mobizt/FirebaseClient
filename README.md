@@ -2085,26 +2085,18 @@ The following section will provide the basic (bare minimum) code example and the
 void asyncCB(AsyncResult &aResult);
 
 DefaultNetwork network;
-
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000);
-
 FirebaseApp app;
-
 WiFiClientSecure ssl_client;
-
 using AsyncClient = AsyncClientClass;
-
 AsyncClient aClient(ssl_client, getNetwork(network));
-
 RealtimeDatabase Database;
 
 unsigned long tmo = 0;
 
 void setup()
 {
-
     Serial.begin(115200);
-
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     Serial.print("Connecting to Wi-Fi");
@@ -2120,15 +2112,11 @@ void setup()
     Serial.println();
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
-
-    Serial.println("Initializing the app...");
-
     ssl_client.setInsecure();
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
-
     app.getApp<RealtimeDatabase>(Database);
-
     Database.url(DATABASE_URL);
 
 }
@@ -2137,7 +2125,6 @@ void loop()
 {
     app.loop();
     Database.loop();
-
     if (app.ready() && millis() - tmo > 3000)
     {
        tmo = millis();
@@ -2189,28 +2176,18 @@ void asyncCB(AsyncResult &aResult)
 void printResult(AsyncResult &aResult);
 
 DefaultNetwork network;
-
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000);
-
 FirebaseApp app;
-
 WiFiClientSecure ssl_client;
-
 using AsyncClient = AsyncClientClass;
-
 AsyncClient aClient(ssl_client, getNetwork(network));
-
 RealtimeDatabase Database;
-
 unsigned long tmo = 0;
-
 AsyncResult aResult_no_callback;
 
 void setup()
 {
-
     Serial.begin(115200);
-
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     Serial.print("Connecting to Wi-Fi");
@@ -2226,31 +2203,23 @@ void setup()
     Serial.println();
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
-
-    Serial.println("Initializing the app...");
-
     ssl_client.setInsecure();
 
+    Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
-    
     app.getApp<RealtimeDatabase>(Database);
-
     Database.url(DATABASE_URL);
-
 }
 
 void loop()
 {
-    
     app.loop();
     Database.loop();
-
     if (app.ready() && millis() - tmo > 3000)
     {
        tmo = millis();
        Database.get(aClient, "/test/int", aResult_no_callback);
     }
-    
     printResult(aResult_no_callback);
 
 }
@@ -2282,7 +2251,6 @@ void printResult(AsyncResult &aResult)
 
   #### The Sync Example.
 
-
 ```cpp
 #include <Arduino.h>
 #include <WiFi.h>
@@ -2299,30 +2267,20 @@ void printResult(AsyncResult &aResult)
 #define DATABASE_URL "URL"
 
 void authHandler();
-
 void printError(int code, const String &msg);
-
 void printResult(AsyncResult &aResult);
 
 DefaultNetwork network;
-
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
-
 FirebaseApp app;
-
 WiFiClientSecure ssl_client;
-
 using AsyncClient = AsyncClientClass;
-
 AsyncClient aClient(ssl_client, getNetwork(network));
-
 RealtimeDatabase Database;
-
 AsyncResult aResult_no_callback;
 
 void setup()
 {
-
     Serial.begin(115200);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
@@ -2339,22 +2297,15 @@ void setup()
     Serial.println();
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
-
-    Serial.println("Initializing the app...");
-
     ssl_client.setInsecure();
-
-    initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
-
-    authHandler();
     
+    Serial.println("Initializing the app...");
+    initializeApp(aClient, app, getAuth(user_auth), aResult_no_callback);
+    authHandler();
     app.getApp<RealtimeDatabase>(Database);
-
     Database.url(DATABASE_URL);
-
     aClient.setAsyncResult(aResult_no_callback);
 
-    Serial.print("Getting int vakue... ");
     int v1 = Database.get<int>(aClient, "/test/int");
     if (aClient.lastError().code() == 0)
         Serial.println(v1);
@@ -2365,7 +2316,6 @@ void setup()
 void loop()
 {
     authHandler();
-
     Database.loop();
 }
 
@@ -2504,17 +2454,6 @@ The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `R
 - ### JsonWriter
 
     - [Class and Functions](/resources/docs/json_writer.md).
-
-
-> [!WARNING]
-> This library included the `SSL Client` library called [`ESP_SSLClient`](https://github.com/mobizt/FirebaseClient/tree/main/src/client/SSLClient) to use in JWT token signing and the alternative use of the core SSL Client library e.g. `WiFIClientSecure` and `WiFiSSLClient` in some Arduino Client use cases which makes this library portable with no third-party library needed.
-When this library was used together with my other library e.g. [ESP-Mail-Client](https://github.com/mobizt/ESP-Mail-Client) which comes with built-in `ESP_SSLClient` library, the Arduino IDE compilation error will be occurred.
-You have to remove the folder `src/client/SSLClient` in the subsequent included library. 
-For example if `ESP_Mail_Client.h` was included after `FirebaseClient.h`, the folder [`src/client/SSLClient`](https://github.com/mobizt/ESP-Mail-Client/tree/master/src/client/SSLClient) in the `ESP-Mail-Client` library installation folder should be removed.
-
-The useful of using `ESP_SSLClient` library is it uses `PSRAM` by default (if it is available), you can use it in ESP32 and ESP8266 modules that have `PSRAM` or connected to external `PSRAM`.
-
-For using `PSRAM`, see [Memory Options](#memory-options) section.
 
 
 ## OTA Update
