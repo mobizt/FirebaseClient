@@ -132,7 +132,9 @@ public:
         streamClient[current_stream_index].setNetwork(stream_client, getNetwork(net));
 
         Database.setSSEFilters(filter);
-
+        
+        // All results will store in one streamResult, the data of one Stream can be replaced by another Stream.
+        // To avoid this issue, use StreamCallback or define the AsyncResults for each Stream.
         Database.get(streamClient[current_stream_index], path, streamResult, true);
         current_stream_index++;
 
