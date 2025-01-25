@@ -86,7 +86,7 @@ Revision `2025-01-24T18:25:17Z`
 
 Async Firebase Client library for Arduino Documentation.
 
-This library is the `REST APIs Firebase Client` that supports the following `Firebase` and `Google Cloud` products in one places.
+This library is the `REST APIs Firebase Client` that supports the following `Firebase` and `Google Cloud` products in one place.
 
 - `Firebase Realtime Database`
 - `Cloud Firestore Database`
