@@ -105,7 +105,11 @@ The network configuration (identifier) class, authentication configuration class
 
 The [bare minimum code examples](/examples/BareMinimum/) provide the basic guidelines for library usage concepts. Even though it contains more lines of code, it is still simple and understandable but efficient.
 
-You can create your own wrapper class as you want that provides the callback-less, cleaner and simpler API but well managed, powerfull and reliable. See the [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to.
+You can create your own wrapper class as you want that provides the callback-free, cleaner and simpler API but well managed, powerfull and reliable. See the [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to.
+
+The well managed authentication task handler allows you to access Firebase and Google Cloud services smoothly and seemlessly. Managing the authentication levels for varous apps/users under the same device is so easy with this library similarly to Firebase SDK client.
+
+The zero-copy access token makes this library uses less memory when dealing with large access token API request.
 
 > [!IMPORTANT]  
 > If you are new to `Firebase` products, please read the [Project Preparation and Setup](#project-preparation-and-setup) section first.
