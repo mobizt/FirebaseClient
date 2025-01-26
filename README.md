@@ -110,14 +110,13 @@ You can create your own wrapper class as you want that provides the callback-fre
 
 This library also provides the OTA firmware update functionalities by using your Realtime Database data or Firebase/Cloud Storage object (file).
 
-The well managed authentication task handler allows you to access Firebase and Google Cloud services smoothly and seemlessly. Managing the authentication levels for various apps/users under the same device is so easy as the Firebase SDK client.
+The well-managed authentication task handler allows you to access Firebase and Google Cloud services smoothly and seemlessly. Managing the authentication levels for various apps/users under the same device is so easy as the Firebase SDK client.
 
 This library is worth trusty to try with fully examples and documentation and intensively tested 24/7 for its functionality, reliability and performance. 
 
-Using the simple/half-baked Firebase library or creating your own REST API client can cause your headache later.
+Using any simple/half-baked Firebase libraries or creating your own REST API client is your own risks because of code flaws. Sometime it just works but not always depending on how it is well-managed, API compliances or just using the trial and errors or error from something that has not yet been noticed.
 
-> [!NOTE]  
-> The Firestore data change listening and Realtime Database disconnected event are not support by the Firebase REST API.
+Note that the Firestore data change listening and Realtime Database disconnected event are not support by the Firebase REST API.
 
 ## Frequently Asked Questions
 
