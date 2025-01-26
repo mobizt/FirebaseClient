@@ -365,7 +365,7 @@ For the concept and basic usage, you may have to read this documentation thoroug
 
 For new `Firebase` users, please read the [Project Preparation and Setup](#project-preparation-and-setup) section.
 
-The [bare minimun examples](/examples/BareMinimum/) provides the minimum code that requires by this library.
+The [bare minimun examples](/examples/BareMinimum/) provide the minimum code that requires by this library.
 
 - ### Authentication
 
