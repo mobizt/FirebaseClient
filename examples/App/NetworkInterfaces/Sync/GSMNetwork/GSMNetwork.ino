@@ -102,7 +102,6 @@ void authHandler();
 
 void setup()
 {
-
     Serial.begin(115200);
 
     // Resetting the modem

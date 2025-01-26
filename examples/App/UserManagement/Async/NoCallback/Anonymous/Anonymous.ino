@@ -70,7 +70,6 @@ int cnt = 0;
 
 void setup()
 {
-
     Serial.begin(115200);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 

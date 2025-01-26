@@ -82,7 +82,6 @@ AsyncResult aResult_no_callback;
 
 void setup()
 {
-
     Serial.begin(115200);
 
     wifimulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);

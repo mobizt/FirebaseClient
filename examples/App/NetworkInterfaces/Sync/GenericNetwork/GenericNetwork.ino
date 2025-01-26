@@ -73,7 +73,6 @@ AsyncResult aResult_no_callback;
 
 void setup()
 {
-
   Serial.begin(115200);
 
   netconnect();

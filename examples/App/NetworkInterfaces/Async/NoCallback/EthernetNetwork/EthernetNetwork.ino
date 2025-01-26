@@ -81,7 +81,6 @@ AsyncResult aResult_no_callback;
 
 void setup()
 {
-
     Serial.begin(115200);
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);

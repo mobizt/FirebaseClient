@@ -159,7 +159,6 @@ AsyncResult authResult;
 
 void setup()
 {
-
     Serial.begin(115200);
 
     WiFi.begin("WIFI_AP", "WIFI_PASSWORD");
