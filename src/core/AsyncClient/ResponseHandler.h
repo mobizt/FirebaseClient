@@ -377,6 +377,25 @@ public:
         return res;
     }
 
+    bool readStatusLine()
+    {
+        if (httpCode > 0)
+            return false;
+
+        val[resns::header].reserve(1024);
+
+        // The first chunk (line) can be http response status or already connected stream payload
+        readLine();
+        int status = getStatusCode();
+        if (status > 0)
+        {
+            // http response status
+            flags.header_remaining = true;
+            httpCode = status;
+        }
+        return true;
+    }
+
     uint32_t hex2int(const char *hex)
     {
         uint32_t val = 0;

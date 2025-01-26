@@ -811,7 +811,7 @@ private:
         if (sData->response.tcpAvailable() > 0)
         {
             // status line or data?
-            if (!readStatusLine(sData))
+            if (!sData->response.readStatusLine())
             {
                 // remaining headers to read?
                 if (sData->response.flags.header_remaining)
@@ -885,25 +885,6 @@ private:
             }
         }
 
-        return true;
-    }
-
-    bool readStatusLine(async_data *sData)
-    {
-        if (sData->response.httpCode > 0)
-            return false;
-
-        sData->response.val[resns::header].reserve(1024);
-
-        // The first chunk (line) can be http response status or already connected stream payload
-        sData->response.readLine();
-        int status = sData->response.getStatusCode();
-        if (status > 0)
-        {
-            // http response status
-            sData->response.flags.header_remaining = true;
-            sData->response.httpCode = status;
-        }
         return true;
     }
 
