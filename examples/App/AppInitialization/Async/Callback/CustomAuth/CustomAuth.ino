@@ -2,7 +2,7 @@
  * ABOUT:
  *
  * The bare minimum non-blocking (async) example for Firebase custom user authentication with UID, scopes and claims.
- * 
+ *
  * This example requires the service account credentials that obtains from the JSON key file.
  *
  * This example uses the DefaultNetwork class for network interface configuration.
@@ -36,7 +36,7 @@
  * <scope> - The OAuth scopes.
  * <claims> - The OAuth claims.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
- * 
+ *
  *  3.------------------------
  *
  * CustomAuth::CustomAuth(<timestamp>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>);
@@ -190,13 +190,7 @@ void timeStatusCB(uint32_t &ts)
 #endif
 }
 
-void asyncCB(AsyncResult &aResult)
-{
-    // WARNING!
-    // Do not put your codes inside the callback and printResult.
-
-    printResult(aResult);
-}
+void asyncCB(AsyncResult &aResult) { printResult(aResult); }
 
 void printResult(AsyncResult &aResult)
 {

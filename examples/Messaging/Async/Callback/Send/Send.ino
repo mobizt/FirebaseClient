@@ -216,13 +216,7 @@ void timeStatusCB(uint32_t &ts)
 #endif
 }
 
-void asyncCB(AsyncResult &aResult)
-{
-    // WARNING!
-    // Do not put your codes inside the callback and printResult.
-
-    printResult(aResult);
-}
+void asyncCB(AsyncResult &aResult) { printResult(aResult); }
 
 void printResult(AsyncResult &aResult)
 {

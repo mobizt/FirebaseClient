@@ -156,13 +156,7 @@ void loop()
     }
 }
 
-void asyncCB(AsyncResult &aResult)
-{
-    // WARNING!
-    // Do not put your codes inside the callback and printResult.
-
-    printResult(aResult);
-}
+void asyncCB(AsyncResult &aResult) { printResult(aResult); }
 
 void printResult(AsyncResult &aResult)
 {
