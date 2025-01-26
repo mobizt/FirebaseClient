@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-26
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -218,6 +218,8 @@ private:
 
     void newCon(async_data *sData, const char *host, uint16_t port)
     {
+        sData->request.setClient(client_type, client, async_tcp_config);
+        sData->response.setClient(client_type, client, async_tcp_config);
 
         if ((!sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC && session_timer.remaining() == 0) || (sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == astate_undefined) ||
             strcmp(this->host.c_str(), host) != 0 || this->port != port)
@@ -403,7 +405,7 @@ private:
         {
             uint16_t toSend = len - sData->request.dataIndex > FIREBASE_CHUNK_SIZE ? FIREBASE_CHUNK_SIZE : len - sData->request.dataIndex;
 
-            size_t sent = sData->request.tcpWrite(client_type, client, async_tcp_config, data + sData->request.dataIndex, toSend);
+            size_t sent = sData->request.tcpWrite(data + sData->request.dataIndex, toSend);
             sys_idle();
 
             if (sent == toSend)
@@ -716,7 +718,6 @@ private:
 
     void returnResult(async_data *sData, bool setData)
     {
-
         bool error_notify_timeout = false;
         if (sData->err_timer.remaining() == 0)
         {
@@ -800,44 +801,6 @@ private:
         }
     }
 
-    int readLine(async_data *sData, String &buf)
-    {
-        int p = 0;
-
-        while (sData->response.tcpAvailable(client_type, client, async_tcp_config))
-        {
-            int res = sData->response.tcpRead(client_type, client, async_tcp_config);
-            if (res > -1)
-            {
-                buf += (char)res;
-                p++;
-                if (res == '\n')
-                    return p;
-            }
-        }
-        return p;
-    }
-
-    uint32_t hex2int(const char *hex)
-    {
-        uint32_t val = 0;
-        while (*hex)
-        {
-            // get current character then increment
-            uint8_t byte = *hex++;
-            // transform hex character to the 4bit equivalent number, using the ascii table indexes
-            if (byte >= '0' && byte <= '9')
-                byte = byte - '0';
-            else if (byte >= 'a' && byte <= 'f')
-                byte = byte - 'a' + 10;
-            else if (byte >= 'A' && byte <= 'F')
-                byte = byte - 'A' + 10;
-            // shift 4 to make space for new digit, and add the 4 bits of the new digit
-            val = (val << 4) | (byte & 0xF);
-        }
-        return val;
-    }
-
     void clear(String &str) { sut.clear(str); }
 
     bool readResponse(async_data *sData)
@@ -845,7 +808,7 @@ private:
         if (!client || !sData)
             return false;
 
-        if (sData->response.tcpAvailable(client_type, client, async_tcp_config) > 0)
+        if (sData->response.tcpAvailable() > 0)
         {
             // status line or data?
             if (!readStatusLine(sData))
@@ -885,7 +848,7 @@ private:
                                     // Prevent sse timeout due to large sse Stream playload
                                     feedSSETimer(&sData->aResult.rtdbResult);
 
-                                    if ((*payload)[payload->length() - 1] == '\n' && sData->response.tcpAvailable(client_type, client, async_tcp_config) == 0)
+                                    if ((*payload)[payload->length() - 1] == '\n' && sData->response.tcpAvailable() == 0)
                                     {
                                         setRefPayload(&sData->aResult.rtdbResult, payload);
                                         parseSSE(&sData->aResult.rtdbResult);
@@ -925,18 +888,6 @@ private:
         return true;
     }
 
-    int getStatusCode(const String &header)
-    {
-        String out;
-        int p1 = header.indexOf("HTTP/1.");
-        if (p1 > -1)
-        {
-            out = header.substring(p1 + 9, header.indexOf(' ', p1 + 9));
-            return atoi(out.c_str());
-        }
-        return 0;
-    }
-
     bool readStatusLine(async_data *sData)
     {
         if (sData->response.httpCode > 0)
@@ -944,9 +895,9 @@ private:
 
         sData->response.val[resns::header].reserve(1024);
 
-        // the first chunk (line) can be http response status or already connected stream payload
-        readLine(sData, sData->response.val[resns::header]);
-        int status = getStatusCode(sData->response.val[resns::header]);
+        // The first chunk (line) can be http response status or already connected stream payload
+        sData->response.readLine();
+        int status = sData->response.getStatusCode();
         if (status > 0)
         {
             // http response status
@@ -960,21 +911,21 @@ private:
     {
         if (sData->response.flags.header_remaining)
         {
-            int read = readLine(sData, sData->response.val[resns::header]);
+            int read = sData->response.readLine();
             if ((read == 1 && sData->response.val[resns::header][sData->response.val[resns::header].length() - 1] == '\n') ||
                 (read == 2 && sData->response.val[resns::header][sData->response.val[resns::header].length() - 2] == '\r' && sData->response.val[resns::header][sData->response.val[resns::header].length() - 1] == '\n'))
             {
                 sData->response.flags.http_response = true;
                 clear(sData->response.val[resns::etag]);
-                String temp[5];
+                String temp;
 #if defined(ENABLE_CLOUD_STORAGE)
                 if (sData->upload)
-                    parseRespHeader(sData, sData->response.val[resns::header], sData->request.file_data.resumable.getLocationRef(), "Location");
+                    sData->response.parseRespHeader(sData->request.file_data.resumable.getLocationRef(), "Location");
 #else
-                parseRespHeader(sData, sData->response.val[resns::header], sData->response.val[resns::location], "Location");
+                sData->response.parseRespHeader(sData->response.val[resns::location], "Location");
 
 #endif
-                parseRespHeader(sData, sData->response.val[resns::header], sData->response.val[resns::etag], "ETag");
+                sData->response.parseRespHeader(sData->response.val[resns::etag], "ETag");
                 resETag = sData->response.val[resns::etag];
                 sData->aResult.val[ares_ns::res_etag] = sData->response.val[resns::etag];
                 sData->aResult.val[ares_ns::data_path] = sData->request.val[reqns::path];
@@ -982,21 +933,20 @@ private:
                 setNullETagOption(&sData->aResult.rtdbResult, sData->response.val[resns::etag].indexOf("null_etag") > -1);
 #endif
 
-                parseRespHeader(sData, sData->response.val[resns::header], temp[0], "Content-Length");
+                sData->response.parseRespHeader(temp, "Content-Length");
+                sData->response.payloadLen = atoi(temp.c_str());
 
-                sData->response.payloadLen = atoi(temp[0].c_str());
+                sData->response.parseRespHeader(temp, "Connection");
+                sData->response.flags.keep_alive = temp.length() && temp.indexOf("keep-alive") > -1;
 
-                parseRespHeader(sData, sData->response.val[resns::header], temp[1], "Connection");
-                sData->response.flags.keep_alive = temp[1].length() && temp[1].indexOf("keep-alive") > -1;
+                sData->response.parseRespHeader(temp, "Transfer-Encoding");
+                sData->response.flags.chunks = temp.length() && temp.indexOf("chunked") > -1;
 
-                parseRespHeader(sData, sData->response.val[resns::header], temp[2], "Transfer-Encoding");
-                sData->response.flags.chunks = temp[2].length() && temp[2].indexOf("chunked") > -1;
-
-                parseRespHeader(sData, sData->response.val[resns::header], temp[3], "Content-Type");
-                sData->response.flags.sse = temp[3].length() && temp[3].indexOf("text/event-stream") > -1;
+                sData->response.parseRespHeader(temp, "Content-Type");
+                sData->response.flags.sse = temp.length() && temp.indexOf("text/event-stream") > -1;
 
                 if (sData->upload)
-                    parseRespHeader(sData, sData->response.val[resns::header], temp[4], "Range");
+                    sData->response.parseRespHeader(temp, "Range");
 
                 clear(sData);
 
@@ -1004,12 +954,10 @@ private:
                 if (sData->upload && sData->request.file_data.resumable.isEnabled())
                 {
                     sData->request.file_data.resumable.setHeaderState();
-                    if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && temp[4].indexOf("bytes=") > -1)
+                    if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && temp.indexOf("bytes=") > -1)
                         sData->request.file_data.resumable.updateRange();
                 }
 #endif
-                for (size_t i = 0; i < 5; i++)
-                    sut.clear(temp[i]);
 
                 if (sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
                     sData->response.flags.payload_remaining = true;
@@ -1021,121 +969,6 @@ private:
                     setDebugBase(app_debug, FPSTR("Delete operation complete"));
             }
         }
-    }
-
-    void parseRespHeader(async_data *sData, const String &src, String &out, const char *header)
-    {
-        if (sData->response.httpCode > 0)
-        {
-            int p1 = -1, p2 = -1, p3 = -1;
-            p1 = src.indexOf(header);
-            if (p1 > -1)
-                p2 = src.indexOf(':', p1);
-
-            if (p2 > -1)
-                p3 = src.indexOf("\r\n", p2);
-
-            if (p2 > -1 && p3 > -1)
-                out = src.substring(p2 + 1, p3);
-
-            out.trim();
-        }
-    }
-
-    int getChunkSize(async_data *sData, Client *client, String &line)
-    {
-        if (line.length() == 0)
-            readLine(sData, line);
-
-        int p = line.indexOf(";");
-        if (p == -1)
-            p = line.indexOf("\r\n");
-        if (p != -1)
-            sData->response.chunkInfo.chunkSize = hex2int(line.substring(0, p).c_str());
-
-        return sData->response.chunkInfo.chunkSize;
-    }
-
-    // Returns -1 when complete
-    int decodeChunks(async_data *sData, Client *client, String *out)
-    {
-        if (!client || !sData || !out)
-            return 0;
-        int res = 0, read = 0;
-        String line;
-
-        // because chunks might span multiple reads, we need to keep track of where we are in the chunk
-        // chunkInfo.dataLen is our current position in the chunk
-        // chunkInfo.chunkSize is the total size of the chunk
-
-        // readline() only reads while there is data available, so it might return early
-        // when available() is less than the remaining amount of data in the chunk
-
-        // read chunk-size, chunk-extension (if any) and CRLF
-        if (sData->response.chunkInfo.phase == res_handler::READ_CHUNK_SIZE)
-        {
-            sData->response.chunkInfo.phase = res_handler::READ_CHUNK_DATA;
-            sData->response.chunkInfo.chunkSize = -1;
-            sData->response.chunkInfo.dataLen = 0;
-            res = getChunkSize(sData, client, line);
-            sData->response.payloadLen += res > -1 ? res : 0;
-        }
-        // read chunk-data and CRLF
-        // append chunk-data to entity-body
-        else
-        {
-            // if chunk-size is 0, it's the last chunk, and can be skipped
-            if (sData->response.chunkInfo.chunkSize > 0)
-            {
-                read = readLine(sData, line);
-
-                // if we read till a CRLF, we have a chunk (or the rest of it)
-                // if the last two bytes are NOT CRLF, we have a partial chunk
-                // if we read 0 bytes, read next chunk size
-
-                // check for \n and \r, remove them if present (they're part of the protocol, not the data)
-                if (read >= 2 && line[read - 2] == '\r' && line[read - 1] == '\n')
-                {
-                    // last chunk?
-                    if (line[0] == '0')
-                        return -1;
-
-                    // remove the \r\n
-                    line.remove(line.length() - 2);
-                    read -= 2;
-                }
-
-                // if we still have data, append it and update the chunkInfo
-                if (read)
-                {
-                    *out += line;
-                    sData->response.chunkInfo.dataLen += read;
-                    sData->response.payloadRead += read;
-
-                    // check if we're done reading this chunk
-                    if (sData->response.chunkInfo.dataLen == sData->response.chunkInfo.chunkSize)
-                        sData->response.chunkInfo.phase = res_handler::READ_CHUNK_SIZE;
-                }
-                // if we read 0 bytes, read next chunk size
-                else
-                {
-                    sData->response.chunkInfo.phase = res_handler::READ_CHUNK_SIZE;
-                }
-            }
-            else
-            {
-
-                read = readLine(sData, line);
-
-                // CRLF (end of chunked body)
-                if (read == 2 && line[0] == '\r' && line[1] == '\n')
-                    res = -1;
-                else // another chunk?
-                    getChunkSize(sData, client, line);
-            }
-        }
-
-        return res;
     }
 
     bool readPayload(async_data *sData)
@@ -1154,7 +987,7 @@ private:
                 {
                     // Use temporary String buffer for decodeChunks
                     String temp;
-                    int res = decodeChunks(sData, client, &temp);
+                    int res = sData->response.decodeChunks(&temp);
                     if (temp.length())
                     {
                         reserveString(sData);
@@ -1216,7 +1049,7 @@ private:
                                 ofs = sData->request.base64 && sData->response.payloadRead == 0 ? 1 : 0;
                                 toRead = (int)(sData->response.payloadLen - sData->response.payloadRead) > FIREBASE_CHUNK_SIZE + ofs ? FIREBASE_CHUNK_SIZE + ofs : sData->response.payloadLen - sData->response.payloadRead;
                                 buf = reinterpret_cast<uint8_t *>(mem.alloc(toRead));
-                                read = sData->response.tcpRead(client_type, client, async_tcp_config, buf, toRead);
+                                read = sData->response.tcpRead(buf, toRead);
                             }
 
                             if (read > 0)
@@ -1316,7 +1149,7 @@ private:
                     {
                         // Use temporary String buffer for readLine
                         String temp;
-                        size_t len = readLine(sData, temp);
+                        size_t len = sData->response.readLine(&temp);
                         sData->response.payloadRead += len;
                         reserveString(sData);
                         sData->response.val[resns::payload] += temp;
@@ -1329,7 +1162,7 @@ private:
         if (buf)
             mem.release(&buf);
 
-        if (sData->response.payloadLen > 0 && sData->response.payloadRead >= sData->response.payloadLen && sData->response.tcpAvailable(client_type, client, async_tcp_config) == 0)
+        if (sData->response.payloadLen > 0 && sData->response.payloadRead >= sData->response.payloadLen && sData->response.tcpAvailable() == 0)
         {
 
             // Async payload and header data collision workaround from session reusage.
@@ -1400,7 +1233,7 @@ private:
         {
             if (sData->response.toFill && sData->response.toFillLen)
             {
-                int currentRead = sData->response.tcpRead(client_type, client, async_tcp_config, sData->response.toFill + sData->response.toFillIndex, sData->response.toFillLen);
+                int currentRead = sData->response.tcpRead(sData->response.toFill + sData->response.toFillIndex, sData->response.toFillLen);
                 if (currentRead == sData->response.toFillLen)
                 {
                     buf = reinterpret_cast<uint8_t *>(mem.alloc(sData->response.toFillIndex + sData->response.toFillLen));
@@ -2374,7 +2207,7 @@ private:
                 if (sData->return_type == ret_complete)
                     sData->return_type = ret_continue;
 
-                if (sData->async && !sData->response.tcpAvailable(client_type, client, async_tcp_config))
+                if (sData->async && !sData->response.tcpAvailable())
                 {
                     if (sData->sse)
                     {
@@ -2388,7 +2221,7 @@ private:
                 }
                 else if (!sData->async) // wait for non async
                 {
-                    while (!sData->response.tcpAvailable(client_type, client, async_tcp_config) && networkConnect(sData) == ret_complete)
+                    while (!sData->response.tcpAvailable() && networkConnect(sData) == ret_complete)
                     {
                         sys_idle();
                         if (handleReadTimeout(sData))

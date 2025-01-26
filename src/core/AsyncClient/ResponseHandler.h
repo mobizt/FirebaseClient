@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -97,7 +97,12 @@ public:
     Timer read_timer;
     bool auth_data_available = false;
 
+    reqns::tcp_client_type client_type;
+    Client *client = nullptr;
+    void *atcp_config = nullptr;
+
     res_handler() {}
+
     ~res_handler()
     {
         if (toFill)
@@ -105,6 +110,13 @@ public:
         toFill = nullptr;
         toFillLen = 0;
         toFillIndex = 0;
+    }
+
+    void setClient(reqns::tcp_client_type client_type, Client *client, void *atcp_config)
+    {
+        this->client_type = client_type;
+        this->client = client;
+        this->atcp_config = atcp_config;
     }
 
     void clear()
@@ -129,7 +141,7 @@ public:
 
     void feedTimer(int interval = -1) { read_timer.feed(interval == -1 ? FIREBASE_TCP_READ_TIMEOUT_SEC : interval); }
 
-    int tcpAvailable(reqns::tcp_client_type client_type, Client *client, void *atcp_config)
+    int tcpAvailable()
     {
         if (client_type == reqns::tcpc_sync)
             return client ? client->available() : 0;
@@ -156,7 +168,7 @@ public:
         return 0;
     }
 
-    int tcpRead(reqns::tcp_client_type client_type, Client *client, void *atcp_config)
+    int tcpRead()
     {
         if (client_type == reqns::tcpc_sync)
             return client ? client->read() : -1;
@@ -191,7 +203,7 @@ public:
         return 0;
     }
 
-    int tcpRead(reqns::tcp_client_type client_type, Client *client, void *atcp_config, uint8_t *buf, size_t size)
+    int tcpRead(uint8_t *buf, size_t size)
     {
         if (client_type == reqns::tcpc_sync)
             return client ? client->read(buf, size) : -1;
@@ -235,6 +247,174 @@ public:
         }
 
         return 0;
+    }
+
+    void parseRespHeader(String &out, const char *header)
+    {
+        out.remove(0, out.length());
+        if (httpCode > 0)
+        {
+            int p1 = -1, p2 = -1, p3 = -1;
+            p1 = val[resns::header].indexOf(header);
+            if (p1 > -1)
+                p2 = val[resns::header].indexOf(':', p1);
+
+            if (p2 > -1)
+                p3 = val[resns::header].indexOf("\r\n", p2);
+
+            if (p2 > -1 && p3 > -1)
+                out = val[resns::header].substring(p2 + 1, p3);
+
+            out.trim();
+        }
+    }
+
+    int getStatusCode()
+    {
+        String out;
+        int p1 = val[resns::header].indexOf("HTTP/1.");
+        if (p1 > -1)
+        {
+            out = val[resns::header].substring(p1 + 9, val[resns::header].indexOf(' ', p1 + 9));
+            return atoi(out.c_str());
+        }
+        return 0;
+    }
+
+    int getChunkSize(String &line)
+    {
+        if (line.length() == 0)
+            readLine(&line);
+
+        int p = line.indexOf(";");
+        if (p == -1)
+            p = line.indexOf("\r\n");
+        if (p != -1)
+            chunkInfo.chunkSize = hex2int(line.substring(0, p).c_str());
+
+        return chunkInfo.chunkSize;
+    }
+
+    // Returns -1 when complete
+    int decodeChunks(String *out)
+    {
+        if (!client || !out)
+            return 0;
+        int res = 0, read = 0;
+        String line;
+
+        // because chunks might span multiple reads, we need to keep track of where we are in the chunk
+        // chunkInfo.dataLen is our current position in the chunk
+        // chunkInfo.chunkSize is the total size of the chunk
+
+        // readline() only reads while there is data available, so it might return early
+        // when available() is less than the remaining amount of data in the chunk
+
+        // read chunk-size, chunk-extension (if any) and CRLF
+        if (chunkInfo.phase == READ_CHUNK_SIZE)
+        {
+            chunkInfo.phase = READ_CHUNK_DATA;
+            chunkInfo.chunkSize = -1;
+            chunkInfo.dataLen = 0;
+            res = getChunkSize(line);
+            payloadLen += res > -1 ? res : 0;
+        }
+        // read chunk-data and CRLF
+        // append chunk-data to entity-body
+        else
+        {
+            // if chunk-size is 0, it's the last chunk, and can be skipped
+            if (chunkInfo.chunkSize > 0)
+            {
+                read = readLine(&line);
+
+                // if we read till a CRLF, we have a chunk (or the rest of it)
+                // if the last two bytes are NOT CRLF, we have a partial chunk
+                // if we read 0 bytes, read next chunk size
+
+                // check for \n and \r, remove them if present (they're part of the protocol, not the data)
+                if (read >= 2 && line[read - 2] == '\r' && line[read - 1] == '\n')
+                {
+                    // last chunk?
+                    if (line[0] == '0')
+                        return -1;
+
+                    // remove the \r\n
+                    line.remove(line.length() - 2);
+                    read -= 2;
+                }
+
+                // if we still have data, append it and update the chunkInfo
+                if (read)
+                {
+                    *out += line;
+                    chunkInfo.dataLen += read;
+                    payloadRead += read;
+
+                    // check if we're done reading this chunk
+                    if (chunkInfo.dataLen == chunkInfo.chunkSize)
+                        chunkInfo.phase = READ_CHUNK_SIZE;
+                }
+                // if we read 0 bytes, read next chunk size
+                else
+                {
+                    chunkInfo.phase = READ_CHUNK_SIZE;
+                }
+            }
+            else
+            {
+
+                read = readLine(&line);
+
+                // CRLF (end of chunked body)
+                if (read == 2 && line[0] == '\r' && line[1] == '\n')
+                    res = -1;
+                else // another chunk?
+                    getChunkSize(line);
+            }
+        }
+
+        return res;
+    }
+
+    uint32_t hex2int(const char *hex)
+    {
+        uint32_t val = 0;
+        while (*hex)
+        {
+            // get current character then increment
+            uint8_t byte = *hex++;
+            // transform hex character to the 4bit equivalent number, using the ascii table indexes
+            if (byte >= '0' && byte <= '9')
+                byte = byte - '0';
+            else if (byte >= 'a' && byte <= 'f')
+                byte = byte - 'a' + 10;
+            else if (byte >= 'A' && byte <= 'F')
+                byte = byte - 'A' + 10;
+            // shift 4 to make space for new digit, and add the 4 bits of the new digit
+            val = (val << 4) | (byte & 0xF);
+        }
+        return val;
+    }
+
+    int readLine(String *buf = nullptr)
+    {
+        if (!buf)
+            buf = &val[resns::header];
+
+        int p = 0;
+        while (tcpAvailable())
+        {
+            int res = tcpRead();
+            if (res > -1)
+            {
+                *buf += (char)res;
+                p++;
+                if (res == '\n')
+                    return p;
+            }
+        }
+        return p;
     }
 };
 

@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -110,8 +110,17 @@ public:
     reqns::http_request_method method = reqns::http_undefined;
     Timer send_timer;
 
-    req_handler()
+    reqns::tcp_client_type client_type;
+    Client *client = nullptr;
+    void *atcp_config = nullptr;
+
+    req_handler() {}
+
+    void setClient(reqns::tcp_client_type client_type, Client *client, void *atcp_config)
     {
+        this->client_type = client_type;
+        this->client = client;
+        this->atcp_config = atcp_config;
     }
 
     void clear()
@@ -248,7 +257,7 @@ public:
         send_timer.feed(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval);
     }
 
-    size_t tcpWrite(reqns::tcp_client_type client_type, Client *client, void *atcp_config, const uint8_t *data, size_t size)
+    size_t tcpWrite(const uint8_t *data, size_t size)
     {
         if (client_type == reqns::tcpc_sync)
             return client ? client->write(data, size) : 0;
