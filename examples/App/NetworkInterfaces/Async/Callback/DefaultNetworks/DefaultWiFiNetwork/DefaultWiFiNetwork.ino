@@ -81,7 +81,6 @@ AsyncClient aClient(ssl_client, getNetwork(default_network));
 
 void setup()
 {
-
     Serial.begin(115200);
 
     wifimulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);

@@ -83,7 +83,6 @@ AsyncClient aClient(ssl_client, getNetwork(default_network));
 
 void setup()
 {
-
     Serial.begin(115200);
 
     // https://github.com/esp8266/Arduino/blob/master/libraries/lwIP_Ethernet/examples/EthClient/EthClient.ino

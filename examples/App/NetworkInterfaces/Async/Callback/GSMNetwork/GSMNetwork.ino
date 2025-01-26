@@ -101,7 +101,6 @@ void printResult(AsyncResult &aResult);
 
 void setup()
 {
-
     Serial.begin(115200);
 
     // Resetting the modem

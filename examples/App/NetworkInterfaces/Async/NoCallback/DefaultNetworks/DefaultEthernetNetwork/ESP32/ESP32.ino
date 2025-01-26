@@ -179,7 +179,6 @@ void WiFiEvent(WiFiEvent_t event)
 
 void setup()
 {
-
     Serial.begin(115200);
 
     // This delay is needed in case ETH_CLK_MODE was set to ETH_CLOCK_GPIO0_IN,

@@ -71,7 +71,6 @@ AsyncClient aClient(ssl_client, getNetwork(generic_network));
 
 void setup()
 {
-
   Serial.begin(115200);
 
   netconnect();

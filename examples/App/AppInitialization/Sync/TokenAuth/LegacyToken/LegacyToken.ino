@@ -75,7 +75,6 @@ AsyncClient aClient(ssl_client, getNetwork(network));
 
 void setup()
 {
-
     Serial.begin(115200);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
