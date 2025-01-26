@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-01-25`
+Revision `2025-01-26`
 
 ## Table of Contents
 
@@ -14,12 +14,13 @@ Revision `2025-01-25`
 2. [Frequently Asked Questions](/FAQ.md)
 3. [Supported Devices](#supported-devices)
 4. [Dependencies](#dependencies)
-5. [Incompatability Between Old Firebase Library and This Firebase Library](#incompatability-between-old-firebase-library-and-this-firebase-library)
-6. [Installation](#installation)
+5. [Prerequisites](#prerequisites)
+6. [Incompatability Between Old Firebase Library and This Firebase Library](#incompatability-between-old-firebase-library-and-this-firebase-library)
+7. [Installation](#installation)
     1. [Using Library Manager](#using-library-manager)
     2. [Manual installation](#manual-installation)
     3. [RP2040 Arduino SDK installation](#rp2040-arduino-sdk-installation)
-7. [Usages](#usages)
+8. [Usages](#usages)
     1. [Authentication](#authentication)
     2. [Firebase and Google Cloud Services](#firebase-and-google-cloud-services)
     3. [Async Queue](#async-queue)
@@ -57,8 +58,8 @@ Revision `2025-01-25`
     21. [Google Cloud Storage Usage](#google-cloud-storage-usage)
     22. [Google Cloud Functions Usage](#google-cloud-functions-usage)
     23. [Placeholders](#the-placeholder-represents-the-primitive-types-values-that-used-in-this-library)
-8. [OTA Update](#ota-update)
-9. [Project Preparation and Setup](#project-preparation-and-setup)
+9. [OTA Update](#ota-update)
+10. [Project Preparation and Setup](#project-preparation-and-setup)
     1. [Authentication Getting Started](#authentication-getting-started)
     2. [Realtime Database Getting Started](#realtime-database-getting-started)
     3. [Google Cloud Firestore Database Getting Started](#google-cloud-firestore-database-getting-started)
@@ -67,7 +68,7 @@ Revision `2025-01-25`
     6. [Cloud Messaging Getting Started](#cloud-messaging-getting-started)
     7. [Service Account](#service-account)
         1. [Service Account Permissions](#service-account-permissions)
-10. [Memory Options](#memory-options)
+11. [Memory Options](#memory-options)
     1. [Memory Options for ESP8266](#memory-options-for-esp8266)
         1. [Arduino IDE](#arduino-ide)
         2. [PlatformIO IDE](#platformio-ide)
@@ -75,11 +76,11 @@ Revision `2025-01-25`
     2. [Memory Options for ESP32](#memory-options-for-esp32)
         1. [Arduino IDE](#arduino-ide-1)
         2. [PlatformIO IDE](#platformio-ide-1)
-11. [Library Build Options](#library-build-options)
+12. [Library Build Options](#library-build-options)
     1. [Predefined Options](#predefined-options)
     2. [Optional Options](#optional-options)
-12. [Sponsors](#sponsors)
-13. [License](#license)
+13. [Sponsors](#sponsors)
+14. [License](#license)
 
 
 ## Introduction
@@ -107,15 +108,13 @@ The [bare minimum code examples](/examples/BareMinimum/) provide the basic guide
 
 You can create your own wrapper class as you want that provides the callback-free, cleaner and simpler API but well managed, powerfull and reliable. See the [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to.
 
+This library also provides the OTA firmware update functionalities by using your Realtime Database data or Firebase/Cloud Storage object (file).
+
 The well managed authentication task handler allows you to access Firebase and Google Cloud services smoothly and seemlessly. Managing the authentication levels for various apps/users under the same device is so easy as the Firebase SDK client.
 
-This library is worth trusty and intensively tested 24/7 for its functionality, reliability and performance. 
+This library is worth trusty to try with fully examples and documentation and intensively tested 24/7 for its functionality, reliability and performance. 
 
-> [!IMPORTANT]  
-> If you are new to `Firebase` products, please read the [Project Preparation and Setup](#project-preparation-and-setup) section first.
-
-> [!IMPORTANT]  
-> For ESP8266 device user, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section for heap selection.
+Using the simple/half-baked Firebase library or creating your own REST API client can cause your headache later.
 
 > [!NOTE]  
 > The Firestore data change listening and Realtime Database disconnected event are not support by the Firebase REST API.
@@ -167,27 +166,29 @@ For PlatformIO IDE, the ESP8266 Core SDK can be installed through **PIO Home** >
 
 The RP2040 boards required [Arduino-Pico SDK](https://github.com/earlephilhower/arduino-pico) from Earle F. Philhower to be installed.
 
-> [!IMPORTANT]  
-> Please make sure that the `Arduino IDE's Board Manager URL` is up to date before you update your device's `platform Core SDK`. Any issue due to using out dated `platform Core SDK` is your own risk and does not support by library.
->
-> In case the library compile status showed here is passing and your code compilation is error, you should check your libary installation, `platform Core SDK` installation and the library usage. You cannot install library in the cloud storage virtual folder or sandbox e.g. `Microsoft's OneDrive`.
+## Prerequisites
 
-> [!IMPORTANT]
-> If you are using `Arduino® MKR 1000 WIFI`, please make sure you have already done the following steps.
-> - Add the `Realtime Database host root certificate` to the board firmware. 
-> - Install the WiFi101 library and uninstall or remove the WiFiNINA library from the libraries folder if it was installed.
+If you are new to `Firebase` products, please read the [Project Preparation and Setup](#project-preparation-and-setup) section first.
 
-> [!IMPORTANT]
-> If you are using `Arduino UNO R4 WiFi`, `Arduino Portenta C33`, `Arduino MKR WiFi 1010`, `Arduino NANO 33 IoT`, and `Arduino Nano RP2040`, please make sure you have already done the following.
-> - Add the `Realtime Database host root certificate` to the board firmware. Plese see [Upload SSL root certificates](https://support.arduino.cc/hc/en-us/articles/360016119219-Upload-SSL-root-certificates) for how to.
-> - Install the WiFiNINA library.
+For ESP8266 device user, you should read the [Memory Options for ESP8266](#memory-options-for-esp8266) section for heap selection.
+
+Please make sure that the `Arduino IDE's Board Manager URL` is up to date before you update your device's `platform Core SDK`. Any issue due to using out dated `platform Core SDK` is your own risk and does not support by library.
+
+In case the library compile status showed here is passing and your code compilation is error, you should check your libary installation, `platform Core SDK` installation and the library usage. You cannot install library in the cloud storage virtual folder or sandbox e.g. `Microsoft's OneDrive`.
+
+If you are using `Arduino® MKR 1000 WIFI`, please make sure you have already done the following steps.
+- Add the `Realtime Database host root certificate` to the board firmware. 
+- Install the WiFi101 library and uninstall or remove the WiFiNINA library from the libraries folder if it was installed.
+
+If you are using `Arduino UNO R4 WiFi`, `Arduino Portenta C33`, `Arduino MKR WiFi 1010`, `Arduino NANO 33 IoT`, and `Arduino Nano RP2040`, please make sure you have already done the following.
+- Add the `Realtime Database host root certificate` to the board firmware. Plese see [Upload SSL root certificates](https://support.arduino.cc/hc/en-us/articles/360016119219-Upload-SSL-root-certificates) for how to.
+- Install the WiFiNINA library.
 
 Some Arduino MKR devices have the problem when connecting to the Realtime database URL that ends with `firebasedatabase.app`. Please see [Note for Realtime Database location selection](#note-for-realtime-database-location-selection) for more information.
 
-> [!WARNING]  
-> Known problem in `PlatformIO IDE` compilation, if you are using `Arduino® UNO R4 WiFi` board and using the `Firebase Realtime Database`, your `Arduino® UNO R4 WiFi` board will stop with the error: `"Fault on interrupt or bare metal(no OS) environment"`.
-> This is the error related to the `Realtime Database` server certificate handling in WiFiS3 library that compiled with `PlatformIO IDE` even you are already uploaded the SSL root certificates of `Realtime Database` server using the Arduino IDE Certificate Upload tool.
-> This problem is only specific to `Firebase Realtime Database` with `Arduino® UNO R4 WiFi` that compiled using `PlatformIO IDE` only.
+Known problem in `PlatformIO IDE` compilation, if you are using `Arduino® UNO R4 WiFi` board and using the `Firebase Realtime Database`, your `Arduino® UNO R4 WiFi` board will stop with the error: `"Fault on interrupt or bare metal(no OS) environment"`.
+This is the error related to the `Realtime Database` server certificate handling in WiFiS3 library that compiled with `PlatformIO IDE` even you are already uploaded the SSL root certificates of `Realtime Database` server using the Arduino IDE Certificate Upload tool.
+This problem is only specific to `Firebase Realtime Database` with `Arduino® UNO R4 WiFi` that compiled using `PlatformIO IDE` only.
 
 
 ## Change from the ancestor library.
@@ -196,7 +197,9 @@ The library APIs are not compattible with the ancestor libraries.
 
 If you are using those libraries, the code should be rewritten or cleate the wrapper class (see [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to do this).
 
-In addition, some features are changed which included the following.
+
+<details>
+<summary>For the features changed, please click here.</summary>
 
 - ### FirebaseJson
 
@@ -208,9 +211,9 @@ For `JSON` payload, this library will use [`object_t`](/resources/docs/placehold
 
 - ### Realtime Database
 
-There are no base64 signature string (`file,` and `blob,`) prepended to the base64 encoded string when working with Blob and File upload.
+There are no base64 signature string (`file,` and `blob,`) prepended to the base64 encoded string when working with Blob and File upload/download.
 
-The `MultipathStream`is support supported. You can use multi-Stream instead. Please see the [StreamConcurentcy](/examples/RealtimeDatabase/Async/Callback/StreamConcurentcy/) examples for how to.
+The `MultipathStream`is not supported. You can use multiple Stream connections instead. Please see the [StreamConcurentcy](/examples/RealtimeDatabase/Async/Callback/StreamConcurentcy/) examples for how to.
 
 - ### Cloud Messaging
 
@@ -298,6 +301,7 @@ The server certificate verification can be done via the SSL Client setup that as
 
 The filesystems operations were done in user file callback function that assigned to the `FileConfig` class constructor..
 
+</details>
 
 ## Installation
 
@@ -310,8 +314,6 @@ In Library Manager Window, search **"firebase"** in the search form then select 
 
 Click **"Install"** button.
 
-
-
 For `PlatformIO` IDE, using the following command.
 
 **pio lib install "FirebaseClient""**
@@ -319,7 +321,6 @@ For `PlatformIO` IDE, using the following command.
 Or at **PIO Home** -> **Library** -> **Registry** then search **FirebaseClient**.
 
 In case ESP32, PlatformIO's platform-espressif32 core is outdated. You should use [pioarduino](https://github.com/pioarduino) platform instead. 
-
 
 - ### Manual installation
 
@@ -359,12 +360,11 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 
 Based on the async library design , there are no central configuration class (`FirebaseConfig`) and all-in-one data containter class (`FirebaseData`) as in the ancestor Firebase libraries. 
 
-This library provides the managed classes that are used in different purposes i.e. the classes that used to hadle the sync and async tasks and to use as a container (data provider) for authentication credentials, networking and filesystems configurations, and async task result.
+This library provides the managed classes that are used in different purposes i.e. the classes that used to hadle the sync and async tasks and to use as a container (data provider) for authentication credentials, networking and filesystems configurations, and keeping the task results.
 
-For the concept and basic usage understanding, you should read this documentation thoroughly. 
+For the concept and basic usage, you may have to read this documentation thoroughly. 
 
-> [!IMPORTANT]  
-> For new `Firebase` users, please read the [Project Preparation and Setup](#project-preparation-and-setup) section.
+For new `Firebase` users, please read the [Project Preparation and Setup](#project-preparation-and-setup) section.
 
 The [bare minimun examples](/examples/BareMinimum/) provides the minimum code that requires by this library.
 
@@ -390,13 +390,13 @@ For secure and more elaborate usages, you have to read the documentation thourou
 
 The authorization token types that can be used for Firebase/Google APIs authorization are `ID token` and `access token` which will be called shorter as `auth tokens` in this library.
 
-The following authentication/authorization classes hold the credentials for use in the intermediate process (token generator) for providing the `ID token` for authorization requests.
+The following authentication/authorization classes hold the credentials for use in the intermediate process (token generator) for providing the `ID token` for Firebase/Google Cloud REST API requests.
 
-- The `UserAuth` class is for `User Sign-in authentication` which is the only authentication method that allows user to sign in for confirming the identity of a user and it provides the `ID token` to use in the authorization requests.
+- The `UserAuth` class is for `User Sign-in authentication` which is the only authentication method that allows user to sign in for confirming the identity of a user and it provides the `ID token` to use in the Firebase/Google Cloud REST API requests.
 
-- The `IDToken` class is for `ID token authorization`, which the `ID token` that obtained from the user authentication process in other applications will be used for authorization request. 
+- The `IDToken` class is for `ID token authorization`, which the `ID token` that obtained from the user authentication process in other applications will be used for Firebase/Google Cloud REST API request. 
 
-- The `CustomAuth` class is for `ID token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `ID token` that uses in the authorization requests. This allows the client to acess the services on behalf of user with custom `UID`, claims and scopes.
+- The `CustomAuth` class is for `ID token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `ID token` that uses in the Firebase/Google Cloud REST API requests. This allows the client to acess the services on behalf of user with custom `UID`, claims and scopes.
 
 The `CustomAuth` class and `ServiceAuth` class which will discus later use the crypto library to sign the JWT token.
 
@@ -404,10 +404,10 @@ The `BearSSL` engine library that includes in `ESP_SSLClient` library that comes
 
 This `BearSSL` and `ESP_SSLClient`libraries are enabled or included by default with `ENABLE_SERVICE_AUTH` or `ENABLE_CUSTOM_AUTH` macros defined in [src/Config.h](src/Config.h) which requires more program space.
 
-If you want to authenticate with Custom Token using custom claims signed `JWT` token via `CustomToken` class below or never use the `ServiceAuth` and `CustomAuth` classes and `ESP_SSLClient` library, you can disable `BearSSL` inclusion by defining the macros/build flags `DISABLE_CUSTOM_AUTH` and `DISABLE_SERVICE_AUTH` in  [src/Config.h](src/Config.h) or `src/UserConfig.h`, see [Library Build Options](#library-build-options) section.
+If you want to authenticate with Custom Token using custom claims signed `JWT` token via `CustomToken` class below or never use the `ServiceAuth` and `CustomAuth` classes and `ESP_SSLClient` library, you can disable `BearSSL` inclusion by defining the macros/build flags `DISABLE_CUSTOM_AUTH` and `DISABLE_SERVICE_AUTH` in  [src/Config.h](src/Config.h) or `src/UserConfig.h`, see [Library Build Options](#library-build-options) section for details.
 
 
-- The `CustomToken` class is for `ID token authorization using custom token`, which the custom claims signed `JWT` token obtained from the user authentication process in other applications e.g. NodeJS server side app that runs Firebase Admin SDK and working with the Service Account JSON file, will be used in the authorization requests.
+- The `CustomToken` class is for `ID token authorization using custom token`, which the custom claims signed `JWT` token obtained from the user authentication process in other applications e.g. NodeJS server side app that runs Firebase Admin SDK and working with the Service Account JSON file, will be used in the Firebase/Google Cloud REST API requests.
 
 For crating Custom token using Service Account JSON file and Firebase Admin SDK in server side app, visit [Create Custom Tokens](https://firebase.google.com/docs/auth/admin/create-custom-tokens) documentation from Firebase for more information.
 
@@ -416,9 +416,9 @@ For creating Custom token using [Application Default Credentials (ADC)](https://
 
 The following authentication/authorization classes generate and hold the `access token` and `secret key` for Firebase/Google APIs privilege access.
 
-- The `ServiceAuth` class is for `OAuth2.0 access token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `access token` that uses in the authorization requests.
+- The `ServiceAuth` class is for `OAuth2.0 access token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `access token` that uses in the Firebase/Google Cloud REST API requests.
 
-- The `AcessToken` class is for `OAuth2.0 access token authorization`, which the `access token` from the user authentication process in other applications will be used in the authorization requests.
+- The `AcessToken` class is for `OAuth2.0 access token authorization`, which the `access token` from the user authentication process in other applications will be used in the Firebase/Google Cloud REST API requests.
 
 - The `LegacyToken` class that holds the `database secret` that used as the `secret key` for `Realtime Database` privilege access.
 
@@ -891,7 +891,7 @@ User can unbind the `FirebaseApp` or authentication task handler from the Servic
 
 The authentication/authorization classes also mentioned in the earlier section will be discussed here.
 
-The following authentication/authorization classes generate and hold the `ID token` which used in the authorization requests.
+The following authentication/authorization classes generate the `ID token` which used in the Firebase/Google Cloud REST API requests.
 
 - [UserAuth](/examples/App/AppInitialization/Async/Callback/UserAuth/)
 
@@ -899,7 +899,7 @@ The following authentication/authorization classes generate and hold the `ID tok
 
 - [IDToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/IDToken/)
 
-The following classes provide the privilege access to the Firebase/Google APIs.
+The following classes provide the privilege access to the Firebase/Google Cloud APIs.
 
  - [ServiceAuth](/examples/App/AppInitialization/Async/Callback/ServiceAuth/)
  
@@ -907,7 +907,7 @@ The following classes provide the privilege access to the Firebase/Google APIs.
 
  - [LegacyToken](/examples/App/AppInitialization/Async/Callback/TokenAuth/LegacyToken/)
 
- The following class is for non-authentication acesss.
+ The following class is for non-authentication acesss the Firebase/Google Cloud APIs when the securiry rules allowed for public access.
  
  - [NoAuth](/examples/App/AppInitialization/Async/Callback/NoAuth/)
 
@@ -921,19 +921,19 @@ The user `UID` can be obtained from `FirebaseApp::getUid()`. Don't be confused w
 
 The `auth token` (`ID token` and `access token`) and legacy token can be obtained from `FirebaseApp::getToken()`.
 
-The refresh token (when using authentication/authorization classes that provided the `ID token`) can be obtained from `FirebaseApp::getRefreshToken()`.
+The refresh token (when using authentication/authorization classes that provide the `ID token`) can be obtained from `FirebaseApp::getRefreshToken()`.
 
-- ### initializeApp or Firebase::initializeApp
+- ### App Initialization
 
-To initialize the `FirebaseApp`, call `Firebase::initializeApp` or static function `initializeApp` which the functions parameters are included the following.
+This is the important processs to generate the `auth token` using the account (user or service) credentials from the authentication classes.
 
-Initialize with the callback (Since v1.2.0).
+The `FirebaseApp` class object  (aka authentication task handler) does those processes and provides the tokens for Firebase/Google Cloud REST API requests.
+
+To initialize the authentication task handler, use `FirebaseApp::initializeApp` or `initializeApp` which the functions parameters are included the following.
 
 ```cpp
 initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResult>);
 ```
-
-Initialize with the AsyncResult without the callback (Since v1.2.0)
 
 ```cpp
 initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResultCallback>, <UID>);
@@ -951,9 +951,11 @@ initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResultC
 
 `<UID>` The Task UID. See [Async Result](#async-result) section.
 
-- ### deinitializeApp or Firebase::deinitializeApp
+- ### App De-initialization
 
-Since v1.2.11, to deinitialize the `FirebaseApp`, call `Firebase::deinitializeApp` or static function `deinitializeApp` which the functions parameters are included the following.
+This process resets all authentication information stored in the authentication task handler (`FirebaseApp`). The Firebase/Google Cloud services classes that bind the authentication credentials with it (using `FirebaseApp::getApp`) will be unauthenticated when performing the Firebase/Google Cloud REST API requests.
+
+To de-initialize the authentication task handler, use `Firebase:App:deinitializeApp` or `deinitializeApp` which the functions parameters are included the following.
 
 ```cpp
 initializeApp(<FirebaseApp>);
@@ -1382,22 +1384,24 @@ When you don't use filesystems, you can exclude the related code in this library
 
 - ### Working with Networks
 
-It should be noted that the user defined SSL client that assigned with async client was used for server connection, sending and receiving the data to/from server.
+It should be noted that the user defined SSL client that assigned with async client was used for server connection and data transfer.
 
-Library also provides the option to resume the network connection in case of network connection disconnected.
+This library supports many types of network interfaces via network config classes. Then we have to know which type of network is currently inused and how to check the connection status and how to re-connect the network.
+
+This reduces the user code to maintain the network connection and management and also provides the networks switching or bridge usage.
 
 In case WiFi, if the Core SDK provides reconnection function, library will reconnect to WiFi using that function otherwise the WiFi AP credentials are required.
 
-In case Ethernet, if external Ethernet client was used, library will provide the configuarations to allow Ethernet module enabling/resetting and initialization.
+In case Ethernet interface, if external Ethernet client was used, library will provide the configuarations to allow Ethernet module enabling/resetting and initialization.
 
-In case GSM, it requires the configurations for initialize the TinyGSM modem.
+In case GSM module interface, it requires the configurations for initialize the TinyGSM modem.
 
-In ESP32 Core v3.x.x, SIM devices are natively supported, the SIM or GSM module connected with ESP32 device can work without TinyGSMClient library.
+In ESP32 Core v3.x.x, SIM devices are natively supported via PPP.h library, the SIM or GSM module connected with ESP32 device can work without TinyGSMClient library.
 
-In case generic client, it required the callback function to handle the network connection/reconnection.
+In case generic client, it requires the callback functions to handle the network status checking, connection and reconnection.
 
 > [!NOTE] 
-> In case of server connection and networking issues, please read [FAQ](/FAQ.md) for the known issue.
+> In case of server and networking issues, please read [FAQ](/FAQ.md) for the known issue.
 
 
 The `AsyncClientClass` object requires the network config data (`network_config_data`) that obtained from one of the following networking classes via the static function called `getNetwork`.
@@ -1418,19 +1422,13 @@ The `AsyncClientClass` object requires the network config data (`network_config_
 
 To set or change the network for the `AsyncClientClass`, please see [Change Network Interfaces](#change-network-interfaces).
 
-
-> [!WARNING]  
-> In ESP32, [ADC2](https://docs.espressif.com/projects/esp-idf/en/v4.2/esp32/api-reference/peripherals/adc.html) (`GPIO 0`, `GPIO 2`, `GPIO 4`, `GPIO 12`, `GPIO 13`, `GPIO 14`, `GPIO 15`, `GPIO 25`, `GPIO 26` and `GPIO 27`) cannot be used while using WiFi.
->
-> In ESP32, you can't use WiFi while using Bluetooth.
->
-> In ESP8266/ESP32, you can't use WiFi while using ESP-Now.
+In ESP32 Core v3.x.x, the network bridge (auto networks switching) is supported in its new network APIs.
 
 The default network class can be used with WiFi capable MCUs e.g. ESP8266, ESP32 and Raspberry Pi Pico W/2W.
 
 The boolean parameter passed to the default network class constructor is the option for how the network (WiFi) reconnection can be done automatically or manually.
 
-The default WiFi network class provided the mean for connection with multiple WiFi credentials (WiFi Multi),
+The default WiFi network class provide the mean for connection with multiple WiFi credentials (WiFi Multi),
 
 This default WiFi network class is suitable for device that has the built-in WiFi module (e.g. U-blox) or device that supports WiFi Multi in its core.
 
@@ -1661,27 +1659,23 @@ See [GenericNetwork example](/examples/App/NetworkInterfaces/Async/Callback/Gene
 
 - ### Examples
 
-With this library, you can use async functions with or without the callback functions. The sync functions are also supported. 
+This library supports sync and async usage modes. In the async mode, you can work with or without the callback functions.
 
-Because of all information from operating result, error and debug information are stored in the `AsyncResult`.  
+The information included error and debug information and response payload from the operations are stored in the `AsyncResult` class object.  
 
-Library usage is very flexible which `AsyncResult` can be defined by user or create instantly internally and accessing from within callback, depending on the use cases, which this is how the library examples are organized. 
+Library usage is very flexible which `AsyncResult` can be defined by user or create instantly internally and accessing from within the callback function, depending on the use cases, which this is how the library examples are organized. 
 
-You can choose externally provided `AsyncResult` used with sync or async without callback to save the stack memory usage.
+You can choose externally provided `AsyncResult` used with sync or async function without the callback to save the stack memory usage.
 
-Then the examples provided by this library can be divided into two use cases i.e. `Async` (with `Callback` and `NoCallback`) and `Sync` operations.
+Then the examples provided by this library can be divided into two main use cases i.e. `Async` (with `Callback` and `NoCallback`) and `Sync` operations.
 
-For Firebase services, inside the `Async` and `Sync` folders, the examples based on the Firebase REST APIs are located. The additional cases examples are also included in those folders.
+The `App` folder contains 3 sub folders for dealing with `FilebaseApp` or authentication task handler:
 
-For user that ever used the other legacy Firebase library for Realtime database, the examples in the `Simple` folder under the `RealtimeDatabase` folder, provide the basic usage that is enough for simple use.
+- `AppInitialization` folder is for the different types of authentications examples.
 
-The `App` folder contains 3 sub folders:
+- `NetworkInrerfaces` folder is for the networks examples.
 
-- `AppInitialization` folder is for authentication examples.
-
-- `NetworkInrerfaces` folder is for neiworking examples.
-
-- `UserManagement` folder is for Google authentication examples to manage user.
+- `UserManagement` folder is for Firebase user management examples.
 
 The following section will provide the basic (bare minimum) code example and the links: for the examples, class and functions description and Google API documentation.
 
@@ -2067,7 +2061,7 @@ The following section will provide the basic (bare minimum) code example and the
 </details>
 
 
-  #### The Async function with Callback Example.
+  #### The async mode with callback example.
 
 ```cpp
 #include <Arduino.h>
@@ -2118,7 +2112,6 @@ void setup()
     initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
     app.getApp<RealtimeDatabase>(Database);
     Database.url(DATABASE_URL);
-
 }
 
 void loop()
@@ -2158,7 +2151,7 @@ void asyncCB(AsyncResult &aResult)
 
 ```
 
-  #### The Async Example without Callback.
+  #### The async example without callback.
 
 ```cpp
 #include <Arduino.h>
@@ -2249,7 +2242,7 @@ void printResult(AsyncResult &aResult)
 
 ```
 
-  #### The Sync Example.
+  #### The sync example.
 
 ```cpp
 #include <Arduino.h>
@@ -2355,21 +2348,23 @@ void printError(int code, const String &msg)
 
 - ### The Value Placeholders.
 
-The library provides the placeholder structs for boolean, integer, float with custom precision, double with custom precision and object represents JSON or map and Array to use as the inputs of the functions.
+This is as known as the input data representation class object.
 
-- [`bool_t`](/resources/docs/placeholders.md#bool_t) is the placeholder class represents the `bool` value used in this libaray. This object is optional then use normal `bool` variable instead.
+The library provides the placeholder structs for boolean, integer, float with custom precision, double with custom precision and object represents JSON or map and Array to use as the input data of the functions.
+
+- [`bool_t`](/resources/docs/placeholders.md#bool_t) is the placeholder class represents the `bool` value used in this libaray. This object is not neccessary then use normal `bool` variable instead.
 
 - [`number_t`](/resources/docs/placeholders.md#number_t) is the placeholder class represents the `int`, `float` and `double` values used in this libaray. The normal `int`, `float` and `double` values are supported unless the default decimal places will be used for `float` and `double` values.
 
 The [`number_t`](/resources/docs/placeholders.md#number_t) was used mostly in `Realtime Database` and `Firestore Database` functions.
 
-- [`string_t`](/resources/docs/placeholders.md#string_t) is the placeholder class represents the string used in this libaray. This object is optional then use normal `String`, `const char*` instead.
+- [`string_t`](/resources/docs/placeholders.md#string_t) is the placeholder class represents the string used in this libaray. This object is not neccessary then use normal `String`, `const char*` instead.
 
 - [`object_t`](/resources/docs/placeholders.md#object_t) is the placeholder class represents the `JSON` object and `JSON Array` object used in this libaray.
 
-The string payload that contains `JSON` and `Array` sent to server will be treated as normal string instead of the JSON object. In addition, the `JSON` tags presented in the string can cause the sever interpretation confusion. That is why the [`object_t`](/resources/docs/placeholders.md#object_t) was developed and uses as `JSON` and `Array` placeholders.
+The string payload that contains `JSON` and `Array` that sent to the server will be treated as normal string instead of the JSON object. In addition, the `JSON` tags presented in the string can cause the sever interpretation confusion. That is why the [`object_t`](/resources/docs/placeholders.md#object_t) was developed and uses as `JSON` and `Array` placeholders to distinguish between the normal string and object.
 
-There is no `JSON` serialization/deserialization class in this library unless the [`JsonWriter`](/resources/docs/json_writer.md) utility class to work for the [`object_t`](/resources/docs/placeholders.md#object_t) which used in the examples.
+This library is JSON library independent. You have to use third party JSON library for serialization/deserialization. This library only provides the [`JsonWriter`](/resources/docs/json_writer.md) utility class to work for the [`object_t`](/resources/docs/placeholders.md#object_t) which used in the examples.
 
 The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `Realtime Database` functions.
 
@@ -2471,7 +2466,6 @@ The [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) is th
 To allow OTA update in SAMD21 Arduino boards, you have to include `Internal_Storage_OTA.h` in your sketch.
 
 Then assign the `InternalStorage` class object to be used for `Realtume Database` via `RealtumeDatabase::setOTAStorage`,  for `Google Cloud Storage` via `CloudStorage::setOTAStorage` and for `Firebase Storage` via `Storage::setOTAStorage`
-
 
 In SAMD21 Arduino boards, if `OTA Storage` was not set before calling OTA function, the error `OTA Storage was not set` will be occurred.
 
