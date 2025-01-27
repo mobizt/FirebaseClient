@@ -59,7 +59,7 @@ public:
     {
 
     public:
-        bool header_remaining = false, payload_remaining = false, keep_alive = false;
+        bool header_remaining = false, payload_remaining = false, keep_alive = false, uploadRange = false;
         bool sse = false, http_response = false, chunks = false, payload_available = false;
 
         void reset()
@@ -434,6 +434,68 @@ public:
             }
         }
         return p;
+    }
+
+    bool endOfHeader(int read)
+    {
+        return ((read == 1 && val[resns::header][val[resns::header].length() - 1] == '\n') ||
+                (read == 2 && val[resns::header][val[resns::header].length() - 2] == '\r' && val[resns::header][val[resns::header].length() - 1] == '\n'));
+    }
+
+    bool readHeader(bool sse, bool clearPayload, bool upload)
+    {
+        bool ret = endOfHeader(readLine());
+        if (ret)
+        {
+            flags.http_response = true;
+            val[resns::etag].remove(0, val[resns::etag].length());
+            parseRespHeader(val[resns::etag], "ETag");
+
+            String temp;
+            parseRespHeader(temp, "Content-Length");
+            payloadLen = atoi(temp.c_str());
+
+            parseRespHeader(temp, "Connection");
+            flags.keep_alive = temp.length() && temp.indexOf("keep-alive") > -1;
+
+            parseRespHeader(temp, "Transfer-Encoding");
+            flags.chunks = temp.length() && temp.indexOf("chunked") > -1;
+
+            parseRespHeader(temp, "Content-Type");
+            flags.sse = temp.length() && temp.indexOf("text/event-stream") > -1;
+
+            clear(clearPayload);
+
+            if (upload)
+            {
+                parseRespHeader(temp, "Range");
+                if (httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && temp.indexOf("bytes=") > -1)
+                    flags.uploadRange = true;
+            }
+
+            if (httpCode > 0 && httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
+                flags.payload_remaining = true;
+
+            if (!sse && (httpCode == FIREBASE_ERROR_HTTP_CODE_OK || httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT || httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT) && !flags.chunks && payloadLen == 0)
+                flags.payload_remaining = false;
+        }
+        return ret;
+    }
+
+    void clear(bool clearPayload)
+    {
+        val[resns::header].remove(0, val[resns::header].length());
+        if (clearPayload)
+            val[resns::payload].remove(0, val[resns::payload].length());
+        flags.header_remaining = false;
+        flags.payload_remaining = false;
+        flags.uploadRange = false;
+        payloadRead = 0;
+        error.resp_code = 0;
+        error.string.remove(0, error.string.length());
+        chunkInfo.chunkSize = 0;
+        chunkInfo.dataLen = 0;
+        chunkInfo.phase = res_handler::READ_CHUNK_SIZE;
     }
 };
 

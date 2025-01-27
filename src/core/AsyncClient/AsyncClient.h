@@ -205,7 +205,7 @@ private:
         function_return_type ret = conn.netConnect();
         if (ret == ret_failure)
         {
-            // In case TCP (network) disconnected error.
+            // TCP (network) disconnected error.
             setAsyncError(sData ? sData : nullptr, sData ? sData->state : astate_undefined, FIREBASE_ERROR_TCP_DISCONNECTED, sData ? !sData->sse : true, false);
             return ret_failure;
         }
@@ -242,7 +242,7 @@ private:
                 {
                     if (!sData->request.openFile(file_mode_open_read))
                     {
-                        // In case file open error.
+                        // File open error.
                         setAsyncError(sData, state, FIREBASE_ERROR_OPEN_FILE, !sData->sse, true);
                         return ret_failure;
                     }
@@ -290,7 +290,7 @@ private:
                     toSend = sData->request.file_data.file.read(buf, toSend);
                     if (toSend == 0)
                     {
-                        // In case file read error.
+                        // File read error.
                         setAsyncError(sData, state, FIREBASE_ERROR_FILE_READ, !sData->sse, true);
                         ret = ret_failure;
                         goto exit;
@@ -325,7 +325,7 @@ private:
                     toSend = sData->request.file_data.file.read(buf, toSend);
                     if (toSend == 0)
                     {
-                        // In case file read error.
+                        // File read error.
                         setAsyncError(sData, state, FIREBASE_ERROR_FILE_READ, !sData->sse, true);
                         ret = ret_failure;
                         goto exit;
@@ -424,7 +424,7 @@ private:
 
         sData->return_type = sData->request.payloadIndex == size && size > 0 ? ret_complete : ret_failure;
 
-        // In case TCP write error.
+        // TCP write error.
         if (sData->return_type == ret_failure)
             setAsyncError(sData, state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
 
@@ -495,7 +495,7 @@ private:
             {
                 if (sData->request.app_token->val[app_tk_ns::token].length() == 0)
                 {
-                    // In case missing auth token error.
+                    // Missing auth token error.
                     setAsyncError(sData, sData->state, FIREBASE_ERROR_UNAUTHENTICATE, !sData->sse, false);
                     return ret_failure;
                 }
@@ -541,7 +541,7 @@ private:
         // HTTP error is allowed in case non-auth task to get its response.
         if (!readResponse(sData))
         {
-            // In case HTTP or TCP read error.
+            // HTTP or TCP read error.
             setAsyncError(sData, sData->state, sData->response.httpCode > 0 ? sData->response.httpCode : FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
             return ret_failure;
         }
@@ -600,7 +600,7 @@ private:
 
     function_return_type connErrorHandler(async_data *sData, async_state state)
     {
-        // In case TCP connection error.
+        // TCP connection error.
         setAsyncError(sData, state, FIREBASE_ERROR_TCP_CONNECTION, !sData->sse, false);
         return ret_failure;
     }
@@ -814,14 +814,7 @@ private:
                                         parseSSE(&sData->aResult.rtdbResult);
 
                                         // Event filtering.
-                                        String event = sData->aResult.rtdbResult.event();
-                                        if (sse_events_filter.length() == 0 ||
-                                            (sData->response.flags.http_response && sse_events_filter.indexOf("get") > -1 && event.indexOf("put") > -1) ||
-                                            (!sData->response.flags.http_response && sse_events_filter.indexOf("put") > -1 && event.indexOf("put") > -1) ||
-                                            (sse_events_filter.indexOf("patch") > -1 && event.indexOf("patch") > -1) ||
-                                            (sse_events_filter.indexOf("keep-alive") > -1 && event.indexOf("keep-alive") > -1) ||
-                                            (sse_events_filter.indexOf("cancel") > -1 && event.indexOf("cancel") > -1) ||
-                                            (sse_events_filter.indexOf("auth_revoked") > -1 && event.indexOf("auth_revoked") > -1))
+                                        if (sseFilter(sData))
                                         {
                                             // save payload to slot result
                                             sData->aResult.setPayload(*payload);
@@ -830,9 +823,7 @@ private:
                                             returnResult(sData, true);
                                         }
                                         else
-                                        {
                                             clear(*payload);
-                                        }
 
                                         sData->response.flags.http_response = false;
                                     }
@@ -852,59 +843,30 @@ private:
     {
         if (sData->response.flags.header_remaining)
         {
-            int read = sData->response.readLine();
-            if ((read == 1 && sData->response.val[resns::header][sData->response.val[resns::header].length() - 1] == '\n') ||
-                (read == 2 && sData->response.val[resns::header][sData->response.val[resns::header].length() - 2] == '\r' && sData->response.val[resns::header][sData->response.val[resns::header].length() - 1] == '\n'))
+            if (sData->response.readHeader(sData->sse, !sData->auth_used, sData->upload))
             {
-                sData->response.flags.http_response = true;
-                clear(sData->response.val[resns::etag]);
-                String temp;
 #if defined(ENABLE_CLOUD_STORAGE)
                 if (sData->upload)
                     sData->response.parseRespHeader(sData->request.file_data.resumable.getLocationRef(), "Location");
 #else
                 sData->response.parseRespHeader(sData->response.val[resns::location], "Location");
-
 #endif
-                sData->response.parseRespHeader(sData->response.val[resns::etag], "ETag");
                 resETag = sData->response.val[resns::etag];
                 sData->aResult.val[ares_ns::res_etag] = sData->response.val[resns::etag];
                 sData->aResult.val[ares_ns::data_path] = sData->request.val[reqns::path];
+
 #if defined(ENABLE_DATABASE)
                 setNullETagOption(&sData->aResult.rtdbResult, sData->response.val[resns::etag].indexOf("null_etag") > -1);
 #endif
-
-                sData->response.parseRespHeader(temp, "Content-Length");
-                sData->response.payloadLen = atoi(temp.c_str());
-
-                sData->response.parseRespHeader(temp, "Connection");
-                sData->response.flags.keep_alive = temp.length() && temp.indexOf("keep-alive") > -1;
-
-                sData->response.parseRespHeader(temp, "Transfer-Encoding");
-                sData->response.flags.chunks = temp.length() && temp.indexOf("chunked") > -1;
-
-                sData->response.parseRespHeader(temp, "Content-Type");
-                sData->response.flags.sse = temp.length() && temp.indexOf("text/event-stream") > -1;
-
-                if (sData->upload)
-                    sData->response.parseRespHeader(temp, "Range");
-
-                clear(sData);
 
 #if defined(ENABLE_CLOUD_STORAGE)
                 if (sData->upload && sData->request.file_data.resumable.isEnabled())
                 {
                     sData->request.file_data.resumable.setHeaderState();
-                    if (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && temp.indexOf("bytes=") > -1)
+                    if (sData->response.flags.uploadRange)
                         sData->request.file_data.resumable.updateRange();
                 }
 #endif
-
-                if (sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
-                    sData->response.flags.payload_remaining = true;
-
-                if (!sData->sse && (sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_OK || sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT || sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT) && !sData->response.flags.chunks && sData->response.payloadLen == 0)
-                    sData->response.flags.payload_remaining = false;
 
                 if (sData->request.method == reqns::http_delete && sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
                     setDebugBase(app_debug, FPSTR("Delete operation complete"));
@@ -955,7 +917,7 @@ private:
                                     otaut.prepareDownloadOTA(sData->response.payloadLen, sData->request.base64, sData->request.ota_error);
                                     if (sData->request.ota_error != 0)
                                     {
-                                        // In case OTA error.
+                                        // OTA error.
                                         setAsyncError(sData, astate_read_response, sData->request.ota_error, !sData->sse, false);
                                         return false;
                                     }
@@ -967,7 +929,7 @@ private:
 
                                     if (!sData->request.openFile(file_mode_open_write))
                                     {
-                                        // In case file open error.
+                                        // File open error.
                                         setAsyncError(sData, astate_read_response, FIREBASE_ERROR_OPEN_FILE, !sData->sse, true);
                                         return false;
                                     }
@@ -1013,7 +975,7 @@ private:
                                         otaut.decodeBase64OTA(mem, &b64ut, reinterpret_cast<const char *>(buf), read - ofs, sData->request.ota_error);
                                         if (sData->request.ota_error != 0)
                                         {
-                                            // In case OTA error.
+                                            // OTA error.
                                             setAsyncError(sData, astate_read_response, sData->request.ota_error, !sData->sse, false);
                                             goto exit;
                                         }
@@ -1023,7 +985,7 @@ private:
                                             otaut.endDownloadOTA(b64ut, sData->request.b64Pad, sData->request.ota_error);
                                             if (sData->request.ota_error != 0)
                                             {
-                                                // In case OTA error.
+                                                // OTA error.
                                                 setAsyncError(sData, astate_read_response, sData->request.ota_error, !sData->sse, false);
                                                 goto exit;
                                             }
@@ -1035,7 +997,7 @@ private:
 
                                         if (!b64ut.decodeToFile(mem, sData->request.file_data.file, reinterpret_cast<const char *>(buf + ofs)))
                                         {
-                                            // In case file write error.
+                                            // File write error.
                                             setAsyncError(sData, astate_read_response, FIREBASE_ERROR_FILE_WRITE, !sData->sse, true);
                                             goto exit;
                                         }
@@ -1055,7 +1017,7 @@ private:
                                             otaut.endDownloadOTA(b64ut, 0, sData->request.ota_error);
                                             if (sData->request.ota_error != 0)
                                             {
-                                                // In case OTA error.
+                                                // OTA error.
                                                 setAsyncError(sData, astate_read_response, sData->request.ota_error, !sData->sse, false);
                                                 goto exit;
                                             }
@@ -1067,7 +1029,7 @@ private:
                                         int write = sData->request.file_data.file.write(buf, read);
                                         if (write < read)
                                         {
-                                            // In case file write error.
+                                            // File write error.
                                             setAsyncError(sData, astate_read_response, FIREBASE_ERROR_FILE_WRITE, !sData->sse, true);
                                             goto exit;
                                         }
@@ -1105,7 +1067,6 @@ private:
 
         if (sData->response.payloadLen > 0 && sData->response.payloadRead >= sData->response.payloadLen && sData->response.tcpAvailable() == 0)
         {
-
             // Async payload and header data collision workaround from session reusage.
             if (!sData->response.flags.chunks && sData->response.payloadRead > sData->response.payloadLen)
             {
@@ -1125,7 +1086,7 @@ private:
             if (sData->response.flags.chunks && sData->auth_used)
                 stop(sData);
 
-            // In case HTTP error.
+            // HTTP server error.
             if (sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
             {
                 setAsyncError(sData, sData->state, sData->response.httpCode, !sData->sse, true);
@@ -1152,6 +1113,18 @@ private:
         }
 
         return sData->error.code == 0;
+    }
+
+    bool sseFilter(async_data *sData)
+    {
+        String event = sData->aResult.rtdbResult.event();
+        return (sse_events_filter.length() == 0 ||
+                (sData->response.flags.http_response && sse_events_filter.indexOf("get") > -1 && event.indexOf("put") > -1) ||
+                (!sData->response.flags.http_response && sse_events_filter.indexOf("put") > -1 && event.indexOf("put") > -1) ||
+                (sse_events_filter.indexOf("patch") > -1 && event.indexOf("patch") > -1) ||
+                (sse_events_filter.indexOf("keep-alive") > -1 && event.indexOf("keep-alive") > -1) ||
+                (sse_events_filter.indexOf("cancel") > -1 && event.indexOf("cancel") > -1) ||
+                (sse_events_filter.indexOf("auth_revoked") > -1 && event.indexOf("auth_revoked") > -1));
     }
 
     void reserveString(async_data *sData)
@@ -1196,21 +1169,6 @@ private:
         return buf;
     }
 
-    void clear(async_data *sData)
-    {
-        clear(sData->response.val[resns::header]);
-        if (!sData->auth_used)
-            clear(sData->response.val[resns::payload]);
-        sData->response.flags.header_remaining = false;
-        sData->response.flags.payload_remaining = false;
-        sData->response.payloadRead = 0;
-        sData->response.error.resp_code = 0;
-        clear(sData->response.error.string);
-        sData->response.chunkInfo.chunkSize = 0;
-        sData->response.chunkInfo.dataLen = 0;
-        sData->response.chunkInfo.phase = res_handler::READ_CHUNK_SIZE;
-    }
-
     void reset(async_data *sData, bool disconnect)
     {
         if (disconnect)
@@ -1224,7 +1182,7 @@ private:
         clear(sData->response.val[resns::etag]);
         sData->aResult.download_data.reset();
         sData->aResult.upload_data.reset();
-        clear(sData);
+        sData->response.clear(!sData->auth_used);
     }
 
     function_return_type connect(async_data *sData, const char *host, uint16_t port)
@@ -1305,11 +1263,12 @@ private:
         {
             if (eventResumeStatus(&sData->aResult.rtdbResult) == event_resume_status_undefined)
             {
-                // In case stream time out.
-                // We have to clear app data (available), reset the last error and set the Stream time out error.
+                // In case Stream timed out,
+                // we have to clear app data (available), reset the last error and set the Stream time out error.
                 sData->aResult.lastError.reset();
                 clearAppData(sData->aResult.app_data);
                 setEventResumeStatus(&sData->aResult.rtdbResult, event_resume_status_resuming);
+                // Stream timed out error.
                 setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEOUT, false, false);
                 returnResult(sData, false);
                 reset(sData, true);
@@ -1322,7 +1281,7 @@ private:
     {
         if (sData->request.send_timer.remaining() == 0)
         {
-            // In case TCP write error.
+            // TCP write error.
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_SEND, !sData->sse, false);
             sData->return_type = ret_failure;
             // This requires by WiFiSSLClient before stating a new connection in case session was reused.
@@ -1336,7 +1295,7 @@ private:
     {
         if (!sData->sse && sData->response.read_timer.remaining() == 0)
         {
-            // In case TCP read error.
+            // TCP read error.
             setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT, !sData->sse, false);
             sData->return_type = ret_failure;
             // This requires by WiFiSSLClient before stating a new connection in case session was reused.
@@ -1575,7 +1534,7 @@ private:
 
             if (networkConnect(sData) == ret_failure)
             {
-                // In case TCP (network) disconnected error.
+                // TCP (network) disconnected error.
                 setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
                 if (sData->async)
                 {
