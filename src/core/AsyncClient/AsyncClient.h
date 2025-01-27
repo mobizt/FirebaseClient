@@ -1123,7 +1123,7 @@ private:
 
     void reserveString(async_data *sData)
     {
-        // String memory reservation is needed to hadle large data in external memory.
+        // String memory reservation is needed to handle large data in external memory.
 #if defined(ENABLE_PSRAM) && ((defined(ESP8266) && defined(MMU_EXTERNAL_HEAP)) || (defined(ESP32) && defined(BOARD_HAS_PSRAM)))
         String old = sData->response.val[resns::payload];
         sData->response.val[resns::payload].remove(0, sData->response.val[resns::payload].length());
@@ -1132,7 +1132,7 @@ private:
 #endif
     }
 
-    // non-block memory buffer for collecting the multiple of 4 data prepared for base64 decoding
+    // Non-blocking memory buffer for collecting the data (multiple of 4 bytes) that prepared for base64 decoding
     uint8_t *asyncBase64Buffer(async_data *sData, Memory &mem, int &toRead, int &read)
     {
         uint8_t *buf = nullptr;
@@ -1348,7 +1348,6 @@ private:
     {
         if (conn.isConnected())
             setDebugBase(app_debug, FPSTR("Terminating the server connection..."));
-
         conn.stop();
     }
 
@@ -1452,10 +1451,7 @@ private:
         }
     }
 
-    void setEvent(async_data *sData, int code, const String &msg)
-    {
-        setEventBase(app_event, code, msg);
-    }
+    void setEvent(async_data *sData, int code, const String &msg) { setEventBase(app_event, code, msg); }
 
     void removeSlot(uint8_t slot, bool sse = true)
     {
@@ -1489,14 +1485,10 @@ private:
 
     size_t slotCount() { return sVec.size(); }
 
-    void exitProcess(bool status)
-    {
-        inProcess = status;
-    }
+    void exitProcess(bool status) { inProcess = status; }
 
     void process(bool async)
     {
-
         if (processLocked())
             return;
 
@@ -1809,7 +1801,7 @@ public:
     void setNetwork(Client &client, network_config_data &net)
     {
         // Check client changes.
-       bool client_changed = reinterpret_cast<uint32_t>(&client) != reinterpret_cast<uint32_t>(this->client);
+        bool client_changed = reinterpret_cast<uint32_t>(&client) != reinterpret_cast<uint32_t>(this->client);
 
         // Some changes, stop the current network client.
         if (client_changed && this->client)
