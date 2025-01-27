@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-27
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -1045,7 +1045,7 @@ private:
         if (request.file && sData->upload)
         {
             sData->request.base64 = true;
-            request.aClient->setFileContentLength(sData, 0);
+            sData->request.setFileContentLength(0);
 
             if (sData->request.file_data.file_size == 0)
                 return request.aClient->setClientError(request, FIREBASE_ERROR_FILE_READ);
@@ -1053,7 +1053,7 @@ private:
         else if (strlen(payload))
         {
             sData->request.val[reqns::payload] = payload;
-            request.aClient->setContentLength(sData, strlen(payload));
+            sData->request.setContentLength(strlen(payload));
         }
 
         if (request.cb)

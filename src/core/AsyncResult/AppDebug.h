@@ -36,6 +36,25 @@ namespace firebase_ns
         friend class AppBase;
         friend class ResultBase;
         friend class JWTClass;
+        friend class ConnBase;
+
+    protected:
+        void setDebug(const String &msg)
+        {
+
+            if (msg.length() == 0 || strcmp(last.c_str(), msg.c_str()) == 0)
+                return;
+
+            limitQueue();
+
+            last = msg;
+            ms = millis();
+            dbg_item dbgt;
+            dbgt.msg = msg;
+            dbgt.ts = ms;
+            dbgVec.push_back(dbgt);
+            available = true;
+        }
 
     private:
         StringUtil sut;
@@ -68,23 +87,6 @@ namespace firebase_ns
         {
             if (dbgVec.size() > 3)
                 dbgVec.erase(dbgVec.begin());
-        }
-
-        void setDebug(const String &msg)
-        {
-
-            if (msg.length() == 0 || strcmp(last.c_str(), msg.c_str()) == 0)
-                return;
-
-            limitQueue();
-
-            last = msg;
-            ms = millis();
-            dbg_item dbgt;
-            dbgt.msg = msg;
-            dbgt.ts = ms;
-            dbgVec.push_back(dbgt);
-            available = true;
         }
 
         void reset()

@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-27
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -213,7 +213,7 @@ private:
         if (request.options->payload.length())
         {
             sData->request.val[reqns::payload] = request.options->payload;
-            request.aClient->setContentLength(sData, request.options->payload.length());
+            sData->request.setContentLength(request.options->payload.length());
         }
 
         if (request.cb)

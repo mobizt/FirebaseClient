@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-27
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -53,7 +53,7 @@ protected:
     void newRequestBase(AsyncClientClass *aClient, async_data *sData, const String &url, const String &path, const String &extras, reqns::http_request_method method, const slot_options_t &options, const String &uid) { aClient->newRequest(sData, url, path, extras, method, options, uid); }
     void setAuthTsBase(AsyncClientClass *aClient, uint32_t ts) { aClient->auth_ts = ts; }
     void addRemoveClientVecBase(AsyncClientClass *aClient, uint32_t cvec_addr, bool add) { aClient->addRemoveClientVec(cvec_addr, add); }
-    void setContentLengthBase(AsyncClientClass *aClient, async_data *sData, size_t len) { aClient->setContentLength(sData, len); }
+    void setContentLengthBase(AsyncClientClass *aClient, async_data *sData, size_t len) { sData->request.setContentLength(len); }
     void handleRemoveBase(AsyncClientClass *aClient) { aClient->handleRemove(); }
     void removeSlotBase(AsyncClientClass *aClient, uint8_t slot, bool sse = true) { aClient->removeSlot(slot, sse); }
     size_t slotCountBase(AsyncClientClass *aClient) { return aClient->sVec.size(); }

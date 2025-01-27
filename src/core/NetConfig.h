@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-27
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -48,6 +48,7 @@ struct network_config_data
     friend class DefaultEthernetNetwork;
     friend class DefaultWiFiNetwork;
     friend class AsyncClientClass;
+    friend class conn_handler;
 
 private:
     struct generic_data

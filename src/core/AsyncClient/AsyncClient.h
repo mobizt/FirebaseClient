@@ -27,9 +27,9 @@
 #ifndef ASYNC_CLIENT_H
 #define ASYNC_CLIENT_H
 #include <vector>
+#include "./core/AsyncClient/ConnectionHandler.h"
 #include "./core/AsyncClient/RequestHandler.h"
 #include "./core/AsyncClient/ResponseHandler.h"
-#include "./core/NetConfig.h"
 #include "./core/Memory.h"
 #include "./core/FileConfig.h"
 #include "./core/Error.h"
@@ -56,15 +56,6 @@ enum async_state
     astate_send_payload,
     astate_read_response,
     astate_complete
-};
-
-enum function_return_type
-{
-    ret_undefined = -2,
-    ret_failure = -1,
-    ret_continue = 0,
-    ret_complete = 1,
-    ret_retry = 2
 };
 
 struct async_data
@@ -162,64 +153,37 @@ class AsyncClientClass : public ResultBase, RTDBResultBase
 
 private:
     StringUtil sut;
+    conn_handler conn;
     app_debug_t app_debug;
     app_event_t app_event;
     FirebaseError lastErr;
     String header, reqEtag, resETag, sse_events_filter;
     AsyncResult *refResult = nullptr;
     AsyncResult aResult;
-    int netErrState = 0;
     uint32_t addr = 0, auth_ts = 0, cvec_addr = 0, result_addr = 0, sync_send_timeout_sec = 0, sync_read_timeout_sec = 0, session_timeout_sec = 0;
     Timer session_timer;
     Client *client = nullptr;
     bool client_changed = false, network_changed = false;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
-    AsyncTCPConfig *async_tcp_config = nullptr;
+    AsyncTCPConfig *atcp_config = nullptr;
 #else
-    void *async_tcp_config = nullptr;
+    void *atcp_config = nullptr;
 #endif
-    reqns::tcp_client_type client_type = reqns::tcpc_sync;
-    bool sse = false, connected = false;
+    tcp_client_type client_type = tcpc_sync;
+    bool sse = false;
     String host;
     uint16_t port;
     std::vector<uint32_t> sVec;
     Memory mem;
     Base64Util b64ut;
     OTAUtil otaut;
-    network_config_data net;
     bool inProcess = false, inStopAsync = false;
-
-    void closeFile(async_data *sData)
-    {
-#if defined(ENABLE_FS)
-        if (sData->request.file_data.file && sData->request.file_data.file_status == file_config_data::file_status_opened)
-        {
-            sData->request.file_data.file_size = 0;
-            sData->request.payloadIndex = 0;
-            sData->request.dataIndex = 0;
-            sData->request.file_data.file_status = file_config_data::file_status_closed;
-            sData->request.file_data.file.close();
-        }
-#endif
-    }
-
-    bool openFile(async_data *sData, file_operating_mode mode)
-    {
-#if defined(ENABLE_FS)
-        sData->request.file_data.cb(sData->request.file_data.file, sData->request.file_data.filename.c_str(), mode);
-        if (!sData->request.file_data.file)
-            return false;
-#else
-        return false;
-#endif
-        sData->request.file_data.file_status = file_config_data::file_status_opened;
-        return true;
-    }
 
     void newCon(async_data *sData, const char *host, uint16_t port)
     {
-        sData->request.setClient(client_type, client, async_tcp_config);
-        sData->response.setClient(client_type, client, async_tcp_config);
+        conn.newConn(client_type, client, atcp_config, &app_debug);
+        sData->request.setClient(client_type, client, atcp_config);
+        sData->response.setClient(client_type, client, atcp_config);
 
         if ((!sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC && session_timer.remaining() == 0) || (sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == astate_undefined) ||
             strcmp(this->host.c_str(), host) != 0 || this->port != port)
@@ -238,9 +202,8 @@ private:
 
     function_return_type networkConnect(async_data *sData)
     {
-        function_return_type ret = netConnect(sData);
-
-        if (!sData || ret == ret_failure)
+        function_return_type ret = conn.netConnect();
+        if (ret == ret_failure)
         {
             // In case TCP (network) disconnected error.
             setAsyncError(sData ? sData : nullptr, sData ? sData->state : astate_undefined, FIREBASE_ERROR_TCP_DISCONNECTED, sData ? !sData->sse : true, false);
@@ -277,7 +240,7 @@ private:
             {
                 if (sData->request.file_data.file_status == file_config_data::file_status_closed)
                 {
-                    if (!openFile(sData, file_mode_open_read))
+                    if (!sData->request.openFile(file_mode_open_read))
                     {
                         // In case file open error.
                         setAsyncError(sData, state, FIREBASE_ERROR_OPEN_FILE, !sData->sse, true);
@@ -508,11 +471,11 @@ private:
 
         if (sData->state == astate_undefined || sData->state == astate_send_header)
         {
-            newCon(sData, getHost(sData, true).c_str(), sData->request.port);
+            newCon(sData, sData->request.getHost(true, &sData->response.val[resns::location]).c_str(), sData->request.port);
 
-            if ((client_type == reqns::tcpc_sync && !isConnected()) || client_type == reqns::tcpc_async)
+            if ((client_type == tcpc_sync && !conn.isConnected()) || client_type == tcpc_async)
             {
-                ret = connect(sData, getHost(sData, true).c_str(), sData->request.port);
+                ret = connect(sData, sData->request.getHost(true, &sData->response.val[resns::location]).c_str(), sData->request.port);
 
                 // allow non-blocking async tcp connection
                 if (ret == ret_continue)
@@ -591,7 +554,7 @@ private:
         if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.getLocation().length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
             String ext;
-            String _host = getHost(sData, false, &ext);
+            String _host = sData->request.getHost(false, &sData->response.val[resns::location], &ext);
 
             if (connect(sData, _host.c_str(), sData->request.port) > ret_failure)
             {
@@ -609,13 +572,10 @@ private:
         if (sData->response.val[resns::location].length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
             String ext;
-            String _host = getHost(sData, false, &ext);
-            if (client)
-            {
-                client->stop();
-                this->connected = false;
-            }
-            if (connect(sData, _host.c_str(), sData->request.port) > ret_failure)
+            String _host = sData->request.getHost(false, &sData->response.val[resns::location], &ext);
+            conn.stop();
+
+            if (conn.connect(_host.c_str(), sData->request.port) > ret_failure)
             {
                 URLUtil uut;
                 uut.relocate(sData->request.val[reqns::header], _host, ext);
@@ -657,7 +617,7 @@ private:
             sData->to_remove = toRemove;
 
         if (toCloseFile)
-            closeFile(sData);
+            sData->request.closeFile();
 
         setLastError(sData);
     }
@@ -1003,9 +963,9 @@ private:
 #if defined(ENABLE_FS)
                                 else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                 {
-                                    closeFile(sData);
+                                    sData->request.closeFile();
 
-                                    if (!openFile(sData, file_mode_open_write))
+                                    if (!sData->request.openFile(file_mode_open_write))
                                     {
                                         // In case file open error.
                                         setAsyncError(sData, astate_read_response, FIREBASE_ERROR_OPEN_FILE, !sData->sse, true);
@@ -1185,7 +1145,7 @@ private:
             if (!sData->response.flags.chunks)
                 sData->response.flags.payload_remaining = false;
 
-            closeFile(sData);
+            sData->request.closeFile();
 
             if (sData->auth_used)
                 sData->response.auth_data_available = true;
@@ -1279,441 +1239,18 @@ private:
         sData->aResult.conn_ms = millis();
         resetDebug(app_debug);
 
-        if (!isConnected() && !sData->auth_used) // This info is already show in auth task
+        if (!conn.isConnected() && !sData->auth_used) // This info is already shown in auth task
             setDebugBase(app_debug, FPSTR("Connecting to server..."));
 
-        if (!isConnected() && client_type == reqns::tcpc_sync)
-            sData->return_type = client->connect(host, port) > 0 ? ret_complete : ret_failure;
-        else if (client_type == reqns::tcpc_async)
-        {
-
-#if defined(ENABLE_ASYNC_TCP_CLIENT)
-            if (async_tcp_config && async_tcp_config->tcpStatus && async_tcp_config->tcpConnect)
-            {
-                bool status = false;
-                if (async_tcp_config->tcpStatus)
-                    async_tcp_config->tcpStatus(status);
-
-                if (!status)
-                {
-                    if (async_tcp_config->tcpConnect)
-                        async_tcp_config->tcpConnect(host, port);
-
-                    if (async_tcp_config->tcpStatus)
-                        async_tcp_config->tcpStatus(status);
-                }
-
-                sData->return_type = status ? ret_complete : ret_continue;
-            }
-#endif
-        }
+        sData->return_type = conn.connect(host, port);
 
         this->host = host;
         this->port = port;
-        this->connected = sData->return_type == ret_complete;
 
-        if (isConnected() && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC)
+        if (conn.isConnected() && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC)
             session_timer.feed(session_timeout_sec);
 
         return sData->return_type;
-    }
-
-    /**
-     * Get the ethernet link status.
-     * @return true for link up or false for link down.
-     */
-    bool ethLinkUp()
-    {
-        bool ret = false;
-
-#if defined(ENABLE_ETHERNET_NETWORK)
-
-#if defined(FIREBASE_LWIP_ETH_IS_AVAILABLE)
-
-#if defined(ESP32)
-        if (validIP(ETH.localIP()))
-        {
-            ETH.linkUp();
-            ret = true;
-        }
-#elif defined(ESP8266) || defined(CORE_ARDUINO_PICO)
-
-        if (!net.eth)
-            return false;
-
-#if defined(ESP8266) && defined(ESP8266_CORE_SDK_V3_X_X)
-
-#if defined(INC_ENC28J60_LWIP)
-        if (net.eth->enc28j60)
-        {
-            ret = net.eth->enc28j60->status() == WL_CONNECTED;
-            goto ex;
-        }
-#endif
-#if defined(INC_W5100_LWIP)
-        if (net.eth->w5100)
-        {
-            ret = net.eth->w5100->status() == WL_CONNECTED;
-            goto ex;
-        }
-#endif
-#if defined(INC_W5500_LWIP)
-        if (net.eth->w5500)
-        {
-            ret = net.eth->w5500->status() == WL_CONNECTED;
-            goto ex;
-        }
-#endif
-
-#elif defined(CORE_ARDUINO_PICO)
-
-#endif
-
-#endif
-
-        return ret;
-
-#if defined(INC_ENC28J60_LWIP) || defined(INC_W5100_LWIP) || defined(INC_W5500_LWIP)
-    ex:
-#endif
-
-        // workaround for ESP8266 Ethernet
-        delayMicroseconds(0);
-
-        return ret;
-#endif
-
-#endif
-
-        return ret;
-    }
-
-    /**
-     * Checking for valid IP.
-     * @return true for valid.
-     */
-    bool validIP(IPAddress ip)
-    {
-        char buf[16];
-        sprintf(buf, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
-        return strcmp(buf, "0.0.0.0") != 0;
-    }
-
-    function_return_type gprsConnect(async_data *sData)
-    {
-
-#if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
-        TinyGsm *gsmModem = (TinyGsm *)net.gsm.modem;
-
-        if (gsmModem)
-        {
-            if (net.gsm.conn_status == network_config_data::gsm_conn_status_idle)
-            {
-                net.gsm.conn_status = network_config_data::gsm_conn_status_waits_network;
-
-                gprsDisconnect();
-
-                // Unlock your SIM card with a PIN if needed
-                if (net.gsm.pin.length() && gsmModem->getSimStatus() != 3)
-                    gsmModem->simUnlock(net.gsm.pin.c_str());
-
-#if defined(TINY_GSM_MODEM_XBEE)
-                // The XBee must run the gprsConnect function BEFORE waiting for network!
-                gsmModem->gprsConnect(_apn.c_str(), _user.c_str(), _password.c_str());
-#endif
-
-                setDebugBase(app_debug, FPSTR("Waiting for network..."));
-                return ret_continue;
-            }
-            else if (net.gsm.conn_status == network_config_data::gsm_conn_status_waits_network)
-            {
-                if (!gsmModem->waitForNetwork())
-                {
-                    setDebugBase(app_debug, FPSTR("Network connection failed"));
-                    netErrState = 1;
-                    net.network_status = false;
-                    net.gsm.conn_status = network_config_data::gsm_conn_status_idle;
-                    return ret_failure;
-                }
-
-                net.gsm.conn_status = network_config_data::gsm_conn_status_waits_gprs;
-
-                setDebugBase(app_debug, FPSTR("Network connected"));
-
-                if (gsmModem->isNetworkConnected())
-                {
-                    if (netErrState == 0)
-                    {
-                        String debug = FPSTR("Connecting to ");
-                        debug += net.gsm.apn.c_str();
-                        setDebugBase(app_debug, debug);
-                    }
-                }
-
-                return ret_continue;
-            }
-            else if (net.gsm.conn_status == network_config_data::gsm_conn_status_waits_gprs)
-            {
-                if (gsmModem->isNetworkConnected())
-                {
-
-                    net.network_status = gsmModem->gprsConnect(net.gsm.apn.c_str(), net.gsm.user.c_str(), net.gsm.password.c_str()) && gsmModem->isGprsConnected();
-
-                    if (netErrState == 0)
-                        setDebugBase(app_debug, net.network_status ? FPSTR("GPRS/EPS connected") : FPSTR("GPRS/EPS connection failed"));
-
-                    if (!net.network_status)
-                        netErrState = 1;
-                }
-            }
-
-            net.gsm.conn_status = network_config_data::gsm_conn_status_idle;
-
-            return net.network_status ? ret_complete : ret_failure;
-        }
-
-#endif
-        return ret_failure;
-    }
-
-    bool gprsConnected()
-    {
-#if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
-        TinyGsm *gsmModem = (TinyGsm *)net.gsm.modem;
-        net.network_status = gsmModem && gsmModem->isGprsConnected();
-#endif
-        return net.network_status;
-    }
-
-    bool gprsDisconnect()
-    {
-#if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
-        TinyGsm *gsmModem = (TinyGsm *)net.gsm.modem;
-        net.network_status = gsmModem && gsmModem->gprsDisconnect();
-#endif
-        return !net.network_status;
-    }
-
-    function_return_type ethernetConnect(async_data *sData)
-    {
-
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
-
-        if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_idle && net.ethernet.ethernet_cs_pin > -1)
-            FIREBASE_ETHERNET_MODULE_CLASS_IMPL.init(net.ethernet.ethernet_cs_pin);
-
-        if (net.ethernet.ethernet_reset_pin > -1)
-        {
-            if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_idle)
-            {
-                setDebugBase(app_debug, FPSTR("Resetting Ethernet Board..."));
-
-                pinMode(net.ethernet.ethernet_reset_pin, OUTPUT);
-                digitalWrite(net.ethernet.ethernet_reset_pin, HIGH);
-
-                net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_rst_pin_unselected;
-                net.ethernet.stobe_ms = millis();
-            }
-            else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_rst_pin_unselected && millis() - net.ethernet.stobe_ms > 200)
-            {
-                digitalWrite(net.ethernet.ethernet_reset_pin, LOW);
-                net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_rst_pin_selected;
-                net.ethernet.stobe_ms = millis();
-            }
-            else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_rst_pin_selected && millis() - net.ethernet.stobe_ms > 50)
-            {
-                digitalWrite(net.ethernet.ethernet_reset_pin, HIGH);
-                net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_rst_pin_released;
-                net.ethernet.stobe_ms = millis();
-            }
-            else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_rst_pin_released && millis() - net.ethernet.stobe_ms > 200)
-            {
-                net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_begin;
-            }
-        }
-        else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_idle)
-            net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_begin;
-
-        if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_begin)
-        {
-
-            net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_waits;
-            setDebugBase(app_debug, FPSTR("Starting Ethernet connection..."));
-
-            if (validIP(net.ethernet.static_ip.ipAddress))
-            {
-                if (net.ethernet.static_ip.optional == false)
-                    FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip.ipAddress, net.ethernet.static_ip.dnsServer, net.ethernet.static_ip.defaultGateway, net.ethernet.static_ip.netMask);
-                else if (!FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac))
-                {
-                    FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac, net.ethernet.static_ip.ipAddress, net.ethernet.static_ip.dnsServer, net.ethernet.static_ip.defaultGateway, net.ethernet.static_ip.netMask);
-                }
-            }
-            else
-                FIREBASE_ETHERNET_MODULE_CLASS_IMPL.begin(net.ethernet.ethernet_mac);
-
-            net.eth_timer.feed(FIREBASE_ETHERNET_MODULE_TIMEOUT / 1000);
-        }
-        else if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_waits)
-        {
-
-            if (FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() != LinkON && net.eth_timer.remaining() > 0)
-                return ret_continue;
-
-            net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_idle;
-
-            bool ret = ethernetConnected();
-
-            if (ret)
-            {
-                String msg = FPSTR("Connected, IP: ");
-                msg += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP().toString();
-                setDebugBase(app_debug, msg);
-            }
-            else
-            {
-                setDebugBase(app_debug, FPSTR("Can't connect to network"));
-            }
-
-            return ret ? ret_complete : ret_failure;
-        }
-
-#endif
-
-        return ret_continue;
-    }
-
-    bool ethernetConnected()
-    {
-#if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE)
-#if defined(ENABLE_ETHERNET_NETWORK)
-        if (net.ethernet.conn_satatus != network_config_data::ethernet_conn_status_waits)
-            net.network_status = FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkON && validIP(FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP());
-#else
-        net.network_status = FIREBASE_ETHERNET_MODULE_CLASS_IMPL.linkStatus() == LinkON && validIP(FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP());
-#endif
-#endif
-        return net.network_status;
-    }
-
-    function_return_type netConnect(async_data *sData)
-    {
-        if (!getNetworkStatus())
-        {
-            bool recon = net.reconnect;
-
-            if (net.wifi && net.net_timer.feedCount() == 0)
-                recon = true;
-
-            // Self network connection controls.
-            bool self_connect = net.network_type == firebase_network_gsm || net.network_type == firebase_network_ethernet;
-
-            if (!self_connect && net.net_timer.remaining() == 0)
-                net.net_timer.feed(FIREBASE_NET_RECONNECT_TIMEOUT_SEC);
-
-            if (recon && (self_connect || net.net_timer.remaining() == 0))
-            {
-
-                if (net.network_type == firebase_network_generic)
-                {
-                    if (generic_network_owner_addr > 0 && generic_network_owner_addr != reinterpret_cast<uint32_t>(this))
-                        return ret_continue;
-
-                    if (generic_network_owner_addr == 0)
-                        generic_network_owner_addr = reinterpret_cast<uint32_t>(this);
-
-                    setDebugBase(app_debug, FPSTR("Reconnecting to network..."));
-
-                    if (net.generic.net_con_cb)
-                        net.generic.net_con_cb();
-
-                    generic_network_owner_addr = 0;
-                }
-                else if (net.network_type == firebase_network_gsm)
-                {
-                    if (gsm_network_owner_addr > 0 && gsm_network_owner_addr != reinterpret_cast<uint32_t>(this))
-                        return ret_continue;
-
-                    if (gsm_network_owner_addr == 0)
-                        gsm_network_owner_addr = reinterpret_cast<uint32_t>(this);
-
-                    if (gprsConnect(sData) == ret_continue)
-                        return ret_continue;
-
-                    gsm_network_owner_addr = 0;
-                }
-                else if (net.network_type == firebase_network_ethernet)
-                {
-                    if (ethernet_network_owner_addr > 0 && ethernet_network_owner_addr != reinterpret_cast<uint32_t>(this))
-                        return ret_continue;
-
-                    if (ethernet_network_owner_addr == 0)
-                        ethernet_network_owner_addr = reinterpret_cast<uint32_t>(this);
-
-                    if (ethernetConnect(sData) == ret_continue)
-                        return ret_continue;
-
-                    ethernet_network_owner_addr = 0;
-                }
-                else if (net.network_type == firebase_network_default)
-                {
-
-                    if (wifi_reconnection_ms == 0 || (wifi_reconnection_ms > 0 && millis() - wifi_reconnection_ms > FIREBASE_NET_RECONNECT_TIMEOUT_SEC * 1000))
-                    {
-                        wifi_reconnection_ms = millis();
-
-                        setDebugBase(app_debug, FPSTR("Reconnecting to WiFi network..."));
-
-#if defined(FIREBASE_WIFI_IS_AVAILABLE)
-#if defined(ESP32) || defined(ESP8266)
-
-                        if (net.wifi && net.wifi->credentials.size())
-                            net.wifi->reconnect();
-                        else
-                            WiFi.reconnect();
-#else
-                        if (net.wifi && net.wifi->credentials.size())
-                            net.wifi->reconnect();
-#endif
-#endif
-                    }
-                }
-            }
-        }
-
-        return getNetworkStatus() ? ret_complete : ret_failure;
-    }
-
-    bool getNetworkStatus()
-    {
-        bool net_status = net.network_status;
-
-        // We will not invoke the network status request when device has built-in WiFi or Ethernet and it is connected.
-        if (net.network_type == firebase_network_gsm)
-        {
-            net.network_status = gprsConnected();
-        }
-        else if (net.network_type == firebase_network_ethernet)
-        {
-            net.network_status = ethernetConnected();
-        }
-        // also check the native network before calling external cb
-        else if (net.network_type == firebase_network_default || WIFI_CONNECTED || ethLinkUp() || PPP_CONNECTED)
-            net.network_status = WIFI_CONNECTED || ethLinkUp() || PPP_CONNECTED;
-        else if (net.network_type == firebase_network_generic)
-        {
-            if (!net.generic.net_status_cb)
-                netErrState = 1;
-            else
-                net.generic.net_status_cb(net.network_status);
-        }
-        else
-            net.network_status = false;
-
-        if (net_status && !net.network_status)
-            net.disconnected_ms = millis() - 10;
-
-        return net.network_status;
     }
 
     int sMan(slot_options_t &options)
@@ -1749,42 +1286,6 @@ private:
         }
 
         return slot;
-    }
-
-    void setContentType(async_data *sData, const String &type)
-    {
-        sData->request.addContentTypeHeader(type.c_str());
-    }
-
-    void setFileContentLength(async_data *sData, int headerLen = 0, const String &customHeader = "")
-    {
-        size_t sz = 0;
-
-#if defined(ENABLE_FS)
-        if (sData->request.file_data.cb && sData->request.file_data.filename.length())
-        {
-            sData->request.file_data.cb(sData->request.file_data.file, sData->request.file_data.filename.c_str(), file_mode_open_read);
-            sz = sData->request.file_data.file.size();
-        }
-#endif
-        if (sData->request.file_data.data_size && sData->request.file_data.data)
-            sz = sData->request.file_data.data_size;
-
-        if (sz > 0)
-        {
-            sData->request.file_data.file_size = sData->request.base64 ? 2 + b64ut.getBase64Len(sz) : sz;
-            if (customHeader.length())
-            {
-                sData->request.val[reqns::header] += customHeader;
-                sData->request.val[reqns::header] += ":";
-                sData->request.val[reqns::header] += sData->request.file_data.file_size + headerLen;
-                sData->request.val[reqns::header] += "\r\n";
-            }
-            else
-                setContentLength(sData, sData->request.file_data.file_size);
-
-            closeFile(sData);
-        }
     }
 
     uint8_t slotCount() const { return sVec.size(); }
@@ -1855,17 +1356,6 @@ private:
         }
     }
 
-    String getHost(async_data *sData, bool fromReq, String *ext = nullptr)
-    {
-#if defined(ENABLE_CLOUD_STORAGE)
-        String url = fromReq ? sData->request.val[reqns::url] : sData->request.file_data.resumable.getLocation();
-#else
-        String url = fromReq ? sData->request.val[reqns::url] : sData->response.val[resns::location];
-#endif
-        URLUtil uut;
-        return uut.getHost(url, ext);
-    }
-
     void stopAsyncImpl(bool all = false, const String &uid = "")
     {
         if (inStopAsync)
@@ -1904,49 +1394,15 @@ private:
         inStopAsync = false;
     }
 
-    bool isConnected()
-    {
-        // Re-check the client status only when the connected flag was set.
-        // This prevents calling client's connected() if it was not yet connected.
-        // This also prevents ESP32 Arduino Core v3.x.x's WiFiClientSecure connected() method
-        // (error) warning when it was trying to read 0 byte from, and set the socket option to
-        // the unopen socket.
-        if (this->connected)
-        {
-            if (client_type == reqns::tcpc_sync)
-                this->connected = client && client->connected();
-            else if (client_type == reqns::tcpc_async)
-            {
-#if defined(ENABLE_ASYNC_TCP_CLIENT)
-                if (async_tcp_config && async_tcp_config->tcpStatus)
-                    async_tcp_config->tcpStatus(this->connected);
-#endif
-            }
-        }
-        return this->connected;
-    }
-
     void stop(async_data *sData)
     {
-        if (isConnected())
+        if (conn.isConnected())
             setDebugBase(app_debug, FPSTR("Terminating the server connection..."));
 
-        if (client_type == reqns::tcpc_sync)
-        {
-            if (client)
-                client->stop();
-        }
-        else
-        {
-#if defined(ENABLE_ASYNC_TCP_CLIENT)
-            if (async_tcp_config && async_tcp_config->tcpStop)
-                async_tcp_config->tcpStop();
-#endif
-        }
+        conn.stop();
 
         clear(host);
         this->port = 0;
-        this->connected = false;
         client_changed = false;
         network_changed = false;
     }
@@ -1986,7 +1442,7 @@ private:
         sData->request.val[reqns::header] += path;
         sData->request.val[reqns::header] += extras;
         sData->request.addRequestHeaderLast();
-        sData->request.addHostHeader(getHost(sData, true).c_str());
+        sData->request.addHostHeader(sData->request.getHost(true, &sData->response.val[resns::location]).c_str());
 
         sData->auth_used = options.auth_used;
 
@@ -2041,15 +1497,6 @@ private:
         }
     }
 
-    void setContentLength(async_data *sData, size_t len)
-    {
-        if (sData->request.method == reqns::http_post || sData->request.method == reqns::http_put || sData->request.method == reqns::http_patch)
-        {
-            sData->request.addContentLengthHeader(len);
-            sData->request.addNewLine();
-        }
-    }
-
     void handleRemove()
     {
         for (size_t slot = 0; slot < slotCount(); slot++)
@@ -2084,7 +1531,7 @@ private:
 #if defined(ENABLE_DATABASE)
         clearSSE(&sData->aResult.rtdbResult);
 #endif
-        closeFile(sData);
+        sData->request.closeFile();
         setLastError(sData);
         // data available from sync and asyn request except for sse
         returnResult(sData, true);
@@ -2262,22 +1709,22 @@ public:
     AsyncClientClass()
     {
         this->addr = reinterpret_cast<uint32_t>(this);
-        client_type = reqns::tcpc_sync;
+        client_type = tcpc_sync;
     }
 
     AsyncClientClass(Client &client, network_config_data &net) : client(&client)
     {
-        this->net.copy(net);
+        conn.setNetwork(net);
         this->addr = reinterpret_cast<uint32_t>(this);
-        client_type = reqns::tcpc_sync;
+        client_type = tcpc_sync;
     }
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
-    AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net) : async_tcp_config(&tcpClientConfig)
+    AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net) : atcp_config(&tcpClientConfig)
     {
-        this->net.copy(net);
+        conn.setNetwork(net);
         this->addr = reinterpret_cast<uint32_t>(this);
-        client_type = reqns::tcpc_async;
+        client_type = tcpc_async;
     }
 #endif
 
@@ -2327,7 +1774,7 @@ public:
      *
      * @return bool Returns true if network is connected.
      */
-    bool networkStatus() { return getNetworkStatus(); }
+    bool networkStatus() { return conn.getNetworkStatus(); }
 
     /**
      * Stop and remove the async/sync task from the queue.
@@ -2399,14 +1846,14 @@ public:
      *
      * @return unsigned long The millisec of network disconnection since device boot.
      */
-    unsigned long networkLastSeen() { return this->net.disconnected_ms; }
+    unsigned long networkLastSeen() { return conn.networkLastSeen(); }
 
     /**
      * Return the current network type enum.
      *
      * @return firebase_network_type The firebase_network_type enums are firebase_network_default, firebase_network_generic, firebase_network_ethernet and firebase_network_gsm.
      */
-    firebase_network_type getNetworkType() { return this->net.network_type; }
+    firebase_network_type getNetworkType() { return conn.getNetworkType(); }
 
     /**
      * Set the network interface.
@@ -2424,14 +1871,11 @@ public:
 
         // Some changes, stop the current network client.
         if (client_changed && this->client)
-        {
-            this->client->stop();
-            this->connected = false;
-        }
+            conn.stop();
 
         // Change the network interface.
         // Should not check the type changes, just overwrite
-        this->net.copy(net);
+        conn.setNetwork(net);
 
         // Change the client.
         if (client_changed)

@@ -97,7 +97,7 @@ public:
     Timer read_timer;
     bool auth_data_available = false;
 
-    reqns::tcp_client_type client_type;
+    tcp_client_type client_type;
     Client *client = nullptr;
     void *atcp_config = nullptr;
 
@@ -112,7 +112,7 @@ public:
         toFillIndex = 0;
     }
 
-    void setClient(reqns::tcp_client_type client_type, Client *client, void *atcp_config)
+    void setClient(tcp_client_type client_type, Client *client, void *atcp_config)
     {
         this->client_type = client_type;
         this->client = client;
@@ -143,7 +143,7 @@ public:
 
     int tcpAvailable()
     {
-        if (client_type == reqns::tcpc_sync)
+        if (client_type == tcpc_sync)
             return client ? client->available() : 0;
         else
         {
@@ -170,7 +170,7 @@ public:
 
     int tcpRead()
     {
-        if (client_type == reqns::tcpc_sync)
+        if (client_type == tcpc_sync)
             return client ? client->read() : -1;
         else
         {
@@ -205,7 +205,7 @@ public:
 
     int tcpRead(uint8_t *buf, size_t size)
     {
-        if (client_type == reqns::tcpc_sync)
+        if (client_type == tcpc_sync)
             return client ? client->read(buf, size) : -1;
         else
         {

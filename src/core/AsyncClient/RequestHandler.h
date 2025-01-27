@@ -31,16 +31,15 @@
 #include "Client.h"
 #include "./core/AuthConfig.h"
 #include "./core/StringUtil.h"
+#include "./core/AsyncClient/ConnectionHandler.h"
+#include "./core/URL.h"
+#include "./core/Base64.h"
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncTCPConfig.h"
 #endif
 
 #define FIREBASE_TCP_WRITE_TIMEOUT_SEC 30 // Do not change
-
-#define FIREBASE_RECONNECTION_TIMEOUT_MSEC 5000
-
-#define FIREBASE_SESSION_TIMEOUT_SEC 150
 
 #define FIREBASE_AUTH_PLACEHOLDER FPSTR("<auth_token>")
 
@@ -71,13 +70,6 @@ namespace reqns
         max_type
     };
 
-    enum tcp_client_type
-    {
-        tcpc_none,
-        tcpc_sync,
-        tcpc_async
-    };
-
     enum http_request_method
     {
         http_undefined,
@@ -93,6 +85,7 @@ struct req_handler
 {
 private:
     StringUtil sut;
+    Base64Util b64ut;
 
 public:
     String val[reqns::max_type];
@@ -101,7 +94,7 @@ public:
     uint16_t port = 443;
     uint8_t *data = nullptr;
     file_config_data file_data;
-    bool base64 = false, ota = false;
+    bool base64 = false, ota = false, connected = false;
     uint32_t ul_dl_task_running_addr = 0, ota_storage_addr = 0, payloadLen = 0;
     uint32_t dataLen = 0, payloadIndex = 0;
     uint16_t dataIndex = 0;
@@ -110,13 +103,13 @@ public:
     reqns::http_request_method method = reqns::http_undefined;
     Timer send_timer;
 
-    reqns::tcp_client_type client_type;
+    tcp_client_type client_type;
     Client *client = nullptr;
     void *atcp_config = nullptr;
 
     req_handler() {}
 
-    void setClient(reqns::tcp_client_type client_type, Client *client, void *atcp_config)
+    void setClient(tcp_client_type client_type, Client *client, void *atcp_config)
     {
         this->client_type = client_type;
         this->client = client;
@@ -197,6 +190,20 @@ public:
         addNewLine();
     }
 
+    void setContentType(const String &type)
+    {
+        addContentTypeHeader(type.c_str());
+    }
+
+    void setContentLength(size_t len)
+    {
+        if (method == reqns::http_post || method == reqns::http_put || method == reqns::http_patch)
+        {
+            addContentLengthHeader(len);
+            addNewLine();
+        }
+    }
+
     /* Append the string with first request line (HTTP method) */
     bool addRequestHeaderFirst(reqns::http_request_method method)
     {
@@ -257,9 +264,20 @@ public:
         send_timer.feed(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval);
     }
 
+    String getHost(bool fromReq, String *location = nullptr, String *ext = nullptr)
+    {
+#if defined(ENABLE_CLOUD_STORAGE)
+        String url = fromReq ? val[reqns::url] : file_data.resumable.getLocation();
+#else
+        String url = fromReq ? val[reqns::url] : *location;
+#endif
+        URLUtil uut;
+        return uut.getHost(url, ext);
+    }
+
     size_t tcpWrite(const uint8_t *data, size_t size)
     {
-        if (client_type == reqns::tcpc_sync)
+        if (client_type == tcpc_sync)
             return client ? client->write(data, size) : 0;
         else
         {
@@ -276,6 +294,64 @@ public:
 #endif
         }
         return 0;
+    }
+
+    void setFileContentLength(int headerLen = 0, const String &customHeader = "")
+    {
+        size_t sz = 0;
+
+#if defined(ENABLE_FS)
+        if (file_data.cb && file_data.filename.length())
+        {
+            file_data.cb(file_data.file, file_data.filename.c_str(), file_mode_open_read);
+            sz = file_data.file.size();
+        }
+#endif
+        if (file_data.data_size && file_data.data)
+            sz = file_data.data_size;
+
+        if (sz > 0)
+        {
+            file_data.file_size = base64 ? 2 + b64ut.getBase64Len(sz) : sz;
+            if (customHeader.length())
+            {
+                val[reqns::header] += customHeader;
+                val[reqns::header] += ":";
+                val[reqns::header] += file_data.file_size + headerLen;
+                val[reqns::header] += "\r\n";
+            }
+            else
+                setContentLength(file_data.file_size);
+
+            closeFile();
+        }
+    }
+
+    void closeFile()
+    {
+#if defined(ENABLE_FS)
+        if (file_data.file && file_data.file_status == file_config_data::file_status_opened)
+        {
+            file_data.file_size = 0;
+            payloadIndex = 0;
+            dataIndex = 0;
+            file_data.file_status = file_config_data::file_status_closed;
+            file_data.file.close();
+        }
+#endif
+    }
+
+    bool openFile(file_operating_mode mode)
+    {
+#if defined(ENABLE_FS)
+        file_data.cb(file_data.file, file_data.filename.c_str(), mode);
+        if (!file_data.file)
+            return false;
+#else
+        return false;
+#endif
+        file_data.file_status = file_config_data::file_status_opened;
+        return true;
     }
 };
 

@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-27
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -312,7 +312,7 @@ struct FirebaseWiFi_credential_t
 
 class FirebaseWiFi
 {
-    friend class AsyncClientClass;
+    friend class conn_handler;
 
 public:
     FirebaseWiFi() {}
