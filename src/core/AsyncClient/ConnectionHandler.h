@@ -78,6 +78,10 @@ private:
     int netErrState = 0;
 
 public:
+    bool sse = false;
+    String host;
+    uint16_t port;
+    
     void newConn(tcp_client_type client_type, Client *client, void *atcp_config, firebase_ns::app_debug_t *app_debug)
     {
         this->client_type = client_type;
@@ -143,6 +147,13 @@ public:
         }
 #endif
         connected = ret == ret_complete;
+
+        if (connected)
+        {
+            this->host = host;
+            this->port = port;
+        }
+
         return ret;
     }
 
@@ -160,7 +171,13 @@ public:
                 atcp_config->tcpStop();
 #endif
         }
+        reset();
+    }
 
+    void reset()
+    {
+        host.remove(0, host.length());
+        port = 0;
         this->connected = false;
         client_changed = false;
         network_changed = false;

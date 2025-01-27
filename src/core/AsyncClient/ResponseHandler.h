@@ -70,6 +70,7 @@ public:
             sse = false;
             chunks = false;
             payload_available = false;
+            uploadRange = false;
         }
     };
 
@@ -124,16 +125,36 @@ public:
         httpCode = 0;
         flags.reset();
         payloadLen = 0;
-        payloadRead = 0;
-        error.resp_code = 0;
-        sut.clear(error.string);
+
         if (toFill)
             delete toFill;
         toFill = nullptr;
         toFillLen = 0;
         toFillIndex = 0;
+
         for (size_t i = 0; i < resns::max_type; i++)
             sut.clear(val[i]);
+
+        payloadRead = 0;
+        error.resp_code = 0;
+        sut.clear(error.string);
+        chunkInfo.chunkSize = 0;
+        chunkInfo.dataLen = 0;
+        chunkInfo.phase = READ_CHUNK_SIZE;
+    }
+
+    void clearHeader(bool clearPayload)
+    {
+        sut.clear(val[resns::header]);
+        if (clearPayload)
+            sut.clear(val[resns::payload]);
+
+        flags.header_remaining = false;
+        flags.payload_remaining = false;
+
+        payloadRead = 0;
+        error.resp_code = 0;
+        sut.clear(error.string);
         chunkInfo.chunkSize = 0;
         chunkInfo.dataLen = 0;
         chunkInfo.phase = READ_CHUNK_SIZE;
@@ -249,7 +270,7 @@ public:
         return 0;
     }
 
-    void parseRespHeader(String &out, const char *header)
+    void parseHeaders(String &out, const char *header)
     {
         out.remove(0, out.length());
         if (httpCode > 0)
@@ -444,58 +465,43 @@ public:
 
     bool readHeader(bool sse, bool clearPayload, bool upload)
     {
-        bool ret = endOfHeader(readLine());
-        if (ret)
+        if (endOfHeader(readLine()))
         {
+            flags.uploadRange = false;
             flags.http_response = true;
-            val[resns::etag].remove(0, val[resns::etag].length());
-            parseRespHeader(val[resns::etag], "ETag");
+            parseHeaders(val[resns::etag], "ETag");
 
-            String temp;
-            parseRespHeader(temp, "Content-Length");
-            payloadLen = atoi(temp.c_str());
+            String v;
+            parseHeaders(v, "Content-Length");
+            payloadLen = atoi(v.c_str());
 
-            parseRespHeader(temp, "Connection");
-            flags.keep_alive = temp.length() && temp.indexOf("keep-alive") > -1;
+            parseHeaders(v, "Connection");
+            flags.keep_alive = v.length() && v.indexOf("keep-alive") > -1;
 
-            parseRespHeader(temp, "Transfer-Encoding");
-            flags.chunks = temp.length() && temp.indexOf("chunked") > -1;
+            parseHeaders(v, "Transfer-Encoding");
+            flags.chunks = v.length() && v.indexOf("chunked") > -1;
 
-            parseRespHeader(temp, "Content-Type");
-            flags.sse = temp.length() && temp.indexOf("text/event-stream") > -1;
-
-            clear(clearPayload);
+            parseHeaders(v, "Content-Type");
+            flags.sse = v.length() && v.indexOf("text/event-stream") > -1;
 
             if (upload)
             {
-                parseRespHeader(temp, "Range");
-                if (httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && temp.indexOf("bytes=") > -1)
+                parseHeaders(v, "Range");
+                if (httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && v.indexOf("bytes=") > -1)
                     flags.uploadRange = true;
             }
+
+            clearHeader(clearPayload);
 
             if (httpCode > 0 && httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
                 flags.payload_remaining = true;
 
             if (!sse && (httpCode == FIREBASE_ERROR_HTTP_CODE_OK || httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT || httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT) && !flags.chunks && payloadLen == 0)
                 flags.payload_remaining = false;
-        }
-        return ret;
-    }
 
-    void clear(bool clearPayload)
-    {
-        val[resns::header].remove(0, val[resns::header].length());
-        if (clearPayload)
-            val[resns::payload].remove(0, val[resns::payload].length());
-        flags.header_remaining = false;
-        flags.payload_remaining = false;
-        flags.uploadRange = false;
-        payloadRead = 0;
-        error.resp_code = 0;
-        error.string.remove(0, error.string.length());
-        chunkInfo.chunkSize = 0;
-        chunkInfo.dataLen = 0;
-        chunkInfo.phase = res_handler::READ_CHUNK_SIZE;
+            return true;
+        }
+        return false;
     }
 };
 

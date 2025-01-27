@@ -169,9 +169,6 @@ private:
     void *atcp_config = nullptr;
 #endif
     tcp_client_type client_type = tcpc_sync;
-    bool sse = false;
-    String host;
-    uint16_t port;
     std::vector<uint32_t> sVec;
     Memory mem;
     Base64Util b64ut;
@@ -184,8 +181,8 @@ private:
         sData->request.setClient(client_type, client, atcp_config);
         sData->response.setClient(client_type, client, atcp_config);
 
-        if ((!sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC && session_timer.remaining() == 0) || (sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == astate_undefined) ||
-            strcmp(this->host.c_str(), host) != 0 || this->port != port)
+        if ((!sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC && session_timer.remaining() == 0) || (conn.sse && !sData->sse) || (!conn.sse && sData->sse) || (sData->auth_used && sData->state == astate_undefined) ||
+            strcmp(conn.host.c_str(), host) != 0 || conn.port != port)
         {
             stop();
             getResult()->clear();
@@ -483,7 +480,7 @@ private:
                 if (ret != ret_complete)
                     return connErrorHandler(sData, sData->state);
 
-                sse = sData->sse;
+                conn.sse = sData->sse;
                 sData->auth_ts = auth_ts;
             }
 
@@ -846,9 +843,9 @@ private:
             {
 #if defined(ENABLE_CLOUD_STORAGE)
                 if (sData->upload)
-                    sData->response.parseRespHeader(sData->request.file_data.resumable.getLocationRef(), "Location");
+                    sData->response.parseHeaders(sData->request.file_data.resumable.getLocationRef(), "Location");
 #else
-                sData->response.parseRespHeader(sData->response.val[resns::location], "Location");
+                sData->response.parseHeaders(sData->response.val[resns::location], "Location");
 #endif
                 resETag = sData->response.val[resns::etag];
                 sData->aResult.val[ares_ns::res_etag] = sData->response.val[resns::etag];
@@ -1179,7 +1176,7 @@ private:
         clear(sData->response.val[resns::etag]);
         sData->aResult.download_data.reset();
         sData->aResult.upload_data.reset();
-        sData->response.clear(!sData->auth_used);
+        sData->response.clearHeader(!sData->auth_used);
     }
 
     function_return_type connect(async_data *sData, const char *host, uint16_t port)
@@ -1198,9 +1195,6 @@ private:
             setDebugBase(app_debug, FPSTR("Connecting to server..."));
 
         sData->return_type = conn.connect(host, port);
-
-        this->host = host;
-        this->port = port;
 
         if (conn.isConnected() && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC)
             session_timer.feed(session_timeout_sec);
@@ -1356,8 +1350,6 @@ private:
             setDebugBase(app_debug, FPSTR("Terminating the server connection..."));
 
         conn.stop();
-        clear(host);
-        this->port = 0;
     }
 
     async_data *createSlot(slot_options_t &options)
