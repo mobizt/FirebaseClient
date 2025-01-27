@@ -74,7 +74,7 @@ private:
     Client *client = nullptr;
     void *atcp_config = nullptr;
     firebase_ns::app_debug_t *app_debug = nullptr;
-    bool connected = false;
+    bool connected = false, client_changed = false, network_changed = false;
     int netErrState = 0;
 
 public:
@@ -85,7 +85,12 @@ public:
         this->atcp_config = atcp_config;
         this->app_debug = app_debug;
     }
-    void setNetwork(network_config_data &net) { this->net.copy(net); }
+    void setNetwork(network_config_data &net)
+    {
+        network_changed = true;
+        this->net.copy(net);
+    }
+    void setClientChange() { client_changed = true; }
     unsigned long networkLastSeen() { return this->net.disconnected_ms; }
     firebase_network_type getNetworkType() { return this->net.network_type; }
     bool isConnected()
@@ -143,7 +148,6 @@ public:
 
     void stop()
     {
-
         if (client_type == tcpc_sync)
         {
             if (client)
@@ -158,7 +162,11 @@ public:
         }
 
         this->connected = false;
+        client_changed = false;
+        network_changed = false;
     }
+
+    bool isChanged() { return client_changed || network_changed; }
 
     void setDebug(const String &msg)
     {
@@ -461,7 +469,6 @@ public:
 
             if (recon && (self_connect || net.net_timer.remaining() == 0))
             {
-
                 if (net.network_type == firebase_network_generic)
                 {
                     if (generic_network_owner_addr > 0 && generic_network_owner_addr != reinterpret_cast<uint32_t>(this))

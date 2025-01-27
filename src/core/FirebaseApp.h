@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-27
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -324,7 +324,7 @@ namespace firebase_ns
             if (!aClient)
                 return;
 
-            stopAsync(aClient, sData);
+            stopAsync(aClient);
 
             if (sData)
             {

@@ -42,7 +42,7 @@ protected:
     void resultSetDebug(AsyncResult *aResult, app_debug_t *app_debug) { aResult->app_debug = app_debug; }
     void resultSetEvent(AsyncResult *aResult, app_event_t *app_event) { aResult->app_event = app_event; }
     app_event_t *getAppEvent(AsyncClientClass *aClient) { return &aClient->app_event; }
-    void stopAsync(AsyncClientClass *aClient, async_data *sData) { aClient->stop(sData); }
+    void stopAsync(AsyncClientClass *aClient) { aClient->stop(); }
     async_data *createSlotBase(AsyncClientClass *aClient, slot_options_t &soption)
     {
         if (aClient)

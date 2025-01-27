@@ -163,7 +163,6 @@ private:
     uint32_t addr = 0, auth_ts = 0, cvec_addr = 0, result_addr = 0, sync_send_timeout_sec = 0, sync_read_timeout_sec = 0, session_timeout_sec = 0;
     Timer session_timer;
     Client *client = nullptr;
-    bool client_changed = false, network_changed = false;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
     AsyncTCPConfig *atcp_config = nullptr;
 #else
@@ -188,7 +187,7 @@ private:
         if ((!sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC && session_timer.remaining() == 0) || (sse && !sData->sse) || (!sse && sData->sse) || (sData->auth_used && sData->state == astate_undefined) ||
             strcmp(this->host.c_str(), host) != 0 || this->port != port)
         {
-            stop(sData);
+            stop();
             getResult()->clear();
         }
 
@@ -867,7 +866,6 @@ private:
                         sData->request.file_data.resumable.updateRange();
                 }
 #endif
-
                 if (sData->request.method == reqns::http_delete && sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
                     setDebugBase(app_debug, FPSTR("Delete operation complete"));
             }
@@ -885,7 +883,6 @@ private:
             // the next chunk data is the payload
             if (sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
             {
-
                 if (sData->response.flags.chunks)
                 {
                     // Use temporary String buffer for decodeChunks
@@ -1084,7 +1081,7 @@ private:
             }
 
             if (sData->response.flags.chunks && sData->auth_used)
-                stop(sData);
+                stop();
 
             // HTTP server error.
             if (sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
@@ -1172,7 +1169,7 @@ private:
     void reset(async_data *sData, bool disconnect)
     {
         if (disconnect)
-            stop(sData);
+            stop();
 
         sData->response.httpCode = 0;
         sData->error.code = 0;
@@ -1353,17 +1350,14 @@ private:
         inStopAsync = false;
     }
 
-    void stop(async_data *sData)
+    void stop()
     {
         if (conn.isConnected())
             setDebugBase(app_debug, FPSTR("Terminating the server connection..."));
 
         conn.stop();
-
         clear(host);
         this->port = 0;
-        client_changed = false;
-        network_changed = false;
     }
 
     async_data *createSlot(slot_options_t &options)
@@ -1549,9 +1543,9 @@ private:
                 return exitProcess(false);
 
             // Restart connection when authenticate, client or network changed
-            if ((sData->sse && sData->auth_ts != auth_ts) || client_changed || network_changed)
+            if ((sData->sse && sData->auth_ts != auth_ts) || conn.isChanged())
             {
-                stop(sData);
+                stop();
                 sData->state = astate_send_header;
             }
 
@@ -1689,8 +1683,7 @@ public:
 
     ~AsyncClientClass()
     {
-        stop(nullptr);
-
+        stop();
         for (size_t i = 0; i < sVec.size(); i++)
         {
             reset(getData(i), true);
@@ -1698,7 +1691,6 @@ public:
             delete sData;
             sData = nullptr;
         }
-
         addRemoveClientVec(cvec_addr, false);
     }
 
@@ -1825,8 +1817,7 @@ public:
     void setNetwork(Client &client, network_config_data &net)
     {
         // Check client changes.
-        client_changed = reinterpret_cast<uint32_t>(&client) != reinterpret_cast<uint32_t>(this->client);
-        network_changed = true;
+       bool client_changed = reinterpret_cast<uint32_t>(&client) != reinterpret_cast<uint32_t>(this->client);
 
         // Some changes, stop the current network client.
         if (client_changed && this->client)
@@ -1838,7 +1829,10 @@ public:
 
         // Change the client.
         if (client_changed)
+        {
             this->client = &client;
+            conn.setClientChange();
+        }
     }
 };
 
