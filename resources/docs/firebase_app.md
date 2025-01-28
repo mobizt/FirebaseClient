@@ -209,3 +209,24 @@ Reset or clear app (deinitailize).
 ```cpp
 void deinitializeApp()
 ```
+
+
+17. ## 🔹  void autoRefresh(bool enable)
+
+Set the option to enable/disable re-authentication.
+
+```cpp
+void autoAuthenticate(bool enable)
+```
+
+**Params:**
+
+- `enable` - Set to true to enable or false to disable.
+
+18. ## 🔹  void authenticate()
+
+Force library to re-authenticate (refresh the auth token).
+
+```cpp
+void authenticate()
+```

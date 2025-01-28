@@ -1,5 +1,5 @@
 /**
- * 2025-01-27
+ * 2025-01-28
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -365,7 +365,7 @@ namespace firebase_ns
 
             process(aClient, sData ? &sData->aResult : nullptr, resultCb);
 
-            if (!isExpired())
+            if (!isExpired() || (isExpired() && auth_data.app_token.val[app_tk_ns::token].length() && !auth_data.auto_renew && !auth_data.force_refresh))
                 return true;
 
             if (!processing)
@@ -635,6 +635,7 @@ namespace firebase_ns
                         auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         auth_data.app_token.authenticated = true;
                         auth_data.app_token.auth_ts = millis();
+                        auth_data.force_refresh = false;
                         if (getClient())
                             setAuthTsBase(aClient, auth_data.app_token.auth_ts);
                         auth_data.app_token.auth_type = auth_data.user_auth.auth_type;
@@ -807,6 +808,22 @@ namespace firebase_ns
          * @return auth_data_t* The pointer to internal auth data.
          */
         auth_data_t *getAuth() { return &auth_data; }
+
+        /**
+         * Set the option to enable/disable re-authentication.
+         *
+         * @param enable Set to true to enable or false to disable.
+         */
+        void autoAuthenticate(bool enable) { auth_data.auto_renew = enable; }
+
+        /**
+         * Force library to re-authenticate (refresh the auth token).
+         */
+        void authenticate()
+        {
+            auth_data.force_refresh = true;
+            auth_timer.setInterval(0);
+        }
     };
 };
 

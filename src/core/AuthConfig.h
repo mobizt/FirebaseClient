@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-28
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -1401,6 +1401,8 @@ namespace firebase_ns
         app_token_t app_token;
         AsyncResultCallback cb;
         AsyncResult *refResult = nullptr;
+        bool auto_renew = true;
+        bool force_refresh = false;
     };
 
 };

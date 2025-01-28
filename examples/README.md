@@ -9,6 +9,7 @@
 │   │   │   │   ├───CustomAuth
 │   │   │   │   ├───CustomAuthFile
 │   │   │   │   ├───NoAuth
+│   │   │   │   ├───ReAuthenticate
 │   │   │   │   ├───SaveAndLoad
 │   │   │   │   ├───ServiceAuth
 │   │   │   │   ├───ServiceAuthFile
@@ -22,6 +23,7 @@
 │   │   │       ├───CustomAuth
 │   │   │       ├───CustomAuthFile
 │   │   │       ├───NoAuth
+│   │   │       ├───ReAuthenticate
 │   │   │       ├───SaveAndLoad
 │   │   │       ├───ServiceAuth
 │   │   │       ├───ServiceAuthFile
@@ -35,6 +37,7 @@
 │   │       ├───CustomAuth
 │   │       ├───CustomAuthFile
 │   │       ├───NoAuth
+│   │       ├───ReAuthenticate
 │   │       ├───SaveAndLoad
 │   │       ├───ServiceAuth
 │   │       ├───ServiceAuthFile

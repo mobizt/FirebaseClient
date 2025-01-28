@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.5.1-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.5.2-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-01-26`
+Revision `2025-01-28`
 
 ## Table of Contents
 
@@ -96,27 +96,22 @@ This is the `REST APIs Firebase Client` library that supports the following `Fir
 - `Google Cloud Functions`
 - `Google Cloud Storage`
 
-This Firebase library is comprehensive and provides more usage flexibilities. You can choose what you only want to use (see [Library Build Options](#library-build-options)) and you can work with any network interfaces and authentications.
+This Firebase library is quite comprehensive which covers many applications. 
 
-In addition, this library provides the sync and async usage modes which they can be mixed. The async mode provides responsive application with zero delay.
+It is suitable for all serverless applications e.g. data logging, automation and IoTs. You can choose what options and services you want to use (see [Library Build Options](#library-build-options)) and it also works with any network interfaces (WiFi, Ethernet and GSM/PPP modem).
 
-The library's powerful debugding system allows you to understand what is going on when it is running or failed.
+There are many types of authentications supported and you can manage the user account with sign up (user/guest), delete, verify the user and reset the user password.
 
-The network configuration (identifier) and authentication configuration classes allow us to change the networks and authentication types easily.
-
-The [bare minimum code examples](/examples/BareMinimum/) provide the basic guidelines for library usage concepts. Even though it contains more lines of code, it is still simple and understandable but efficient.
-
-You can create your own wrapper class as you want that provides the callback-free, cleaner and simpler API but well managed, powerfull and reliable. See the [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to.
+This library also supports auto- and one-time authentications and you can force the library to re-authenticate any time.
 
 This library also provides the OTA firmware update functionalities by using your Realtime Database data or Firebase/Cloud Storage object (file).
 
-The well-managed authentication task handler allows you to access Firebase and Google Cloud services smoothly and seemlessly. Managing the authentication levels for various apps/users under the same device is so easy as the Firebase SDK client.
-
-This library is worth trusty to try with fully examples and documentation and intensively tested 24/7 for its functionality, reliability and performance. 
-
-Using any simple/half-baked Firebase libraries or creating your own REST API client is your own risks because of code flaws. Sometime it just works but not always depending on how it is well-managed, API compliances or just using the trial and errors or error from something that has not yet been noticed.
-
 Note that the Firestore data change listening and Realtime Database disconnected event are not support by the Firebase REST API.
+
+The [bare minimum code examples](/examples/BareMinimum/) provide the basic guidelines for library usage concepts. There is a little more code that needs to be written but it is still simple and understandable.
+
+You can create your own wrapper class as you want that provides the callback-free, cleaner and simpler API. See the [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to.
+
 
 ## Frequently Asked Questions
 
@@ -928,7 +923,7 @@ This is the important processs to generate the `auth token` using the account (u
 
 The `FirebaseApp` class object  (aka authentication task handler) does those processes and provides the tokens for Firebase/Google Cloud REST API requests.
 
-To initialize the authentication task handler, use `FirebaseApp::initializeApp` or `initializeApp` which the functions parameters are included the following.
+To initialize the authentication task handler, use `Firebase.initializeApp` or `initializeApp` which the functions parameters are included the following.
 
 ```cpp
 initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResult>);
@@ -950,14 +945,27 @@ initializeApp(<AsyncClientClass>, <FirebaseApp>, <user_auth_data>, <AsyncResultC
 
 `<UID>` The Task UID. See [Async Result](#async-result) section.
 
+- ### One-time Authentication (no refresh or renew)
+
+Normally, the re-authentication process (auth token refreshing or re-creation) when the expire period is reached will be performed automatically.
+
+You can disable auto re-authentication feature by calling `FirebaseApp::autoAuthenticate(false)`. This function takes the boolean parameter to enable or disable the re-authentication process.
+
+The auth token will be expired in 60 minutes after it is renewed or created.
+
+
+- ### Force authentication
+
+You can force the authentication task handler (`FirebaseApp`) to re-authenticate any time by calling `FirebaseApp::authenticate()`.
+
 - ### App De-initialization
 
 This process resets all authentication information stored in the authentication task handler (`FirebaseApp`). The Firebase/Google Cloud services classes that bind the authentication credentials with it (using `FirebaseApp::getApp`) will be unauthenticated when performing the Firebase/Google Cloud REST API requests.
 
-To de-initialize the authentication task handler, use `Firebase:App:deinitializeApp` or `deinitializeApp` which the functions parameters are included the following.
+To de-initialize the authentication task handler, use `Firebase.deinitializeApp` or `deinitializeApp` which the functions parameters are included the following.
 
 ```cpp
-initializeApp(<FirebaseApp>);
+deinitializeApp(<FirebaseApp>);
 ```
 
 `<FirebaseApp>` The `FirebaseApp` class object to handle authentication/authorization task. 
@@ -1688,6 +1696,7 @@ The following section will provide the basic (bare minimum) code example and the
                 * [CustomAuth](/examples/App/AppInitialization/Async/Callback/CustomAuth/)
                 * [CustomAuthFile](/examples/App/AppInitialization/Async/Callback/CustomAuthFile/)
                 * [NoAuth](/examples/App/AppInitialization/Async/Callback/NoAuth/)
+                * [ReAuthenticate](/examples/App/AppInitialization/Async/Callback/ReAuthenticate/)
                 * [SaveAndLoad](/examples/App/AppInitialization/Async/Callback/SaveAndLoad/)
                 * [ServiceAuth](/examples/App/AppInitialization/Async/Callback/ServiceAuth/)
                 * [ServiceAuthFile](/examples/App/AppInitialization/Async/Callback/ServiceAuth/)
@@ -1701,6 +1710,7 @@ The following section will provide the basic (bare minimum) code example and the
                 * [CustomAuth](/examples/App/AppInitialization/Async/NoCallback/CustomAuth/)
                 * [CustomAuthFile](/examples/App/AppInitialization/Async/NoCallback/CustomAuthFile/)
                 * [NoAuth](/examples/App//AppInitialization//Async/NoCallback/NoAuth/)
+                * [ReAuthenticate](/examples/App//AppInitialization//Async/NoCallback/ReAuthenticate/)
                 * [SaveAndLoad](/examples/App/AppInitialization/Async/NoCallback/SaveAndLoad/)
                 * [ServiceAuth](/examples/App/AppInitialization/Async/NoCallback/ServiceAuth/)
                 * [ServiceAuthFile](/examples/App/AppInitialization/Async/NoCallback/ServiceAuth/)
@@ -1713,7 +1723,8 @@ The following section will provide the basic (bare minimum) code example and the
         * [Sync](/examples/App/AppInitialization/Sync/)
             * [CustomAuth](/examples/App/AppInitialization/Sync/CustomAuth/)
             * [CustomAuthFile](/examples/App/AppInitialization/Sync/CustomAuthFile/)
-            * [NoAuth](/examples/App/AppInitialization/Sync/SaveAndLoad/)
+            * [NoAuth](/examples/App/AppInitialization/Sync/NoAuth/)
+            * [ReAuthenticate](/examples/App/AppInitialization/Sync/ReAuthenticate/)
             * [SaveAndLoad](/examples/App/AppInitialization/Sync/SaveAndLoad/)
             * [ServiceAuth](/examples/App/AppInitialization/Sync/ServiceAuth/)
             * [ServiceAuthFile](/examples/App/AppInitialization/Sync/ServiceAuthFile/)
