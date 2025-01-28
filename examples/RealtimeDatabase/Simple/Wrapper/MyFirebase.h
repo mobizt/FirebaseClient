@@ -138,7 +138,7 @@ public:
         Database.get(streamClient[current_stream_index], path, streamResult, true);
         current_stream_index++;
 
-        if (current_stream_index > max_stream_client_num)
+        if (current_stream_index > max_stream_client_num - 1)
             current_stream_index = 0;
     }
 
