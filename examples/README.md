@@ -337,6 +337,7 @@
 │   │   ├───SimpleNoAuth
 │   │   ├───StreamDatabaseSecret
 │   │   └───StreamNoAuth
+│   ├───StreamPerformancetest
 │   └───Sync
 │       ├───CustomPushID
 │       ├───ETAG

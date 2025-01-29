@@ -2,7 +2,7 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.5.3-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.5.4-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
@@ -802,17 +802,15 @@ If the size of payload string from the async reseut is large, to access the inte
 
 <br>
 
-The `SSE mode (HTTP Streaming)` event payload might contain many events data due to the events are constantly changing. The data in this case can be obtained from the specific index.
-
 The specific `Realtime Database` server response payload and `SSE mode (HTTP Streaming)` event data (`RealtimeDatabaseResult`) can be obtained from  `AsyncResult::to<RealtimeDatabaseResult>()` which are included the following.
 
 - `bool RealtimeDatabaseResult::isStream()` returns true if the result is from `SSE mode (HTTP Streaming)` task.
 
-- `String RealtimeDatabaseResult::event(<index>)` returns the `SSE mode (HTTP Streaming)` event type strings at the specific index which included `put`, `patch`, `keep-alive`, `cancel` and `auth_revoked`.
+- `String RealtimeDatabaseResult::event()` returns the `SSE mode (HTTP Streaming)` event type strings include `put`, `patch`, `keep-alive`, `cancel` and `auth_revoked`.
 
-- `String RealtimeDatabaseResult::dataPath(<index>)` returns the `SSE mode (HTTP Streaming)` event data path (at the specific index) which is the relative path of the changed value in the database. The absolute path of the changed value can be obtained from the concatenation of `AsyncResult::path()` and `RealtimeDatabaseResult::dataPath(<index>)` e.g. `AsyncResult::path() + "/" + RealtimeDatabaseResult::dataPath(<index>)`.
+- `String RealtimeDatabaseResult::dataPath()` returns the `SSE mode (HTTP Streaming)` event data path which is the relative path of the changed value in the database. The absolute path of the changed value can be obtained from the concatenation of `AsyncResult::path()` and `RealtimeDatabaseResult::dataPath()` e.g. `AsyncResult::path() + "/" + RealtimeDatabaseResult::dataPath()`.
 
-- `realtime_database_data_type RealtimeDatabaseResult::type(<index>)` returns the `realtime_database_data_type` enum (see below)  at the specific index represents the type of `Realtime Database` response payload and event data (`HTTP Streaming`).
+- `realtime_database_data_type RealtimeDatabaseResult::type()` returns the `realtime_database_data_type` enum (see below) represents the type of `Realtime Database` response payload and event data (`HTTP Streaming`).
 
 - `RealtimeDatabaseResult::name()` returns the name (random UID) of the node that will be creaated after from `RealtimeDatabase::Push`.
 
@@ -2032,6 +2030,7 @@ The following section will provide the basic (bare minimum) code example and the
         * [SimpleNoAuth](/examples/RealtimeDatabase/Simple/SimpleNoAuth/)
         * [StreamDatabaseSecret](/examples/RealtimeDatabase/Simple/StreamDatabaseSecret/)
         * [StreamNoAuth](/examples/RealtimeDatabase/Simple/StreamNoAuth/)
+    * [Simple](/examples/RealtimeDatabase/StreamPerformanceTest/)
     * [Sync](/examples/RealtimeDatabase/Sync/)
         * [CustomPushID](/examples/RealtimeDatabase/Sync/CustomPushID/)
         * [ETAG](/examples/RealtimeDatabase/Sync/ETAG/)

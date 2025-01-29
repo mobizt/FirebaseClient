@@ -1,7 +1,7 @@
 /**
  * ABOUT:
  *
- * The non-blocking (async) example to listen to the changes of value (from a node) stores in your database
+ * The non-blocking (async) example to listen to the changes of value (from a node) stores in your database 
  * via SSE Streaming connection.
  *
  * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
@@ -195,25 +195,17 @@ void printResult(AsyncResult &aResult)
         {
             Serial.println("----------------------------");
             Firebase.printf("task: %s\n", aResult.uid().c_str());
+            Firebase.printf("event: %s\n", RTDB.event().c_str());
+            Firebase.printf("path: %s\n", RTDB.dataPath().c_str());
+            Firebase.printf("data: %s\n", RTDB.to<const char *>());
+            Firebase.printf("type: %d\n", RTDB.type());
 
-            // The Stream payload might contain many events data due to
-            // the events are constantly changing.
-            Firebase.printf("event count: %d\n", RTDB.eventCount());
-            for (uint32_t i = 0; i < RTDB.eventCount(); i++)
-            {
-                Firebase.printf("event: %s\n", RTDB.event(i).c_str());
-                Firebase.printf("path: %s\n", RTDB.dataPath(i).c_str());
-                Firebase.printf("data: %s\n", RTDB.to<const char *>(i));
-                Firebase.printf("type: %d\n", RTDB.type(i));
-                Serial.println();
-
-                // The stream event from RealtimeDatabaseResult can be converted to the values as following.
-                bool v1 = RTDB.to<bool>(i);
-                int v2 = RTDB.to<int>(i);
-                float v3 = RTDB.to<float>(i);
-                double v4 = RTDB.to<double>(i);
-                String v5 = RTDB.to<String>(i);
-            }
+            // The stream event from RealtimeDatabaseResult can be converted to the values as following.
+            bool v1 = RTDB.to<bool>();
+            int v2 = RTDB.to<int>();
+            float v3 = RTDB.to<float>();
+            double v4 = RTDB.to<double>();
+            String v5 = RTDB.to<String>();
         }
         else
         {

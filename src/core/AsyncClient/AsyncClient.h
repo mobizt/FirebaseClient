@@ -1,5 +1,5 @@
 /**
- * 2025-01-26
+ * 2025-01-29
  *
  * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
  *
@@ -804,7 +804,10 @@ private:
                                     // Prevent sse timeout due to large sse Stream playload
                                     feedSSETimer(&sData->aResult.rtdbResult);
 
-                                    if ((*payload)[payload->length() - 1] == '\n' && sData->response.tcpAvailable() == 0)
+                                    uint32_t len = payload->length();
+                                    bool partial = (*payload)[len - 1] == '\n' && ((len > 2 && (*payload)[len - 2] == '}') || (len > 3 && (*payload)[len - 3] == '}'));
+
+                                    if (((*payload)[len - 1] == '\n' && sData->response.tcpAvailable() == 0) || partial)
                                     {
                                         setRefPayload(&sData->aResult.rtdbResult, payload);
                                         parseSSE(&sData->aResult.rtdbResult);

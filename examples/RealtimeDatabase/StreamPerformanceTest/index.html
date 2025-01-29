@@ -1,0 +1,119 @@
+<html>
+
+<head>
+    <title>Stream Performance Test</title>
+</head>
+
+<body>
+
+    <div style="line-height: 1.5em;">This html test page will set the continuous 10,000 integer values to the path <b>/test/performance</b>.<br />
+        In the Arduino sketch, set the stream path in the function <b>Database.get</b> to <b>/test/performance</b>.<br /><br />
+        And in the Stream <b>printResult</b> callback function, write the following code.<br /><br />
+        <div style="color:rgb(18, 42, 176);">
+        int counter = 0;<br /><br />
+        void printResult(AsyncResult &aResult)<br />
+        {<br />
+            <div style="padding-left:20px;">
+            if (aResult.isEvent())<br />
+            {<br />
+                <div style="padding-left:20px;">Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());</div>
+            }<br /><br />
+
+            if (aResult.isDebug())<br />
+            {<br />
+                <div style="padding-left:20px;">Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());</div>
+            }<br /><br />
+
+            if (aResult.isError())<br />
+            {<br />
+                <div style="padding-left:20px;">Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());</div>
+            }<br /><br />
+
+            if (aResult.available())<br />
+            {<br />
+            <div style="padding-left:20px;">RealtimeDatabaseResult &RTDB = aResult.to&lt;RealtimeDatabaseResult&gt;();<br />
+                if (RTDB.isStream() && RTDB.type() == 0)<br />
+                <div style="padding-left:20px;">counter = 0;</div>
+                <br />
+                if (RTDB.isStream() && RTDB.type() == 1)<br />
+                {<br />
+                    <div style="padding-left:20px;">Firebase.printf("counter: %d\n", counter);<br />
+                    Firebase.printf("data: %d\n", RTDB.to&lt;int&gt;());<br />
+                    counter++;
+                    </div>
+                }<br />
+            </div>
+            }<br />
+        </div>
+    }
+    </div>
+    <br /><br />
+   
+    Tempolary set the database rules in the Firebase project console to allow full read and write.<br />
+    <div style="color:rgb(66, 168, 6);">
+        {
+        <div style="padding-left:20px;">"rules": {
+        <div style="padding-left:20px;">".read": true,<br />
+        ".write": true</div>
+        }</div>
+        }<br />
+    </div>
+        Press the <b>Set</b> button to store the 10,000 values to the Firebase Realtime Database.<br />
+        Press the <b>Delete</b> button to delete the previous set data from the Firebase Realtime Database and the counter value in the Arduino sketch will be reset to 0<br />
+        Don't forget to change <b>projectID</b>, <b>Web API Key</b> and <b>databaseURL</b> in the source of this html file.
+    <br /><br />
+    After press the <b>Set</b> button, the output in Arduino IDE console will look like<br /><br />
+    <div style="color:rgb(196, 4, 151);">
+    counter: 0<br />
+    data: 0<br />
+    counter: 1<br />
+    data: 1<br />
+    counter: 2<br />
+    <br />
+    ...<br />
+    ...<br />
+    <br />
+    counter: 9998<br />
+    data: 9998<br />
+    counter: 9999<br />
+    data: 9999<br />
+    </div>
+    <br />
+</div>
+    <div style="margin-top:20px">
+        <button type="button" onclick="setData()" title="Set random number">Set</button>
+        <button type="button" onclick="delData()" title="Delete data">Delete</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+
+    <script>
+
+        var projectID = "_______________________________";
+        var apiKey = "__________________________________";
+        var databaseURL = "_____________________________";
+
+        var config = {
+            apiKey: apiKey,
+            authDomain: projectID + ".firebaseapp.com",
+            databaseURL: databaseURL,
+            storageBucket: projectID + ".appspot.com"
+        };
+
+        firebase.initializeApp(config);
+
+        setData = function () {
+            for (var i = 0; i < 10000; i++)
+                firebase.database().ref('/test/performance/' + i).set(i);
+        }
+
+        delData = function () {
+            firebase.database().ref('/test/performance').remove();
+        }
+
+    </script>
+</body>
+
+</html>
