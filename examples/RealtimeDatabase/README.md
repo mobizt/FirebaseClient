@@ -35,6 +35,7 @@
         * [SimpleNoAuth](/examples/RealtimeDatabase/Simple/SimpleNoAuth/)
         * [StreamDatabaseSecret](/examples/RealtimeDatabase/Simple/StreamDatabaseSecret/)
         * [StreamNoAuth](/examples/RealtimeDatabase/Simple/StreamNoAuth/)
+        * [Wrapper](/examples/RealtimeDatabase/Simple/Wrapper/)
     * [Sync](/examples/RealtimeDatabase/Sync/)
         * [CustomPushID](/examples/RealtimeDatabase/Sync/CustomPushID/)
         * [ETAG](/examples/RealtimeDatabase/Sync/ETAG/)
