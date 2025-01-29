@@ -8,13 +8,17 @@ The Realtime database result class.
 class RealtimeDatabaseResult
 ```
 
-1. ## 🔹  T to()
+1. ## 🔹  T to(uint32_t index = 0)
 
 Convert the RealtimeDatabaseResult to any type of values.
 
 ```cpp
-T to()
+T to(uint32_t index = 0)
 ```
+
+**Params:**
+
+- `index` - The index of Stream event to convert the data or 0 for non-Stream data.
 
 **Returns:**
 
@@ -59,38 +63,50 @@ String ETag() const
 - `String` - The ETag string.
 
 
-5. ## 🔹   String dataPath() const
+5. ## 🔹   String dataPath(uint32_t index = 0) const
 
-Get the SSE mode (HTTP Streaming) event data path which is the relative path of the data that has been changed in the database.
+Get the SSE mode (HTTP Streaming) event data path (at the specific index) which is the relative path of the data that has been changed in the database.
 
 ```cpp
-String dataPath() const
+String dataPath(uint32_t index = 0) const
 ```
+
+**Params:**
+
+- `index` - The Stream event index to get the data path.
 
 **Returns:**
 
 - `String` - The relative path of data that has been changed.
 
 
-6. ## 🔹  String event()
+6. ## 🔹  String event(uint32_t index = 0)
 
-Get the `SSE mode (HTTP Streaming)` event type string.
+Get the `SSE mode (HTTP Streaming)` event type string (at the specific index).
 
 ```cpp
-String event()
+String event(uint32_t index = 0)
 ```
+
+**Params:**
+
+- `index` - The Stream event index to get the data path.
 
 **Returns:**
 
 - `String` - The event type string e.g. `put`, `patch`, `keep-alive`, `cancel` and `auth_revoked`.
 
-7. ## 🔹  String data()
+7. ## 🔹  String data(uint32_t index = 0)
 
-Get the SSE mode (HTTP Streaming) event data that has been changed.
+Get the SSE mode (HTTP Streaming) event data (at the specific index) that has been changed.
 
 ```cpp
-String data()
+String data(uint32_t index = 0)
 ```
+
+**Params:**
+
+- `index` - The Stream event index to get the data path.
 
 **Returns:**
 
@@ -109,9 +125,9 @@ bool eventTimeout()
 - `bool` - The SSE mode (HTTP Streaming) event timed out status.
 
 
-9. ## 🔹  realtime_database_data_type type()
+9. ## 🔹  realtime_database_data_type type(uint32_t index = 0)
 
-Get the type of Realtime database data.
+Get the type of Realtime Database payload and SSE mode (HTTP Streaming) event data.
 
 The realtime_database_data_type enums are included the following.
   
@@ -134,8 +150,12 @@ The realtime_database_data_type enums are included the following.
 `realtime_database_data_type_array` or 7.
 
 ```cpp
-realtime_database_data_type type()
+realtime_database_data_type type(uint32_t index = 0)
 ```
+
+**Params:**
+
+- `index` - The index of Stream event to convert the data or 0 for non-Stream data.
 
 **Returns:**
 

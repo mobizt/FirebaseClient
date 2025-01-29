@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-29
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -29,7 +29,7 @@
 #define FIREBASE_CHUNK_SIZE 2048
 
 // Base64 encoded string chunk size for TCP's read and write operations.
-// This used in Realtime database with File implementation.
+// This used in Realtime Database with File implementation.
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
 
 // SSE mode time out in milliseconds.
@@ -59,24 +59,23 @@ namespace firebase_ns
         friend class RTDBResultBase;
 
     private:
+        struct event_info_t
+        {
+            uint32_t data_path_p1 = 0, data_path_p2 = 0, event_p1 = 0, event_p2 = 0, data_p1 = 0, data_p2 = 0;
+        };
         ValueConverter vcon;
         StringUtil sut;
         Timer sse_timer;
         bool sse = false;
         event_resume_status_t event_resume_status = event_resume_status_undefined;
         String node_name, etag;
-        uint32_t data_path_p1 = 0, data_path_p2 = 0, event_p1 = 0, event_p2 = 0, data_p1 = 0, data_p2 = 0;
+        std::vector<event_info_t> events;
         bool null_etag = false;
         String *ref_payload = nullptr;
 
         void clearSSE()
         {
-            data_path_p1 = 0;
-            data_path_p2 = 0;
-            event_p1 = 0;
-            event_p2 = 0;
-            data_p1 = 0;
-            data_p2 = 0;
+            events.clear();
             sse = false;
             event_resume_status = event_resume_status_undefined;
         }
@@ -93,55 +92,70 @@ namespace firebase_ns
         void parseSSE()
         {
             clearSSE();
-            int p1 = 0, p2 = 0;
-            sut.parse(*ref_payload, "event", "\n", p1, p2);
-            if (p1 > -1 && p2 > -1)
-            {
-                event_p1 = p1;
-                event_p2 = p2;
-                p1 = p2;
-                setEventResumeStatus(event_resume_status_undefined);
-                sse_timer.feed(String(event()).indexOf("cancel") > -1 || String(event()).indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT_MS / 1000);
-                sse = true;
-            }
 
-            sut.parse(*ref_payload, "data", "\n", p1, p2);
-            if (p1 > -1 && p2 > -1)
+            uint32_t stream_event_begin_pos = 0, stream_event_end_pos = 0;
+            events.clear();
+            while (stream_event_end_pos < ref_payload->length() - 3)
             {
-                int p3 = p1, p4 = p2;
-                if (ref_payload->substring(p1, p2) == "null")
-                {
-                    data_p1 = p1;
-                    data_p2 = p2;
-                    return;
-                }
+                int p1 = stream_event_begin_pos, p2 = stream_event_end_pos;
+                event_info_t info;
 
-                sut.parse(*ref_payload, "\"path\"", ",", p1, p2);
+                sut.parse(*ref_payload, "event", "\n", p1, p2);
                 if (p1 > -1 && p2 > -1)
                 {
-                    data_path_p1 = p1 + 1;
-                    data_path_p2 = p2 - 1;
+                    info.event_p1 = p1;
+                    info.event_p2 = p2;
                     p1 = p2;
+                    setEventResumeStatus(event_resume_status_undefined);
+                    sse_timer.feed(String(event()).indexOf("cancel") > -1 || String(event()).indexOf("auth_revoked") > -1 ? 0 : FIREBASE_SSE_TIMEOUT_MS / 1000);
+                    sse = true;
                 }
 
-                sut.parse(*ref_payload, "\"data\"", "\n", p1, p2);
+                sut.parse(*ref_payload, "data", "\n", p1, p2);
                 if (p1 > -1 && p2 > -1)
                 {
-                    if ((*ref_payload)[p2 - 1] == '}')
-                        p2--;
-                    data_p1 = p1;
-                    data_p2 = p2;
+                    int p3 = p1, p4 = p2;
+                    if (ref_payload->substring(p1, p2) == "null")
+                    {
+                        info.data_p1 = p1;
+                        info.data_p2 = p2;
+                        return;
+                    }
+
+                    sut.parse(*ref_payload, "\"path\"", ",", p1, p2);
+                    if (p1 > -1 && p2 > -1)
+                    {
+                        info.data_path_p1 = p1 + 1;
+                        info.data_path_p2 = p2 - 1;
+                        p1 = p2;
+                    }
+
+                    sut.parse(*ref_payload, "\"data\"", "\n", p1, p2);
+                    if (p1 > -1 && p2 > -1)
+                    {
+                        if ((*ref_payload)[p2 - 1] == '}')
+                            p2--;
+                        info.data_p1 = p1;
+                        info.data_p2 = p2;
+                    }
+
+                    if (info.data_p1 == 0)
+                    {
+                        info.data_p1 = p3;
+                        info.data_p2 = p4;
+                    }
                 }
 
-                if (data_p1 == 0)
-                {
-                    data_p1 = p3;
-                    data_p2 = p4;
-                }
+                if (info.data_p2 > 0)
+                    events.push_back(info);
+
+                stream_event_end_pos = info.data_p2;
+                stream_event_begin_pos = stream_event_end_pos + 1;
             }
         }
         void setEventResumeStatus(event_resume_status_t status) { event_resume_status = status; }
         event_resume_status_t eventResumeStatus() const { return event_resume_status; }
+
     protected:
         void setRefPayload(RealtimeDatabaseResult *rtdbResult, String *payload) { rtdbResult->ref_payload = payload; }
         void clearSSE(RealtimeDatabaseResult *rtdbResult) { rtdbResult->clearSSE(); }
@@ -156,11 +170,13 @@ namespace firebase_ns
 
         /**
          * Convert the RealtimeDatabaseResult to any type of values.
-         *
+         * 
+         * @param index The index of Stream event to convert the data or 0 for non-Stream data.
+         * 
          * @return T The T type value e.g. boolean, integer, float, double and string.
          */
         template <typename T>
-        T to() { return vcon.to<T>(data().c_str()); }
+        T to(uint32_t index = 0) { return vcon.to<T>(data(index < eventCount() ? index : 0).c_str()); }
 
         /**
          * Check if the async task is SSE mode (HTTP Streaming) task.
@@ -177,35 +193,48 @@ namespace firebase_ns
         String name() const { return node_name.c_str(); }
 
         /**
-         * Get the ETag from Realtime database get function.
+         * Get the ETag from Realtime Database get function.
          *
          * @return String The ETag string.
          */
         String ETag() const { return etag.c_str(); }
 
         /**
-         * Get the SSE mode (HTTP Streaming) event data path which is the relative path of the data that has been changed in the database.
+         * Get the SSE mode (HTTP Streaming) event count in current Stream payload.
          *
+         * @return numbers of events in current Stream payload.
+         */
+        uint32_t eventCount() const { return events.size(); }
+
+        /**
+         * Get the SSE mode (HTTP Streaming) event data path (at the specific index) which is the relative path of the data that has been changed in the database.
+         * 
+         * @param index The Stream event index to get the data path.
+         * 
          * @return String The relative path of data that has been changed.
          */
-        String dataPath() const { return ref_payload ? ref_payload->substring(data_path_p1, data_path_p2).c_str() : String(); }
+        String dataPath(uint32_t index = 0) const { return ref_payload && eventCount() ? ref_payload->substring(events[index < eventCount() ? index : 0].data_path_p1, events[index < eventCount() ? index : 0].data_path_p2).c_str() : String(); }
 
         /**
-         * Get the `SSE mode (HTTP Streaming)` event type string.
-         *
+         * Get the `SSE mode (HTTP Streaming)` event type string (at the specific index).
+         * 
+         * @param index The Stream event index to get the event name.
+         * 
          * @return String The event type string e.g. `put`, `patch`, `keep-alive`, `cancel` and `auth_revoked`.
          */
-        String event() { return ref_payload ? ref_payload->substring(event_p1, event_p2).c_str() : String(); }
+        String event(uint32_t index = 0) { return ref_payload && eventCount() ? ref_payload->substring(events[index < eventCount() ? index : 0].event_p1, events[index < eventCount() ? index : 0].event_p2).c_str() : String(); }
 
         /**
-         * Get the SSE mode (HTTP Streaming) event data that has been changed.
-         *
+         * Get the SSE mode (HTTP Streaming) event data (at the specific index) that has been changed.
+         * 
+         * @param index The Stream event index to get the data.
+         * 
          * @return String The data that has been changed.
          */
-        String data()
+        String data(uint32_t index = 0)
         {
-            if (data_p1 > 0)
-                return ref_payload->substring(data_p1, data_p2);
+            if (eventCount() && events[index < eventCount() ? index : 0].data_p1 > 0)
+                return ref_payload->substring(events[index < eventCount() ? index : 0].data_p1, events[index < eventCount() ? index : 0].data_p2);
             return ref_payload ? ref_payload->c_str() : String();
         }
 
@@ -217,9 +246,11 @@ namespace firebase_ns
         bool eventTimeout() { return sse && sse_timer.remaining() == 0; }
 
         /**
-         * Get the type of Realtime database data.
+         * Get the type of Realtime Database payload and SSE mode (HTTP Streaming) event data.
+         * 
+         * @param index The index of Stream event to convert the data or 0 for non-Stream data.
          *
-         * @return realtime_database_data_type The realtime_database_data_type enum represents the type of Realtime database data.
+         * @return realtime_database_data_type The realtime_database_data_type enum represents the type of Realtime Database and SSE mode (HTTP Streaming) event data.
          *
          * The realtime_database_data_type enums are included the following.
          *
@@ -233,7 +264,7 @@ namespace firebase_ns
          * realtime_database_data_type_json or 6.
          * realtime_database_data_type_array or 7.
          */
-        realtime_database_data_type type() { return vcon.getType(data().c_str()); }
+        realtime_database_data_type type(uint32_t index = 0) { return vcon.getType(data(index).c_str()); }
     };
 #endif
 

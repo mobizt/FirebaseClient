@@ -5,8 +5,8 @@
 #include <FirebaseClient.h>
 
 /**
- * The simple, reliable and efficient Firebase wrapper class example.  
- * 
+ * The simple, reliable and efficient Firebase wrapper class example.
+ *
  * Powered by FirebaseClient library.
  */
 class MyFirebase
@@ -94,10 +94,13 @@ public:
     int errorCode() { return err_code; }
     String payload() const { return payload_str; }
 
-    String StreamData() const { return stream_payload; }
-    String StreamDataPath() const { return stream_data_path; }
-    String StreamEvent() const { return stream_event; }
-    int StreamDataType() const { return stream_data_type; }
+    // The Stream payload might contain many events data due to
+    // the events are constantly changing.
+    uint32_t StreamEventCount() { return stream_payload.size(); }
+    String StreamData(uint32_t index = 0) const { return stream_payload[index < stream_payload.size() ? index : 0]; }
+    String StreamDataPath(uint32_t index = 0) const { return stream_data_path[index < stream_data_path.size() ? index : 0]; }
+    String StreamEvent(uint32_t index = 0) const { return stream_event[index < stream_event.size() ? index : 0]; }
+    int StreamDataType(uint32_t index = 0) const { return stream_data_type[index < stream_data_type.size() ? index : 0]; }
 
     String getString(const String &path) { return Database.get<String>(aClient, path); }
     int getInt(const String &path) { return Database.get<int>(aClient, path); }
@@ -132,7 +135,7 @@ public:
         streamClient[current_stream_index].setNetwork(stream_client, getNetwork(net));
 
         Database.setSSEFilters(filter);
-        
+
         // All results will store in one streamResult, the data of one Stream can be replaced by another Stream.
         // To avoid this issue, use StreamCallback or define the AsyncResults for each Stream.
         Database.get(streamClient[current_stream_index], path, streamResult, true);
@@ -176,8 +179,10 @@ private:
     AsyncResult authResult, streamResult;
 
     bool is_event = false, is_debug = false, is_error = false, is_payload = false, is_stream = false;
-    String task_id, payload_str, stream_payload, stream_event, stream_data_path, debug_str, event_str, err_str;
-    int event_code = 0, err_code = 0, stream_data_type = 0, current_stream_index = 0;
+    String task_id, payload_str, debug_str, event_str, err_str;
+    std::vector<String> stream_payload, stream_event, stream_data_path;
+    std::vector<int> stream_data_type;
+    int event_code = 0, err_code = 0, current_stream_index = 0;
 
     void beginInternal(Client &client, network_config_data &net, user_auth_data &auth, const String &databaseUrl)
     {
@@ -228,10 +233,13 @@ private:
 
             if (is_stream)
             {
-                stream_payload = RTDB.to<const char *>();
-                stream_data_type = RTDB.type();
-                stream_data_path = RTDB.dataPath();
-                stream_event = RTDB.event();
+                for (uint32_t i = 0; i < RTDB.eventCount(); i++)
+                {
+                    stream_payload.push_back(RTDB.to<const char *>(i));
+                    stream_data_type.push_back(RTDB.type(i));
+                    stream_data_path.push_back(RTDB.dataPath(i));
+                    stream_event.push_back(RTDB.event(i));
+                }
             }
         }
 
@@ -248,14 +256,14 @@ private:
         is_event = false;
         is_error = false;
         is_payload = false;
-        stream_data_type = false;
         debug_str.remove(0, debug_str.length());
         payload_str.remove(0, payload_str.length());
         event_str.remove(0, event_str.length());
         err_str.remove(0, err_str.length());
-        stream_payload.remove(0, stream_payload.length());
-        stream_event.remove(0, stream_event.length());
-        stream_data_path.remove(0, stream_data_path.length());
+        stream_payload.clear();
+        stream_data_type.clear();
+        stream_data_path.clear();
+        stream_event.clear();
         task_id.remove(0, task_id.length());
     }
 };

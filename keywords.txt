@@ -306,6 +306,7 @@ setBlob KEYWORD2
 setFile KEYWORD2
 autoAuthenticate    KEYWORD2
 authenticate    KEYWORD2
+eventCount  KEYWORD2
 
 ###################
 # Struct (KEYWORD3)

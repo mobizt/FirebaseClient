@@ -1,8 +1,8 @@
 /**
  * ABOUT:
- * 
+ *
  * The example show how to create a wrapper class for Firebase Realtime Database that is easier to use.
-*/
+ */
 
 #include "MyFirebase.h"
 #include <WiFi.h>
@@ -81,10 +81,18 @@ void loop()
                 Serial.println("---------------------------");
                 Serial.println("Stream data...");
                 Serial.printf("task: %s\n", firebase.taskId().c_str());
-                Serial.printf("event: %s\n", firebase.StreamEvent().c_str());
-                Serial.printf("path: %s\n", firebase.StreamDataPath().c_str());
-                Serial.printf("data: %s\n", firebase.StreamData().c_str());
-                Serial.printf("type: %d\n", firebase.StreamDataType());
+
+                // The Stream payload might contain many events data due to
+                // the events are constantly changing.
+                Serial.printf("event count: %d\n", firebase.StreamEventCount());
+                for (uint32_t i = 0; i < firebase.StreamEventCount(); i++)
+                {
+                    Serial.printf("event: %s\n", firebase.StreamEvent(i).c_str());
+                    Serial.printf("path: %s\n", firebase.StreamDataPath(i).c_str());
+                    Serial.printf("data: %s\n", firebase.StreamData(i).c_str());
+                    Serial.printf("type: %d\n", firebase.StreamDataType(i));
+                    Serial.println();
+                }
             }
             else
                 Serial.printf("task: %s, payload: %s\n", firebase.taskId().c_str(), firebase.payload().c_str());
