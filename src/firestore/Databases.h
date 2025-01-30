@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -22,8 +22,9 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef ASYNC_FIRESTORE_DATABASE_H
-#define ASYNC_FIRESTORE_DATABASE_H
+#ifndef FIRESTORE_DATABASES_H
+#define FIRESTORE_DATABASES_H
+
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
 #include "./firestore/DataOptions.h"
@@ -34,13 +35,10 @@
 using namespace firebase_ns;
 
 #include "./firestore/Query.h"
-
 namespace Firestore
 {
-
     class Databases : public FirestoreBase
     {
-
         friend class AppBase;
 
     public:
@@ -735,7 +733,5 @@ namespace Firestore
     };
 
 }
-
 #endif
-
 #endif

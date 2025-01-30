@@ -1,5 +1,5 @@
 /**
- * 2025-01-27
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -22,8 +22,8 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef ASYNC_DATABASE_H
-#define ASYNC_DATABASE_H
+#ifndef DATABASE_REALTIME_DATABASE_H
+#define DATABASE_REALTIME_DATABASE_H
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
 #include "./database/DataOptions.h"
@@ -31,7 +31,6 @@
 using namespace firebase_ns;
 
 #if defined(ENABLE_DATABASE)
-
 class RealtimeDatabase : public RTDBResultBase
 {
     friend class FirebaseApp;
@@ -52,9 +51,7 @@ public:
         return *this;
     }
 
-    ~RealtimeDatabase()
-    {
-    }
+    ~RealtimeDatabase(){}
 
     /**
      * Set the Firebase database URL
@@ -1107,7 +1104,5 @@ private:
         }
     }
 };
-
 #endif
-
 #endif

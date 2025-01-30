@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -22,8 +22,9 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef ASYNC_FIRESTORE_BASE_H
-#define ASYNC_FIRESTORE_BASE_H
+#ifndef FIRESTORE_FIRESTORE_BASE_H
+#define FIRESTORE_FIRESTORE_BASE_H
+
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
 #include "./firestore/DataOptions.h"
@@ -33,7 +34,6 @@
 using namespace firebase_ns;
 
 #include "./firestore/Query.h"
-
 class FirestoreBase : public AppBase
 {
     friend class FirebaseApp;
@@ -500,7 +500,5 @@ protected:
     void addDatabasePath(String &buf) { buf += FPSTR("/databases"); }
     void addDocsPath(String &buf) { buf += FPSTR("/documents"); }
 };
-
 #endif
-
 #endif

@@ -22,11 +22,11 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef ASYNC_CLOUD_STORAGE_H
-#define ASYNC_CLOUD_STORAGE_H
+#ifndef CLOUD_STORAGE_CLOUD_STORAGE_H
+#define CLOUD_STORAGE_CLOUD_STORAGE_H
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
-#include "./core/StringUtil.h"
+#include "./core/Utils/StringUtil.h"
 
 using namespace firebase_ns;
 

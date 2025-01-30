@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -27,13 +27,11 @@
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "./core/JSON.h"
-#include "./core/ObjectWriter.h"
+#include "./core/Utils/JSON.h"
+#include "./core/Utils/ObjectWriter.h"
 
 // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
-
 #if defined(ENABLE_MESSAGING)
-
 namespace Messages
 {
     enum firebase_cloud_messaging_request_type
@@ -132,7 +130,6 @@ namespace Messages
      */
     struct AndroidNotification : public BaseO26
     {
-
     public:
         // The notification's title. If present, it will override google.firebase.fcm.v1.Notification.title.
         AndroidNotification &title(const String &value) { return wr.set<AndroidNotification &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -236,7 +233,6 @@ namespace Messages
      */
     struct WebpushFcmOptions : public BaseO4
     {
-
     public:
         // The link to open when the user clicks on the notification. For all URL values, HTTPS is required.
         WebpushFcmOptions &link(const String &value) { return wr.set<WebpushFcmOptions &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -250,7 +246,6 @@ namespace Messages
      */
     struct FcmOptions : public BaseO1
     {
-
     public:
         // Label associated with the message's analytics data.
         FcmOptions &analytics_label(const String &value) { return wr.add<FcmOptions &, String>(*this, value, buf, FPSTR(__func__)); }
@@ -282,7 +277,6 @@ namespace Messages
      */
     struct ApnsFcmOptions : public BaseO4
     {
-
     public:
         // Label associated with the message's analytics data.
         ApnsFcmOptions &analytics_label(const object_t &value) { return wr.set<ApnsFcmOptions &, object_t>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -296,7 +290,6 @@ namespace Messages
      */
     struct ApnsConfig : public BaseO4
     {
-
     public:
         // HTTP request headers defined in Apple Push Notification Service. Refer to APNs request headers for supported headers such as apns-expiration and apns-priority.
         // The backend sets a default value for apns-expiration of 30 days and a default value for apns-priority of 10 if not explicitly set.
@@ -315,7 +308,6 @@ namespace Messages
      */
     struct AndroidConfig : public BaseO10
     {
-
     public:
         // An identifier of a group of messages that can be collapsed, so that only the last message gets sent when delivery can be resumed. A maximum of 4 different collapse keys is allowed at any given time.
         AndroidConfig &collapse_key(const String &value) { return wr.set<AndroidConfig &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -349,7 +341,6 @@ namespace Messages
      */
     struct Message : public BaseO8
     {
-
     public:
         // Input only. Arbitrary key/value payload, which must be UTF-8 encoded. The key should not be a reserved word ("from", "message_type", or any word starting with "google" or "gcm"). When sending payloads containing only data fields to iOS devices, only normal priority ("apns-priority": "5") is allowed in ApnsConfig.
         // An object containing a list of "key": value pairs. Example: { "name": "wrench", "mass": "1.3kg", "count": "3" }.
@@ -440,7 +431,5 @@ namespace Messages
     };
 
 }
-
 #endif
-
 #endif

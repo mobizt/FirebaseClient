@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -22,17 +22,16 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef FIREBASE_STORAGE_DATA_OPTIONS_H
-#define FIREBASE_STORAGE_DATA_OPTIONS_H
+#ifndef STORAGE_DATA_OPTIONS_H
+#define STORAGE_DATA_OPTIONS_H
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "./core/JSON.h"
-#include "./core/ObjectWriter.h"
+#include "./core/Utils/JSON.h"
+#include "./core/Utils/ObjectWriter.h"
 #include "./core/AsyncClient/AsyncClient.h"
 
 #if defined(ENABLE_STORAGE)
-
 namespace FirebaseStorage
 {
     enum firebase_storage_request_type
@@ -84,7 +83,6 @@ namespace FirebaseStorage
 
     class DataOptions
     {
-
     public:
         String payload, extras;
         FirebaseStorage::Parent parent;
@@ -125,9 +123,6 @@ namespace FirebaseStorage
             this->uid = uid;
         }
     };
-
 }
-
 #endif
-
 #endif

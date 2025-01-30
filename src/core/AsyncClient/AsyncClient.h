@@ -1,51 +1,22 @@
-/**
- * 2025-01-29
- *
- * For MCU build target (CORE_ARDUINO_XXXX), see Options.h.
- *
- * The MIT License (MIT)
- * Copyright (c) 2025 K. Suwatchai (Mobizt)
- *
- *
- * Permission is hereby granted, free of charge, to any person returning a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-#ifndef ASYNC_CLIENT_H
-#define ASYNC_CLIENT_H
+#ifndef CORE_ASYNC_CLIENT_ASYNC_CLIENT_H
+#define CORE_ASYNC_CLIENT_ASYNC_CLIENT_H
+
 #include <vector>
 #include "./core/AsyncClient/ConnectionHandler.h"
 #include "./core/AsyncClient/RequestHandler.h"
 #include "./core/AsyncClient/ResponseHandler.h"
-#include "./core/Memory.h"
-#include "./core/FileConfig.h"
+#include "./core/Utils/Memory.h"
+#include "./core/File/FileConfig.h"
 #include "./core/Error.h"
-#include "./core/OTA.h"
+#include "./core/Utils/OTA.h"
 #include "./core/AsyncResult/AsyncResult.h"
 #include "./core/AsyncResult/ResultBase.h"
 #include "./core/AsyncResult/RTDBResultBase.h"
-#include "./core/AuthConfig.h"
-#include "./core/List.h"
+#include "./core/Auth/AuthConfig.h"
+#include "./core/Utils/List.h"
 #include "./core/Core.h"
-#include "./core/URL.h"
-#include "./core/StringUtil.h"
-
-#if defined(ENABLE_ASYNC_TCP_CLIENT)
-#include "./core/AsyncTCPConfig.h"
-#endif
+#include "./core/Utils/URL.h"
+#include "./core/Utils/StringUtil.h"
 
 using namespace firebase_ns;
 

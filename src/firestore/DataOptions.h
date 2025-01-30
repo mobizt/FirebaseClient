@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -22,14 +22,14 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef FIRESTORE_DATAOPTIONS_H
-#define FIRESTORE_DATAOPTIONS_H
+#ifndef FIRESTORE_DATA_OPTIONS_H
+#define FIRESTORE_DATA_OPTIONS_H
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "./core/JSON.h"
-#include "./core/ObjectWriter.h"
-#include "./core/URL.h"
+#include "./core/Utils/JSON.h"
+#include "./core/Utils/ObjectWriter.h"
+#include "./core/Utils/URL.h"
 
 #if defined(ENABLE_FIRESTORE)
 #include "./firestore/Values.h"
@@ -56,14 +56,11 @@ enum firebase_firestore_request_type
     cf_create_composite_index,
     cf_create_field_index,
     cf_manage_database,
-
     cf_get_doc = 300,
     cf_list_doc,
     cf_list_index,
     cf_get_index,
-
     cf_patch_doc = 400,
-
     cf_delete_doc = 500,
     cf_delete_index
 };
@@ -1350,7 +1347,5 @@ namespace Firestore
     };
 
 }
-
 #endif
-
 #endif

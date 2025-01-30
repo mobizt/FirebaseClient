@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -27,10 +27,9 @@
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "./core/ObjectWriter.h"
+#include "./core/Utils/ObjectWriter.h"
 
 #if defined(ENABLE_FIRESTORE)
-
 enum firestore_const_key_type
 {
     firestore_const_key_nullValue,
@@ -95,7 +94,6 @@ namespace Values
 
     class StringValue : public Printable
     {
-
     private:
         StringUtil sut;
         String buf, str;
@@ -152,7 +150,6 @@ namespace Values
 
     class IntegerValue : public Printable
     {
-
     private:
         String buf, str;
         ObjectWriter owriter;
@@ -177,7 +174,6 @@ namespace Values
 
     class DoubleValue : public Printable
     {
-
     private:
         String buf, str;
         ObjectWriter owriter;
@@ -208,7 +204,6 @@ namespace Values
 
     class TimestampValue : public Printable
     {
-
     private:
         String buf, str;
         ObjectWriter owriter;
@@ -260,7 +255,6 @@ namespace Values
 
     class ReferenceValue : public Printable
     {
-
     private:
         String buf, str;
         ObjectWriter owriter;
@@ -329,7 +323,6 @@ namespace Values
 
     class ArrayValue : public Printable
     {
-
     private:
         String buf, str;
         ObjectWriter owriter;
@@ -401,7 +394,6 @@ namespace Values
      */
     class MapValue : public Printable
     {
-
     private:
         String buf, str;
         ObjectWriter owriter;
@@ -466,6 +458,5 @@ namespace Values
         void clear() { sut.clear(buf); }
     };
 };
-
 #endif
 #endif

@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -22,21 +22,19 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef CLOUD_FUNCTIONS_DATA_OPTIONS_H
-#define CLOUD_FUNCTIONS_DATA_OPTIONS_H
+#ifndef FUNCTIONS_DATA_OPTIONS_H
+#define FUNCTIONS_DATA_OPTIONS_H
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "./core/JSON.h"
-#include "./core/ObjectWriter.h"
+#include "./core/Utils/JSON.h"
+#include "./core/Utils/ObjectWriter.h"
 #include "./core/AsyncClient/AsyncClient.h"
-#include "./core/URL.h"
+#include "./core/Utils/URL.h"
 #include "./functions/Policy.h"
 
 // https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions
-
 #if defined(ENABLE_FUNCTIONS)
-
 namespace GoogleCloudFunctions
 {
     enum google_cloud_functions_request_type
@@ -347,7 +345,6 @@ namespace GoogleCloudFunctions
      */
     struct EventFilter : public BaseO4
     {
-
     public:
         // Required. The name of a CloudEvents attribute.
         EventFilter &attribute(const String &value) { return wr.set<EventFilter &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -442,7 +439,6 @@ namespace GoogleCloudFunctions
      */
     struct ListOptions : public BaseO6
     {
-
     protected:
         ObjectWriter owriter;
         StringUtil sut;
@@ -497,7 +493,6 @@ namespace GoogleCloudFunctions
      */
     struct GetPolicyOptions : public BaseO1
     {
-
     protected:
         ObjectWriter owriter;
 
@@ -518,7 +513,6 @@ namespace GoogleCloudFunctions
      */
     struct SetPolicyOptions : public BaseO4
     {
-
     public:
         // REQUIRED: The complete policy to be applied to the resource. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Google Cloud services (such as Projects) might reject them.
         SetPolicyOptions &policy(const IAMPolicy::Policy &value) { return wr.set<SetPolicyOptions &, IAMPolicy::Policy>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
@@ -534,7 +528,6 @@ namespace GoogleCloudFunctions
      */
     struct Permissions : public BaseO2
     {
-
     public:
         Permissions &permissions(const String &value) { return wr.set<Permissions &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
         // Obsoleted, use permissions instead.
@@ -562,7 +555,6 @@ namespace GoogleCloudFunctions
 
     class DataOptions
     {
-
     public:
         String payload, extras;
         GoogleCloudFunctions::Parent parent;
@@ -603,7 +595,5 @@ namespace GoogleCloudFunctions
         }
     };
 }
-
 #endif
-
 #endif

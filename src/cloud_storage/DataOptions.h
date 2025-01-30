@@ -22,15 +22,15 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef GOOGLE_CLOUD_STORAGE_DATA_OPTIONS_H
-#define GOOGLE_CLOUD_STORAGE_DATA_OPTIONS_H
+#ifndef CLOUD_STORAGE_DATA_OPTIONS_H
+#define CLOUD_STORAGE_DATA_OPTIONS_H
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "./core/JSON.h"
-#include "./core/ObjectWriter.h"
+#include "./core/Utils/JSON.h"
+#include "./core/Utils/ObjectWriter.h"
 #include "./core/AsyncClient/AsyncClient.h"
-#include "./core/URL.h"
+#include "./core/Utils/URL.h"
 
 #if defined(ENABLE_CLOUD_STORAGE)
 

@@ -1,5 +1,5 @@
 /**
- * 2025-01-27
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -22,20 +22,17 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef ASYNC_MESSAGING_H
-#define ASYNC_MESSAGING_H
+#ifndef MESSAGING_MESSAGING_H
+#define MESSAGING_MESSAGING_H
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
 
 using namespace firebase_ns;
 
 #if defined(ENABLE_MESSAGING)
-
 #include "./messaging/DataOptions.h"
-
 class Messaging
 {
-
     friend class AppBase;
 
 public:
@@ -237,7 +234,5 @@ private:
         extras.replace(",", "%2C");
     }
 };
-
 #endif
-
 #endif

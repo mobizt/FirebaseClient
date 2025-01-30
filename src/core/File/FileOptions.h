@@ -1,0 +1,6 @@
+#ifndef CORE_FILE_FILE_OPTIONS_H
+#define CORE_FILE_FILE_OPTIONS_H
+
+#define FIREBASE_CHUNK_SIZE 2048
+
+#endif

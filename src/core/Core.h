@@ -1,5 +1,5 @@
-#ifndef CORE_CORE_H_
-#define CORE_CORE_H_
+#ifndef CORE_CORE_H
+#define CORE_CORE_H
 
 #include <Arduino.h>
 

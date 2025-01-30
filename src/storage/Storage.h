@@ -1,5 +1,5 @@
 /**
- * 2025-01-27
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -22,20 +22,18 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef ASYNC_STORAGE_H
-#define ASYNC_STORAGE_H
+#ifndef STORAGE_STORAGE_H
+#define STORAGE_STORAGE_H
+
 #include <Arduino.h>
 #include "./core/FirebaseApp.h"
 
 using namespace firebase_ns;
 
 #if defined(ENABLE_STORAGE)
-
 #include "./storage/DataOptions.h"
-
 class Storage
 {
-
     friend class AppBase;
 
 public:
@@ -403,7 +401,6 @@ private:
     void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, file_config_data *file, const String &mime, FirebaseStorage::firebase_storage_request_type requestType, bool async)
     {
         using namespace FirebaseStorage;
-
         DataOptions options;
         options.requestType = requestType;
         options.parent = parent;
@@ -444,7 +441,6 @@ private:
     void asyncRequest(FirebaseStorage::req_data &request, int beta = 0)
     {
         app_token_t *atoken = appToken();
-
         if (!atoken)
             return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
@@ -463,7 +459,6 @@ private:
         }
 
         addParams(request, extras);
-
         url(FPSTR("firebasestorage.googleapis.com"));
 
         async_data *sData = request.aClient->createSlot(request.opt);
@@ -536,7 +531,5 @@ private:
         }
     }
 };
-
 #endif
-
 #endif

@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -22,16 +22,15 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef DATABASE_FILTER_H
-#define DATABASE_FILTER_H
+#ifndef DATABASE_DATABASE_FILTER_H
+#define DATABASE_DATABASE_FILTER_H
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "./core/URL.h"
-#include "./core/StringUtil.h"
+#include "./core/Utils/URL.h"
+#include "./core/Utils/StringUtil.h"
 
 #if defined(ENABLE_DATABASE)
-
 class DatabaseFilter
 {
     friend class DatabaseOptions;
@@ -137,7 +136,5 @@ public:
         return *this;
     }
 };
-
 #endif
-
 #endif

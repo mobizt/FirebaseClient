@@ -1,5 +1,5 @@
 /**
- * 2025-01-25
+ * 2025-01-30
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -31,11 +31,9 @@
 #if defined(ENABLE_FIRESTORE) && defined(ENABLE_FIRESTORE_QUERY)
 
 #include "./firestore/Values.h"
-
 namespace FirestoreQuery
 {
     class Filter;
-
     namespace CompositFilterOperator
     {
         /**
@@ -113,7 +111,6 @@ namespace FirestoreQuery
      */
     class FieldReference : public BaseO1
     {
-
     public:
         // A reference to a field in a document.
         explicit FieldReference(const String &value) { fieldPath(value); }
@@ -163,7 +160,6 @@ namespace FirestoreQuery
      */
     class CollectionSelector : public BaseO4
     {
-
     public:
         CollectionSelector() {}
         explicit CollectionSelector(const String &collectionId, bool allDescendants) { CollectionSelector::collectionId(collectionId).allDescendants(allDescendants); }
@@ -201,7 +197,6 @@ namespace FirestoreQuery
      */
     class StructuredQuery : public BaseO12
     {
-    private:
     public:
         StructuredQuery();
 
@@ -254,7 +249,6 @@ namespace FirestoreQuery
      */
     class CompositeFilter : public BaseO4
     {
-
     public:
         CompositeFilter();
         // The operator for combining multiple filters.
@@ -273,7 +267,6 @@ namespace FirestoreQuery
      */
     class FieldFilter : public BaseO4
     {
-    private:
     public:
         FieldFilter();
 
@@ -320,7 +313,5 @@ namespace FirestoreQuery
     };
 
 }
-
 #endif
-
 #endif
