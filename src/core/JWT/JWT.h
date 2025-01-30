@@ -35,7 +35,6 @@ namespace firebase_ns
 
     struct jwt_token_data_t
     {
-    public:
         String token, msg, pk;
         int err_code = 0;
         char *hash = nullptr;               // SHA256 size (256 bits or 32 bytes)

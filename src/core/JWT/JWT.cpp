@@ -54,10 +54,7 @@ void JWTClass::clear()
     processing = false;
 }
 
-bool JWTClass::ready()
-{
-    return this->auth_data && this->auth_data->user_auth.sa.step == jwt_step_ready;
-}
+bool JWTClass::ready() { return this->auth_data && this->auth_data->user_auth.sa.step == jwt_step_ready; }
 bool JWTClass::loop(auth_data_t *auth_data)
 {
     if (auth_data && auth_data->user_auth.jwt_signing)
@@ -105,10 +102,7 @@ void JWTClass::sendErrResult(AsyncResult *refResult)
         refResult->error().setLastError(jwt_data.err_code, jwt_data.msg);
 }
 
-void JWTClass::setAppDebug(app_debug_t *app_debug)
-{
-    this->app_debug = app_debug;
-}
+void JWTClass::setAppDebug(app_debug_t *app_debug) { this->app_debug = app_debug; }
 
 bool JWTClass::begin(auth_data_t *auth_data)
 {
@@ -124,13 +118,11 @@ bool JWTClass::begin(auth_data_t *auth_data)
         this->auth_data->user_auth.sa.step = jwt_step_create_jwt;
         processing = false;
     }
-
     return true;
 }
 
 bool JWTClass::create()
 {
-
 #if !defined(USE_LEGACY_TOKEN_ONLY) && !defined(FIREBASE_USE_LEGACY_TOKEN_ONLY)
 
     if (!auth_data)
@@ -138,11 +130,9 @@ bool JWTClass::create()
 
     if (auth_data->user_auth.sa.step == jwt_step_create_jwt)
     {
-
         uint32_t now = auth_data->user_auth.ts;
         if (auth_data->user_auth.timestatus_cb)
         {
-
             if (app_debug && !auth_data->user_auth.jwt_time_debug)
             {
                 auth_data->user_auth.jwt_time_debug = true;
@@ -196,7 +186,6 @@ bool JWTClass::create()
             jwt_add_gapis_host(host, "www");
             uut.host2Url(base_uri, host);
             base_uri += FPSTR("/auth/");
-
             String s = base_uri; // https://www.googleapis.com/auth/
             s += FPSTR("devstorage.full_control");
             jwt_add_sp(s);
@@ -215,7 +204,6 @@ bool JWTClass::create()
             s += base_uri; // https://www.googleapis.com/auth/
             s += FPSTR("iam");
             sut.clear(base_uri);
-
             if (auth_data->user_auth.cust.val[cust_ns::scope].length() > 0)
             {
                 char *p = reinterpret_cast<char *>(mem.alloc(auth_data->user_auth.cust.val[cust_ns::scope].length()));
@@ -239,7 +227,6 @@ bool JWTClass::create()
                 // release memory
                 mem.release(&p);
             }
-
             json.addObject(payload, "scope", s, true, true);
         }
         else if (auth_data->user_auth.auth_type == auth_sa_custom_token)
@@ -265,7 +252,6 @@ bool JWTClass::create()
             jwt_data.hash = reinterpret_cast<char *>(mem.alloc(32));
         br_sha256_out(&mc, jwt_data.hash);
         jwt_data.token += '.';
-
         auth_data->user_auth.sa.step = jwt_step_sign;
     }
     else if (auth_data->user_auth.sa.step == jwt_step_sign)
@@ -337,10 +323,7 @@ bool JWTClass::create()
     }
 
 #endif
-
     return exit(true);
 }
-
 #endif
-
 #endif
