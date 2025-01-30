@@ -7,6 +7,7 @@ struct firebase_blob_writer
 {
 public:
     firebase_blob_writer() {}
+    
     void init(uint8_t *data, size_t size)
     {
         this->data = data;

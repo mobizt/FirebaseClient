@@ -5,7 +5,6 @@
 
 class BlobConfig
 {
-
 public:
     /**
      * BLOB config class.

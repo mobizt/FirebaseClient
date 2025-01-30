@@ -22,6 +22,7 @@ static unsigned long wifi_reconnection_ms = 0;
 static uint32_t gsm_network_owner_addr = 0;
 static uint32_t ethernet_network_owner_addr = 0;
 static uint32_t generic_network_owner_addr = 0;
+
 typedef void (*NetworkConnectionCallback)(void);
 typedef void (*NetworkStatusCallback)(bool &);
 
@@ -49,6 +50,7 @@ private:
             this->net_con_cb = rhs.net_con_cb;
             this->net_status_cb = rhs.net_status_cb;
         }
+
         void clear()
         {
             net_con_cb = NULL;
@@ -80,6 +82,7 @@ private:
             this->user = rhs.user;
             this->password = rhs.password;
         }
+
         void clear()
         {
             modem = nullptr;
@@ -116,7 +119,9 @@ private:
 
     public:
         ethernet_data() { ethernet_mac = new uint8_t[6]; }
+
         ~ethernet_data() { clear(); }
+
         void copy(const ethernet_data &rhs)
         {
             this->ethernet_reset_pin = rhs.ethernet_reset_pin;
@@ -183,6 +188,7 @@ private:
 
 public:
     ~network_config_data() { clear(); }
+    
     network_config_data &operator=(const network_config_data &rhs)
     {
         copy(rhs);

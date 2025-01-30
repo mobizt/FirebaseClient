@@ -19,7 +19,6 @@
 
 class OTAUpdaterClass
 {
-
 public:
     OTAUpdaterClass();
     ~OTAUpdaterClass();
@@ -38,7 +37,5 @@ private:
 };
 
 extern OTAUpdaterClass OTAUpdater;
-
 #endif
-
 #endif

@@ -17,7 +17,6 @@ public:
             return false;
 
         String _key(key);
-
         if (!hasParam && _key[0] == '&')
             _key[0] = '?';
         else if (hasParam && _key[0] == '?')
@@ -34,6 +33,7 @@ public:
         hasParam = true;
         return true;
     }
+    
     /* Append the comma separated tokens as URL parameters */
     void addParamsTokens(String &url, const String &key, String val, bool &hasParam)
     {
@@ -60,6 +60,7 @@ public:
         // release memory
         mem.release(&p);
     }
+
     /* Append the path to URL */
     void addPath(String &url, const String &path)
     {
@@ -73,6 +74,7 @@ public:
 
         url += path;
     }
+
     /* Append the string with google storage URL */
     void addGStorageURL(String &uri, const String &bucketID, const String &storagePath)
     {
@@ -82,6 +84,7 @@ public:
             uri += '/';
         uri += storagePath;
     }
+
     /* Append the string with cloudfunctions project host */
     void addFunctionsHost(String &uri, const String &locationId, const String &projectId, const String &path, bool url)
     {

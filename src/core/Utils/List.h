@@ -10,6 +10,7 @@ namespace firebase_ns
     {
     public:
         List() {}
+
         ~List() {}
 
         void addRemoveList(std::vector<uint32_t> &vec, uint32_t addr, bool add)
@@ -38,5 +39,5 @@ namespace firebase_ns
             return false;
         }
     };
-};
+}
 #endif

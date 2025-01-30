@@ -62,7 +62,7 @@ namespace firebase_ns
 #endif
         }
 
-        ~CustomAuth() { data.clear(); };
+        ~CustomAuth() { data.clear(); }
 
         user_auth_data &get()
         {

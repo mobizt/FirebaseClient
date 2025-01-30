@@ -8,9 +8,6 @@ namespace firebase_ns
 {
     struct app_token_t
     {
-    private:
-        StringUtil sut;
-
     public:
         String val[app_tk_ns::max_type];
         uint32_t expire = 0, auth_ts = 0;
@@ -20,7 +17,7 @@ namespace firebase_ns
         void clear()
         {
             for (size_t i = 0; i < app_tk_ns::max_type; i++)
-                sut.clear(val[i]);
+                val[i].remove(0, val[i].length());
             expire = FIREBASE_DEFAULT_TOKEN_TTL;
             authenticated = false;
             auth_type = auth_unknown_token;

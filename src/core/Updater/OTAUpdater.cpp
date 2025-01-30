@@ -7,6 +7,7 @@
 #if defined(FIREBASE_OTA_STORAGE)
 
 OTAUpdaterClass::OTAUpdaterClass() {}
+
 OTAUpdaterClass::~OTAUpdaterClass() {}
 
 bool OTAUpdaterClass::begin(int size)
@@ -59,7 +60,5 @@ void OTAUpdaterClass::apply()
 }
 
 OTAUpdaterClass OTAUpdater;
-
 #endif
-
 #endif

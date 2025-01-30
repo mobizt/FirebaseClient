@@ -51,8 +51,10 @@ namespace firebase_ns
             return ret;
         }
 
-        ~UserAuth() { data.clear(); };
+        ~UserAuth() { data.clear(); }
+
         void clear() { data.clear(); }
+        
         user_auth_data &get()
         {
 #if defined(ENABLE_FS)

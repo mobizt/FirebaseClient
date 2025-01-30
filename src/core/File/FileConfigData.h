@@ -42,7 +42,7 @@ struct file_config_data
     firebase_blob_writer outB;
     StringUtil sut;
     Memory mem;
-
+    
     void clearInternalData()
     {
         if (internal_data && data && data_size > 0)
@@ -50,7 +50,6 @@ struct file_config_data
         data_size = 0;
         internal_data = false;
     }
-
     void initBlobWriter(size_t size)
     {
         clearInternalData();
@@ -69,7 +68,6 @@ public:
         copy(rhs);
         return *this;
     }
-
     void copy(const file_config_data &rhs)
     {
 #if defined(ENABLE_FS)
@@ -91,7 +89,6 @@ public:
         }
         this->initialized = rhs.initialized;
     }
-
     void clear()
     {
 #if defined(ENABLE_FS)

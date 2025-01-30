@@ -15,9 +15,9 @@
 
 class StringUtil
 {
-
 public:
     StringUtil() {}
+
     ~StringUtil() {}
 
 #if defined(FIREBASE_USE_STRSEP_IMPL)

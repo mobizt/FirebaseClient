@@ -17,28 +17,34 @@ namespace firebase_ns
             data.user.val[user_ns::api_key] = apiKey;
             setType(auth_user_id_token, user_auth_data_user_data);
         }
+
+        ~UserAccount() { data.clear(); };
+
         UserAccount &email(const String &email)
         {
             data.user.val[user_ns::em] = email;
             return setType(auth_user_id_token, user_auth_data_user_data);
-        };
+        }
+
         UserAccount &password(const String &password)
         {
             data.user.val[user_ns::psw] = password;
             return setType(auth_user_id_token, user_auth_data_user_data);
-        };
+        }
+
         UserAccount &idToken(const String &idToken)
         {
             data.user.val[user_ns::id_token] = idToken;
             return setType(auth_user_id_token, user_auth_data_user_data);
-        };
+        }
 
-        ~UserAccount() { data.clear(); };
         void clear() { data.clear(); }
+
         user_auth_data &get() { return data; }
 
     private:
         user_auth_data data;
+        
         UserAccount &setType(auth_token_type auth_type, user_auth_data_type data_type)
         {
             data.auth_type = auth_type;
@@ -47,7 +53,6 @@ namespace firebase_ns
             return *this;
         }
     };
-
 #endif
 }
 #endif

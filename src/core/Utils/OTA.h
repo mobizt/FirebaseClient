@@ -53,10 +53,7 @@ public:
     }
 
 #if defined(FIREBASE_OTA_STORAGE)
-    void setOTAStorage(uint32_t addr)
-    {
-        OTAUpdater.setOTAStorage(addr);
-    }
+    void setOTAStorage(uint32_t addr) { OTAUpdater.setOTAStorage(addr); }
 #endif
 
     void prepareDownloadOTA(size_t payloadLen, bool base64, int16_t &code)
@@ -89,9 +86,7 @@ public:
             if (!FIREBASE_OTA_UPDATER.end())
                 code = FIREBASE_ERROR_FW_UPDATE_END_FAILED;
         }
-
         return code == 0;
-
 #endif
         return false;
     }

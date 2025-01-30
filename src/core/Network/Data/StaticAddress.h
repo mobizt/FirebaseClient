@@ -28,7 +28,7 @@ public:
         this->optional = optional;
     };
 
-    firebase_client_static_address() {};
+    firebase_client_static_address() {}
 
 private:
     IPAddress ipAddress, netMask, defaultGateway, dnsServer;

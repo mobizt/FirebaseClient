@@ -10,7 +10,9 @@ class DefaultFileConfig
 public:
     template <typename T = const char *>
     DefaultFileConfig() {}
+
     ~DefaultFileConfig() {}
+    
     file_config_data &get() { return data; }
 
 private:

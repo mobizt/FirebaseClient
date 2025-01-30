@@ -46,12 +46,15 @@ namespace firebase_ns
 
     public:
         user_auth_data() {}
+        
         ~user_auth_data() { clear(); }
+
         user_auth_data &operator=(const user_auth_data &rhs)
         {
             copy(rhs);
             return *this;
         }
+
         void copy(const user_auth_data &rhs)
         {
             this->user.copy(rhs.user);
