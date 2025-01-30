@@ -14,11 +14,6 @@
         void printResult(AsyncResult &aResult)<br />
         {<br />
             <div style="padding-left:20px;">
-            if (aResult.isEvent())<br />
-            {<br />
-                <div style="padding-left:20px;">Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());</div>
-            }<br /><br />
-
             if (aResult.isDebug())<br />
             {<br />
                 <div style="padding-left:20px;">Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());</div>
