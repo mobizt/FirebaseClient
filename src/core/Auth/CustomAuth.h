@@ -89,7 +89,6 @@ namespace firebase_ns
     private:
         user_auth_data data;
     };
-
 #endif
 }
 #endif

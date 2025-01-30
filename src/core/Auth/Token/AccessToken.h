@@ -2,7 +2,7 @@
 #define CORE_AUTH_ACCESS_TOKEN_H
 
 #include <Arduino.h>
-#include "./Core/Auth/UserAuth.h"
+#include "./core/Auth/UserAuth.h"
 
 namespace firebase_ns
 {
