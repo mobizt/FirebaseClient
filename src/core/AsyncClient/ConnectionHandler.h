@@ -9,28 +9,24 @@
 #include "./core/AsyncClient/AsyncTCPConfig.h"
 #endif
 
-#define FIREBASE_RECONNECTION_TIMEOUT_MSEC 5000
-
-#define FIREBASE_SESSION_TIMEOUT_SEC 150
-
-enum function_return_type
-{
-    ret_undefined = -2,
-    ret_failure = -1,
-    ret_continue = 0,
-    ret_complete = 1,
-    ret_retry = 2
-};
-
-enum tcp_client_type
-{
-    tcpc_none,
-    tcpc_sync,
-    tcpc_async
-};
-
 namespace firebase_ns
 {
+    enum function_return_type
+    {
+        ret_undefined = -2,
+        ret_failure = -1,
+        ret_continue = 0,
+        ret_complete = 1,
+        ret_retry = 2
+    };
+
+    enum tcp_client_type
+    {
+        tcpc_none,
+        tcpc_sync,
+        tcpc_async
+    };
+
     class ConnBase
     {
     public:
@@ -41,14 +37,16 @@ namespace firebase_ns
     };
 }
 
-struct conn_handler : public firebase_ns::ConnBase
+using namespace firebase_ns;
+
+struct conn_handler : public ConnBase
 {
 private:
     network_config_data net;
     tcp_client_type client_type;
     Client *client = nullptr;
     void *atcp_config = nullptr;
-    firebase_ns::app_debug_t *app_debug = nullptr;
+    app_debug_t *app_debug = nullptr;
     bool connected = false, client_changed = false, network_changed = false;
     int netErrState = 0;
 
@@ -56,8 +54,8 @@ public:
     bool sse = false;
     String host;
     uint16_t port;
-    
-    void newConn(tcp_client_type client_type, Client *client, void *atcp_config, firebase_ns::app_debug_t *app_debug)
+
+    void newConn(tcp_client_type client_type, Client *client, void *atcp_config, app_debug_t *app_debug)
     {
         this->client_type = client_type;
         this->client = client;

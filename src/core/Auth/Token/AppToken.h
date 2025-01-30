@@ -1,5 +1,5 @@
 #ifndef CORE_AUTH_TOKEN_APP_TOKEN_H
-#define CORE_AUTH_APP_TOKEN_H
+#define CORE_AUTH_TOKEN_APP_TOKEN_H
 
 #include <Arduino.h>
 #include "./core/Auth/UserAuthData.h"

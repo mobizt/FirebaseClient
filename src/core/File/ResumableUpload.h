@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include "./Config.h"
 #include "./core/Utils/StringUtil.h"
-#include "./core/File/FileOptions.h"
 
 #if defined(ENABLE_CLOUD_STORAGE)
 struct file_upload_resumable_data

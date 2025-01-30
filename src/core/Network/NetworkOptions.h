@@ -1,8 +1,6 @@
 #ifndef CORE_NETWORK_NETWORK_OPTIONS_H
 #define CORE_NETWORK_NETWORK_OPTIONS_H
 
-#define FIREBASE_NET_RECONNECT_TIMEOUT_SEC 10
-
 #include <Arduino.h>
 #include "./Config.h"
 #include <vector>
@@ -33,7 +31,7 @@
 #endif
 #endif
 
-#endif
+#endif // ESP8266) || CORE_ARDUINO_PICO
 
 #if !defined(FIREBASE_DISABLE_NATIVE_ETHERNET)
 
@@ -61,17 +59,13 @@
 #include <W5500lwIP.h>
 #endif
 
-#if defined(CORE_ARDUINO_PICO)
-
-#endif
-
 #if defined(INC_ENC28J60_LWIP) || defined(INC_W5100_LWIP) || defined(INC_W5500_LWIP)
 #define FIREBASE_LWIP_ETH_IS_AVAILABLE
 #endif
 
 #endif
 
-#endif
+#endif // FIREBASE_DISABLE_NATIVE_ETHERNET
 
 #if __has_include(<Ethernet.h>) ||  (defined(FIREBASE_ETHERNET_MODULE_LIB) && defined(FIREBASE_ETHERNET_MODULE_CLASS))
 
@@ -114,7 +108,7 @@
 #undef MAX_SOCK_NUM
 #endif
 
-#endif
+#endif // __has_include(<Ethernet.h>) ||  (defined(FIREBASE_ETHERNET_MODULE_LIB) && defined(FIREBASE_ETHERNET_MODULE_CLASS))
 
 #if defined(ESP32) || defined(ESP8266) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || \
     defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_PORTENTA_C33) ||                \
@@ -139,27 +133,6 @@
 #include <WiFiC3.h>
 #elif __has_include(<WiFi.h>)
 #include <WiFi.h>
-#endif
-
-#if defined(ARDUINO_ARCH_SAMD) ||      \
-    defined(ARDUINO_UNOWIFIR4) ||      \
-    defined(ARDUINO_GIGA) ||           \
-    defined(ARDUINO_PORTENTA_C33) ||   \
-    defined(ARDUINO_PORTENTA_H7_M7) || \
-    defined(ARDUINO_PORTENTA_H7_M4) || \
-    defined(ARDUINO_PORTENTA_X8) ||    \
-    defined(ARDUINO_OPTA)
-
-#if !defined(FIREBASE_HAS_ARDUINO_WIFISSLCLIENT)
-#define FIREBASE_HAS_ARDUINO_WIFISSLCLIENT
-#endif
-
-#endif
-
-#if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
-#if !defined(FIREBASE_HAS_WIFICLIENTSECURE)
-#define FIREBASE_HAS_WIFICLIENTSECURE
-#endif
 #endif
 
 #if !defined(ARDUINO_RASPBERRY_PI_PICO_W) && \
@@ -197,9 +170,9 @@
 #define FIREBASE_HAS_WIFIMULTI
 #endif
 
-#endif
+#endif // FIREBASE_DISABLE_ONBOARD_WIFI
 
-#endif
+#endif // ESP32...
 
 #if defined(TINY_GSM_MODEM_SIM800) ||     \
     defined(TINY_GSM_MODEM_SIM808) ||     \
@@ -230,7 +203,7 @@
     defined(TINY_GSM_MODEM_XBEE) ||       \
     defined(TINY_GSM_MODEM_SEQUANS_MONARCH)
 #define FIREBASE_TINYGSM_IS_AVAILABLE
-#endif
+#endif // TINY_GSM_MODEM_SIM800 ...
 
 #if defined(FIREBASE_TINYGSM_IS_AVAILABLE) && __has_include(<TinyGsmClient.h>)
 #include <TinyGsmClient.h>
@@ -246,7 +219,7 @@
 #endif
 
 #endif
-#endif
+#endif // FIREBASE_DISABLE_NATIVE_PPP
 
 #if defined(FIREBASE_WIFI_IS_AVAILABLE)
 #define WIFI_CONNECTED (WiFi.status() == WL_CONNECTED)
@@ -260,4 +233,4 @@
 #define PPP_CONNECTED false
 #endif
 
-#endif
+#endif // CORE_NETWORK_NETWORK_OPTIONS_H

@@ -1,21 +1,9 @@
 #ifndef CORE_OPTIONS_H
 #define CORE_OPTIONS_H
 
-#define FIREBASE_DEFAULT_TS 1618971013
-
-#if defined(ARDUINO_ARCH_RP2040)
-
-#if defined(ARDUINO_NANO_RP2040_CONNECT)
-#ifndef ARDUINO_NANO_RP2040_CONNECT_MODULE
-#define ARDUINO_NANO_RP2040_CONNECT_MODULE
-#endif
-#else
-#ifndef ARDUINO_PICO_MODULE
-#define ARDUINO_PICO_MODULE
-#endif
-#endif
-
-#endif
+// -------------------------------
+// Features options
+// -------------------------------
 
 #if defined(DISABLE_ALL_OPTIONS)
 
@@ -38,7 +26,7 @@
 #undef ENABLE_LEGACY_TOKEN
 #undef ENABLE_JWT
 
-#endif
+#endif // DISABLE_ALL_OPTIONS
 
 #if defined(DISABLE_DATABASE)
 #undef ENABLE_DATABASE
@@ -117,7 +105,48 @@
 #define FPSTR
 #endif
 
-/// CORE_ARDUINO_XXXX macro for MCU build target.
+#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
+
+#define ENABLE_JWT
+
+#else
+
+#if defined(ENABLE_JWT)
+
+#if !defined(ENABLE_SERVICE_AUTH)
+#define ENABLE_SERVICE_AUTH
+#endif
+
+#if !defined(ENABLE_CUSTOM_AUTH)
+#define ENABLE_CUSTOM_AUTH
+#endif
+
+#endif
+
+#endif // ENABLE_SERVICE_AUTH || ENABLE_CUSTOM_AUTH
+
+#if !defined(FIREBASE_ASYNC_CLIENT)
+#define FIREBASE_ASYNC_CLIENT AsyncClient
+#endif
+
+// -------------------------------
+// Build target options
+// CORE_ARDUINO_XXXX
+// -------------------------------
+
+#if defined(ARDUINO_ARCH_RP2040)
+
+#if defined(ARDUINO_NANO_RP2040_CONNECT)
+#ifndef ARDUINO_NANO_RP2040_CONNECT_MODULE
+#define ARDUINO_NANO_RP2040_CONNECT_MODULE
+#endif
+#else
+#ifndef ARDUINO_PICO_MODULE
+#define ARDUINO_PICO_MODULE
+#endif
+#endif
+
+#endif // ARDUINO_ARCH_RP2040
 
 #if defined(ESP8266) || defined(ESP32)
 #ifndef CORE_ARDUINO_ESP
@@ -149,13 +178,17 @@
 #endif
 #endif
 
-#endif
+#endif // ARDUINO_ARCH_RP2040
 
 #if defined(TEENSYDUINO)
 #ifndef CORE_ARDUINO_TEENSY
 #define CORE_ARDUINO_TEENSY
 #endif
 #endif
+
+// -------------------------------
+// Filesystems options
+// -------------------------------
 
 #if defined(ENABLE_FS)
 #if __has_include(<FS.h>)
@@ -166,7 +199,7 @@
 #else
 #undef ENABLE_FS
 #endif
-#endif
+#endif // ENABLE_FS
 
 #if defined(ENABLE_FS)
 
@@ -201,13 +234,21 @@
 #define FILE_OPEN_MODE_APPEND FILE_WRITE
 #endif
 
+#endif // __has_include(<SD.h>) && __has_include(<SPI.h>)
+
+#endif // ENABLE_FS
+
+#if defined(ESP32)
+#if defined(ESP_ARDUINO_VERSION)
+#if ESP_ARDUINO_VERSION > ESP_ARDUINO_VERSION_VAL(2, 0, 1)
+#define ESP32_GT_2_0_1_FS_MEMORY_FIX
+#endif
+#endif
 #endif
 
-#endif
-
-#if __has_include(<time.h>)
-#include <time.h>
-#endif
+// -------------------------------
+// OTA options
+// -------------------------------
 
 #if defined(ENABLE_OTA) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
 #if defined(ESP32)
@@ -218,32 +259,46 @@
 #define OTA_UPDATE_ENABLED
 #endif
 
-#if defined(ESP32)
-#if defined(ESP_ARDUINO_VERSION)
-#if ESP_ARDUINO_VERSION > ESP_ARDUINO_VERSION_VAL(2, 0, 1)
-#define ESP32_GT_2_0_1_FS_MEMORY_FIX
+#if __has_include(<time.h>)
+#include <time.h>
 #endif
+
+// -------------------------------
+// Values and limits options
+// -------------------------------
+
+#if !defined(FIREBASE_ASYNC_QUEUE_LIMIT)
+#if defined(ESP8266)
+#define FIREBASE_ASYNC_QUEUE_LIMIT 10
+#elif defined(ESP32) || defined(ARDUINO_PICO_MODULE)
+#define FIREBASE_ASYNC_QUEUE_LIMIT 20
+#else
+#define FIREBASE_ASYNC_QUEUE_LIMIT 10
 #endif
 #endif
 
-#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
-#define ENABLE_JWT
-#endif
+#define FIREBASE_DEFAULT_TS 1618971013
 
-#if defined(ENABLE_JWT)
+#define FIREBASE_RECONNECTION_TIMEOUT_MSEC 5000
 
-#if !defined(ENABLE_SERVICE_AUTH)
-#define ENABLE_SERVICE_AUTH
-#endif
+#define FIREBASE_NET_RECONNECT_TIMEOUT_SEC 10
 
-#if !defined(ENABLE_CUSTOM_AUTH)
-#define ENABLE_CUSTOM_AUTH
-#endif
+#define FIREBASE_SESSION_TIMEOUT_SEC 150
 
-#endif
+#define FIREBASE_TCP_WRITE_TIMEOUT_SEC 30 // Do not change
 
-#if !defined(FIREBASE_ASYNC_CLIENT)
-#define FIREBASE_ASYNC_CLIENT AsyncClient
-#endif
+#define FIREBASE_TCP_READ_TIMEOUT_SEC 30 // Do not change
+
+#define FIREBASE_AUTH_PLACEHOLDER FPSTR("<auth_token>")
+
+// Raw chunk size for TCP's read and write operations.
+#define FIREBASE_CHUNK_SIZE 2048
+
+// Base64 encoded string chunk size for TCP's read and write operations.
+// This used in Realtime database with File implementation.
+#define FIREBASE_BASE64_CHUNK_SIZE 1026
+
+// SSE mode time out in milliseconds.
+#define FIREBASE_SSE_TIMEOUT_MS 40 * 1000
 
 #endif

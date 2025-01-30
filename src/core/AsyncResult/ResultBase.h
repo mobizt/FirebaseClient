@@ -1,17 +1,9 @@
 #ifndef CORE_ASYNC_RESULT_RESULT_BASE_H
 #define CORE_ASYNC_RESULT_RESULT_BASE_H
 
-// Raw chunk size for TCP's read and write operations.
-#define FIREBASE_CHUNK_SIZE 2048
-
-// Base64 encoded string chunk size for TCP's read and write operations.
-// This used in Realtime database with File implementation.
-#define FIREBASE_BASE64_CHUNK_SIZE 1026
-
-// SSE mode time out in milliseconds.
-#define FIREBASE_SSE_TIMEOUT_MS 40 * 1000
 
 #include <Arduino.h>
+#include "./Config.h"
 #include "./core/AsyncResult/AppEvent.h"
 #include "./core/AsyncResult/AppDebug.h"
 #include "./core/AsyncResult/AppData.h"

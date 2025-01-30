@@ -3,13 +3,12 @@
 
 #include <Arduino.h>
 #include <Client.h>
-#include "RequestHandler.h"
+#include "./core/Error.h"
+#include "./core/AsyncClient/RequestHandler.h"
 #include "./core/Utils/StringUtil.h"
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncClient/AsyncTCPConfig.h"
 #endif
-
-#define FIREBASE_TCP_READ_TIMEOUT_SEC 30 // Do not change
 
 namespace resns
 {

@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include "./Config.h"
 #include "./core/Utils/StringUtil.h"
-#include "./core/File/FileOptions.h"
 #include "./core/File/FileConfigData.h"
 #include "./core/File/DefaultFileConfig.h"
 #include "./core/File/BlobConfig.h"

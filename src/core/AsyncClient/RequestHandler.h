@@ -10,22 +10,9 @@
 #include "./core/AsyncClient/ConnectionHandler.h"
 #include "./core/Utils/URL.h"
 #include "./core/Utils/Base64.h"
+#include "./core/Auth/Token/AppToken.h"
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncClient/AsyncTCPConfig.h"
-#endif
-
-#define FIREBASE_TCP_WRITE_TIMEOUT_SEC 30 // Do not change
-
-#define FIREBASE_AUTH_PLACEHOLDER FPSTR("<auth_token>")
-
-#if !defined(FIREBASE_ASYNC_QUEUE_LIMIT)
-#if defined(ESP8266)
-#define FIREBASE_ASYNC_QUEUE_LIMIT 10
-#elif defined(ESP32) || defined(ARDUINO_PICO_MODULE)
-#define FIREBASE_ASYNC_QUEUE_LIMIT 20
-#else
-#define FIREBASE_ASYNC_QUEUE_LIMIT 10
-#endif
 #endif
 
 typedef void (*NetworkStatus)(bool &status);

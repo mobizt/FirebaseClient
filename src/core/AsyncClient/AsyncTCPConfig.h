@@ -5,7 +5,6 @@
 #include "./Config.h"
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
-
 /**
  * Async TCP Client Connection Request Callback.
  * @param host The host to connect.
