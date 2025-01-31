@@ -294,7 +294,7 @@
 // Raw chunk size for TCP's read and write operations.
 #define FIREBASE_CHUNK_SIZE 2048
 
-// Base64 encoded string chunk size for TCP's read and write operations.
+// Base64 encoded string chunk size for TCP's write operation.
 // This used in Realtime database with File implementation.
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
 

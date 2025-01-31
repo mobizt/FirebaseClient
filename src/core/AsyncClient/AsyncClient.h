@@ -63,7 +63,7 @@ private:
 
     function_return_type sendHeader(async_data *sData, const uint8_t *data, size_t len) { return sendImpl(sData, data, len, len, astate_send_header); }
 
-    // Handles file/blob raw, base64 and resumable data sending process.
+    // Handles file/blob data sending process of raw, base64 encoded string and resumable upload.
     function_return_type sendFileData(async_data *sData, async_state state = astate_send_payload)
     {
         function_return_type ret = ret_continue;
