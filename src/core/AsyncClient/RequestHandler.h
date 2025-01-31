@@ -2,15 +2,13 @@
 #define CORE_ASYNC_CLIENT_REQUEST_HANDLER_H
 
 #include <Arduino.h>
-#include "Client.h"
+#include <Client.h>
 #include "./Config.h"
 #include "./core/File/FileConfig.h"
 #include "./core/Utils/Timer.h"
 #include "./core/Utils/StringUtil.h"
-#include "./core/AsyncClient/ConnectionHandler.h"
 #include "./core/Utils/URL.h"
 #include "./core/Utils/Base64.h"
-#include "./core/Auth/Token/AppToken.h"
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncClient/AsyncTCPConfig.h"
 #endif

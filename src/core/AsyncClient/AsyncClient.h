@@ -2,14 +2,8 @@
 #define CORE_ASYNC_CLIENT_ASYNC_CLIENT_H
 
 #include <vector>
-#include "./core/Utils/Memory.h"
-#include "./core/File/FileConfig.h"
 #include "./core/Error.h"
 #include "./core/Utils/OTA.h"
-#include "./core/Auth/AuthConfig.h"
-#include "./core/Utils/List.h"
-#include "./core/Core.h"
-#include "./core/Utils/URL.h"
 #include "./core/Utils/StringUtil.h"
 #include "./core/AsyncClient/SlotManager.h"
 

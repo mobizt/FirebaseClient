@@ -2,6 +2,7 @@
 #define CORE_ASYNC_CLIENT_CONNECTION_HANDLER_H
 
 #include <Arduino.h>
+#include <Client.h>
 #include "./Config.h"
 #include "./core/Network/NetConfig.h"
 #include "./core/AsyncResult/AppDebug.h"
