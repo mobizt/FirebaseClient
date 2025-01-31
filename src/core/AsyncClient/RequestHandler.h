@@ -229,7 +229,8 @@ public:
 #if defined(ENABLE_CLOUD_STORAGE)
         String url = fromReq ? val[reqns::url] : file_data.resumable.getLocation();
 #else
-        String url = fromReq ? val[reqns::url] : *location;
+        String url = fromReq ? val[reqns::url] : location ? *location
+                                                          : "";
 #endif
         URLUtil uut;
         return uut.getHost(url, ext);

@@ -185,6 +185,7 @@ private:
 
         return ret;
     }
+
     // Handles string data sending process.
     function_return_type send(async_data *sData, const char *data, async_state state = astate_send_payload)
     {
@@ -238,7 +239,6 @@ private:
                     sData->return_type = ret_continue;
                     return sData->return_type;
                 }
-
 #else
                 if (sData->request.payloadIndex < size)
                 {
@@ -389,7 +389,7 @@ private:
         {
             // Connect to the new upload location on the same host.
             String ext;
-            String _host = sData->request.getHost(false, &sData->response.val[resns::location], &ext);
+            String _host = sData->request.getHost(false, nullptr, &ext);
             if (sman.connect(sData, _host.c_str(), sData->request.port) > ret_failure)
             {
                 sut.clear(sData->request.val[reqns::payload]);
@@ -670,7 +670,7 @@ private:
 #if defined(ENABLE_FS)
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                     {
-                                         // Write to file.
+                                        // Write to file.
                                         if (!b64ut.decodeToFile(mem, sData->request.file_data.file, reinterpret_cast<const char *>(buf + ofs)))
                                         {
                                             // File write error.
