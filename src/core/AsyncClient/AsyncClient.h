@@ -61,12 +61,9 @@ private:
         return sendImpl(sData, reinterpret_cast<const uint8_t *>(data), data ? strlen(data) : 0, data ? strlen(data) : 0, astate_send_header);
     }
 
-    function_return_type sendHeader(async_data *sData, const uint8_t *data, size_t len)
-    {
-        return sendImpl(sData, data, len, len, astate_send_header);
-    }
+    function_return_type sendHeader(async_data *sData, const uint8_t *data, size_t len) { return sendImpl(sData, data, len, len, astate_send_header); }
 
-    // Handles file raw, base64 and resumable data sending process.
+    // Handles file/blob raw, base64 and resumable data sending process.
     function_return_type sendFileData(async_data *sData, async_state state = astate_send_payload)
     {
         function_return_type ret = ret_continue;
@@ -221,6 +218,7 @@ private:
                     int ret = sData->request.file_data.resumable.isComplete(size, sData->request.payloadIndex);
                     if (ret == 2)
                     {
+                        // All chunks are uploaded.
                         sData->state = astate_read_response;
                         sData->return_type = ret_complete;
                         sData->request.dataIndex = 0;
@@ -230,12 +228,14 @@ private:
                     }
                     else if (ret == 1)
                     {
+                        // There are more chunks to upload.
                         sData->return_type = ret_continue;
                         return sData->return_type;
                     }
                 }
                 else if (sData->request.payloadIndex < size)
                 {
+                    // There are more chunks to upload.
                     sData->return_type = ret_continue;
                     return sData->return_type;
                 }
@@ -392,6 +392,7 @@ private:
             String _host = sData->request.getHost(false, nullptr, &ext);
             if (sman.connect(sData, _host.c_str(), sData->request.port) > ret_failure)
             {
+                // Get the request header to perform the ranges upload (resumable).
                 sut.clear(sData->request.val[reqns::payload]);
                 sData->request.file_data.resumable.getHeader(sData->request.val[reqns::header], _host, ext);
                 sData->state = astate_send_header;
@@ -467,13 +468,15 @@ private:
                             // Data available from sse event
                             if (sData->response.flags.sse && payload->length())
                             {
-
                                 if (payload->indexOf("event: ") > -1 && payload->indexOf("data: ") > -1 && payload->indexOf("\n") > -1)
                                 {
-                                    // Prevent sse timeout due to large sse Stream playload
+                                    // Prevent sse timed out due to large sse Stream playload
+                                    // This is not prevent the timed out from user blocking code and delay.
                                     feedSSETimer(&sData->aResult.rtdbResult);
 
                                     uint32_t len = payload->length();
+
+                                    // The event data was received while more data (events) are available.
                                     bool partial = (*payload)[len - 1] == '\n' && ((len > 2 && (*payload)[len - 2] == '}') || (len > 3 && (*payload)[len - 3] == '}'));
 
                                     if (((*payload)[len - 1] == '\n' && sData->response.tcpAvailable() == 0) || partial)
@@ -511,13 +514,14 @@ private:
     {
         if (sData->response.flags.header_remaining)
         {
+            // Read and parse for the specific headers.
             if (sData->response.readHeader(sData->sse, !sData->auth_used, sData->upload))
             {
 #if defined(ENABLE_CLOUD_STORAGE)
                 if (sData->upload)
-                    sData->response.parseHeaders(sData->request.file_data.resumable.getLocationRef(), "Location");
+                    sData->response.parseHeaders(sData->request.file_data.resumable.getLocationRef(), "Location"); // Resumable upload url
 #else
-                sData->response.parseHeaders(sData->response.val[resns::location], "Location");
+                sData->response.parseHeaders(sData->response.val[resns::location], "Location"); // Redirect url
 #endif
                 resETag = sData->response.val[resns::etag];
                 sData->aResult.val[ares_ns::res_etag] = sData->response.val[resns::etag];
@@ -540,8 +544,8 @@ private:
         }
     }
 
-    // Handles response payload read process.
-    // Write raw or base64 decoded response to file, blob, and flash (OTA).
+    // Handles response payload reading process.
+    // Write raw or base64 decoded response payload to file, blob, and flash (OTA).
     bool readPayload(async_data *sData)
     {
         uint8_t *buf = nullptr;
@@ -562,7 +566,7 @@ private:
                     int res = sData->response.decodeChunks(&temp);
                     if (temp.length())
                     {
-                        reserveString(sData);
+                        reserveString(sData); // Work around for large string concatenation issue.
                         sData->response.val[resns::payload] += temp;
                     }
 
@@ -615,15 +619,19 @@ private:
                             int toRead = 0, read = 0;
                             uint8_t ofs = 0;
 
-                            // Due to the size of data returns from the SSL Client receive buffer may be varied.
-                            // The following special process will provide the data that is proper to decode in case base64.
+                            // Due to the size of data returns from the SSL Client buffer may be varied and is not suitable for base64 decoder.
+                            // The following process will read the data as a chunk of multiple of 4 bytes (FIREBASE_CHUNK_SIZE)
+                            // that is suitable for the base64 decoder.
                             buf = asyncBase64Buffer(sData, mem, read, toRead);
 
+                            // There is more bytes (base64) to read and fill in to the chunk buffer.
                             if (sData->response.toFillLen)
                                 return true;
 
+                            // No base64 data read? Read the new data (base64 encoded or unencoded) with the expected length.
                             if (!buf)
                             {
+                                // if base64, skip the double quote at the beginning of string response payload (in Realtime Database)
                                 ofs = sData->request.base64 && sData->response.payloadRead == 0 ? 1 : 0;
                                 toRead = (int)(sData->response.payloadLen - sData->response.payloadRead) > FIREBASE_CHUNK_SIZE + ofs ? FIREBASE_CHUNK_SIZE + ofs : sData->response.payloadLen - sData->response.payloadRead;
                                 buf = reinterpret_cast<uint8_t *>(mem.alloc(toRead));
@@ -634,6 +642,9 @@ private:
                             {
                                 if (sData->request.base64 && read < toRead)
                                 {
+                                    // If the read data (base64 encoded) is still less than the size we expected,
+                                    // save it in a larger chunk buffer (response.toFill) and keep the offset and 
+                                    // length of the new incoming base64 data to be filled.
                                     sData->response.toFillIndex += read;
                                     sData->response.toFillLen = toRead - read;
                                     sData->response.toFill = reinterpret_cast<uint8_t *>(mem.alloc(toRead));
@@ -732,8 +743,7 @@ private:
                         String temp;
                         size_t len = sData->response.readLine(&temp);
                         sData->response.payloadRead += len;
-                        // The work around for the large string buffer allocation.
-                        reserveString(sData);
+                        reserveString(sData); // Work around for large string concatenation issue.
                         sData->response.val[resns::payload] += temp;
                     }
                 }
@@ -804,13 +814,17 @@ private:
 #endif
     }
 
-    // Non-blocking memory buffer for collecting the data (multiple of 4 bytes) that prepared for base64 decoding
     uint8_t *asyncBase64Buffer(async_data *sData, Memory &mem, int &toRead, int &read)
     {
         uint8_t *buf = nullptr;
+        // If the chunk buffer was previously allocated and more bytes are required to fill.
         if (sData->request.base64 && sData->response.toFill && sData->response.toFillLen)
         {
+            // Read the data with expected length to the chunk buffer at the specific offset.
             int currentRead = sData->response.tcpRead(sData->response.toFill + sData->response.toFillIndex, sData->response.toFillLen);
+
+            // All bytes are filled, allocate the output buffer
+            // and copy the data from the chunk buffer.
             if (currentRead == sData->response.toFillLen)
             {
                 buf = reinterpret_cast<uint8_t *>(mem.alloc(sData->response.toFillIndex + sData->response.toFillLen));
@@ -823,6 +837,7 @@ private:
             }
             else
             {
+                // There are still more bytes that is remaining to read.
                 sData->response.toFillIndex += currentRead;
                 sData->response.toFillLen -= currentRead;
             }
@@ -845,7 +860,7 @@ private:
         {
             if (eventResumeStatus(&sData->aResult.rtdbResult) == event_resume_status_undefined)
             {
-                // In case Stream timed out,
+                // In case Stream was timed out,
                 // we have to clear app data (available), reset the last error and set the Stream time out error.
                 sData->aResult.lastError.reset();
                 clearAppData(sData->aResult.app_data);
