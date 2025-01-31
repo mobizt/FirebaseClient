@@ -58,15 +58,16 @@ private:
 
     function_return_type sendHeader(async_data *sData, const char *data)
     {
-        return send(sData, reinterpret_cast<const uint8_t *>(data), data ? strlen(data) : 0, data ? strlen(data) : 0, astate_send_header);
+        return sendImpl(sData, reinterpret_cast<const uint8_t *>(data), data ? strlen(data) : 0, data ? strlen(data) : 0, astate_send_header);
     }
 
     function_return_type sendHeader(async_data *sData, const uint8_t *data, size_t len)
     {
-        return send(sData, data, len, len, astate_send_header);
+        return sendImpl(sData, data, len, len, astate_send_header);
     }
 
-    function_return_type sendBuff(async_data *sData, async_state state = astate_send_payload)
+    // Handles file raw, base64 and resumable data sending process.
+    function_return_type sendFileData(async_data *sData, async_state state = astate_send_payload)
     {
         function_return_type ret = ret_continue;
 
@@ -90,7 +91,7 @@ private:
 #endif
             if (sData->request.base64)
             {
-                ret = send(sData, reinterpret_cast<const uint8_t *>("\""), 1, totalLen, astate_send_payload);
+                ret = sendImpl(sData, reinterpret_cast<const uint8_t *>("\""), 1, totalLen, astate_send_payload);
                 if (ret != ret_continue)
                     return ret;
             }
@@ -170,10 +171,10 @@ private:
                 sData->request.file_data.data_pos += toSend;
             }
 
-            ret = send(sData, buf, toSend, totalLen, astate_send_payload);
+            ret = sendImpl(sData, buf, toSend, totalLen, astate_send_payload);
         }
         else if (sData->request.base64)
-            ret = send(sData, reinterpret_cast<const uint8_t *>("\""), 1, totalLen, astate_send_payload);
+            ret = sendImpl(sData, reinterpret_cast<const uint8_t *>("\""), 1, totalLen, astate_send_payload);
 
 #if defined(ENABLE_FS)
     exit:
@@ -184,13 +185,14 @@ private:
 
         return ret;
     }
-
+    // Handles string data sending process.
     function_return_type send(async_data *sData, const char *data, async_state state = astate_send_payload)
     {
-        return send(sData, reinterpret_cast<const uint8_t *>(data), data ? strlen(data) : 0, data ? strlen(data) : 0, state);
+        return sendImpl(sData, reinterpret_cast<const uint8_t *>(data), data ? strlen(data) : 0, data ? strlen(data) : 0, state);
     }
 
-    function_return_type send(async_data *sData, const uint8_t *data, size_t len, size_t size, async_state state = astate_send_payload)
+    // Handles raw data sending process.
+    function_return_type sendImpl(async_data *sData, const uint8_t *data, size_t len, size_t size, async_state state = astate_send_payload)
     {
         sData->state = state;
         if (data && len && sman.client)
@@ -284,24 +286,37 @@ private:
         return sData->return_type;
     }
 
+    // Handles TCP data sending process.
     function_return_type send(async_data *sData)
     {
-        function_return_type ret = sman.networkConnect(sData);
+        function_return_type ret = sman.networkConnect(sData); // Check the network status and re-connect
 
         if (ret != ret_complete)
             return ret;
 
         ret = ret_continue;
 
-        if (sData->state == astate_undefined || sData->state == astate_send_header)
+        if (sData->state == astate_undefined || sData->state == astate_send_header) // Initial connection or payload sending state.
         {
+            // Auth token checking
+            if (!sData->auth_used && sData->request.app_token &&
+                sData->request.app_token->auth_data_type != user_auth_data_no_token &&
+                sData->request.app_token->val[app_tk_ns::token].length() == 0)
+            {
+                // Missing auth token error.
+                sman.setAsyncError(sData, sData->state, FIREBASE_ERROR_UNAUTHENTICATE, !sData->sse, false);
+                return ret_failure;
+            }
+
+            // Stop the server connection when entering the initial/auth token request states or host, port, and SSE mode changes or session timed out.
             sman.newCon(sData, sData->request.getHost(true, &sData->response.val[resns::location]).c_str(), sData->request.port);
 
             if ((sman.client_type == tcpc_sync && !sman.conn.isConnected()) || sman.client_type == tcpc_async)
             {
+                // Connect to the server if not connected.
                 ret = sman.connect(sData, sData->request.getHost(true, &sData->response.val[resns::location]).c_str(), sData->request.port);
 
-                // allow non-blocking async tcp connection
+                // Allowing non-blocking async tcp connection
                 if (ret == ret_continue)
                     return ret;
 
@@ -314,22 +329,17 @@ private:
 
             if (sData->upload)
                 sData->upload_progress_enabled = false;
-
-            if (sData->request.app_token && sData->request.app_token->auth_data_type != user_auth_data_no_token)
+            // Non-auth task header sending.
+            if (!sData->auth_used && sData->request.app_token && sData->request.app_token->auth_data_type != user_auth_data_no_token)
             {
-                if (sData->request.app_token->val[app_tk_ns::token].length() == 0)
-                {
-                    // Missing auth token error.
-                    sman.setAsyncError(sData, sData->state, FIREBASE_ERROR_UNAUTHENTICATE, !sData->sse, false);
-                    return ret_failure;
-                }
-
+                // Set the auth token to the end point uri or authorization header when it is available.
                 header = sData->request.val[reqns::header];
                 header.replace(FIREBASE_AUTH_PLACEHOLDER, sData->request.app_token->val[app_tk_ns::token]);
                 ret = sendHeader(sData, header.c_str());
                 sut.clear(header);
                 return ret;
             }
+            // Auth task header sending.
             return sendHeader(sData, sData->request.val[reqns::header].c_str());
         }
         else if (sData->state == astate_send_payload)
@@ -346,9 +356,9 @@ private:
                 else if (sData->upload)
                 {
                     if (sData->request.data && sData->request.dataLen)
-                        ret = send(sData, sData->request.data, sData->request.dataLen, sData->request.dataLen);
+                        ret = sendImpl(sData, sData->request.data, sData->request.dataLen, sData->request.dataLen);
                     else
-                        ret = sendBuff(sData);
+                        ret = sendFileData(sData);
                 }
             }
         }
@@ -357,7 +367,7 @@ private:
 
     function_return_type receive(async_data *sData)
     {
-        function_return_type ret = sman.networkConnect(sData);
+        function_return_type ret = sman.networkConnect(sData); // Check the network status and re-connect
 
         if (ret != ret_complete)
             return ret;
@@ -370,16 +380,16 @@ private:
             return ret_failure;
         }
 
-        if (sData->response.httpCode == 0)
+        if (sData->response.httpCode == 0) // No responses.
             return ret_continue;
 
 #if defined(ENABLE_CLOUD_STORAGE)
 
         if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.getLocation().length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
+            // Connect to the new upload location on the same host.
             String ext;
             String _host = sData->request.getHost(false, &sData->response.val[resns::location], &ext);
-
             if (sman.connect(sData, _host.c_str(), sData->request.port) > ret_failure)
             {
                 sut.clear(sData->request.val[reqns::payload]);
@@ -393,10 +403,10 @@ private:
 #else
         if (sData->response.val[resns::location].length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
+            // Hadles redirection (stop and connect).
             String ext;
             String _host = sData->request.getHost(false, &sData->response.val[resns::location], &ext);
             conn.stop();
-
             if (conn.connect(_host.c_str(), sData->request.port) > ret_failure)
             {
                 URLUtil uut;
@@ -496,6 +506,7 @@ private:
         return true;
     }
 
+    // Handles response header read process.
     void readHeader(async_data *sData)
     {
         if (sData->response.flags.header_remaining)
@@ -515,7 +526,6 @@ private:
 #if defined(ENABLE_DATABASE)
                 setNullETagOption(&sData->aResult.rtdbResult, sData->response.val[resns::etag].indexOf("null_etag") > -1);
 #endif
-
 #if defined(ENABLE_CLOUD_STORAGE)
                 if (sData->upload && sData->request.file_data.resumable.isEnabled())
                 {
@@ -530,6 +540,8 @@ private:
         }
     }
 
+    // Handles response payload read process.
+    // Write raw or base64 decoded response to file, blob, and flash (OTA).
     bool readPayload(async_data *sData)
     {
         uint8_t *buf = nullptr;
@@ -538,9 +550,11 @@ private:
         {
             sData->response.feedTimer(!sData->async && sync_read_timeout_sec > 0 ? sync_read_timeout_sec : -1);
 
-            // the next chunk data is the payload
+            // The next chunk data is the payload
             if (sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
             {
+                // Handles Chunked transfer encoding payload.
+                // Text only (not applicable for other mime data)
                 if (sData->response.flags.chunks)
                 {
                     // Use temporary String buffer for decodeChunks
@@ -557,10 +571,14 @@ private:
                 }
                 else
                 {
+                    // Raw text and byte array payloads.
+                    // Content length is not available for SSE Stream.
                     if (sData->download)
                     {
+                        // The content length header must be set for Byte array payload.
                         if (sData->response.payloadLen)
                         {
+                            // At the beginning step, preparing file, tempolary blob data buffer and flash (OTA) to write.
                             if (sData->response.payloadRead == 0)
                             {
                                 if (sData->request.ota)
@@ -597,6 +615,8 @@ private:
                             int toRead = 0, read = 0;
                             uint8_t ofs = 0;
 
+                            // Due to the size of data returns from the SSL Client receive buffer may be varied.
+                            // The following special process will provide the data that is proper to decode in case base64.
                             buf = asyncBase64Buffer(sData, mem, read, toRead);
 
                             if (sData->response.toFillLen)
@@ -622,8 +642,9 @@ private:
                                 }
 
                                 sData->response.payloadRead += read;
-                                if (sData->request.base64)
+                                if (sData->request.base64) // Base64 encoded response payload
                                 {
+                                    // Write to flash (OTA).
                                     otaut.getPad(buf + ofs, read, sData->request.b64Pad);
                                     if (sData->request.ota)
                                     {
@@ -649,7 +670,7 @@ private:
 #if defined(ENABLE_FS)
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                     {
-
+                                         // Write to file.
                                         if (!b64ut.decodeToFile(mem, sData->request.file_data.file, reinterpret_cast<const char *>(buf + ofs)))
                                         {
                                             // File write error.
@@ -661,8 +682,9 @@ private:
                                     else
                                         b64ut.decodeToBlob(mem, &sData->request.file_data.outB, reinterpret_cast<const char *>(buf + ofs));
                                 }
-                                else
+                                else // Raw byte array response payload
                                 {
+                                    // To write flash (OTA)
                                     if (sData->request.ota)
                                     {
                                         b64ut.updateWrite(buf, read);
@@ -681,6 +703,7 @@ private:
 #if defined(ENABLE_FS)
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
                                     {
+                                        // To write file.
                                         int write = sData->request.file_data.file.write(buf, read);
                                         if (write < read)
                                         {
@@ -705,10 +728,11 @@ private:
                     }
                     else
                     {
-                        // Use temporary String buffer for readLine
+                        // Use temporary String buffer for the text response payload.
                         String temp;
                         size_t len = sData->response.readLine(&temp);
                         sData->response.payloadRead += len;
+                        // The work around for the large string buffer allocation.
                         reserveString(sData);
                         sData->response.val[resns::payload] += temp;
                     }
@@ -784,27 +808,23 @@ private:
     uint8_t *asyncBase64Buffer(async_data *sData, Memory &mem, int &toRead, int &read)
     {
         uint8_t *buf = nullptr;
-
-        if (sData->request.base64)
+        if (sData->request.base64 && sData->response.toFill && sData->response.toFillLen)
         {
-            if (sData->response.toFill && sData->response.toFillLen)
+            int currentRead = sData->response.tcpRead(sData->response.toFill + sData->response.toFillIndex, sData->response.toFillLen);
+            if (currentRead == sData->response.toFillLen)
             {
-                int currentRead = sData->response.tcpRead(sData->response.toFill + sData->response.toFillIndex, sData->response.toFillLen);
-                if (currentRead == sData->response.toFillLen)
-                {
-                    buf = reinterpret_cast<uint8_t *>(mem.alloc(sData->response.toFillIndex + sData->response.toFillLen));
-                    memcpy(buf, sData->response.toFill, sData->response.toFillIndex + sData->response.toFillLen);
-                    mem.release(&sData->response.toFill);
-                    read = sData->response.toFillLen + sData->response.toFillIndex;
-                    toRead = read;
-                    sData->response.toFillIndex = 0;
-                    sData->response.toFillLen = 0;
-                }
-                else
-                {
-                    sData->response.toFillIndex += currentRead;
-                    sData->response.toFillLen -= currentRead;
-                }
+                buf = reinterpret_cast<uint8_t *>(mem.alloc(sData->response.toFillIndex + sData->response.toFillLen));
+                memcpy(buf, sData->response.toFill, sData->response.toFillIndex + sData->response.toFillLen);
+                mem.release(&sData->response.toFill);
+                read = sData->response.toFillLen + sData->response.toFillIndex;
+                toRead = read;
+                sData->response.toFillIndex = 0;
+                sData->response.toFillLen = 0;
+            }
+            else
+            {
+                sData->response.toFillIndex += currentRead;
+                sData->response.toFillLen -= currentRead;
             }
         }
         return buf;
