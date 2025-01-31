@@ -11,6 +11,7 @@ struct app_progress_t
     friend class download_data_t;
     friend class upload_data_t;
     friend class AsyncClientClass;
+     friend class SlotManager;
 
 protected:
     void reset(app_progress_t &app_progress) { app_progress.reset(); }

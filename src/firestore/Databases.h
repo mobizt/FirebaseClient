@@ -42,7 +42,6 @@ namespace Firestore
         friend class AppBase;
 
     public:
-    
         using Parent = Firestore::Parent;
 
         ~Databases() {}

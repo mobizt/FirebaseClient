@@ -12,11 +12,11 @@ public:
 protected:
     void setResultUID(AsyncResult *aResult, const String &uid) { aResult->val[ares_ns::res_uid] = uid; }
     void setRVec(AsyncResult *aResult, uint32_t addr) { aResult->rvec_addr = addr; }
-    std::vector<uint32_t> &getRVec(AsyncClientClass *aClient) { return aClient->rVec; }
-    app_debug_t *getAppDebug(AsyncClientClass *aClient) { return &aClient->app_debug; }
+    std::vector<uint32_t> &getRVec(AsyncClientClass *aClient) { return aClient->getResultList(); }
+    app_debug_t *getAppDebug(AsyncClientClass *aClient) { return &aClient->getAppDebug(); }
     void resultSetDebug(AsyncResult *aResult, app_debug_t *app_debug) { aResult->app_debug = app_debug; }
     void resultSetEvent(AsyncResult *aResult, app_event_t *app_event) { aResult->app_event = app_event; }
-    app_event_t *getAppEvent(AsyncClientClass *aClient) { return &aClient->app_event; }
+    app_event_t *getAppEvent(AsyncClientClass *aClient) { return &aClient->getAppEvent(); }
     void stopAsync(AsyncClientClass *aClient) { aClient->stop(); }
     async_data *createSlotBase(AsyncClientClass *aClient, slot_options_t &soption)
     {
@@ -31,7 +31,7 @@ protected:
     void setContentLengthBase(AsyncClientClass *aClient, async_data *sData, size_t len) { sData->request.setContentLength(len); }
     void handleRemoveBase(AsyncClientClass *aClient) { aClient->handleRemove(); }
     void removeSlotBase(AsyncClientClass *aClient, uint8_t slot, bool sse = true) { aClient->removeSlot(slot, sse); }
-    size_t slotCountBase(AsyncClientClass *aClient) { return aClient->sVec.size(); }
+    size_t slotCountBase(AsyncClientClass *aClient) { return aClient->slotCount(); }
     void setLastErrorBase(AsyncResult *aResult, int code, const String &message)
     {
         if (aResult)

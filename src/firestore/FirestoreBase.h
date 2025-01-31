@@ -46,10 +46,7 @@ public:
 
     ~FirestoreBase() {}
 
-    explicit FirestoreBase(const String &url = "")
-    {
-        this->service_url = url;
-    };
+    explicit FirestoreBase(const String &url = "") { this->service_url = url; }
 
     FirestoreBase &operator=(const FirestoreBase &rhs)
     {

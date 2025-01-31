@@ -81,6 +81,7 @@ class FirebaseError
     friend class Storage;
     friend class CloudStorage;
     friend class FirebaseApp;
+    friend class SlotManager;
 
 private:
     app_error_t err;

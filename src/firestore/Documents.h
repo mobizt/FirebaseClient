@@ -111,10 +111,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        void batchGet(AsyncClientClass &aClient, const Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResult &aResult)
-        {
-            batchGetDoc(aClient, &aResult, NULL, "", parent, batchOptions, true);
-        }
+        void batchGet(AsyncClientClass &aClient, const Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResult &aResult) { batchGetDoc(aClient, &aResult, NULL, "", parent, batchOptions, true); }
 
         /** Gets multiple documents.
          *
@@ -147,10 +144,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        void batchGet(AsyncClientClass &aClient, const Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResultCallback cb, const String &uid = "")
-        {
-            batchGetDoc(aClient, nullptr, cb, uid, parent, batchOptions, true);
-        }
+        void batchGet(AsyncClientClass &aClient, const Parent &parent, const BatchGetDocumentOptions &batchOptions, AsyncResultCallback cb, const String &uid = "") { batchGetDoc(aClient, nullptr, cb, uid, parent, batchOptions, true); }
 
         /** Applies a batch of write operations.
          *
@@ -190,10 +184,7 @@ namespace Firestore
          * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
          *
          */
-        void batchWrite(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResult &aResult)
-        {
-            batchWriteDoc(aClient, &aResult, NULL, "", parent, writes, true);
-        }
+        void batchWrite(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResult &aResult) { batchWriteDoc(aClient, &aResult, NULL, "", parent, writes, true); }
 
         /** Applies a batch of write operations.
          *
@@ -211,10 +202,7 @@ namespace Firestore
          * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
          *
          */
-        void batchWrite(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
-        {
-            batchWriteDoc(aClient, nullptr, cb, uid, parent, writes, true);
-        }
+        void batchWrite(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "") { batchWriteDoc(aClient, nullptr, cb, uid, parent, writes, true); }
 
         /** Starts a new transaction.
          *
@@ -272,10 +260,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void beginTransaction(AsyncClientClass &aClient, const Parent &parent, const TransactionOptions &transOptions, AsyncResult &aResult)
-        {
-            beginTrans(aClient, &aResult, NULL, "", parent, transOptions, true);
-        }
+        void beginTransaction(AsyncClientClass &aClient, const Parent &parent, const TransactionOptions &transOptions, AsyncResult &aResult) { beginTrans(aClient, &aResult, NULL, "", parent, transOptions, true); }
 
         /** Starts a new transaction.
          *
@@ -303,10 +288,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void beginTransaction(AsyncClientClass &aClient, const Parent &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "")
-        {
-            beginTrans(aClient, nullptr, cb, uid, parent, transOptions, true);
-        }
+        void beginTransaction(AsyncClientClass &aClient, const Parent &parent, const TransactionOptions &transOptions, AsyncResultCallback cb, const String &uid = "") { beginTrans(aClient, nullptr, cb, uid, parent, transOptions, true); }
 
         /** Commits a transaction, while optionally updating documents.
          *
@@ -343,10 +325,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void commit(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResult &aResult)
-        {
-            commitDoc(aClient, &aResult, NULL, "", parent, writes, true);
-        }
+        void commit(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResult &aResult) { commitDoc(aClient, &aResult, NULL, "", parent, writes, true); }
 
         /** Commits a transaction, while optionally updating documents.
          *
@@ -363,10 +342,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void commit(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "")
-        {
-            commitDoc(aClient, nullptr, cb, uid, parent, writes, true);
-        }
+        void commit(AsyncClientClass &aClient, const Parent &parent, Writes &writes, AsyncResultCallback cb, const String &uid = "") { commitDoc(aClient, nullptr, cb, uid, parent, writes, true); }
 
         /** Create a document at the defined document path.
          *
@@ -480,10 +456,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult)
-        {
-            createDoc(aClient, &aResult, NULL, "", parent, collectionId, documentId, mask, document, true);
-        }
+        void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResult &aResult) { createDoc(aClient, &aResult, NULL, "", parent, collectionId, documentId, mask, document, true); }
 
         /** Create a document in the defined collection id.
          *
@@ -503,10 +476,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
-        {
-            createDoc(aClient, nullptr, cb, uid, parent, collectionId, documentId, mask, document, true);
-        }
+        void createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "") { createDoc(aClient, nullptr, cb, uid, parent, collectionId, documentId, mask, document, true); }
 
         /** Delete a document at the defined path.
          *
@@ -558,10 +528,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void deleteDoc(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult)
-        {
-            deleteDocBase(aClient, &aResult, NULL, "", parent, documentPath, currentDocument, true);
-        }
+        void deleteDoc(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResult &aResult) { deleteDocBase(aClient, &aResult, NULL, "", parent, documentPath, currentDocument, true); }
 
         /** Delete a document at the defined path.
          *
@@ -586,10 +553,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void deleteDoc(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "")
-        {
-            deleteDocBase(aClient, nullptr, cb, uid, parent, documentPath, currentDocument, true);
-        }
+        void deleteDoc(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const Precondition &currentDocument, AsyncResultCallback cb, const String &uid = "") { deleteDocBase(aClient, nullptr, cb, uid, parent, documentPath, currentDocument, true); }
 
         /** Get a document at the defined path.
          *
@@ -636,10 +600,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult)
-        {
-            getDoc(aClient, &aResult, NULL, "", parent, documentPath, options, true);
-        }
+        void get(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResult &aResult) { getDoc(aClient, &aResult, NULL, "", parent, documentPath, options, true); }
 
         /** Get a document at the defined path.
          *
@@ -661,10 +622,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void get(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "")
-        {
-            getDoc(aClient, nullptr, cb, uid, parent, documentPath, options, true);
-        }
+        void get(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const GetDocumentOptions &options, AsyncResultCallback cb, const String &uid = "") { getDoc(aClient, nullptr, cb, uid, parent, documentPath, options, true); }
 
         /** List the documents in the defined documents collection.
          *
@@ -716,10 +674,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult)
-        {
-            listDocs(aClient, &aResult, NULL, "", parent, collectionId, listDocsOptions, true);
-        }
+        void list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions, AsyncResult &aResult) { listDocs(aClient, &aResult, NULL, "", parent, collectionId, listDocsOptions, true); }
 
         /** List the documents in the defined documents collection.
          *
@@ -744,10 +699,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const ListDocumentsOptions &listDocsOptions, AsyncResultCallback cb, const String &uid = "")
-        {
-            listDocs(aClient, nullptr, cb, uid, parent, collectionId, listDocsOptions, true);
-        }
+        void list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, const ListDocumentsOptions &listDocsOptions, AsyncResultCallback cb, const String &uid = "") { listDocs(aClient, nullptr, cb, uid, parent, collectionId, listDocsOptions, true); }
 
         /** List the document collection ids in the defined document path.
          *
@@ -795,10 +747,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        void listCollectionIds(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult)
-        {
-            listCollIds(aClient, &aResult, NULL, "", parent, documentPath, listCollectionIdsOptions, true);
-        }
+        void listCollectionIds(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions, AsyncResult &aResult) { listCollIds(aClient, &aResult, NULL, "", parent, documentPath, listCollectionIdsOptions, true); }
 
         /** List the document collection ids in the defined document path.
          *
@@ -821,10 +770,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        void listCollectionIds(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const ListCollectionIdsOptions &listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "")
-        {
-            listCollIds(aClient, nullptr, cb, uid, parent, documentPath, listCollectionIdsOptions, true);
-        }
+        void listCollectionIds(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const ListCollectionIdsOptions &listCollectionIdsOptions, AsyncResultCallback cb, const String &uid = "") { listCollIds(aClient, nullptr, cb, uid, parent, documentPath, listCollectionIdsOptions, true); }
 
         /** Patch or update a document at the defined path.
          *
@@ -894,10 +840,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult)
-        {
-            patchDoc(aClient, &aResult, NULL, "", parent, documentPath, patchOptions, document, true);
-        }
+        void patch(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResult &aResult) { patchDoc(aClient, &aResult, NULL, "", parent, documentPath, patchOptions, document, true); }
 
         /** Patch or update a document at the defined path.
          *
@@ -931,10 +874,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        void patch(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "")
-        {
-            patchDoc(aClient, nullptr, cb, uid, parent, documentPath, patchOptions, document, true);
-        }
+        void patch(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, AsyncResultCallback cb, const String &uid = "") { patchDoc(aClient, nullptr, cb, uid, parent, documentPath, patchOptions, document, true); }
 
         /** Rolls back a transaction.
          *
@@ -966,10 +906,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void rollback(AsyncClientClass &aClient, const Parent &parent, const String &transaction, AsyncResult &aResult)
-        {
-            transRollback(aClient, &aResult, NULL, "", parent, transaction, true);
-        }
+        void rollback(AsyncClientClass &aClient, const Parent &parent, const String &transaction, AsyncResult &aResult) { transRollback(aClient, &aResult, NULL, "", parent, transaction, true); }
 
         /** Rolls back a transaction.
          *
@@ -984,10 +921,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        void rollback(AsyncClientClass &aClient, const Parent &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "")
-        {
-            transRollback(aClient, nullptr, cb, uid, parent, transaction, true);
-        }
+        void rollback(AsyncClientClass &aClient, const Parent &parent, const String &transaction, AsyncResultCallback cb, const String &uid = "") { transRollback(aClient, nullptr, cb, uid, parent, transaction, true); }
 
 #if defined(ENABLE_FIRESTORE_QUERY)
 
@@ -1048,10 +982,7 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        void runQuery(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult)
-        {
-            runQueryImpl(aClient, &aResult, NULL, "", parent, documentPath, queryOptions, true);
-        }
+        void runQuery(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, QueryOptions queryOptions, AsyncResult &aResult) { runQueryImpl(aClient, &aResult, NULL, "", parent, documentPath, queryOptions, true); }
 
         /** Runs a query.
          *
@@ -1079,16 +1010,10 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        void runQuery(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const QueryOptions &queryOptions, AsyncResultCallback cb, const String &uid = "")
-        {
-            runQueryImpl(aClient, nullptr, cb, uid, parent, documentPath, queryOptions, true);
-        }
+        void runQuery(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const QueryOptions &queryOptions, AsyncResultCallback cb, const String &uid = "") { runQueryImpl(aClient, nullptr, cb, uid, parent, documentPath, queryOptions, true); }
 
 #endif
-
-    private:
     };
-
 }
 #endif
 #endif

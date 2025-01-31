@@ -96,10 +96,7 @@ public:
      *
      * @param fieldPaths The list of field paths in the mask. See Document.fields (https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents#Document.FIELDS.fields) for a field path syntax reference.
      */
-    explicit DocumentMask(const String &fieldPaths = "")
-    {
-        setFieldPaths(fieldPaths);
-    }
+    explicit DocumentMask(const String &fieldPaths = "") { setFieldPaths(fieldPaths); }
 
     /**
      * A set of field paths on a document.

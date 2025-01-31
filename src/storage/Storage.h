@@ -1,5 +1,5 @@
 /**
- * 2025-01-30
+ * 2025-01-31
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -509,7 +509,7 @@ private:
         request.aClient->addRemoveClientVec(reinterpret_cast<uint32_t>(&(cVec)), true);
 
         if (request.aResult)
-            sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->rVec)));
+            sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->getResultList())));
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();

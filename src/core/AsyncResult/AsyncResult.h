@@ -39,6 +39,7 @@ class AsyncResult : public ResultBase, RealtimeDatabaseResult
     friend class FirestoreBase;
     friend class FirestoreDocuments;
     friend class async_data;
+    friend class SlotManager;
 
     struct download_data_t
     {

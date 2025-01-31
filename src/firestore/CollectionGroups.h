@@ -39,9 +39,8 @@ namespace Firestore
     class CollectionGroups : public FirestoreBase
     {
     public:
+        using Parent = Firestore::Parent;
 
-     using Parent = Firestore::Parent;
-     
         CollectionGroups() {}
 
         class Indexes : public FirestoreBase

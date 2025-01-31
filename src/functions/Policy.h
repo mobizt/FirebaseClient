@@ -163,7 +163,5 @@ namespace IAMPolicy
         Policy &etag(const String &value) { return wr.set<Policy &, String>(*this, value, buf, bufSize, 4, FPSTR(__func__)); }
     };
 }
-
 #endif
-
 #endif

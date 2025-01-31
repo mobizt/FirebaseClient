@@ -79,7 +79,6 @@ namespace GoogleCloudStorage
 
     struct BaseOptions : public BaseO8
     {
-
     protected:
         ObjectWriter owriter;
         URLUtil uut;
@@ -134,7 +133,6 @@ namespace GoogleCloudStorage
 
     struct GetOptions : public BaseOptions
     {
-
     public:
         BaseOptions &projection(PROJECTION_OPTIONS value)
         {
@@ -156,7 +154,6 @@ namespace GoogleCloudStorage
 
     struct InsertOptions : public BaseO10
     {
-
     private:
         ObjectWriter owriter;
         StringUtil sut;
@@ -244,7 +241,6 @@ namespace GoogleCloudStorage
 
     struct ListOptions : public BaseO10
     {
-
     private:
         ObjectWriter owriter;
         URLUtil uut;
@@ -388,7 +384,6 @@ namespace GoogleCloudStorage
 
     class DataOptions
     {
-
     public:
         String payload, extras;
         Parent parent;
@@ -437,7 +432,5 @@ namespace GoogleCloudStorage
         }
     };
 }
-
 #endif
-
 #endif
