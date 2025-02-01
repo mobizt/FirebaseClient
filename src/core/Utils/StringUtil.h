@@ -5,6 +5,7 @@
 #include <Client.h>
 #include "./Config.h"
 #include <type_traits>
+#include <stdarg.h> 
 
 #if defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_MINIMA) || defined(ARDUINO_PORTENTA_C33)
 #define FIREBASE_STRSEP strsepImpl
