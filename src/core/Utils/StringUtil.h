@@ -119,7 +119,7 @@ public:
         va_start(va, format);
         vsnprintf(s, size, format, va);
         va_end(va);
-        buff += s;
+        buff += String(s);
     }
     void addParams(const String &src, String &dest)
     {
