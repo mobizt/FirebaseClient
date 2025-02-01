@@ -80,9 +80,6 @@ private:
         if (progressVec.size())
             progressVec[0].read = true;
     }
-
-public:
-    // void clear() { reset(); }
 };
 
 #endif

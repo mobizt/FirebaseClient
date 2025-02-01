@@ -1,5 +1,5 @@
 /**
- * 2025-01-31
+ * 2025-02-02
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -31,14 +31,14 @@ using namespace firebase_ns;
 
 #if defined(ENABLE_MESSAGING)
 #include "./messaging/DataOptions.h"
-class Messaging
+
+class Messaging : public AppBase
 {
     friend class AppBase;
 
 public:
-    std::vector<uint32_t> cVec; // AsyncClient vector
-
     ~Messaging() {}
+
     explicit Messaging(const String &url = "") { this->service_url = url; }
 
     Messaging &operator=(const Messaging &rhs)
@@ -51,30 +51,13 @@ public:
     /**
      * Unbind or remove the FirebaseApp
      */
-    void resetApp()
-    {
-        this->app_addr = 0;
-        this->app_token = nullptr;
-        this->avec_addr = 0; // AsyncClient vector (list) address
-        this->ul_dl_task_running_addr = 0;
-    }
+    void resetApp() { resetAppImpl(); }
 
     /**
      * Perform the async task repeatedly.
      * Should be placed in main loop function.
      */
-    void loop()
-    {
-        for (size_t i = 0; i < cVec.size(); i++)
-        {
-            AsyncClientClass *client = reinterpret_cast<AsyncClientClass *>(cVec[i]);
-            if (client)
-            {
-                client->process(true);
-                client->handleRemove();
-            }
-        }
-    }
+    void loop() { loopImpl(); }
 
     /** Send Firebase Cloud Messaging to the devices using the FCM HTTP v1 API.
      *
@@ -88,11 +71,7 @@ public:
      *
      * Read more details about HTTP v1 API here https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
      */
-    String send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, message.c_str(), Messages::fcm_send, false);
-        return aClient.getResult()->c_str();
-    }
+    String send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, message.c_str(), Messages::fcm_send, false)->c_str(); }
 
     /** Send a message to specified target (a registration token, topic or condition) with HTTP v1 API.
      *
@@ -106,10 +85,7 @@ public:
      *
      * Read more details about HTTP v1 API here https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
      */
-    void send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, message.c_str(), Messages::fcm_send, true);
-    }
+    void send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, message.c_str(), Messages::fcm_send, true); }
 
     /** Send a message to specified target (a registration token, topic or condition) with HTTP v1 API.
      *
@@ -124,42 +100,12 @@ public:
      *
      * Read more details about HTTP v1 API here https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
      */
-    void send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, message.c_str(), Messages::fcm_send, true);
-    }
+    void send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, message.c_str(), Messages::fcm_send, true); }
 
 private:
-    String service_url, path, uid;
-    // FirebaseApp address and FirebaseApp vector address
-    uint32_t app_addr = 0, avec_addr = 0, ul_dl_task_running_addr = 0;
-    app_token_t *app_token = nullptr;
+    String path, uid;
 
-    void url(const String &url)
-    {
-        this->service_url = url;
-    }
-
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t ul_dl_task_running_addr)
-    {
-        this->app_addr = app_addr;
-        this->app_token = app_token;
-        this->avec_addr = avec_addr; // AsyncClient vector (list) address
-        this->ul_dl_task_running_addr = ul_dl_task_running_addr;
-    }
-
-    app_token_t *appToken()
-    {
-        if (avec_addr > 0)
-        {
-            const std::vector<uint32_t> *aVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
-            List vec;
-            return vec.existed(*aVec, app_addr) ? app_token : nullptr;
-        }
-        return nullptr;
-    }
-
-    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Messages::Parent &parent, const String &payload, Messages::firebase_cloud_messaging_request_type requestType, bool async)
+    AsyncResult *sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Messages::Parent &parent, const String &payload, Messages::firebase_cloud_messaging_request_type requestType, bool async)
     {
         using namespace Messages;
         DataOptions options;
@@ -174,11 +120,11 @@ private:
 
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
     void asyncRequest(Messages::req_data &request, int beta = 0)
     {
-        URLUtil uut;
         app_token_t *atoken = appToken();
 
         if (!atoken)
@@ -196,7 +142,7 @@ private:
 
         request.path += request.options->parent.getProjectId().length() == 0 ? atoken->val[app_tk_ns::pid] : request.options->parent.getProjectId();
 
-        addParams(request, extras);
+        sut.addParams(request.options->extras, extras);
 
         url(FPSTR("fcm.googleapis.com"));
 
@@ -222,16 +168,8 @@ private:
             sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->getResultList())));
 
         sData->download = request.method == reqns::http_get && sData->request.file_data.filename.length();
-
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
-    }
-
-    void addParams(const Messages::req_data &request, String &extras)
-    {
-        extras += request.options->extras;
-        extras.replace(" ", "%20");
-        extras.replace(",", "%2C");
     }
 };
 #endif

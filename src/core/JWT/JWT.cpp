@@ -11,7 +11,6 @@
 #include "./core/Core.h"
 
 #if defined(ENABLE_JWT)
-
 #include "JWT.h"
 
 #if defined(USE_EMBED_SSL_ENGINE) && !defined(CORE_MOCK)
@@ -55,6 +54,7 @@ void JWTClass::clear()
 }
 
 bool JWTClass::ready() { return this->auth_data && this->auth_data->user_auth.sa.step == jwt_step_ready; }
+
 bool JWTClass::loop(auth_data_t *auth_data)
 {
     if (auth_data && auth_data->user_auth.jwt_signing)
@@ -153,7 +153,7 @@ bool JWTClass::create()
         // {"alg":"RS256","typ":"JWT"}
 
         size_t len = 0;
-        jwt_data.token = FPSTR("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9");
+        jwt_data.token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9";
 
         // payload
         // {"iss":"<email>","sub":"<email>","aud":"<audience>","iat":<timstamp>,"exp":<expire>,"scope":"<scope>"}
@@ -162,48 +162,17 @@ bool JWTClass::create()
         json.addObject(payload, "iss", auth_data->user_auth.sa.val[sa_ns::cm], true);
         json.addObject(payload, "sub", auth_data->user_auth.sa.val[sa_ns::cm], true);
 
-        String t = FPSTR("https://");
         if (auth_data->user_auth.auth_type == auth_sa_custom_token)
-        {
-            jwt_add_gapis_host(t, "identitytoolkit");
-            t += FPSTR("/google.identity.identitytoolkit.v1.IdentityToolkit");
-        }
+            json.addObject(payload, "aud", "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit", true);
         else if (auth_data->user_auth.auth_type == auth_sa_access_token)
-        {
-            jwt_add_gapis_host(t, "oauth2");
-            t += FPSTR("/token");
-        }
+            json.addObject(payload, "aud", "https://oauth2.googleapis.com/token", true);
 
-        json.addObject(payload, "aud", t, true);
-        sut.clear(t);
         json.addObject(payload, "iat", String(now), false);
         json.addObject(payload, "exp", String((int)(now + 3600)), false);
 
         if (auth_data->user_auth.auth_type == auth_sa_access_token)
         {
-            String base_uri;
-            String host;
-            jwt_add_gapis_host(host, "www");
-            uut.host2Url(base_uri, host);
-            base_uri += FPSTR("/auth/");
-            String s = base_uri; // https://www.googleapis.com/auth/
-            s += FPSTR("devstorage.full_control");
-            jwt_add_sp(s);
-            s += base_uri; // https://www.googleapis.com/auth/
-            s += FPSTR("datastore");
-            jwt_add_sp(s);
-            s += base_uri; // https://www.googleapis.com/auth/
-            s += FPSTR("userinfo.email");
-            jwt_add_sp(s);
-            s += base_uri; // https://www.googleapis.com/auth/
-            s += FPSTR("firebase.database");
-            jwt_add_sp(s);
-            s += base_uri; // https://www.googleapis.com/auth/
-            s += FPSTR("cloud-platform");
-            jwt_add_sp(s);
-            s += base_uri; // https://www.googleapis.com/auth/
-            s += FPSTR("iam");
-            sut.clear(base_uri);
+            String s = "https://www.googleapis.com/auth/devstorage.full_control https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/iam";
             if (auth_data->user_auth.cust.val[cust_ns::scope].length() > 0)
             {
                 char *p = reinterpret_cast<char *>(mem.alloc(auth_data->user_auth.cust.val[cust_ns::scope].length()));
@@ -218,7 +187,7 @@ bool JWTClass::create()
                     if (strlen(pp) > 0)
                     {
                         tmp = pp;
-                        jwt_add_sp(s);
+                        s += ' ';
                         s += tmp;
                         i++;
                     }

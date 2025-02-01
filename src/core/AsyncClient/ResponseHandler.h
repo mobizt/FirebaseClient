@@ -249,9 +249,10 @@ public:
         return 0;
     }
 
-    void parseHeaders(String &out, const char *header)
+    void parseHeaders(String &out, const char *header, bool clear)
     {
-        out.remove(0, out.length());
+        if (clear)
+            out.remove(0, out.length());
         if (httpCode > 0)
         {
             int p1 = -1, p2 = -1, p3 = -1;
@@ -442,30 +443,31 @@ public:
                 (read == 2 && val[resns::header][val[resns::header].length() - 2] == '\r' && val[resns::header][val[resns::header].length() - 1] == '\n'));
     }
 
-    bool readHeader(bool sse, bool clearPayload, bool upload)
+    bool readHeader(bool sse, bool clearPayload, bool upload, String *location)
     {
         if (endOfHeader(readLine()))
         {
             flags.uploadRange = false;
             flags.http_response = true;
-            parseHeaders(val[resns::etag], "ETag");
+            parseHeaders(val[resns::etag], "ETag", false);
+            parseHeaders(*location, "Location", false);
 
             String v;
-            parseHeaders(v, "Content-Length");
+            parseHeaders(v, "Content-Length", true);
             payloadLen = atoi(v.c_str());
 
-            parseHeaders(v, "Connection");
+            parseHeaders(v, "Connection", true);
             flags.keep_alive = v.length() && v.indexOf("keep-alive") > -1;
 
-            parseHeaders(v, "Transfer-Encoding");
+            parseHeaders(v, "Transfer-Encoding", true);
             flags.chunks = v.length() && v.indexOf("chunked") > -1;
 
-            parseHeaders(v, "Content-Type");
+            parseHeaders(v, "Content-Type", true);
             flags.sse = v.length() && v.indexOf("text/event-stream") > -1;
 
             if (upload)
             {
-                parseHeaders(v, "Range");
+                parseHeaders(v, "Range", true);
                 if (httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && v.indexOf("bytes=") > -1)
                     flags.uploadRange = true;
             }

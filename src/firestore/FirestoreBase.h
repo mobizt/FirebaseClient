@@ -1,5 +1,5 @@
 /**
- * 2025-01-30
+ * 2025-02-02
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -42,8 +42,6 @@ class FirestoreBase : public AppBase
 public:
     using Parent = Firestore::Parent;
 
-    std::vector<uint32_t> cVec; // AsyncClient vector
-
     ~FirestoreBase() {}
 
     explicit FirestoreBase(const String &url = "") { this->service_url = url; }
@@ -58,36 +56,16 @@ public:
     /**
      * Unbind or remove the FirebaseApp
      */
-    void resetApp()
-    {
-        this->app_addr = 0;
-        this->app_token = nullptr;
-        this->avec_addr = 0; // AsyncClient vector (list) address
-        this->ul_dl_task_running_addr = 0;
-    }
+    void resetApp() { resetAppImpl(); }
 
     /**
      * Perform the async task repeatedly.
      * Should be placed in main loop function.
      */
-    void loop()
-    {
-        for (size_t i = 0; i < cVec.size(); i++)
-        {
-            AsyncClientClass *client = reinterpret_cast<AsyncClientClass *>(cVec[i]);
-            if (client)
-            {
-                processBase(client, true);
-                handleRemoveBase(client);
-            }
-        }
-    }
+    void loop() { loopImpl(); }
 
 protected:
-    String service_url, path, uid;
-    // FirebaseApp address and FirebaseApp vector address
-    uint32_t app_addr = 0, avec_addr = 0, ul_dl_task_running_addr = 0;
-    app_token_t *app_token = nullptr;
+    String path, uid;
 
     struct req_data
     {
@@ -113,30 +91,8 @@ protected:
         }
     };
 
-    void url(const String &url) { this->service_url = url; }
-
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t ul_dl_task_running_addr)
-    {
-        this->app_addr = app_addr;
-        this->app_token = app_token;
-        this->avec_addr = avec_addr; // AsyncClient vector (list) address
-        this->ul_dl_task_running_addr = ul_dl_task_running_addr;
-    }
-
-    app_token_t *appToken()
-    {
-        if (avec_addr > 0)
-        {
-            const std::vector<uint32_t> *aVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
-            List vec;
-            return vec.existed(*aVec, app_addr) ? app_token : nullptr;
-        }
-        return nullptr;
-    }
-
     void asyncRequest(req_data &request, int beta = 0)
     {
-        URLUtil uut;
         app_token_t *atoken = appToken();
 
         if (!atoken)
@@ -157,7 +113,8 @@ protected:
             request.path += '/';
             request.path += request.options->parent.getDatabaseId().length() > 0 ? request.options->parent.getDatabaseId() : FPSTR("(default)");
         }
-        addParams(request, extras);
+
+        sut.addParams(request.options->extras, extras);
 
         url(FPSTR("firestore.googleapis.com"));
 
@@ -188,14 +145,7 @@ protected:
         handleRemoveBase(request.aClient);
     }
 
-    void addParams(const req_data &request, String &extras)
-    {
-        extras += request.options->extras;
-        extras.replace(" ", "%20");
-        extras.replace(",", "%2C");
-    }
-
-    void eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const EximDocumentOptions &eximOptions, bool isImport, bool async)
+    AsyncResult *eximDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const EximDocumentOptions &eximOptions, bool isImport, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = isImport ? cf_import_docs : cf_export_docs;
@@ -206,9 +156,10 @@ protected:
         options.extras += isImport ? FPSTR(":importDocuments") : FPSTR(":exportDocuments");
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void manageDatabase(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &database, const String &key, Firestore::firestore_database_mode mode, bool async)
+    AsyncResult *manageDatabase(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &database, const String &key, Firestore::firestore_database_mode mode, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_manage_database;
@@ -250,9 +201,10 @@ protected:
 
         req_data aReq(&aClient, path, method, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &collectionId, const String &documentId, DocumentMask &mask, Document<Values::Value> &document, bool async)
+    AsyncResult *createDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &collectionId, const String &documentId, DocumentMask &mask, Document<Values::Value> &document, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_create_doc;
@@ -263,15 +215,15 @@ protected:
         addDocsPath(options.extras);
         options.extras += '/';
         options.extras += options.collectionId;
-        URLUtil uut;
         bool hasQueryParams = false;
         uut.addParam(options.extras, "documentId", options.documentId, hasQueryParams);
         options.extras += mask.getQuery("mask", hasQueryParams);
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, bool async)
+    AsyncResult *patchDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_patch_doc;
@@ -283,9 +235,10 @@ protected:
         options.extras += patchOptions.c_str();
         req_data aReq(&aClient, path, reqns::http_patch, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void commitDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const Writes &writes, bool async)
+    AsyncResult *commitDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const Writes &writes, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_commit_document;
@@ -296,9 +249,10 @@ protected:
         options.payload.replace(reinterpret_cast<const char *>(RESOURCE_PATH_BASE), makeResourcePath(parent));
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void batchWriteDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const Writes &writes, bool async)
+    AsyncResult *batchWriteDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const Writes &writes, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_batch_write_doc;
@@ -309,9 +263,10 @@ protected:
         options.extras += FPSTR(":batchWrite");
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void getDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, GetDocumentOptions getOptions, bool async)
+    AsyncResult *getDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, GetDocumentOptions getOptions, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_get_doc;
@@ -322,9 +277,10 @@ protected:
         options.extras += getOptions.c_str();
         req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void batchGetDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const BatchGetDocumentOptions &batchOptions, bool async)
+    AsyncResult *batchGetDoc(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const BatchGetDocumentOptions &batchOptions, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_batch_get_doc;
@@ -335,9 +291,10 @@ protected:
         options.extras += FPSTR(":batchGet");
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void beginTrans(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, TransactionOptions transOptions, bool async)
+    AsyncResult *beginTrans(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, TransactionOptions transOptions, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_begin_transaction;
@@ -348,9 +305,10 @@ protected:
         options.extras += FPSTR(":beginTransaction");
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void transRollback(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &transaction, bool async)
+    AsyncResult *transRollback(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &transaction, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_rollback;
@@ -361,10 +319,11 @@ protected:
         options.extras += FPSTR(":rollback");
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
 #if defined(ENABLE_FIRESTORE_QUERY)
-    void runQueryImpl(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, const QueryOptions &queryOptions, bool async)
+    AsyncResult *runQueryImpl(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, const QueryOptions &queryOptions, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_run_query;
@@ -373,15 +332,15 @@ protected:
         options.payload = queryOptions.c_str();
 
         addDocsPath(options.extras);
-        URLUtil uut;
         uut.addPath(options.extras, documentPath);
         options.extras += FPSTR(":runQuery");
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 #endif
 
-    void deleteDocBase(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, Precondition currentDocument, bool async)
+    AsyncResult *deleteDocBase(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, Precondition currentDocument, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_delete_doc;
@@ -389,29 +348,29 @@ protected:
         options.parent.setDocPath(documentPath);
 
         addDocsPath(options.extras);
-        URLUtil uut;
         uut.addPath(options.extras, documentPath);
         options.extras += currentDocument.getQuery("currentDocument");
         req_data aReq(&aClient, path, reqns::http_delete, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void listDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &collectionId, const ListDocumentsOptions &listDocsOptions, bool async)
+    AsyncResult *listDocs(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &collectionId, const ListDocumentsOptions &listDocsOptions, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_list_doc;
         options.parent = parent;
 
         addDocsPath(options.extras);
-        URLUtil uut;
         uut.addPath(options.extras, collectionId);
 
         options.extras += listDocsOptions.c_str();
         req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void listCollIds(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, const ListCollectionIdsOptions &listCollectionIdsOptions, bool async)
+    AsyncResult *listCollIds(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const String &documentPath, const ListCollectionIdsOptions &listCollectionIdsOptions, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_list_collection;
@@ -420,15 +379,15 @@ protected:
         options.payload = listCollectionIdsOptions.c_str();
 
         addDocsPath(options.extras);
-        URLUtil uut;
         uut.addPath(options.extras, documentPath);
         options.extras += FPSTR(":listCollectionIds");
 
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
-    void databaseIndexManager(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const DatabaseIndex::Index &index, const String &indexId, bool deleteMode, bool async)
+    AsyncResult *databaseIndexManager(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const DatabaseIndex::Index &index, const String &indexId, bool deleteMode, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_create_field_index;
@@ -450,9 +409,10 @@ protected:
 
         req_data aReq(&aClient, path, method, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq, 1);
+        return aClient.getResult();
     }
 
-    void collectionGroupIndexManager(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const CollectionGroupsIndex::Index &index, const String &collectionId, const String &indexId, bool deleteMode, bool async)
+    AsyncResult *collectionGroupIndexManager(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, const CollectionGroupsIndex::Index &index, const String &collectionId, const String &indexId, bool deleteMode, bool async)
     {
         Firestore::DataOptions options;
         options.requestType = cf_create_composite_index;
@@ -481,6 +441,7 @@ protected:
 
         req_data aReq(&aClient, path, method, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
+        return aClient.getResult();
     }
 
     String makeResourcePath(const Parent &parent)

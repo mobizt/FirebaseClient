@@ -301,4 +301,8 @@
 // SSE mode time out in milliseconds.
 #define FIREBASE_SSE_TIMEOUT_MS 40 * 1000
 
+// The JWT process timed out due to absent of JWT.loop in loop or 
+// too long delay in time status callback.
+#define FIREBASE_JWT_TIMEOUT_MS 60 * 1000
+
 #endif

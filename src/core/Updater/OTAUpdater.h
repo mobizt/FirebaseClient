@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include "./Config.h"
 
-
 #if __has_include(<OTAStorage.h>)
 
 #include <OTAStorage.h>

@@ -1,5 +1,5 @@
 /**
- * 2025-01-31
+ * 2025-02-02
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -32,7 +32,7 @@
 using namespace firebase_ns;
 
 #if defined(ENABLE_FUNCTIONS)
-class CloudFunctions
+class CloudFunctions : public AppBase
 {
     friend class AppBase;
 
@@ -41,10 +41,7 @@ public:
     using Function = GoogleCloudFunctions::Function;
     using ListOptions = GoogleCloudFunctions::ListOptions;
 
-    std::vector<uint32_t> cVec; // AsyncClient vector
-
     ~CloudFunctions() {}
-    explicit CloudFunctions(const String &url = "") { this->service_url = url; }
 
     CloudFunctions &operator=(const CloudFunctions &rhs)
     {
@@ -56,30 +53,13 @@ public:
     /**
      * Unbind or remove the FirebaseApp
      */
-    void resetApp()
-    {
-        this->app_addr = 0;
-        this->app_token = nullptr;
-        this->avec_addr = 0; // AsyncClient vector (list) address
-        this->ul_dl_task_running_addr = 0;
-    }
+    void resetApp() { resetAppImpl(); }
 
     /**
      * Perform the async task repeatedly.
      * Should be placed in main loop function.
      */
-    void loop()
-    {
-        for (size_t i = 0; i < cVec.size(); i++)
-        {
-            AsyncClientClass *client = reinterpret_cast<AsyncClientClass *>(cVec[i]);
-            if (client)
-            {
-                client->process(true);
-                client->handleRemove();
-            }
-        }
-    }
+    void loop() { loopImpl(); }
 
     /** Creates a new function.
      * If a function with the given name already exists in the specified project,
@@ -98,11 +78,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String create(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const Function &function)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_create, function.c_str(), false);
-        return aClient.getResult()->c_str();
-    }
+    String create(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const Function &function) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_create, function.c_str(), false)->c_str(); }
 
     /** Creates a new function.
      * If a function with the given name already exists in the specified project,
@@ -121,10 +97,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void create(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const Function &function, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_create, function.c_str(), true);
-    }
+    void create(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const Function &function, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_create, function.c_str(), true); }
 
     /** Creates a new function.
      * If a function with the given name already exists in the specified project,
@@ -144,10 +117,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void create(AsyncClientClass &aClient, const Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_create, function.c_str(), true);
-    }
+    void create(AsyncClientClass &aClient, const Parent &parent, const String &functionId, GoogleCloudFunctions::Function &function, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_create, function.c_str(), true); }
 
     /** Creates a new function.
      * If a function with the given name already exists in the specified project,
@@ -168,11 +138,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String patch(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const Function &function, const String &updateMask)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, updateMask, GoogleCloudFunctions::fn_patch, function.c_str(), false);
-        return aClient.getResult()->c_str();
-    }
+    String patch(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const Function &function, const String &updateMask) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, updateMask, GoogleCloudFunctions::fn_patch, function.c_str(), false)->c_str(); }
 
     /** Creates a new function.
      * If a function with the given name already exists in the specified project,
@@ -193,10 +159,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void patch(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const Function &function, const String &updateMask, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, updateMask, GoogleCloudFunctions::fn_patch, function.c_str(), true);
-    }
+    void patch(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const Function &function, const String &updateMask, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, updateMask, GoogleCloudFunctions::fn_patch, function.c_str(), true); }
 
     /** Creates a new function.
      * If a function with the given name already exists in the specified project,
@@ -218,10 +181,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void patch(AsyncClientClass &aClient, const Parent &parent, const String &functionId, Function &function, const String &updateMask, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, updateMask, GoogleCloudFunctions::fn_patch, function.c_str(), true);
-    }
+    void patch(AsyncClientClass &aClient, const Parent &parent, const String &functionId, Function &function, const String &updateMask, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, updateMask, GoogleCloudFunctions::fn_patch, function.c_str(), true); }
 
     /** Deletes a function with the given name from the specified project. If the given function is used by some trigger, the trigger will be updated to remove this function.
      *
@@ -237,11 +197,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String deleteFunction(AsyncClientClass &aClient, const Parent &parent, const String &functionId)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_delete, "", false);
-        return aClient.getResult()->c_str();
-    }
+    String deleteFunction(AsyncClientClass &aClient, const Parent &parent, const String &functionId) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_delete, "", false)->c_str(); }
 
     /** Deletes a function with the given name from the specified project. If the given function is used by some trigger, the trigger will be updated to remove this function.
      *
@@ -257,10 +213,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void deleteFunction(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_delete, "", true);
-    }
+    void deleteFunction(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_delete, "", true); }
 
     /** Deletes a function with the given name from the specified project. If the given function is used by some trigger, the trigger will be updated to remove this function.
      *
@@ -277,10 +230,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void deleteFunction(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_delete, "", true);
-    }
+    void deleteFunction(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_delete, "", true); }
 
     /** Returns a list of functions that belong to the requested project.
      *
@@ -296,11 +246,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String list(AsyncClientClass &aClient, const Parent &parent, ListOptions &listOptions)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", &listOptions, "", GoogleCloudFunctions::fn_list, "", false);
-        return aClient.getResult()->c_str();
-    }
+    String list(AsyncClientClass &aClient, const Parent &parent, ListOptions &listOptions) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", &listOptions, "", GoogleCloudFunctions::fn_list, "", false)->c_str(); }
 
     /** Returns a list of functions that belong to the requested project.
      *
@@ -316,10 +262,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void list(AsyncClientClass &aClient, const Parent &parent, ListOptions &listOptions, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", &listOptions, "", GoogleCloudFunctions::fn_list, "", true);
-    }
+    void list(AsyncClientClass &aClient, const Parent &parent, ListOptions &listOptions, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", &listOptions, "", GoogleCloudFunctions::fn_list, "", true); }
 
     /** Returns a list of functions that belong to the requested project.
      *
@@ -336,10 +279,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void list(AsyncClientClass &aClient, const Parent &parent, ListOptions &listOptions, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", &listOptions, "", GoogleCloudFunctions::fn_list, "", true);
-    }
+    void list(AsyncClientClass &aClient, const Parent &parent, ListOptions &listOptions, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", &listOptions, "", GoogleCloudFunctions::fn_list, "", true); }
 
     /** Returns a function with the given name from the requested project.
      *
@@ -355,11 +295,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String get(AsyncClientClass &aClient, const Parent &parent, const String &functionId)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", nullptr, "", GoogleCloudFunctions::fn_get, "", false);
-        return aClient.getResult()->c_str();
-    }
+    String get(AsyncClientClass &aClient, const Parent &parent, const String &functionId) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", nullptr, "", GoogleCloudFunctions::fn_get, "", false)->c_str(); }
 
     /** Returns a function with the given name from the requested project.
      *
@@ -375,10 +311,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void get(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", nullptr, "", GoogleCloudFunctions::fn_get, "", true);
-    }
+    void get(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", nullptr, "", GoogleCloudFunctions::fn_get, "", true); }
 
     /** Returns a function with the given name from the requested project.
      *
@@ -395,10 +328,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void get(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", nullptr, "", GoogleCloudFunctions::fn_get, "", true);
-    }
+    void get(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", nullptr, "", GoogleCloudFunctions::fn_get, "", true); }
 
     /** Synchronously invokes a deployed Cloud Function. To be used for testing purposes as very limited traffic is allowed. For more information on the actual limits, refer to Rate Limits (https://cloud.google.com/functions/quotas#rate_limits).
      *
@@ -415,11 +345,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String call(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const String &payload)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_call, payload, false);
-        return aClient.getResult()->c_str();
-    }
+    String call(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const String &payload) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_call, payload, false)->c_str(); }
 
     /** Synchronously invokes a deployed Cloud Function. To be used for testing purposes as very limited traffic is allowed. For more information on the actual limits, refer to Rate Limits (https://cloud.google.com/functions/quotas#rate_limits).
      *
@@ -436,10 +362,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void call(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const String &payload, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_call, payload, true);
-    }
+    void call(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const String &payload, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_call, payload, true); }
 
     /** Synchronously invokes a deployed Cloud Function. To be used for testing purposes as very limited traffic is allowed. For more information on the actual limits, refer to Rate Limits (https://cloud.google.com/functions/quotas#rate_limits).
      *
@@ -457,10 +380,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void call(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const String &payload, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_call, payload, true);
-    }
+    void call(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const String &payload, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_call, payload, true); }
 
     /** Returns a signed URL for downloading deployed function source code. The URL is only valid for a limited period and should be used within 30 minutes of generation. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls
      *
@@ -476,11 +396,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String generateDownloadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_downloadUrl, "", false);
-        return aClient.getResult()->c_str();
-    }
+    String generateDownloadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_downloadUrl, "", false)->c_str(); }
 
     /** Returns a signed URL for downloading deployed function source code. The URL is only valid for a limited period and should be used within 30 minutes of generation. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls
      *
@@ -496,10 +412,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void generateDownloadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_downloadUrl, "", true);
-    }
+    void generateDownloadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_downloadUrl, "", true); }
 
     /** Returns a signed URL for downloading deployed function source code. The URL is only valid for a limited period and should be used within 30 minutes of generation. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls
      *
@@ -516,10 +429,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void generateDownloadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_downloadUrl, "", true);
-    }
+    void generateDownloadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_downloadUrl, "", true); }
 
     /** RReturns a signed URL for uploading a function source code. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls. Once the function source code upload is complete, the used signed URL should be provided in functions.create or functions.patch request as a reference to the function source code.
      *
@@ -536,11 +446,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String generateUploadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::UploadURLOptions &options)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_uploadUrl, options.c_str(), false);
-        return aClient.getResult()->c_str();
-    }
+    String generateUploadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::UploadURLOptions &options) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_uploadUrl, options.c_str(), false)->c_str(); }
 
     /** Returns a signed URL for uploading a function source code. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls. Once the function source code upload is complete, the used signed URL should be provided in functions.create or functions.patch request as a reference to the function source code.
      *
@@ -557,10 +463,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void generateUploadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::UploadURLOptions &options, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_uploadUrl, options.c_str(), true);
-    }
+    void generateUploadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::UploadURLOptions &options, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_uploadUrl, options.c_str(), true); }
 
     /** Returns a signed URL for uploading a function source code. For more information about the signed URL usage see: https://cloud.google.com/storage/docs/access-control/signed-urls. Once the function source code upload is complete, the used signed URL should be provided in functions.create or functions.patch request as a reference to the function source code.
      *
@@ -578,10 +481,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void generateUploadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::UploadURLOptions &options, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_uploadUrl, options.c_str(), true);
-    }
+    void generateUploadURL(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::UploadURLOptions &options, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_gen_uploadUrl, options.c_str(), true); }
 
     /** Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
      *
@@ -598,11 +498,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String getIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_get_iam_policy, options.c_str(), false);
-        return aClient.getResult()->c_str();
-    }
+    String getIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_get_iam_policy, options.c_str(), false)->c_str(); }
 
     /** Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
      *
@@ -619,10 +515,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void getIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_get_iam_policy, options.c_str(), true);
-    }
+    void getIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_get_iam_policy, options.c_str(), true); }
 
     /** Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set.
      *
@@ -640,10 +533,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void getIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_get_iam_policy, options.c_str(), true);
-    }
+    void getIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, GoogleCloudFunctions::GetPolicyOptions options, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_get_iam_policy, options.c_str(), true); }
 
     /** Sets the access control policy on the specified resource. Replaces any existing policy.
      * Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
@@ -661,11 +551,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String setIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::SetPolicyOptions &options)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_set_iam_policy, options.c_str(), false);
-        return aClient.getResult()->c_str();
-    }
+    String setIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::SetPolicyOptions &options) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_set_iam_policy, options.c_str(), false)->c_str(); }
 
     /** Sets the access control policy on the specified resource. Replaces any existing policy.
      * Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
@@ -683,10 +569,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void setIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::SetPolicyOptions &options, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_set_iam_policy, options.c_str(), true);
-    }
+    void setIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::SetPolicyOptions &options, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_set_iam_policy, options.c_str(), true); }
 
     /** Sets the access control policy on the specified resource. Replaces any existing policy.
      * Can return NOT_FOUND, INVALID_ARGUMENT, and PERMISSION_DENIED errors.
@@ -705,10 +588,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void setIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::SetPolicyOptions &options, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_set_iam_policy, options.c_str(), true);
-    }
+    void setIamPolicy(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::SetPolicyOptions &options, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_set_iam_policy, options.c_str(), true); }
 
     /** Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.
      *
@@ -726,11 +606,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    String testIamPermissions(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions)
-    {
-        sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_test_iam_permission, permissions.c_str(), false);
-        return aClient.getResult()->c_str();
-    }
+    String testIamPermissions(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_test_iam_permission, permissions.c_str(), false)->c_str(); }
 
     /** Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.
      *
@@ -748,10 +624,7 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void testIamPermissions(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions, AsyncResult &aResult)
-    {
-        sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_test_iam_permission, permissions.c_str(), true);
-    }
+    void testIamPermissions(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_test_iam_permission, permissions.c_str(), true); }
 
     /** Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.
      *
@@ -770,39 +643,12 @@ public:
      * This function requires OAuth2.0 authentication.
      *
      */
-    void testIamPermissions(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions, AsyncResultCallback cb, const String &uid = "")
-    {
-        sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_test_iam_permission, permissions.c_str(), true);
-    }
+    void testIamPermissions(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_test_iam_permission, permissions.c_str(), true); }
 
 private:
-    String service_url, path, uid;
-    // FirebaseApp address and FirebaseApp vector address
-    uint32_t app_addr = 0, avec_addr = 0, ul_dl_task_running_addr = 0;
-    app_token_t *app_token = nullptr;
+    String path, uid;
 
-    void url(const String &url) { this->service_url = url; }
-
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t ul_dl_task_running_addr)
-    {
-        this->app_addr = app_addr;
-        this->app_token = app_token;
-        this->avec_addr = avec_addr; // AsyncClient vector (list) address
-        this->ul_dl_task_running_addr = ul_dl_task_running_addr;
-    }
-
-    app_token_t *appToken()
-    {
-        if (avec_addr > 0)
-        {
-            const std::vector<uint32_t> *aVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
-            List vec;
-            return vec.existed(*aVec, app_addr) ? app_token : nullptr;
-        }
-        return nullptr;
-    }
-
-    void sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, file_config_data *file, const String &functionId, const ListOptions *listOptions, const String &updateMask, GoogleCloudFunctions::google_cloud_functions_request_type requestType, const String &payload, bool async)
+    AsyncResult *sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, file_config_data *file, const String &functionId, const ListOptions *listOptions, const String &updateMask, GoogleCloudFunctions::google_cloud_functions_request_type requestType, const String &payload, bool async)
     {
         using namespace GoogleCloudFunctions;
         DataOptions options;
@@ -811,7 +657,6 @@ private:
         options.parent.setFunctionId(functionId);
 
         bool hasParam = false;
-        URLUtil uut;
 
         reqns::http_request_method method = reqns::http_post;
 
@@ -854,8 +699,7 @@ private:
 
         if (listOptions && strlen(listOptions->c_str()))
         {
-            options.extras += options.extras.length() ? '&' : '?';
-            options.extras += listOptions->c_str();
+            uut.addUrl(options.extras, listOptions->c_str());
             hasParam = true;
         }
 
@@ -863,8 +707,8 @@ private:
             uut.addParamsTokens(options.extras, "updateMask=", updateMask, hasParam);
 
         req_data aReq(&aClient, path, method, slot_options_t(false, false, async, false, false, false), &options, file, result, cb, uid);
-
         asyncRequest(aReq, requestType);
+        return aClient.getResult();
     }
 
     void asyncRequest(GoogleCloudFunctions::req_data &request, GoogleCloudFunctions::google_cloud_functions_request_type requestType)
@@ -878,22 +722,15 @@ private:
         request.opt.app_token = atoken;
         String extras;
 
-        request.path = "/v";
-        request.path += requestType == fn_call ? 1 : 2;
-        request.path += "/projects/";
-        request.path += request.options->parent.getProjectId();
-        request.path += "/locations/";
-        request.path += request.options->parent.getLocationId();
-        request.path += "/functions";
+        sut.printTo(request.path, 200, "/v%d/projects/%s/locations/%s/functions", requestType == fn_call ? 1 : 2, request.options->parent.getProjectId().c_str(), request.options->parent.getLocationId().c_str());
 
         if ((request.method == reqns::http_get && request.options->parent.getFunctionId().length() > 0) ||
             requestType == fn_call || requestType == fn_gen_downloadUrl || request.method == reqns::http_patch ||
             request.method == reqns::http_delete || requestType == fn_get_iam_policy || requestType == fn_set_iam_policy ||
             requestType == fn_test_iam_permission)
         {
-            URLUtil uut;
-            request.path += "/";
-            request.path += uut.encode(request.options->parent.getFunctionId());
+
+            uut.addEncUrl(request.path, "/", request.options->parent.getFunctionId());
 
             if (requestType == fn_call)
                 request.path += ":call";
@@ -910,7 +747,7 @@ private:
         if (requestType == fn_gen_uploadUrl)
             request.path += ":generateUploadUrl";
 
-        addParams(request, extras);
+        sut.addParams(request.options->extras, extras);
 
         url(FPSTR("cloudfunctions.googleapis.com"));
 
@@ -958,13 +795,6 @@ private:
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
-    }
-
-    void addParams(const GoogleCloudFunctions::req_data &request, String &extras)
-    {
-        extras += request.options->extras;
-        extras.replace(" ", "%20");
-        extras.replace(",", "%2C");
     }
 
     void setFileStatus(async_data *sData, const GoogleCloudFunctions::req_data &request)

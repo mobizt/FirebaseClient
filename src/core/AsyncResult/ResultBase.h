@@ -207,7 +207,6 @@ namespace firebase_ns
 
     class ResultBase : public app_data_t
     {
-
     public:
         ResultBase() {}
 
@@ -222,7 +221,5 @@ namespace firebase_ns
         bool isEventBase(app_event_t &app_event) { return app_event.isEvent(); }
         void clearAppData(app_data_t &app_data) { reset(app_data); }
     };
-
 }
-
 #endif

@@ -46,6 +46,7 @@ struct req_handler
 private:
     StringUtil sut;
     Base64Util b64ut;
+    URLUtil uut;
 
 public:
     String val[reqns::max_type];
@@ -232,7 +233,6 @@ public:
         String url = fromReq ? val[reqns::url] : location ? *location
                                                           : "";
 #endif
-        URLUtil uut;
         return uut.getHost(url, ext);
     }
 
@@ -242,7 +242,6 @@ public:
             return client ? client->write(data, size) : 0;
         else
         {
-
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 
             AsyncTCPConfig *async_tcp_config = reinterpret_cast<AsyncTCPConfig *>(atcp_config);
@@ -257,10 +256,12 @@ public:
         return 0;
     }
 
+    // This will set the Content-Lenght header with actual file size and header len.
+    // Note: If no custom header assigned, the new line will append to the header.
     void setFileContentLength(int headerLen = 0, const String &customHeader = "")
     {
+        StringUtil sut;
         size_t sz = 0;
-
 #if defined(ENABLE_FS)
         if (file_data.cb && file_data.filename.length())
         {
@@ -275,14 +276,9 @@ public:
         {
             file_data.file_size = base64 ? 2 + b64ut.getBase64Len(sz) : sz;
             if (customHeader.length())
-            {
-                val[reqns::header] += customHeader;
-                val[reqns::header] += ":";
-                val[reqns::header] += file_data.file_size + headerLen;
-                val[reqns::header] += "\r\n";
-            }
+                sut.printTo(val[reqns::header], customHeader.length() + 30, "%s:%d\r\n", customHeader.c_str(), file_data.file_size + headerLen);
             else
-                setContentLength(file_data.file_size);
+                sut.printTo(val[reqns::header], 30, "Content-Length: %d\r\n\r\n", (int)file_data.file_size);
 
             closeFile();
         }

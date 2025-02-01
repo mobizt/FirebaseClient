@@ -24,6 +24,7 @@ class AsyncClientClass : public ResultBase, RTDBResultBase
 
 private:
     StringUtil sut;
+    URLUtil uut;
     SlotManager sman;
 
     String header, reqEtag, resETag;
@@ -56,10 +57,7 @@ private:
         }
     }
 
-    function_return_type sendHeader(async_data *sData, const char *data)
-    {
-        return sendImpl(sData, reinterpret_cast<const uint8_t *>(data), data ? strlen(data) : 0, data ? strlen(data) : 0, astate_send_header);
-    }
+    function_return_type sendHeader(async_data *sData, const char *data) { return sendImpl(sData, reinterpret_cast<const uint8_t *>(data), data ? strlen(data) : 0, data ? strlen(data) : 0, astate_send_header); }
 
     function_return_type sendHeader(async_data *sData, const uint8_t *data, size_t len) { return sendImpl(sData, data, len, len, astate_send_header); }
 
@@ -384,16 +382,17 @@ private:
             return ret_continue;
 
 #if defined(ENABLE_CLOUD_STORAGE)
-
         if (sData->request.file_data.resumable.isEnabled() && sData->request.file_data.resumable.getLocation().length() && !sData->response.flags.header_remaining && !sData->response.flags.payload_remaining)
         {
-            // Connect to the new upload location on the same host.
+            // Connect to the new upload location (stop and connect).
             String ext;
             String _host = sData->request.getHost(false, nullptr, &ext);
+            sman.stop();
             if (sman.connect(sData, _host.c_str(), sData->request.port) > ret_failure)
             {
                 // Get the request header to perform the ranges upload (resumable).
                 sut.clear(sData->request.val[reqns::payload]);
+                sut.clear(sData->request.val[reqns::header]);
                 sData->request.file_data.resumable.getHeader(sData->request.val[reqns::header], _host, ext);
                 sData->state = astate_send_header;
                 sData->request.file_data.resumable.setHeaderState();
@@ -410,7 +409,6 @@ private:
             conn.stop();
             if (conn.connect(_host.c_str(), sData->request.port) > ret_failure)
             {
-                URLUtil uut;
                 uut.relocate(sData->request.val[reqns::header], _host, ext);
                 sut.clear(sData->request.val[reqns::payload]);
                 sData->state = astate_send_header;
@@ -514,15 +512,14 @@ private:
     {
         if (sData->response.flags.header_remaining)
         {
-            // Read and parse for the specific headers.
-            if (sData->response.readHeader(sData->sse, !sData->auth_used, sData->upload))
-            {
+            String *location = &sData->response.val[resns::location];
 #if defined(ENABLE_CLOUD_STORAGE)
-                if (sData->upload)
-                    sData->response.parseHeaders(sData->request.file_data.resumable.getLocationRef(), "Location"); // Resumable upload url
-#else
-                sData->response.parseHeaders(sData->response.val[resns::location], "Location"); // Redirect url
+            if (sData->upload)
+                location = &sData->request.file_data.resumable.getLocationRef();
 #endif
+            // Read and parse for the specific headers.
+            if (sData->response.readHeader(sData->sse, !sData->auth_used, sData->upload, location))
+            {
                 resETag = sData->response.val[resns::etag];
                 sData->aResult.val[ares_ns::res_etag] = sData->response.val[resns::etag];
                 sData->aResult.val[ares_ns::data_path] = sData->request.val[reqns::path];
@@ -643,7 +640,7 @@ private:
                                 if (sData->request.base64 && read < toRead)
                                 {
                                     // If the read data (base64 encoded) is still less than the size we expected,
-                                    // save it in a larger chunk buffer (response.toFill) and keep the offset and 
+                                    // save it in a larger chunk buffer (response.toFill) and keep the offset and
                                     // length of the new incoming base64 data to be filled.
                                     sData->response.toFillIndex += read;
                                     sData->response.toFillLen = toRead - read;
@@ -767,10 +764,7 @@ private:
             }
 
             if (sData->upload)
-            {
-                URLUtil uut;
                 uut.updateDownloadURL(sData->aResult.upload_data.downloadUrl, sData->response.val[resns::payload]);
-            }
 
             if (sData->response.flags.chunks && sData->auth_used)
                 sman.stop();

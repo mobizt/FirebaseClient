@@ -14,8 +14,6 @@
 
 class JSONUtil
 {
-
-private:
 public:
     JSONUtil() {}
     ~JSONUtil() {}

@@ -1,5 +1,5 @@
 /**
- * 2025-01-30
+ * 2025-02-02
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -27,7 +27,6 @@
 
 #include <Arduino.h>
 #include "./Config.h"
-#include "./core/Utils/URL.h"
 #include "./core/Utils/StringUtil.h"
 
 #if defined(ENABLE_DATABASE)
@@ -38,22 +37,13 @@ class DatabaseFilter
     friend class AsyncClientClass;
 
 private:
-    StringUtil sut;
     void copy(const DatabaseFilter &rhs)
     {
         this->uri = rhs.uri;
         this->complete = rhs.complete;
     }
-    void toString(String &buf)
-    {
-        String v = "\"";
-        v += buf;
-        buf = v;
-        buf += '"';
-    }
-    bool hasParams = true;
     bool complete = false;
-    URLUtil uut;
+    StringUtil sut;
     String uri;
 
 public:
@@ -63,69 +53,59 @@ public:
     DatabaseFilter &orderBy(const String &val)
     {
         complete = true;
-        String ob = "\"";
-        ob += val;
-        ob += "\"";
-        uut.addParam(uri, FPSTR("orderBy"), ob, hasParams);
+        sut.printTo(uri, val.length(), "%sorderBy=\"%s\"", uri.length() ? "&" : "?", val.c_str());
         return *this;
     }
 
     template <typename T = int>
     DatabaseFilter &limitToFirst(T val)
     {
-        uut.addParam(uri, FPSTR("limitToFirst"), String(val), hasParams);
+        String v = sut.num2Str(val);
+        sut.printTo(uri, v.length(), "%slimitToFirst=%s", uri.length() ? "&" : "?", v.c_str());
         return *this;
     }
 
     template <typename T = int>
     DatabaseFilter &limitToLast(T val)
     {
-        uut.addParam(uri, FPSTR("limitToLast"), String(val), hasParams);
+        String v = sut.num2Str(val);
+        sut.printTo(uri, v.length(), "%slimitToLast=%s", uri.length() ? "&" : "?", v.c_str());
         return *this;
     }
 
     DatabaseFilter &startAt(const String &val)
     {
-        String sa = "\"";
-        sa += val;
-        sa += "\"";
-        uut.addParam(uri, FPSTR("startAt"), sa, hasParams);
+        sut.printTo(uri, val.length(), "%sstartAt=\"%s\"", uri.length() ? "&" : "?", val.c_str());
         return *this;
     }
 
     DatabaseFilter &startAt(int val)
     {
-        uut.addParam(uri, FPSTR("startAt"), String(val), hasParams);
+        sut.printTo(uri, 30, "%sstartAt=%d", uri.length() ? "&" : "?", val);
         return *this;
     }
 
     DatabaseFilter &endAt(const String &val)
     {
-        String sa = "\"";
-        sa += val;
-        sa += "\"";
-        uut.addParam(uri, FPSTR("endAt"), sa, hasParams);
+        sut.printTo(uri, val.length(), "%sendAt=\"%s\"", uri.length() ? "&" : "?", val.c_str());
         return *this;
     }
 
     DatabaseFilter &endAt(int val)
     {
-        uut.addParam(uri, FPSTR("endAt"), String(val), hasParams);
+        sut.printTo(uri, 30, "%sendAt=%d", uri.length() ? "&" : "?", val);
         return *this;
     }
 
     DatabaseFilter &equalTo(const String &val)
     {
-        String sa = "\"";
-        sa += val;
-        sa += "\"";
-        uut.addParam(uri, FPSTR("equalTo"), sa, hasParams);
+        sut.printTo(uri, val.length(), "%sequalTo=\"%s\"", uri.length() ? "&" : "?", val.c_str());
         return *this;
     }
 
     DatabaseFilter &equalTo(int val)
     {
-        uut.addParam(uri, FPSTR("equalTo"), String(val), hasParams);
+        sut.printTo(uri, 30, "%sequalTo=%d", uri.length() ? "&" : "?", val);
         return *this;
     }
 

@@ -1,5 +1,5 @@
 /**
- * 2025-01-30
+ * 2025-02-02
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -75,11 +75,7 @@ namespace Firestore
          * For more detail, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchGet
          *
          */
-        String batchGet(AsyncClientClass &aClient, const Parent &parent, const BatchGetDocumentOptions &batchOptions)
-        {
-            batchGetDoc(aClient, getResultBase(&aClient), NULL, "", parent, batchOptions, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String batchGet(AsyncClientClass &aClient, const Parent &parent, const BatchGetDocumentOptions &batchOptions) { return batchGetDoc(aClient, getResultBase(&aClient), NULL, "", parent, batchOptions, false)->c_str(); }
 
         /** Gets multiple documents.
          *
@@ -163,11 +159,7 @@ namespace Firestore
          * For more description, see https://cloud.google.com/firestore/docs/reference/rest/v1/projects.databases.documents/batchWrite
          *
          */
-        String batchWrite(AsyncClientClass &aClient, const Parent &parent, Writes &writes)
-        {
-            batchWriteDoc(aClient, getResultBase(&aClient), NULL, "", parent, writes, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String batchWrite(AsyncClientClass &aClient, const Parent &parent, Writes &writes) { return batchWriteDoc(aClient, getResultBase(&aClient), NULL, "", parent, writes, false)->c_str(); }
 
         /** Applies a batch of write operations.
          *
@@ -229,11 +221,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        String beginTransaction(AsyncClientClass &aClient, const Parent &parent, const TransactionOptions &transOptions)
-        {
-            beginTrans(aClient, getResultBase(&aClient), NULL, "", parent, transOptions, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String beginTransaction(AsyncClientClass &aClient, const Parent &parent, const TransactionOptions &transOptions) { return beginTrans(aClient, getResultBase(&aClient), NULL, "", parent, transOptions, false)->c_str(); }
 
         /** Starts a new transaction.
          *
@@ -305,11 +293,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String commit(AsyncClientClass &aClient, const Parent &parent, Writes &writes)
-        {
-            commitDoc(aClient, getResultBase(&aClient), NULL, "", parent, writes, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String commit(AsyncClientClass &aClient, const Parent &parent, Writes &writes) { return commitDoc(aClient, getResultBase(&aClient), NULL, "", parent, writes, false)->c_str(); }
 
         /** Commits a transaction, while optionally updating documents.
          *
@@ -365,8 +349,7 @@ namespace Firestore
             parent.setDocPath(documentPath);
             String collectionId, documentId;
             parent.pathResove(collectionId, documentId);
-            createDoc(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, documentId, mask, document, false);
-            return getResultBase(&aClient)->c_str();
+            return createDoc(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, documentId, mask, document, false)->c_str();
         }
 
         /** Create a document at the defined document path.
@@ -433,11 +416,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document)
-        {
-            createDoc(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, documentId, mask, document, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String createDocument(AsyncClientClass &aClient, Firestore::Parent parent, const String &collectionId, const String &documentId, DocumentMask mask, Document<Values::Value> &document) { return createDoc(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, documentId, mask, document, false)->c_str(); }
 
         /** Create a document in the defined collection id.
          *
@@ -500,11 +479,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String deleteDoc(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const Precondition &currentDocument)
-        {
-            deleteDocBase(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, currentDocument, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String deleteDoc(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const Precondition &currentDocument) { return deleteDocBase(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, currentDocument, false)->c_str(); }
 
         /** Delete a document at the defined path.
          *
@@ -575,11 +550,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String get(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const GetDocumentOptions &options)
-        {
-            getDoc(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, options, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String get(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, const GetDocumentOptions &options) { return getDoc(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, options, false)->c_str(); }
 
         /** Get a document at the defined path.
          *
@@ -646,11 +617,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions)
-        {
-            listDocs(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, listDocsOptions, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String list(AsyncClientClass &aClient, const Parent &parent, const String &collectionId, ListDocumentsOptions listDocsOptions) { return listDocs(aClient, getResultBase(&aClient), NULL, "", parent, collectionId, listDocsOptions, false)->c_str(); }
 
         /** List the documents in the defined documents collection.
          *
@@ -721,11 +688,7 @@ namespace Firestore
          * This function requires ServiceAuth authentication.
          *
          */
-        String listCollectionIds(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions)
-        {
-            listCollIds(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, listCollectionIdsOptions, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String listCollectionIds(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, ListCollectionIdsOptions listCollectionIdsOptions) { return listCollIds(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, listCollectionIdsOptions, false)->c_str(); }
 
         /** List the document collection ids in the defined document path.
          *
@@ -803,11 +766,7 @@ namespace Firestore
          * This function requires ServiceAuth, CustomAuth, UserAuth, CustomToken or IDToken authentication.
          *
          */
-        String patch(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document)
-        {
-            patchDoc(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, patchOptions, document, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String patch(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, PatchDocumentOptions patchOptions, Document<Values::Value> &document) { return patchDoc(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, patchOptions, document, false)->c_str(); }
 
         /** Patch or update a document at the defined path.
          *
@@ -888,11 +847,7 @@ namespace Firestore
          *
          * This function requires ServiceAuth authentication.
          */
-        String rollback(AsyncClientClass &aClient, const Parent &parent, const String &transaction)
-        {
-            transRollback(aClient, getResultBase(&aClient), NULL, "", parent, transaction, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String rollback(AsyncClientClass &aClient, const Parent &parent, const String &transaction) { return transRollback(aClient, getResultBase(&aClient), NULL, "", parent, transaction, false)->c_str(); }
 
         /** Rolls back a transaction.
          *
@@ -951,11 +906,7 @@ namespace Firestore
          * For more description, see https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.documents/runQuery
          *
          */
-        String runQuery(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, QueryOptions queryOptions)
-        {
-            runQueryImpl(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, queryOptions, false);
-            return getResultBase(&aClient)->c_str();
-        }
+        String runQuery(AsyncClientClass &aClient, const Parent &parent, const String &documentPath, QueryOptions queryOptions) { return runQueryImpl(aClient, getResultBase(&aClient), NULL, "", parent, documentPath, queryOptions, false)->c_str(); }
 
         /** Runs a query.
          *

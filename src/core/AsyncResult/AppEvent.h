@@ -46,12 +46,9 @@ namespace firebase_ns
 
         void setEvent(int code, const String &msg)
         {
-
             if (code == 0 || last == code)
                 return;
-
             last = code;
-
             limitQueue();
             ms = millis();
             ev_item evt;
@@ -80,7 +77,6 @@ namespace firebase_ns
                 new_code = getEvent().code;
                 return new_code != current_code;
             }
-
             // remaining to read?
             return remaining();
         }
@@ -88,10 +84,8 @@ namespace firebase_ns
         ev_item getEvent()
         {
             last_ms = millis();
-
             if (evntVec.size())
                 evntVec[0].read = true;
-
             return evntVec.size() ? evntVec[0] : ev;
         }
 

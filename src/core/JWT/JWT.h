@@ -24,15 +24,6 @@ using namespace firebase_ns;
 
 namespace firebase_ns
 {
-    static void jwt_add_gapis_host(String &str, PGM_P sub)
-    {
-        str += sub;
-        if (str[str.length() - 1] != '.')
-            str += ".";
-        str += FPSTR("googleapis.com");
-    }
-    static void jwt_add_sp(String &buf) { buf += ' '; }
-
     struct jwt_token_data_t
     {
         String token, msg, pk;

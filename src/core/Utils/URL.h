@@ -33,15 +33,13 @@ public:
         hasParam = true;
         return true;
     }
-    
+
     /* Append the comma separated tokens as URL parameters */
     void addParamsTokens(String &url, const String &key, String val, bool &hasParam)
     {
         if (val.length() == 0)
             return;
-
         Memory mem;
-        StringUtil sut;
         char *p = reinterpret_cast<char *>(mem.alloc(val.length()));
         strcpy(p, val.c_str());
         char *pp = p;
@@ -71,18 +69,13 @@ public:
         }
         else
             url += '/';
-
         url += path;
     }
 
     /* Append the string with google storage URL */
     void addGStorageURL(String &uri, const String &bucketID, const String &storagePath)
     {
-        uri += FPSTR("gs://");
-        uri += bucketID;
-        if (storagePath[0] != '/')
-            uri += '/';
-        uri += storagePath;
+        sut.printTo(uri, 500, "gs://%s%s%s", bucketID.c_str(), storagePath[0] != '/' ? "/" : "", storagePath.c_str());
     }
 
     /* Append the string with cloudfunctions project host */
@@ -90,16 +83,8 @@ public:
     {
 #if defined(ENABLE_FUNCTIONS)
         if (url)
-            uri = FPSTR("https://");
-        uri += locationId;
-        uri += '-';
-        uri += projectId;
-        uri += FPSTR(".cloudfunctions.net");
-        if (path.length() > 0)
-        {
-            uri += '/';
-            uri += path;
-        }
+            sut.clear(uri);
+        sut.printTo(uri, 500, "%s%s-%s.cloudfunctions.net%s%s", url ? "https://" : "", locationId.c_str(), projectId.c_str(), path.length() ? "/" : "", path.length() ? path.c_str() : "");
 #endif
     }
     void addGAPIv1Path(String &uri) { uri += FPSTR("/v1/projects/"); }
@@ -178,11 +163,8 @@ public:
 
     String downloadURL(const String &bucketId, const String &object)
     {
-        String url = FPSTR("https://firebasestorage.googleapis.com/v0/b/");
-        url += bucketId;
-        url += FPSTR("/o/");
-        url += object;
-        url += FPSTR("?alt=media&token=a82781ce-a115-442f-bac6-a52f7f63b3e8");
+        String url;
+        sut.printTo(url, 500, "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media&token=a82781ce-a115-442f-bac6-a52f7f63b3e8", bucketId.c_str(), object.c_str());
         return url.c_str();
     }
 
@@ -197,5 +179,22 @@ public:
                 url.replace(FPSTR("a82781ce-a115-442f-bac6-a52f7f63b3e8"), payload.substring(p1, p2));
         }
     }
+
+    void addEncUrl(String &buff, const String &prefix, const String &param)
+    {
+        buff += prefix;
+        buff += encode(param);
+    }
+    void addUrl(String &buff, const String &param)
+    {
+        if (param.length())
+        {
+            buff += buff.length() ? '&' : '?';
+            buff += param;
+        }
+    }
+
+private:
+    StringUtil sut;
 };
 #endif

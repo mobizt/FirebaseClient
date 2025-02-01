@@ -76,7 +76,6 @@ namespace firebase_ns
 
         bool parseToken(const String &payload)
         {
-            StringUtil sut;
             int p1 = 0, p2 = 0;
             auth_data.app_token.clear();
             String token, refresh, str;
@@ -359,14 +358,24 @@ namespace firebase_ns
                 }
             }
 
-            if (auth_data.user_auth.jwt_signing && auth_data.user_auth.jwt_ts == 0)
+            if (auth_data.user_auth.jwt_signing && (auth_data.user_auth.jwt_ts == 0 || millis() - auth_data.user_auth.jwt_ts > FIREBASE_JWT_TIMEOUT_MS))
             {
 #if defined(ENABLE_JWT)
                 if (err_timer.remaining() == 0)
                 {
                     err_timer.feed(3);
-                    jwtProcessor()->jwt_data.err_code = FIREBASE_ERROR_JWT_CREATION_REQUIRED;
-                    jwtProcessor()->jwt_data.msg = "JWT process has not begun";
+                    if (auth_data.user_auth.jwt_ts == 0)
+                    {
+                        jwtProcessor()->jwt_data.err_code = FIREBASE_ERROR_JWT_CREATION_REQUIRED;
+                        jwtProcessor()->jwt_data.msg = "JWT process has not begun";
+                    }
+                    else
+                    {
+                        auth_data.user_auth.jwt_ts = millis();
+                        jwtProcessor()->jwt_data.err_code = FIREBASE_ERROR_JWT_CREATION_TIMEDOUT;
+                        jwtProcessor()->jwt_data.msg = "JWT process timed out";
+                    }
+
                     if (getRefResult())
                         jwtProcessor()->sendErrResult(auth_data.refResult);
                     else

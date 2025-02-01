@@ -109,5 +109,22 @@ public:
     }
 
     void clear(String &s) { s.remove(0, s.length()); }
+
+    void printTo(String &buff, int size, const char *format, ...)
+    {
+        size += strlen(format) + 1;
+        char s[size];
+        va_list va;
+        va_start(va, format);
+        vsnprintf(s, size, format, va);
+        va_end(va);
+        buff += s;
+    }
+    void addParams(const String &src, String &dest)
+    {
+        dest += src;
+        dest.replace(" ", "%20");
+        dest.replace(",", "%2C");
+    }
 };
 #endif

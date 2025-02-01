@@ -16,7 +16,7 @@ private:
         resume_state_send_payload,
         resume_state_read_response
     };
-    
+
     int index = 0, size = 0, read = 0, len = 0;
     bool enable = false;
     String location;
@@ -84,22 +84,7 @@ public:
         }
         return 0;
     }
-    void getHeader(String &header, const String &host, const String &ext)
-    {
-        header = FPSTR("PUT ");
-        header += ext;
-        header += FPSTR(" HTTP/1.1\r\nHost: ");
-        header += host;
-        header += FPSTR("\r\nConnection: keep-alive\r\nContent-Length: ");
-        header += len;
-        header += FPSTR("\r\nContent-Range: bytes ");
-        header += index;
-        header += '-';
-        header += index + read - 1;
-        header += '/';
-        header += size;
-        header += FPSTR("\r\n\r\n");
-    }
+    void getHeader(String &header, const String &host, const String &ext) { sut.printTo(header, 1024, "PUT %s HTTP/1.1\r\nHost: %s\r\nConnection: keep-alive\r\nContent-Length: %d\r\nContent-Range: bytes %d-%d/%d\r\n\r\n", ext.c_str(), host.c_str(), len, index, index + read - 1, size); }
     void clear()
     {
         sut.clear(location);

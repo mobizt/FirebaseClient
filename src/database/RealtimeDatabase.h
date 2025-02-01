@@ -1,5 +1,5 @@
 /**
- * 2025-01-31
+ * 2025-02-02
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -31,18 +31,13 @@
 using namespace firebase_ns;
 
 #if defined(ENABLE_DATABASE)
-class RealtimeDatabase : public RTDBResultBase
+class RealtimeDatabase : public RTDBResultBase, AppBase
 {
     friend class FirebaseApp;
     friend class AppBase;
 
 public:
-    std::vector<uint32_t> cVec; // AsyncClient vector
-
-    explicit RealtimeDatabase(const String &url = "")
-    {
-        this->service_url = url;
-    };
+    explicit RealtimeDatabase(const String &url = "") { this->service_url = url; }
 
     RealtimeDatabase &operator=(const RealtimeDatabase &rhs)
     {
@@ -54,32 +49,15 @@ public:
     ~RealtimeDatabase() {}
 
     /**
+     * Unbind or remove the FirebaseApp
+     */
+    void resetApp() { resetAppImpl(); }
+
+    /**
      * Set the Firebase database URL
      * @param url The Firebase database URL.
      */
-    void url(const String &url)
-    {
-        this->service_url = url;
-        if (this->service_url.length())
-        {
-            if (this->service_url.indexOf("://") > -1)
-                this->service_url.remove(0, this->service_url.indexOf("://") + 3);
-
-            if (this->service_url.length() && this->service_url[this->service_url.length() - 1] == '/')
-                this->service_url.remove(this->service_url.length() - 1, 1);
-        }
-    }
-
-    /**
-     * Unbind or remove the FirebaseApp
-     */
-    void resetApp()
-    {
-        this->app_addr = 0;
-        this->app_token = nullptr;
-        this->avec_addr = 0; // AsyncClient vector (list) address
-        this->ul_dl_task_running_addr = 0;
-    }
+    void url(const String &url) { this->service_url = uut.getHost(url, nullptr); }
 
     /**
      * Get value at the node path.
@@ -96,9 +74,7 @@ public:
     template <typename T = int>
     auto get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
     {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL);
-        asyncRequest(aReq);
-        return aClient.getResult()->rtdbResult.to<T>();
+        return sendRequest(&aClient, path, reqns::http_get, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL)->rtdbResult.to<T>();
     }
 
     /**
@@ -139,9 +115,7 @@ public:
     template <typename T = int>
     auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
     {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, false, false, false, options.shallow), &options, nullptr, aClient.getResult(), NULL);
-        asyncRequest(aReq);
-        return aClient.getResult()->rtdbResult.to<T>();
+        return sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, false, false, false, options.shallow), &options, nullptr, aClient.getResult(), NULL)->rtdbResult.to<T>();
     }
 
     /**
@@ -157,11 +131,7 @@ public:
      * @param sse The Server-sent events (Stream) mode
      *
      */
-    void get(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, bool sse = false)
-    {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, &aResult, NULL);
-        asyncRequest(aReq);
-    }
+    void get(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, bool sse = false) { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, &aResult, NULL); }
 
     /**
      * Get value at the node path.
@@ -177,11 +147,7 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void get(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "")
-    {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
-        asyncRequest(aReq);
-    }
+    void get(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "") { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, sse, true, false, false, false), nullptr, nullptr, nullptr, cb, uid); }
 
     /**
      * Get value at the node path.
@@ -203,11 +169,7 @@ public:
      * @return value that casts from response payload.
      *
      */
-    void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult)
-    {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, &aResult, NULL);
-        asyncRequest(aReq);
-    }
+    void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, &aResult, NULL); }
 
     /**
      * Get value at the node path.
@@ -230,11 +192,7 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "")
-    {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb, uid);
-        asyncRequest(aReq);
-    }
+    void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), &options, nullptr, nullptr, cb, uid); }
 
     /**
      * Get value at the node path.
@@ -282,11 +240,7 @@ public:
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param aResult The async result (AsyncResult)
      */
-    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
-    {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, NULL);
-        asyncRequest(aReq);
-    }
+    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, NULL); }
 
     /**
      * Get value at the node path.
@@ -335,11 +289,7 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
-    {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(), nullptr, &file, nullptr, cb, uid);
-        asyncRequest(aReq);
-    }
+    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_get, slot_options_t(), nullptr, &file, nullptr, cb, uid); }
 
     /**
      * Checks if path exists in database
@@ -357,9 +307,7 @@ public:
     {
         DatabaseOptions options;
         options.silent = true;
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(), &options, nullptr, aClient.getResult(), NULL);
-        asyncRequest(aReq);
-        return !getNullETagOption(&aClient.getResult()->rtdbResult);
+        return !getNullETagOption(&sendRequest(&aClient, path, reqns::http_get, slot_options_t(), &options, nullptr, aClient.getResult(), NULL)->rtdbResult);
     }
 
     /**
@@ -376,11 +324,7 @@ public:
      * @param aResult The async result (AsyncResult)
      *
      */
-    void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
-    {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, &aResult, NULL);
-        asyncRequest(aReq);
-    }
+    void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, &aResult, NULL); }
 
     /**
      * Perform OTA update using a firmware file from the database.
@@ -397,11 +341,7 @@ public:
      * The data of node to download should be base64 encoded string of the firmware file.
      *
      */
-    void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
-    {
-        req_data aReq(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, nullptr, cb, uid);
-        asyncRequest(aReq);
-    }
+    void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, nullptr, cb, uid); }
 
     /**
      * Set value to database.
@@ -423,10 +363,7 @@ public:
      * ```
      */
     template <typename T = const char *>
-    bool set(AsyncClientClass &aClient, const String &path, T value)
-    {
-        return storeAsync(aClient, path, value, reqns::http_put, false, aClient.getResult(), NULL, "");
-    }
+    bool set(AsyncClientClass &aClient, const String &path, T value) { return storeAsync(aClient, path, value, reqns::http_put, false, aClient.getResult(), NULL, ""); }
 
     /**
      * Set value to database.
@@ -448,10 +385,7 @@ public:
      * ```
      */
     template <typename T = const char *>
-    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
-    {
-        storeAsync(aClient, path, value, reqns::http_put, true, &aResult, NULL, "");
-    }
+    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult) { storeAsync(aClient, path, value, reqns::http_put, true, &aResult, NULL, ""); }
 
     /**
      * Set value to database.
@@ -474,10 +408,7 @@ public:
      * ```
      */
     template <typename T = const char *>
-    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
-    {
-        storeAsync(aClient, path, value, reqns::http_put, true, nullptr, cb, uid);
-    }
+    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "") { storeAsync(aClient, path, value, reqns::http_put, true, nullptr, cb, uid); }
 
     /**
      * Set content from file to database.
@@ -524,11 +455,7 @@ public:
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param aResult The async result (AsyncResult)
      */
-    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
-    {
-        req_data aReq(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
-        asyncRequest(aReq);
-    }
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr); }
 
     /**
      * Set content from file to database.
@@ -576,11 +503,7 @@ public:
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      */
-    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
-    {
-        req_data aReq(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid);
-        asyncRequest(aReq);
-    }
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid); }
 
     /**
      * Push value to database.
@@ -603,15 +526,7 @@ public:
      *
      */
     template <typename T = const char *>
-    String push(AsyncClientClass &aClient, const String &path, T value)
-    {
-        ValueConverter vcon;
-        String payload;
-        vcon.getVal<T>(payload, value);
-        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL);
-        asyncRequest(aReq, payload.c_str());
-        return aClient.getResult()->rtdbResult.name();
-    }
+    String push(AsyncClientClass &aClient, const String &path, T value) { return sendRequest(&aClient, path, reqns::http_post, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL, "", convert(value).c_str())->rtdbResult.name(); }
 
     /**
      * Push value to database.
@@ -633,14 +548,7 @@ public:
      * @param aResult The async result (AsyncResult).
      */
     template <typename T = const char *>
-    void push(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
-    {
-        ValueConverter vcon;
-        String payload;
-        vcon.getVal<T>(payload, value);
-        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, NULL);
-        asyncRequest(aReq, payload.c_str());
-    }
+    void push(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, NULL, "", convert(value).c_str()); }
 
     /**
      * Push value to database.
@@ -663,14 +571,7 @@ public:
      * @param uid The user specified UID of async result (optional).
      */
     template <typename T = const char *>
-    void push(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
-    {
-        ValueConverter vcon;
-        String payload;
-        vcon.getVal<T>(payload, value);
-        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
-        asyncRequest(aReq, payload.c_str());
-    }
+    void push(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid, convert(value).c_str()); }
 
     /**
      * Push content from file to database.
@@ -718,11 +619,7 @@ public:
      * @param aResult The async result (AsyncResult)
      *
      */
-    void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
-    {
-        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr);
-        asyncRequest(aReq);
-    }
+    void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr); }
 
     /**
      * Push content from file to database.
@@ -769,11 +666,7 @@ public:
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      *
      */
-    void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
-    {
-        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, nullptr, cb, uid);
-        asyncRequest(aReq);
-    }
+    void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_post, slot_options_t(false, false, true, false, false, false), nullptr, &file, nullptr, cb, uid); }
 
     /**
      * Update (patch) JSON representation data to database.
@@ -789,10 +682,7 @@ public:
      *
      */
     template <typename T = object_t>
-    bool update(AsyncClientClass &aClient, const String &path, const T &value)
-    {
-        return storeAsync(aClient, path, value, reqns::http_patch, false, aClient.getResult(), NULL, "");
-    }
+    bool update(AsyncClientClass &aClient, const String &path, const T &value) { return storeAsync(aClient, path, value, reqns::http_patch, false, aClient.getResult(), NULL, ""); }
 
     /**
      * Update (patch) JSON representation data to database.
@@ -807,10 +697,7 @@ public:
      * @param aResult The async result (AsyncResult).
      */
     template <typename T = object_t>
-    void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult)
-    {
-        storeAsync(aClient, path, value, reqns::http_patch, true, &aResult, NULL, "");
-    }
+    void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult) { storeAsync(aClient, path, value, reqns::http_patch, true, &aResult, NULL, ""); }
 
     /**
      * Update (patch) JSON representation data to database.
@@ -826,10 +713,7 @@ public:
      * @param uid The user specified UID of async result (optional).
      */
     template <typename T = object_t>
-    void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "")
-    {
-        storeAsync(aClient, path, value, reqns::http_patch, true, nullptr, cb, uid);
-    }
+    void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "") { storeAsync(aClient, path, value, reqns::http_patch, true, nullptr, cb, uid); }
 
     /**
      * Remove node from database
@@ -843,12 +727,7 @@ public:
      * @return boolean value indicates the operating status.
      *
      */
-    bool remove(AsyncClientClass &aClient, const String &path)
-    {
-        req_data aReq(&aClient, path, reqns::http_delete, slot_options_t(), nullptr, nullptr, aClient.getResult(), nullptr);
-        asyncRequest(aReq);
-        return getNullETagOption(&aClient.getResult()->rtdbResult) && String(aClient.getResult()->rtdbResult.data()).indexOf("null") > -1;
-    }
+    bool remove(AsyncClientClass &aClient, const String &path) { return getNullETagOption(&sendRequest(&aClient, path, reqns::http_delete, slot_options_t(), nullptr, nullptr, aClient.getResult(), nullptr)->rtdbResult) && String(aClient.getResult()->rtdbResult.data()).indexOf("null") > -1; }
 
     /**
      * Remove node from database
@@ -862,11 +741,7 @@ public:
      * @param aResult The async result (AsyncResult).
      *
      */
-    void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
-    {
-        req_data aReq(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, nullptr);
-        asyncRequest(aReq);
-    }
+    void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, nullptr); }
 
     /**
      * Remove node from database
@@ -880,11 +755,7 @@ public:
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
      */
-    void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
-    {
-        req_data aReq(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid);
-        asyncRequest(aReq);
-    }
+    void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid); }
 
     /**
      * Filtering response payload for SSE mode (HTTP Streaming).
@@ -902,10 +773,7 @@ public:
      *
      * To clear all prevousely set filter to allow all Stream events, use RealtimeDatabase::setSSEFilters().
      */
-    void setSSEFilters(const String &filter = "")
-    {
-        this->sse_events_filter = filter;
-    }
+    void setSSEFilters(const String &filter = "") { this->sse_events_filter = filter; }
 
 #if defined(FIREBASE_OTA_STORAGE)
     /**
@@ -919,31 +787,10 @@ public:
      * Perform the async task repeatedly.
      * Should be placed in main loop function.
      */
-    void loop()
-    {
-        app_token_t *aToken = appToken();
-        for (size_t i = 0; i < cVec.size(); i++)
-        {
-            AsyncClientClass *client = reinterpret_cast<AsyncClientClass *>(cVec[i]);
-            if (client)
-            {
-                // Store the auth time in all async clients.
-                // The auth time will be used to reconnect the Stream when auth changed.
-                if (aToken && aToken->auth_ts > 0 && aToken->authenticated)
-                    client->setAuthTs(aToken->auth_ts);
-                client->process(true);
-                client->handleRemove();
-            }
-        }
-    }
+    void loop() { loopImpl(); }
 
 private:
-    String service_url, sse_events_filter;
-
-    // FirebaseApp address and FirebaseApp vector address
-    uint32_t app_addr = 0, avec_addr = 0, ul_dl_task_running_addr = 0, ota_storage_addr = 0;
-    app_token_t *app_token = nullptr;
-
+    String sse_events_filter;
     struct req_data
     {
     public:
@@ -970,25 +817,6 @@ private:
         }
     };
 
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t ul_dl_task_running_addr)
-    {
-        this->app_addr = app_addr;
-        this->app_token = app_token;
-        this->avec_addr = avec_addr; // AsyncClient vector (list) address
-        this->ul_dl_task_running_addr = ul_dl_task_running_addr;
-    }
-
-    app_token_t *appToken()
-    {
-        if (avec_addr > 0)
-        {
-            const std::vector<uint32_t> *aVec = reinterpret_cast<std::vector<uint32_t> *>(avec_addr);
-            List vec;
-            return vec.existed(*aVec, app_addr) ? app_token : nullptr;
-        }
-        return nullptr;
-    }
-
     template <typename T = object_t>
     bool storeAsync(AsyncClientClass &aClient, const String &path, const T &value, reqns::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb, const String &uid)
     {
@@ -998,11 +826,22 @@ private:
         DatabaseOptions options;
         if (!async && aClient.reqEtag.length() == 0)
             options.silent = true;
-        req_data aReq(&aClient, path, mode, slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid);
-        asyncRequest(aReq, payload.c_str());
-        if (!async)
-            return aResult->lastError.code() == 0;
-        return true;
+        return sendRequest(&aClient, path, mode, slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid, payload.c_str())->lastError.code() == 0;
+    }
+    template <typename T = object_t>
+    const char *convert(T value)
+    {
+        ValueConverter vcon;
+        String payload;
+        vcon.getVal<T>(payload, value);
+        return payload.c_str();
+    }
+
+    AsyncResult *sendRequest(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const char *payload = "")
+    {
+        req_data areq(aClient, path, method, opt, options, file, aResult, cb, uid);
+        asyncRequest(areq, payload);
+        return aClient->getResult();
     }
 
     void asyncRequest(req_data &request, const char *payload = "")
@@ -1070,26 +909,24 @@ private:
 
     void addParams(bool hasQueryParams, String &extras, reqns::http_request_method method, DatabaseOptions *options, bool isFile)
     {
-        URLUtil uut;
-        bool hasParam = hasQueryParams;
-
         if (options)
         {
             if (options->readTimeout > 0)
-                uut.addParam(extras, "timeout", String(options->readTimeout) + "ms", hasQueryParams);
+                sut.printTo(extras, 20, "%stimeout=%dms", extras.length() || hasQueryParams ? "&" : "?", options->readTimeout);
 
-            uut.addParam(extras, "writeSizeLimit", options->writeSizeLimit, hasQueryParams);
+            if (options->writeSizeLimit.length())
+                sut.printTo(extras, 20, "%swriteSizeLimit=%s", extras.length() || hasQueryParams ? "&" : "?", options->writeSizeLimit.c_str());
 
             if (options->shallow)
-                uut.addParam(extras, "shallow", "true", hasQueryParams, true);
+                sut.printTo(extras, 20, "%sshallow=true", extras.length() || hasQueryParams ? "&" : "?");
         }
 
         if ((options && options->silent) || ((method == reqns::http_put || method == reqns::http_post || method == reqns::http_patch) && isFile))
-            uut.addParam(extras, "print", "silent", hasQueryParams, true);
+            sut.printTo(extras, 20, "%sprint=silent", extras.length() || hasQueryParams ? "&" : "?");
 
         if (options && options->filter.complete)
         {
-            options->filter.uri[0] = !hasParam ? '?' : '&';
+            options->filter.uri[0] = extras.length() || hasQueryParams ? '&' : '?';
             extras += options->filter.uri;
         }
     }
@@ -1103,6 +940,9 @@ private:
             sData->upload = request.method == http_post || request.method == http_put || request.method == http_patch;
         }
     }
+
+private:
+    StringUtil sut;
 };
 #endif
 #endif

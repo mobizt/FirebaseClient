@@ -43,13 +43,11 @@ private:
 
     void setError(int code, const String &msg)
     {
-
         if (code == 0 || code == last)
             return;
 
         last = code;
         limitQueue();
-
         ms = millis();
         err_item errt;
         errt.code = code;
@@ -80,7 +78,6 @@ private:
                 errVec.erase(errVec.begin());
             return new_code != current_code;
         }
-
         // remaining to read?
         return remaining();
     }
@@ -88,10 +85,8 @@ private:
     err_item getError()
     {
         last_ms = millis();
-
         if (errVec.size())
             errVec[0].read = true;
-
         return errVec.size() ? errVec[0] : err;
     }
 
@@ -106,7 +101,6 @@ public:
             isErrorChecked = true;
             return 0;
         }
-
         return getError().code;
     }
 
