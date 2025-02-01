@@ -5,7 +5,7 @@
 #include <Client.h>
 #include "./Config.h"
 #include <type_traits>
-#include <stdarg.h> 
+#include <stdarg.h>
 
 #if defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_MINIMA) || defined(ARDUINO_PORTENTA_C33)
 #define FIREBASE_STRSEP strsepImpl
@@ -119,7 +119,7 @@ public:
         va_start(va, format);
         vsnprintf(s, size, format, va);
         va_end(va);
-        buff += String(s);
+        buff += (const char *)s;
     }
     void addParams(const String &src, String &dest)
     {
