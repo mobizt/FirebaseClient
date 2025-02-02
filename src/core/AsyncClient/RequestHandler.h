@@ -9,6 +9,8 @@
 #include "./core/Utils/StringUtil.h"
 #include "./core/Utils/URL.h"
 #include "./core/Utils/Base64.h"
+#include "./core/AsyncClient/ConnectionHandler.h"
+#include "./core/Auth/Token/AppToken.h"
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncClient/AsyncTCPConfig.h"
 #endif

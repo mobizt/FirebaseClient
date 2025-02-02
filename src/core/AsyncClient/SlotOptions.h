@@ -3,6 +3,8 @@
 
 #include "./core/Auth/Token/AppToken.h"
 
+using namespace firebase_ns;
+
 struct slot_options_t
 {
 public:

@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <Client.h>
 #include "./core/Error.h"
+#include "./core/AsyncClient/ConnectionHandler.h"
 #include "./core/AsyncClient/RequestHandler.h"
 #include "./core/Utils/StringUtil.h"
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
