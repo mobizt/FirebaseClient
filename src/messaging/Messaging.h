@@ -133,12 +133,7 @@ private:
         request.opt.app_token = atoken;
         String extras;
 
-        if (beta == 2)
-            uut.addGAPIv1beta2Path(request.path);
-        else if (beta == 1)
-            uut.addGAPIv1beta1Path(request.path);
-        else
-            uut.addGAPIv1Path(request.path);
+        sut.printTo(request.path, 20, "/v1%s%s/projects/", beta == 0 ? "" : "beta", beta == 0 ? "" : String(beta).c_str());
 
         request.path += request.options->parent.getProjectId().length() == 0 ? atoken->val[app_tk_ns::pid] : request.options->parent.getProjectId();
 
@@ -156,7 +151,7 @@ private:
         if (request.options->payload.length())
         {
             sData->request.val[reqns::payload] = request.options->payload;
-            sData->request.setContentLength(request.options->payload.length());
+            sData->request.setContentLengthFinal(request.options->payload.length());
         }
 
         if (request.cb)

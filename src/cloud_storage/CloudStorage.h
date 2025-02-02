@@ -452,7 +452,7 @@ private:
             else
             {
                 if (request.mime.length())
-                    sData->request.setContentType(request.mime);
+                    sData->request.addContentType(request.mime);
                 sData->request.setFileContentLength();
             }
 
@@ -465,7 +465,7 @@ private:
         else if (request.options->payload.length())
         {
             sData->request.val[reqns::payload] = request.options->payload;
-            sData->request.setContentLength(request.options->payload.length());
+            sData->request.setContentLengthFinal(request.options->payload.length());
         }
 
         if (request.cb)

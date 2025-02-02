@@ -56,29 +56,14 @@ namespace FirebaseStorage
         Parent() {}
         explicit Parent(const String &bucketId, const String &object = "", const String &accessToken = "")
         {
-            this->object = object;
-            this->bucketId = bucketId;
-
-            if (this->bucketId.length() && this->bucketId.indexOf("://") > -1)
-                this->bucketId.remove(0, this->bucketId.indexOf("://") + 3);
-
-            if (this->bucketId.length())
-            {
-                if (this->bucketId.indexOf("://") > -1)
-                    this->bucketId.remove(0, this->bucketId.indexOf("://") + 3);
-
-                if (this->bucketId.length() && this->bucketId[this->bucketId.length() - 1] == '/')
-                    this->bucketId.remove(this->bucketId.length() - 1, 1);
-            }
-
-            if (this->object.length() && this->object[0] == '/')
-                this->object.remove(0, 1);
-
+            URLUtil uut;
+            this->bucketId = uut.getHost(bucketId);
+            this->object = uut.getHost(object);
             this->accessToken = accessToken;
         }
         String getObject() const { return object; }
         String getBucketId() const { return bucketId; }
-        String getAccessToken() const { return accessToken; }
+        const char* getAccessToken() const { return accessToken.c_str(); }
     };
 
     class DataOptions
@@ -110,10 +95,9 @@ namespace FirebaseStorage
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         req_data() {}
-        explicit req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        explicit req_data(AsyncClientClass *aClient, reqns::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
         {
             this->aClient = aClient;
-            this->path = path;
             this->method = method;
             this->opt = opt;
             this->options = options;

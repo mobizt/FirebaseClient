@@ -85,9 +85,8 @@ public:
     String toString(const String &value)
     {
         String buf;
-        buf += '"';
-        buf += value;
-        buf += '"';
+        StringUtil sut;
+        sut.printTo(buf, value.length(), "\"%s\"", value);
         return buf;
     }
 };
@@ -103,7 +102,6 @@ private:
         memset(p, 0, path.length() + 1);
         strcpy(p, path.c_str());
         char *pp = p, *end = p;
-        String tmp;
         int i = 0;
         obj = "{";
         while (pp != NULL)
@@ -111,18 +109,13 @@ private:
             sut.strsepImpl(&end, "/");
             if (strlen(pp) > 0)
             {
-                tmp = pp;
-                if (i > 0)
-                    obj += '{';
-                obj += '"';
-                obj += tmp;
-                obj += '"';
-                obj += ':';
+                String buff;
+                sut.printTo(buff, strlen(pp) + 1, "%s\"%s\":", i > 0 ? "{" : "", pp);
+                obj += buff;
                 i++;
             }
             pp = end;
         }
-
         delete p;
         return i;
     }

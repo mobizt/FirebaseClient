@@ -295,8 +295,6 @@ public:
 #endif
 
 private:
-    String path, uid;
-
     AsyncResult *sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, file_config_data *file, const String &mime, FirebaseStorage::firebase_storage_request_type requestType, bool async)
     {
         using namespace FirebaseStorage;
@@ -310,25 +308,16 @@ private:
         {
             method = reqns::http_get;
             if (requestType == fs_download || requestType == fs_download_ota)
-            {
-                options.extras += "?alt=media";
-                if (options.parent.getAccessToken().length())
-                {
-                    options.extras += "&token=";
-                    options.extras += options.parent.getAccessToken();
-                }
-            }
+                sut.printTo(options.extras, strlen(options.parent.getAccessToken()) + 100, "?alt=media%s%s", strlen(options.parent.getAccessToken()) ? "&token=" : "", strlen(options.parent.getAccessToken()) ? options.parent.getAccessToken() : "");
         }
         else if (requestType == fs_upload || requestType == fs_delete)
         {
-            options.extras += "?name=";
-            options.extras += uut.encode(parent.getObject());
-
+            uut.addEncUrl(options.extras, "?name=", parent.getObject());
             if (requestType == fs_delete)
                 method = reqns::http_delete;
         }
 
-        req_data aReq(&aClient, path, method, slot_options_t(false, false, async, false, requestType == fs_download_ota, false), &options, file, result, cb, uid);
+        req_data aReq(&aClient, method, slot_options_t(false, false, async, false, requestType == fs_download_ota, false), &options, file, result, cb, uid);
         if (mime.length() && requestType == fs_upload)
             aReq.mime = mime;
         asyncRequest(aReq);
@@ -378,7 +367,7 @@ private:
             sData->request.base64 = false;
 
             if (request.mime.length())
-                sData->request.setContentType(request.mime);
+                sData->request.addContentType(request.mime);
 
             sData->request.setFileContentLength();
 
@@ -389,7 +378,7 @@ private:
         else if (request.options->payload.length())
         {
             sData->request.val[reqns::payload] = request.options->payload;
-            sData->request.setContentLength(request.options->payload.length());
+            sData->request.setContentLengthFinal(request.options->payload.length());
         }
 
         if (request.cb)

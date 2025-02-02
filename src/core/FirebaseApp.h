@@ -273,7 +273,7 @@ namespace firebase_ns
                 newRequestBase(aClient, sData, host, extras, "", reqns::http_post, soption, uid);
 
                 addContentTypeHeader(sData->request.val[reqns::header], "application/json");
-                setContentLengthBase(aClient, sData, sData->request.val[reqns::payload].length());
+                sData->request.setContentLengthFinal(sData->request.val[reqns::payload].length());
                 req_timer.feed(FIREBASE_TCP_READ_TIMEOUT_SEC);
                 slot = slotCountBase(aClient) - 1;
 

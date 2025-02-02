@@ -72,10 +72,7 @@ public:
      *
      */
     template <typename T = int>
-    auto get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
-    {
-        return sendRequest(&aClient, path, reqns::http_get, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL)->rtdbResult.to<T>();
-    }
+    auto get(AsyncClientClass &aClient, const String &path) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type { return sendRequest(&aClient, path, reqns::http_get, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL)->rtdbResult.to<T>(); }
 
     /**
      * Get value at the node path.
@@ -113,10 +110,7 @@ public:
      *
      */
     template <typename T = int>
-    auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type
-    {
-        return sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, false, false, false, options.shallow), &options, nullptr, aClient.getResult(), NULL)->rtdbResult.to<T>();
-    }
+    auto get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options) -> typename std::enable_if<!std::is_same<T, void>::value && !std::is_same<T, AsyncResult>::value, T>::type { return sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, false, false, false, options.shallow), &options, nullptr, aClient.getResult(), NULL)->rtdbResult.to<T>(); }
 
     /**
      * Get value at the node path.
@@ -853,8 +847,8 @@ private:
 
         request.opt.app_token = atoken;
         request.opt.auth_param = atoken->auth_data_type != user_auth_data_no_token && atoken->auth_type != auth_access_token && atoken->auth_type != auth_sa_access_token;
-        String extras = request.opt.auth_param ? ".json?auth=" + String(FIREBASE_AUTH_PLACEHOLDER) : ".json";
-
+        String extras;
+        sut.printTo(extras, 100, ".json%s%s", request.opt.auth_param ? "?auth=" : "", request.opt.auth_param ? String(FIREBASE_AUTH_PLACEHOLDER).c_str() : ""); //
         addParams(request.opt.auth_param, extras, request.method, request.options, request.file);
 
         async_data *sData = request.aClient->createSlot(request.opt);
@@ -889,7 +883,7 @@ private:
         else if (strlen(payload))
         {
             sData->request.val[reqns::payload] = payload;
-            sData->request.setContentLength(strlen(payload));
+            sData->request.setContentLengthFinal(strlen(payload));
         }
 
         if (request.cb)
@@ -907,26 +901,26 @@ private:
         request.aClient->handleRemove();
     }
 
-    void addParams(bool hasQueryParams, String &extras, reqns::http_request_method method, DatabaseOptions *options, bool isFile)
+    void addParams(bool hasParam, String &extras, reqns::http_request_method method, DatabaseOptions *options, bool isFile)
     {
         if (options)
         {
             if (options->readTimeout > 0)
-                sut.printTo(extras, 20, "%stimeout=%dms", extras.length() || hasQueryParams ? "&" : "?", options->readTimeout);
+                sut.printTo(extras, 20, "%stimeout=%dms", extras.length() || hasParam ? "&" : "?", options->readTimeout);
 
             if (options->writeSizeLimit.length())
-                sut.printTo(extras, 20, "%swriteSizeLimit=%s", extras.length() || hasQueryParams ? "&" : "?", options->writeSizeLimit.c_str());
+                sut.printTo(extras, 20, "%swriteSizeLimit=%s", extras.length() || hasParam ? "&" : "?", options->writeSizeLimit.c_str());
 
             if (options->shallow)
-                sut.printTo(extras, 20, "%sshallow=true", extras.length() || hasQueryParams ? "&" : "?");
+                sut.printTo(extras, 20, "%sshallow=true", extras.length() || hasParam ? "&" : "?");
         }
 
         if ((options && options->silent) || ((method == reqns::http_put || method == reqns::http_post || method == reqns::http_patch) && isFile))
-            sut.printTo(extras, 20, "%sprint=silent", extras.length() || hasQueryParams ? "&" : "?");
+            sut.printTo(extras, 20, "%sprint=silent", extras.length() || hasParam ? "&" : "?");
 
         if (options && options->filter.complete)
         {
-            options->filter.uri[0] = extras.length() || hasQueryParams ? '&' : '?';
+            options->filter.uri[0] = extras.length() || hasParam ? '&' : '?';
             extras += options->filter.uri;
         }
     }

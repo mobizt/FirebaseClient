@@ -332,28 +332,14 @@ private:
     JSONUtil jut;
     StringUtil sut;
 
-    String getQuery(const String &mask)
+    const char* getQuery(const String &mask)
     {
         sut.clear(buf[1]);
         if (buf[2].length())
-        {
-            buf[1] = FPSTR("?");
-            buf[1] += mask;
-            buf[1] += FPSTR(".exists=");
-            buf[1] += buf[2];
-        }
-
+            sut.printTo(buf[1], mask.length() + buf[2].length(), "?%s.exists=%s", mask.c_str(), buf[2].c_str());
         if (buf[3].length())
-        {
-            if (buf[1].length())
-                buf[1] += '&';
-            else
-                buf[1] = FPSTR("?");
-            buf[1] += mask;
-            buf[1] += FPSTR(".updateTime=");
-            buf[1] += jut.toString(buf[3]);
-        }
-        return buf[1];
+            sut.printTo(buf[1], mask.length() + jut.toString(buf[3]).length(), "%s%s.updateTime=%s", buf[1].length() ? "&" : "?", mask.c_str(), jut.toString(buf[3]).c_str());
+        return buf[1].c_str();
     }
 
     Precondition &setObject()
@@ -1312,8 +1298,8 @@ namespace Firestore
             }
         }
         void setDocPath(const String &docPath) { documentPath = docPath; }
-        String getDatabaseId() const { return databaseId.c_str(); }
-        String getProjectId() const { return projectId.c_str(); }
+        const char *getDatabaseId() const { return databaseId.c_str(); }
+        const char *getProjectId() const { return projectId.c_str(); }
         void setDatabaseIdParam(bool value) { databaseIdParam = value; }
         bool isDatabaseIdParam() { return databaseIdParam; }
     };

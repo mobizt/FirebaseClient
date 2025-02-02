@@ -956,14 +956,7 @@ private:
         sData->aResult.setUID(uid);
 
         clear(sData->request.val[reqns::header]);
-        sData->request.addRequestHeaderFirst(method);
-        if (path.length() == 0)
-            sData->request.val[reqns::header] += '/';
-        else if (path[0] != '/')
-            sData->request.val[reqns::header] += '/';
-        sData->request.val[reqns::header] += path;
-        sData->request.val[reqns::header] += extras;
-        sData->request.addRequestHeaderLast();
+        sData->request.addRequestHeader(method, path, extras);
         sData->request.addHostHeader(sData->request.getHost(true, &sData->response.val[resns::location]).c_str());
 
         sData->auth_used = options.auth_used;
@@ -972,32 +965,18 @@ private:
         {
             sData->request.app_token = options.app_token;
             if (options.app_token && !options.auth_param && (options.app_token->auth_type > auth_unknown_token && options.app_token->auth_type < auth_refresh_token))
-            {
-                sData->request.addAuthHeaderFirst(options.app_token->auth_type);
-                sData->request.val[reqns::header] += FIREBASE_AUTH_PLACEHOLDER;
-                sData->request.addNewLine();
-            }
+                sData->request.addAuthHeader(options.app_token->auth_type);
 
             sData->request.addConnectionHeader(true);
 
             if (!options.sv && !options.no_etag && method != reqns::http_patch && extras.indexOf("orderBy") == -1)
-            {
-                sData->request.val[reqns::header] += FPSTR("X-Firebase-ETag: true");
-                sData->request.addNewLine();
-            }
+                sData->request.val[reqns::header] += "X-Firebase-ETag: true\r\n";
 
             if (sData->request.val[reqns::etag].length() > 0 && (method == reqns::http_put || method == reqns::http_delete))
-            {
-                sData->request.val[reqns::header] += FPSTR("if-match: ");
-                sData->request.val[reqns::header] += sData->request.val[reqns::etag];
-                sData->request.addNewLine();
-            }
+                sut.printTo(sData->request.val[reqns::header], 100, "if-match: %s\r\n", sData->request.val[reqns::etag].c_str());
 
             if (options.sse)
-            {
-                sData->request.val[reqns::header] += FPSTR("Accept: text/event-stream");
-                sData->request.addNewLine();
-            }
+                sData->request.val[reqns::header] += "Accept: text/event-stream\r\n";
         }
 
         if (method == reqns::http_get || method == reqns::http_delete)

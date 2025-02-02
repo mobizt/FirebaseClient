@@ -646,8 +646,6 @@ public:
     void testIamPermissions(AsyncClientClass &aClient, const Parent &parent, const String &functionId, const GoogleCloudFunctions::Permissions &permissions, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, functionId, nullptr, "", GoogleCloudFunctions::fn_test_iam_permission, permissions.c_str(), true); }
 
 private:
-    String path, uid;
-
     AsyncResult *sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, file_config_data *file, const String &functionId, const ListOptions *listOptions, const String &updateMask, GoogleCloudFunctions::google_cloud_functions_request_type requestType, const String &payload, bool async)
     {
         using namespace GoogleCloudFunctions;
@@ -655,9 +653,7 @@ private:
         options.requestType = requestType;
         options.parent = parent;
         options.parent.setFunctionId(functionId);
-
         bool hasParam = false;
-
         reqns::http_request_method method = reqns::http_post;
 
         if (payload.length())
@@ -706,7 +702,7 @@ private:
         if (updateMask.length())
             uut.addParamsTokens(options.extras, "updateMask=", updateMask, hasParam);
 
-        req_data aReq(&aClient, path, method, slot_options_t(false, false, async, false, false, false), &options, file, result, cb, uid);
+        req_data aReq(&aClient, method, slot_options_t(false, false, async, false, false, false), &options, file, result, cb, uid);
         asyncRequest(aReq, requestType);
         return aClient.getResult();
     }
@@ -768,7 +764,7 @@ private:
             sData->request.base64 = false;
 
             if (request.mime.length())
-                sData->request.setContentType(request.mime);
+                sData->request.addContentType(request.mime);
 
             sData->request.setFileContentLength(0);
 
@@ -778,12 +774,11 @@ private:
         else if (request.options->payload.length())
         {
             sData->request.val[reqns::payload] = request.options->payload;
-            sData->request.setContentLength(request.options->payload.length());
+            sData->request.setContentLengthFinal(request.options->payload.length());
         }
 
-        if (requestType == fn_gen_downloadUrl ||
-            (requestType == fn_gen_uploadUrl && request.options->payload.length() == 0))
-            sData->request.setContentLength(0);
+        if (requestType == fn_gen_downloadUrl || (requestType == fn_gen_uploadUrl && request.options->payload.length() == 0))
+            sData->request.setContentLengthFinal(0);
 
         if (request.cb)
             sData->cb = request.cb;

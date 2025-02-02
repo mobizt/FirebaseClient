@@ -60,23 +60,10 @@ public:
     }
 
     /* Append the path to URL */
-    void addPath(String &url, const String &path)
-    {
-        if (path.length() > 0)
-        {
-            if (path[0] != '/')
-                url += '/';
-        }
-        else
-            url += '/';
-        url += path;
-    }
+    void addPath(String &url, const String &path) { sut.printTo(url, path.length(), "%s%s", path.length() == 0 || (path.length() && path[0] != '/') ? "/" : "", path); }
 
     /* Append the string with google storage URL */
-    void addGStorageURL(String &uri, const String &bucketID, const String &storagePath)
-    {
-        sut.printTo(uri, 500, "gs://%s%s%s", bucketID.c_str(), storagePath[0] != '/' ? "/" : "", storagePath.c_str());
-    }
+    void addGStorageURL(String &uri, const String &bucketID, const String &storagePath) { sut.printTo(uri, 500, "gs://%s%s%s", bucketID.c_str(), storagePath[0] != '/' ? "/" : "", storagePath.c_str()); }
 
     /* Append the string with cloudfunctions project host */
     void addFunctionsHost(String &uri, const String &locationId, const String &projectId, const String &path, bool url)
@@ -87,14 +74,7 @@ public:
         sut.printTo(uri, 500, "%s%s-%s.cloudfunctions.net%s%s", url ? "https://" : "", locationId.c_str(), projectId.c_str(), path.length() ? "/" : "", path.length() ? path.c_str() : "");
 #endif
     }
-    void addGAPIv1Path(String &uri) { uri += FPSTR("/v1/projects/"); }
-    void addGAPIv1beta1Path(String &uri) { uri += FPSTR("/v1beta1/projects/"); }
-    void addGAPIv1beta2Path(String &uri) { uri += FPSTR("/v1beta2/projects/"); }
-    void host2Url(String &url, const String &host)
-    {
-        url = FPSTR("https://");
-        url += host;
-    }
+
     void hexchar(char c, char &hex1, char &hex2)
     {
         hex1 = c / 16;
@@ -102,6 +82,7 @@ public:
         hex1 += hex1 < 10 ? '0' : 'A' - 10;
         hex2 += hex2 < 10 ? '0' : 'A' - 10;
     }
+
     String encode(const String &s)
     {
         String ret;
@@ -149,16 +130,11 @@ public:
 
     String getHost(const String &url, String *ext = nullptr)
     {
-        int p1 = url.indexOf("://");
-        int p2 = -1;
-        p1 = p1 > -1 ? p1 + 3 : 0;
-        p2 = url.indexOf("/", p1);
-        if (p2 == -1)
-            p2 = url.length();
-
+        int start = url.length() && url[0] == '/' ? 1 : (url.indexOf("://") == -1 ? 0 : url.indexOf("://") + 3);
+        int end = url.indexOf("/", start) == -1 ? url.length() : url.indexOf("/", start);
         if (ext)
-            *ext = url.substring(p2, url.length());
-        return url.substring(p1, p2);
+            *ext = url.substring(end, url.length());
+        return url.substring(start, end);
     }
 
     String downloadURL(const String &bucketId, const String &object)
@@ -180,19 +156,8 @@ public:
         }
     }
 
-    void addEncUrl(String &buff, const String &prefix, const String &param)
-    {
-        buff += prefix;
-        buff += encode(param);
-    }
-    void addUrl(String &buff, const String &param)
-    {
-        if (param.length())
-        {
-            buff += buff.length() ? '&' : '?';
-            buff += param;
-        }
-    }
+    void addEncUrl(String &buff, const String &prefix, const String &param) { sut.printTo(buff, encode(param).length() + prefix.length(), "%s%s", prefix.c_str(), encode(param).c_str()); }
+    void addUrl(String &buff, const String &param) { sut.printTo(buff, param.length(), "%s%s", param.length() ? (buff.length() ? "&" : "?") : "", param.length() ? param.c_str() : ""); }
 
 private:
     StringUtil sut;

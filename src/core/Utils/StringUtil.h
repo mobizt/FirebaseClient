@@ -113,7 +113,7 @@ public:
 
     void printTo(String &buff, int size, const char *format, ...)
     {
-        size += strlen(format) + 1;
+        size += strlen(format) + 10;
         char s[size];
         va_list va;
         va_start(va, format);

@@ -477,11 +477,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &indexId)
-            {
-                DatabaseIndex::Index idx("");
-                return databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, idx, indexId, true, false)->c_str();
-            }
+            String deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &indexId) { return databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, DatabaseIndex::Index(), indexId, true, false)->c_str(); }
 
             /** Deletes an index.
              *
@@ -497,11 +493,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResult &aResult)
-            {
-                DatabaseIndex::Index idx("");
-                databaseIndexManager(aClient, &aResult, NULL, "", parent, idx, indexId, true, true);
-            }
+            void deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResult &aResult) { databaseIndexManager(aClient, &aResult, NULL, "", parent, DatabaseIndex::Index(), indexId, true, true); }
 
             /** Deletes an index.
              *
@@ -518,11 +510,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
-            {
-                DatabaseIndex::Index idx("");
-                databaseIndexManager(aClient, nullptr, cb, uid, parent, idx, indexId, true, true);
-            }
+            void deleteIndex(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "") { databaseIndexManager(aClient, nullptr, cb, uid, parent, DatabaseIndex::Index(), indexId, true, true); }
 
             /** Gets an index.
              *
@@ -539,11 +527,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String get(AsyncClientClass &aClient, const Parent &parent, const String &indexId)
-            {
-                DatabaseIndex::Index idx("");
-                return databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, idx, indexId, false, false)->c_str();
-            }
+            String get(AsyncClientClass &aClient, const Parent &parent, const String &indexId) { return databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, DatabaseIndex::Index(), indexId, false, false)->c_str(); }
 
             /** Gets an index.
              *
@@ -559,11 +543,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void get(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResult &aResult)
-            {
-                DatabaseIndex::Index idx("");
-                databaseIndexManager(aClient, &aResult, NULL, "", parent, idx, indexId, false, true);
-            }
+            void get(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResult &aResult) { databaseIndexManager(aClient, &aResult, NULL, "", parent, DatabaseIndex::Index(), indexId, false, true); }
 
             /** Gets an index.
              *
@@ -580,11 +560,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void get(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "")
-            {
-                DatabaseIndex::Index idx("");
-                databaseIndexManager(aClient, nullptr, cb, uid, parent, idx, indexId, false, true);
-            }
+            void get(AsyncClientClass &aClient, const Parent &parent, const String &indexId, AsyncResultCallback cb, const String &uid = "") { databaseIndexManager(aClient, nullptr, cb, uid, parent, DatabaseIndex::Index(), indexId, false, true); }
 
             /** Lists the indexes.
              *
@@ -600,11 +576,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            String list(AsyncClientClass &aClient, const Parent &parent)
-            {
-                DatabaseIndex::Index idx("");
-                return databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, idx, "", false, false)->c_str();
-            }
+            String list(AsyncClientClass &aClient, const Parent &parent) { return databaseIndexManager(aClient, getResultBase(&aClient), NULL, "", parent, DatabaseIndex::Index(), "", false, false)->c_str(); }
 
             /** Lists the indexes.
              *
@@ -620,11 +592,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void list(AsyncClientClass &aClient, const Parent &parent, AsyncResult &aResult)
-            {
-                DatabaseIndex::Index idx("");
-                databaseIndexManager(aClient, &aResult, NULL, "", parent, idx, "", false, true);
-            }
+            void list(AsyncClientClass &aClient, const Parent &parent, AsyncResult &aResult) { databaseIndexManager(aClient, &aResult, NULL, "", parent, DatabaseIndex::Index(), "", false, true); }
 
             /** Lists the indexes.
              *
@@ -640,11 +608,7 @@ namespace Firestore
              * This function requires ServiceAuth authentication.
              *
              */
-            void list(AsyncClientClass &aClient, const Parent &parent, AsyncResultCallback cb, const String &uid = "")
-            {
-                DatabaseIndex::Index idx("");
-                databaseIndexManager(aClient, nullptr, cb, uid, parent, idx, "", false, true);
-            }
+            void list(AsyncClientClass &aClient, const Parent &parent, AsyncResultCallback cb, const String &uid = "") { databaseIndexManager(aClient, nullptr, cb, uid, parent, DatabaseIndex::Index(), "", false, true); }
         };
     };
 }

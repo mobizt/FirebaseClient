@@ -79,7 +79,6 @@ public:
 
     void clear()
     {
-
         for (size_t i = 0; i < reqns::max_type; i++)
             sut.clear(val[i]);
         port = 443;
@@ -98,140 +97,58 @@ public:
         method = reqns::http_undefined;
     }
 
-    void addNewLine()
+    void addNewLine() { val[reqns::header] += "\r\n"; }
+    void addHostHeader(const String &host) { sut.printTo(val[reqns::header], 100, "Host: %s\r\n", host.c_str()); }
+    void addConnectionHeader(bool keepAlive) { sut.printTo(val[reqns::header], 50, "Connection: %s\r\n", keepAlive ? "keep-alive" : "close"); }
+    void addContentType(const String &type) { sut.printTo(val[reqns::header], 100, "Content-Type: %s\r\n", type.c_str()); }
+    void setContentLengthFinal(size_t len) { sut.printTo(val[reqns::header], 30, "Content-Length: %d\r\n\r\n", (int)len); }
+    void addRequestHeader(reqns::http_request_method method, const String &path, const String &extras)
     {
-        val[reqns::header] += "\r\n";
-    }
-
-    void addGAPIsHost(String &str, PGM_P sub)
-    {
-        str += sub;
-        if (str[str.length() - 1] != '.')
-            str += ".";
-        str += FPSTR("googleapis.com");
-    }
-
-    void addGAPIsHostHeader(PGM_P sub)
-    {
-        val[reqns::header] += FPSTR("Host: ");
-        addGAPIsHost(val[reqns::header], sub);
-        addNewLine();
-    }
-
-    void addHostHeader(PGM_P host)
-    {
-        val[reqns::header] += FPSTR("Host: ");
-        val[reqns::header] += host;
-        addNewLine();
-    }
-
-    void addContentTypeHeader(PGM_P v)
-    {
-        val[reqns::header] += FPSTR("Content-Type: ");
-        val[reqns::header] += v;
-        addNewLine();
-    }
-
-    void addContentLengthHeader(size_t len)
-    {
-        val[reqns::header] += FPSTR("Content-Length: ");
-        val[reqns::header] += len;
-        addNewLine();
-    }
-
-    void addUAHeader()
-    {
-        val[reqns::header] += FPSTR("User-Agent: ESP");
-        addNewLine();
-    }
-
-    void addConnectionHeader(bool keepAlive)
-    {
-        val[reqns::header] += keepAlive ? FPSTR("Connection: keep-alive") : FPSTR("Connection: close");
-        addNewLine();
-    }
-
-    void setContentType(const String &type)
-    {
-        addContentTypeHeader(type.c_str());
-    }
-
-    void setContentLength(size_t len)
-    {
-        if (method == reqns::http_post || method == reqns::http_put || method == reqns::http_patch)
-        {
-            addContentLengthHeader(len);
-            addNewLine();
-        }
-    }
-
-    /* Append the string with first request line (HTTP method) */
-    bool addRequestHeaderFirst(reqns::http_request_method method)
-    {
-        bool post = false;
         switch (method)
         {
         case reqns::http_get:
-            val[reqns::header] += FPSTR("GET");
+            val[reqns::header] += "GET ";
             break;
         case reqns::http_post:
-            val[reqns::header] += FPSTR("POST");
-            post = true;
+            val[reqns::header] += "POST ";
             break;
-
         case reqns::http_patch:
-            val[reqns::header] += FPSTR("PATCH");
-            post = true;
+            val[reqns::header] += "PATCH ";
             break;
-
         case reqns::http_delete:
-            val[reqns::header] += FPSTR("DELETE");
+            val[reqns::header] += "DELETE ";
             break;
-
         case reqns::http_put:
-            val[reqns::header] += FPSTR("PUT");
+            val[reqns::header] += "PUT ";
             break;
-
         default:
             break;
         }
-
-        if (method == reqns::http_get || method == reqns::http_post || method == reqns::http_patch || method == reqns::http_delete || method == reqns::http_put)
-            val[reqns::header] += FPSTR(" ");
-
-        return post;
-    }
-
-    /* Append the string with last request line (HTTP version) */
-    void addRequestHeaderLast()
-    {
-        val[reqns::header] += FPSTR(" HTTP/1.1\r\n");
+        sut.printTo(val[reqns::header], 300, "%s%s%s HTTP/1.1\r\n", path.length() == 0 || (path.length() && path[0] != '/') ? "/" : "", path.c_str(), extras.c_str());
     }
 
     /* Append the string with first part of Authorization header */
-    void addAuthHeaderFirst(auth_token_type type)
+    void addAuthHeader(auth_token_type type)
     {
-        val[reqns::header] += FPSTR("Authorization: ");
+        val[reqns::header] += "Authorization: ";
         if (type == auth_access_token || type == auth_sa_access_token)
-            val[reqns::header] += FPSTR("Bearer ");
+            val[reqns::header] += "Bearer ";
         else if (type == auth_user_id_token || type == auth_id_token || type == auth_custom_token || type == auth_sa_custom_token)
-            val[reqns::header] += FPSTR("Firebase ");
+            val[reqns::header] += "Firebase ";
         else
-            val[reqns::header] += FPSTR("key=");
+            val[reqns::header] += "key=";
+        val[reqns::header] += FIREBASE_AUTH_PLACEHOLDER;
+        val[reqns::header] += "\r\n";
     }
 
-    void feedTimer(int interval = -1)
-    {
-        send_timer.feed(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval);
-    }
+    void feedTimer(int interval = -1) { send_timer.feed(interval == -1 ? FIREBASE_TCP_WRITE_TIMEOUT_SEC : interval); }
 
     String getHost(bool fromReq, String *location = nullptr, String *ext = nullptr)
     {
 #if defined(ENABLE_CLOUD_STORAGE)
         String url = fromReq ? val[reqns::url] : file_data.resumable.getLocation();
 #else
-        String url = fromReq ? val[reqns::url] : location ? *location
-                                                          : "";
+        String url = fromReq ? val[reqns::url] : (location ? *location : "");
 #endif
         return uut.getHost(url, ext);
     }
