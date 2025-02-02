@@ -831,7 +831,7 @@ private:
             }
             else
             {
-                // There are still more bytes that is remaining to read.
+                // There are still more bytes that are remaining to read.
                 sData->response.toFillIndex += currentRead;
                 sData->response.toFillLen -= currentRead;
             }
