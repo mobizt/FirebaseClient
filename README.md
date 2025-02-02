@@ -168,7 +168,8 @@ For ESP8266 device user, you should read the [Memory Options for ESP8266](#memor
 
 Please make sure that the `Arduino IDE's Board Manager URL` is up to date before you update your device's `platform Core SDK`. Any issue due to using out dated `platform Core SDK` is your own risk and does not support by library.
 
-In case the library compile status showed here is passing and your code compilation is error, you should check your libary installation, `platform Core SDK` installation and the library usage. You cannot install library in the cloud storage virtual folder or sandbox e.g. `Microsoft's OneDrive`.
+> [!NOTE]  
+> In the case that the library compilation status shows here is passing and your code compilation is error, you should check your libary installation, `platform Core SDK` installation and the library usage. You cannot install library in the cloud storage virtual folder or sandbox e.g. `Microsoft's OneDrive`.
 
 If you are using `Arduino® MKR 1000 WIFI`, please make sure you have already done the following steps.
 - Add the `Realtime Database host root certificate` to the board firmware. 
@@ -1061,7 +1062,7 @@ ServiceAuth::ServiceAuth(<timestamp>, <file_config_data>, <expire>)
 
 The auth token need to be re-created instead of refreshing.
 
-The `CustomAuth` and `ServiceAuth` classes required the JWT token processor which is done via the function `firebase::JWTClass::loop(<auth_data_t*>)` which accepts the pointer to the `auth_data_t` from the `FirebaseApp::getAuth()`. 
+The `CustomAuth` and `ServiceAuth` classes required the JWT token processor which is done via the function `firebase_ns::JWTClass::loop(<auth_data_t*>)` which accepts the pointer to the `auth_data_t` from the `FirebaseApp::getAuth()`. 
 
 The examples in this library, the static object of `JWTClass` called `JWT` will be used to save the stack memory usage and it is not thread safe when using in multi-threaded operations (`multi-FirebaseApp`) because of sharing internal `jwt_token_data_t`.
 

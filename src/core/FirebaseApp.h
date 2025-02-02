@@ -220,21 +220,6 @@ namespace firebase_ns
             }
         }
 
-        void addGAPIsHost(String &str, PGM_P sub)
-        {
-            str += sub;
-            if (str[str.length() - 1] != '.')
-                str += ".";
-            str += FPSTR("googleapis.com");
-        }
-
-        void addContentTypeHeader(String &header, PGM_P v)
-        {
-            header += FPSTR("Content-Type: ");
-            header += v;
-            header += FPSTR("\r\n");
-        }
-
         void createSlot(AsyncClientClass *aClient, slot_options_t &soption)
         {
             if (aClient)
@@ -269,10 +254,10 @@ namespace firebase_ns
 
             if (sData)
             {
-                addGAPIsHost(host, subdomain.c_str());
+                sut.printTo(host, subdomain.length(), "%s.googleapis.com", subdomain.c_str());
                 newRequestBase(aClient, sData, host, extras, "", reqns::http_post, soption, uid);
 
-                addContentTypeHeader(sData->request.val[reqns::header], "application/json");
+                sData->request.addContentType("application/json");
                 sData->request.setContentLengthFinal(sData->request.val[reqns::payload].length());
                 req_timer.feed(FIREBASE_TCP_READ_TIMEOUT_SEC);
                 slot = slotCountBase(aClient) - 1;
