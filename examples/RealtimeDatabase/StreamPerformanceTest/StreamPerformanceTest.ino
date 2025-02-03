@@ -20,13 +20,18 @@
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
+
+#define API_KEY "Web_API_KEY"
 #define DATABASE_URL "URL"
+#define USER_EMAIL "USER_EMAIL"
+#define USER_PASSWORD "USER_PASSWORD"
+
 
 void asyncCB(AsyncResult &aResult);
 void printResult(AsyncResult &aResult);
 
 DefaultNetwork network;
-NoAuth no_auth;
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
 FirebaseApp app;
 
 #include <WiFiClientSecure.h>
@@ -53,7 +58,7 @@ void setup()
     Serial.println();
 
     ssl_client.setInsecure();
-    initializeApp(aClient, app, getAuth(no_auth));
+    initializeApp(aClient, app, getAuth(user_auth));
     app.getApp<RealtimeDatabase>(Database);
     Database.url(DATABASE_URL);
     Database.get(aClient, "/test/performance", printResult, true, "streamTask");
@@ -69,6 +74,11 @@ int counter = 0;
 
 void printResult(AsyncResult &aResult)
 {
+    if (aResult.isEvent())
+    {
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
+    }
+    
     if (aResult.isDebug())
     {
         Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());

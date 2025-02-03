@@ -4,80 +4,107 @@
     <title>Stream Performance Test</title>
 </head>
 
-<body>
+<body onload="setForm()" style="font-size: 17px;">
+    <style>
+        button {
+            border: 1px solid #0066cc;
+            background-color: #050461;
+            color: #ffffff;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
 
-    <div style="line-height: 1.5em;">This html test page will set the continuous 10,000 integer values to the path <b>/test/performance</b>.<br />
-        In the Arduino sketch, set the stream path in the function <b>Database.get</b> to <b>/test/performance</b>.<br /><br />
-        And in the Stream <b>printResult</b> callback function, write the following code.<br /><br />
-        <div style="color:rgb(18, 42, 176);">
-        int counter = 0;<br /><br />
-        void printResult(AsyncResult &aResult)<br />
-        {<br />
-            <div style="padding-left:20px;">
-            if (aResult.isDebug())<br />
-            {<br />
-                <div style="padding-left:20px;">Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());</div>
-            }<br /><br />
+        button:hover {
+            border: 1px solid #0099cc;
+            background-color: #3540dc;
+            color: #ffffff;
+            padding: 5px 10px;
+        }
 
-            if (aResult.isError())<br />
-            {<br />
-                <div style="padding-left:20px;">Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());</div>
-            }<br /><br />
+        button:disabled,
+        button[disabled] {
+            border: 1px solid #999999;
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
 
-            if (aResult.available())<br />
-            {<br />
-            <div style="padding-left:20px;">RealtimeDatabaseResult &RTDB = aResult.to&lt;RealtimeDatabaseResult&gt;();<br />
-                if (RTDB.isStream() && RTDB.type() == 0)<br />
-                <div style="padding-left:20px;">counter = 0;</div>
-                <br />
-                if (RTDB.isStream() && RTDB.type() == 1)<br />
-                {<br />
-                    <div style="padding-left:20px;">Firebase.printf("counter: %d\n", counter);<br />
-                    Firebase.printf("data: %d\n", RTDB.to&lt;int&gt;());<br />
-                    counter++;
-                    </div>
-                }<br />
-            </div>
-            }<br />
+        div {
+            padding: 5px 10px;
+        }
+    </style>
+
+    <div style="line-height: 1.5em;max-width:550px;">This HTML test page will set the continuous values to the specific
+        path<br /><br />
+        How to test:<br />
+        1. In the <b>StreamPerformanceTest.ino</b> code in your Arduino IDE, set the path in <b>Database.get</b>
+        to the data path you set here i.e. <span id="spath"></span><br />
+        2. In this HTML page, specify the <b>API Key</b>, <b>Database URL</b>, <b>User Email</b> and <b>User
+            Password</b> in the input fields below and click the <b>Sign In</b>
+        button.<br />
+        3. Choose the amount of values to set and specify the path to set the values.
+        You can select the checkbox <b>Data changes listener</b> to listen to the data changes.<br />
+        4. Click the <b>Set Values</b> button to set the values.<br />
+        5. Click the <b>Delete Values</b> button to delete the values.<br />
+        6. Check the values received in the Arduino IDE Serial monitor.<br /><br />
+
+        <span style="font-size: 14px;">Note that, the counter printed in the Arduino IDE Serial monitor will be reset to
+            0 when you delete the values or the new amounts of values are set</span>.
+    </div>
+    <div style="margin-top:10px;">
+        <form style="max-width:500px;">
+            <label for="apiKey">API Key:</label><br />
+            <input type="text" style="margin-bottom:10px;padding:5px;width:100%;color:rgb(24, 130, 3);" id="apiKey"
+                name="apiKey" onchange="saveValue('apiKey')"><br />
+            <label for="dbUrl">Database URL:</label><br />
+            <input type="text" style="margin-bottom:10px;padding:5px;width:100%;color:rgb(24, 130, 3);" id="dbUrl"
+                name="dbUrl" onchange="saveValue('dbUrl')"><br /><br />
+            <label for="userEmail">User Email:</label><br />
+            <input type="text" style="margin-bottom:10px;padding:5px;width:50%;color:rgb(24, 130, 3);" id="userEmail"
+                name="userEmail" onchange="saveValue('userEmail')"><br />
+            <label for="userPsw">User Password:</label><br />
+            <input type="text" style="margin-bottom:10px;padding:5px;width:50%;color:rgb(24, 130, 3);" id="userPsw"
+                name="userPsw" onchange="saveValue('userPsw')">
+        </form>
+
+        <div style="margin-top:20px;margin-bottom:20px;">
+            <button type="button" id="signInBtn" onclick="initApp()" style="padding:5px;color:rgb(254, 254, 254);"
+                title="Sign in">Sign
+                In</button>
+            <button type="button" id="signOutBtn" onclick="signOut()" style="padding:5px;color:rgb(254, 255, 253);"
+                title="Sign out">Sign Out</button><br /><br />
+
+            <label for="amount">The amount of values to set:</label>
+            <select id="amount" style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                <option value="1">1</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100" selected>100</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+                <option value="5000">5000</option>
+                <option value="10000">10000</option>
+                <option value="50000">50000</option>
+                <option value="100000">100000</option>
+            </select>
+            <form style="max-width:500px;">
+                <label for="path">The data path to set the values:</label><br>
+                <input type="text" style="margin-bottom:10px;padding:5px;width:50%;color:rgb(5, 31, 160);" id="path"
+                    name="path" onchange="saveValue('path')"><br /><br />
+                <button type="button" id="setBtn" onclick="setData()" style="padding:5px;color:rgb(255, 255, 255);"
+                    title="Set data">Set
+                    Values</button>
+                <button type="button" id="delBtn" onclick="delData()" style="padding:5px;color:rgb(255, 255, 255);"
+                    title="Delete data">Delete
+                    Values</button>
+            </form>
+            <input type="checkbox" id="enableListener" name="enableListener" value="1"><label for="enableListener">Data
+                changes listener:</label><br />
+            <textarea style="background-color:rgb(0, 0, 0);color:#7fff00;padding: 10px;" id="listener" name="listener"
+                rows="10" cols="50"></textarea><br /><br />
+            <label id="err">&nbsp;</label><br />
         </div>
-    }
-    </div>
-    <br /><br />
-   
-    Tempolary set the database rules in the Firebase project console to allow full read and write.<br />
-    <div style="color:rgb(66, 168, 6);">
-        {
-        <div style="padding-left:20px;">"rules": {
-        <div style="padding-left:20px;">".read": true,<br />
-        ".write": true</div>
-        }</div>
-        }<br />
-    </div>
-        Press the <b>Set</b> button to store the 10,000 values to the Firebase Realtime Database.<br />
-        Press the <b>Delete</b> button to delete the previous set data from the Firebase Realtime Database and the counter value in the Arduino sketch will be reset to 0<br />
-        Don't forget to change <b>projectID</b>, <b>Web API Key</b> and <b>databaseURL</b> in the source of this html file.
-    <br /><br />
-    After press the <b>Set</b> button, the output in Arduino IDE console will look like<br /><br />
-    <div style="color:rgb(196, 4, 151);">
-    counter: 0<br />
-    data: 0<br />
-    counter: 1<br />
-    data: 1<br />
-    counter: 2<br />
-    <br />
-    ...<br />
-    ...<br />
-    <br />
-    counter: 9998<br />
-    data: 9998<br />
-    counter: 9999<br />
-    data: 9999<br />
-    </div>
-    <br />
-</div>
-    <div style="margin-top:20px">
-        <button type="button" onclick="setData()" title="Set random number">Set</button>
-        <button type="button" onclick="delData()" title="Delete data">Delete</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
@@ -86,28 +113,175 @@
 
     <script>
 
-        var projectID = "_______________________________";
-        var apiKey = "__________________________________";
-        var databaseURL = "_____________________________";
+        var authenticated = false;
+        var amount = 0;
+        var oldPath = '';
+        var listener;
 
         var config = {
-            apiKey: apiKey,
-            authDomain: projectID + ".firebaseapp.com",
-            databaseURL: databaseURL,
-            storageBucket: projectID + ".appspot.com"
+            apiKey: '',
+            databaseURL: ''
         };
 
-        firebase.initializeApp(config);
+        setForm = function () {
+            setAuthState(false);
+            if (localStorage["apiKey"] != undefined)
+                document.getElementById("apiKey").value = localStorage["apiKey"].trim();
+            if (localStorage["dbUrl"] != undefined)
+                document.getElementById("dbUrl").value = localStorage["dbUrl"].trim();
+            if (localStorage["userEmail"] != undefined)
+                document.getElementById("userEmail").value = localStorage["userEmail"].trim();
+            if (localStorage["userPsw"] != undefined)
+                document.getElementById("userPsw").value = localStorage["userPsw"].trim();
+            if (localStorage["path"] != undefined)
+                document.getElementById("path").value = localStorage["path"].trim();
+            else
+                document.getElementById("path").value = "/test/performance";
+
+            document.getElementById("spath").innerHTML = "<b>" + document.getElementById("path").value.trim() + "</b>";
+        }
+
+        saveValue = function (id) {
+            localStorage[id] = document.getElementById(id).value.trim();
+            if (id == "path")
+                document.getElementById("spath").innerHTML = "<b>" + document.getElementById("path").value.trim() + "</b>";
+        }
+
+        initApp = function () {
+
+            showInfo("Please wait...");
+            document.getElementById("signInBtn").disabled = true;
+
+            firebase.app().delete().then(function () {
+                config.apiKey = document.getElementById("apiKey").value.trim();
+                config.databaseURL = document.getElementById("dbUrl").value.trim();
+                firebase.initializeApp(config);
+                signIn();
+            }).catch(function (error) {
+                document.getElementById("signInBtn").disabled = false;
+                showError(error.message);
+            });;
+        }
+
+        signIn = function () {
+            var email = document.getElementById("userEmail").value.trim();
+            var password = document.getElementById("userPsw").value.trim();
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then(function (userCredential) {
+                    setAuthState(true);
+                    showInfo("Signed In");
+                })
+                .catch(function (error) {
+                    document.getElementById("signInBtn").disabled = false;
+                    showError(error.message);
+                });
+        }
+
+        signOut = function () {
+
+            firebase.auth().signOut().then(function () {
+                setAuthState(false);
+                showInfo("Signed Out");
+            }, function (error) {
+                showError(error.message);
+            });
+        }
+
+        showError = function (msg) {
+            document.getElementById("err").style.color = 'red';
+            try {
+                var obj = JSON.parse(msg);
+                document.getElementById("err").innerHTML = obj["error"]["message"];
+            } catch (e) {
+                document.getElementById("err").innerHTML = msg;
+            }
+        }
+
+        showInfo = function (msg) {
+            document.getElementById("err").style.color = 'blue';
+            document.getElementById("err").innerHTML = msg;
+        }
+
+        setAuthState = function (auth) {
+            if (!auth)
+                removeListener();
+            authenticated = auth;
+            document.getElementById("signInBtn").disabled = auth;
+            document.getElementById("signOutBtn").disabled = !auth;
+            document.getElementById("delBtn").disabled = !auth;
+            document.getElementById("setBtn").disabled = !auth;
+        }
+
+        preCheck = function () {
+            var path = document.getElementById("path").value.trim();
+            if (path == "" || path == "/") {
+                showError("Path should not be empty or at the root!");
+                return false;
+            }
+
+            if (document.getElementById("enableListener").checked)
+                setListener();
+            else
+                removeListener();
+            return true;
+        }
 
         setData = function () {
-            for (var i = 0; i < 10000; i++)
-                firebase.database().ref('/test/performance/' + i).set(i);
+            if (preCheck()) {
+                showInfo("Please wait...");
+                var path = document.getElementById("path").value.trim();
+                var newAmount = document.getElementById("amount").value.trim();
+                if (amount != newAmount)
+                    delData();
+                for (var i = 0; i < newAmount; i++)
+                    firebase.database().ref(path + "/" + + i).set(i);
+                amount = newAmount;
+                showInfo("Set done");
+            }
         }
 
         delData = function () {
-            firebase.database().ref('/test/performance').remove();
+            if (preCheck()) {
+                var path = document.getElementById("path").value.trim();
+                firebase.database().ref(path).remove();
+                amount = 0;
+                showInfo("Delete done");
+            }
         }
 
+        setListener = function () {
+            var path = document.getElementById("path").value.trim();
+            if (oldPath != path) {
+
+                removeListener();
+
+                var ref = firebase.database().ref(path);
+                listener = ref.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    var s = "";
+                    if (!data)
+                        s += 'null\r\n';
+                    else {
+                        snapshot.forEach(function (childSnapshot) {
+                            s += "Key: " + childSnapshot.key + ", Value: " + childSnapshot.val() + "\r\n";
+                        });
+                    }
+                    document.getElementById("listener").value = s;
+                });
+                oldPath = path;
+            }
+        }
+
+        removeListener = function () {
+            if (oldPath != "") {
+                var oldref = firebase.database().ref(oldPath);
+                oldref.off('value', listener);
+            }
+            document.getElementById("listener").value = "";
+            oldPath = "";
+        }
+
+        firebase.initializeApp();
     </script>
 </body>
 
