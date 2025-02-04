@@ -57,7 +57,7 @@
         button.<br />
         3. Choose the amount of values to set and specify the path to set the values.
         You can select the checkbox <b>Data changes listener</b> to listen to the data changes.<br />
-        4. Click the <b>Set Values</b> button to set the values.<br />
+        4. Click the <b>Append/Set Values</b> button to set the values.<br />
         5. Click the <b>Delete Values</b> button to delete the values.<br />
         6. Check the values received in the Arduino IDE Serial monitor.<br /><br />
 
@@ -101,7 +101,7 @@
                 <option value="50000">50000</option>
                 <option value="100000">100000</option>
             </select><br />
-            <input type="checkbox" id="appendChk" name="appendChk" value="1" style="margin-bottom:10px;"><label
+            <input type="checkbox" onClick="changeMode()" id="appendChk" name="appendChk" value="1" style="margin-bottom:10px;"><label
                 for="appendChk">Append (checked) or
                 Set (unchecked) the values</label><br />
             <form style="max-width:500px;">
@@ -158,6 +158,13 @@
                 document.getElementById("path").value = "/test/performance";
 
             document.getElementById("spath").innerHTML = "<b>" + document.getElementById("path").value.trim() + "</b>";
+        }
+
+        changeMode = function () {
+            if (document.getElementById("appendChk").checked)
+                document.getElementById("setBtn").innerHTML = "Append Values";
+            else
+                document.getElementById("setBtn").innerHTML = "Set Values";
         }
 
         saveValue = function (id) {
