@@ -4,7 +4,7 @@
     <title>Stream Performance Test</title>
 </head>
 
-<body onload="setForm()" style="font-family: Open Sans;">
+<body onload="setForm()" style="font-family: Open Sans;background-color:#cfe1fb;">
     <style>
         button {
             border: 1px solid #0066cc;
@@ -48,21 +48,7 @@
 
     <div style="line-height: 1.5em;max-width:550px;">This HTML test page will append or set the continuous values to the
         specific
-        path<br /><br />
-        <b>How to test:</b><br />
-        1. In the <b>StreamPerformanceTest.ino</b> code in your Arduino IDE, set the path in <b>Database.get</b>
-        to the data path you set here i.e. <span id="spath"></span><br />
-        2. In this HTML page, specify the <b>API Key</b>, <b>Database URL</b>, <b>User Email</b> and <b>User
-            Password</b> in the input fields below and click the <b>Sign In</b>
-        button.<br />
-        3. Choose the amount of values to set and specify the path to set the values.
-        You can select the checkbox <b>Data changes listener</b> to listen to the data changes.<br />
-        4. Click the <b>Append/Set Values</b> button to set the values.<br />
-        5. Click the <b>Delete Values</b> button to delete the values.<br />
-        6. Check the values received in the Arduino IDE Serial monitor.<br /><br />
-
-        <span style="font-size: 14px;">Note that, the counter printed in the Arduino IDE Serial monitor will be reset to
-            0 when you delete the values or the new amounts of values are set</span>.
+        path. Specify the information below to test.<br />
     </div>
     <div style="margin-top:10px;">
         <form style="max-width:500px;">
@@ -87,40 +73,73 @@
             <button type="button" id="signOutBtn" onclick="signOut()" style="padding:5px;color:rgb(254, 255, 253);"
                 title="Sign out">Sign Out</button><br /><br />
 
-            <label for="amount">The amount of values to set:</label>
-            <select id="amount" style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
-                <option value="1">1</option>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="50">50</option>
-                <option value="100" selected>100</option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
-                <option value="5000">5000</option>
-                <option value="10000">10000</option>
-                <option value="50000">50000</option>
-                <option value="100000">100000</option>
-            </select><br />
-            <input type="checkbox" onClick="changeMode()" id="appendChk" name="appendChk" value="1" style="margin-bottom:10px;"><label
-                for="appendChk">Append (checked) or
-                Set (unchecked) the values</label><br />
             <form style="max-width:500px;">
-                <label for="path">The data path to append or set the values:</label><br>
+
+                <label for="mode">Mode:</label>
+                <select id="mode" onchange="changeAppendMode()"
+                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                    <option value="set">Set</option>
+                    <option value="Append">Append</option>
+                </select><br />
+
+                <label for="path">Path:</label>
                 <input type="text" style="margin-bottom:10px;padding:5px;width:50%;color:rgb(5, 31, 160);" id="path"
-                    name="path" onchange="saveValue('path')"><br /><br />
-                <button type="button" id="setBtn" onclick="setData()" style="padding:5px;color:rgb(255, 255, 255);"
-                    title="Set data">Set
-                    Values</button>
-                <button type="button" id="delBtn" onclick="delData()" style="padding:5px;color:rgb(255, 255, 255);"
-                    title="Delete data">Delete
-                    Values</button>
+                    name="path" onchange="saveValue('path')"><br />
+
+                <label for="amount">Amount:</label>
+                <select id="amount" onchange="saveAmount()"
+                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                    <option value="1">1</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                    <option value="5000">5000</option>
+                    <option value="10000">10000</option>
+                    <option value="50000">50000</option>
+                    <option value="100000">100000</option>
+                </select><br />
+
+                <label for="interval">Intervals:</label>
+                <select id="interval" onchange="saveInterval()"
+                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="60">60</option>
+                </select> <select id="timeBase" onchange="saveInterval()"
+                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                    <option value="Sec">Sec</option>
+                    <option value="Min">Min</option>
+                </select><br />
+                <label for="iteration">Iterations:</label>
+                <select id="iteration" onchange="saveIteration()"
+                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="60">60</option>
+                </select> <span id="iterationInfo"></span><br />
+                <input type="checkbox" id="enListenerChk" name="enListenerChk" value="1"
+                    onclick="addRemoveListener()"><label for="enListenerChk">Listener:</label><br />
+                <textarea style="background-color:#050461;color:#ffffff;padding: 10px;" id="listener" name="listener"
+                    rows="10" cols="50"></textarea>
             </form>
-            <input type="checkbox" id="enListenerChk" name="enListenerChk" value="1"
-                onclick="addRemoveListener()"><label for="enListenerChk">Data
-                changes listener:</label><br />
-            <textarea style="background-color:#050461;color:#ffffff;padding: 10px;" id="listener" name="listener"
-                rows="10" cols="50"></textarea><br /><br />
-            <label id="err">&nbsp;</label><br />
+
+            <button type="button" id="setBtn" onclick="setData(false)" style="padding:5px;color:rgb(255, 255, 255);"
+                title="Set data">Set</button>
+            <button type="button" id="delBtn" onclick="delData(false)" style="padding:5px;color:rgb(255, 255, 255);"
+                title="Delete data">Delete</button><br /><br />
+
+            <label id="msg">&nbsp;</label><br />
             <img alt="" id="loader" style="display:none;width:22px;height:22px;"
                 src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHdpZHRoPSI0MHB4IiBoZWlnaHQ9IjQwcHgiIHZpZXdCb3g9IjAgMCA0MCA0MCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWw6c3BhY2U9InByZXNlcnZlIiBzdHlsZT0iZmlsbC1ydWxlOmV2ZW5vZGQ7Y2xpcC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEuNDE0MjE7IiB4PSIwcHgiIHk9IjBweCI+CiAgICA8ZGVmcz4KICAgICAgICA8c3R5bGUgdHlwZT0idGV4dC9jc3MiPjwhW0NEQVRBWwogICAgICAgICAgICBALXdlYmtpdC1rZXlmcmFtZXMgc3BpbiB7CiAgICAgICAgICAgICAgZnJvbSB7CiAgICAgICAgICAgICAgICAtd2Via2l0LXRyYW5zZm9ybTogcm90YXRlKDBkZWcpCiAgICAgICAgICAgICAgfQogICAgICAgICAgICAgIHRvIHsKICAgICAgICAgICAgICAgIC13ZWJraXQtdHJhbnNmb3JtOiByb3RhdGUoLTM1OWRlZykKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgICAgQGtleWZyYW1lcyBzcGluIHsKICAgICAgICAgICAgICBmcm9tIHsKICAgICAgICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDBkZWcpCiAgICAgICAgICAgICAgfQogICAgICAgICAgICAgIHRvIHsKICAgICAgICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKC0zNTlkZWcpCiAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIHN2ZyB7CiAgICAgICAgICAgICAgICAtd2Via2l0LXRyYW5zZm9ybS1vcmlnaW46IDUwJSA1MCU7CiAgICAgICAgICAgICAgICAtd2Via2l0LWFuaW1hdGlvbjogc3BpbiAxLjVzIGxpbmVhciBpbmZpbml0ZTsKICAgICAgICAgICAgICAgIC13ZWJraXQtYmFja2ZhY2UtdmlzaWJpbGl0eTogaGlkZGVuOwogICAgICAgICAgICAgICAgYW5pbWF0aW9uOiBzcGluIDEuNXMgbGluZWFyIGluZmluaXRlOwogICAgICAgICAgICB9CiAgICAgICAgXV0+PC9zdHlsZT4KICAgIDwvZGVmcz4KICAgIDxnIGlkPSJvdXRlciI+CiAgICAgICAgPGc+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMCwwQzIyLjIwNTgsMCAyMy45OTM5LDEuNzg4MTMgMjMuOTkzOSwzLjk5MzlDMjMuOTkzOSw2LjE5OTY4IDIyLjIwNTgsNy45ODc4MSAyMCw3Ljk4NzgxQzE3Ljc5NDIsNy45ODc4MSAxNi4wMDYxLDYuMTk5NjggMTYuMDA2MSwzLjk5MzlDMTYuMDA2MSwxLjc4ODEzIDE3Ljc5NDIsMCAyMCwwWiIgc3R5bGU9ImZpbGw6YmxhY2s7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnPgogICAgICAgICAgICA8cGF0aCBkPSJNNS44NTc4Niw1Ljg1Nzg2QzcuNDE3NTgsNC4yOTgxNSA5Ljk0NjM4LDQuMjk4MTUgMTEuNTA2MSw1Ljg1Nzg2QzEzLjA2NTgsNy40MTc1OCAxMy4wNjU4LDkuOTQ2MzggMTEuNTA2MSwxMS41MDYxQzkuOTQ2MzgsMTMuMDY1OCA3LjQxNzU4LDEzLjA2NTggNS44NTc4NiwxMS41MDYxQzQuMjk4MTUsOS45NDYzOCA0LjI5ODE1LDcuNDE3NTggNS44NTc4Niw1Ljg1Nzg2WiIgc3R5bGU9ImZpbGw6cmdiKDIxMCwyMTAsMjEwKTsiLz4KICAgICAgICA8L2c+CiAgICAgICAgPGc+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMCwzMi4wMTIyQzIyLjIwNTgsMzIuMDEyMiAyMy45OTM5LDMzLjgwMDMgMjMuOTkzOSwzNi4wMDYxQzIzLjk5MzksMzguMjExOSAyMi4yMDU4LDQwIDIwLDQwQzE3Ljc5NDIsNDAgMTYuMDA2MSwzOC4yMTE5IDE2LjAwNjEsMzYuMDA2MUMxNi4wMDYxLDMzLjgwMDMgMTcuNzk0MiwzMi4wMTIyIDIwLDMyLjAxMjJaIiBzdHlsZT0iZmlsbDpyZ2IoMTMwLDEzMCwxMzApOyIvPgogICAgICAgIDwvZz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPHBhdGggZD0iTTI4LjQ5MzksMjguNDkzOUMzMC4wNTM2LDI2LjkzNDIgMzIuNTgyNCwyNi45MzQyIDM0LjE0MjEsMjguNDkzOUMzNS43MDE5LDMwLjA1MzYgMzUuNzAxOSwzMi41ODI0IDM0LjE0MjEsMzQuMTQyMUMzMi41ODI0LDM1LjcwMTkgMzAuMDUzNiwzNS43MDE5IDI4LjQ5MzksMzQuMTQyMUMyNi45MzQyLDMyLjU4MjQgMjYuOTM0MiwzMC4wNTM2IDI4LjQ5MzksMjguNDkzOVoiIHN0eWxlPSJmaWxsOnJnYigxMDEsMTAxLDEwMSk7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnPgogICAgICAgICAgICA8cGF0aCBkPSJNMy45OTM5LDE2LjAwNjFDNi4xOTk2OCwxNi4wMDYxIDcuOTg3ODEsMTcuNzk0MiA3Ljk4NzgxLDIwQzcuOTg3ODEsMjIuMjA1OCA2LjE5OTY4LDIzLjk5MzkgMy45OTM5LDIzLjk5MzlDMS43ODgxMywyMy45OTM5IDAsMjIuMjA1OCAwLDIwQzAsMTcuNzk0MiAxLjc4ODEzLDE2LjAwNjEgMy45OTM5LDE2LjAwNjFaIiBzdHlsZT0iZmlsbDpyZ2IoMTg3LDE4NywxODcpOyIvPgogICAgICAgIDwvZz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPHBhdGggZD0iTTUuODU3ODYsMjguNDkzOUM3LjQxNzU4LDI2LjkzNDIgOS45NDYzOCwyNi45MzQyIDExLjUwNjEsMjguNDkzOUMxMy4wNjU4LDMwLjA1MzYgMTMuMDY1OCwzMi41ODI0IDExLjUwNjEsMzQuMTQyMUM5Ljk0NjM4LDM1LjcwMTkgNy40MTc1OCwzNS43MDE5IDUuODU3ODYsMzQuMTQyMUM0LjI5ODE1LDMyLjU4MjQgNC4yOTgxNSwzMC4wNTM2IDUuODU3ODYsMjguNDkzOVoiIHN0eWxlPSJmaWxsOnJnYigxNjQsMTY0LDE2NCk7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnPgogICAgICAgICAgICA8cGF0aCBkPSJNMzYuMDA2MSwxNi4wMDYxQzM4LjIxMTksMTYuMDA2MSA0MCwxNy43OTQyIDQwLDIwQzQwLDIyLjIwNTggMzguMjExOSwyMy45OTM5IDM2LjAwNjEsMjMuOTkzOUMzMy44MDAzLDIzLjk5MzkgMzIuMDEyMiwyMi4yMDU4IDMyLjAxMjIsMjBDMzIuMDEyMiwxNy43OTQyIDMzLjgwMDMsMTYuMDA2MSAzNi4wMDYxLDE2LjAwNjFaIiBzdHlsZT0iZmlsbDpyZ2IoNzQsNzQsNzQpOyIvPgogICAgICAgIDwvZz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPHBhdGggZD0iTTI4LjQ5MzksNS44NTc4NkMzMC4wNTM2LDQuMjk4MTUgMzIuNTgyNCw0LjI5ODE1IDM0LjE0MjEsNS44NTc4NkMzNS43MDE5LDcuNDE3NTggMzUuNzAxOSw5Ljk0NjM4IDM0LjE0MjEsMTEuNTA2MUMzMi41ODI0LDEzLjA2NTggMzAuMDUzNiwxMy4wNjU4IDI4LjQ5MzksMTEuNTA2MUMyNi45MzQyLDkuOTQ2MzggMjYuOTM0Miw3LjQxNzU4IDI4LjQ5MzksNS44NTc4NloiIHN0eWxlPSJmaWxsOnJnYig1MCw1MCw1MCk7Ii8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4K" />
         </div>
@@ -136,6 +155,10 @@
         var amount = 0;
         var oldPath = '';
         var listener;
+        var tmo;
+        var intvInstant;
+        var interval = 0;
+        var iteration = 0;
 
         var config = {
             apiKey: '',
@@ -157,14 +180,45 @@
             else
                 document.getElementById("path").value = "/test/performance";
 
-            document.getElementById("spath").innerHTML = "<b>" + document.getElementById("path").value.trim() + "</b>";
+            if (localStorage["amount"] != undefined)
+                document.getElementById("amount").value = localStorage["amount"].trim();
+            else
+                document.getElementById("amount").value = 100;
+
+            if (localStorage["mode"] != undefined)
+                document.getElementById("mode").value = localStorage["mode"];
+            else
+                document.getElementById("mode").value = "set";
+
+
+            if (localStorage["interval"] != undefined)
+                document.getElementById("interval").value = localStorage["interval"].trim();
+            else
+                document.getElementById("interval").value = 1;
+
+            if (localStorage["timeBase"] != undefined)
+                document.getElementById("timeBase").value = localStorage["timeBase"].trim();
+            else
+                document.getElementById("timeBase").value = "Min";
+
+            if (localStorage["iteration"] != undefined)
+                document.getElementById("iteration").value = localStorage["iteration"].trim();
+            else
+                document.getElementById("iteration").value = 1;
+
+            if (localStorage["listener"] != undefined)
+                document.getElementById("enListenerChk").checked = localStorage["listener"] == 1 ? true : false;
+            else
+                document.getElementById("enListenerChk").checked = false;
+
+            initApp();
+
+            changeAppendMode();
         }
 
-        changeMode = function () {
-            if (document.getElementById("appendChk").checked)
-                document.getElementById("setBtn").innerHTML = "Append Values";
-            else
-                document.getElementById("setBtn").innerHTML = "Set Values";
+        changeAppendMode = function () {
+            document.getElementById("setBtn").innerHTML = document.getElementById("mode").value;
+            saveAppendOption();
         }
 
         saveValue = function (id) {
@@ -174,8 +228,8 @@
         }
 
         initApp = function () {
-            showHideLoader(true);
-            showInfo("Please wait...");
+
+            showMessage("Initializing and signing in...", "#a10fae", true);
             document.getElementById("signInBtn").disabled = true;
 
             firebase.app().delete().then(function () {
@@ -197,7 +251,7 @@
                 .then(function (userCredential) {
                     setAuthState(true);
                     showHideLoader(false);
-                    showInfo("Signed In");
+                    showMessage("Successfully signed in", "#008c00", false);
                 })
                 .catch(function (error) {
                     showHideLoader(false);
@@ -207,31 +261,40 @@
         }
 
         signOut = function () {
-
-            firebase.auth().signOut().then(function () {
-                setAuthState(false);
-                showInfo("Signed Out");
-            }, function (error) {
-                showError(error.message);
-            });
+            showMessage("Signing out...", "#a10fae", true);
+            setTimeout(function () {
+                firebase.auth().signOut().then(function () {
+                    setAuthState(false);
+                    showMessage("Successfully signed out", "#008c00", false);
+                }, function (error) {
+                    showError(error.message);
+                });
+            }, 1);
         }
 
         showError = function (msg) {
-            document.getElementById("err").style.color = 'red';
             try {
                 var obj = JSON.parse(msg);
-                document.getElementById("err").innerHTML = obj["error"]["message"];
+                showMessage(obj["error"]["message"], "red", false);
             } catch (e) {
-                document.getElementById("err").innerHTML = msg;
+                showMessage(msg, "red", false);
             }
         }
 
-        showInfo = function (msg) {
-            document.getElementById("err").style.color = '#050461';
-            document.getElementById("err").innerHTML = msg;
+        showMessage = function (msg, color, loader) {
+            showHideLoader(loader);
+            if (tmo)
+                clearTimeout(tmo);
+            document.getElementById("msg").style.display = "inline";
+            document.getElementById("msg").style.color = color;
+            document.getElementById("msg").innerHTML = msg;
+            tmo = setTimeout(hideMessage, 5000);
         }
 
         setAuthState = function (auth) {
+
+            clearIterationLoop(true);
+
             if (!auth)
                 removeListener();
             else
@@ -242,6 +305,7 @@
             document.getElementById("delBtn").disabled = !auth;
             document.getElementById("setBtn").disabled = !auth;
             document.getElementById("enListenerChk").disabled = !auth;
+            document.getElementById("iterationInfo").innerHTML = "";
         }
 
         preCheck = function () {
@@ -255,7 +319,6 @@
         }
 
         addRemoveListener = function () {
-
             var path = document.getElementById("path").value.trim();
             if (path == "" || path == "/")
                 return;
@@ -264,34 +327,79 @@
                 setListener();
             else
                 removeListener();
+
+            saveAListenerOption();
         }
 
-        setData = function () {
+        setBtnUi = function (setState, delState) {
+            document.getElementById("setBtn").disabled = !setState;
+            document.getElementById("delBtn").disabled = !delState;
+        }
+
+        setData = function (loop) {
             if (preCheck()) {
-                showInfo("Please wait...");
+                document.getElementById("listener").value = "";
+                setBtnUi(false, false);
                 var path = document.getElementById("path").value.trim();
                 var newAmount = document.getElementById("amount").value.trim();
-                var append = (document.getElementById("appendChk").checked) ? true : false;
-                if (amount != newAmount)
-                    delData();
-                for (var i = 0; i < newAmount; i++) {
-                    if (append)
-                        firebase.database().ref(path + "/" + i).set(i);
-                    else
-                        firebase.database().ref(path).set(i);
-                }
+                var append = (document.getElementById("mode").value == "Append") ? true : false;
 
-                amount = newAmount;
-                showInfo("Set done");
+                showMessage((append ? "Appending" : "Setting") + " the values...", "#a10fae", true);
+
+                if (!loop) clearIterationLoop(true);
+
+                setTimeout(function () {
+
+                    if (loop || amount != newAmount)
+                        delData(true);
+
+                    iteration++;
+
+                    if (iteration < parseInt(document.getElementById("iteration").value)) {
+                        document.getElementById("iterationInfo").innerHTML = " (" + iteration + " of " + document.getElementById("iteration").value + " Running)";
+                    } else {
+                        document.getElementById("iterationInfo").innerHTML = " (Stopped)"
+                    }
+
+                    for (var i = 0; i < newAmount; i++) {
+                        if (append)
+                            firebase.database().ref(path + "/" + i).set(i);
+                        else
+                            firebase.database().ref(path).set(i);
+                    }
+                    amount = newAmount;
+                    showMessage("Successfully " + (append ? "appended" : "set") + " values", "#008c00", false);
+                    setBtnUi(true, true);
+
+                    if (iteration >= parseInt(document.getElementById("iteration").value)) clearIterationLoop(false);
+
+                    if (!intvInstant && parseInt(document.getElementById("iteration").value) > 1 && iteration < parseInt(document.getElementById("iteration").value)) {
+                        startIterationLoop();
+                    }
+
+                }, 1/* 1 ms for allowing ui to update */);
             }
         }
 
-        delData = function () {
+        delData = function (immediate) {
             if (preCheck()) {
-                var path = document.getElementById("path").value.trim();
-                firebase.database().ref(path).remove();
-                amount = 0;
-                showInfo("Delete done");
+                document.getElementById("listener").value = "";
+                if (immediate) {
+                    var path = document.getElementById("path").value.trim();
+                    firebase.database().ref(path).remove();
+                    amount = 0;
+                } else {
+                    showMessage("Deleting the values", "#a10fae", true);
+                    setBtnUi(false, false);
+                    setTimeout(function () {
+                        var path = document.getElementById("path").value.trim();
+                        firebase.database().ref(path).remove();
+                        amount = 0;
+                        showMessage("Successfully deleted values", "#008c00", false);
+                        setBtnUi(true, true);
+                    }, 0);
+                }
+
             }
         }
 
@@ -305,11 +413,8 @@
                 listener = ref.on('value', (snapshot) => {
                     const data = snapshot.val();
                     var s = "";
-                    if (!data) {
-                        s += 'null\r\n';
-                        document.getElementById("listener").value = s;
-                    }
-                    else if (snapshot.numChildren()) {
+
+                    if (snapshot.numChildren()) {
                         snapshot.forEach(function (childSnapshot) {
                             s += "Key: " + childSnapshot.key + ", Value: " + childSnapshot.val() + "\r\n";
                         });
@@ -333,11 +438,53 @@
         }
 
         showHideLoader = function (show) {
-            document.getElementById("err").style.marginLeft = show ? "28px" : "0px";
+            document.getElementById("msg").style.marginLeft = show ? "28px" : "0px";
             document.getElementById("loader").style.display = show ? "inline" : "none";
         }
 
+        hideMessage = function () {
+            document.getElementById("msg").style.display = "none";
+        };
+
+        saveAmount = function () {
+            localStorage["amount"] = document.getElementById("amount").value;
+        }
+
+        saveAppendOption = function () {
+            localStorage["mode"] = document.getElementById("mode").value;
+        }
+
+        saveAListenerOption = function () {
+            localStorage["listener"] = document.getElementById("enListenerChk").checked ? 1 : 0;
+        }
+
+        saveInterval = function () {
+            localStorage["interval"] = document.getElementById("interval").value;
+            localStorage["timeBase"] = document.getElementById("timeBase").value;
+            if (intvInstant && authenticated) {
+                clearIterationLoop(false);
+                startIterationLoop();
+            }
+        }
+
+        saveIteration = function () {
+            localStorage["iteration"] = document.getElementById("iteration").value;
+        }
+
+        clearIterationLoop = function (reset) {
+            clearInterval(intvInstant);
+            intvInstant = undefined;
+            if (reset)
+                iteration = 0;
+        }
+
+        startIterationLoop = function () {
+            interval = parseInt(document.getElementById("interval").value) * 1000 * (document.getElementById("timeBase").value == "Min" ? 60 : 1);
+            intvInstant = setInterval(function () { setData(true); }, interval);
+        }
+
         firebase.initializeApp();
+
     </script>
 </body>
 
