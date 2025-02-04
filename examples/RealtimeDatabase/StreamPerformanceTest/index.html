@@ -46,7 +46,8 @@
         }
     </style>
 
-    <div style="line-height: 1.5em;max-width:550px;">This HTML test page will set the continuous values to the specific
+    <div style="line-height: 1.5em;max-width:550px;">This HTML test page will append or set the continuous values to the
+        specific
         path<br /><br />
         <b>How to test:</b><br />
         1. In the <b>StreamPerformanceTest.ino</b> code in your Arduino IDE, set the path in <b>Database.get</b>
@@ -99,9 +100,12 @@
                 <option value="10000">10000</option>
                 <option value="50000">50000</option>
                 <option value="100000">100000</option>
-            </select>
+            </select><br />
+            <input type="checkbox" id="appendChk" name="appendChk" value="1" style="margin-bottom:10px;"><label
+                for="appendChk">Append (checked) or
+                Set (unchecked) the values</label><br />
             <form style="max-width:500px;">
-                <label for="path">The data path to set the values:</label><br>
+                <label for="path">The data path to append or set the values:</label><br>
                 <input type="text" style="margin-bottom:10px;padding:5px;width:50%;color:rgb(5, 31, 160);" id="path"
                     name="path" onchange="saveValue('path')"><br /><br />
                 <button type="button" id="setBtn" onclick="setData()" style="padding:5px;color:rgb(255, 255, 255);"
@@ -260,10 +264,16 @@
                 showInfo("Please wait...");
                 var path = document.getElementById("path").value.trim();
                 var newAmount = document.getElementById("amount").value.trim();
+                var append = (document.getElementById("appendChk").checked) ? true : false;
                 if (amount != newAmount)
                     delData();
-                for (var i = 0; i < newAmount; i++)
-                    firebase.database().ref(path + "/" + + i).set(i);
+                for (var i = 0; i < newAmount; i++) {
+                    if (append)
+                        firebase.database().ref(path + "/" + i).set(i);
+                    else
+                        firebase.database().ref(path).set(i);
+                }
+
                 amount = newAmount;
                 showInfo("Set done");
             }
@@ -288,14 +298,19 @@
                 listener = ref.on('value', (snapshot) => {
                     const data = snapshot.val();
                     var s = "";
-                    if (!data)
+                    if (!data) {
                         s += 'null\r\n';
-                    else {
+                        document.getElementById("listener").value = s;
+                    }
+                    else if (snapshot.numChildren()) {
                         snapshot.forEach(function (childSnapshot) {
                             s += "Key: " + childSnapshot.key + ", Value: " + childSnapshot.val() + "\r\n";
                         });
+                        document.getElementById("listener").value = s;
+                    } else {
+                        document.getElementById("listener").value += "Value: " + data + "\r\n";
                     }
-                    document.getElementById("listener").value = s;
+
                 });
                 oldPath = path;
             }
