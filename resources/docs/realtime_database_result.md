@@ -117,7 +117,7 @@ The realtime_database_data_type enums are included the following.
   
 `realtime_database_data_type_undefined` or -1
 
-`realtime_database_data_type_null` or 5.
+`realtime_database_data_type_null` or 0.
 
 `realtime_database_data_type_integer` or 1.
 

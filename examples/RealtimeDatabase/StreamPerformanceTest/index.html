@@ -4,9 +4,10 @@
     <title>Stream Performance Test</title>
 </head>
 
-<body onload="setForm()" style="font-family: Open Sans;background-color:#cfe1fb;">
+<body onload="setForm()" style="min-width: 650px;font-family: Open Sans;background-color:#cfe1fb;">
     <style>
         button {
+            border-radius: 4px;
             border: 1px solid #0066cc;
             background-color: #050461;
             color: #ffffff;
@@ -17,15 +18,15 @@
 
         button:hover {
             border: 1px solid #61bbef;
-            background-color: #35b2dc;
+            background-color: #62afce;
             color: #ffffff;
             padding: 5px 10px;
         }
 
         button:disabled,
         button[disabled] {
-            border: 1px solid #999999;
-            background-color: #cccccc;
+            border: 1px solid #8c9098;
+            background-color: #d3d3d7;
             color: #666666;
             cursor: not-allowed;
         }
@@ -33,6 +34,133 @@
         img {
             margin: -20px 0;
         }
+
+        /* The container */
+        .container {
+            display: block;
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            width: 80px;
+        }
+
+        /* Hide the browser's default checkbox */
+        .container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+
+        /* Create a custom checkbox */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #eee;
+        }
+
+        /* On mouse-over, add a grey background color */
+        .container:hover input~.checkmark {
+            background-color: #ccc;
+        }
+
+        /* When the checkbox is checked, add a blue background */
+        .container input:checked~.checkmark {
+            background-color: #62afce;
+        }
+
+        /* Create the checkmark/indicator (hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* Show the checkmark when checked */
+        .container input:checked~.checkmark:after {
+            display: block;
+        }
+
+        /* Style the checkmark/indicator */
+        .container .checkmark:after {
+            left: 6px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+
+        input[type=text],
+        input[type=number] {
+            background-color: #62afce;
+            color: white;
+            border-radius: 4px;
+            border: none;
+            padding: 6px;
+            width: 100%;
+            font-size: 15px;
+            box-sizing: border-box;
+            border: 3px solid #3bb1dc;
+            -webkit-transition: 0.5s;
+            transition: 0.5s;
+            outline: none;
+        }
+
+        input[type=text]:focus,
+        input[type=number]:focus {
+            background-color: #1580aa;
+        }
+
+        select {
+            width: 30%;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            background-color: #62afce;
+            color: #fff;
+        }
+
+        label {
+            display: inline-block;
+        }
+
+        .textarea {
+            border-radius: 4px;
+            resize: none;
+            border: none;
+            -webkit-transition: 0.5s;
+            transition: 0.5s;
+            outline: none;
+            width: 94%;
+            background-color: #62afce;
+            color: #ffffff;
+            padding: 10px;
+        }
+
+        .textarea:focus {
+            background-color: #1580aa;
+        }
+
+        p.info {
+            min-height: 120px;
+            overflow: hidden;
+        }
+
 
         /* latin */
         @font-face {
@@ -46,24 +174,25 @@
         }
     </style>
 
-    <div style="line-height: 1.5em;max-width:550px;">This HTML test page will append or set the continuous values to the
-        specific
-        path. Specify the information below to test.<br />
+    <div style="line-height:1.5em;max-width:650px;color:#4c5364;">This HTML test page will append or set the continuous
+        values to the specific path. Specify the information below to test.
     </div>
+    <br />
+    <hr class="rounded">
     <div style="margin-top:10px;">
-        <form style="max-width:500px;">
-            <label for="apiKey">API Key:</label><br />
-            <input type="text" style="margin-bottom:10px;padding:5px;width:100%;color:rgb(24, 130, 3);" id="apiKey"
-                name="apiKey" onchange="saveValue('apiKey')"><br />
-            <label for="dbUrl">Database URL:</label><br />
-            <input type="text" style="margin-bottom:10px;padding:5px;width:100%;color:rgb(24, 130, 3);" id="dbUrl"
-                name="dbUrl" onchange="saveValue('dbUrl')"><br /><br />
-            <label for="userEmail">User Email:</label><br />
-            <input type="text" style="margin-bottom:10px;padding:5px;width:50%;color:rgb(24, 130, 3);" id="userEmail"
-                name="userEmail" onchange="saveValue('userEmail')"><br />
-            <label for="userPsw">User Password:</label><br />
-            <input type="text" style="margin-bottom:10px;padding:5px;width:50%;color:rgb(24, 130, 3);" id="userPsw"
-                name="userPsw" onchange="saveValue('userPsw')">
+        <form style="max-width:650px;">
+            <label for="apiKey" style="min-width:115px;">API Key:</label>
+            <input type="text" style="margin-bottom:10px;width:75%;" id="apiKey" name="apiKey"
+                onchange="saveValue('apiKey')"><br />
+            <label for="dbUrl" style="min-width:115px;">Database URL:</label>
+            <input type="text" style="margin-bottom:10px;width:75%;" id="dbUrl" name="dbUrl"
+                onchange="saveValue('dbUrl')"><br />
+            <label for="userEmail" style="min-width:115px;">Email:</label>
+            <input type="text" style="margin-bottom:10px;width:75%;" id="userEmail" name="userEmail"
+                onchange="saveValue('userEmail')"><br />
+            <label for="userPsw" style="min-width:115px;">Password:</label>
+            <input type="text" style="margin-bottom:10px;width:75%;" id="userPsw" name="userPsw"
+                onchange="saveValue('userPsw')">
         </form>
 
         <div style="margin-top:20px;margin-bottom:20px;">
@@ -72,23 +201,28 @@
                 In</button>
             <button type="button" id="signOutBtn" onclick="signOut()" style="padding:5px;color:rgb(254, 255, 253);"
                 title="Sign out">Sign Out</button><br /><br />
+            <hr class="rounded">
+            <br />
+            <form style="max-width:650px;">
 
-            <form style="max-width:500px;">
-
-                <label for="mode">Mode:</label>
-                <select id="mode" onchange="changeAppendMode()"
-                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                <label for="mode" style="min-width:115px;">Data Mode:</label>
+                <select id="mode" onchange="changeAppendMode()" style="margin-bottom:10px;">
                     <option value="set">Set</option>
                     <option value="Append">Append</option>
                 </select><br />
 
-                <label for="path">Path:</label>
-                <input type="text" style="margin-bottom:10px;padding:5px;width:50%;color:rgb(5, 31, 160);" id="path"
-                    name="path" onchange="saveValue('path')"><br />
+                <label for="path" style="min-width:115px;">Working Path:</label>
+                <input type="text" style="margin-bottom:10px;width:75%;" id="path" name="path"
+                    onchange="saveValue('path')"><br />
 
-                <label for="amount">Amount:</label>
-                <select id="amount" onchange="saveAmount()"
-                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                <label for="valueType" style="min-width:115px;">Value Types:</label>
+                <select id="valueType" onchange="saveValueType()" style="margin-bottom:10px;">
+                    <option value="1">Series</option>
+                    <option value="2">Random</option>
+                </select><br />
+
+                <label for="amount" style="min-width:115px;">Value Amount:</label>
+                <select id="amount" onchange="saveAmount()" style="margin-bottom:10px;">
                     <option value="1">1</option>
                     <option value="5">5</option>
                     <option value="10">10</option>
@@ -102,9 +236,8 @@
                     <option value="100000">100000</option>
                 </select><br />
 
-                <label for="interval">Intervals:</label>
-                <select id="interval" onchange="saveInterval()"
-                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                <label for="interval" style="min-width:115px;">Intervals:</label>
+                <select id="interval" onchange="saveInterval()" style="margin-bottom:10px;">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="5">5</option>
@@ -112,14 +245,12 @@
                     <option value="20">20</option>
                     <option value="30">30</option>
                     <option value="60">60</option>
-                </select> <select id="timeBase" onchange="saveInterval()"
-                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                </select> <select id="timeBase" onchange="saveInterval()" style="width:80px;margin-bottom:10px;">
                     <option value="Sec">Sec</option>
                     <option value="Min">Min</option>
                 </select><br />
-                <label for="iteration">Iterations:</label>
-                <select id="iteration" onchange="saveIteration()"
-                    style="margin-bottom:10px;padding:5px;color:rgb(30, 8, 154);">
+                <label for="iteration" style="min-width:115px;">Iterations:</label>
+                <select id="iteration" onchange="saveIteration()" style="margin-bottom:10px;">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="5">5</option>
@@ -128,20 +259,31 @@
                     <option value="30">30</option>
                     <option value="60">60</option>
                 </select> <span id="iterationInfo"></span><br />
-                <input type="checkbox" id="enListenerChk" name="enListenerChk" value="1"
-                    onclick="addRemoveListener()"><label for="enListenerChk">Listener:</label><br />
-                <textarea style="background-color:#050461;color:#ffffff;padding: 10px;" id="listener" name="listener"
-                    rows="10" cols="50"></textarea>
+
+                <label for="deviceJob" style="min-width:115px;">Jobs:</label>
+                <select id="deviceJob" onchange="saveDeviceJobs()" style="margin-bottom:10px;">
+                    <option value="1">Print all data in device</option>
+                    <option value="2">Print counter/sum in device</option>
+                    <option value="3">Blink the LED</option>
+                </select> <label id="ledGPIOLbl" for="ledGPIO" style="display:none;">GPIO </label><input type="number"
+                    id="ledGPIO" name="ledGPIO" onchange="saveLedGPIO()" style="width:80px;display:none;" /> <label
+                    id="delayMsLbl" for="delayMs" style="display:none;">Delay </label><input type="number"
+                    id="delayMs" name="delayMs" onchange="saveDelay()" style="width:80px;display:none;" /><br />
+
+                <label class="container">Listener
+                    <input type="checkbox" id="enListenerChk" name="enListenerChk" value="1"
+                        onclick="addRemoveListener()">
+                    <span class="checkmark"></span>
+                </label>
+                <textarea class="textarea" id="listener" name="listener" rows="10" cols="50" readonly></textarea>
             </form>
 
             <button type="button" id="setBtn" onclick="setData(false)" style="padding:5px;color:rgb(255, 255, 255);"
                 title="Set data">Set</button>
             <button type="button" id="delBtn" onclick="delData(false)" style="padding:5px;color:rgb(255, 255, 255);"
                 title="Delete data">Delete</button><br /><br />
-
-            <label id="msg">&nbsp;</label><br />
-            <img alt="" id="loader" style="display:none;width:22px;height:22px;"
-                src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHdpZHRoPSI0MHB4IiBoZWlnaHQ9IjQwcHgiIHZpZXdCb3g9IjAgMCA0MCA0MCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWw6c3BhY2U9InByZXNlcnZlIiBzdHlsZT0iZmlsbC1ydWxlOmV2ZW5vZGQ7Y2xpcC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlLWxpbmVqb2luOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEuNDE0MjE7IiB4PSIwcHgiIHk9IjBweCI+CiAgICA8ZGVmcz4KICAgICAgICA8c3R5bGUgdHlwZT0idGV4dC9jc3MiPjwhW0NEQVRBWwogICAgICAgICAgICBALXdlYmtpdC1rZXlmcmFtZXMgc3BpbiB7CiAgICAgICAgICAgICAgZnJvbSB7CiAgICAgICAgICAgICAgICAtd2Via2l0LXRyYW5zZm9ybTogcm90YXRlKDBkZWcpCiAgICAgICAgICAgICAgfQogICAgICAgICAgICAgIHRvIHsKICAgICAgICAgICAgICAgIC13ZWJraXQtdHJhbnNmb3JtOiByb3RhdGUoLTM1OWRlZykKICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICAgICAgQGtleWZyYW1lcyBzcGluIHsKICAgICAgICAgICAgICBmcm9tIHsKICAgICAgICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDBkZWcpCiAgICAgICAgICAgICAgfQogICAgICAgICAgICAgIHRvIHsKICAgICAgICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKC0zNTlkZWcpCiAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgICAgIHN2ZyB7CiAgICAgICAgICAgICAgICAtd2Via2l0LXRyYW5zZm9ybS1vcmlnaW46IDUwJSA1MCU7CiAgICAgICAgICAgICAgICAtd2Via2l0LWFuaW1hdGlvbjogc3BpbiAxLjVzIGxpbmVhciBpbmZpbml0ZTsKICAgICAgICAgICAgICAgIC13ZWJraXQtYmFja2ZhY2UtdmlzaWJpbGl0eTogaGlkZGVuOwogICAgICAgICAgICAgICAgYW5pbWF0aW9uOiBzcGluIDEuNXMgbGluZWFyIGluZmluaXRlOwogICAgICAgICAgICB9CiAgICAgICAgXV0+PC9zdHlsZT4KICAgIDwvZGVmcz4KICAgIDxnIGlkPSJvdXRlciI+CiAgICAgICAgPGc+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMCwwQzIyLjIwNTgsMCAyMy45OTM5LDEuNzg4MTMgMjMuOTkzOSwzLjk5MzlDMjMuOTkzOSw2LjE5OTY4IDIyLjIwNTgsNy45ODc4MSAyMCw3Ljk4NzgxQzE3Ljc5NDIsNy45ODc4MSAxNi4wMDYxLDYuMTk5NjggMTYuMDA2MSwzLjk5MzlDMTYuMDA2MSwxLjc4ODEzIDE3Ljc5NDIsMCAyMCwwWiIgc3R5bGU9ImZpbGw6YmxhY2s7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnPgogICAgICAgICAgICA8cGF0aCBkPSJNNS44NTc4Niw1Ljg1Nzg2QzcuNDE3NTgsNC4yOTgxNSA5Ljk0NjM4LDQuMjk4MTUgMTEuNTA2MSw1Ljg1Nzg2QzEzLjA2NTgsNy40MTc1OCAxMy4wNjU4LDkuOTQ2MzggMTEuNTA2MSwxMS41MDYxQzkuOTQ2MzgsMTMuMDY1OCA3LjQxNzU4LDEzLjA2NTggNS44NTc4NiwxMS41MDYxQzQuMjk4MTUsOS45NDYzOCA0LjI5ODE1LDcuNDE3NTggNS44NTc4Niw1Ljg1Nzg2WiIgc3R5bGU9ImZpbGw6cmdiKDIxMCwyMTAsMjEwKTsiLz4KICAgICAgICA8L2c+CiAgICAgICAgPGc+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yMCwzMi4wMTIyQzIyLjIwNTgsMzIuMDEyMiAyMy45OTM5LDMzLjgwMDMgMjMuOTkzOSwzNi4wMDYxQzIzLjk5MzksMzguMjExOSAyMi4yMDU4LDQwIDIwLDQwQzE3Ljc5NDIsNDAgMTYuMDA2MSwzOC4yMTE5IDE2LjAwNjEsMzYuMDA2MUMxNi4wMDYxLDMzLjgwMDMgMTcuNzk0MiwzMi4wMTIyIDIwLDMyLjAxMjJaIiBzdHlsZT0iZmlsbDpyZ2IoMTMwLDEzMCwxMzApOyIvPgogICAgICAgIDwvZz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPHBhdGggZD0iTTI4LjQ5MzksMjguNDkzOUMzMC4wNTM2LDI2LjkzNDIgMzIuNTgyNCwyNi45MzQyIDM0LjE0MjEsMjguNDkzOUMzNS43MDE5LDMwLjA1MzYgMzUuNzAxOSwzMi41ODI0IDM0LjE0MjEsMzQuMTQyMUMzMi41ODI0LDM1LjcwMTkgMzAuMDUzNiwzNS43MDE5IDI4LjQ5MzksMzQuMTQyMUMyNi45MzQyLDMyLjU4MjQgMjYuOTM0MiwzMC4wNTM2IDI4LjQ5MzksMjguNDkzOVoiIHN0eWxlPSJmaWxsOnJnYigxMDEsMTAxLDEwMSk7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnPgogICAgICAgICAgICA8cGF0aCBkPSJNMy45OTM5LDE2LjAwNjFDNi4xOTk2OCwxNi4wMDYxIDcuOTg3ODEsMTcuNzk0MiA3Ljk4NzgxLDIwQzcuOTg3ODEsMjIuMjA1OCA2LjE5OTY4LDIzLjk5MzkgMy45OTM5LDIzLjk5MzlDMS43ODgxMywyMy45OTM5IDAsMjIuMjA1OCAwLDIwQzAsMTcuNzk0MiAxLjc4ODEzLDE2LjAwNjEgMy45OTM5LDE2LjAwNjFaIiBzdHlsZT0iZmlsbDpyZ2IoMTg3LDE4NywxODcpOyIvPgogICAgICAgIDwvZz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPHBhdGggZD0iTTUuODU3ODYsMjguNDkzOUM3LjQxNzU4LDI2LjkzNDIgOS45NDYzOCwyNi45MzQyIDExLjUwNjEsMjguNDkzOUMxMy4wNjU4LDMwLjA1MzYgMTMuMDY1OCwzMi41ODI0IDExLjUwNjEsMzQuMTQyMUM5Ljk0NjM4LDM1LjcwMTkgNy40MTc1OCwzNS43MDE5IDUuODU3ODYsMzQuMTQyMUM0LjI5ODE1LDMyLjU4MjQgNC4yOTgxNSwzMC4wNTM2IDUuODU3ODYsMjguNDkzOVoiIHN0eWxlPSJmaWxsOnJnYigxNjQsMTY0LDE2NCk7Ii8+CiAgICAgICAgPC9nPgogICAgICAgIDxnPgogICAgICAgICAgICA8cGF0aCBkPSJNMzYuMDA2MSwxNi4wMDYxQzM4LjIxMTksMTYuMDA2MSA0MCwxNy43OTQyIDQwLDIwQzQwLDIyLjIwNTggMzguMjExOSwyMy45OTM5IDM2LjAwNjEsMjMuOTkzOUMzMy44MDAzLDIzLjk5MzkgMzIuMDEyMiwyMi4yMDU4IDMyLjAxMjIsMjBDMzIuMDEyMiwxNy43OTQyIDMzLjgwMDMsMTYuMDA2MSAzNi4wMDYxLDE2LjAwNjFaIiBzdHlsZT0iZmlsbDpyZ2IoNzQsNzQsNzQpOyIvPgogICAgICAgIDwvZz4KICAgICAgICA8Zz4KICAgICAgICAgICAgPHBhdGggZD0iTTI4LjQ5MzksNS44NTc4NkMzMC4wNTM2LDQuMjk4MTUgMzIuNTgyNCw0LjI5ODE1IDM0LjE0MjEsNS44NTc4NkMzNS43MDE5LDcuNDE3NTggMzUuNzAxOSw5Ljk0NjM4IDM0LjE0MjEsMTEuNTA2MUMzMi41ODI0LDEzLjA2NTggMzAuMDUzNiwxMy4wNjU4IDI4LjQ5MzksMTEuNTA2MUMyNi45MzQyLDkuOTQ2MzggMjYuOTM0Miw3LjQxNzU4IDI4LjQ5MzksNS44NTc4NloiIHN0eWxlPSJmaWxsOnJnYig1MCw1MCw1MCk7Ii8+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4K" />
+            <hr class="rounded">
+            <p class="info" id="msg"></p>
         </div>
     </div>
 
@@ -154,7 +296,9 @@
         var authenticated = false;
         var amount = 0;
         var oldPath = '';
-        var listener;
+        var dataListener;
+        var ackListener;
+        var helloMs = 0, ackMs = 0;
         var tmo;
         var intvInstant;
         var interval = 0;
@@ -179,6 +323,11 @@
                 document.getElementById("path").value = localStorage["path"].trim();
             else
                 document.getElementById("path").value = "/test/performance";
+
+            if (localStorage["valueType"] != undefined)
+                document.getElementById("valueType").value = localStorage["valueType"].trim();
+            else
+                document.getElementById("valueType").value = "1";
 
             if (localStorage["amount"] != undefined)
                 document.getElementById("amount").value = localStorage["amount"].trim();
@@ -206,6 +355,23 @@
             else
                 document.getElementById("iteration").value = 1;
 
+            if (localStorage["deviceJob"] != undefined)
+                document.getElementById("deviceJob").value = localStorage["deviceJob"].trim();
+            else
+                document.getElementById("deviceJob").value = "1";
+
+            if (localStorage["ledGPIO"] != undefined)
+                document.getElementById("ledGPIO").value = localStorage["ledGPIO"].trim();
+            else
+                document.getElementById("ledGPIO").value = "5";
+
+            if (localStorage["delayMs"] != undefined)
+                document.getElementById("delayMs").value = localStorage["delayMs"].trim();
+            else
+                document.getElementById("delayMs").value = "30";
+
+            saveDeviceJobs();
+
             if (localStorage["listener"] != undefined)
                 document.getElementById("enListenerChk").checked = localStorage["listener"] == 1 ? true : false;
             else
@@ -218,7 +384,7 @@
 
         changeAppendMode = function () {
             document.getElementById("setBtn").innerHTML = document.getElementById("mode").value;
-            saveAppendOption();
+            saveAppendJob();
         }
 
         saveValue = function (id) {
@@ -229,16 +395,17 @@
 
         initApp = function () {
 
-            showMessage("Initializing and signing in...", "#a10fae", true);
+            showMessage("Initializing...", "#a10fae");
             document.getElementById("signInBtn").disabled = true;
 
             firebase.app().delete().then(function () {
                 config.apiKey = document.getElementById("apiKey").value.trim();
                 config.databaseURL = document.getElementById("dbUrl").value.trim();
                 firebase.initializeApp(config);
+                showMessage("Successfully initialized.", "#008c00");
+                showMessage("Signing in...", "#a10fae");
                 signIn();
             }).catch(function (error) {
-                showHideLoader(false);
                 document.getElementById("signInBtn").disabled = false;
                 showError(error.message);
             });;
@@ -250,43 +417,65 @@
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then(function (userCredential) {
                     setAuthState(true);
-                    showHideLoader(false);
-                    showMessage("Successfully signed in", "#008c00", false);
+                    var ackRef = firebase.database().ref("test/ack");
+                    ackListener = ackRef.on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data.indexOf("-") > -1) {
+                            const arr = data.split("-");
+                            if (arr[0] == "hello" && arr[1] == helloMs)
+                                showMessage("Device [" + arr[2] + "] was connected.", "#008c00");
+                            else if (arr[0] == "accepted" && arr[1] == helloMs)
+                                showMessage("Device [" + arr[2] + "] accepts the job.", "#a10fae");
+                            else if (arr[0] == "done" && arr[1] == helloMs)
+                                showMessage("Device [" + arr[2] + "] has done the job.", "#008c00");
+                        }
+                    });
+                    showMessage("Successfully signed in.", "#008c00");
+                    checkClient();
                 })
                 .catch(function (error) {
-                    showHideLoader(false);
                     document.getElementById("signInBtn").disabled = false;
                     showError(error.message);
                 });
         }
 
         signOut = function () {
-            showMessage("Signing out...", "#a10fae", true);
+            showMessage("Signing out...", "#a10fae");
             setTimeout(function () {
                 firebase.auth().signOut().then(function () {
                     setAuthState(false);
-                    showMessage("Successfully signed out", "#008c00", false);
+                    var ackRef = firebase.database().ref("test/ack");
+                    ackRef.off('value', ackListener);
+                    showMessage("Successfully signed out.", "#008c00");
                 }, function (error) {
                     showError(error.message);
                 });
             }, 1);
         }
 
-        showError = function (msg) {
-            try {
-                var obj = JSON.parse(msg);
-                showMessage(obj["error"]["message"], "red", false);
-            } catch (e) {
-                showMessage(msg, "red", false);
+        checkClient = function () {
+            if (authenticated && preCheck()) {
+                var path = document.getElementById("path").value.trim();
+                helloMs = Date.now();
+                firebase.database().ref(path + "/chat").set("hello-" + helloMs);
             }
         }
 
-        showMessage = function (msg, color, loader) {
-            showHideLoader(loader);
+        showError = function (msg) {
+            try {
+                var obj = JSON.parse(msg);
+                showMessage(obj["error"]["message"], "red");
+            } catch (e) {
+                showMessage(msg, "red");
+            }
+        }
+
+        showMessage = function (msg, color) {
             if (tmo)
                 clearTimeout(tmo);
-            document.getElementById("msg").style.display = "inline";
-            document.getElementById("msg").style.color = color;
+            var old = document.getElementById("msg").innerHTML;
+            if (old != "") msg = old + "<br/><span style='color:" + color + ";'>" + msg + "</span>";
+            else msg = "<span style='color:" + color + ";'>" + msg + "</span>";
             document.getElementById("msg").innerHTML = msg;
             tmo = setTimeout(hideMessage, 5000);
         }
@@ -328,7 +517,7 @@
             else
                 removeListener();
 
-            saveAListenerOption();
+            saveAListenerJob();
         }
 
         setBtnUi = function (setState, delState) {
@@ -344,7 +533,7 @@
                 var newAmount = document.getElementById("amount").value.trim();
                 var append = (document.getElementById("mode").value == "Append") ? true : false;
 
-                showMessage((append ? "Appending" : "Setting") + " the values...", "#a10fae", true);
+                showMessage((append ? "Appending" : "Setting") + " the values...", "#a10fae");
 
                 if (!loop) clearIterationLoop(true);
 
@@ -356,19 +545,48 @@
                     iteration++;
 
                     if (iteration < parseInt(document.getElementById("iteration").value)) {
-                        document.getElementById("iterationInfo").innerHTML = " (" + iteration + " of " + document.getElementById("iteration").value + " Running)";
+                        document.getElementById("iterationInfo").innerHTML = " (" + iteration + "/" + document.getElementById("iteration").value + " completed)";
                     } else {
-                        document.getElementById("iterationInfo").innerHTML = " (Stopped)"
+                        document.getElementById("iterationInfo").innerHTML = ""
                     }
 
-                    for (var i = 0; i < newAmount; i++) {
-                        if (append)
-                            firebase.database().ref(path + "/" + i).set(i);
-                        else
-                            firebase.database().ref(path).set(i);
+                    var option = parseInt(document.getElementById("deviceJob").value);
+
+                    helloMs = Date.now();
+                    if (option == 1) {
+                        firebase.database().ref(path + "/chat").set("print-all-" + document.getElementById("amount").value + "-" + helloMs);
+                        firebase.database().ref(path + "/chat").remove();
                     }
+                    else if (option == 2)
+                        firebase.database().ref(path + "/chat").set("print-count-" + document.getElementById("amount").value + "-" + helloMs);
+                    else if (option == 3) {
+                        firebase.database().ref(path + "/chat").set("blink-" + document.getElementById("ledGPIO").value + "-" + + document.getElementById("delayMs").value + "-" + document.getElementById("amount").value + "-" + helloMs);
+                        firebase.database().ref(path + "/chat").remove();
+                    }
+
+                    var sum = 0;
+                    var valType = parseInt(document.getElementById("valueType").value);
+                    var val = 0;
+
+                    for (var i = 0; i < newAmount; i++) {
+
+                        var nval = valType == 1 ? i : Math.floor(Math.random() * 10000 + 1);
+
+                        if (nval == val)
+                            nval++;
+
+                        val = nval;
+                        sum += val;
+                        if (append)
+                            firebase.database().ref(path + "/" + i).set(val);
+                        else
+                            firebase.database().ref(path).set(val);
+                    }
+
+
                     amount = newAmount;
-                    showMessage("Successfully " + (append ? "appended" : "set") + " values", "#008c00", false);
+                    showMessage("Successfully " + (append ? "appended" : "set") + " values" + (option == 1 || option == 2?" (sum = " + sum + ")":"") + ".", "#008c00");
+
                     setBtnUi(true, true);
 
                     if (iteration >= parseInt(document.getElementById("iteration").value)) clearIterationLoop(false);
@@ -389,13 +607,13 @@
                     firebase.database().ref(path).remove();
                     amount = 0;
                 } else {
-                    showMessage("Deleting the values", "#a10fae", true);
+                    showMessage("Deleting the values...", "#a10fae");
                     setBtnUi(false, false);
                     setTimeout(function () {
                         var path = document.getElementById("path").value.trim();
                         firebase.database().ref(path).remove();
                         amount = 0;
-                        showMessage("Successfully deleted values", "#008c00", false);
+                        showMessage("Successfully deleted values.", "#008c00");
                         setBtnUi(true, true);
                     }, 0);
                 }
@@ -410,7 +628,7 @@
                 removeListener();
 
                 var ref = firebase.database().ref(path);
-                listener = ref.on('value', (snapshot) => {
+                dataListener = ref.on('value', (snapshot) => {
                     const data = snapshot.val();
                     var s = "";
 
@@ -431,30 +649,31 @@
         removeListener = function () {
             if (oldPath != "") {
                 var oldref = firebase.database().ref(oldPath);
-                oldref.off('value', listener);
+                oldref.off('value', dataListener);
             }
             document.getElementById("listener").value = "";
             oldPath = "";
         }
 
-        showHideLoader = function (show) {
-            document.getElementById("msg").style.marginLeft = show ? "28px" : "0px";
-            document.getElementById("loader").style.display = show ? "inline" : "none";
+        hideMessage = function () {
+            // document.getElementById("msg").style.display = "none";
+            document.getElementById("msg").innerHTML = "";
+        };
+
+        saveValueType = function () {
+            localStorage["valueType"] = document.getElementById("valueType").value;
         }
 
-        hideMessage = function () {
-            document.getElementById("msg").style.display = "none";
-        };
 
         saveAmount = function () {
             localStorage["amount"] = document.getElementById("amount").value;
         }
 
-        saveAppendOption = function () {
+        saveAppendJob = function () {
             localStorage["mode"] = document.getElementById("mode").value;
         }
 
-        saveAListenerOption = function () {
+        saveAListenerJob = function () {
             localStorage["listener"] = document.getElementById("enListenerChk").checked ? 1 : 0;
         }
 
@@ -469,6 +688,35 @@
 
         saveIteration = function () {
             localStorage["iteration"] = document.getElementById("iteration").value;
+        }
+
+        saveDeviceJobs = function () {
+            localStorage["deviceJob"] = document.getElementById("deviceJob").value;
+            if (document.getElementById("deviceJob").value == 3) {
+                document.getElementById("ledGPIO").style.display = "inline";
+                document.getElementById("ledGPIOLbl").style.display = "inline";
+                document.getElementById("delayMsLbl").style.display = "inline";
+                document.getElementById("delayMs").style.display = "inline";
+            }
+            else {
+                document.getElementById("ledGPIO").style.display = "none";
+                document.getElementById("ledGPIOLbl").style.display = "none";
+                document.getElementById("delayMsLbl").style.display = "none";
+                document.getElementById("delayMs").style.display = "none";
+            }
+
+        }
+
+        saveLedGPIO = function () {
+            if (parseInt(document.getElementById("ledGPIO").value) < 0)
+                document.getElementById("ledGPIO").value = "0";
+            localStorage["ledGPIO"] = document.getElementById("ledGPIO").value;
+        }
+
+        saveDelay = function () {
+            if (parseInt(document.getElementById("delayMs").value) < 0)
+                document.getElementById("delayMs").value = "0";
+            localStorage["delayMs"] = document.getElementById("delayMs").value;
         }
 
         clearIterationLoop = function (reset) {

@@ -192,7 +192,7 @@ namespace firebase_ns
          * The realtime_database_data_type enums are included the following.
          *
          * realtime_database_data_type_undefined or -1
-         * realtime_database_data_type_null or 5.
+         * realtime_database_data_type_null or 0.
          * realtime_database_data_type_integer or 1.
          * realtime_database_data_type_float or 2.
          * realtime_database_data_type_double or 3.
