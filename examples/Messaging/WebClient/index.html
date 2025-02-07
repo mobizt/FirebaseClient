@@ -1,10 +1,12 @@
 <html>
 
 <head>
-    <title>Stream Performance Test</title>
+
+    <title>Firebase Cloud Messaging Web Client App</title>
+
 </head>
 
-<body onload="setForm()" style="min-width: 650px;font-family: Open Sans;background-color:#cfe1fb;">
+<body id="body" style="min-width: 650px;font-family: Open Sans;background-color:#cfe1fb;">
     <style>
         button {
             border-radius: 4px;
@@ -157,11 +159,69 @@
         }
 
         p.info {
-            min-height: 120px;
+            height: 80px;
             overflow-y: auto;
-            max-height: 120px;
             max-width: 610px;
             word-wrap: break-word;
+        }
+
+        .input-container {
+            width: 98%;
+            max-width: 609px;
+            display: inline-block;
+        }
+
+        .input-container input:focus,
+        .input-container input:active {
+            outline: none;
+        }
+
+        .input-container input {
+            width: 80%;
+            border: none;
+        }
+
+        .input-container button {
+            float: right;
+        }
+
+        /* Style the tab */
+        .tab {
+            overflow: hidden;
+            border: 1px solid #62afce;
+            background: transparent;
+            border-radius: 0px;
+        }
+
+        /* Style the buttons that are used to open the tab content */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            color: #000;
+            border-radius: 0px;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+            background-color: #b0d9ea;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+            background-color: #71ccf0;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #62afce;
+            border-top: none;
         }
 
 
@@ -177,565 +237,538 @@
         }
     </style>
 
-    <div style="line-height:1.5em;max-width:650px;color:#4c5364;">This HTML test page will append or set the continuous
-        values to the specific path. Specify the information below to test.
-    </div>
-    <br />
-    <hr class="rounded">
-    <div style="margin-top:10px;">
-        <form style="max-width:650px;">
-            <label for="apiKey" style="min-width:115px;">API Key:</label>
-            <input type="text" style="margin-bottom:10px;width:75%;" id="apiKey" name="apiKey"
-                onchange="saveValue('apiKey')"><br />
-            <label for="dbUrl" style="min-width:115px;">Database URL:</label>
-            <input type="text" style="margin-bottom:10px;width:75%;" id="dbUrl" name="dbUrl"
-                onchange="saveValue('dbUrl')"><br />
-            <label for="userEmail" style="min-width:115px;">Email:</label>
-            <input type="text" style="margin-bottom:10px;width:75%;" id="userEmail" name="userEmail"
-                onchange="saveValue('userEmail')"><br />
-            <label for="userPsw" style="min-width:115px;">Password:</label>
-            <input type="text" style="margin-bottom:10px;width:75%;" id="userPsw" name="userPsw"
-                onchange="saveValue('userPsw')">
-        </form>
 
-        <div style="margin-top:20px;margin-bottom:20px;">
-            <button type="button" id="signInBtn" onclick="initApp()" style="padding:5px;color:rgb(254, 254, 254);"
-                title="Sign in">Sign
-                In</button>
-            <button type="button" id="signOutBtn" onclick="signOut()" style="padding:5px;color:rgb(254, 255, 253);"
-                title="Sign out">Sign Out</button><br /><br />
-            <hr class="rounded">
-            <br />
-            <form style="max-width:650px;">
 
-                <label for="mode" style="min-width:115px;">Data Mode:</label>
-                <select id="mode" onchange="changeAppendMode()" style="margin-bottom:10px;">
-                    <option value="set">Set</option>
-                    <option value="Append">Append</option>
-                </select><br />
+    <h3>Firebase Cloud Messaging Web Client</h3>
+    <div style="line-height:1.5em;max-width:610px;">
 
-                <label for="path" style="min-width:115px;">Working Path:</label>
-                <input type="text" style="margin-bottom:10px;width:75%;" id="path" name="path"
-                    onchange="saveValue('path')"><br />
-
-                <label for="valueType" style="min-width:115px;">Value Types:</label>
-                <select id="valueType" onchange="saveValueType()" style="margin-bottom:10px;">
-                    <option value="1">Series</option>
-                    <option value="2">Random</option>
-                </select><br />
-
-                <label for="amount" style="min-width:115px;">Value Amount:</label>
-                <select id="amount" onchange="saveAmount()" style="margin-bottom:10px;">
-                    <option value="1">1</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="500">500</option>
-                    <option value="1000">1000</option>
-                    <option value="5000">5000</option>
-                    <option value="10000">10000</option>
-                    <option value="50000">50000</option>
-                    <option value="100000">100000</option>
-                </select><br />
-
-                <label for="interval" style="min-width:115px;">Intervals:</label>
-                <select id="interval" onchange="saveInterval()" style="margin-bottom:10px;">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="60">60</option>
-                </select> <select id="timeBase" onchange="saveInterval()" style="width:80px;margin-bottom:10px;">
-                    <option value="Sec">Sec</option>
-                    <option value="Min">Min</option>
-                </select><br />
-                <label for="iteration" style="min-width:115px;">Iterations:</label>
-                <select id="iteration" onchange="saveIteration()" style="margin-bottom:10px;">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="60">60</option>
-                </select> <span id="iterationInfo"></span><br />
-
-                <label for="deviceJob" style="min-width:115px;">Jobs:</label>
-                <select id="deviceJob" onchange="saveDeviceJobs()" style="margin-bottom:10px;">
-                    <option value="1">Print all data in device</option>
-                    <option value="2">Print counter/sum in device</option>
-                    <option value="3">Blink the LED</option>
-                </select> <label id="ledGPIOLbl" for="ledGPIO" style="display:none;">GPIO </label><input type="number"
-                    id="ledGPIO" name="ledGPIO" onchange="saveLedGPIO()" style="width:80px;display:none;" /> <label
-                    id="delayMsLbl" for="delayMs" style="display:none;">Delay </label><input type="number"
-                    id="delayMs" name="delayMs" onchange="saveDelay()" style="width:80px;display:none;" /><br />
-
-                <label class="container">Listener
-                    <input type="checkbox" id="enListenerChk" name="enListenerChk" value="1"
-                        onclick="addRemoveListener()">
-                    <span class="checkmark"></span>
-                </label>
-                <textarea class="textarea" id="listener" name="listener" rows="10" cols="50" readonly></textarea>
-            </form>
-
-            <button type="button" id="setBtn" onclick="setData(false)" style="padding:5px;color:rgb(255, 255, 255);"
-                title="Set data">Set</button>
-            <button type="button" id="delBtn" onclick="delData(false)" style="padding:5px;color:rgb(255, 255, 255);"
-                title="Delete data">Delete</button><br /><br />
-            <hr class="rounded">
-            <p class="info" id="msg"></p>
+        <!-- Tab links -->
+        <div class="tab">
+            <button class="tablinks" id="instructionTabBtn">Instructions</button>
+            <button class="tablinks" id="setupTabBtn">Initialization</button>
+            <button class="tablinks" id="receiveTabBtn">Received message</button>
+            <button class="tablinks" id="composeTabBtn">Compose message</button>
         </div>
+
+        <!-- Tab content -->
+        <div id="instructionTab" class="tabcontent">
+            <h3>Instruction</h3>
+            <div id="longDiv" style="overflow-y: auto;max-height: 558px;">
+                1. Place the <b>index.html</b> and <b>auth.php</b> files in your web server or install the
+                http web server locally in your PC e.g. using <a href="https://www.apachefriends.org/download.html"
+                    target="_blank">XAMMP</a>, <a href="https://www.uniformserver.com/"
+                    target="_blank">UiformServer</a>, phython and Node.js and open this HTML file with the web browser
+                through the web server URL e.g. <a href="http://localhost/index.html"
+                    target="_blank">http://localhost/index.html</a>.<br /><br />
+
+                2. Specify the information below which you can get it from your web app in the project settings <a
+                    href="https://console.firebase.google.com/project/_/settings/general/"
+                    target="_blank">here</a><br /><br />
+
+
+                The <b>VAPID</b> key can be taken from the <b>Web Push certificates</b> section under <a
+                    href="https://console.firebase.google.com/project/_/settings/cloudmessaging/web"
+                    target="_blank">Project settings > Cloud Messaging</a><br /><br />
+
+                The <b>Client Email</b> and <b>Private Key</b> are taken from the Service Account key file and only
+                required for message sending purpose.<br /><br />
+
+                3. Click the <b>Initialize & Get Token</b> button to initialize your Firebase Cloud Messaging Web Client
+                and get the registration token to test with your Arduino device.<br /><br />
+
+                You also have to allow or enable notification for your web server site URL in your web browser
+                settings or
+                pop-up.<br /><br />
+
+                After the registration token was generated, you can now use for the registeration token in your
+                Arduino code.<br /><br />
+
+                4. Click the <b>Download SW File</b> button to download the service worker javascript file that is
+                required for background message notification.<br /><br />
+                Save the <b>firebase-messaging-sw.js</b> that downloaded to the same directory of this
+                <b>index.html</b> file.<br /><br />
+
+                In case you can't download file, you can also create a new <b>firebase-messaging-sw.js</b> by
+                click the <b>Copy SW Content</b> button and paste it to your <b>firebase-messaging-sw.js</b>
+                file.<br /><br />
+
+                5. Reload this HTML page and click the <b>Initialize & Get Token</b> button again. Now your web client
+                is ready to receive the messages.<br /><br />
+
+                6. To compose and send the message, this example app will send HTTP request to the googleapis server in
+                the behalf of server admin.<br /><br />
+                The access token was used for authorization and obtained from sending the <b>auth.php</b>
+                request.<br /><br />
+
+                The message to be sent should be valid <a
+                    href="https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages" target="_blank">HTTP
+                    v1 FCM messages</a> format.
+            </div>
+
+        </div>
+
+        <div id="setupTab" class="tabcontent">
+            <h3>Initialization</h3>
+            <div style="margin-top:10px;overflow-y: auto;max-height: 558px;">
+                <form style="max-width:650px;">
+                    <label for="projectId" style="min-width:115px;">Project ID:</label>
+                    <input type="text" style="margin-bottom:10px;width:78%;" id="projectId" name="projectId"><br />
+                    <label for="clientEmail" style="min-width:115px;">Client Email:</label>
+                    <input type="text" style="margin-bottom:10px;width:78%;" id="clientEmail" name="clientEmail"><br />
+                    <label for="privateKey" style="min-width:115px;">Private Key:</label>
+                    <input type="text" style="margin-bottom:10px;width:78%;" id="privateKey" name="privateKey"><br />
+                    <label for="apiKey" style="min-width:115px;">API Key:</label>
+                    <input type="text" style="margin-bottom:10px;width:78%;" id="apiKey" name="apiKey"><br />
+                    <label for="appId" style="min-width:115px;">App ID:</label>
+                    <input type="text" style="margin-bottom:10px;width:78%;" id="appId" name="appId">
+                    <label for="senderId" style="min-width:115px;">Sender ID:</label>
+                    <input type="text" style="margin-bottom:10px;width:78%;" id="senderId" name="senderId"><br />
+                    <label for="vapidKey" style="min-width:115px;">VAPID Key:</label>
+                    <input type="text" style="margin-bottom:10px;width:78%;" id="vapidKey" name="vapidKey">
+                </form>
+                <div class="input-container">
+                    <label for="iidToken" style="min-width:115px;">Regs. Token:</label>
+                    <input type="text" style="margin-bottom:10px;width:68%;background-color: #c2cad1;border: none;"
+                        id="iidToken" name="iidToken" class="input-field" readonly>
+                    <button class="input-button" style="min-width:50px;" id="tokenCopyBtn">Copy</button>
+                </div>
+            </div>
+            <hr class="rounded">
+            <p class="info" id="appStatus"></p>
+            <hr class="rounded">
+            <div style="margin-top:20px;margin-bottom:20px;">
+                <button type="button" id="initializeBtn" style="padding:5px;color:rgb(254, 254, 254);"
+                    title="Initialize">Initialize & Get Token</button> <button type="button" id="deleteTokenBtn"
+                    style="padding:5px;color:rgb(254, 254, 254);" title="Delete Token">Delete Token</button> <button
+                    type="button" id="getSwBtn" style="padding:5px;color:rgb(254, 254, 254);"
+                    title="Download Service Worker file">Download
+                    SW File</button> <button type="button" id="copySwBtn" style="padding:5px;color:rgb(254, 254, 254);"
+                    title="Copy Service Worker file">Copy SW Content</button>
+            </div>
+
+        </div>
+
+        <div id="receiveTab" class="tabcontent">
+            <h3>Received Message</h3>
+            <div style="max-width: 610px;overflow-y: auto;max-height: 558px;">
+                <button id="clearMsgBtn" style="min-width:30px;">Clear</button><br />
+                <div id='messages'
+                    style="border:none;width:96%;display:block;height:389px;max-width: 610px;overflow-y: auto;background: transparent;"
+                    class="textarea" id="listener" name="listener" rows="10" cols="50"></div>
+            </div>
+            <hr class="rounded">
+            <p class="info" id="receiveStatus" style="min-height: 30px;"></p>
+        </div>
+
+        <div id="composeTab" class="tabcontent">
+            <h3>Compose message</h3>
+            <div style="margin-top:10px;overflow-y: auto;max-height: 558px;">
+                <div style="max-width:650px;">
+                    <label for="msgPayload" style="min-width:115px;">Message Payload (JSON):</label> <button
+                        id="loadMsgBtn"
+                        style="float:right;min-width:30px;margin-right: 10px;margin-bottom:3px;">Sample</button><br />
+                    <textarea class="textarea"
+                        style="border:none;width:98%;display:block;height:337px;max-width: 610px;overflow-y: auto;"
+                        id="msgPayload" name="msgPayload" rows="10" cols="50"></textarea>
+                    <hr class="rounded">
+                    <p class="info" id="sendStatus" style="min-height: 30px;"></p>
+                    <hr class="rounded">
+                    <div style="margin-top:20px;margin-bottom:20px;">
+                        <button type="button" id="msgSendBtn" style="padding:5px;color:rgb(254, 254, 254);"
+                            title="send">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-database.js"></script>
+    <script type="module">
 
-    <script>
+        import { initializeApp, deleteApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js'
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js'
+        import { deleteToken, getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-messaging.js";
 
-        var authenticated = false;
-        var amount = 0;
-        var oldPath = '';
-        var dataListener;
-        var ackListener;
-        var helloMs = 0, ackMs = 0;
-        var tmo;
-        var intvInstant;
-        var interval = 0;
-        var iteration = 0;
-
-        var config = {
-            apiKey: '',
-            databaseURL: ''
+        const firebaseConfig = {
+            apiKey: "",
+            projectId: "",
+            messagingSenderId: "",
+            appId: ""
         };
 
-        setForm = function () {
-            setAuthState(false);
-            if (localStorage["apiKey"] != undefined)
-                document.getElementById("apiKey").value = localStorage["apiKey"].trim();
-            if (localStorage["dbUrl"] != undefined)
-                document.getElementById("dbUrl").value = localStorage["dbUrl"].trim();
-            if (localStorage["userEmail"] != undefined)
-                document.getElementById("userEmail").value = localStorage["userEmail"].trim();
-            if (localStorage["userPsw"] != undefined)
-                document.getElementById("userPsw").value = localStorage["userPsw"].trim();
-            if (localStorage["path"] != undefined)
-                document.getElementById("path").value = localStorage["path"].trim();
-            else
-                document.getElementById("path").value = "/test/performance";
-
-            if (localStorage["valueType"] != undefined)
-                document.getElementById("valueType").value = localStorage["valueType"].trim();
-            else
-                document.getElementById("valueType").value = "1";
-
-            if (localStorage["amount"] != undefined)
-                document.getElementById("amount").value = localStorage["amount"].trim();
-            else
-                document.getElementById("amount").value = 100;
-
-            if (localStorage["mode"] != undefined)
-                document.getElementById("mode").value = localStorage["mode"];
-            else
-                document.getElementById("mode").value = "set";
+        var appStatusTmo, receiveStatusTmo, sendStatusTmo;
+        var app, messaging, vapidKey = undefined;
+        var onMsgCallback = false;
+        var accessToken = "";
+        var tokenTime = 0;
 
 
-            if (localStorage["interval"] != undefined)
-                document.getElementById("interval").value = localStorage["interval"].trim();
-            else
-                document.getElementById("interval").value = 1;
+        function initializeFCM() {
 
-            if (localStorage["timeBase"] != undefined)
-                document.getElementById("timeBase").value = localStorage["timeBase"].trim();
-            else
-                document.getElementById("timeBase").value = "Min";
+            firebaseConfig.apiKey = document.getElementById("apiKey").value.trim();
+            firebaseConfig.projectId = document.getElementById("projectId").value.trim();
+            firebaseConfig.messagingSenderId = document.getElementById("senderId").value.trim();
+            firebaseConfig.appId = document.getElementById("appId").value.trim();
+            vapidKey = document.getElementById("vapidKey").value.trim();
 
-            if (localStorage["iteration"] != undefined)
-                document.getElementById("iteration").value = localStorage["iteration"].trim();
-            else
-                document.getElementById("iteration").value = 1;
-
-            if (localStorage["deviceJob"] != undefined)
-                document.getElementById("deviceJob").value = localStorage["deviceJob"].trim();
-            else
-                document.getElementById("deviceJob").value = "1";
-
-            if (localStorage["ledGPIO"] != undefined)
-                document.getElementById("ledGPIO").value = localStorage["ledGPIO"].trim();
-            else
-                document.getElementById("ledGPIO").value = "5";
-
-            if (localStorage["delayMs"] != undefined)
-                document.getElementById("delayMs").value = localStorage["delayMs"].trim();
-            else
-                document.getElementById("delayMs").value = "30";
-
-            saveDeviceJobs();
-
-            if (localStorage["listener"] != undefined)
-                document.getElementById("enListenerChk").checked = localStorage["listener"] == 1 ? true : false;
-            else
-                document.getElementById("enListenerChk").checked = false;
-
-            initApp();
-
-            changeAppendMode();
-        }
-
-        changeAppendMode = function () {
-            document.getElementById("setBtn").innerHTML = document.getElementById("mode").value;
-            saveAppendJob();
-        }
-
-        saveValue = function (id) {
-            localStorage[id] = document.getElementById(id).value.trim();
-            if (id == "path")
-                document.getElementById("spath").innerHTML = "<b>" + document.getElementById("path").value.trim() + "</b>";
-        }
-
-        initApp = function () {
-
-            showMessage("Initializing...", "#a10fae");
-            document.getElementById("signInBtn").disabled = true;
-
-            firebase.app().delete().then(function () {
-                config.apiKey = document.getElementById("apiKey").value.trim();
-                config.databaseURL = document.getElementById("dbUrl").value.trim();
-                firebase.initializeApp(config);
-                showMessage("Successfully initialized.", "#008c00");
-                showMessage("Signing in...", "#a10fae");
-                signIn();
-            }).catch(function (error) {
-                document.getElementById("signInBtn").disabled = false;
-                showError(error.message);
-            });;
-        }
-
-        signIn = function () {
-            var email = document.getElementById("userEmail").value.trim();
-            var password = document.getElementById("userPsw").value.trim();
-            firebase.auth().signInWithEmailAndPassword(email, password)
-                .then(function (userCredential) {
-                    setAuthState(true);
-                    var ackRef = firebase.database().ref("test/ack");
-                    ackListener = ackRef.on('value', (snapshot) => {
-                        const data = snapshot.val();
-                        if (data.indexOf("-") > -1) {
-                            const arr = data.split("-");
-                            if (arr[0] == "hello" && arr[1] == helloMs)
-                                showMessage("Device [" + arr[2] + "] was connected.", "#008c00");
-                            else if (arr[0] == "accepted" && arr[1] == helloMs)
-                                showMessage("Device [" + arr[2] + "] accepts the job.", "#a10fae");
-                            else if (arr[0] == "done" && arr[1] == helloMs)
-                                showMessage("Device [" + arr[2] + "] has done the job.", "#008c00");
-                        }
-                    });
-                    showMessage("Successfully signed in.", "#008c00");
-                    checkClient();
-                })
-                .catch(function (error) {
-                    document.getElementById("signInBtn").disabled = false;
-                    showError(error.message);
-                });
-        }
-
-        signOut = function () {
-            showMessage("Signing out...", "#a10fae");
-            setTimeout(function () {
-                firebase.auth().signOut().then(function () {
-                    setAuthState(false);
-                    var ackRef = firebase.database().ref("test/ack");
-                    ackRef.off('value', ackListener);
-                    showMessage("Successfully signed out.", "#008c00");
-                }, function (error) {
-                    showError(error.message);
-                });
-            }, 1);
-        }
-
-        checkClient = function () {
-            if (authenticated && preCheck()) {
-                var path = document.getElementById("path").value.trim();
-                helloMs = Date.now();
-                firebase.database().ref(path + "/chat").set("hello-" + helloMs);
+            if (app) {
+                deleteApp(app).then(function () { }).catch(function (error) {
+                    showError(error, "appStatus", appStatusTmo);
+                });;
             }
-        }
-
-        showError = function (msg) {
             try {
-                var obj = JSON.parse(msg);
-                showMessage(obj["error"]["message"], "red");
-            } catch (e) {
-                showMessage(msg, "red");
-            }
-        }
 
-        showMessage = function (msg, color) {
-            if (tmo)
-                clearTimeout(tmo);
-            var old = document.getElementById("msg").innerHTML;
-            if (old != "") msg = old + "<br/><span style='color:" + color + ";'>" + msg + "</span>";
-            else msg = "<span style='color:" + color + ";'>" + msg + "</span>";
-            document.getElementById("msg").innerHTML = msg;
-            tmo = setTimeout(hideMessage, 5000);
-        }
+                app = initializeApp(firebaseConfig);
+                messaging = getMessaging(app);
+                if (vapidKey != "")
+                    getRegistrationToken();
+                else
+                    showError("Please specify the public VAPID key.", "appStatus", appStatusTmo);
 
-        setAuthState = function (auth) {
+                // Handle incoming messages. Called when:
+                // - a message is received while the app has focus
+                // - the user clicks on an app notification created by a service worker
+                //   `messaging.onBackgroundMessage` handler.
+                if (!onMsgCallback) {
+                    onMsgCallback = true;
+                    onMessage(messaging, (payload) => {
+                        showMessage('New foreground message received!.', "#008c00", "receiveStatus", receiveStatusTmo);
+                        appendMessage(payload, "foreground", "#27960e");
+                    });
 
-            clearIterationLoop(true);
+                    navigator.serviceWorker.addEventListener('message', event => {
 
-            if (!auth)
-                removeListener();
-            else
-                addRemoveListener();
-            authenticated = auth;
-            document.getElementById("signInBtn").disabled = auth;
-            document.getElementById("signOutBtn").disabled = !auth;
-            document.getElementById("delBtn").disabled = !auth;
-            document.getElementById("setBtn").disabled = !auth;
-            document.getElementById("enListenerChk").disabled = !auth;
-            document.getElementById("iterationInfo").innerHTML = "";
-        }
+                        if (event.data['type']) {
+                            showMessage('New background message received!.', "#008c00", "receiveStatus", receiveStatusTmo);
+                            appendMessage(event.data['payload'], event.data['type'], "#9c19eb");
+                        }
 
-        preCheck = function () {
-            var path = document.getElementById("path").value.trim();
-            if (path == "" || path == "/") {
-                showError("Path should not be empty or at the root!");
-                return false;
-            }
-            addRemoveListener();
-            return true;
-        }
-
-        addRemoveListener = function () {
-            var path = document.getElementById("path").value.trim();
-            if (path == "" || path == "/")
-                return;
-
-            if (document.getElementById("enListenerChk").checked)
-                setListener();
-            else
-                removeListener();
-
-            saveAListenerJob();
-        }
-
-        setBtnUi = function (setState, delState) {
-            document.getElementById("setBtn").disabled = !setState;
-            document.getElementById("delBtn").disabled = !delState;
-        }
-
-        setData = function (loop) {
-            if (preCheck()) {
-                document.getElementById("listener").value = "";
-                setBtnUi(false, false);
-                var path = document.getElementById("path").value.trim();
-                var newAmount = document.getElementById("amount").value.trim();
-                var append = (document.getElementById("mode").value == "Append") ? true : false;
-
-                showMessage((append ? "Appending" : "Setting") + " the values...", "#a10fae");
-
-                if (!loop) clearIterationLoop(true);
-
-                setTimeout(function () {
-
-                    if (loop || amount != newAmount)
-                        delData(true);
-
-                    iteration++;
-
-                    if (iteration < parseInt(document.getElementById("iteration").value)) {
-                        document.getElementById("iterationInfo").innerHTML = " (" + iteration + "/" + document.getElementById("iteration").value + " completed)";
-                    } else {
-                        document.getElementById("iterationInfo").innerHTML = ""
-                    }
-
-                    var option = parseInt(document.getElementById("deviceJob").value);
-
-                    helloMs = Date.now();
-                    if (option == 1) {
-                        firebase.database().ref(path + "/chat").set("print-all-" + document.getElementById("amount").value + "-" + helloMs);
-                        firebase.database().ref(path + "/chat").remove();
-                    }
-                    else if (option == 2)
-                        firebase.database().ref(path + "/chat").set("print-count-" + document.getElementById("amount").value + "-" + helloMs);
-                    else if (option == 3) {
-                        firebase.database().ref(path + "/chat").set("blink-" + document.getElementById("ledGPIO").value + "-" + + document.getElementById("delayMs").value + "-" + document.getElementById("amount").value + "-" + helloMs);
-                        firebase.database().ref(path + "/chat").remove();
-                    }
-
-                    var sum = 0;
-                    var valType = parseInt(document.getElementById("valueType").value);
-                    var val = 0;
-
-                    for (var i = 0; i < newAmount; i++) {
-
-                        var nval = valType == 1 ? i : Math.floor(Math.random() * 10000 + 1);
-
-                        if (nval == val)
-                            nval++;
-
-                        val = nval;
-                        sum += val;
-                        if (append)
-                            firebase.database().ref(path + "/" + i).set(val);
-                        else
-                            firebase.database().ref(path).set(val);
-                    }
-
-
-                    amount = newAmount;
-                    showMessage("Successfully " + (append ? "appended" : "set") + " values" + (option == 1 || option == 2?" (sum = " + sum + ")":"") + ".", "#008c00");
-
-                    setBtnUi(true, true);
-
-                    if (iteration >= parseInt(document.getElementById("iteration").value)) clearIterationLoop(false);
-
-                    if (!intvInstant && parseInt(document.getElementById("iteration").value) > 1 && iteration < parseInt(document.getElementById("iteration").value)) {
-                        startIterationLoop();
-                    }
-
-                }, 1/* 1 ms for allowing ui to update */);
-            }
-        }
-
-        delData = function (immediate) {
-            if (preCheck()) {
-                document.getElementById("listener").value = "";
-                if (immediate) {
-                    var path = document.getElementById("path").value.trim();
-                    firebase.database().ref(path).remove();
-                    amount = 0;
-                } else {
-                    showMessage("Deleting the values...", "#a10fae");
-                    setBtnUi(false, false);
-                    setTimeout(function () {
-                        var path = document.getElementById("path").value.trim();
-                        firebase.database().ref(path).remove();
-                        amount = 0;
-                        showMessage("Successfully deleted values.", "#008c00");
-                        setBtnUi(true, true);
-                    }, 0);
+                    });
                 }
 
+            } catch (error) {
+                showError(error, "appStatus", appStatusTmo);
             }
+
         }
 
-        setListener = function () {
-            var path = document.getElementById("path").value.trim();
-            if (oldPath != path) {
+        function getRegistrationToken() {
 
-                removeListener();
+            getToken(messaging, { vapidKey }).then((currentToken) => {
+                if (currentToken) {
+                    document.getElementById("iidToken").value = currentToken;
+                    document.getElementById("iidToken").style.backgroundColor = "#139a3b";
+                    showMessage('The app was successfully initialized and the registration token is gained.', "#008c00", "appStatus", appStatusTmo);
+                } else {
+                    showError('No registration token available. Request permission to generate one.', "appStatus", appStatusTmo);
+                }
+            }).catch((err) => {
+                showError(err, "appStatus", appStatusTmo);
+            });
+        }
 
-                var ref = firebase.database().ref(path);
-                dataListener = ref.on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    var s = "";
-
-                    if (snapshot.numChildren()) {
-                        snapshot.forEach(function (childSnapshot) {
-                            s += "Key: " + childSnapshot.key + ", Value: " + childSnapshot.val() + "\r\n";
-                        });
-                        document.getElementById("listener").value = s;
-                    } else {
-                        document.getElementById("listener").value += "Value: " + data + "\r\n";
-                    }
-
+        function deleteRegistrationTokenFromFirebase() {
+            // Delete registration token.
+            getToken(messaging).then((currentToken) => {
+                deleteToken(messaging).then(() => {
+                    showMessage('Successfully deleted token.', "#008c00", "appStatus", appStatusTmo);
+                    document.getElementById("iidToken").value = "";
+                    document.getElementById("iidToken").style.backgroundColor = "#c2cad1";
+                }).catch((err) => {
+                    showError('Unable to delete token.', "appStatus", appStatusTmo);
                 });
-                oldPath = path;
+            }).catch((err) => {
+                showError(err, "appStatus", appStatusTmo);
+            });
+        }
+
+        function requestNotificationPermission() {
+            showMessage('Requesting permission...', "#a10fae", "appStatus", appStatusTmo);
+
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    showMessage('Notification permission granted.', "#008c00", "appStatus", appStatusTmo);
+                    // TODO(developer): Retrieve a registration token for use with FCM.
+                    // In many cases once an app has been granted notification permission,
+                    // it should update its UI reflecting this.
+                    initializeFCM();
+                } else {
+                    showError('Unable to get permission to notify.<br/> Set your web browser settings for allowing notification for this site (URL).', "appStatus", appStatusTmo);
+                }
+            }).catch((err) => {
+                showError(err, "appStatus", appStatusTmo);
+            });
+        }
+
+        function getSWFileContent() {
+            var content = "importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');\n";
+            content += "importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');\n\n";
+            content += "firebase.initializeApp({apiKey: '";
+            content += document.getElementById("apiKey").value;
+            content += "',projectId:'";
+            content += document.getElementById("projectId").value;
+            content += "',messagingSenderId:'";
+            content += document.getElementById("senderId").value;
+            content += "',appId:'";
+            content += document.getElementById("appId").value;
+            content += "'});\n\nconst messaging = firebase.messaging();\n\n";
+            content += "function postMessage(payload) {\n";
+            content += "self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(all => all.forEach(client => {\n";
+            content += "var data = { payload: payload, type: 'background' };\n";
+            content += "client.postMessage(data);\n";
+            content += " }));\n}\n\n"
+            content += "messaging.onBackgroundMessage(function (payload) {\n\n";
+            content += "postMessage(payload);\n";
+            content += "const notificationTitle = 'Background Message Title';\n";
+            content += "const notificationOptions = {body: 'Background Message body.',icon: '/firebase-logo.png'};\n";
+            content += "self.registration.showNotification(notificationTitle,notificationOptions);\n\n});";
+            return content;
+        }
+
+        function getSwFile() {
+            download("firebase-messaging-sw.js", getSWFileContent());
+        }
+
+        function copySwFile() {
+            navigator.clipboard.writeText(getSWFileContent());
+        }
+
+        function download(filename, text) {
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function addEvent(id, event, func, param) {
+            var el = document.getElementById(id);
+            el.addEventListener(event, func, false)
+            if (param) el.param = param;
+        }
+
+        function saveValue(evt) {
+            localStorage[evt.currentTarget.param] = evt.currentTarget.value.trim();
+        }
+
+        function setForm(evt) {
+            if (localStorage["apiKey"] != undefined)
+                document.getElementById("apiKey").value = localStorage["apiKey"].trim();
+            if (localStorage["clientEmail"] != undefined)
+                document.getElementById("clientEmail").value = localStorage["clientEmail"].trim();
+            if (localStorage["privateKey"] != undefined)
+                document.getElementById("privateKey").value = localStorage["privateKey"].trim();
+            if (localStorage["projectId"] != undefined)
+                document.getElementById("projectId").value = localStorage["projectId"].trim();
+            if (localStorage["senderId"] != undefined)
+                document.getElementById("senderId").value = localStorage["senderId"].trim();
+            if (localStorage["appId"] != undefined)
+                document.getElementById("appId").value = localStorage["appId"].trim();
+            if (localStorage["vapidKey"] != undefined)
+                document.getElementById("vapidKey").value = localStorage["vapidKey"].trim();
+
+            if (localStorage["msgPayload"] != undefined)
+                document.getElementById("msgPayload").value = localStorage["msgPayload"].trim();
+        }
+
+        function showError(msg, id, tmo) {
+            try {
+                var obj = JSON.parse(msg);
+                showMessage(obj["error"]["message"], "red", id, tmo);
+            } catch (e) {
+                showMessage(msg, "red", id, tmo);
             }
         }
 
-        removeListener = function () {
-            if (oldPath != "") {
-                var oldref = firebase.database().ref(oldPath);
-                oldref.off('value', dataListener);
-            }
-            document.getElementById("listener").value = "";
-            oldPath = "";
+        function showMessage(msg, color, id, tmo) {
+            if (tmo)
+                clearTimeout(tmo);
+            var old = document.getElementById(id).innerHTML;
+            if (old != "") msg = old + "<br/><span style='color:" + color + ";'>" + msg + "</span>";
+            else msg = "<span style='color:" + color + ";'>" + msg + "</span>";
+            document.getElementById(id).innerHTML = msg;
+            tmo = setTimeout(hideMessage, 5000, id);
         }
 
-        hideMessage = function () {
-            // document.getElementById("msg").style.display = "none";
-            document.getElementById("msg").innerHTML = "";
+        function hideMessage(id) {
+            document.getElementById(id).innerHTML = "";
         };
 
-        saveValueType = function () {
-            localStorage["valueType"] = document.getElementById("valueType").value;
+        function copyToken() {
+            navigator.clipboard.writeText(document.getElementById("iidToken").value);
         }
 
 
-        saveAmount = function () {
-            localStorage["amount"] = document.getElementById("amount").value;
+        // Add a message to the messages element.
+        function appendMessage(payload, type, color) {
+            const messagesElement = document.querySelector('#messages');
+            const dataHeaderElement = document.createElement('h5');
+            const dataElement = document.createElement('pre');
+            dataElement.style.overflowX = 'hidden;';
+            dataHeaderElement.textContent = 'Received ' + type + ' message:';
+            dataHeaderElement.style.color = color;
+            dataElement.textContent = JSON.stringify(payload, null, 2);
+            dataElement.style.color = color;
+            messagesElement.appendChild(dataHeaderElement);
+            messagesElement.appendChild(dataElement);
         }
 
-        saveAppendJob = function () {
-            localStorage["mode"] = document.getElementById("mode").value;
-        }
-
-        saveAListenerJob = function () {
-            localStorage["listener"] = document.getElementById("enListenerChk").checked ? 1 : 0;
-        }
-
-        saveInterval = function () {
-            localStorage["interval"] = document.getElementById("interval").value;
-            localStorage["timeBase"] = document.getElementById("timeBase").value;
-            if (intvInstant && authenticated) {
-                clearIterationLoop(false);
-                startIterationLoop();
+        // Clear the messages element of all children.
+        function clearMessages() {
+            const messagesElement = document.querySelector('#messages');
+            while (messagesElement.hasChildNodes()) {
+                messagesElement.removeChild(messagesElement.lastChild);
             }
         }
 
-        saveIteration = function () {
-            localStorage["iteration"] = document.getElementById("iteration").value;
+        function msgFormClear(evt) {
+            document.getElementById("msgToken").value = "";
+            document.getElementById("msgTopic").value = "";
+            document.getElementById("msgTitle").value = "";
+            document.getElementById("msgBody").value = "";
+            document.getElementById("msgData").value = "";
+            localStorage["msgToken"] = "";
+            localStorage["msgTopic"] = "";
+            localStorage["msgTitle"] = "";
+            localStorage["msgBody"] = "";
+            localStorage["msgData"] = "";
         }
 
-        saveDeviceJobs = function () {
-            localStorage["deviceJob"] = document.getElementById("deviceJob").value;
-            if (document.getElementById("deviceJob").value == 3) {
-                document.getElementById("ledGPIO").style.display = "inline";
-                document.getElementById("ledGPIOLbl").style.display = "inline";
-                document.getElementById("delayMsLbl").style.display = "inline";
-                document.getElementById("delayMs").style.display = "inline";
+        function asyncHttpRequest(mode, url, callback, header, body) {
+            var xmlHttp = new XMLHttpRequest();
+
+            xmlHttp.addEventListener("error", function () {
+                showError("An error occurred while sending the request.", "sendStatus", sendStatusTmo);
+            });
+
+            xmlHttp.onreadystatechange = function () {
+
+                if (xmlHttp.readyState === 4) {
+                    if (xmlHttp.status === 200) {
+                        callback(xmlHttp.responseText, true);
+                    } else {
+                        callback("An error occurred while sending the request.", false);
+                    }
+                }
             }
-            else {
-                document.getElementById("ledGPIO").style.display = "none";
-                document.getElementById("ledGPIOLbl").style.display = "none";
-                document.getElementById("delayMsLbl").style.display = "none";
-                document.getElementById("delayMs").style.display = "none";
+            xmlHttp.open(mode, url, true); // true for asynchronous 
+
+            if (header) {
+                for (const key in header) {
+                    xmlHttp.setRequestHeader(key, header[key]);
+                }
             }
 
+            xmlHttp.send(body);
         }
 
-        saveLedGPIO = function () {
-            if (parseInt(document.getElementById("ledGPIO").value) < 0)
-                document.getElementById("ledGPIO").value = "0";
-            localStorage["ledGPIO"] = document.getElementById("ledGPIO").value;
+        function msgSend(evt) {
+
+            if (accessToken == "" || tokenTime + ((3600 - 120) * 1000) < Date.now()) {
+
+                tokenTime = Date.now();
+
+                var email = document.getElementById("clientEmail").value;
+                var privateKey = encodeURI(document.getElementById("privateKey").value);
+
+                asyncHttpRequest("GET", "auth.php?email=" + email + "&private_key=" + privateKey, function (response, status) {
+
+                    if (!status)
+                        showError("Error while requesting the access token: " + response, "sendStatus", sendStatusTmo);
+                    else
+                        accessToken = response;
+
+                    if (response && status) {
+                        sendFCMMessage(accessToken);
+                    }
+
+                })
+            } else {
+                sendFCMMessage(accessToken);
+            }
         }
 
-        saveDelay = function () {
-            if (parseInt(document.getElementById("delayMs").value) < 0)
-                document.getElementById("delayMs").value = "0";
-            localStorage["delayMs"] = document.getElementById("delayMs").value;
+        function sendFCMMessage(accessToken) {
+
+            var projectId = document.getElementById("projectId").value;
+            var message = document.getElementById("msgPayload").value;
+            var header = { "Authorization": 'Bearer ' + accessToken };
+            asyncHttpRequest("POST", "https://fcm.googleapis.com/v1/projects/" + projectId + "/messages:send", function (response, status) {
+                if (!status)
+                    showError(response, "sendStatus", sendStatusTmo);
+                else
+                    showMessage('Successfully sent message.<br/>' + response, "#008c00", "sendStatus", sendStatusTmo);
+
+            }, header, message);
         }
 
-        clearIterationLoop = function (reset) {
-            clearInterval(intvInstant);
-            intvInstant = undefined;
-            if (reset)
-                iteration = 0;
+        function loadSampleMsg(evt) {
+
+            var token = document.getElementById("iidToken").value;
+
+            if (token == "")
+                token = "APP_REGISTRATION_TOKEN";
+
+            var msg = '{\n    "message": {\n        "data": {\n            "name": "wrench",\n';
+            msg += '            "mass": "1.3kg",\n            "count": "3"\n        },\n        "notification": {\n';
+            msg += '            "title": "Notification title",\n            "body": "Notification body"\n';
+            msg += '        },\n        "android": {\n\            "priority": "HIGH",\n            "notification": {\n';
+            msg += '                "notification_priority": "PRIORITY_HIGH"\n            }\n        },\n        "webpush": {\n';
+            msg += '            "fcm_options": {\n                "link": "https://github.com"\n            }\n        },\n';
+            msg += '        "token": "' + token + '"\n';
+            msg += '    }\n}';
+            document.getElementById("msgPayload").value = msg;
         }
 
-        startIterationLoop = function () {
-            interval = parseInt(document.getElementById("interval").value) * 1000 * (document.getElementById("timeBase").value == "Min" ? 60 : 1);
-            intvInstant = setInterval(function () { setData(true); }, interval);
+        function openTab(evt) {
+            // Declare all variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(evt.currentTarget.param).style.display = "block";
+            evt.currentTarget.className += " active";
         }
 
-        firebase.initializeApp();
+        addEvent('initializeBtn', 'click', requestNotificationPermission);
+        addEvent('deleteTokenBtn', 'click', deleteRegistrationTokenFromFirebase);
+        addEvent('apiKey', 'change', saveValue, 'apiKey');
+        addEvent('clientEmail', 'change', saveValue, 'clientEmail');
+        addEvent('privateKey', 'change', saveValue, 'privateKey');
+        addEvent('projectId', 'change', saveValue, 'projectId');
+        addEvent('senderId', 'change', saveValue, 'senderId');
+        addEvent('appId', 'change', saveValue, 'appId');
+        addEvent('vapidKey', 'change', saveValue, 'vapidKey');
+        addEvent('msgPayload', 'change', saveValue, 'msgPayload');
+        addEvent('tokenCopyBtn', 'click', copyToken);
+        addEvent('getSwBtn', 'click', getSwFile);
+        addEvent("copySwBtn", "click", copySwFile);
+        addEvent('clearMsgBtn', 'click', clearMessages);
+        addEvent('msgSendBtn', 'click', msgSend);
+        addEvent('loadMsgBtn', 'click', loadSampleMsg);
 
+        addEvent('instructionTabBtn', 'click', openTab, 'instructionTab');
+        addEvent('setupTabBtn', 'click', openTab, 'setupTab');
+        addEvent('receiveTabBtn', 'click', openTab, 'receiveTab');
+        addEvent('composeTabBtn', 'click', openTab, 'composeTab');
+        setForm();
+
+        document.getElementById("instructionTabBtn").click();
+        
     </script>
 </body>
 
