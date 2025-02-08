@@ -26,7 +26,7 @@
 #define DATABASE_DATA_OPTIONS_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./database/DatabaseFilter.h"
 #include "./core/Utils/StringUtil.h"
 

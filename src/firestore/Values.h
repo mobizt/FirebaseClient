@@ -1,5 +1,5 @@
 /**
- * 2025-01-30
+ * 2025-02-08
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -26,7 +26,7 @@
 #define FIRESTORE_VALUES_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/Utils/ObjectWriter.h"
 
 #if defined(ENABLE_FIRESTORE)
@@ -161,7 +161,7 @@ namespace Values
          * A 64-bit signed integer value.
          *  @param value The 64-bit signed integer value.
          */
-        explicit IntegerValue(int64_t value) : buf(StringValue(sut.num2Str(value)).c_str()) { getVal(); }
+        explicit IntegerValue(int64_t value) : buf(StringValue(sut.numString(value)).c_str()) { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }

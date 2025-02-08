@@ -2,7 +2,7 @@
 #define CORE_UTILS_MEMORY_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #if defined(ESP8266) && defined(MMU_EXTERNAL_HEAP)
 #include <umm_malloc/umm_malloc.h>
 #include <umm_malloc/umm_heap_select.h>

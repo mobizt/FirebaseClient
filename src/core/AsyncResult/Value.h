@@ -46,7 +46,7 @@ public:
     template <typename T1 = int>
     explicit number_t(T1 v, int d) : buf(String(v, d)) {}
     template <typename T = int>
-    explicit number_t(T o) : buf(sut.num2Str(o)) {}
+    explicit number_t(T o) : buf(sut.numString(o)) {}
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
 };
@@ -62,7 +62,7 @@ public:
         if (std::is_same<T, bool>::value)
             buf += v ? FPSTR("true") : FPSTR("false");
         else if (v_number<T>::value)
-            buf += sut.num2Str(v);
+            buf += sut.numString(v);
         else
             buf += v;
         aq();
@@ -148,7 +148,7 @@ public:
         if (std::is_same<T, bool>::value)
             buf += o ? FPSTR("true") : FPSTR("false");
         else if (v_number<T>::value)
-            buf += sut.num2Str(o);
+            buf += sut.numString(o);
         else
             buf += o;
     }
@@ -241,7 +241,7 @@ public:
             if (v_string<T>::value)
                 buf += '\"';
 
-            buf += sut.num2Str(value);
+            buf += sut.numString(value);
 
             if (v_string<T>::value)
                 buf += '\"';

@@ -5,6 +5,8 @@
  *
  * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
  * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ * 
+ * You can test this example with Firebase Cloud Messaging Web Client App in /examples/Messaging/WebClient.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  *

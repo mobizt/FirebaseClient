@@ -2,7 +2,7 @@
 #define CORE_JWT_JWT_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/Utils/Memory.h"
 #include "./core/Auth/AuthConfig.h"
 #include "./core/Utils/Base64.h"

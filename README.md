@@ -2,11 +2,11 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.5.4-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.5.5-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-01-29`
+Revision `2025-02-08`
 
 ## Table of Contents
 
@@ -397,9 +397,9 @@ The `CustomAuth` class and `ServiceAuth` class which will discus later use the c
 
 The `BearSSL` engine library that includes in `ESP_SSLClient` library that comes with this FirebaseClient library will be used to handle this cryptographic tasks.
 
-This `BearSSL` and `ESP_SSLClient`libraries are enabled or included by default with `ENABLE_SERVICE_AUTH` or `ENABLE_CUSTOM_AUTH` macros defined in [src/Config.h](src/Config.h) which requires more program space.
+This `BearSSL` and `ESP_SSLClient`libraries are enabled or included by default with `ENABLE_SERVICE_AUTH` or `ENABLE_CUSTOM_AUTH` macros defined in [src/FirebaseConfig.h](src/FirebaseConfig.h) which requires more program space.
 
-If you want to authenticate with Custom Token using custom claims signed `JWT` token via `CustomToken` class below or never use the `ServiceAuth` and `CustomAuth` classes and `ESP_SSLClient` library, you can disable `BearSSL` inclusion by defining the macros/build flags `DISABLE_CUSTOM_AUTH` and `DISABLE_SERVICE_AUTH` in  [src/Config.h](src/Config.h) or `src/UserConfig.h`, see [Library Build Options](#library-build-options) section for details.
+If you want to authenticate with Custom Token using custom claims signed `JWT` token via `CustomToken` class below or never use the `ServiceAuth` and `CustomAuth` classes and `ESP_SSLClient` library, you can disable `BearSSL` inclusion by defining the macros/build flags `DISABLE_CUSTOM_AUTH` and `DISABLE_SERVICE_AUTH` in  [src/FirebaseConfig.h](src/FirebaseConfig.h) or `src/UserConfig.h`, see [Library Build Options](#library-build-options) section for details.
 
 
 - The `CustomToken` class is for `ID token authorization using custom token`, which the custom claims signed `JWT` token obtained from the user authentication process in other applications e.g. NodeJS server side app that runs Firebase Admin SDK and working with the Service Account JSON file, will be used in the Firebase/Google Cloud REST API requests.
@@ -1387,7 +1387,7 @@ void download()
 
 ```
 
-When you don't use filesystems, you can exclude the related code in this library by removing the `ENABLE_FS` macro in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `DISABLE_FS` in the compiler build flags.
+When you don't use filesystems, you can exclude the related code in this library by removing the `ENABLE_FS` macro in [src/FirebaseConfig.h](/src/FirebaseConfig.h) or in your own defined config at [src/UserConfig.h](/src) or adding `DISABLE_FS` in the compiler build flags.
 
 
 - ### Working with Networks
@@ -1531,7 +1531,7 @@ DefaultEthernetNetwork::DefaultEthernetNetwork(<Firebase_SPI_ETH_Module>)
 
 `<Firebase_SPI_ETH_Module>` The ESP8266 core SPI ethernet driver class that work with external SPI Ethernet modules that currently supported e.g. ENC28J60, Wiznet W5100 and Wiznet 5500. This `<Firebase_SPI_ETH_Module>` should be defined at the same usage scope of `AsyncClientCalss`.
 
- To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` should be defined in [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src/UserConfig.h) or adding `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in the compiler build flags.
+ To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` should be defined in [src/FirebaseConfig.h](/src/FirebaseConfig.h) or in your own defined config at [src/UserConfig.h](/src/UserConfig.h) or adding `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in the compiler build flags.
 
  Use `Firebase_SPI_ETH_Module::enc28j60`, `Firebase_SPI_ETH_Module::w5100` and `Firebase_SPI_ETH_Module::w5500` to assign the pointer to `ENC28J60lwIP`, `Wiznet5100lwIP` and `Wiznet5500lwIP` classes objects respectively.
 
@@ -1618,7 +1618,7 @@ For example, for SIM7600 module, the macro `TINY_GSM_MODEM_SIM7600` should be de
 
 > [!IMPORTANT]  
 > The GSM module macros e.g. `TINY_GSM_MODEM_SIM7600` should be defined in two locations.
-> 1. In [src/Config.h](/src/Config.h) or in your own defined config at [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
+> 1. In [src/FirebaseConfig.h](/src/FirebaseConfig.h) or in your own defined config at [src/UserConfig.h](/src) or adding `TINY_GSM_MODEM_SIM7600` in compiler build flags.
 > 2. In your sketch.
 
 The class parameters are included the following.
@@ -2894,7 +2894,7 @@ Vcc (Pin 8)                         3V3
 Vcc (Pin 4)                         GND
 ```
 
-Once the external Heap memory was selected in IDE, to allow the library to use the external memory, you can set it in [**Config.h**](src/Config.h) by define this macro.
+Once the external Heap memory was selected in IDE, to allow the library to use the external memory, you can set it in [**FirebaseConfig.h**](src/FirebaseConfig.h) by define this macro.
 
 
 ```cpp
@@ -2925,7 +2925,7 @@ In PlatformIO on VSCode or Atom IDE, add the following build_flags in your proje
 build_flags = -DBOARD_HAS_PSRAM -mfix-esp32-psram-cache-issue
 ```
 
-As in ESP8266, once the external Heap memory was enabled in IDE, to allow the library to use the external memory, you can set it in [**Config.h**](src/Config.h) by define this macro.
+As in ESP8266, once the external Heap memory was enabled in IDE, to allow the library to use the external memory, you can set it in [**FirebaseConfig.h**](src/FirebaseConfig.h) by define this macro.
 
 ```cpp
 #define ENABLE_PSRAM
@@ -2940,7 +2940,7 @@ Some options can be disabled.
 
 - ### Predefined Options
 
-The predefined options that are already set in [**Config.h**](src/Config.h) are following.
+The predefined options that are already set in [**FirebaseConfig.h**](src/FirebaseConfig.h) are following.
 
 ```cpp
 ENABLE_DATABASE // For RTDB compilation
@@ -2970,7 +2970,7 @@ ENABLE_GSM_NETWORK
 
 - ### Optional Options
 
-The following options are not yet defined in [**Config.h**](src/Config.h) and can be defined by user.
+The following options are not yet defined in [**FirebaseConfig.h**](src/FirebaseConfig.h) and can be defined by user.
 
 ```cpp
 FIREBASE_ETHERNET_MODULE_LIB `"EthernetLibrary.h"` // For the Ethernet library to work with external Ethernet module.
@@ -3011,7 +3011,7 @@ For external Ethernet module integation used with function `setEthernetClient`, 
 
 `FIREBASE_ETHERNET_MODULE_TIMEOUT` is the timeout in milliseconds to wait for network connection.
 
-For disabling predefined options instead of editing the [**Config.h**](src/Config.h) or using `#undef` in `UserConfig.h`, you can define these build flags with these names or macros in `UserConfig.h`.
+For disabling predefined options instead of editing the [**FirebaseConfig.h**](src/FirebaseConfig.h) or using `#undef` in `UserConfig.h`, you can define these build flags with these names or macros in `UserConfig.h`.
 
 ```cpp
 DISABLE_DATABASE // For disabling RTDB support

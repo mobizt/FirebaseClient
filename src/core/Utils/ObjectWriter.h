@@ -2,7 +2,7 @@
 #define CORE_UTILS_OBJECT_WRITER_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/Utils/JSON.h"
 
 #define RESOURCE_PATH_BASE FPSTR("<resource_path>")
@@ -184,7 +184,7 @@ public:
     auto add(T1 ret, const T2 &value, String &buf, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
     {
         clear(buf);
-        jut.addObject(buf, name, sut.num2Str(value), false, true);
+        jut.addObject(buf, name, sut.numString(value), false, true);
         return ret;
     }
 
@@ -214,7 +214,7 @@ public:
     template <typename T1, typename T2>
     auto set(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
     {
-        setObject(buf, bufSize, index, name, sut.num2Str(value), false, true);
+        setObject(buf, bufSize, index, name, sut.numString(value), false, true);
         return ret;
     }
 
@@ -242,7 +242,7 @@ public:
     template <typename T1, typename T2>
     auto append(T1 ret, const T2 &value, String *buf, size_t bufSize, uint8_t index, const String &name) -> typename std::enable_if<v_number<T2>::value, T1>::type
     {
-        owriter.addMapArrayMember(buf, bufSize, index, name, sut.num2Str(value), false);
+        owriter.addMapArrayMember(buf, bufSize, index, name, sut.numString(value), false);
         return ret;
     }
 

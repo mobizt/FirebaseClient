@@ -1,4 +1,5 @@
-#ifndef FIREBASE_CONFIG_H
+#if !defined(FIREBASE_CLIENT_CONFIG_H) && !defined(FIREBASE_CONFIG_H)
+#define FIREBASE_CLIENT_CONFIG_H
 #define FIREBASE_CONFIG_H
 
 /** 📌 Predefined Build Options
@@ -114,20 +115,20 @@
  *
  * 🏷️ For disabling native (sdk) Ethernet functionality in case external Client usage.
  * #define FIREBASE_DISABLE_NATIVE_ETHERNET
- * 
+ *
  * 🏷️ For disabling native ESP32 (sdk) PPP functionality.
  * #define FIREBASE_DISABLE_NATIVE_PPP
  *
  * 🏷️ For Async TCP Client usage.
  * #define ENABLE_ASYNC_TCP_CLIENT
- * 
+ *
  * 🏷️ For maximum async queue limit setting for an async client
  * #define FIREBASE_ASYNC_QUEUE_LIMIT 10
- * 
+ *
  * 🏷️ For Firebase.printf debug port.
  * #define FIREBASE_PRINTF_PORT Serial
- * 
- * * 🏷️ For Firebase.printf buffer size. 
+ *
+ * * 🏷️ For Firebase.printf buffer size.
  * The default printf buffer size is 1024 for ESP8266 and SAMD otherwise 4096.
  * #define FIREBASE_PRINTF_BUFFER 2048
  */
@@ -137,5 +138,47 @@
 #endif
 
 #include "core/Options.h"
+
+/**
+ * Included from the following files.
+ * 
+ * core/AsyncClient/ConnectionHandler.h
+ * core/AsyncClient/RequestHandler.h
+ * core/Auth/AuthBase.h
+ * core/Auth/UserAuthData.h
+ * core/File/DefaultFileConfig.h
+ * core/File/FileConfig.h
+ * core/File/FileConfigData.h
+ * core/File/ResumableUpload.h
+ * core/JWT/JWT.h
+ * core/JWT/JWT.cpp
+ * core/Network/Data/FirebaseWiFi.h
+ * core/Network/Data/NetworkConfigData.h
+ * core/Network/Data/SPIEthernet.h
+ * core/Network/Data/StaticData.h
+ * core/Network/NetConfig.h
+ * core/Network/NetworkOptions.h
+ * core/Updater/OTAUpdater.h
+ * core/Utils/Base64.h
+ * core/Utils/JSON.h
+ * core/Utils/Memory.h
+ * core/Utils/ObjectWriter.h
+ * core/Utils/OTA.h
+ * core/Utils/StringUtil.h
+ * core/Utils/Timer.h
+ * core/Utils/URL.h
+ * core/FirebaseApp.h
+ * database/DatabaseFilter.h
+ * database/DataOptions.h
+ * firestore/DataOptions.h
+ * firestore/Query.cpp
+ * firestore/Query.h
+ * firestore/Values.h
+ * functions/DataOptions.h
+ * functions/Policy.h
+ * messaging/DataOptions.h
+ * storage/DataOptions.h
+ * cloud_storage/DataOptions.h
+*/
 
 #endif

@@ -1,5 +1,5 @@
 /**
- * 2025-02-02
+ * 2025-02-08
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -26,7 +26,7 @@
 #define DATABASE_DATABASE_FILTER_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/Utils/StringUtil.h"
 
 #if defined(ENABLE_DATABASE)
@@ -60,7 +60,7 @@ public:
     template <typename T = int>
     DatabaseFilter &limitToFirst(T val)
     {
-        String v = sut.num2Str(val);
+        String v = sut.numString(val);
         sut.printTo(uri, v.length(), "%slimitToFirst=%s", uri.length() ? "&" : "?", v.c_str());
         return *this;
     }
@@ -68,7 +68,7 @@ public:
     template <typename T = int>
     DatabaseFilter &limitToLast(T val)
     {
-        String v = sut.num2Str(val);
+        String v = sut.numString(val);
         sut.printTo(uri, v.length(), "%slimitToLast=%s", uri.length() ? "&" : "?", v.c_str());
         return *this;
     }

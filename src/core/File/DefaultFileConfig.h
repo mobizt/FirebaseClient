@@ -2,7 +2,7 @@
 #define CORE_FILE_DEFAULT_FILE_CONFIG_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/File/FileConfigData.h"
 
 class DefaultFileConfig

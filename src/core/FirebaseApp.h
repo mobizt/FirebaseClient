@@ -2,7 +2,7 @@
 #define CORE_FIREBASE_APP_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/Auth/AuthConfig.h"
 #include "./core/AsyncClient/AsyncClient.h"
 #include "./core/AsyncResult/ResultBase.h"

@@ -2,7 +2,7 @@
 #define CORE_UTILS_TIMER_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 
 class Timer
 {

@@ -2,7 +2,7 @@
 #define CORE_AUTH_DATA_ID_TOKEN_DATA_H
 
 #include <Arduino.h>
-#include "./core/Auth/Base.h"
+#include "./core/Auth/AuthBase.h"
 
 namespace id_tk_ns
 {

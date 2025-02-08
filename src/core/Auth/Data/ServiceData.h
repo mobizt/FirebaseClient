@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include "./core/File/FileConfig.h"
-#include "./core/Auth/Base.h"
+#include "./core/Auth/AuthBase.h"
 
 namespace sa_ns
 {

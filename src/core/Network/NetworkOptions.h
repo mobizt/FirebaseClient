@@ -2,7 +2,7 @@
 #define CORE_NETWORK_NETWORK_OPTIONS_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include <vector>
 
 #if __has_include(<esp_idf_version.h>)

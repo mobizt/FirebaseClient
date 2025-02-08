@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <Client.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/File/FileConfig.h"
 #include "./core/Utils/Timer.h"
 #include "./core/Utils/StringUtil.h"

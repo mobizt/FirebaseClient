@@ -2,7 +2,7 @@
 #define CORE_AUTH_AUTH_STATUS_H
 
 #include <Arduino.h>
-#include "./core/Auth/Base.h"
+#include "./core/Auth/AuthBase.h"
 
 namespace firebase_ns
 {

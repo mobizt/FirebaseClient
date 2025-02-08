@@ -2,7 +2,7 @@
 #define CORE_AUTH_DATA_ACCESS_TOKEN_DATA_H
 
 #include <Arduino.h>
-#include "./core/Auth/Base.h"
+#include "./core/Auth/AuthBase.h"
 
 namespace access_tk_ns
 {

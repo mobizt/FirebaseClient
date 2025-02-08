@@ -17,7 +17,7 @@ public:
      * @param user The GPRS user.
      * @param password The GPRS password.
      *
-     * This required two places of the GSM module macro definitions, one in your sketch and another in /src/Config.h
+     * This required two places of the GSM module macro definitions, one in your sketch and another in /src/FirebaseConfig.h
      * or in your own defined config at src/UserConfig.h or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
      *
      * The TinyGsm modem should be defined at the same usage scope of GSMNetwork and AsyncClientClass.

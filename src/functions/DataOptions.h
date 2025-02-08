@@ -1,5 +1,5 @@
 /**
- * 2025-01-30
+ * 2025-02-08
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -26,7 +26,7 @@
 #define FUNCTIONS_DATA_OPTIONS_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/Utils/JSON.h"
 #include "./core/Utils/ObjectWriter.h"
 #include "./core/AsyncClient/AsyncClient.h"
@@ -462,7 +462,7 @@ namespace GoogleCloudFunctions
         // Maximum number of functions to return per call. The largest allowed pageSize is 1,000, if the pageSize is omitted or specified as greater than 1,000 then it will be replaced as 1,000. The size of the list response can be less than specified when used with filters.
         ListOptions &pageSize(uint64_t value)
         {
-            buf[1] = "pageSize=" + sut.num2Str(value);
+            buf[1] = "pageSize=" + sut.numString(value);
             return setBuf();
         }
 

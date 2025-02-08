@@ -2,7 +2,7 @@
 #define CORE_NETWORK_DATA_STATIC_ADDRESS_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 
 typedef struct firebase_client_static_address
 {

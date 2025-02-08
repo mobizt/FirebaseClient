@@ -2,7 +2,7 @@
 #define CORE_NETWORK_NET_CONFIG_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/Network/Data/NetworkConfigData.h"
 #include "./core/Network/GenericNetwork.h"
 #include "./core/Network/GSMNetwork.h"

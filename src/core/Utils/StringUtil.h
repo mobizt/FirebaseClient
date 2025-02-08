@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <Client.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include <type_traits>
 #include <stdarg.h>
 
@@ -78,7 +78,7 @@ public:
 
     // Some cores do not provide 64-bit integer to string conversion.
     template <typename T = uint64_t>
-    auto num2Str(T val, bool negative = false) -> typename std::enable_if<(std::is_same<T, uint64_t>::value), String>::type
+    auto numString(T val, bool negative = false) -> typename std::enable_if<(std::is_same<T, uint64_t>::value), String>::type
     {
         String v;
         char buffer[21];
@@ -97,14 +97,14 @@ public:
     }
 
     template <typename T = int64_t>
-    auto num2Str(T val) -> typename std::enable_if<(std::is_same<T, int64_t>::value), String>::type
+    auto numString(T val) -> typename std::enable_if<(std::is_same<T, int64_t>::value), String>::type
     {
         uint64_t value = val < 0 ? -val : val;
-        return num2Str(value, val < 0);
+        return numString(value, val < 0);
     }
 
     template <typename T = int>
-    auto num2Str(T val) -> typename std::enable_if<(!std::is_same<T, uint64_t>::value && !std::is_same<T, int64_t>::value), String>::type
+    auto numString(T val) -> typename std::enable_if<(!std::is_same<T, uint64_t>::value && !std::is_same<T, int64_t>::value), String>::type
     {
         return String(val);
     }

@@ -2,7 +2,7 @@
 #define CORE_AUTH_DATA_CUSTOM_DATA_H
 
 #include <Arduino.h>
-#include "./core/Auth/Base.h"
+#include "./core/Auth/AuthBase.h"
 
 namespace cust_ns
 {

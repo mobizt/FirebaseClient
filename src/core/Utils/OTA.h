@@ -2,7 +2,7 @@
 #define CORE_UTILS_OTA_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/Utils/Memory.h"
 #include "./core/Utils/Base64.h"
 #include "./core/Error.h"

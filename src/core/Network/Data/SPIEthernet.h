@@ -2,7 +2,7 @@
 #define CORE_NETWORK_DATA_SPI_ETHERNET_H
 
 #include <Arduino.h>
-#include "./Config.h"
+#include "./FirebaseConfig.h"
 #include "./core/Network/NetworkOptions.h"
 
 typedef struct firebase_spi_ethernet_module_t
