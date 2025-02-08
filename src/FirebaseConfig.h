@@ -144,6 +144,7 @@
  * 
  * core/AsyncClient/ConnectionHandler.h
  * core/AsyncClient/RequestHandler.h
+ * core/AsyncResult/ResultBase.h
  * core/Auth/AuthBase.h
  * core/Auth/UserAuthData.h
  * core/File/DefaultFileConfig.h
