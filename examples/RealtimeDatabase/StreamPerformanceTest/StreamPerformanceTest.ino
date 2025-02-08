@@ -26,7 +26,6 @@
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
 
-
 void asyncCB(AsyncResult &aResult);
 void printResult(AsyncResult &aResult);
 
