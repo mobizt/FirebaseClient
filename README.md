@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-02-08`
+Revision `2025-02-09`
 
 ## Table of Contents
 
@@ -2709,34 +2709,25 @@ Add the Firebase SDK and click `Continue to console` button.
 
 ![Cloud Messaging Add Firebase SDK](https://raw.githubusercontent.com/mobizt/FirebaseClient/main/resources/images/firebase_console_messaging_get_started_step2.png)
 
-Follow the [Firebase Cloud Messaging Quickstart for Javascript](https://github.com/firebase/quickstart-js/tree/master/messaging) for the rest of steps.
+After you register the web app in your Firebase project, the next step is you have to use Firebase SDK to use the Firebase services (FCM for this case). 
 
-> [!NOTE]  
-> The script that provided in [Firebase Cloud Messaging Quickstart for Javascript](https://github.com/firebase/quickstart-js/tree/master/messaging) does not work at the present with the error `Failed to register a Service Worker`.
 
-To workaround, change the script in `firebase-messaging-sw.js` as the following.
+The FCM web app that consists of html document and related scripts requirs the server (local or remote) to run, you cannot access or browse your web app by opening the file from your local computer via file protocol (file://). 
 
-From
+The FCM SDK is supported only in pages served over HTTPS. This is due to its use of service workers, which are available only on HTTPS sites (remote host) or HTTP (local host). If you need a provider, Firebase Hosting is recommended and provides a no-cost tier for HTTPS hosting on your own domain.
 
-```js
-importScripts('/__/firebase/init.js');
-```
+There are the choises that you can access the Firebase SDK in your web app. 
 
-To
+1. Install the [Firebase SDK](https://firebase.google.com/docs/web/setup/#add-sdks-initialize) using the [Firebase CLI](https://firebase.google.com/docs/cli/).
 
-```js
-firebase.initializeApp({
-  apiKey: 'API_KEY', // Change this with your API Key
-  authDomain: 'PROJECT_ID.firebaseapp.com', // Change this with your API Key
-  databaseURL: 'https://PROJECT_ID.firebaseio.com', // Change this with your database url
-  projectId: 'PROJECT_ID', // Change this with your Project ID
-  storageBucket: 'PROJECT_ID.appspot.com', // Change this with your storage bucket
-  messagingSenderId: 'SENDER_ID', // Change this with your messaging sender ID
-  appId: 'APP_ID' // Change this with your app ID
-});
-```
+2. Access the Firebase SDK via [the global CDN or npm for Node.js apps](https://firebase.google.com/docs/web/alt-setup).
 
-The app (iOS, Android, Web and Unity) registration token or `DEVICE_TOKEN` is a unique token string that identifies each client app instance. The registration token is required for single device and device group messaging. Note that registration tokens must be kept secret ([Ref.](https://firebase.google.com/docs/cloud-messaging/concept-options#credentials))
+This library provides the ready to test **FCM Web Client App** in [examples/Messaging/WebClient](examples/Messaging/WebClient/). You can host this FCM web app files (fcm.html and fcm.php) in your local (php) server (localhost via http) or remote (php) server (https only).
+
+You can open [examples/Messaging/WebClient/fcm.html](examples/Messaging/WebClient/fcm.html) via web browser to review and follow the instructions on that page.
+
+
+The app (iOS, Android, Web and Unity) registration token or `DEVICE_TOKEN` is a unique token string that identifies each client app instance. The registration token is required for single device and device group messaging. Note that registration tokens must be kept secret, see [this](https://firebase.google.com/docs/cloud-messaging/concept-options#credentials) for more info.
 
 
 ### Service Account
