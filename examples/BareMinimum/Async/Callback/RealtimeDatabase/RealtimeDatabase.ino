@@ -57,7 +57,7 @@
  * ==============================
  * It handles server connection and data transfer works.
  *
- * In this beare minimum example we use only one SSL client for all process.
+ * In this beare minimum example we use only one SSL client for all processes.
  * In some use cases e.g. Realtime Database Stream connection, you may have to define the SSL client for it separately.
  *
  * Step 7. Define the Async Client.
