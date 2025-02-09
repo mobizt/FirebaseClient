@@ -2726,7 +2726,7 @@ This library provides the ready to test **FCM Web Client App** in [examples/Mess
 
 You can open [examples/Messaging/WebClient/fcm.html](examples/Messaging/WebClient/fcm.html) via web browser to review and follow the instructions on that page.
 
-In Windows 11 PC, even notification is granted for your site in the brower notification settings, the notification may go directly to the notification center instead of displaying pop-up, if **Do not disturb** is **On** in the [System > Notifications](ms-settings:notifications) and you have to turn it **Off** to allow the notification pop-up to show.
+In Windows 11 PC, even notification is granted for your site in the brower notification settings, the notification may go directly to the notification center instead of displaying pop-up, if **Do not disturb** is **On** in the <a href="ms-settings:notifications"><b></b></a> and you have to turn it **Off** to allow the notification pop-up to show.
 
 
 The app (iOS, Android, Web and Unity) registration token or `DEVICE_TOKEN` is a unique token string that identifies each client app instance. The registration token is required for single device and device group messaging. Note that registration tokens must be kept secret, see [this](https://firebase.google.com/docs/cloud-messaging/concept-options#credentials) for more info.
