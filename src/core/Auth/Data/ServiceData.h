@@ -31,7 +31,7 @@ namespace firebase_ns
         jwt_step_error
     };
 
-#if defined(ENABLE_SERVICE_AUTH)
+#if defined(ENABLE_SERVICE_AUTH) ||  defined(ENABLE_CUSTOM_AUTH)
     struct service_account
     {
         friend class SAParser;

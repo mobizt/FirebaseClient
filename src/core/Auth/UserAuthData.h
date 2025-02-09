@@ -47,7 +47,7 @@ namespace firebase_ns
 
     public:
         user_auth_data() {}
-        
+
         ~user_auth_data() { clear(); }
 
         user_auth_data &operator=(const user_auth_data &rhs)
@@ -114,7 +114,7 @@ namespace firebase_ns
 
     protected:
         user_data user;
-#if defined(ENABLE_SERVICE_AUTH)
+#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
         service_account sa;
 #endif
 #if defined(ENABLE_CUSTOM_AUTH)

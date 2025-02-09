@@ -8,7 +8,7 @@
 namespace firebase_ns
 {
 #if defined(ENABLE_FS)
-#if defined(ENABLE_SERVICE_AUTH) && defined(ENABLE_CUSTOM_AUTH)
+#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
     class SAParser
     {
     public:
