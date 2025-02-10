@@ -2,7 +2,7 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.5.7-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v1.5.8-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
@@ -391,7 +391,9 @@ The following authentication/authorization classes hold the credentials for use 
 
 - The `IDToken` class is for `ID token authorization`, which the `ID token` that obtained from the user authentication process in other applications will be used for Firebase/Google Cloud REST API request. 
 
-- The `CustomAuth` class is for `ID token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `ID token` that uses in the Firebase/Google Cloud REST API requests. This allows the client to acess the services on behalf of user with custom `UID`, claims and scopes.
+- The `CustomAuth` class is for `ID token authorization using service account`. The `Service Account` will be used for user authentication and it also provides the `ID token` that uses in the Firebase/Google Cloud REST API requests. This allows the client to acess the services on behalf of user with custom `UID` and claims.
+
+For more details about claims, please visit [Control Access with Custom Claims and Security Rules](https://firebase.google.com/docs/auth/admin/custom-claims).
 
 The `CustomAuth` class and `ServiceAuth` class which will discus later use the crypto library to sign the JWT token.
 
@@ -978,15 +980,15 @@ The service account credentials and json file can be used for authentication.
 The [CustomAuth](/examples/App/AppInitialization/Async/Callback/CustomAuth/) class parameters are included the following.
 
 ```cpp
-CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
+CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <claims>, <expire>)
 ```
 
 ```cpp
-CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <user_id>, <scope>, <claims>, <expire>)
+CustomAuth::CustomAuth(<TimeStatusCallback>, <file_config_data>, <api_key>, <user_id>, <claims>, <expire>)
 ```
 
 ```cpp
-CustomAuth::CustomAuth(<timestamp>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>)
+CustomAuth::CustomAuth(<timestamp>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <claims>, <expire>)
 ```
 
 ```cpp
@@ -1007,11 +1009,11 @@ CustomAuth::CustomAuth(<timestamp>, <file_config_data>, <api_key>, <user_id>, <s
 
 `<private_key>` The service account private key.
 
-`<user_id>` The user ID.
+`<user_id>` The unique identifier of the signed-in user must be a string, between 1-128 characters long, inclusive. Shorter uids offer better performance.
 
-`<scope>` The OAuth scopes.
+`<claims>` Optional custom claims to include in the Security Rules auth / request.auth variables.
 
-`<claims>` The OAuth claims.
+For more details about claims, please visit [Control Access with Custom Claims and Security Rules](https://firebase.google.com/docs/auth/admin/custom-claims).
 
 `<expire>`The expiry period in seconds (less than 3600), 3300 is the default value.
 
@@ -1117,9 +1119,9 @@ UserAuth::save(<file_config_data>)
 
 `<user_email>` The Email of user in the project.
 
-`<user_password>`The password of user in the project.
+`<user_password>` The password of user in the project.
 
-`<expire>`The expiry period in seconds (less than 3600), 3300 is the default value.
+`<expire>` The expiry period in seconds (less than 3600), 3300 is the default value.
 
 `<file_config_data>` The filesystem data (`file_config_data`) obtained from `FileConfig` class object of file that the `UserAuth` credentials will be saved to or read from.
 
@@ -1996,6 +1998,7 @@ The following section will provide the basic (bare minimum) code example and the
             * [Send](/examples/Messaging/Async/NoCallback/Send/)
     * [Sync](/examples/Messaging/Sync/)
         * [Send](/examples/Messaging/Sync/Send/)
+    * [WebClient](/examples/Messaging/WebClient/)
 * [RealtimeDatabase](/examples/RealtimeDatabase/)
     * [Async](/examples/RealtimeDatabase/Async/)
         * [Callback](/examples/RealtimeDatabase/Async/Callback/)
@@ -2033,6 +2036,7 @@ The following section will provide the basic (bare minimum) code example and the
         * [StreamNoAuth](/examples/RealtimeDatabase/Simple/StreamNoAuth/)
     * [Simple](/examples/RealtimeDatabase/StreamPerformanceTest/)
     * [Sync](/examples/RealtimeDatabase/Sync/)
+        * [CustomClaims](/examples/RealtimeDatabase/Sync/CustomClaims/)
         * [CustomPushID](/examples/RealtimeDatabase/Sync/CustomPushID/)
         * [ETAG](/examples/RealtimeDatabase/Sync/ETAG/)
         * [Existed](/examples/RealtimeDatabase/Sync/Existed/)
@@ -2395,6 +2399,10 @@ The [`object_t`](/resources/docs/placeholders.md#object_t) was used mostly in `R
 - ### Async Result Usage
 
     - [Class and Functions](/resources/docs/async_result.md).
+
+- ### Auth Class Usage
+
+    - [Class and Functions](/resources/docs/auth_class.md).
 
 - ### Network Usage
 

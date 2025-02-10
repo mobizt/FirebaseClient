@@ -2,7 +2,7 @@
  * ABOUT:
  *
  * The bare minimum non-blocking (async) example for Firebase custom user authentication with UID, scopes and claims.
- * 
+ *
  * The service account JSON key file path should be set via FileConfig.
  *
  * This example uses the DefaultNetwork class for network interface configuration.
@@ -33,10 +33,11 @@
  * <client_email> - The service account client Email.
  * <project_id> - The service account project ID.
  * <private_key> - The service account private key.
- * <user_id> - The user ID.
- * <scope> - The OAuth scopes.
- * <claims> - The OAuth claims.
+ * <user_id> - The unique identifier of the signed-in user must be a string, between 1-128 characters long, inclusive. Shorter uids offer better performance.
+ * <claims> - Optional custom claims to include in the Security Rules auth / request.auth variables. For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
+ * 
+ * See examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino for how it can work with security rules for security control.
  *
  * NOTE:
  *
@@ -156,6 +157,10 @@ void setup()
     ssl_client.setBufferSizes(4096, 1024);
 #endif
 #endif
+
+    // For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
+    String claims = "{\"premium_account\": true,\"admin\": true}";
+    sa_file_auth.setClaims(claims);
 
     // Initialize the FirebaseApp or auth task handler.
     // To deinitialize, use deinitializeApp(app).

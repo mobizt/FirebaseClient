@@ -601,6 +601,9 @@ namespace firebase_ns
 
                     if (parseToken(sData->response.val[resns::payload].c_str()))
                     {
+                        if (auth_data.user_auth.auth_type == auth_sa_custom_token && auth_data.app_token.val[app_tk_ns::uid].length() == 0) // store the custom UID if UID was not found in the response.
+                            auth_data.app_token.val[app_tk_ns::uid] = auth_data.user_auth.cust.val[cust_ns::uid];
+
                         sut.clear(sData->response.val[resns::payload]);
                         auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
                         auth_data.app_token.authenticated = true;

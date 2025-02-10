@@ -170,49 +170,20 @@ bool JWTClass::create()
         json.addObject(payload, "iat", String(now), false);
         json.addObject(payload, "exp", String((int)(now + 3600)), false);
 
-#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
-        if (auth_data->user_auth.auth_type == auth_sa_access_token || auth_data->user_auth.auth_type == auth_sa_custom_token)
+#if defined(ENABLE_SERVICE_AUTH)
+        if (auth_data->user_auth.auth_type == auth_sa_access_token)
+            json.addObject(payload, "scope", "https://www.googleapis.com/auth/devstorage.full_control https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/iam", true, true);
+#endif
+
+#if defined(ENABLE_CUSTOM_AUTH)
+        if (auth_data->user_auth.auth_type == auth_sa_custom_token)
         {
-            String s = "https://www.googleapis.com/auth/devstorage.full_control https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/iam";
-#if defined(ENABLE_CUSTOM_AUTH)
-            if (auth_data->user_auth.auth_type == auth_sa_custom_token)
-            {
-                if (auth_data->user_auth.cust.val[cust_ns::scope].length() > 0)
-                {
-                    char *p = reinterpret_cast<char *>(mem.alloc(auth_data->user_auth.cust.val[cust_ns::scope].length()));
-                    strcpy(p, auth_data->user_auth.cust.val[cust_ns::scope].c_str());
-                    char *pp = p;
-                    char *end = p;
-                    String tmp;
-                    int i = 0;
-                    while (pp != NULL)
-                    {
-                        sut.strsepImpl(&end, ",");
-                        if (strlen(pp) > 0)
-                        {
-                            tmp = pp;
-                            s += ' ';
-                            s += tmp;
-                            i++;
-                        }
-                        pp = end;
-                    }
-                    // release memory
-                    mem.release(&p);
-                }
-            }
-#endif
-            json.addObject(payload, "scope", s, true, true);
-#if defined(ENABLE_CUSTOM_AUTH)
-            if (auth_data->user_auth.auth_type == auth_sa_custom_token)
-            {
-                json.addObject(payload, "uid", auth_data->user_auth.cust.val[cust_ns::uid], true, auth_data->user_auth.cust.val[cust_ns::claims].length() <= 2);
-                if (auth_data->user_auth.cust.val[cust_ns::claims].length() > 2)
-                    json.addObject(payload, "claims", auth_data->user_auth.cust.val[cust_ns::claims], true, true);
-            }
-#endif
+            json.addObject(payload, "uid", auth_data->user_auth.cust.val[cust_ns::uid], true, auth_data->user_auth.cust.val[cust_ns::claims].length() <= 2);
+            if (auth_data->user_auth.cust.val[cust_ns::claims].length() > 2)
+                json.addObject(payload, "claims", auth_data->user_auth.cust.val[cust_ns::claims], false, true);
         }
 #endif
+
         len = but.encodedLength(payload.length());
         char *buf = reinterpret_cast<char *>(mem.alloc(len));
         but.encodeUrl(mem, buf, reinterpret_cast<const unsigned char *>(payload.c_str()), payload.length());

@@ -8,3 +8,4 @@
             * [Send](/examples/Messaging/Async/NoCallback/Send/)
     * [Sync](/examples/Messaging/Sync/)
         * [Send](/examples/Messaging/Sync/Send/)
+    * [WebClient](/examples/Messaging/WebClient/)

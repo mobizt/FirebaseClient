@@ -38,6 +38,7 @@
         * [Wrapper](/examples/RealtimeDatabase/Simple/Wrapper/)
     * [StreamPerformanceTest](/examples/RealtimeDatabase/StreamPerformanceTest/)
     * [Sync](/examples/RealtimeDatabase/Sync/)
+        * [CustomClaims](/examples/RealtimeDatabase/Sync/CustomClaims/)
         * [CustomPushID](/examples/RealtimeDatabase/Sync/CustomPushID/)
         * [ETAG](/examples/RealtimeDatabase/Sync/ETAG/)
         * [Existed](/examples/RealtimeDatabase/Sync/Existed/)

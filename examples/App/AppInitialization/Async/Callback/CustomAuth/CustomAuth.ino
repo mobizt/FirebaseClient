@@ -34,8 +34,10 @@
  * <private_key> - The service account private key.
  * <user_id> - The user ID.
  * <scope> - The OAuth scopes.
- * <claims> - The OAuth claims.
+ * <claims> - The OAuth claims. For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
+ * 
+ * See examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino for how it can work with security rules for security control.
  *
  *  3.------------------------
  *
@@ -46,9 +48,8 @@
  * <client_email> - The service account client Email.
  * <project_id> - The service account project ID.
  * <private_key> - The service account private key.
- * <user_id> - The user ID.
- * <scope> - The OAuth scopes.
- * <claims> - The OAuth claims.
+ * <user_id> - The unique identifier of the signed-in user must be a string, between 1-128 characters long, inclusive. Shorter uids offer better performance.
+ * <claims> - Optional custom claims to include in the Security Rules auth / request.auth variables.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
  *
  * NOTE:
@@ -105,7 +106,7 @@ void printResult(AsyncResult &aResult);
 DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 // Don't forget to call firebase::JWTClass::loop() in the main loop(), otherwise the JWT token process cannot be started.
-CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "myId" /* UID */, "" /* scope */, "" /* claims */, 3600 /* expire period in seconds (<3600) */);
+CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "myId" /* UID */, "" /* claims */, 3600 /* expire period in seconds (<3600) */);
 
 FirebaseApp app;
 
@@ -147,6 +148,10 @@ void setup()
     ssl_client.setBufferSizes(4096, 1024);
 #endif
 #endif
+
+    // For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
+    String claims = "{\"premium_account\": true,\"admin\": true}";
+    custom_auth.setClaims(claims);
 
     // Initialize the FirebaseApp or auth task handler.
     // To deinitialize, use deinitializeApp(app).

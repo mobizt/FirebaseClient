@@ -300,8 +300,9 @@
 │   │   │   └───Send
 │   │   └───NoCallback
 │   │       └───Send
-│   └───Sync
-│       └───Send
+│   ├───Sync
+│   │    └───Send
+│   └───WebClient
 ├───RealtimeDatabase
 │   ├───Async
 │   │   ├───Callback
@@ -339,6 +340,7 @@
 │   │   └───StreamNoAuth
 │   ├───StreamPerformancetest
 │   └───Sync
+│       ├───CustomClaims
 │       ├───CustomPushID
 │       ├───ETAG
 │       ├───Existed

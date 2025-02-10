@@ -10,7 +10,6 @@ namespace cust_ns
     {
         api_key, // API Key
         uid,     // UID
-        scope,   // scope
         claims,  // claims
         max_type
     };
