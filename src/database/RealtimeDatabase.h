@@ -1,5 +1,5 @@
 /**
- * 2025-02-02
+ * 2025-02-11
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -903,26 +903,30 @@ private:
 
     void addParams(bool hasParam, String &extras, reqns::http_request_method method, DatabaseOptions *options, bool isFile)
     {
+        String params;
         if (options)
         {
             if (options->readTimeout > 0)
-                sut.printTo(extras, 20, "%stimeout=%dms", extras.length() || hasParam ? "&" : "?", options->readTimeout);
+                sut.printTo(params, 20, "%stimeout=%dms", hasParam ? "&" : "?", options->readTimeout);
 
             if (options->writeSizeLimit.length())
-                sut.printTo(extras, 20, "%swriteSizeLimit=%s", extras.length() || hasParam ? "&" : "?", options->writeSizeLimit.c_str());
+                sut.printTo(params, 20, "%swriteSizeLimit=%s", params.length() || hasParam ? "&" : "?", options->writeSizeLimit.c_str());
 
             if (options->shallow)
-                sut.printTo(extras, 20, "%sshallow=true", extras.length() || hasParam ? "&" : "?");
+                sut.printTo(params, 20, "%sshallow=true", params.length() || hasParam ? "&" : "?");
         }
 
         if ((options && options->silent) || ((method == reqns::http_put || method == reqns::http_post || method == reqns::http_patch) && isFile))
-            sut.printTo(extras, 20, "%sprint=silent", extras.length() || hasParam ? "&" : "?");
+            sut.printTo(params, 20, "%sprint=silent", params.length() || hasParam ? "&" : "?");
 
         if (options && options->filter.complete)
         {
-            options->filter.uri[0] = extras.length() || hasParam ? '&' : '?';
-            extras += options->filter.uri;
+            options->filter.uri[0] = params.length() || hasParam ? '&' : '?';
+            params += options->filter.uri;
         }
+
+        if (params.length())
+            extras += params;
     }
 
     void setFileStatus(async_data *sData, const req_data &request)
