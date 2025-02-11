@@ -3072,7 +3072,7 @@ Current sponsors
 
 Past sponsors
 
-<img src="https://avatars.githubusercontent.com/u/5763108?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/57544850?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/63749581?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/83292822?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/31892707?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/96478986?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/13026382?s=35&v=4" width="30" height="30" alt="private sponsor"></a>
+<img src="https://avatars.githubusercontent.com/u/5763108?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/57544850?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/63749581?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/83292822?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/31892707?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/96478986?s=60&amp;v=4" width="30" height="30" alt="past_sponsor">
 
 ### Buy Me a Coffee
 
