@@ -1,43 +1,32 @@
 /**
  * ABOUT:
  *
- * The example to show how to control the user access with security rules, UID and custom claims.
+ * The example to show how to use custom claims and UID with security rules to control Firebase Realtime database access.
+ *
+ * We use the sync functions in this example because it is easy to describe the processes stype by step.
+ *
+ * For more details of using claims with security rules to control Firebase services accesses,
+ * visit https://firebase.google.com/docs/auth/admin/custom-claims
  * 
- * User is allowed to access only the certain Realtime database resource under its user name if the auth.tokens variables
- * match the custom claims.  
+ * For security rules information.
+ * https://firebase.google.com/docs/rules 
+ * https://firebase.google.com/docs/rules/rules-language
  *
- * This example also shows how to simulate the push operation with the custom UUID.
+ * This example uses the CustomAuth class for authentication for setting our custom UID and additional claims.
  *
- * This example uses the CustomAuth class for authentication, and the DefaultNetwork class for network interface configuration.
+ * The LegacyToken class (database secret) was used only for security rules read and modification process.
+ *
+ * The DefaultNetwork class was used for network interface configuration.
+ *
  * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
- * 
- * The LegacyToken class (database secret) was used only for security rules read and modification.
- * 
- * The FirebaseJson library used in this example is available in Library Manager or 
- * can download from https://github.com/mobizt/FirebaseJson.
+ *
+ * The FirebaseJson library used in this example is available to install in IDE's Library Manager or
+ * can be downloaded from https://github.com/mobizt/FirebaseJson.
+ *
+ * The syntaxes used in this example are described in example/App/AppInitialization/Sync/CustomAuth/CustomAuth.ino
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * bool RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>);
- *
- * T - The type of value to set.
- * <AsyncClient> - The async client.
- * <path> - The node path to set the value.
- * <value> - The value to set.
- * <AsyncResult> - The async result (AsyncResult).
- *
- * 2.------------------------
- *
- * String RealtimeDatabase::push<T>(<AsyncClient>, <path>, <value>, <AsyncResult>);
- *
- * T - The type of value to push.
- * <AsyncClient> - The async client.
- * <path> - The node path to push the value.
- * <value> - The value to push.
  */
 
 #include <Arduino.h>
@@ -95,7 +84,7 @@ String genUUID();
 
 DefaultNetwork network;
 
-CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "Node1" /* UID */, "" /* claims */, 3600 /* expire period in seconds (<3600) */);
+CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "Node1" /* UID */, "" /* claims can be set later */, 3600 /* expire period in seconds (<3600) */);
 
 FirebaseApp app;
 
@@ -160,8 +149,12 @@ void setup()
     //         }
     //    }
     // }
-    //
-    // To acheive what we want, you have to remove the following rules from your security rules.
+    // 
+    // =========
+    // IMPORTANT
+    // =========
+    // To allow read/write access only the path we want, 
+    // you have to remove the following rules from your security rules (if it existed).
     // ".read": "auth != null"
     // ".write": "auth != null"
     // ".read": "true"
@@ -174,10 +167,14 @@ void setup()
     mofifyRules(base_path, var, val, val, DATABASE_SECRET);
 
     // The custom claims.
+    // Once, the conditions are set in the .read/.write rules are "auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar'",
+    // if our claims set to CustomAuth object here e.g. premium_account is not true, admin is not true and foo is not "bar", the access to the database will fail.
+    
     // For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
     String claims = "{\"premium_account\": true,\"admin\": true, \"foo\":\"bar\"}";
     custom_auth.setClaims(claims);
-
+    
+    // Now we authenticate (sign in) with CustomAuth (ID token with custom UID and claims).
     Serial.println("Initializing the app...");
     initializeApp(aClient, app, getAuth(custom_auth), aResult_no_callback);
 
@@ -199,22 +196,29 @@ void loop()
         ms = millis();
 
         String path = "/UsersData/";
-        path += app.getUid(); //<- "Node1"
+        path += app.getUid(); // Node1 is the UID that previously defind in CustomAuth constructor.
         path += "/test/int";
 
         Serial.print("Setting the int value to the granted path... ");
-        bool status = Database.set<int>(aClient, path, 12345);
+        // This should be ok. Because we write to the path /UsersData/Node1/... which is allowed in the security rules.
+        bool status = Database.set<int>(aClient, path, 12345); 
         if (status)
             Serial.println("ok");
         else
             printError(aClient.lastError().code(), aClient.lastError().message());
 
         Serial.print("Setting the int value to outside of granted path... ");
+        // This should be failed because we write to the path that is not allowed.
+        // Only /UsersData/Node1/... is allowed in the security rules.
         status = Database.set<int>(aClient, "/test/int", 12345);
         if (status)
             Serial.println("ok");
         else
             printError(aClient.lastError().code(), aClient.lastError().message());
+
+        // If you change auth.token.foo === 'bar' in the security rules to something like auth.token.foo === 'bear'
+        // The write access to "/UsersData/Node1/..." with current claims will be denied too because our claim foo i.e. {"foo":"bar"}
+        // does not match the auth.token.foo variable.
     }
 }
 
@@ -282,83 +286,93 @@ void timeStatusCB(uint32_t &ts)
 }
 
 /**
- * @param path The parent path of child's node that the .read and .write rules are being set.
- * @param var The child node key that the .read and .write rules are being set.
- * @param readVal The child node key .read value.
- * @param writeVal The child node key .write value.
+ * @param basePath The parent path of child's node that the .read and .write rules are being set.
+ * @param node The child node key in security rules to set the .read and .write rules.
+ * @param readVal The child node key .read value to set.
+ * @param writeVal The child node key .write value to set.
  * @param databaseSecret The database secret.
  */
-bool mofifyRules(const String &path, const String &var, const String &readVal, const String &writeVal, const String &databaseSecret)
+bool mofifyRules(const String &basePath, const String &node, const String &readVal, const String &writeVal, const String &databaseSecret)
 {
+    // Use database secret for to allow for security rules access.
+    // The ServiceAuth (OAuth2.0 access token authorization) also can be used for authorization
+    // but for simple demonstration and testing the database secret will be used.
+
+    // The final result is the following rules are added, which you also can add it manually.
+    //     "UsersData": {
+    //         "$userId": {
+    //             ".read": "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')",
+    //             ".write": "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')"
+    //                     }
+    //                 }
+
+    // If our claims set to CustomAuth object e.g. premium_account is not true, admin is not true and foo is not bar, the access to the database will fail.
+
     LegacyToken legacy_token(databaseSecret);
-
     initializeApp(aClient, app, getAuth(legacy_token));
-
     app.getApp<RealtimeDatabase>(Database);
-
     Database.url(DATABASE_URL);
 
     Serial.print("Getting the security rules to check the existing keys... ");
 
     String jsonStr = Database.get<String>(aClient, ".settings/rules");
 
+    // The Security Rules are ready to check and modify.
     if (aClient.lastError().code() == 0)
     {
         Serial.println("ok");
 
         bool ret = true;
-        FirebaseJsonData data;
-        FirebaseJson json(jsonStr);
-        bool rd = false, wr = false;
+        FirebaseJsonData parseResult;
+        FirebaseJson currentRules(jsonStr);
+        bool readKeyExists = false, writeKeyExists = false;
 
-        String s = "rules";
-        s += path;
-        s += "/";
-        s += var;
+        String rulePath = basePath.length() && basePath[0] != '/' ? "rules" : "rules/";
+        rulePath += basePath;
+        rulePath += "/";
+        rulePath += node;
 
+        // Check the .read key exists in rules/<path>/<var>
         if (readVal.length() > 0)
         {
-            rd = true;
-            String r = s;
-            r += '/';
-            r += ".read";
-            if (json.get(data, r.c_str()) && strcmp(data.to<const char *>(), readVal.c_str()) == 0)
-                rd = false;
+            String readPath = rulePath;
+            readPath += "/.read";
+            if (currentRules.get(parseResult, readPath.c_str()) && strcmp(parseResult.to<const char *>(), readVal.c_str()) == 0)
+                readKeyExists = true;
         }
 
+        // Check the .write key exists in rules/<path>/<var>
         if (writeVal.length() > 0)
         {
-            wr = true;
-            MB_String w = s;
-            w += "/";
-            w += ".write";
-            if (json.get(data, w.c_str()) && strcmp(data.to<const char *>(), writeVal.c_str()) == 0)
-                wr = false;
+            String writePath = rulePath;
+            writePath += "/.write";
+            if (currentRules.get(parseResult, writePath.c_str()) && strcmp(parseResult.to<const char *>(), writeVal.c_str()) == 0)
+                writeKeyExists = true;
         }
 
-        // modify if the rules changed or does not exist.
-        if (wr || rd)
+        // Add our read/write keys if they do not exist.
+        if (!readKeyExists || !writeKeyExists)
         {
-            FirebaseJson js;
-            if (rd)
-                js.add(".read", readVal);
-            if (wr)
-                js.add(".write", writeVal);
+            FirebaseJson addedRules;
+            if (!readKeyExists)
+                addedRules.add(".read", readVal);
+            if (!writeKeyExists)
+                addedRules.add(".write", writeVal);
 
-            json.set(s.c_str(), js);
+            currentRules.set(rulePath, addedRules);
 
-            String str;
-            json.toString(str, true);
+            String modifiedRules;
+            currentRules.toString(modifiedRules, true);
 
             Serial.print("Setting the security rules to add the modified rules... ");
-            bool status = Database.set<object_t>(aClient, ".settings/rules", object_t(str));
+            bool status = Database.set<object_t>(aClient, ".settings/rules", object_t(modifiedRules));
             if (status)
                 Serial.println("ok");
             else
                 printError(aClient.lastError().code(), aClient.lastError().message());
         }
 
-        json.clear();
+        currentRules.clear();
         return aClient.lastError().code() == 0;
     }
     else

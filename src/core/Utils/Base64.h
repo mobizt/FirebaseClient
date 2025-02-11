@@ -216,7 +216,7 @@ public:
             }
         }
 
-        // write remaining
+        // write the remaining bytes
         if (out.bufWrite > 0 && !writeOutput(out))
             goto skip;
 

@@ -9,6 +9,12 @@
  * and the DefaultNetwork class for network interface configuration.
  *
  * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
+ * 
+ * For security rules information.
+ * https://firebase.google.com/docs/rules 
+ * https://firebase.google.com/docs/rules/rules-language
+ * 
+ * See examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino for how to control access using security rules and custom UID and claims.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  *

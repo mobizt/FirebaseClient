@@ -153,7 +153,7 @@ bool JWTClass::create()
         // {"alg":"RS256","typ":"JWT"}
 
         size_t len = 0;
-        jwt_data.token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9";
+        jwt_data.token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9"; // base64 encoded string of JWT header
 
         // payload
         // {"iss":"<email>","sub":"<email>","aud":"<audience>","iat":<timstamp>,"exp":<expire>,"scope":"<scope>"}
