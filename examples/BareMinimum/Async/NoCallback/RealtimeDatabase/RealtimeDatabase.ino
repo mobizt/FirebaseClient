@@ -39,7 +39,7 @@
  * In Google Cloud services e.g. Cloud Storage and Cloud Functions, the higest authentication level is required and
  * the ServiceAuth class (OAuth2.0 authen) and AccessToken class will be use for this case.
  *
- * While the CustomAuth provides the same authentication level as user authentication unless it allows the custom UID, scopes and claims.
+ * While the CustomAuth provides the same authentication level as user authentication unless it allows the custom UID and claims.
  *
  * The internal process of some authentication types e.g. ServiceAuth and CustomAuth, requires the signed JWT token generation process.
  * Because of it uses large memory and high cpu usage while signing the JWT token, this process requires another class to work
