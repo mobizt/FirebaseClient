@@ -149,9 +149,8 @@ void setup()
     //             ".read": "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')",
     //             ".write": "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')"
     //                     }
-    //                 }
-    //         }
-    //    }
+    //              }
+    //       }
     // }
     //
     // We use $ variable in the rules e.g. #userId to capture the path segment. If we access database at /UserData/xyz, the xyz well be our $userId variable in the rules.
