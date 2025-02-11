@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-02-10`
+Revision `2025-02-11`
 
 ## Table of Contents
 
@@ -111,6 +111,14 @@ Note that the Firestore data change listening and Realtime Database disconnected
 The [bare minimum code examples](/examples/BareMinimum/) provide the basic guidelines for library usage concepts. There is a little more code that needs to be written but it is still simple and understandable.
 
 You can create your own wrapper class as you want that provides the callback-free, cleaner and simpler API. See the [Wrapper example](/examples/RealtimeDatabase/Simple/Wrapper/) for how to.
+
+You can use security rules to fully control the Firebase services access instead of relying only on the authentication credentials and tokens. For access control using custom claims and security rule use case, see [/examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino](/examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino) example.
+
+This library also provides the test tools (web client app) that are simple and ready to try without coding.
+
+To see how Firebase Realtime Database provides the efficient, fast and reliable performance when work with this library, see  [/examples/RealtimeDatabase/StreamPerformanceTest/](/examples/RealtimeDatabase/StreamPerformanceTest/)
+
+To test notification sending with Firebase Cloud Messaging by using our FCM Web Client App, see  [/examples/Messaging/WebClient/](/examples/Messaging/WebClient/).
 
 
 ## Frequently Asked Questions

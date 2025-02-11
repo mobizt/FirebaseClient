@@ -231,9 +231,7 @@ void loop()
         else
             printError(aClient.lastError().code(), aClient.lastError().message());
 
-        // If you change auth.token.foo === 'bar' in the security rules to something like auth.token.foo === 'bear'
-        // The write access to "/UsersData/Node1/..." with current claims will be denied too because our claim foo i.e. {"foo":"bar"}
-        // does not match the auth.token.foo variable.
+        // If you try to change the claim value e.g. from {"foo":"bar"} to {"foo":"bear"} the write and read accesses will be denied.
     }
 }
 
@@ -318,7 +316,7 @@ bool mofifyRules(const String &parentPath, const String &child, const String &re
     app.getApp<RealtimeDatabase>(Database);
     Database.url(DATABASE_URL);
 
-    Serial.print("Getting the security rules to check the existing keys... ");
+    Serial.print("Getting the security rules to check the existing conditions... ");
 
     String jsonStr = Database.get<String>(aClient, ".settings/rules");
 
@@ -330,7 +328,7 @@ bool mofifyRules(const String &parentPath, const String &child, const String &re
         bool ret = true;
         FirebaseJsonData parseResult;
         FirebaseJson currentRules(jsonStr);
-        bool readKeyExists = false, writeKeyExists = false;
+        bool readConditionExists = false, writeConditionExists = false;
 
         String rulePath = parentPath.length() && parentPath[0] != '/' ? "rules" : "rules/";
         rulePath += parentPath;
@@ -343,7 +341,7 @@ bool mofifyRules(const String &parentPath, const String &child, const String &re
             String readPath = rulePath;
             readPath += "/.read";
             if (currentRules.get(parseResult, readPath.c_str()) && strcmp(parseResult.to<const char *>(), readCondition.c_str()) == 0)
-                readKeyExists = true;
+                readConditionExists = true;
         }
 
         // Check the write condition exists or match
@@ -352,16 +350,16 @@ bool mofifyRules(const String &parentPath, const String &child, const String &re
             String writePath = rulePath;
             writePath += "/.write";
             if (currentRules.get(parseResult, writePath.c_str()) && strcmp(parseResult.to<const char *>(), writeCondition.c_str()) == 0)
-                writeKeyExists = true;
+                writeConditionExists = true;
         }
 
         // Add our read/write keys if they do not exist.
-        if (!readKeyExists || !writeKeyExists)
+        if (!readConditionExists || !writeConditionExists)
         {
             FirebaseJson addedRules;
-            if (!readKeyExists)
+            if (!readConditionExists)
                 addedRules.add(".read", readCondition);
-            if (!writeKeyExists)
+            if (!writeConditionExists)
                 addedRules.add(".write", writeCondition);
 
             currentRules.set(rulePath, addedRules);
@@ -369,7 +367,7 @@ bool mofifyRules(const String &parentPath, const String &child, const String &re
             String modifiedRules;
             currentRules.toString(modifiedRules, true);
 
-            Serial.print("Setting the security rules to add the modified rules... ");
+            Serial.print("Setting the security rules to add the modified conditions... ");
             bool status = Database.set<object_t>(aClient, ".settings/rules", object_t(modifiedRules));
             if (status)
                 Serial.println("ok");
