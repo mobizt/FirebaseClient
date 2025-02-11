@@ -1,7 +1,7 @@
 /**
  * ABOUT:
  *
- * The bare minimum non-blocking (async) example for Firebase custom user authentication with UID, scopes and claims.
+ * The bare minimum non-blocking (async) example for Firebase custom user (ID token) authentication with custom UID and claims.
  *
  * The service account JSON key file path should be set via FileConfig.
  *
@@ -37,7 +37,7 @@
  * <claims> - Optional custom claims to include in the Security Rules auth / request.auth variables. For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
  * 
- * See examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino for how it can work with security rules for security control.
+ * See examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino for how it can work with security rules for database access control.
  *
  * NOTE:
  *
@@ -158,7 +158,12 @@ void setup()
 #endif
 #endif
 
-    // For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
+    // We will set the claims to the token we used here (ID token using CustomAuth).
+    // We set the values of the claims to math the auth.token varibles values in the security rules condition checking.
+    // The claims string must be JSON serialized string when passing to CustomAuth::setClaims or CustomAuth class constructor.
+
+    // For more details about custom claims, please see https://firebase.google.com/docs/auth/admin/custom-claims.
+    // See examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino for Realtime Database use case.
     String claims = "{\"premium_account\": true,\"admin\": true}";
     sa_file_auth.setClaims(claims);
 

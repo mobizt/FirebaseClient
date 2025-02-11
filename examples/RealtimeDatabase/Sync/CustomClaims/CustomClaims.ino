@@ -11,6 +11,7 @@
  * For security rules information.
  * https://firebase.google.com/docs/rules 
  * https://firebase.google.com/docs/rules/rules-language
+ * https://firebase.google.com/docs/database/security/rules-conditions
  *
  * This example uses the CustomAuth class for authentication for setting our custom UID and additional claims.
  *
@@ -74,7 +75,7 @@ void authHandler();
 
 void printResult(AsyncResult &aResult);
 
-bool mofifyRules(const String &path, const String &var, const String &readVal, const String &writeVal, const String &databaseSecret);
+bool mofifyRules(const String &parentPath, const String &node, const String &readCondition, const String &writeCondition, const String &databaseSecret);
 
 void printError(int code, const String &msg);
 
@@ -133,8 +134,11 @@ void setup()
 
     aClient.setAsyncResult(aResult_no_callback);
 
-    // This will modify the security rules to allow the read/write accesses at UsersData/$userId and the auth.token
-    // variables match the custom claims.
+    // The following process will modify the Realtime Database security rules to allow the read/write accesses only at UsersData/$userId 
+    // if the auth.token variables are match the custom claims we set.
+    //
+    // Here is the final security rules we want to set in this example.
+    // 
     // {
     // "rules": {
     //     ...
@@ -150,27 +154,38 @@ void setup()
     //    }
     // }
     // 
+    // We use $ variable in the rules e.g. #userId to capture the path segment. If we access database at /UserData/xyz, the xyz well be our $userId variable in the rules.
+    // When the $userId was used in the condition e.g. "$userId === auth.uid", the result will be false for this xyz UID case.
+    // This will allow us to access the database only at /UserData/Node1.  
+    // Then the user with provided UID e.g. xyz can only access to database at /UserData/xyz.
+    // In our rules above at the path UsersData/$userId, other auth variables are checked 
+    // i.e. auth.token which premium_account and foo are check for the maching values.
+    // If one of these condition is false, the access to UsersData/$userId will be denied.
+    // The auth.token.??? is variable taken from the ID token's claims.
+    // For more information, visit https://firebase.google.com/docs/database/security/rules-conditions#using_variables_to_capture_path_segments
+    // 
     // =========
     // IMPORTANT
     // =========
-    // To allow read/write access only the path we want, 
-    // you have to remove the following rules from your security rules (if it existed).
+    // To allow read/write access only the conditions we set above, 
+    // you have to remove the following rules from your security rules (if it exists).
     // ".read": "auth != null"
     // ".write": "auth != null"
     // ".read": "true"
     // ".write": "true"
-    // Because it allows all authenticated user to access any resources without restriction.
+    // ".read": "some other conditions that allow access by date"
+    // ".write": "some other conditions that allow access by date"
 
     String base_path = "/UsersData";
-    String var = "$userId";
+    String node = "$userId";
     String val = "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')";
-    mofifyRules(base_path, var, val, val, DATABASE_SECRET);
+    mofifyRules(base_path, node, val, val, DATABASE_SECRET);
 
-    // The custom claims.
-    // Once, the conditions are set in the .read/.write rules are "auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar'",
-    // if our claims set to CustomAuth object here e.g. premium_account is not true, admin is not true and foo is not "bar", the access to the database will fail.
-    
-    // For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
+    // We will set the claims to the token we used here (ID token using CustomAuth).
+    // We set the values of the claims to math the auth.token varibles values in the security rules condition checking.
+    // The claims string must be JSON serialized string when passing to CustomAuth::setClaims or CustomAuth class constructor.
+
+    // For more details about custom claims, please see https://firebase.google.com/docs/auth/admin/custom-claims.
     String claims = "{\"premium_account\": true,\"admin\": true, \"foo\":\"bar\"}";
     custom_auth.setClaims(claims);
     
@@ -286,27 +301,17 @@ void timeStatusCB(uint32_t &ts)
 }
 
 /**
- * @param basePath The parent path of child's node that the .read and .write rules are being set.
- * @param node The child node key in security rules to set the .read and .write rules.
- * @param readVal The child node key .read value to set.
- * @param writeVal The child node key .write value to set.
+ * @param parent The parent path of child's node that the which we want to control access.
+ * @param child The child node path which we want to control access.
+ * @param readCondition The read access condition.
+ * @param writeVal The write access condition.
  * @param databaseSecret The database secret.
  */
-bool mofifyRules(const String &basePath, const String &node, const String &readVal, const String &writeVal, const String &databaseSecret)
+bool mofifyRules(const String &parentPath, const String &child, const String &readCondition, const String &writeCondition, const String &databaseSecret)
 {
-    // Use database secret for to allow for security rules access.
-    // The ServiceAuth (OAuth2.0 access token authorization) also can be used for authorization
-    // but for simple demonstration and testing the database secret will be used.
-
-    // The final result is the following rules are added, which you also can add it manually.
-    //     "UsersData": {
-    //         "$userId": {
-    //             ".read": "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')",
-    //             ".write": "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')"
-    //                     }
-    //                 }
-
-    // If our claims set to CustomAuth object e.g. premium_account is not true, admin is not true and foo is not bar, the access to the database will fail.
+    // Use database secret for to allow security rules access.
+    // The ServiceAuth (OAuth2.0 access token authorization) can also be used
+    // but database secret is more simple for this case.
 
     LegacyToken legacy_token(databaseSecret);
     initializeApp(aClient, app, getAuth(legacy_token));
@@ -317,7 +322,7 @@ bool mofifyRules(const String &basePath, const String &node, const String &readV
 
     String jsonStr = Database.get<String>(aClient, ".settings/rules");
 
-    // The Security Rules are ready to check and modify.
+    // If security rules are ready get.
     if (aClient.lastError().code() == 0)
     {
         Serial.println("ok");
@@ -327,26 +332,26 @@ bool mofifyRules(const String &basePath, const String &node, const String &readV
         FirebaseJson currentRules(jsonStr);
         bool readKeyExists = false, writeKeyExists = false;
 
-        String rulePath = basePath.length() && basePath[0] != '/' ? "rules" : "rules/";
-        rulePath += basePath;
+        String rulePath = parentPath.length() && parentPath[0] != '/' ? "rules" : "rules/";
+        rulePath += parentPath;
         rulePath += "/";
-        rulePath += node;
+        rulePath += child;
 
-        // Check the .read key exists in rules/<path>/<var>
-        if (readVal.length() > 0)
+        // Check the read condition exists or match
+        if (readCondition.length() > 0)
         {
             String readPath = rulePath;
             readPath += "/.read";
-            if (currentRules.get(parseResult, readPath.c_str()) && strcmp(parseResult.to<const char *>(), readVal.c_str()) == 0)
+            if (currentRules.get(parseResult, readPath.c_str()) && strcmp(parseResult.to<const char *>(), readCondition.c_str()) == 0)
                 readKeyExists = true;
         }
 
-        // Check the .write key exists in rules/<path>/<var>
-        if (writeVal.length() > 0)
+        // Check the write condition exists or match
+        if (writeCondition.length() > 0)
         {
             String writePath = rulePath;
             writePath += "/.write";
-            if (currentRules.get(parseResult, writePath.c_str()) && strcmp(parseResult.to<const char *>(), writeVal.c_str()) == 0)
+            if (currentRules.get(parseResult, writePath.c_str()) && strcmp(parseResult.to<const char *>(), writeCondition.c_str()) == 0)
                 writeKeyExists = true;
         }
 
@@ -355,9 +360,9 @@ bool mofifyRules(const String &basePath, const String &node, const String &readV
         {
             FirebaseJson addedRules;
             if (!readKeyExists)
-                addedRules.add(".read", readVal);
+                addedRules.add(".read", readCondition);
             if (!writeKeyExists)
-                addedRules.add(".write", writeVal);
+                addedRules.add(".write", writeCondition);
 
             currentRules.set(rulePath, addedRules);
 

@@ -13,6 +13,7 @@
  * For security rules information.
  * https://firebase.google.com/docs/rules 
  * https://firebase.google.com/docs/rules/rules-language
+ * https://firebase.google.com/docs/database/security/rules-conditions
  * 
  * See examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino for how to control access using security rules and custom UID and claims.
  *
