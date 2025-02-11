@@ -302,7 +302,7 @@ void timeStatusCB(uint32_t &ts)
  * @param parent The parent path of child's node that the which we want to control access.
  * @param child The child node path which we want to control access.
  * @param readCondition The read access condition.
- * @param writeVal The write access condition.
+ * @param writeCondition The write access condition.
  * @param databaseSecret The database secret.
  */
 bool mofifyRules(const String &parentPath, const String &child, const String &readCondition, const String &writeCondition, const String &databaseSecret)
