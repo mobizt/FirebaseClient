@@ -332,7 +332,7 @@ private:
     JSONUtil jut;
     StringUtil sut;
 
-    const char* getQuery(const String &mask)
+    const char *getQuery(const String &mask)
     {
         sut.clear(buf[1]);
         if (buf[2].length())
@@ -883,7 +883,7 @@ public:
     // This value represents the item to add to an array.
     // The names of the documents to retrieve.
     // The item or value will be added to the array or list.
-    BatchGetDocumentOptions &documents(const String &value) { return wr.append<BatchGetDocumentOptions &, String>(*this, owriter.makeResourcePath(value, true), buf, bufSize, 1, FPSTR(__func__)); }
+    BatchGetDocumentOptions &documents(const String &value) { return wr.append<BatchGetDocumentOptions &, String>(*this, owriter.makeResourcePath(value), buf, bufSize, 1, FPSTR(__func__)); }
 
     // The fields to return. If not set, returns all fields.
     BatchGetDocumentOptions &mask(const DocumentMask &value) { return wr.set<BatchGetDocumentOptions &, DocumentMask>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }

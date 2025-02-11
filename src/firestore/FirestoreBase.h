@@ -400,7 +400,7 @@ protected:
         return aClient.getResult();
     }
 
-    const char *makeResourcePath(const Parent &parent)
+    String makeResourcePath(const Parent &parent)
     {
         String str;
         sut.printTo(str, strlen(parent.getProjectId()) + strlen(parent.getDatabaseId()) + 20, "projects/%s/databases/%s/documents", parent.getProjectId(), strlen(parent.getDatabaseId()) ? parent.getDatabaseId() : "(default)");
