@@ -520,7 +520,7 @@ public:
      *
      */
     template <typename T = const char *>
-    String push(AsyncClientClass &aClient, const String &path, T value) { return sendRequest(&aClient, path, reqns::http_post, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL, "", convert(value).c_str())-> rtdbResult.name(); }
+    String push(AsyncClientClass &aClient, const String &path, T value) { return sendRequest(&aClient, path, reqns::http_post, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL, "", convert(value).c_str())->rtdbResult.name(); }
 
     /**
      * Push value to database.
