@@ -52,7 +52,7 @@ private:
     int netErrState = 0;
 
 public:
-    bool sse = false;
+    bool sse = false, async = false;
     String host;
     uint16_t port;
 

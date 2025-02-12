@@ -42,12 +42,13 @@
 
 #include <LwipEthernet.h>
 
-/** Don't gorget to define this in src/Config.h or src/UserConfig.h
+/** Don't gorget to define this in src/FirebaseConfig.h or src/UserConfig.h
   #define ENABLE_ESP8266_ENC28J60_ETH
 */
 
-/** For PlatformIO IDE, please set the lib_ldf_mode in platformio.ini as the following.
+/** For PlatformIO IDE, please set the lib_ldf_mode or lib_deps in platformio.ini as the following.
   lib_ldf_mode = chain+
+  lib_deps = arduino-libraries/Ethernet @ 2.0.2
 */
 
 // The API key can be obtained from Firebase console > Project Overview > Project settings.

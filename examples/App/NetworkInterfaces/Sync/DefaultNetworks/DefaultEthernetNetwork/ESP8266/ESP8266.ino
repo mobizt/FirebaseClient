@@ -42,7 +42,7 @@
 
 #include <LwipEthernet.h>
 
-/** Don't gorget to define this in src/Config.h or src/UserConfig.h
+/** Don't gorget to define this in src/FirebaseConfig.h or src/UserConfig.h
   #define ENABLE_ESP8266_ENC28J60_ETH
 */
 

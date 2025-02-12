@@ -8,7 +8,7 @@
 #include "./core/Network/NetworkOptions.h"
 #include "./core/Network/Data/SPIEthernet.h"
 #include "./core/Network/Data/FirebaseWiFi.h"
-
+#include "./core/Network/Data/StaticAddress.h"
 typedef enum
 {
     firebase_network_undefined,
@@ -109,6 +109,7 @@ private:
     struct ethernet_data
     {
         friend class AsyncClientClass;
+        friend class conn_handler;
 
     private:
         int ethernet_reset_pin = -1, ethernet_cs_pin = -1;

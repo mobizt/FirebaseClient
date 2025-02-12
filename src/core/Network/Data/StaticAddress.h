@@ -8,6 +8,7 @@ typedef struct firebase_client_static_address
 {
     friend class AsyncClientClass;
     friend class network_config_data;
+    friend class conn_handler;
 
 public:
     /**

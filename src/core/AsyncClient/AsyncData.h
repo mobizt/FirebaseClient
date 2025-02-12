@@ -23,7 +23,7 @@ public:
     req_handler request;
     res_handler response;
     async_error_t error;
-    bool to_remove = false, auth_used = false, complete = false, async = false, sse = false, path_not_existed = false;
+    bool to_remove = false, auth_used = false, complete = false, async = false, stop_current_async = false, sse = false, path_not_existed = false;
     bool download = false, upload_progress_enabled = false, upload = false;
     uint32_t auth_ts = 0, addr = 0, ref_result_addr = 0;
     AsyncResult aResult;
@@ -62,6 +62,7 @@ public:
         auth_used = false;
         complete = false;
         async = false;
+        stop_current_async = false;
         sse = false;
         path_not_existed = false;
         cb = NULL;

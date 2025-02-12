@@ -22,7 +22,7 @@ public:
         network_data.ethernet.setMac(macAddress);
         network_data.ethernet.setCs(csPin);
         network_data.ethernet.setReset(resetPin);
-        network_data.network_type = firebase_network_ethernet_network;
+        network_data.network_type = firebase_network_ethernet;
     }
 
     /**
@@ -50,7 +50,7 @@ public:
         network_data.ethernet.setCs(csPin);
         network_data.ethernet.setReset(resetPin);
         network_data.ethernet.setStaticIP(staticIP);
-        network_data.network_type = firebase_network_ethernet_network;
+        network_data.network_type = firebase_network_ethernet;
     }
     ~EthernetNetwork() { clear(); }
 };

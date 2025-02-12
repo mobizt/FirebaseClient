@@ -1,5 +1,5 @@
 /**
- * 2025-02-11
+ * 2025-02-12
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -520,7 +520,7 @@ public:
      *
      */
     template <typename T = const char *>
-    String push(AsyncClientClass &aClient, const String &path, T value) { return sendRequest(&aClient, path, reqns::http_post, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL, "", convert(value).c_str())->rtdbResult.name(); }
+    String push(AsyncClientClass &aClient, const String &path, T value) { return sendRequest(&aClient, path, reqns::http_post, slot_options_t(), nullptr, nullptr, aClient.getResult(), NULL, "", convert(value).c_str())-> rtdbResult.name(); }
 
     /**
      * Push value to database.
@@ -823,7 +823,7 @@ private:
         return sendRequest(&aClient, path, mode, slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid, payload.c_str())->lastError.code() == 0;
     }
     template <typename T = object_t>
-    const char *convert(T value)
+    String convert(T value)
     {
         ValueConverter vcon;
         String payload;

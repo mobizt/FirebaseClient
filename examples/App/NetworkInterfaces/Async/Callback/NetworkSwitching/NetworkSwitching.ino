@@ -155,12 +155,12 @@ void checkConnection(AsyncClientClass &a_client)
     if (!a_client.networkStatus() && millis() - last_change_ms > change_timeout && millis() - a_client.networkLastSeen() > lastseen_timeout)
     {
         last_change_ms = millis();
-        if (a_client.getNetworkType() == firebase_network_data_default_network)
+        if (a_client.getNetworkType() == firebase_network_default)
         {
             Serial.println("Switch to Ethernet network...");
             a_client.setNetwork(ethernet_ssl_client, getNetwork(ethernet_network));
         }
-        else if (a_client.getNetworkType() == firebase_network_data_ethernet_network)
+        else if (a_client.getNetworkType() == firebase_network_ethernet)
         {
             Serial.println("Switch to WiFi network...");
             connectWiFi();

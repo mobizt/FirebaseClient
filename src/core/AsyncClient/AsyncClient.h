@@ -322,6 +322,7 @@ private:
                     return sman.connErrorHandler(sData, sData->state);
 
                 sman.conn.sse = sData->sse;
+                sman.conn.async = sData->async;
                 sData->auth_ts = auth_ts;
             }
 
@@ -1043,6 +1044,13 @@ private:
             {
                 sman.stop();
                 sData->state = astate_send_header;
+            }
+
+            // Resume async task from previously stopped.
+            if (!sman.conn.async && sData->async)
+            {
+                sData->state = astate_send_header;
+                sman.conn.async = sData->async;
             }
 
             bool sending = false;

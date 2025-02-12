@@ -38,7 +38,7 @@ public:
     int availableSlot(slot_options_t &options)
     {
         int slot = -1;
-        if (options.auth_used)
+        if (options.auth_used /* highest priority */ || !options.async)
             slot = 0;
         else
         {
@@ -101,8 +101,17 @@ public:
         // Only one SSE mode is allowed
         if (slot_index == -2)
             return nullptr;
+
+        bool prev_async = getData(0) && getData(0)->async && conn.async;
+
         async_data *sData = addSlot(slot_index);
         sData->reset();
+
+        // If new task is sync while current async task is running then stop it.
+        // The stopped async task will be resumed later.
+        if (prev_async && !options.auth_used && !options.async)
+            sData->stop_current_async = true;
+
         return sData;
     }
 
@@ -231,9 +240,11 @@ public:
         sData->request.setClient(client_type, client, atcp_config);
         sData->response.setClient(client_type, client, atcp_config);
 
-        if ((!sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC && session_timer.remaining() == 0) || (conn.sse && !sData->sse) || (!conn.sse && sData->sse) || (sData->auth_used && sData->state == astate_undefined) ||
+        if ((!sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC && session_timer.remaining() == 0) || sData->stop_current_async ||
+            (conn.sse && !sData->sse) || (!conn.sse && sData->sse) || (sData->auth_used && sData->state == astate_undefined) ||
             strcmp(conn.host.c_str(), host) != 0 || conn.port != port)
         {
+            sData->stop_current_async = false;
             stop();
             getResult()->clear();
         }

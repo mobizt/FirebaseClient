@@ -188,7 +188,7 @@ void setup()
     Serial.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
     WiFi.onEvent(WiFiEvent);
-    ETH.begin(ETH_PHY_ADDR, ETH_PHY_POWER, ETH_PHY_MDC, ETH_PHY_MDIO, ETH_PHY_TYPE, ETH_CLK_MODE);
+    ETH.begin(ETH_PHY_TYPE, ETH_PHY_ADDR, ETH_PHY_MDC, ETH_PHY_MDIO, ETH_PHY_POWER, ETH_CLK_MODE);
 }
 
 void setConfig()
