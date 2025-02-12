@@ -73,6 +73,8 @@ RealtimeDatabase Database;
 
 AsyncResult aResult_no_callback;
 
+bool taskComplete = false;
+
 void setup()
 {
     Serial.begin(115200);
@@ -107,9 +109,6 @@ void setup()
 
     // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
-
-    Serial.println("Removing data... ");
-    Database.remove(aClient, "/test/toRemove", aResult_no_callback);
 }
 
 void loop()
@@ -120,6 +119,12 @@ void loop()
     app.loop();
 
     Database.loop();
+
+    if (app.ready() && !taskComplete)
+    {
+        Serial.println("Removing data... ");
+        Database.remove(aClient, "/test/toRemove", aResult_no_callback);
+    }
 
     printResult(aResult_no_callback);
 }

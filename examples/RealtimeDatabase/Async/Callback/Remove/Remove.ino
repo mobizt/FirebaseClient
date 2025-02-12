@@ -74,6 +74,8 @@ AsyncClient aClient(ssl_client, getNetwork(network));
 
 RealtimeDatabase Database;
 
+bool taskComplete = false;
+
 void setup()
 {
     Serial.begin(115200);
@@ -108,9 +110,6 @@ void setup()
 
     // Set your database URL (requires only for Realtime Database)
     Database.url(DATABASE_URL);
-
-    Serial.println("Removing data... ");
-    Database.remove(aClient, "/test/toRemove", asyncCB, "removeTask");
 }
 
 void loop()
@@ -121,6 +120,13 @@ void loop()
     app.loop();
 
     Database.loop();
+
+    if (app.ready() && !taskComplete)
+    {
+        taskComplete = true;
+        Serial.println("Removing data... ");
+        Database.remove(aClient, "/test/toRemove", asyncCB, "removeTask");
+    }
 }
 
 void asyncCB(AsyncResult &aResult) { printResult(aResult); }

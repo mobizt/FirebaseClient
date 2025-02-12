@@ -122,7 +122,7 @@ void setup()
     aClient.setAsyncResult(aResult_no_callback);
 
     Serial.print("Removing data... ");
-    bool status = Database.remove(aClient, "/test/update/json");
+    bool status = Database.remove(aClient, "/test/toRemove");
     if (status)
         Serial.println("ok");
     else
