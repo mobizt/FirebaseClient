@@ -1,5 +1,5 @@
 /**
- * 2025-02-08
+ * 2025-02-13
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -58,12 +58,12 @@ namespace FirebaseStorage
         {
             URLUtil uut;
             this->bucketId = uut.getHost(bucketId);
-            this->object = uut.getHost(object);
+            this->object = object.length() && object[0] == '/' ? object.substring(1, object.length() - 1) : object;
             this->accessToken = accessToken;
         }
         String getObject() const { return object; }
         String getBucketId() const { return bucketId; }
-        const char* getAccessToken() const { return accessToken.c_str(); }
+        const char *getAccessToken() const { return accessToken.c_str(); }
     };
 
     class DataOptions

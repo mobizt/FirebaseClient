@@ -75,7 +75,7 @@ void authHandler();
 
 void printResult(AsyncResult &aResult);
 
-bool mofifyRules(const String &parentPath, const String &node, const String &readCondition, const String &writeCondition, const String &databaseSecret);
+bool mofifyRules(const String &controlPath, const String &readCondition, const String &writeCondition, const String &databaseSecret);
 
 void printError(int code, const String &msg);
 
@@ -85,7 +85,7 @@ String genUUID();
 
 DefaultNetwork network;
 
-CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "Node1" /* UID */, "" /* claims can be set later */, 3600 /* expire period in seconds (<3600) */);
+CustomAuth custom_auth(timeStatusCB, API_KEY, FIREBASE_CLIENT_EMAIL, FIREBASE_PROJECT_ID, PRIVATE_KEY, "peter" /* UID */, "" /* claims can be set later */, 3600 /* expire period in seconds (<3600) */);
 
 FirebaseApp app;
 
@@ -140,29 +140,25 @@ void setup()
     // Here is the final security rules we want to set in this example.
     //
     // {
-    // "rules": {
-    //     ...
-    //
-    //     ...
-    //     "UsersData": {
-    //         "$userId": {
-    //             ".read": "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')",
-    //             ".write": "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')"
-    //                     }
-    //              }
-    //       }
+    // 	  "rules": {
+    // 		  "logs": {
+    // 			  "database": {
+    // 				  "$resource": {
+    // 					  "$group": {
+    // 						  "$userId": {
+    // 							  ".read": "($userId === auth.uid && auth.token.resource === $resource && auth.token.group === $group)",
+    // 							  ".write": "($userId === auth.uid && auth.token.resource === $resource && auth.token.group === $group)"
+    // 						  }
+    // 					  }
+    // 				  }
+    // 			  }
+    // 		  }
+    // 	  }
     // }
     //
-    // We use $ variable in the rules e.g. #userId to capture the path segment. If we access database at /UserData/xyz, the xyz well be our $userId variable in the rules.
-    // When the $userId was used in the condition e.g. "$userId === auth.uid", the result will be false for this xyz UID case.
-    // This will allow us to access the database only at /UserData/Node1.
-    // Then the user with provided UID e.g. xyz can only access to database at /UserData/xyz because the UID obtains from auth.uid variable
-    // matches the path segment variable $userId.
-    //
-    // In our rules above at the path UsersData/$userId, other auth variables are also checked
-    // i.e. auth.token which the admin's, premium_account's and foo's values are checked for maching.
-    // If one of these condition is false, the access to UsersData/$userId will be denied.
-    // The auth.token.??? is variable that taken from the ID token's claims.
+    // We use $ variable in the rules e.g. $resource, $group, and $userId to capture the path segment that are used to compare with the auth variables
+    // that we set e.g. $userId will be compared with UID (auth.uid), $resource will be compared with resource claim (auth.token.resource),
+    // and $group will be compared with group claim (auth.token.group).
     //
     // For more information, visit https://firebase.google.com/docs/database/security/rules-conditions#using_variables_to_capture_path_segments
     //
@@ -178,19 +174,21 @@ void setup()
     // ".read": "some other conditions that allow access by date"
     // ".write": "some other conditions that allow access by date"
 
-    String parentPath = "/UsersData";
-    String node = "$userId";
-    String readConditions = "($userId === auth.uid && auth.token.premium_account === true && auth.token.admin === true && auth.token.foo === 'bar')";
+    String controlPath = "/logs/database/$resource/$group/$userId";
+    String readConditions = "($userId === auth.uid && auth.token.resource === $resource && auth.token.group === $group)";
     String writeConditions = readConditions;
 
-    mofifyRules(parentPath, node, readConditions, writeConditions, DATABASE_SECRET);
+    mofifyRules(controlPath, readConditions, writeConditions, DATABASE_SECRET);
 
     // We will set the claims to the token we used here (ID token using CustomAuth).
-    // We set the values of the claims to math the auth.token varibles values in the security rules condition checking.
+    // We set the values of the claims to math the auth.token varibles values in the security rules conditions.
     // The claims string must be JSON serialized string when passing to CustomAuth::setClaims or CustomAuth class constructor.
 
     // For more details about custom claims, please see https://firebase.google.com/docs/auth/admin/custom-claims.
-    String claims = "{\"premium_account\": true,\"admin\": true, \"foo\":\"bar\"}";
+
+    // The resource claim value can be access via auth.token.resource in the security rules.
+    // And group claim value can be access via auth.token.group.
+    String claims = "{\"resource\":\"products\", \"group\":\"user\"}";
     custom_auth.setClaims(claims);
 
     // Now we authenticate (sign in) with CustomAuth (ID token with custom UID and claims).
@@ -214,9 +212,13 @@ void loop()
     {
         ms = millis();
 
-        String path = "/UsersData/";
-        path += app.getUid(); // Node1 is the UID that previously defind in CustomAuth constructor.
-        path += "/test/int";
+        // From the UID, claims and security rules we have set,
+        // it only allows us to access at logs/database/products/user/peter/...
+        // Because the resource in the claim is products and group claim is user.
+
+        String path = "logs/database/products/user/";
+        path += app.getUid();
+        path += "/value";
 
         Serial.print("Setting the int value to the granted path... ");
         // This should be ok. Because we write to the path /UsersData/Node1/... which is allowed in the security rules.
@@ -303,13 +305,12 @@ void timeStatusCB(uint32_t &ts)
 }
 
 /**
- * @param parent The parent path of child's node that the which we want to control access.
- * @param child The child node path which we want to control access.
+ * @param controlPath The path that the which we want to control access.
  * @param readCondition The read access condition.
  * @param writeCondition The write access condition.
  * @param databaseSecret The database secret.
  */
-bool mofifyRules(const String &parentPath, const String &child, const String &readCondition, const String &writeCondition, const String &databaseSecret)
+bool mofifyRules(const String &controlPath, const String &readCondition, const String &writeCondition, const String &databaseSecret)
 {
     // Use database secret for to allow security rules access.
     // The ServiceAuth (OAuth2.0 access token authorization) can also be used
@@ -336,18 +337,10 @@ bool mofifyRules(const String &parentPath, const String &child, const String &re
 
         String rulePath = "rules";
 
-        if (parentPath.length() && parentPath[0] != '/')
+        if (controlPath.length() && controlPath[0] != '/')
             rulePath += '/';
 
-        rulePath += parentPath;
-
-        if (rulePath[rulePath.length() - 1] == '/')
-            rulePath[rulePath.length() - 1] = 0;
-
-        if (child.length() && child[0] != '/' && rulePath[rulePath.length() - 1] != '/')
-            rulePath += '/';
-
-        rulePath += child;
+        rulePath += controlPath;
 
         // Check the read condition exists or matches
         if (readCondition.length() > 0)
@@ -388,12 +381,18 @@ bool mofifyRules(const String &parentPath, const String &child, const String &re
             else
                 printError(aClient.lastError().code(), aClient.lastError().message());
         }
+        else
+        {
+            Serial.println("The rules exist, nothing to change");
+        }
 
         currentRules.clear();
         return aClient.lastError().code() == 0;
     }
     else
         printError(aClient.lastError().code(), aClient.lastError().message());
+
+    Serial.println("-----------------------------------");
 
     return false;
 }
