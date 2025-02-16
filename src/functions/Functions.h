@@ -718,7 +718,7 @@ private:
         request.opt.app_token = atoken;
         String extras;
 
-        sut.printTo(request.path, 200, "/v%d/projects/%s/locations/%s/functions", requestType == fn_call ? 1 : 2, request.options->parent.getProjectId().c_str(), request.options->parent.getLocationId().c_str());
+        sut.printTo(request.path, request.options->parent.getProjectId().length() + request.options->parent.getLocationId().length(), "/v%d/projects/%s/locations/%s/functions", requestType == fn_call ? 1 : 2, request.options->parent.getProjectId().c_str(), request.options->parent.getLocationId().c_str());
 
         if ((request.method == reqns::http_get && request.options->parent.getFunctionId().length() > 0) ||
             requestType == fn_call || requestType == fn_gen_downloadUrl || request.method == reqns::http_patch ||

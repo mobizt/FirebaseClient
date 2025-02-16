@@ -601,8 +601,10 @@ namespace firebase_ns
 
                     if (parseToken(sData->response.val[resns::payload].c_str()))
                     {
+#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
                         if (auth_data.user_auth.auth_type == auth_sa_custom_token && auth_data.app_token.val[app_tk_ns::uid].length() == 0) // store the custom UID if UID was not found in the response.
                             auth_data.app_token.val[app_tk_ns::uid] = auth_data.user_auth.cust.val[cust_ns::uid];
+#endif
 
                         sut.clear(sData->response.val[resns::payload]);
                         auth_timer.feed(expire && expire < auth_data.app_token.expire ? expire : auth_data.app_token.expire - 2 * 60);
@@ -695,6 +697,34 @@ namespace firebase_ns
          * @return String of auth tokens based on the authentication/authoeization e.g. ID token and access token.
          */
         String getToken() const { return auth_data.app_token.val[app_tk_ns::token]; }
+
+        /**
+         * Get the token type.
+         *
+         * @return firebase_token_type enums The enums are included following token_type_id (3), token_type_access (2), token_type_legacy (1) and token_type_no (0).
+         */
+        firebase_ns::firebase_token_type getTokenType()
+        {
+            switch (auth_data.app_token.auth_data_type)
+            {
+            case user_auth_data_custom_data:
+            case user_auth_data_user_data:
+            case user_auth_data_id_token:
+            case user_auth_data_custom_token:
+                return firebase_ns::token_type_id;
+                break;
+            case user_auth_data_access_token:
+            case user_auth_data_service_account:
+                return firebase_ns::token_type_access;
+                break;
+            case user_auth_data_legacy_token:
+                return firebase_ns::token_type_legacy;
+                break;
+            default:
+                return firebase_ns::token_type_no;
+                break;
+            }
+        }
 
         /**
          * Get the refresh token.

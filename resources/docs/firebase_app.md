@@ -70,7 +70,20 @@ String getToken() const
 - `String` - String of auth tokens based on the authentication/authoeization e.g. ID token and access token.
 
 
-6. ## 🔹  String getRefreshToken() const
+6. ## 🔹  firebase_token_type getTokenType()
+
+Get the token type.
+
+```cpp
+firebase_token_type getTokenType()
+```
+
+**Returns:**
+
+- `firebase_token_type` enums - The enums are included following: `token_type_id` (3), `token_type_access` (2), `token_type_legacy` (1) and `token_type_no` (0).
+
+
+7. ## 🔹  String getRefreshToken() const
 
 Get the refresh token.
 
@@ -82,7 +95,7 @@ String getRefreshToken() const
 
 - `String` - String of refresh token after user sign in or authorization using ID token.
 
-7. ## 🔹  String getUid() const
+8. ## 🔹  String getUid() const
 
 Get unique identifier.
 
@@ -94,7 +107,7 @@ String getUid() const
 
 - `String` - String of unique identifier after user sign in or authorization using ID token.
 
-8. ## 🔹  bool isAuthenticated() const
+9. ## 🔹  bool isAuthenticated() const
 
 Get the authentication status since app initialized.
 
@@ -107,7 +120,7 @@ bool isAuthenticated() const
 - `bool` - Return true once authenticated since initialized. It will reset when app re-initialized and user management task was executed.
 
 
-9. ## 🔹  bool isExpired()
+10. ## 🔹  bool isExpired()
 
 Get the auth token expiration status.
 
@@ -120,7 +133,7 @@ bool isExpired()
 - `bool` - Return true if auth token was expired upon the expire period setup.
 
 
-10. ## 🔹  unsigned long ttl()
+11. ## 🔹  unsigned long ttl()
 
 Get the remaining time to live of token until expired.
 
@@ -133,7 +146,7 @@ unsigned long ttl()
 - `unsigned long` - The integer value of ttl.
 
 
-11. ## 🔹  void setCallback(AsyncResultCallback cb) 
+12. ## 🔹  void setCallback(AsyncResultCallback cb) 
 
 Set the async result callback function.
 
@@ -146,7 +159,7 @@ void setCallback(AsyncResultCallback cb)
 - `cb` - The async result callback function (AsyncResultCallback).
 
 
-12. ## 🔹  void setAsyncResult(AsyncResult &aResult)
+13. ## 🔹  void setAsyncResult(AsyncResult &aResult)
 
 Set the async result class object.
 
@@ -159,7 +172,7 @@ void setAsyncResult(AsyncResult &aResult)
 - `aResult` - The async result (AsyncResult).
 
 
-13. ## 🔹  void setUID(const String &uid)
+14. ## 🔹  void setUID(const String &uid)
 
 Set the UID for authentication task.
 
@@ -175,7 +188,7 @@ void setUID(const String &uid)
 
 - `uid` - The unique identifier for the authentication task.
 
-14. ## 🔹  void setJWTProcessor(JWTClass &jwtClass)
+15. ## 🔹  void setJWTProcessor(JWTClass &jwtClass)
 
 Set the JWT token processor object.
 
@@ -189,7 +202,7 @@ void setJWTProcessor(JWTClass &jwtClass)
 
 - `jwtClass` - The JWT token processor object.
 
-15. ## 🔹  auth_data_t *getAuth()
+16. ## 🔹  auth_data_t *getAuth()
 
 Get the pointer to the internal auth data.
 
@@ -202,7 +215,7 @@ auth_data_t *getAuth()
 - `auth_data_t*` - The pointer to internal auth data.
 
 
-16. ## 🔹  void deinitializeApp()
+17. ## 🔹  void deinitializeApp()
 
 Reset or clear app (deinitailize).
 
@@ -211,7 +224,7 @@ void deinitializeApp()
 ```
 
 
-17. ## 🔹  void autoRefresh(bool enable)
+18. ## 🔹  void autoRefresh(bool enable)
 
 Set the option to enable/disable re-authentication.
 
@@ -223,7 +236,7 @@ void autoAuthenticate(bool enable)
 
 - `enable` - Set to true to enable or false to disable.
 
-18. ## 🔹  void authenticate()
+19. ## 🔹  void authenticate()
 
 Force library to re-authenticate (refresh the auth token).
 

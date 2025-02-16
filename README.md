@@ -6,7 +6,7 @@
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/mobizt?logo=github)](https://github.com/sponsors/mobizt)
 
-Revision `2025-02-13`
+Revision `2025-02-16`
 
 ## Table of Contents
 
@@ -3066,11 +3066,11 @@ Current sponsors
 
 
 <a href="https://github.com/Jagakatt"><img src="https://github.com/Jagakatt.png" width="30" height="30" alt="@Jagakatt"></a>
-<a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/166620797?s=35&v=4" width="30" height="30" alt="private sponsor"></a> <a href="https://github.com/siz0001"><img src="https://avatars.githubusercontent.com/u/42665078?s=60&v=4" width="30" height="30" alt="@siz0001"></a>
+<a href="#sponsors"><img src="https://avatars.githubusercontent.com/u/166620797?s=35&v=4" width="30" height="30" alt="private sponsor"></a>
 
 Past sponsors
 
-<img src="https://avatars.githubusercontent.com/u/5763108?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/57544850?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/63749581?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/83292822?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/31892707?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/96478986?s=60&amp;v=4" width="30" height="30" alt="past_sponsor">
+<img src="https://avatars.githubusercontent.com/u/5763108?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/57544850?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/63749581?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/83292822?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/31892707?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <img src="https://avatars.githubusercontent.com/u/96478986?s=60&amp;v=4" width="30" height="30" alt="past_sponsor"> <a href="https://github.com/siz0001"><img src="https://avatars.githubusercontent.com/u/42665078?s=60&v=4" width="30" height="30" alt="@siz0001"></a>
 
 ### Buy Me a Coffee
 

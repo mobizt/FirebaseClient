@@ -63,5 +63,13 @@ namespace firebase_ns
         user_auth_data_legacy_token,
         user_auth_data_no_token
     };
+
+    enum firebase_token_type
+    {
+        token_type_no,
+        token_type_legacy,
+        token_type_access,
+        token_type_id
+    };
 }
 #endif

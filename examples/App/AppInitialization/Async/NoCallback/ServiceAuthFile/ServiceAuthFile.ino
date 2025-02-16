@@ -2,7 +2,7 @@
  * ABOUT:
  *
  * The bare minimum non-blocking (async) example for Firebase OAuth2.0 authentication.
- * 
+ *
  * The service account JSON key file path should be set via FileConfig.
  *
  * This example uses the DefaultNetwork class for network interface configuration.
@@ -119,6 +119,8 @@ AsyncClient aClient(ssl_client, getNetwork(network));
 
 AsyncResult aResult_no_callback;
 
+bool taskComplete = false;
+
 void setup()
 {
     Serial.begin(115200);
@@ -169,6 +171,21 @@ void loop()
 
     // To get the authentication time to live in seconds before expired.
     // app.ttl();
+
+    if (app.ready() && !taskComplete)
+    {
+        taskComplete = true;
+        Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
+        firebase_token_type type = app.getTokenType();
+        if (type == token_type_access)
+            Serial.println("Token Type: access token");
+        else if (type == token_type_id)
+            Serial.println("Token Type: ID token");
+        else if (type == token_type_legacy)
+            Serial.println("Token Type: legacy token");
+        else if (type == token_type_no)
+            Serial.println("Token Type: no token");
+    }
 
     printResult(aResult_no_callback);
 }

@@ -333,7 +333,7 @@ private:
         request.opt.app_token = atoken;
         String extras;
 
-        sut.printTo(request.path, 200, "/v0/b/%s/o", request.options->parent.getBucketId().c_str());
+        sut.printTo(request.path, request.options->parent.getBucketId().length(), "/v0/b/%s/o", request.options->parent.getBucketId().c_str());
 
         if (request.method == reqns::http_get)
             uut.addEncUrl(request.path, "/", request.options->parent.getObject());

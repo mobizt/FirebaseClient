@@ -2,7 +2,7 @@
  * ABOUT:
  *
  * The bare minimum non-blocking (async) example for Firebase OAuth2.0 authentication.
- * 
+ *
  * The service account JSON key file path should be set via FileConfig.
  *
  * This example uses the DefaultNetwork class for network interface configuration.
@@ -30,7 +30,7 @@
  * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
  * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of service account key file.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
- * 
+ *
  * 3.------------------------
  *
  * ServiceAuth::ServiceAuth(<timestamp>, <file_config_data>, <expire>);
@@ -127,6 +127,8 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
+bool taskComplete = false;
+
 void setup()
 {
     Serial.begin(115200);
@@ -177,6 +179,21 @@ void loop()
 
     // To get the authentication time to live in seconds before expired.
     // app.ttl();
+
+    if (app.ready() && !taskComplete)
+    {
+        taskComplete = true;
+        Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
+        firebase_token_type type = app.getTokenType();
+        if (type == token_type_access)
+            Serial.println("Token Type: access token");
+        else if (type == token_type_id)
+            Serial.println("Token Type: ID token");
+        else if (type == token_type_legacy)
+            Serial.println("Token Type: legacy token");
+        else if (type == token_type_no)
+            Serial.println("Token Type: no token");
+    }
 }
 
 void timeStatusCB(uint32_t &ts)

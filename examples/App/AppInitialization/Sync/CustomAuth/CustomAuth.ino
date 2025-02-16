@@ -35,7 +35,7 @@
  * <user_id> - The unique identifier of the signed-in user must be a string, between 1-128 characters long, inclusive. Shorter uids offer better performance.
  * <claims> - Optional custom claims to include in the Security Rules auth / request.auth variables. For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
- * 
+ *
  * See examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino for how it can work with security rules for database access control.
  *
  * NOTE:
@@ -152,6 +152,20 @@ void setup()
     initializeApp(aClient, app, getAuth(custom_auth), aResult_no_callback);
 
     authHandler();
+
+    if (app.ready())
+    {
+        Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
+        firebase_token_type type = app.getTokenType();
+        if (type == token_type_access)
+            Serial.println("Token Type: access token");
+        else if (type == token_type_id)
+            Serial.println("Token Type: ID token");
+        else if (type == token_type_legacy)
+            Serial.println("Token Type: legacy token");
+        else if (type == token_type_no)
+            Serial.println("Token Type: no token");
+    }
 }
 
 void loop()

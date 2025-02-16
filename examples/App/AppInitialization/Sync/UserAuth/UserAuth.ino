@@ -137,6 +137,15 @@ void setup()
     Firebase.printf("User UID: %s\n", app.getUid().c_str());
     Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
     Firebase.printf("Refresh Token: %s\n", app.getRefreshToken().c_str());
+    firebase_token_type type = app.getTokenType();
+    if (type == token_type_access)
+        Serial.println("Token Type: access token");
+    else if (type == token_type_id)
+        Serial.println("Token Type: ID token");
+    else if (type == token_type_legacy)
+        Serial.println("Token Type: legacy token");
+    else if (type == token_type_no)
+        Serial.println("Token Type: no token");
 }
 
 void loop()

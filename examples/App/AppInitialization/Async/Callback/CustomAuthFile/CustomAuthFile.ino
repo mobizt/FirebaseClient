@@ -37,7 +37,7 @@
  * <scope> - The OAuth scopes.
  * <claims> - The OAuth claims. For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
  * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
- * 
+ *
  * See examples/RealtimeDatabase/Sync/CustomClaims/CustomClaims.ino for how it can work with security rules for database access control.
  *
  * 3.------------------------
@@ -144,6 +144,8 @@ using AsyncClient = AsyncClientClass;
 
 AsyncClient aClient(ssl_client, getNetwork(network));
 
+bool taskComplete = false;
+
 void setup()
 {
     Serial.begin(115200);
@@ -203,6 +205,21 @@ void loop()
 
     // To get the authentication time to live in seconds before expired.
     // app.ttl();
+
+    if (app.ready() && !taskComplete)
+    {
+        taskComplete = true;
+        Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
+        firebase_token_type type = app.getTokenType();
+        if (type == token_type_access)
+            Serial.println("Type: access token");
+        else if (type == token_type_id)
+            Serial.println("Type: ID token");
+        else if (type == token_type_legacy)
+            Serial.println("Type: legacy token");
+        else if (type == token_type_no)
+            Serial.println("Type: no token");
+    }
 }
 
 void timeStatusCB(uint32_t &ts)

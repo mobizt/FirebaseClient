@@ -175,6 +175,20 @@ void setup()
     initializeApp(aClient, app, getAuth(sa_file_auth), aResult_no_callback);
 
     authHandler();
+
+    if (app.ready())
+    {
+        Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
+        firebase_token_type type = app.getTokenType();
+        if (type == token_type_access)
+            Serial.println("Token Type: access token");
+        else if (type == token_type_id)
+            Serial.println("Token Type: ID token");
+        else if (type == token_type_legacy)
+            Serial.println("Token Type: legacy token");
+        else if (type == token_type_no)
+            Serial.println("Token Type: no token");
+    }
 }
 
 void loop()
