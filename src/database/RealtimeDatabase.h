@@ -1,5 +1,5 @@
 /**
- * 2025-02-12
+ * 2025-02-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -31,7 +31,7 @@
 using namespace firebase_ns;
 
 #if defined(ENABLE_DATABASE)
-class RealtimeDatabase : public RTDBResultBase, AppBase
+class RealtimeDatabase : public RTDBResultImpl, AppBase
 {
     friend class FirebaseApp;
     friend class AppBase;
@@ -86,10 +86,6 @@ public:
      *
      * shallow, the option (boolean) for shallowing (truncating) the JSON representation data data into true while JSON primitive values
      * (string, number and boolean) will not shallow.
-     *
-     * silent, the option (boolean) to mute the return reponse payload.
-     *
-     * classicRequest, the option (boolean) to use HTTP POST for PUT (set) and DELETE (remove).
      *
      * Filter, the options for complex data filtering which included the properties i.e., orderBy, startAt, endAt, limitToFirst, limitToLast, and equalTo.
      *
@@ -232,6 +228,54 @@ public:
      * The FileConfig object constructor should be included filename and FileCallback.
      * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
+     * @return boolean value indicates the operating status.
+     */
+    bool get(AsyncClientClass &aClient, const String &path, file_config_data &file) { return sendRequest(&aClient, path, reqns::http_get, slot_options_t(), nullptr, &file, nullptr, NULL)->error().code() == 0; }
+
+    /**
+     * Get value at the node path.
+     *
+     * ### Example
+     * ```cpp
+     * // Example of FileCallback when SPIFFS is used as filesystem.
+     *
+     * #include <FS.h>
+     * File myFile; // Define the File object globally.
+     * #defined FILESYSTEMS SPIFFS
+     *
+     * void fileCallback(File &file, const char *filename, file_operating_mode mode)
+     * {
+     *   switch (mode)
+     *   {
+     *     case file_mode_open_read:
+     *     myFile = FILESYSTEMS.open(filename, "r");
+     *     break;
+     *   case file_mode_open_write:
+     *     myFile = FILESYSTEMS.open(filename, "w");
+     *     break;
+     *   case file_mode_open_append:
+     *     myFile = FILESYSTEMS.open(filename, "a");
+     *     break;
+     *   case file_mode_remove:
+     *     FILESYSTEMS.remove(filename);
+     *     break;
+     *   default:
+     *     break;
+     *   }
+     *   file = myFile;
+     * }
+     *
+     * FileConfig fileConfig("/example.txt", fileCallback);
+     *
+     * Database.get(aClient, "/path/to/data", getFile(fileConfig), aResult);
+     * ```
+     *
+     * @param aClient The async client.
+     * @param path The node path to get value.
+     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
+     * The FileConfig object constructor should be included filename and FileCallback.
+     * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param aResult The async result (AsyncResult)
      */
     void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, NULL); }
@@ -283,26 +327,45 @@ public:
      * @param uid The user specified UID of async result (optional).
      *
      */
-    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_get, slot_options_t(), nullptr, &file, nullptr, cb, uid); }
+    void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, false, false), nullptr, &file, nullptr, cb, uid); }
 
     /**
      * Checks if path exists in database
      *
      * ### Example
      * ```cpp
-     * bool status = Database.existed(aClient, "/path/to/data");
+     * bool status = Database.exists(aClient, "/path/to/data");
      * ```
      * @param aClient The async client.
      * @param path The node path to check.
-     * @return boolean value indicates the operating status.
+     * @return boolean value. Returns true if node exists.
      *
      */
-    bool existed(AsyncClientClass &aClient, const String &path)
+    bool exists(AsyncClientClass &aClient, const String &path)
     {
         DatabaseOptions options;
         options.silent = true;
         return !getNullETagOption(&sendRequest(&aClient, path, reqns::http_get, slot_options_t(), &options, nullptr, aClient.getResult(), NULL)->rtdbResult);
     }
+
+    // Obsoleted, use exists instead.
+    bool existed(AsyncClientClass &aClient, const String &path) { return exists(aClient, path); }
+
+    /**
+     * Perform OTA update using a firmware file from the database.
+     *
+     * The data of node to download should be base64 encoded string of the firmware file.
+     *
+     * ### Example
+     * ```cpp
+     * Database.ota(aClient, "/path/to/data", aResult);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to download.
+     * @return boolean value indicates the operating status.
+     *
+     */
+    bool ota(AsyncClientClass &aClient, const String &path) { return sendRequest(&aClient, path, reqns::http_get, slot_options_t(), nullptr, nullptr, nullptr, NULL)->error().code() == 0; }
 
     /**
      * Perform OTA update using a firmware file from the database.
@@ -342,6 +405,8 @@ public:
      * @param aClient The async client.
      * @param path The node path to set the value.
      * @param value The value to set.
+     * @param matchingEtag. Optional. The Etag value for comparison with the existing server's Ethag value.
+     * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
      * @return boolean value indicates the operating status.
      *
      * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
@@ -357,13 +422,15 @@ public:
      * ```
      */
     template <typename T = const char *>
-    bool set(AsyncClientClass &aClient, const String &path, T value) { return storeAsync(aClient, path, value, reqns::http_put, false, aClient.getResult(), NULL, ""); }
+    bool set(AsyncClientClass &aClient, const String &path, T value, const String &matchingEtag = "") { return storeAsync(aClient, path, value, reqns::http_put, false, aClient.getResult(), NULL, "", matchingEtag); }
 
     /**
      * Set value to database.
      * @param aClient The async client.
      * @param path The node path to set the value.
      * @param value The value to set.
+     * @param matchingEtag Optional. The Etag value for comparison with the existing server's Ethag value.
+     * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
      * @param aResult The async result (AsyncResult)
      *
      * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
@@ -379,7 +446,7 @@ public:
      * ```
      */
     template <typename T = const char *>
-    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult) { storeAsync(aClient, path, value, reqns::http_put, true, &aResult, NULL, ""); }
+    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult, const String &matchingEtag = "") { storeAsync(aClient, path, value, reqns::http_put, true, &aResult, NULL, "", matchingEtag); }
 
     /**
      * Set value to database.
@@ -387,7 +454,9 @@ public:
      * @param path The node path to set the value.
      * @param value The value to set.
      * @param cb The async result callback (AsyncResultCallback).
-     * @param uid The user specified UID of async result (optional).
+     * @param uid Optional. The user specified UID of async result.
+     * @param matchingEtag Optional. The Etag value for comparison with the existing server's Ethag value.
+     * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
      *
      * The value type can be primitive types, Arduino String, string_t, number_t, boolean_t and object_t.
      *
@@ -402,7 +471,7 @@ public:
      * ```
      */
     template <typename T = const char *>
-    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "") { storeAsync(aClient, path, value, reqns::http_put, true, nullptr, cb, uid); }
+    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "", const String &matchingEtag = "") { storeAsync(aClient, path, value, reqns::http_put, true, nullptr, cb, uid, matchingEtag); }
 
     /**
      * Set content from file to database.
@@ -447,9 +516,60 @@ public:
      * The FileConfig object constructor should be included filename and FileCallback.
      * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
+     * @param matchingEtag Optional. The Etag value for comparison with the existing server's Ethag value.
+     * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
+     * @return boolean value indicates the operating status.
+     */
+    bool set(AsyncClientClass &aClient, const String &path, file_config_data &file, const String &matchingEtag = "") { return sendRequest(&aClient, path, reqns::http_put, slot_options_t(), nullptr, &file, nullptr, nullptr, "", "", matchingEtag)->lastError.code() == 0; }
+
+    /**
+     * Set content from file to database.
+     *
+     * ### Example
+     * ```cpp
+     * // Example of FileCallback when SPIFFS is used as filesystem.
+     *
+     * #include <FS.h>
+     * File myFile; // Define the File object globally.
+     * #defined FILESYSTEMS SPIFFS
+     *
+     * void fileCallback(File &file, const char *filename, file_operating_mode mode)
+     * {
+     *   switch (mode)
+     *   {
+     *     case file_mode_open_read:
+     *     myFile = FILESYSTEMS.open(filename, "r");
+     *     break;
+     *   case file_mode_open_write:
+     *     myFile = FILESYSTEMS.open(filename, "w");
+     *     break;
+     *   case file_mode_open_append:
+     *     myFile = FILESYSTEMS.open(filename, "a");
+     *     break;
+     *   case file_mode_remove:
+     *     FILESYSTEMS.remove(filename);
+     *     break;
+     *   default:
+     *     break;
+     *   }
+     *   file = myFile;
+     * }
+     *
+     * FileConfig fileConfig("/example.txt", fileCallback);
+     *
+     * Database.set(aClient, "/path/to/data", getFile(fileConfig), aResult);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to set value.
+     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
+     * The FileConfig object constructor should be included filename and FileCallback.
+     * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
+     * @param matchingEtag Optional. The Etag value for comparison with the existing server's Ethag value.
+     * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
      * @param aResult The async result (AsyncResult)
      */
-    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr); }
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult, const String &matchingEtag = "") { sendRequest(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, false, false), nullptr, &file, &aResult, nullptr, "", "", matchingEtag); }
 
     /**
      * Set content from file to database.
@@ -495,9 +615,11 @@ public:
      * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param cb The async result callback (AsyncResultCallback).
-     * @param uid The user specified UID of async result (optional).
+     * @param uid Optional. The user specified UID of async result.
+     * @param matchingEtag Optional. The Etag value for comparison with the existing server's Ethag value.
+     * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
      */
-    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid); }
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "", const String &matchingEtag = "") { sendRequest(&aClient, path, reqns::http_put, slot_options_t(false, false, true, false, true, false), nullptr, &file, nullptr, cb, uid, "", matchingEtag); }
 
     /**
      * Push value to database.
@@ -610,6 +732,54 @@ public:
      * The FileConfig object constructor should be included filename and FileCallback.
      * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
      * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
+     * @return String name of new node that created.
+     *
+     */
+    String push(AsyncClientClass &aClient, const String &path, file_config_data &file) { return sendRequest(&aClient, path, reqns::http_post, slot_options_t(), nullptr, &file, nullptr, nullptr)->rtdbResult.name(); }
+
+    /**
+     * Push content from file to database.
+     *
+     * ### Example
+     * ```cpp
+     * // Example of FileCallback when SPIFFS is used as filesystem.
+     *
+     * #include <FS.h>
+     * File myFile; // Define the File object globally.
+     * #defined FILESYSTEMS SPIFFS
+     *
+     * void fileCallback(File &file, const char *filename, file_operating_mode mode)
+     * {
+     *   switch (mode)
+     *   {
+     *     case file_mode_open_read:
+     *     myFile = FILESYSTEMS.open(filename, "r");
+     *     break;
+     *   case file_mode_open_write:
+     *     myFile = FILESYSTEMS.open(filename, "w");
+     *     break;
+     *   case file_mode_open_append:
+     *     myFile = FILESYSTEMS.open(filename, "a");
+     *     break;
+     *   case file_mode_remove:
+     *     FILESYSTEMS.remove(filename);
+     *     break;
+     *   default:
+     *     break;
+     *   }
+     *   file = myFile;
+     * }
+     *
+     * FileConfig fileConfig("/example.txt", fileCallback);
+     *
+     * Database.push(aClient, "/path/to/data", getFile(fileConfig), aResult);
+     * ```
+     * @param aClient The async client.
+     * @param path The node path to push value.
+     * @param file The filesystem data (file_config_data) obtained from FileConfig class object.
+     * The FileConfig object constructor should be included filename and FileCallback.
+     * The FileCallback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
+     * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
      * @param aResult The async result (AsyncResult)
      *
      */
@@ -676,7 +846,7 @@ public:
      *
      */
     template <typename T = object_t>
-    bool update(AsyncClientClass &aClient, const String &path, const T &value) { return storeAsync(aClient, path, value, reqns::http_patch, false, aClient.getResult(), NULL, ""); }
+    bool update(AsyncClientClass &aClient, const String &path, const T &value) { return storeAsync(aClient, path, value, reqns::http_patch, false, aClient.getResult(), NULL, "", ""); }
 
     /**
      * Update (patch) JSON representation data to database.
@@ -691,7 +861,7 @@ public:
      * @param aResult The async result (AsyncResult).
      */
     template <typename T = object_t>
-    void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult) { storeAsync(aClient, path, value, reqns::http_patch, true, &aResult, NULL, ""); }
+    void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult) { storeAsync(aClient, path, value, reqns::http_patch, true, &aResult, NULL, "", ""); }
 
     /**
      * Update (patch) JSON representation data to database.
@@ -707,7 +877,7 @@ public:
      * @param uid The user specified UID of async result (optional).
      */
     template <typename T = object_t>
-    void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "") { storeAsync(aClient, path, value, reqns::http_patch, true, nullptr, cb, uid); }
+    void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "") { storeAsync(aClient, path, value, reqns::http_patch, true, nullptr, cb, uid, ""); }
 
     /**
      * Remove node from database
@@ -718,10 +888,12 @@ public:
      * ```
      * @param aClient The async client.
      * @param path The node path to remove.
+     * @param matchingEtag Optional. The Etag value for comparison with the existing server's Ethag value.
+     * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
      * @return boolean value indicates the operating status.
      *
      */
-    bool remove(AsyncClientClass &aClient, const String &path) { return getNullETagOption(&sendRequest(&aClient, path, reqns::http_delete, slot_options_t(), nullptr, nullptr, aClient.getResult(), nullptr)->rtdbResult) && String(aClient.getResult()->rtdbResult.data()).indexOf("null") > -1; }
+    bool remove(AsyncClientClass &aClient, const String &path, const String &matchingEtag = "") { return getNullETagOption(&sendRequest(&aClient, path, reqns::http_delete, slot_options_t(), nullptr, nullptr, aClient.getResult(), nullptr, "", "", matchingEtag)->rtdbResult) && String(aClient.getResult()->rtdbResult.data()).indexOf("null") > -1; }
 
     /**
      * Remove node from database
@@ -732,10 +904,12 @@ public:
      * ```
      * @param aClient The async client.
      * @param path The node path to remove.
+     * @param matchingEtag Optional. The Etag value for comparison with the existing server's Ethag value.
+     * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
      * @param aResult The async result (AsyncResult).
      *
      */
-    void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, nullptr); }
+    void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, const String &matchingEtag = "") { sendRequest(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, &aResult, nullptr, "", "", matchingEtag); }
 
     /**
      * Remove node from database
@@ -748,8 +922,10 @@ public:
      * @param path The node path to remove.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
+     * @param matchingEtag Optional. The Etag value for comparison with the existing server's Ethag value.
+     * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
      */
-    void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid); }
+    void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "", const String &matchingEtag = "") { sendRequest(&aClient, path, reqns::http_delete, slot_options_t(false, false, true, false, false, false), nullptr, nullptr, nullptr, cb, uid, "", matchingEtag); }
 
     /**
      * Filtering response payload for SSE mode (HTTP Streaming).
@@ -778,10 +954,9 @@ public:
 #endif
 
     /**
-     * Perform the async task repeatedly.
-     * Should be placed in main loop function.
+     * Perform the async task repeatedly (DEPRECATED).
      */
-    void loop() { loopImpl(); }
+    void loop() { loopImpl(__PRETTY_FUNCTION__); }
 
 private:
     String sse_events_filter;
@@ -789,15 +964,16 @@ private:
     {
     public:
         AsyncClientClass *aClient = nullptr;
-        String path, uid;
+        String path, uid, etag;
         reqns::http_request_method method = reqns::http_undefined;
         slot_options_t opt;
         DatabaseOptions *options = nullptr;
         file_config_data *file = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
+        bool isSSEFilter = false;
         req_data() {}
-        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const String &etag = "")
         {
             this->aClient = aClient;
             this->path = path;
@@ -808,19 +984,21 @@ private:
             this->aResult = aResult;
             this->cb = cb;
             this->uid = uid;
+            this->etag = etag;
+            isSSEFilter = aClient->sman.isSSEFilter();
         }
     };
 
     template <typename T = object_t>
-    bool storeAsync(AsyncClientClass &aClient, const String &path, const T &value, reqns::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb, const String &uid)
+    bool storeAsync(AsyncClientClass &aClient, const String &path, const T &value, reqns::http_request_method mode, bool async, AsyncResult *aResult, AsyncResultCallback cb, const String &uid, const String &etag)
     {
         ValueConverter vcon;
         String payload;
         vcon.getVal<T>(payload, value);
         DatabaseOptions options;
-        if (!async && aClient.reqEtag.length() == 0)
+        if (!async && etag.length() == 0)
             options.silent = true;
-        return sendRequest(&aClient, path, mode, slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid, payload.c_str())->lastError.code() == 0;
+        return sendRequest(&aClient, path, mode, slot_options_t(false, false, async, payload.indexOf("\".sv\"") > -1, false, false), &options, nullptr, aResult, cb, uid, payload.c_str(), etag)->lastError.code() == 0;
     }
     template <typename T = object_t>
     String convert(T value)
@@ -831,9 +1009,9 @@ private:
         return payload.c_str();
     }
 
-    AsyncResult *sendRequest(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const char *payload = "")
+    AsyncResult *sendRequest(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const char *payload = "", const String &etag = "")
     {
-        req_data areq(aClient, path, method, opt, options, file, aResult, cb, uid);
+        req_data areq(aClient, path, method, opt, options, file, aResult, cb, uid, etag);
         asyncRequest(areq, payload);
         return aClient->getResult();
     }
@@ -843,7 +1021,19 @@ private:
         app_token_t *atoken = appToken();
 
         if (!atoken)
+        {
+            request.aClient->_lastError()->code();
+            request.aClient->_lastError()->setLastError(FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED, "app was not assigned");
             return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
+        }
+
+        service_url.trim();
+        if (service_url.length() == 0)
+        {
+            request.aClient->_lastError()->code();
+            request.aClient->_lastError()->setLastError(FIREBASE_ERROR_INVALID_DATABASE_URL, "invalid database URL, please use RealtimeDatabase::url to set");
+            return request.aClient->setClientError(request, FIREBASE_ERROR_INVALID_DATABASE_URL);
+        }
 
         request.opt.app_token = atoken;
         request.opt.auth_param = atoken->auth_data_type != user_auth_data_no_token && atoken->auth_type != auth_access_token && atoken->auth_type != auth_sa_access_token;
@@ -856,7 +1046,7 @@ private:
         if (!sData)
             return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
-        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
+        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid, request.etag);
 
         if (request.file)
             sData->request.file_data.copy(*request.file);
@@ -871,6 +1061,9 @@ private:
             sData->request.ul_dl_task_running_addr = ul_dl_task_running_addr;
             sData->request.ota_storage_addr = ota_storage_addr;
         }
+
+        if (sData->download)
+            sData->request.base64 = true;
 
         if (request.file && sData->upload)
         {
@@ -894,8 +1087,8 @@ private:
         if (request.aResult)
             sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->getResultList())));
 
-        if (sData->sse && sse_events_filter.length())
-            request.aClient->setSSEFilter(sse_events_filter);
+        if (sData->sse && sse_events_filter.length() && !request.isSSEFilter)
+            request.aClient->setSSEFilters(sse_events_filter);
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
@@ -932,7 +1125,7 @@ private:
     void setFileStatus(async_data *sData, const req_data &request)
     {
         using namespace reqns;
-        if ((request.file && request.file->filename.length()) || request.opt.ota)
+        if ((request.file && (request.file->filename.length() || (request.file->data && request.file->data_size))) || request.opt.ota)
         {
             sData->download = request.method == http_get;
             sData->upload = request.method == http_post || request.method == http_put || request.method == http_patch;

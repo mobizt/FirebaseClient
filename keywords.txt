@@ -114,7 +114,11 @@ VectorConfig    KEYWORD1
 Firestore   KEYWORD1
 Messages    KEYWORD1
 Color   KEYWORD1
-JsonWriter  KEYWORD2
+JsonWriter  KEYWORD1
+Ruleset KEYWORD1
+RuleSets    KEYWORD1
+Release KEYWORD1
+Releases    KEYWORD1
 
 #####################
 # Methods  (KEYWORD2)
@@ -306,6 +310,8 @@ setBlob KEYWORD2
 setFile KEYWORD2
 autoAuthenticate    KEYWORD2
 authenticate    KEYWORD2
+getExecutable   KEYWORD2
+getSha1 KEYWORD2
 
 ###################
 # Struct (KEYWORD3)

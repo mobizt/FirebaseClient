@@ -5,7 +5,7 @@
 #include "./FirebaseConfig.h"
 #include "./core/Auth/AuthConfig.h"
 #include "./core/AsyncClient/AsyncClient.h"
-#include "./core/AsyncResult/ResultBase.h"
+#include "./core/AsyncResult/RTDBResult.h"
 #include "./core/Utils/List.h"
 #if defined(ENABLE_JWT)
 #include "./core/JWT/JWT.h"
@@ -13,13 +13,15 @@
 #include "./core/Utils/JSON.h"
 #include "./core/Utils/Timer.h"
 #include "./core/AppBase.h"
+#include "./core/Debug.h"
 
 namespace firebase_ns
 {
 #if defined(ENABLE_JWT)
     static JWTClass JWT;
 #endif
-    class FirebaseApp : public AppBase, public ResultBase
+
+    class FirebaseApp : public AppBase
     {
         friend class RealtimeDatabase;
         friend class FirebaseClient;
@@ -35,7 +37,7 @@ namespace firebase_ns
         String extras, subdomain, host, uid;
         bool deinit = false, processing = false, ul_dl_task_running = false;
         uint16_t slot = 0;
-        uint32_t ref_result_addr = 0, expire = FIREBASE_DEFAULT_TOKEN_TTL, aclient_addr = 0, app_addr = 0, ref_ts = 0;
+        uint32_t ref_result_addr = 0, expire = FIREBASE_DEFAULT_TOKEN_TTL, aclient_addr = 0, app_addr = 0, ref_ts = 0, await_ms = 0;
 
 #if defined(ENABLE_JWT)
         JWTClass *jwtClass = nullptr;
@@ -46,13 +48,57 @@ namespace firebase_ns
         AsyncResultCallback resultCb = NULL;
 
         auth_data_t auth_data;
-        std::vector<uint32_t> aVec; // FirebaseApp vector
-        std::vector<uint32_t> cVec; // AsyncClient vector
+        std::vector<uint32_t> aVec;                         // FirebaseApp vector
+        std::vector<uint32_t> cVec;                         // AsyncClient vector
+        std::vector<cvec_address_info_t> cvec_address_list; // The Firebase services async client list
+        uint16_t app_loop_count = 0;
 
         Timer req_timer, auth_timer, err_timer, app_ready_timer;
         JSONUtil json;
         StringUtil sut;
         slot_options_t sop;
+
+        void appLoop()
+        {
+#if defined(ENABLE_JWT)
+            if (auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_sa_custom_token)
+            {
+                if (jwtClass)
+                    jwtClass->loop(getAuth());
+                else
+                    JWT.loop(getAuth());
+            }
+#endif
+            auth_data.user_auth.jwt_loop = true;
+            processAuth();
+            auth_data.user_auth.jwt_loop = false;
+
+            if (this->resultCb && getRefResult())
+            {
+                if (getRefResult()->debugLog().isAvailable() || getRefResult()->eventLog().isAvailable() || getRefResult()->error().isError())
+                    firebase_bebug_callback(this->resultCb, *getRefResult(), __func__, __LINE__, __FILE__);
+            }
+
+            for (uint32_t i = 0; i < cvec_address_list.size(); i++)
+            {
+                cvec_address_info_t cvec_address_info = cvec_address_list[i];
+                staticLoop(cvec_address_info.app_token, cvec_address_info.cvec_addr);
+            }
+        }
+
+        void await(unsigned long timeoutMs = 0)
+        {
+            await_ms = timeoutMs;
+            appLoop();
+            if (await_ms > 0)
+            {
+                unsigned long ms = millis();
+                while (isInitialized() && !ready() && millis() - ms < await_ms)
+                {
+                    appLoop();
+                }
+            }
+        }
 
         void setLastError(AsyncResult *aResult, int code, const String &message) { setLastErrorBase(aResult, code, message); }
 
@@ -206,12 +252,11 @@ namespace firebase_ns
             }
 
             if (!getRefResult())
-                resetEvent(*getAppEvent(aClient));
+                getAppEvent(aClient)->reset();
 
-            setEventBase(*getAppEvent(aClient), code, msg);
+            getAppEvent(aClient)->push_back(code, msg);
 
-            if (resultCb)
-                resultCb(*ares);
+            firebase_bebug_callback(resultCb, *ares, __func__, __LINE__, __FILE__);
 
             if (!isRes)
             {
@@ -245,7 +290,7 @@ namespace firebase_ns
             }
         }
 
-        void newRequest(AsyncClientClass *aClient, slot_options_t &soption, const String &subdomain, const String &extras, AsyncResultCallback resultCb, const String &uid = "")
+        void newRequest(AsyncClientClass *aClient, slot_options_t &soption, const String &subdomain, const String &extras, AsyncResultCallback resultCb, const String &uid = "", const String &etag = "")
         {
             if (!aClient)
                 return;
@@ -255,17 +300,15 @@ namespace firebase_ns
             if (sData)
             {
                 sut.printTo(host, subdomain.length(), "%s.googleapis.com", subdomain.c_str());
-                newRequestBase(aClient, sData, host, extras, "", reqns::http_post, soption, uid);
+                newRequestBase(aClient, sData, host, extras, "", reqns::http_post, soption, uid, etag);
 
                 sData->request.addContentType("application/json");
                 sData->request.setContentLengthFinal(sData->request.val[reqns::payload].length());
                 req_timer.feed(FIREBASE_TCP_READ_TIMEOUT_SEC);
                 slot = slotCountBase(aClient) - 1;
 
-                setDebugBase(*getAppDebug(aClient), FPSTR("Connecting to server..."));
-
-                if (resultCb)
-                    resultCb(sData->aResult);
+                getAppDebug(aClient)->push_back(-1, FPSTR("Connecting to server..."));
+                firebase_bebug_callback(resultCb, sData->aResult, __func__, __LINE__, __FILE__);
             }
         }
 
@@ -299,6 +342,7 @@ namespace firebase_ns
 
         bool processAuth()
         {
+            app_loop_count++;
             sys_idle();
 
             if (!getClient())
@@ -320,8 +364,8 @@ namespace firebase_ns
                 return false;
             }
 
-            updateDebug(*getAppDebug(aClient));
-            updateEvent(*getAppEvent(aClient));
+            getAppDebug(aClient)->pop_front();
+            getAppEvent(aClient)->pop_front();
 
             process(aClient, sData ? &sData->aResult : nullptr, resultCb);
 
@@ -667,14 +711,28 @@ namespace firebase_ns
         bool isInitialized() const { return auth_data.user_auth.initialized; }
 
         /**
-         * The authentication/authorization handler.
+         * The authentication and async tasks handler.
+         *
+         * Since v2.0.0, the async task in any AsyncClient's queue that belongs to this app will be maintained to run which includes
+         * the tasks in the AsyncClient's queue that was assigned to the initializeApp function.
+         *
+         * Then calling individual Firebase service's class's loop is not neccessary and can be ignored.
+         *
+         * @param jwt - Optional. The pointer to JWTClass class object to handle the JWT token generation and signing.
          */
+#if defined(ENABLE_JWT)
+        void loop(JWTClass *jwt = nullptr)
+        {
+            jwtClass = jwt;
+            await(await_ms);
+        }
+#else
         void loop()
         {
-            auth_data.user_auth.jwt_loop = true;
-            processAuth();
-            auth_data.user_auth.jwt_loop = false;
+            jwtClass = nullptr;
+            await(await_ms);
         }
+#endif
 
         /**
          * Get the authentication/autorization process status.
@@ -689,7 +747,16 @@ namespace firebase_ns
          * @param app The Firebase services calss object e.g. RealtimeDatabase, Storage, Messaging, CloudStorage and CloudFunctions.
          */
         template <typename T>
-        void getApp(T &app) { setAppBase(app, app_addr, &auth_data.app_token, reinterpret_cast<uint32_t>(&aVec), reinterpret_cast<uint32_t>(&ul_dl_task_running)); }
+        void getApp(T &app)
+        {
+            app.resetApp();
+            cvec_address_info_t cvec_address_info;
+            cvec_address_info.app_token = &auth_data.app_token;
+            cvec_address_info.app_addr = app_addr;
+            cvec_address_info.cvec_addr = cVecAddr(app);
+            cvec_address_list.push_back(cvec_address_info);
+            setAppBase(app, app_addr, &auth_data.app_token, reinterpret_cast<uint32_t>(&aVec), reinterpret_cast<uint32_t>(&ul_dl_task_running), reinterpret_cast<uint32_t>(&cvec_address_list), reinterpret_cast<uint32_t>(&app_loop_count));
+        }
 
         /**
          * Get the auth token.
@@ -793,17 +860,16 @@ namespace firebase_ns
          */
         void setUID(const String &uid) { this->uid = uid; }
 
-#if defined(ENABLE_JWT)
         /**
-         * Set the JWT token processor object.
+         * Set the app UNIX timestamp.
          *
-         * This function should be executed before calling initializeApp.
-         *
-         * @param jwtClass The JWT token processor object.
-         *
+         * @param sec The UNIX timestamp in seconds.
          */
-        void setJWTProcessor(JWTClass &jwtClass) { this->jwtClass = &jwtClass; }
-#endif
+        void setTime(uint32_t sec)
+        {
+            this->auth_data.user_auth.ts = sec;
+            this->auth_data.user_auth.ms = millis();
+        }
 
         /**
          * Get the pointer to the internal auth data.
@@ -827,6 +893,17 @@ namespace firebase_ns
             auth_data.force_refresh = true;
             auth_timer.setInterval(0);
         }
+
+        /**
+         * Set the JWT token processor object(DEPRECATED).
+         *
+         * This function should be executed before calling initializeApp.
+         *
+         * Use FirebaseApp::loop function instead for assigning the JWT token processor for individual app (thread safe).
+         *
+         * @param  jwtClass The pointer to JWTClass class object to handle the JWT token generation and signing.
+         */
+        void setJWTProcessor(JWTClass &jwtClass) { this->jwtClass = &jwtClass; }
     };
 };
 #endif

@@ -12,45 +12,21 @@
  */
 
 #include <Arduino.h>
-#if defined(ESP32) || defined(ARDUINO_RASPBERRY_PI_PICO_W) || defined(ARDUINO_GIGA)
-#include <WiFi.h>
-#elif defined(ESP8266)
-#include <ESP8266WiFi.h>
-#elif __has_include(<WiFiNINA.h>) || defined(ARDUINO_NANO_RP2040_CONNECT)
-#include <WiFiNINA.h>
-#elif __has_include(<WiFi101.h>)
-#include <WiFi101.h>
-#elif __has_include(<WiFiS3.h>) || defined(ARDUINO_UNOWIFIR4)
-#include <WiFiS3.h>
-#elif __has_include(<WiFiC3.h>) || defined(ARDUINO_PORTENTA_C33)
-#include <WiFiC3.h>
-#elif __has_include(<WiFi.h>)
-#include <WiFi.h>
-#endif
-
 #include <FirebaseClient.h>
+#include "ExampleFunctions.h" // Provides the functions used in the examples.
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
-// The API key can be obtained from Firebase console > Project Overview > Project settings.
 #define API_KEY "Web_API_KEY"
-
-// User Email and password that already registerd or added in your project.
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
-
-void asyncCB(AsyncResult &aResult);
-
-void printResult(AsyncResult &aResult);
 
 void AsyncTCPConnectCB(const char *host, uint16_t port);
 void AsyncTCPStatusCB(bool &status);
 void AsyncTCPSendCB(uint8_t *data, size_t size, uint32_t &sent);
 void AsyncTCPReceiveCB(uint8_t *buff, size_t buffSize, int32_t &filledSize, uint32_t &available);
 void AsyncTCPStop();
-
-DefaultNetwork network; // initilize with boolean parameter to enable/disable network reconnection
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
 
@@ -59,9 +35,10 @@ FirebaseApp app;
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 AsyncTCPConfig asyncTCP(AsyncTCPConnectCB, AsyncTCPStatusCB, AsyncTCPSendCB, AsyncTCPReceiveCB, AsyncTCPStop);
 
+// This uses built-in core WiFi/Ethernet for network connection.
+// See examples/App/NetworkInterfaces for more network examples.
 using AsyncClient = AsyncClientClass;
-
-AsyncClient aClient(asyncTCP, getNetwork(network));
+AsyncClient aClient(ssl_client);
 
 #endif
 
@@ -83,53 +60,17 @@ void setup()
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
-    Serial.println("Initializing the app...");
+    Serial.println("Initializing app...");
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
-    initializeApp(aClient, app, getAuth(user_auth), asyncCB, "authTask");
+    initializeApp(aClient, app, getAuth(user_auth), auth_debug_print, "authTask");
 #endif
 }
 
 void loop()
 {
-    // The async task handler should run inside the main loop
-    // without blocking delay or bypassing with millis code blocks.
-
+    // To maintain the authentication and async tasks.
     app.loop();
-
-    // To get the authentication time to live in seconds before expired.
-    // app.ttl();
-}
-
-void asyncCB(AsyncResult &aResult)
-{
-    // WARNING!
-    // Do not put your codes inside the callback and printResult.
-
-    printResult(aResult);
-}
-
-void printResult(AsyncResult &aResult)
-{
-    if (aResult.isEvent())
-    {
-        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
-    }
-
-    if (aResult.isDebug())
-    {
-        Firebase.printf("Debug task: %s, msg: %s\n", aResult.uid().c_str(), aResult.debug().c_str());
-    }
-
-    if (aResult.isError())
-    {
-        Firebase.printf("Error task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.error().message().c_str(), aResult.error().code());
-    }
-
-    if (aResult.available())
-    {
-        Firebase.printf("task: %s, payload: %s\n", aResult.uid().c_str(), aResult.c_str());
-    }
 }
 
 /**

@@ -34,6 +34,27 @@ namespace firebase_ns
 #endif
         }
 
+        ~UserAuth() { data.clear(); }
+
+        void clear() { data.clear(); }
+
+        user_auth_data &get()
+        {
+#if defined(ENABLE_FS)
+            if (data.file_data.cb)
+                data.file_data.cb(data.file_data.file, data.file_data.filename.c_str(), file_mode_open_read);
+            if (data.file_data.file)
+            {
+                if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_user_data, data.file_data.file, data))
+                    data.initialized = true;
+                data.file_data.file.close();
+            }
+#endif
+            return data;
+        }
+
+        bool isInitialized() { return data.initialized || data.file_data.initialized; }
+
         bool save(file_config_data &userFile)
         {
             bool ret = false;
@@ -49,25 +70,6 @@ namespace firebase_ns
             }
 #endif
             return ret;
-        }
-
-        ~UserAuth() { data.clear(); }
-
-        void clear() { data.clear(); }
-        
-        user_auth_data &get()
-        {
-#if defined(ENABLE_FS)
-            if (data.file_data.cb)
-                data.file_data.cb(data.file_data.file, data.file_data.filename.c_str(), file_mode_open_read);
-            if (data.file_data.file)
-            {
-                if (UserTokenFileParser::parseUserFile(UserTokenFileParser::token_type_user_data, data.file_data.file, data))
-                    data.initialized = true;
-                data.file_data.file.close();
-            }
-#endif
-            return data;
         }
 
     private:

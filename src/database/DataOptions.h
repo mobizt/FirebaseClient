@@ -41,7 +41,7 @@ private:
 public:
     uint32_t readTimeout = 0;
     String writeSizeLimit;
-    bool shallow = false, silent = false, classicRequest = false;
+    bool shallow = false, silent = false;
     DatabaseFilter filter;
 
     void copy(const DatabaseOptions &rhs)
@@ -49,11 +49,7 @@ public:
         this->readTimeout = rhs.readTimeout;
         this->writeSizeLimit = rhs.writeSizeLimit;
         this->shallow = rhs.shallow;
-        this->silent = rhs.silent;
-        this->classicRequest = rhs.classicRequest;
         this->filter.copy(rhs.filter);
-        this->ota = rhs.ota;
-        this->base64 = rhs.base64;
     }
 
     void clear()
@@ -62,7 +58,6 @@ public:
         sut.clear(writeSizeLimit);
         shallow = false;
         silent = false;
-        classicRequest = false;
         filter.clear();
     }
 

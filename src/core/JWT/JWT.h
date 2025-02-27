@@ -47,7 +47,7 @@ namespace firebase_ns
         jwt_token_data_t jwt_data;
         Timer err_timer;
         auth_data_t *auth_data = nullptr;
-        app_debug_t *app_debug = nullptr;
+        app_log_t *debug_log = nullptr;
         bool processing = false;
 
         bool exit(bool ret)
@@ -64,7 +64,7 @@ namespace firebase_ns
         bool create();
         void sendErrCB(AsyncResultCallback cb, AsyncResult *aResult = nullptr);
         void sendErrResult(AsyncResult *refResult);
-        void setAppDebug(app_debug_t *app_debug);
+        void setAppDebug(app_log_t *debug_log);
         const char *token();
         bool ready();
         void clear();

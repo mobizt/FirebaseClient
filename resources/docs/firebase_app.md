@@ -23,13 +23,21 @@ bool isInitialized() const
 - `bool` - Return true if initialized.
 
 
-2. ## 🔹  void loop()
+2. ## 🔹  void loop(JWTClass *jwt = nullptr)
 
-The authentication/authorization handler.
+The authentication and async tasks handler.
+
+Since v2.0.0, the async task in any AsyncClient's queue that belongs to this app will be maintained to run which includes the tasks in the AsyncClient's queue that was assigned to the initializeApp function.
+
+Then calling individual Firebase service's class's loop is not neccessary and can be ignored.
 
 ```cpp
-void loop()
+void loop(JWTClass *jwt = nullptr)
 ```
+
+**Params:**
+
+- `jwt` - Optional. The pointer to `JWTClass` class object to handle the JWT token generation and signing.
 
 3. ## 🔹  bool ready()
 
@@ -188,15 +196,18 @@ void setUID(const String &uid)
 
 - `uid` - The unique identifier for the authentication task.
 
-15. ## 🔹  void setJWTProcessor(JWTClass &jwtClass)
 
-Set the JWT token processor object.
+15. ## 🔹  void setTime(uint32_t sec)
 
-This function should be executed before calling `initializeApp`.
+Set the app UNIX timestamp.
 
 ```cpp
-void setJWTProcessor(JWTClass &jwtClass)
+void setTime(uint32_t sec)
 ```
+
+**Params:**
+
+- `sec` - The UNIX timestamp in seconds.
 
 **Params:**
 
@@ -215,16 +226,7 @@ auth_data_t *getAuth()
 - `auth_data_t*` - The pointer to internal auth data.
 
 
-17. ## 🔹  void deinitializeApp()
-
-Reset or clear app (deinitailize).
-
-```cpp
-void deinitializeApp()
-```
-
-
-18. ## 🔹  void autoRefresh(bool enable)
+17. ## 🔹  void autoRefresh(bool enable)
 
 Set the option to enable/disable re-authentication.
 
@@ -236,10 +238,26 @@ void autoAuthenticate(bool enable)
 
 - `enable` - Set to true to enable or false to disable.
 
-19. ## 🔹  void authenticate()
+18. ## 🔹  void authenticate()
 
 Force library to re-authenticate (refresh the auth token).
 
 ```cpp
 void authenticate()
 ```
+
+19. ## 🔹  void setJWTProcessor(JWTClass &jwtClass)
+
+Set the JWT token processor object (DEPRECATED).
+
+This function should be executed before calling initializeApp.
+
+Use FirebaseApp::loop function instead for assigning the JWT token processor for individual app (thread safe).
+
+```cpp
+void setJWTProcessor(JWTClass &jwtClass)
+```
+
+**Params:**
+
+- `jwtClass` - The pointer to JWTClass class object to handle the JWT token generation and signing.

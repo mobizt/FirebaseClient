@@ -1,5 +1,5 @@
 /**
- * 2025-02-02
+ * 2025-02-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -57,7 +57,7 @@ public:
      * Perform the async task repeatedly.
      * Should be placed in main loop function.
      */
-    void loop() { loopImpl(); }
+    void loop() { loopImpl(__PRETTY_FUNCTION__); }
 
     /** Send Firebase Cloud Messaging to the devices using the FCM HTTP v1 API.
      *
@@ -146,7 +146,7 @@ private:
         if (!sData)
             return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
-        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
+        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid, "");
 
         if (request.options->payload.length())
         {

@@ -70,6 +70,7 @@ private:
     struct gsm_data
     {
         String pin, apn, user, password;
+        bool allowed_initialize = false;
         void *modem = nullptr;
         gsm_conn_status conn_status;
 
@@ -81,6 +82,7 @@ private:
             this->apn = rhs.apn;
             this->user = rhs.user;
             this->password = rhs.password;
+            this->allowed_initialize = rhs.allowed_initialize;
         }
 
         void clear()
@@ -90,6 +92,7 @@ private:
             apn.remove(0, apn.length());
             user.remove(0, user.length());
             password.remove(0, password.length());
+            allowed_initialize = false;
         }
     };
 #endif
@@ -113,6 +116,7 @@ private:
 
     private:
         int ethernet_reset_pin = -1, ethernet_cs_pin = -1;
+        bool allowed_initialize = false;
         uint8_t *ethernet_mac = nullptr;
         Firebase_StaticIP static_ip;
         ethernet_conn_status conn_satatus;
@@ -128,6 +132,7 @@ private:
             this->ethernet_reset_pin = rhs.ethernet_reset_pin;
             this->ethernet_cs_pin = rhs.ethernet_cs_pin;
             this->static_ip = rhs.static_ip;
+            this->allowed_initialize = rhs.allowed_initialize;
             setMac(rhs.ethernet_mac);
         }
 
@@ -162,6 +167,7 @@ private:
             ethernet_mac = nullptr;
             ethernet_cs_pin = -1;
             ethernet_reset_pin = -1;
+            allowed_initialize = false;
         }
     };
 #endif

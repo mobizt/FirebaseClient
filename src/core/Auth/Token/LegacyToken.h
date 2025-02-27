@@ -29,24 +29,6 @@ namespace firebase_ns
                 data.file_data.copy(tokenFile);
 #endif
         }
-
-        bool save(file_config_data &tokenFile)
-        {
-            bool ret = false;
-#if defined(ENABLE_FS)
-            if (tokenFile.initialized)
-            {
-                tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_write);
-                if (tokenFile.file)
-                {
-                    ret = UserTokenFileParser::saveUserFile(UserTokenFileParser::token_type_legacy_token, tokenFile.file, data);
-                    tokenFile.file.close();
-                }
-            }
-#endif
-            return ret;
-        }
-
         void clear() { data.clear(); }
         user_auth_data &get()
         {
@@ -65,6 +47,25 @@ namespace firebase_ns
             }
 #endif
             return data;
+        }
+
+        bool isInitialized() { return data.initialized || data.file_data.initialized; }
+
+        bool save(file_config_data &tokenFile)
+        {
+            bool ret = false;
+#if defined(ENABLE_FS)
+            if (tokenFile.initialized)
+            {
+                tokenFile.cb(tokenFile.file, tokenFile.filename.c_str(), file_mode_open_write);
+                if (tokenFile.file)
+                {
+                    ret = UserTokenFileParser::saveUserFile(UserTokenFileParser::token_type_legacy_token, tokenFile.file, data);
+                    tokenFile.file.close();
+                }
+            }
+#endif
+            return ret;
         }
 
     private:

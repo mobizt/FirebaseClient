@@ -3,17 +3,18 @@
 
 #include <Arduino.h>
 #include <vector>
-#include "./core/AsyncResult/RTDBResultBase.h"
+#include "./core/AsyncResult/RTDBResultImpl.h"
 #include "./core/AsyncClient/SlotOptions.h"
 #include "./core/AsyncClient/AsyncData.h"
+#include "./core/Debug.h"
 
-class SlotManager : public ResultBase, RTDBResultBase
+class SlotManager : public RTDBResultImpl
 {
     friend class AsyncClientClass;
 
 private:
-    app_debug_t app_debug;
-    app_event_t app_event;
+    app_log_t debug_log;
+    app_log_t event_log;
     conn_handler conn;
     std::vector<uint32_t> sVec;
     Client *client = nullptr;
@@ -34,6 +35,8 @@ private:
 
 public:
     SlotManager() {}
+
+    bool isSSEFilter() { return sse_events_filter.length() > 0; }
 
     int availableSlot(slot_options_t &options)
     {
@@ -81,8 +84,8 @@ public:
     {
         async_data *sData = new async_data();
 
-        sData->aResult.app_debug = &app_debug;
-        sData->aResult.app_event = &app_event;
+        sData->aResult.debug_log = &debug_log;
+        sData->aResult.event_log = &event_log;
 
         if (index > -1)
             sVec.insert(sVec.begin() + index, sData->addr);
@@ -185,10 +188,12 @@ public:
         if (sData->err_timer.remaining() == 0)
         {
             sData->err_timer.feed(5);
-            error_notify_timeout = true;
+
+            error_notify_timeout = sData->aResult.lastError.isError();
+            sData->aResult.lastError.reset();
         }
 
-        bool sseTimeout = true;
+        bool sseTimeout = false;
 #if defined(ENABLE_DATABASE)
         sseTimeout = sData->sse && sData->aResult.rtdbResult.eventTimeout();
 #endif
@@ -217,7 +222,7 @@ public:
         if (sData->cb && (sseTimeout || setData || error_notify_timeout || download_status || upload_status))
         {
             if (!sData->auth_used)
-                sData->cb(sData->aResult);
+                firebase_bebug_callback(sData->cb, sData->aResult, __func__, __LINE__, __FILE__);
         }
 
         if (getResult(sData))
@@ -236,7 +241,7 @@ public:
 
     void newCon(async_data *sData, const char *host, uint16_t port)
     {
-        conn.newConn(client_type, client, atcp_config, &app_debug);
+        conn.newConn(client_type, client, atcp_config, &debug_log);
         sData->request.setClient(client_type, client, atcp_config);
         sData->response.setClient(client_type, client, atcp_config);
 
@@ -260,7 +265,7 @@ public:
     void stop()
     {
         if (conn.isConnected())
-            setDebugBase(app_debug, FPSTR("Terminating the server connection..."));
+            debug_log.push_back(-1, FPSTR("Terminating the server connection..."));
         conn.stop();
     }
 
@@ -308,9 +313,7 @@ public:
             aResult = new AsyncResult();
 
         aResult->lastError.setClientError(code);
-
-        if (request.cb)
-            request.cb(*aResult);
+        firebase_bebug_callback(request.cb, *aResult, __func__, __LINE__, __FILE__);
 
         if (!request.aResult)
         {
@@ -325,7 +328,7 @@ public:
         {
             sData->aResult.lastError.setClientError(sData->error.code);
             lastErr.setClientError(sData->error.code);
-            clearAppData(sData->aResult.app_data);
+            sData->aResult.data_log.reset();
 
             // Required for sync task.
             if (!sData->async)
@@ -338,7 +341,7 @@ public:
         {
             sData->aResult.lastError.setResponseError(sData->response.val[resns::payload], sData->response.httpCode);
             lastErr.setResponseError(sData->response.val[resns::payload], sData->response.httpCode);
-            clearAppData(sData->aResult.app_data);
+            sData->aResult.data_log.reset();
 
             // Required for sync task.
             if (!sData->async)
@@ -360,16 +363,16 @@ public:
     {
         sData->aResult.lastError.clearError();
         lastErr.clearError();
-        clearAppData(sData->aResult.app_data);
+        sData->aResult.data_log.reset();
 
         if ((sData->auth_used || sData->sse) && (millis() - sData->aResult.conn_ms < FIREBASE_RECONNECTION_TIMEOUT_MSEC) && sData->aResult.conn_ms > 0)
             return ret_continue;
 
         sData->aResult.conn_ms = millis();
-        resetDebug(app_debug);
+        debug_log.reset();
 
         if (!conn.isConnected() && !sData->auth_used) // This info is already shown in auth task
-            setDebugBase(app_debug, FPSTR("Connecting to server..."));
+            debug_log.push_back(-1, FPSTR("Connecting to server..."));
 
         sData->return_type = conn.connect(host, port);
 

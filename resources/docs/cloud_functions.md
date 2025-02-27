@@ -23,8 +23,7 @@ void resetApp()
 
 1. ## 🔹  void loop()
 
-Perform the async task repeatedly.
-Should be places in main loop function.
+Perform the async task repeatedly (DEPRECATED).
 
 ```cpp
 void loop()

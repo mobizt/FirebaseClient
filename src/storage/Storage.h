@@ -60,7 +60,7 @@ public:
      * Perform the async task repeatedly.
      * Should be placed in main loop function.
      */
-    void loop() { loopImpl(); }
+    void loop() { loopImpl(__PRETTY_FUNCTION__); }
 
     /** Download object from the Firebase Storage.
      *
@@ -346,7 +346,7 @@ private:
         if (!sData)
             return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
-        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
+        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid, "");
 
         if (request.file)
             sData->request.file_data.copy(*request.file);

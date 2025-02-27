@@ -1,5 +1,5 @@
 /**
- * 2025-02-01
+ * 2025-02-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -62,10 +62,9 @@ public:
     void resetApp() { resetAppImpl(); }
 
     /**
-     * Perform the async task repeatedly.
-     * Should be placed in main loop function.
+     * Perform the async task repeatedly (DEPRECATED).
      */
-    void loop() { loopImpl(); }
+    void loop() { loopImpl(__PRETTY_FUNCTION__); }
 
     /** Download object from the Google Cloud Storage.
      *
@@ -417,7 +416,7 @@ private:
         if (!sData)
             return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
-        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid);
+        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid, "");
 
         if (request.file)
             sData->request.file_data.copy(*request.file);

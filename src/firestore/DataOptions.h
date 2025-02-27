@@ -848,7 +848,7 @@ public:
 };
 
 /**
- * This class used in Documents.get function represents the query parameters
+ * This class used in Documents::get function represents the query parameters
  */
 class GetDocumentOptions : public BaseO1
 {
@@ -870,7 +870,7 @@ public:
 };
 
 /**
- * This class used in Documents.batchGet function represents the JSON representation of request body
+ * This class used in Documents::batchGet function represents the JSON representation of request body
  */
 class BatchGetDocumentOptions : public BaseO4
 {
@@ -937,7 +937,7 @@ public:
 };
 
 /**
- * This class used in Documents.runQuery function represents the JSON representation of the request body.
+ * This class used in Documents::runQuery function represents the JSON representation of the request body.
  */
 class QueryOptions : public BaseO4
 {
@@ -970,7 +970,7 @@ public:
 // Ref https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents/list
 
 /**
- * This class used in Documents.list function represents the query parametes.
+ * This class used in Documents::list function represents the query parametes.
  */
 class ListDocumentsOptions : public BaseO6
 {
@@ -1066,7 +1066,7 @@ public:
 // Ref https://firebase.google.com/docs/firestore/reference/rest/v1/projects.databases.documents/listCollectionIds
 
 /**
- * This class used in Documents.listCollectionIds function represents the JSON representation of the request body.
+ * This class used in Documents::listCollectionIds function represents the JSON representation of the request body.
  */
 class ListCollectionIdsOptions : public BaseO4
 {

@@ -18,7 +18,20 @@ Default constructor.
 AsyncClientClass()
 ```
 
-2. ### 🔹 AsyncClientClass(Client &client, network_config_data &net)
+2. ### 🔹 AsyncClientClass(Client &client, bool reconnect = true)
+
+
+```cpp
+AsyncClientClass(Client &client, bool reconnect = true)
+```
+
+**Params:**
+
+- `client` - The SSL client that working with the network interface.
+
+- `reconnect` - Optional The network reconnection option when the network lost connection.
+
+3. ### 🔹 AsyncClientClass(Client &client, network_config_data &net)
 
 
 ```cpp
@@ -31,7 +44,7 @@ AsyncClientClass(Client &client, network_config_data &net)
 
 - `net` - The network config data can be obtained from the networking classes via the static function called `getNetwork`.
 
-3. ### 🔹 AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
+4. ### 🔹 AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
 
 
 ```cpp
@@ -162,7 +175,7 @@ FirebaseError lastError() const
 
 10. ## 🔹  String etag() const
 
-Get the response ETag.
+Get the response etag.
 
 ```cpp
 String etag() const
@@ -170,16 +183,16 @@ String etag() const
 
 **Returns:**
 
-- `String` - The response ETag header.
+- `String` - The response etag header.
 
 11. ## 🔹  void setETag(const String &etag) 
 
-Set the ETag header to the task.
+Set the etag header to the task (DEPRECATED).
 
-ETag of async client which obtained from etag() function will be empty after it assign to the task.
+The etag can be set via the functions that support etag.
 
 ```cpp
-void setETag(const String &etag) 
+void setEtag(const String &etag) 
 ```
 
 **Params:**
@@ -212,7 +225,66 @@ void setSyncReadTimeout(uint32_t timeoutSec)
 - `timeoutSec` - The TCP read timeout in seconds.
 
 
-14. ## 🔹  void setNetwork(Client &client, network_config_data &net)
+14. ## 🔹  void setSessionTimeout(uint32_t timeoutSec)
+
+Set the TCP session timeout in seconds.
+
+```cpp
+void setSessionTimeout(uint32_t timeoutSec)
+```
+   
+**Params:**
+
+- `timeoutSec` - The TCP session timeout in seconds.
+   
+
+15. ### 🔹 void setSSEFilters(const String &filter = "")
+
+Filtering response payload for for Relatime Database SSE streaming. 
+    
+This function is available since v1.2.1.
+
+This is optional to allow specific events filtering.
+
+The following event keywords are supported.
+    
+`get` - To allow the http get response (first put event since stream connected).
+    
+`put` - To allow the put event.
+    
+`patch` - To allow the patch event.
+    
+`keep-alive` - To allow the keep-alive event.
+    
+`cancel` - To allow the cancel event.
+    
+`auth_revoked` - To allow the auth_revoked event.
+
+You can separate each keyword with comma or space.
+    
+To clear all prevousely set filter to allow all Stream events, use `AsyncClientClass::setSSEFilters()`.
+
+This will overwrite the value sets by `RealtimeDatabase::setSSEFilters`.
+
+### Example
+```cpp
+    
+// To all all tream events.
+aClient.setSSEFilters("get,put,patch,keep-alive,cancel,auth_revoked");
+    
+// SSE streaming
+Database.get(aClient, "/path/to/stream/data", cb, true);
+```
+
+```cpp
+void setSSEFilters(const String &filter = "")
+```
+**Params:**
+- `filter` - The event keywords for filtering.
+   
+
+
+16. ## 🔹  void setNetwork(Client &client, network_config_data &net)
 
 Set the network interface.
 

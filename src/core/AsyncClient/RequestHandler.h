@@ -15,6 +15,12 @@
 #include "./core/AsyncClient/AsyncTCPConfig.h"
 #endif
 
+#if defined(ENABLE_FS)
+#if __has_include(<SPIFFS.h>)
+#include <SPIFFS.h>
+#endif
+#endif
+
 typedef void (*NetworkStatus)(bool &status);
 typedef void (*NetworkReconnect)(void);
 

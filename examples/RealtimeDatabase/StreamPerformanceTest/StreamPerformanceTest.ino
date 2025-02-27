@@ -14,30 +14,28 @@
  */
 
 #include <Arduino.h>
-#include <WiFi.h>
-
 #include <FirebaseClient.h>
+#include "ExampleFunctions.h" // Provides the functions used in the examples.
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
 #define API_KEY "Web_API_KEY"
-#define DATABASE_URL "URL"
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
+#define DATABASE_URL "URL"
 
-void asyncCB(AsyncResult &aResult);
-void printResult(AsyncResult &aResult);
+void processData(AsyncResult &aResult);
 
-DefaultNetwork network;
-UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
-FirebaseApp app;
+SSL_CLIENT ssl_client, stream_ssl_client;
 
-#include <WiFiClientSecure.h>
-WiFiClientSecure ssl_client1, ssl_client2;
-
+// This uses built-in core WiFi/Ethernet for network connection.
+// See examples/App/NetworkInterfaces for more network examples.
 using AsyncClient = AsyncClientClass;
-AsyncClient aClient1(ssl_client1, getNetwork(network)), aClient2(ssl_client2, getNetwork(network));
+AsyncClient aClient(ssl_client), streamClient(stream_ssl_client);
+
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<3600) */);
+FirebaseApp app;
 RealtimeDatabase Database;
 
 uint32_t expected_count = 0, counter = 0, sum = 0, delayMs = 0;
@@ -62,12 +60,12 @@ void setup()
     Serial.println(WiFi.localIP());
     Serial.println();
 
-    ssl_client1.setInsecure();
-    ssl_client2.setInsecure();
-    initializeApp(aClient2, app, getAuth(user_auth));
+    ssl_client.setInsecure();
+    stream_ssl_client.setInsecure();
+    initializeApp(aClient, app, getAuth(user_auth), auth_debug_print, "🔐 authTask");
     app.getApp<RealtimeDatabase>(Database);
     Database.url(DATABASE_URL);
-    Database.get(aClient1, "/test/performance", asyncCB, true, "streamTask");
+    Database.get(streamClient, "/test/performance", processData, true, "streamTask");
 
     IPAddress ip = WiFi.localIP(); // Can use toString
     char buff[20];
@@ -78,21 +76,21 @@ void setup()
 void loop()
 {
     app.loop();
-    Database.loop();
     if (app.ready() && sendAck)
     {
         sendAck = false;
-        Database.set<String>(aClient2, "/test/ack", msg, asyncCB, "setTask");
+        Database.set<String>(aClient, "/test/ack", msg, processData, "setTask");
     }
 }
 
-void asyncCB(AsyncResult &aResult) { printResult(aResult); }
-
-void printResult(AsyncResult &aResult)
+void processData(AsyncResult &aResult)
 {
+    // To maintain the authentication and async tasks
+    app.loop();
+
     if (aResult.isEvent())
     {
-        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.appEvent().message().c_str(), aResult.appEvent().code());
+        Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.eventLog().message().c_str(), aResult.eventLog().code());
     }
 
     if (aResult.isDebug())

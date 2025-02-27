@@ -64,12 +64,15 @@
 #define FIREBASE_ERROR_JWT_CREATION_TIMEDOUT -121
 #define FIREBASE_ERROR_INVALID_DATABASE_SECRET -122
 #define FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE -123
+#define FIREBASE_ERROR_INVALID_DATABASE_URL -124
+#define FIREBASE_ERROR_INVALID_HOST -125
 
 #if !defined(FPSTR)
 #define FPSTR
 #endif
 
-#include "./core/AsyncResult/AppError.h"
+#include "./core/AsyncResult/AppLog.h"
+
 class FirebaseError
 {
     friend class AsyncClientClass;
@@ -83,23 +86,25 @@ class FirebaseError
     friend class CloudStorage;
     friend class FirebaseApp;
     friend class SlotManager;
+    friend class AsyncResult;
+    friend class ResultBase;
 
 private:
-    app_error_t err;
+    app_log_t err;
     void clearError() { err.reset(); }
     void setResponseError(const String &message, int code)
     {
         if (code == FIREBASE_ERROR_HTTP_CODE_PRECONDITION_FAILED)
-            err.setError(code, FPSTR("precondition failed (ETag does not match)"));
+            err.push_back(code, FPSTR("precondition failed (ETag does not match)"));
         else if (code == FIREBASE_ERROR_HTTP_CODE_UNAUTHORIZED)
-            err.setError(code, FPSTR("unauthorized"));
+            err.push_back(code, FPSTR("unauthorized"));
         else if (message.length())
-            err.setError(code, message);
+            err.push_back(code, message);
         else
         {
             String buf = FPSTR("HTTP Status ");
             buf += code;
-            err.setError(code, buf);
+            err.push_back(code, buf);
         }
     }
     void setClientError(int code)
@@ -109,67 +114,73 @@ private:
             switch (code)
             {
             case FIREBASE_ERROR_TCP_CONNECTION:
-                err.setError(code, FPSTR("TCP connection failed"));
+                err.push_back(code, FPSTR("TCP connection failed"));
                 break;
             case FIREBASE_ERROR_TCP_SEND:
-                err.setError(code, FPSTR("TCP send failed"));
+                err.push_back(code, FPSTR("TCP send failed"));
                 break;
             case FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT:
-                err.setError(code, FPSTR("TCP receive timed out"));
+                err.push_back(code, FPSTR("TCP receive timed out"));
                 break;
             case FIREBASE_ERROR_TCP_DISCONNECTED:
-                err.setError(code, FPSTR("TCP disconnected"));
+                err.push_back(code, FPSTR("TCP disconnected"));
                 break;
             case FIREBASE_ERROR_OPEN_FILE:
-                err.setError(code, FPSTR("error opening file"));
+                err.push_back(code, FPSTR("error opening file"));
                 break;
             case FIREBASE_ERROR_FILE_READ:
-                err.setError(code, FPSTR("error reading file"));
+                err.push_back(code, FPSTR("error reading file"));
                 break;
             case FIREBASE_ERROR_FILE_WRITE:
-                err.setError(code, FPSTR("error writing file"));
+                err.push_back(code, FPSTR("error writing file"));
                 break;
             case FIREBASE_ERROR_UNAUTHENTICATE:
-                err.setError(code, FPSTR("unauthenticate"));
+                err.push_back(code, FPSTR("unauthenticate"));
                 break;
             case FIREBASE_ERROR_TOKEN_PARSE_PK:
-                err.setError(code, FPSTR("parse private key"));
+                err.push_back(code, FPSTR("parse private key"));
                 break;
             case FIREBASE_ERROR_TOKEN_SIGN:
-                err.setError(code, FPSTR("sign JWT token"));
+                err.push_back(code, FPSTR("sign JWT token"));
                 break;
             case FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE:
-                err.setError(code, FPSTR("too low sketch space"));
+                err.push_back(code, FPSTR("too low sketch space"));
                 break;
             case FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE:
-                err.setError(code, FPSTR("OTA Storage was not set"));
+                err.push_back(code, FPSTR("OTA Storage was not set"));
                 break;
             case FIREBASE_ERROR_FW_UPDATE_WRITE_FAILED:
-                err.setError(code, FPSTR("firmware write failed"));
+                err.push_back(code, FPSTR("firmware write failed"));
                 break;
             case FIREBASE_ERROR_FW_UPDATE_END_FAILED:
-                err.setError(code, FPSTR("firmware end failed"));
+                err.push_back(code, FPSTR("firmware end failed"));
                 break;
             case FIREBASE_ERROR_STREAM_TIMEOUT:
-                err.setError(code, FPSTR("stream connection timed out"));
+                err.push_back(code, FPSTR("stream connection timed out"));
                 break;
             case FIREBASE_ERROR_STREAM_AUTH_REVOKED:
-                err.setError(code, FPSTR("auth revoked"));
+                err.push_back(code, FPSTR("auth revoked"));
                 break;
             case FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED:
-                err.setError(code, FPSTR("app was not assigned"));
+                err.push_back(code, FPSTR("app was not assigned"));
                 break;
             case FIREBASE_ERROR_OPERATION_CANCELLED:
-                err.setError(code, FPSTR("operation was cancelled"));
+                err.push_back(code, FPSTR("operation was cancelled"));
                 break;
             case FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID:
-                err.setError(code, FPSTR("time was not set or not valid"));
+                err.push_back(code, FPSTR("time was not set or not valid"));
                 break;
             case FIREBASE_ERROR_INVALID_DATABASE_SECRET:
-                err.setError(code, FPSTR("invalid database secret"));
+                err.push_back(code, FPSTR("invalid database secret"));
+                break;
+            case FIREBASE_ERROR_INVALID_DATABASE_URL:
+                err.push_back(code, FPSTR("invalid database URL, please use RealtimeDatabase::url to set"));
+                break;
+            case FIREBASE_ERROR_INVALID_HOST:
+                err.push_back(code, FPSTR("invalid host"));
                 break;
             default:
-                err.setError(code, FPSTR("undefined"));
+                err.push_back(code, FPSTR("undefined"));
                 break;
             }
         }
@@ -180,8 +191,9 @@ public:
     ~FirebaseError() {}
     String message() { return err.message(); }
     int code() { return err.code(); }
-    void setLastError(int code, const String &msg) { err.setError(code, msg); }
+    void setLastError(int code, const String &msg) { err.push_back(code, msg); }
     void reset() { err.reset(); }
-    bool isError() { return err.isError(); }
+    bool isError() { return err.isAvailable(); }
+    void errorPopFront() { err.pop_front(); }
 };
 #endif

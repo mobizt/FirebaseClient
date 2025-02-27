@@ -14,6 +14,7 @@
 #undef ENABLE_STORAGE
 #undef ENABLE_CLOUD_STORAGE
 #undef ENABLE_FUNCTIONS
+#undef ENABLE_RULESETS
 #undef ENABLE_PSRAM
 #undef ENABLE_OTA
 #undef ENABLE_FS
@@ -55,6 +56,10 @@
 
 #if defined(DISABLE_FUNCTIONS)
 #undef ENABLE_FUNCTIONS
+#endif
+
+#if defined(DISABLE_RULESETS)
+#undef ENABLE_RULESETS
 #endif
 
 #if defined(DISABLE_PSRAM)

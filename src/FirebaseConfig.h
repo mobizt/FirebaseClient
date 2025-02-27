@@ -49,6 +49,12 @@
  */
 #define ENABLE_FUNCTIONS
 
+/**📍 For Firebase RuleSets compilation
+ * ⛔ Use following build flag to disable.
+ * -D DISABLE_RULESETS
+ */
+#define ENABLE_RULESETS
+
 /**📍 For enabling PSRAM support
  * ⛔ Use following build flag to disable.
  * -D DISABLE_PSRAM
@@ -138,48 +144,5 @@
 #endif
 
 #include "core/Options.h"
-
-/**
- * Included from the following files.
- *
- * core/AsyncClient/ConnectionHandler.h
- * core/AsyncClient/RequestHandler.h
- * core/AsyncResult/ResultBase.h
- * core/Auth/AuthBase.h
- * core/Auth/UserAuthData.h
- * core/File/DefaultFileConfig.h
- * core/File/FileConfig.h
- * core/File/FileConfigData.h
- * core/File/ResumableUpload.h
- * core/JWT/JWT.h
- * core/JWT/JWT.cpp
- * core/Network/Data/FirebaseWiFi.h
- * core/Network/Data/NetworkConfigData.h
- * core/Network/Data/SPIEthernet.h
- * core/Network/Data/StaticData.h
- * core/Network/NetConfig.h
- * core/Network/NetworkOptions.h
- * core/Updater/OTAUpdater.h
- * core/Utils/Base64.h
- * core/Utils/JSON.h
- * core/Utils/Memory.h
- * core/Utils/ObjectWriter.h
- * core/Utils/OTA.h
- * core/Utils/StringUtil.h
- * core/Utils/Timer.h
- * core/Utils/URL.h
- * core/FirebaseApp.h
- * database/DatabaseFilter.h
- * database/DataOptions.h
- * firestore/DataOptions.h
- * firestore/Query.cpp
- * firestore/Query.h
- * firestore/Values.h
- * functions/DataOptions.h
- * functions/Policy.h
- * messaging/DataOptions.h
- * storage/DataOptions.h
- * cloud_storage/DataOptions.h
- */
 
 #endif

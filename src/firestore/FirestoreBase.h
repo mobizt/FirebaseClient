@@ -1,5 +1,5 @@
 /**
- * 2025-02-11
+ * 2025-02-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -62,7 +62,7 @@ public:
      * Perform the async task repeatedly.
      * Should be placed in main loop function.
      */
-    void loop() { loopImpl(); }
+    void loop() { loopImpl(__PRETTY_FUNCTION__); }
 
 protected:
     struct req_data
@@ -112,7 +112,7 @@ protected:
         if (!sData)
             return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
-        newRequestBase(request.aClient, sData, service_url, request.path, extras, request.method, request.opt, request.uid);
+        newRequestBase(request.aClient, sData, service_url, request.path, extras, request.method, request.opt, request.uid, "");
 
         if (request.options->payload.length())
         {

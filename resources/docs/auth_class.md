@@ -47,17 +47,15 @@ explicit ServiceAuth(TimeStatusCallback timeCb, const file_config_data &safile, 
 - `expire` - The expiry period in seconds (less than 3600), 3300 is the default value.
 
 
-3. ### 🔹 explicit ServiceAuth(uint32_t ts, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+3. ### 🔹 explicit ServiceAuth(const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
 
 A ServiceAuth constructor.
 
 ```cpp
-explicit ServiceAuth(uint32_t ts, const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+explicit ServiceAuth(const String &clientEmail, const String &projectId, const String &privateKey, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
 ```
 
 **Params:**
-
-- `ts` -  The current UNiX timestamp (seonds since Jan 1, 1970 midnight).
 
 - `clientEmail` - The service account client Email.
 
@@ -68,17 +66,15 @@ explicit ServiceAuth(uint32_t ts, const String &clientEmail, const String &proje
 - `expire` - The expiry period in seconds (less than 3600), 3300 is the default value.
 
 
-4. ### 🔹 explicit ServiceAuth(uint32_t ts, const file_config_data &safile, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+4. ### 🔹 explicit ServiceAuth(const file_config_data &safile, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
 
 A ServiceAuth constructor.
 
 ```cpp
-explicit ServiceAuth(uint32_t ts, const file_config_data &safile, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+explicit ServiceAuth(const file_config_data &safile, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
 ```
 
 **Params:**
-
-- `ts` -  The current UNiX timestamp (seonds since Jan 1, 1970 midnight).
 
 - `safile` - The filesystem data (`file_config_data`) obtained from `FileConfig` class object of service account key file.
 
@@ -87,7 +83,23 @@ explicit ServiceAuth(uint32_t ts, const file_config_data &safile, size_t expire 
 
 ## Functions
 
-1. ## 🔹 void clear()
+1. ## 🔹  void setTime(uint32_t ts)
+
+Set the timestamp for the JWT token generation and signing process when authenticated with `ServiceAuth` and `CustomAuth`.
+
+Once the timestamp was set, the internal timestamp value will be set and increased by the millisec of the system timer count since it was set, deviced by 1000.
+
+The precision of the system timer depends on the crystal oscillator.
+
+```cpp
+ void setTime(uint32_t ts)
+```
+
+**Params:**
+
+- `ts` - The UNIX timestamp.
+
+2. ## 🔹 void clear()
 
 Clear the internal credentials.
 
@@ -95,7 +107,7 @@ Clear the internal credentials.
 void clear()
 ```
 
-2. ## 🔹 user_auth_data &get()
+3. ## 🔹 user_auth_data &get()
 
 Returns the internal user_auth_data reference.
 
@@ -107,7 +119,7 @@ user_auth_data &get()
 
 - `user_auth_data` - Return internal user_auth_data reference.
 
-3. ## 🔹 bool isInitialized() const
+4. ## 🔹 bool isInitialized() const
 
 Returns the status of this class initialization.
 
@@ -185,17 +197,15 @@ explicit CustomAuth(TimeStatusCallback timeCb, const file_config_data &safile, c
 - `expire` - The expiry period in seconds (less than 3600), 3300 is the default value.
 
 
-3. ### 🔹 explicit CustomAuth(uint32_t ts, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+3. ### 🔹 explicit CustomAuth(const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
 
 A CustomAuth constructor.
 
 ```cpp
-explicit CustomAuth(uint32_t ts, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+explicit CustomAuth(const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
 ```
 
 **Params:**
-
-- `ts` -  The current UNiX timestamp (seonds since Jan 1, 1970 midnight).
 
 - `apiKey` - The web API key of the project.
 
@@ -212,17 +222,15 @@ explicit CustomAuth(uint32_t ts, const String &apiKey, const String &clientEmail
 - `expire` - The expiry period in seconds (less than 3600), 3300 is the default value.
 
 
-4. ### 🔹 explicit CustomAuth(uint32_t ts, const file_config_data &safile, const String &apiKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+4. ### 🔹 explicit CustomAuth(const file_config_data &safile, const String &apiKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
 
 A CustomAuth constructor.
 
 ```cpp
-explicit CustomAuth(uint32_t ts, const file_config_data &safile, const String &apiKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+explicit CustomAuth(const file_config_data &safile, const String &apiKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
 ```
 
 **Params:**
-
-- `ts` -  The current UNiX timestamp (seonds since Jan 1, 1970 midnight).
 
 - `safile` - The filesystem data (`file_config_data`) obtained from `FileConfig` class object of service account key file.
 
@@ -237,7 +245,24 @@ explicit CustomAuth(uint32_t ts, const file_config_data &safile, const String &a
 
 ## Functions
 
-1. ## 🔹 void clear()
+
+1. ## 🔹  void setTime(uint32_t ts)
+
+Set the timestamp for the JWT token generation and signing process when authenticated with `ServiceAuth` and `CustomAuth`.
+
+Once the timestamp was set, the internal timestamp value will be set and increased by the millisec of the system timer count since it was set, deviced by 1000.
+
+The precision of the system timer depends on the crystal oscillator.
+
+```cpp
+ void setTime(uint32_t ts)
+```
+
+**Params:**
+
+- `ts` - The UNIX timestamp.
+
+2. ## 🔹 void clear()
 
 Clear the internal credentials.
 
@@ -245,7 +270,19 @@ Clear the internal credentials.
 void clear()
 ```
 
-2. ## 🔹 user_auth_data &get()
+3. ## 🔹 void setClaims(const String &claims)
+
+Set the additional claims.
+
+Because this library does not include JSON library to parse the claims, this function will replace or set the internal claims data.
+
+For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
+
+```cpp
+void setClaims(const String &claims)
+```
+
+4. ## 🔹 user_auth_data &get()
 
 Returns the internal user_auth_data reference.
 
@@ -258,7 +295,7 @@ user_auth_data &get()
 - `user_auth_data` - Return internal user_auth_data reference.
 
 
-3. ## 🔹 bool isInitialized() const
+5. ## 🔹 bool isInitialized() const
 
 Returns the status of this class initialization.
 
@@ -269,18 +306,6 @@ bool isInitialized() const
 **Returns:**
 
 - `bool` - Return true if initialized.
-
-4. ## 🔹 void setClaims(const String &claims)
-
-Set the additional claims.
-
-Because this library does not include JSON library to parse the claims, this function will replace or set the internal claims data.
-
-For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
-
-```cpp
-void setClaims(const String &claims)
-```
 
 **Params:**
 
@@ -763,7 +788,20 @@ user_auth_data &get()
 - `user_auth_data` - Return internal user_auth_data reference.
 
 
-3. ## 🔹 bool save(file_config_data &userFile)
+3. ## 🔹 bool isInitialized() const
+
+Returns the status of this class initialization.
+
+```cpp
+bool isInitialized() const
+```
+
+**Returns:**
+
+- `bool` - Return true if initialized.
+
+
+4. ## 🔹 bool save(file_config_data &userFile)
 
 Save the user config data.
 

@@ -9,6 +9,7 @@
 #include "./core/Utils/JSON.h"
 #include "./core/Error.h"
 #include "./core/Core.h"
+#include "./core/Debug.h"
 
 #if defined(ENABLE_JWT)
 #include "JWT.h"
@@ -86,7 +87,7 @@ void JWTClass::sendErrCB(AsyncResultCallback cb, AsyncResult *aResult)
             if (!hasRes)
                 ares = new AsyncResult();
             ares->error().setLastError(jwt_data.err_code, jwt_data.msg);
-            cb(*ares);
+            firebase_bebug_callback(cb, *ares, __func__, __LINE__, __FILE__);
             if (!hasRes)
             {
                 delete ares;
@@ -102,7 +103,7 @@ void JWTClass::sendErrResult(AsyncResult *refResult)
         refResult->error().setLastError(jwt_data.err_code, jwt_data.msg);
 }
 
-void JWTClass::setAppDebug(app_debug_t *app_debug) { this->app_debug = app_debug; }
+void JWTClass::setAppDebug(app_log_t *debug_log) { this->debug_log = debug_log; }
 
 bool JWTClass::begin(auth_data_t *auth_data)
 {
@@ -133,19 +134,27 @@ bool JWTClass::create()
         uint32_t now = auth_data->user_auth.ts;
         if (auth_data->user_auth.timestatus_cb)
         {
-            if (app_debug && !auth_data->user_auth.jwt_time_debug)
+            if (debug_log && !auth_data->user_auth.jwt_time_debug)
             {
                 auth_data->user_auth.jwt_time_debug = true;
-                app_debug->setDebug(FPSTR("Getting current time..."));
+                debug_log->push_back(-1, FPSTR("Getting current time..."));
                 return exit(false);
             }
             auth_data->user_auth.timestatus_cb(now);
+        }
+        else
+        {
+            // Current time calculation based on the counter since the time was set.
+            uint32_t diff = millis() > auth_data->user_auth.ms ? millis() - auth_data->user_auth.ms : 0;
+            now += diff / 1000;
+            auth_data->user_auth.ts = now;
+            auth_data->user_auth.ms = millis();
         }
 
         if (now < FIREBASE_DEFAULT_TS)
         {
             jwt_data.err_code = FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID;
-            jwt_data.msg = FPSTR("JWT, time was not set or not valid");
+            jwt_data.msg = FPSTR("JWT, time was not set or not valid. Use FirebaseApp::setTime to set.");
             return exit(false);
         }
 

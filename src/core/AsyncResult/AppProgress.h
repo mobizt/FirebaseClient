@@ -7,11 +7,10 @@
 struct app_progress_t
 {
     friend class AsyncResult;
-    friend class ResultBase;
     friend class download_data_t;
     friend class upload_data_t;
     friend class AsyncClientClass;
-     friend class SlotManager;
+    friend class SlotManager;
 
 protected:
     void reset(app_progress_t &app_progress) { app_progress.reset(); }
@@ -62,23 +61,27 @@ private:
         available = false;
     }
     bool remaining() { return progressVec.size() && !progressVec[0].read; }
-    bool isProgress()
+    bool isProgress(bool isUpdate)
     {
         if (available && last_ms < ms && ms > 0)
         {
-            available = false;
-            getProgress();
+            if (isUpdate)
+                available = false;
+            getProgress(isUpdate);
             return true;
         }
 
         // remaining to read?
         return false;
     }
-    void getProgress()
+    void getProgress(bool isUpdate)
     {
-        last_ms = millis();
-        if (progressVec.size())
-            progressVec[0].read = true;
+        if (isUpdate)
+        {
+            last_ms = millis();
+            if (progressVec.size())
+                progressVec[0].read = true;
+        }
     }
 };
 

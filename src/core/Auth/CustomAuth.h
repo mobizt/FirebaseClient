@@ -14,53 +14,21 @@ namespace firebase_ns
         friend class FirebaseApp;
 
     public:
-        explicit CustomAuth(TimeStatusCallback timeCb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
-        {
-            data.clear();
-            data.sa.val[sa_ns::cm] = clientEmail;
-            data.sa.val[sa_ns::pid] = projectId;
-            data.sa.val[sa_ns::pk] = privateKey;
-            data.sa.expire = expire;
-            data.cust.val[cust_ns::api_key] = apiKey;
-            data.cust.val[cust_ns::uid] = uid;
-            data.cust.val[cust_ns::claims] = claims;
-            data.initialized = isInitialized();
-            data.auth_type = auth_sa_custom_token;
-            data.auth_data_type = user_auth_data_custom_data;
-            data.timestatus_cb = timeCb;
-        };
+        explicit CustomAuth(TimeStatusCallback timeCb, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL) { init(timeCb, 0, apiKey, clientEmail, projectId, privateKey, uid, claims, expire); }
 
-        explicit CustomAuth(TimeStatusCallback timeCb, const file_config_data &safile, const String &apiKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
-        {
-#if defined(ENABLE_FS)
-            data.clear();
-            if (safile.initialized)
-            {
-                data.file_data.copy(safile);
-                data.sa.expire = expire;
-                data.cust.val[cust_ns::api_key] = apiKey;
-                data.cust.val[cust_ns::uid] = uid;
-                data.cust.val[cust_ns::claims] = claims;
-                data.timestatus_cb = timeCb;
-            }
-#endif
-        }
+        explicit CustomAuth(TimeStatusCallback timeCb, const file_config_data &safile, const String &apiKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL) { init(timeCb, 0, safile, apiKey, uid, claims, expire); }
 
-        explicit CustomAuth(uint32_t ts, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
-        {
-            CustomAuth(nullptr, apiKey, clientEmail, projectId, privateKey, uid, claims, expire);
-            data.ts = ts;
-        };
+        explicit CustomAuth(const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL) { init(nullptr, 0, apiKey, clientEmail, projectId, privateKey, uid, claims, expire); }
 
-        explicit CustomAuth(uint32_t ts, const file_config_data &safile, const String &apiKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
-        {
-#if defined(ENABLE_FS)
-            CustomAuth(nullptr, safile, apiKey, uid, claims, expire);
-            data.ts = ts;
-#endif
-        }
+        explicit CustomAuth(const file_config_data &safile, const String &apiKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL) { init(nullptr, 0, safile, apiKey, uid, claims, expire); }
 
         ~CustomAuth() { data.clear(); }
+
+        void setTime(uint32_t ts)
+        {
+            data.ts = ts;
+            data.ms = millis();
+        }
 
         void setClaims(const String &claims) { data.cust.val[cust_ns::claims] = claims; }
 
@@ -88,6 +56,40 @@ namespace firebase_ns
 
     private:
         user_auth_data data;
+
+        void init(TimeStatusCallback timeCb, int ts, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        {
+            data.clear();
+            data.sa.val[sa_ns::cm] = clientEmail;
+            data.sa.val[sa_ns::pid] = projectId;
+            data.sa.val[sa_ns::pk] = privateKey;
+            data.sa.expire = expire;
+            data.cust.val[cust_ns::api_key] = apiKey;
+            data.cust.val[cust_ns::uid] = uid;
+            data.cust.val[cust_ns::claims] = claims;
+            data.initialized = isInitialized();
+            data.auth_type = auth_sa_custom_token;
+            data.auth_data_type = user_auth_data_custom_data;
+            data.timestatus_cb = timeCb;
+            setTime(ts);
+        }
+
+        void init(TimeStatusCallback timeCb, int ts, const file_config_data &safile, const String &apiKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
+        {
+#if defined(ENABLE_FS)
+            data.clear();
+            if (safile.initialized)
+            {
+                data.file_data.copy(safile);
+                data.sa.expire = expire;
+                data.cust.val[cust_ns::api_key] = apiKey;
+                data.cust.val[cust_ns::uid] = uid;
+                data.cust.val[cust_ns::claims] = claims;
+                data.timestatus_cb = timeCb;
+                setTime(ts);
+            }
+#endif
+        }
     };
 #endif
 }

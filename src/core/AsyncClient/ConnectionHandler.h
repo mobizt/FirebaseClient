@@ -5,7 +5,7 @@
 #include <Client.h>
 #include "./FirebaseConfig.h"
 #include "./core/Network/NetConfig.h"
-#include "./core/AsyncResult/AppDebug.h"
+#include "./core/AsyncResult/AppLog.h"
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 #include "./core/AsyncClient/AsyncTCPConfig.h"
 #endif
@@ -28,13 +28,13 @@ namespace firebase_ns
         tcpc_async
     };
 
-    class ConnBase
+    class ConnBase : public app_log_t
     {
     public:
         ConnBase() {}
 
     protected:
-        void setDebugBase(app_debug_t &app_debug, const String &msg) { app_debug.setDebug(msg); }
+        void debugPushBackBase(app_log_t &debug_log, const String &msg) { debug_log.push_back(-1, msg); }
     };
 }
 
@@ -47,7 +47,7 @@ private:
     tcp_client_type client_type;
     Client *client = nullptr;
     void *atcp_config = nullptr;
-    app_debug_t *app_debug = nullptr;
+    app_log_t *debug_log = nullptr;
     bool connected = false, client_changed = false, network_changed = false;
     int netErrState = 0;
 
@@ -56,12 +56,12 @@ public:
     String host;
     uint16_t port;
 
-    void newConn(tcp_client_type client_type, Client *client, void *atcp_config, app_debug_t *app_debug)
+    void newConn(tcp_client_type client_type, Client *client, void *atcp_config, app_log_t *debug_log)
     {
         this->client_type = client_type;
         this->client = client;
         this->atcp_config = atcp_config;
-        this->app_debug = app_debug;
+        this->debug_log = debug_log;
     }
     void setNetwork(network_config_data &net)
     {
@@ -161,8 +161,8 @@ public:
 
     void setDebug(const String &msg)
     {
-        if (app_debug)
-            setDebugBase(*app_debug, msg);
+        if (debug_log)
+            debugPushBackBase(*debug_log, msg);
     }
 
     /**
@@ -252,7 +252,7 @@ public:
 #if defined(FIREBASE_GSM_MODEM_IS_AVAILABLE)
         TinyGsm *gsmModem = (TinyGsm *)net.gsm.modem;
 
-        if (gsmModem)
+        if (gsmModem && net.gsm.allowed_initialize)
         {
             if (net.gsm.conn_status == network_config_data::gsm_conn_status_idle)
             {
@@ -266,7 +266,7 @@ public:
 
 #if defined(TINY_GSM_MODEM_XBEE)
                 // The XBee must run the gprsConnect function BEFORE waiting for network!
-                gsmModem->gprsConnect(_apn.c_str(), _user.c_str(), _password.c_str());
+                gsmModem->gprsConnect(net.gsm.apn.c_str(), net.gsm.user.c_str(), net.gsm.password.c_str());
 #endif
 
                 setDebug(FPSTR("Waiting for network..."));
@@ -345,6 +345,9 @@ public:
     {
 
 #if defined(FIREBASE_ETHERNET_MODULE_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
+
+        if (!net.ethernet.allowed_initialize)
+            return ethernetConnected() ? ret_complete : ret_failure;
 
         if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_idle && net.ethernet.ethernet_cs_pin > -1)
             FIREBASE_ETHERNET_MODULE_CLASS_IMPL.init(net.ethernet.ethernet_cs_pin);

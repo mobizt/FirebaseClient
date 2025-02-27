@@ -124,7 +124,27 @@ class GSMNetwork
 
 ## Constructors
 
-1. ### 🔹 GSMNetwork(TinyGsm *modem, const String &pin, const String &apn, const String &user, const String &password)
+1. ### 🔹 GSMNetwork(TinyGsm *modem)
+
+    The GSM network reconnection will be ignored.
+
+    This required two places of the GSM module macro definitions, one in your sketch and another in `/src/FirebaseConfig.h` or in your own defined config at `src/UserConfig.h` or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
+    
+    The TinyGsm modem should be defined at the same usage scope of `GSMNetwork` and `AsyncClientClass`.
+
+    See [GSMNetwork example](/examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/) for using TinyGSM with this library.
+
+    ```cpp
+    GSMNetwork(TinyGsm *modem, const String &pin, const String &apn, const String &user, const String &password)
+    ```
+
+    **Params:**
+
+    - `modem` - The pointer to TinyGsm modem object. Modem should be initialized and/or set the mode before transfering the data.
+
+2. ### 🔹 GSMNetwork(TinyGsm *modem, const String &pin, const String &apn, const String &user, const String &password)
+
+    This will handle the GSM network reconnection.
 
     This required two places of the GSM module macro definitions, one in your sketch and another in `/src/FirebaseConfig.h` or in your own defined config at `src/UserConfig.h` or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
     
@@ -184,7 +204,20 @@ class EthernetNetwork
 
 ## Constructors
 
-1. ### 🔹 EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin)
+1. ### 🔹 EthernetNetwork()
+
+    By default the external Ethernet module can be used with the library when the macro `ENABLE_ETHERNET_NETWORK` was defined and Ethernet library was included in the user sketch.
+    
+    The user defined Ethernet class and header other than `Ethernet.h` and `Ethernet` can be used, see [Library Build Options](https://github.com/mobizt/FirebaseClient?tab=readme-ov-file#library-build-options) for how to.
+
+    The Ethernet client initialization will be ignored.
+
+    ```cpp
+    EthernetNetwork()
+    ```
+
+
+2. ### 🔹 EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin)
 
     By default the external Ethernet module can be used with the library when the macro `ENABLE_ETHERNET_NETWORK` was defined and Ethernet library was included in the user sketch.
     
@@ -201,7 +234,7 @@ class EthernetNetwork
     - `resetPin` - The Ethernet module reset pin. Assign -1 if not used.
     - `staticIP` - (Optional) The pointer to Firebase_StaticIP object that holds the static ip configuration.
 
-2. ### 🔹 EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, const Firebase_StaticIP &staticIP)
+3. ### 🔹 EthernetNetwork(uint8_t macAddress[6], int csPin, int resetPin, const Firebase_StaticIP &staticIP)
 
     By default the external Ethernet module can be used with the library when the macro `ENABLE_ETHERNET_NETWORK` was defined and Ethernet library was included in the user sketch.
     

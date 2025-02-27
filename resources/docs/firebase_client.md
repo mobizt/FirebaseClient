@@ -24,12 +24,12 @@ static user_auth_data &getAuth(T &auth)
 - `user_auth_data` - The user authentication/authorization data.
 
 
-2. ## 🔹  static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+2. ## 🔹  static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, unsigned long timeoutMs = 0, AsyncResultCallback cb = NULL)
 
-Initialize the FirebaseApp.
+Initialize the FirebaseApp and wait.
 
 ```cpp
-static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, unsigned long timeoutMs = 0, AsyncResultCallback cb = NULL)
 ```
 
 **Params:**
@@ -37,25 +37,11 @@ static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth
 - `aClient` - The async client to work for authentication/authorization task.
 - `app` - The FirebaseApp class object to handle authentication/authorization task.
 - `auth` - The user auth data (`user_auth_data`) which is the struct that holds the user sign-in credentials and tokens that obtained from the authentication/authorization classes via getAuth function.
+- `timeoutMs` - Optional. The await timeout in milliseconds.
+- `cb` - Optional. The async result callback (AsyncResultCallback).
 
 
-3. ## 🔹  static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
-
-Initialize the FirebaseApp without callback.
-
-```cpp
-static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
-```
-
-**Params:**
-
-- `aClient` - The async client to work for authentication/authorization task.
-- `app` - The FirebaseApp class object to handle authentication/authorization task.
-- `auth` - The user auth data (`user_auth_data`) which is the struct that holds the user sign-in credentials and tokens that obtained from the authentication/authorization classes via getAuth function.
-- `aResult` - The async result (AsyncResult).
-
-
-4. ## 🔹  static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
+3. ## 🔹  static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
 
 Initialize the FirebaseApp with callback.
 
@@ -70,6 +56,22 @@ static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth
 - `auth` - The user auth data (`user_auth_data`) which is the struct that holds the user sign-in credentials and tokens that obtained from the authentication/authorization classes via getAuth function.
 - `cb` - The async result callback (AsyncResultCallback).
 - `uid` - The user specified UID of async result (optional).
+
+
+4. ## 🔹  static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+
+Initialize the FirebaseApp without callback.
+
+```cpp
+static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+```
+
+**Params:**
+
+- `aClient` - The async client to work for authentication/authorization task.
+- `app` - The FirebaseApp class object to handle authentication/authorization task.
+- `auth` - The user auth data (`user_auth_data`) which is the struct that holds the user sign-in credentials and tokens that obtained from the authentication/authorization classes via getAuth function.
+- `aResult` - The async result (AsyncResult).
 
 
 5. ## 🔹  static void dnitializeApp(FirebaseApp &app)

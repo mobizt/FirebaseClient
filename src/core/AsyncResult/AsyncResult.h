@@ -7,10 +7,8 @@
 #include "./core/Utils/List.h"
 #include "./core/Utils/Timer.h"
 #include "./core/Utils/StringUtil.h"
-#include "./core/AsyncResult/AppEvent.h"
-#include "./core/AsyncResult/AppDebug.h"
-#include "./core/AsyncResult/ResultBase.h"
-#include "./core/AsyncResult/AppData.h"
+#include "./core/AsyncResult/AppLog.h"
+#include "./core/AsyncResult/RTDBResult.h"
 #include "./core/AsyncResult/AppProgress.h"
 
 using namespace firebase_ns;
@@ -27,7 +25,7 @@ namespace ares_ns
     };
 }
 
-class AsyncResult : public ResultBase, RealtimeDatabaseResult
+class AsyncResult : public RealtimeDatabaseResult
 {
     friend class AsyncClientClass;
     friend class AppBase;
@@ -40,6 +38,7 @@ class AsyncResult : public ResultBase, RealtimeDatabaseResult
     friend class FirestoreDocuments;
     friend class async_data;
     friend class SlotManager;
+    friend class FirebaseApp;
 
     struct download_data_t
     {
@@ -92,17 +91,12 @@ private:
     {
         if (data.length())
         {
-            app_data.setData();
+            data_log.push_back(-2, "");
             val[ares_ns::data_payload] = data;
         }
 #if defined(ENABLE_DATABASE)
         setRefPayload(&rtdbResult, &val[ares_ns::data_payload]);
 #endif
-    }
-
-    void updateData()
-    {
-        app_data.update();
     }
 
     void setETag(const String &etag) { val[ares_ns::res_etag] = etag; }
@@ -137,8 +131,8 @@ private:
     }
     void setDebug(const String &msg)
     {
-        if (app_debug)
-            setDebugBase(*app_debug, msg);
+        if (debug_log)
+            debug_log->push_back(-1, msg);
     }
     void setUID(const String &uid = "")
     {
@@ -155,13 +149,18 @@ private:
         }
     }
 
-    app_debug_t *app_debug = nullptr;
-    app_event_t *app_event = nullptr;
-    // This required by appEvent() that returns the reference to the app_event object which is not yet initialized.
-    app_event_t ev;
+    app_log_t *debug_log = nullptr;
+    app_log_t *event_log = nullptr;
+    // This required by appEvent() that returns the reference to the event_log object which is not yet initialized.
+    app_log_t evt;
+    app_log_t dbg;
     FirebaseError lastError;
-    app_data_t app_data;
+    app_log_t data_log;
     uint32_t conn_ms = 0;
+
+    bool _downloadProgress() { return download_data.download_progress.isProgress(false); }
+    bool _uploadProgress() { return upload_data.upload_progress.isProgress(false); }
+    void errorPopFront() { lastError.err.pop_front(); }
 
 public:
     AsyncResult()
@@ -189,14 +188,22 @@ public:
      *
      * @return const char * The pointer to internal response payload string.
      */
-    const char *c_str() { return val[ares_ns::data_payload].c_str(); }
+    const char *c_str()
+    {
+        data_log.read();
+        return val[ares_ns::data_payload].c_str();
+    }
 
     /**
-     * Get the copy of server response payload string.
+     * Get the server response payload string.
      *
-     * @return String The copy of payload string.
+     * @return const String The payload string.
      */
-    String payload() const { return val[ares_ns::data_payload].c_str(); }
+    const String &payload()
+    {
+        data_log.read();
+        return val[ares_ns::data_payload];
+    }
 
     /**
      * Get the length of response payload string.
@@ -213,7 +220,7 @@ public:
     String path() const { return val[ares_ns::data_path].c_str(); }
 
     /**
-     * Get the Etag of the server response headers.
+     * Get the etag of the server response headers.
      *
      * @return String The ETag of response header.
      */
@@ -233,8 +240,9 @@ public:
      */
     String debug()
     {
-        if (app_debug)
-            return app_debug->message();
+        static String buf;
+        if (debug_log)
+            return debug_log->message();
         return String();
     }
 
@@ -248,13 +256,13 @@ public:
 
         lastError.reset();
 
-        if (app_debug)
-            resetDebug(*app_debug);
+        if (debug_log)
+            debug_log->reset();
 
-        if (app_event)
-            resetEvent(*app_event);
+        if (event_log)
+            event_log->reset();
 
-        app_data.reset();
+        data_log.reset();
         download_data.reset();
         upload_data.reset();
 #if defined(ENABLE_DATABASE)
@@ -270,6 +278,7 @@ public:
     template <typename T>
     T &to()
     {
+        data_log.read();
         static T o;
         if (std::is_same<T, RealtimeDatabaseResult>::value)
             return rtdbResult;
@@ -282,21 +291,51 @@ public:
      */
     int available()
     {
-        if (app_data.isData())
+        if (data_log.isAvailable())
             return val[ares_ns::data_payload].length();
         return 0;
     }
 
     /**
+     * Check if the AsyncResult data/information is available.
+     *
+     * @return bool Returns true if data/information is available.
+     */
+    bool isResult() { return data_log.isAvailable() || lastError.isError() || (debug_log && debug_log->isAvailable()) || (event_log && event_log->isAvailable()) || _downloadProgress() || _uploadProgress(); }
+
+    /**
      * Get the reference of internal app event information.
      *
-     * @return app_event_t The reference of internal app event.
+     * @return app_log_t The reference of internal app event.
      */
-    app_event_t &appEvent()
+    app_log_t &eventLog()
     {
-        if (app_event)
-            return *app_event;
-        return ev;
+        if (event_log)
+            return *event_log;
+        return evt;
+    }
+    app_log_t &appEvent() { return eventLog(); }
+
+    /**
+     * Get the reference of internal app debug information.
+     *
+     * @return app_log_t The reference of internal app debug.
+     */
+    app_log_t &debugLog()
+    {
+        if (debug_log)
+            return *debug_log;
+        return dbg;
+    }
+
+    /**
+     * Get the reference of internal app data log information.
+     *
+     * @return app_log_t The reference of internal app data log.
+     */
+    app_log_t &dataLog()
+    {
+        return data_log;
     }
 
     /**
@@ -304,7 +343,7 @@ public:
      *
      * @return bool Returns true if upload information is available.
      */
-    bool uploadProgress() { return upload_data.upload_progress.isProgress(); }
+    bool uploadProgress() { return upload_data.upload_progress.isProgress(true); }
 
     /**
      * Get the file/BLOB upload information.
@@ -318,7 +357,7 @@ public:
      *
      * @return bool The file/BLOB download status.
      */
-    bool downloadProgress() { return download_data.download_progress.isProgress(); }
+    bool downloadProgress() { return download_data.download_progress.isProgress(true); }
 
     /**
      * Get the file/BLOB download information.
@@ -346,24 +385,14 @@ public:
      *
      * @return bool Returns true if debug information in available.
      */
-    bool isDebug()
-    {
-        if (app_debug)
-            return isDebugBase(*app_debug);
-        return false;
-    }
+    bool isDebug() { return debug_log && debug_log->isAvailable(); }
 
     /**
-     * Check if the app event information in available.
+     * Check if the app event information is available.
      *
-     * @return bool Returns true if app event information in available.
+     * @return bool Returns true if app event information is available.
      */
-    bool isEvent()
-    {
-        if (app_event)
-            return isEventBase(*app_event);
-        return false;
-    }
+    bool isEvent() { return event_log && event_log->isAvailable(); }
 
     /**
      * Get the reference of internal FirebaseError object.

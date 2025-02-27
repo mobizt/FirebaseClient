@@ -12,6 +12,17 @@ public:
     /**
      * The Ethernet network class for generic Ethernet modules.
      *
+     */
+    EthernetNetwork()
+    {
+        init();
+        network_data.network_type = firebase_network_ethernet;
+        network_data.ethernet.allowed_initialize = false;
+    }
+
+    /**
+     * The Ethernet network class for generic Ethernet modules.
+     *
      * @param macAddress The mac address.
      * @param csPin The Ethernet module chip select/enable pin.
      * @param resetPin The Ethernet module reset pin. Assign -1 if not used.
@@ -23,6 +34,7 @@ public:
         network_data.ethernet.setCs(csPin);
         network_data.ethernet.setReset(resetPin);
         network_data.network_type = firebase_network_ethernet;
+        network_data.ethernet.allowed_initialize = true;
     }
 
     /**
@@ -51,6 +63,7 @@ public:
         network_data.ethernet.setReset(resetPin);
         network_data.ethernet.setStaticIP(staticIP);
         network_data.network_type = firebase_network_ethernet;
+        network_data.ethernet.allowed_initialize = true;
     }
     ~EthernetNetwork() { clear(); }
 };

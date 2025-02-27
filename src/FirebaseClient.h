@@ -80,6 +80,18 @@
 #endif
 #endif
 
+#if defined(ENABLE_RULESETS)
+#if __has_include("rules/RuleSets.h")
+#include "rules/RuleSets.h"
+#endif
+#if __has_include("rules/Releases.h")
+#include "rules/Releases.h"
+#endif
+#if __has_include("rules/DataOptions.h")
+#include "rules/DataOptions.h"
+#endif
+#endif
+
 using namespace firebase_ns;
 
 namespace firebase_ns
@@ -128,7 +140,7 @@ namespace firebase_ns
         FirebaseClient() {}
         ~FirebaseClient() {}
 
-        void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+        void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, uint32_t awaitMs = 0)
         {
             configApp(aClient, app, auth);
 
@@ -220,32 +232,38 @@ namespace firebase_ns
             {
                 app.setEventResult(nullptr, FPSTR("initialization failed"), auth_event_error);
             }
+
+            app.await(awaitMs);
         }
 
         void deinitializeApp(FirebaseApp &app) { app.deinit = true; }
 
-        void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+        void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, uint32_t awaitMs = 0)
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_signup);
             resetTimer(app, true, 0);
+            app.await(awaitMs);
         }
 
-        void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+        void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, uint32_t awaitMs = 0)
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_reset_password);
             resetTimer(app, true, 0);
+            app.await(awaitMs);
         }
 
-        void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+        void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, uint32_t awaitMs = 0)
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_send_verify_email);
             resetTimer(app, true, 0);
+            app.await(awaitMs);
         }
 
-        void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth)
+        void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, uint32_t awaitMs = 0)
         {
             configApp(aClient, app, auth, firebase_core_auth_task_type_delete_user);
             resetTimer(app, true, 0);
+            app.await(awaitMs);
         }
 
         void printf(const char *format, ...)
@@ -288,14 +306,34 @@ template <typename T>
 static user_auth_data &getAuth(T &auth) { return auth.get(); }
 
 /**
- * Initialize the FirebaseApp.
+ * Initialize the FirebaseApp and wait.
  *
  * @param aClient  The async client to work for authentication/authorization task.
  * @param app The FirebaseApp class object to handle authentication/authorization task.
  * @param auth The user auth data (user_auth_data) which is the struct that holds the user sign-in credentials and tokens that obtained from the authentication/authorization classes via getAuth function.
- *
+ * @param timeoutMs Optional. The await timeout in milliseconds.
+ * @param cb  Optional. The async result callback (AsyncResultCallback).
  */
-static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.initializeApp(aClient, app, auth); }
+static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, unsigned long timeoutMs = 0, AsyncResultCallback cb = NULL)
+{
+    app.setCallback(cb);
+    Firebase.initializeApp(aClient, app, auth, timeoutMs);
+}
+
+/**
+ * Initialize the FirebaseApp with callback.
+ *
+ * @param aClient  The async client to work for authentication/authorization task.
+ * @param app The FirebaseApp class object to handle authentication/authorization task.
+ * @param auth The user auth data (user_auth_data) which is the struct that holds the user sign-in credentials and tokens that obtained from the authentication/authorization classes via getAuth function.
+ * @param cb The async result callback (AsyncResultCallback).
+ * @param uid The user specified UID of async result (optional).
+ */
+static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
+{
+    app.setUID(uid);
+    initializeApp(aClient, app, auth, 0, cb);
+}
 
 /**
  * Initialize the FirebaseApp without callback.
@@ -312,22 +350,6 @@ static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth
 }
 
 /**
- * Initialize the FirebaseApp with callback.
- *
- * @param aClient  The async client to work for authentication/authorization task.
- * @param app The FirebaseApp class object to handle authentication/authorization task.
- * @param auth The user auth data (user_auth_data) which is the struct that holds the user sign-in credentials and tokens that obtained from the authentication/authorization classes via getAuth function.
- * @param cb The async result callback (AsyncResultCallback).
- * @param uid The user specified UID of async result (optional).
- */
-static void initializeApp(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResultCallback cb, const String &uid = "")
-{
-    app.setUID(uid);
-    app.setCallback(cb);
-    Firebase.initializeApp(aClient, app, auth);
-}
-
-/**
  * Deinitialize the FirebaseApp.
  *
  * @param app The FirebaseApp class object to handle authentication/authorization task.
@@ -340,21 +362,13 @@ static void deinitializeApp(FirebaseApp &app) { Firebase.deinitializeApp(app); }
  * @param aClient  The async client to work for authentication/authorization task.
  * @param app The FirebaseApp class object to handle authentication/authorization task.
  * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
+ * @param timeoutMs Optional. The await timeout in milliseconds.
+ * @param cb  Optional. The async result callback (AsyncResultCallback).
  */
-static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.signup(aClient, app, auth); }
-
-/**
- * Signup a new user without callback.
- *
- * @param aClient  The async client to work for authentication/authorization task.
- * @param app The FirebaseApp class object to handle authentication/authorization task.
- * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
- * @param aResult The async result (AsyncResult).
- */
-static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, unsigned long timeoutMs = 0, AsyncResultCallback cb = NULL)
 {
-    app.setAsyncResult(aResult);
-    Firebase.signup(aClient, app, auth);
+    app.setCallback(cb);
+    Firebase.signup(aClient, app, auth, timeoutMs);
 }
 
 /**
@@ -374,26 +388,33 @@ static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &
 }
 
 /**
- * Reset the user password.
- *
- * @param aClient  The async client to work for authentication/authorization task.
- * @param app The FirebaseApp class object to handle authentication/authorization task.
- * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
- */
-static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.resetPassword(aClient, app, auth); }
-
-/**
- * Reset the user password without callback.
+ * Signup a new user without callback (obsoleted).
  *
  * @param aClient  The async client to work for authentication/authorization task.
  * @param app The FirebaseApp class object to handle authentication/authorization task.
  * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
  * @param aResult The async result (AsyncResult).
  */
-static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+static void signup(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
 {
+    Serial.println("Warning. The AsyncResult is not needed any more when calling the signup.");
     app.setAsyncResult(aResult);
-    Firebase.resetPassword(aClient, app, auth);
+    Firebase.signup(aClient, app, auth);
+}
+
+/**
+ * Reset the user password.
+ *
+ * @param aClient  The async client to work for authentication/authorization task.
+ * @param app The FirebaseApp class object to handle authentication/authorization task.
+ * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
+ * @param timeoutMs Optional. The await timeout in milliseconds.
+ * @param cb  Optional. The async result callback (AsyncResultCallback).
+ */
+static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, unsigned long timeoutMs = 0, AsyncResultCallback cb = NULL)
+{
+    app.setCallback(cb);
+    Firebase.resetPassword(aClient, app, auth, timeoutMs);
 }
 
 /**
@@ -413,26 +434,32 @@ static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth
 }
 
 /**
- * Send the user verification link to email.
- *
- * @param aClient  The async client to work for authentication/authorization task.
- * @param app The FirebaseApp class object to handle authentication/authorization task.
- * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
- */
-static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.verify(aClient, app, auth); }
-
-/**
- * Send the user verification link to email without callback.
+ * Reset the user password without callback (obsoleted).
  *
  * @param aClient  The async client to work for authentication/authorization task.
  * @param app The FirebaseApp class object to handle authentication/authorization task.
  * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
  * @param aResult The async result (AsyncResult).
  */
-static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+static void resetPassword(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
 {
     app.setAsyncResult(aResult);
-    Firebase.verify(aClient, app, auth);
+    Firebase.resetPassword(aClient, app, auth);
+}
+
+/**
+ * Send the user verification link to email.
+ *
+ * @param aClient  The async client to work for authentication/authorization task.
+ * @param app The FirebaseApp class object to handle authentication/authorization task.
+ * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
+ * @param timeoutMs Optional. The await timeout in milliseconds.
+ * @param cb  Optional. The async result callback (AsyncResultCallback).
+ */
+static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, unsigned long timeoutMs = 0, AsyncResultCallback cb = NULL)
+{
+    app.setCallback(cb);
+    Firebase.verify(aClient, app, auth, timeoutMs);
 }
 
 /**
@@ -452,26 +479,32 @@ static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &
 }
 
 /**
- * Delete a user.
- *
- * @param aClient  The async client to work for authentication/authorization task.
- * @param app The FirebaseApp class object to handle authentication/authorization task.
- * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
- */
-static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth) { Firebase.deleteUser(aClient, app, auth); }
-
-/**
- * Delete a user without callback.
+ * Send the user verification link to email without callback (obsoleted).
  *
  * @param aClient  The async client to work for authentication/authorization task.
  * @param app The FirebaseApp class object to handle authentication/authorization task.
  * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
  * @param aResult The async result (AsyncResult).
  */
-static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+static void verify(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
 {
     app.setAsyncResult(aResult);
-    Firebase.deleteUser(aClient, app, auth);
+    Firebase.verify(aClient, app, auth);
+}
+
+/**
+ * Delete a user.
+ *
+ * @param aClient  The async client to work for authentication/authorization task.
+ * @param app The FirebaseApp class object to handle authentication/authorization task.
+ * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
+ * @param timeoutMs Optional. The await timeout in milliseconds.
+ * @param cb  Optional. The async result callback (AsyncResultCallback).
+ */
+static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, unsigned long timeoutMs = 0, AsyncResultCallback cb = NULL)
+{
+    app.setCallback(cb);
+    Firebase.deleteUser(aClient, app, auth, timeoutMs);
 }
 
 /**
@@ -487,6 +520,20 @@ static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_da
 {
     app.setUID(uid);
     app.setCallback(cb);
+    Firebase.deleteUser(aClient, app, auth);
+}
+
+/**
+ * Delete a user without callback (obsoleted).
+ *
+ * @param aClient  The async client to work for authentication/authorization task.
+ * @param app The FirebaseApp class object to handle authentication/authorization task.
+ * @param auth The user auth data (user_auth_data) which holds the user credentials from USerAccount class.
+ * @param aResult The async result (AsyncResult).
+ */
+static void deleteUser(AsyncClientClass &aClient, FirebaseApp &app, user_auth_data &auth, AsyncResult &aResult)
+{
+    app.setAsyncResult(aResult);
     Firebase.deleteUser(aClient, app, auth);
 }
 

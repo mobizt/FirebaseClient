@@ -82,7 +82,10 @@ namespace firebase_ns
             this->anonymous = rhs.anonymous;
             this->initialized = rhs.initialized;
             this->timestatus_cb = rhs.timestatus_cb;
-            this->ts = rhs.ts;
+            if (rhs.ts > this->ts)
+                this->ts = rhs.ts;
+            if (rhs.ms > this->ms)
+                this->ms = rhs.ms;
         }
 
         void clear()
@@ -139,7 +142,7 @@ namespace firebase_ns
         firebase_core_auth_task_type task_type = firebase_core_auth_task_type_undefined;
         auth_status status;
         TimeStatusCallback timestatus_cb = NULL;
-        uint32_t ts = 0;
+        uint32_t ts = 0, ms = 0;
         file_config_data file_data;
     };
 }

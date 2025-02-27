@@ -82,7 +82,41 @@ class RealtimeDatabase
     void resetApp()
     ```
 
-4. ### 🔹 T get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options)
+4. ## 🔹  void loop()
+
+    Perform the async task repeatedly (DEPRECATED).
+
+    ```cpp
+    void loop()
+    ```
+
+5. ## 🔹  void url(const String &url)
+
+    Set the Firebase database URL
+
+    ```cpp
+    void url(const String &url) { this->service_url = uut.getHost(url, nullptr); }
+    ```
+
+    **Params:**
+    - `url` - The Firebase database URL.
+
+6. ### 🔹 T get(AsyncClientClass &aClient, const String &path)
+
+    Get value at the node path.
+
+    ```cpp
+    T get(AsyncClientClass &aClient, const String &path)
+    ```
+    **Params:**
+    - `aClient` - The async client.
+    - `path` - The node path to get value.
+
+    **Returns:**
+
+    - `T` - The value of type T that casts from response payload.
+
+7. ### 🔹 T get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options)
 
     Get value at the node path.
 
@@ -97,10 +131,6 @@ class RealtimeDatabase
 
     `shallow`, the option (boolean) for shallowing (truncating) the JSON object data into true while JSON primitive values (string, number and boolean) will not shallow.
 
-    This option cannot be mixed with any other options.
-
-    `silent`, the option (boolean) to mute the return reponse payload.
-    `classicRequest`, the option (boolean) to use HTTP POST for PUT (set) and DELETE (remove).
     `Filter`, the options for complex data filtering which included the properties i.e., orderBy, startAt, endAt,`limitToFirst`, limitToLast, and equalTo.
 
     ### Example
@@ -125,7 +155,7 @@ class RealtimeDatabase
     - `T` - The value of type T that casts from response payload.
     
     
-5. ### 🔹 void get(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, bool sse = false)
+8. ### 🔹 void get(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, bool sse = false)
 
     Get value at the node path.
 
@@ -136,7 +166,7 @@ class RealtimeDatabase
     // Non-Stream
     Database.get(aClient, "/path/to/data", aResult);
 
-    // Since v1.2.1, in SSE mode (HTTP Streaming) task, you can filter the Stream events by using RealtimeDatabase::setSSEFilters(<keywords>), 
+    // In SSE Streaming task, you can filter the Stream events by using RealtimeDatabase::setSSEFilters(<keywords>), 
     // which the <keywords> is the comma separated events.
     // The event keywords supported are: 
     // get - To allow the http get response (first put event since stream connected).
@@ -162,7 +192,7 @@ class RealtimeDatabase
     - `sse` - The Server-sent events (Stream) mode
 
 
-6. ### 🔹 void get(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "")
+9. ### 🔹 void get(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, bool sse = false, const String &uid = "")
 
     Get value at the node path.
 
@@ -201,7 +231,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-7. ### 🔹 void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult)
+10. ### 🔹 void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResult &aResult)
 
     Get value at the node path.
 
@@ -229,7 +259,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
 
 
-8. ### 🔹 void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "")
+11. ### 🔹 void get(AsyncClientClass &aClient, const String &path, DatabaseOptions &options, AsyncResultCallback cb, const String &uid = "")
 
     Get value at the node path.
 
@@ -257,8 +287,65 @@ class RealtimeDatabase
     - `cb` - The async result callback (AsyncResultCallback).
     - `uid` - The user specified UID of async result (optional).
 
+12. ### 🔹 bool get(AsyncClientClass &aClient, const String &path, file_config_data &file)
 
-9. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
+    Get value at the node path.
+    The FileConfig object constructor should be included filename and FileConfigCallback.
+
+    The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+
+    ### Example
+    ```cpp
+    #include <FS.h>
+    File myFile; // Define the File object globally.
+
+    #defined FILESYSTEMS SPIFFS
+
+    void fileCallback(File &file, const char *filename, file_operating_mode mode)
+    {
+      switch (mode)
+      {
+        case file_mode_open_read:
+        myFile = FILESYSTEMS.open(filename, "r");
+        break;
+
+        case file_mode_open_write:
+        myFile = FILESYSTEMS.open(filename, "w");
+        break;
+        
+        case file_mode_open_append:
+        myFile = FILESYSTEMS.open(filename, "a");
+        break;
+        
+        case file_mode_remove:
+        FILESYSTEMS.remove(filename);
+        break;
+        
+        default:
+        break;
+      }
+
+      // Set the internal FS object with global File object.
+      file = myFile;
+    }
+
+    FileConfig fileConfig("/example.txt", fileCallback);
+    bool status = Database.get(aClient, "/path/to/data", getFile(fileConfig));
+    ```
+    
+    ```cpp
+    bool get(AsyncClientClass &aClient, const String &path, file_config_data &file)
+    ```
+    
+    **Params:**
+    - `aClient` - The async client.
+    - `path` - The node path to get value.
+    - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
+
+    **Returns:**
+    - boolean value indicates the operating status.
+
+13. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
 
     Get value at the node path.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -314,7 +401,7 @@ class RealtimeDatabase
     - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
     - `aResult` - The async result (AsyncResult)
 
-10. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
+14. ### 🔹 void get(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 
     Get value at the node path.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -371,7 +458,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-11. ### 🔹 bool existed(AsyncClientClass &aClient, const String &path)
+15. ### 🔹 bool exists(AsyncClientClass &aClient, const String &path)
 
     Check if data exists in database.
 
@@ -380,7 +467,7 @@ class RealtimeDatabase
     ### Example
     ```cpp
     // Check if the data exists in database.
-    bool status = Database.existed(aClient, "/path/to/data");
+    bool status = Database.exists(aClient, "/path/to/data");
 
     // The status will be true if data exists or returns false if data does not exist or error.
 
@@ -392,7 +479,7 @@ class RealtimeDatabase
     ```
     
     ```cpp
-    bool existed(AsyncClientClass &aClient, const String &path)
+    bool exists(AsyncClientClass &aClient, const String &path)
     ```
     
     **Params:**
@@ -402,7 +489,30 @@ class RealtimeDatabase
     **Returns:**
     - boolean value indicates the operating status.
 
-12. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
+
+16. ### 🔹 bool ota(AsyncClientClass &aClient, const String &path)
+
+    Perform OTA update using a firmware file from the database.
+    
+    The data of node to download should be base64 encoded string of the firmware file.
+
+    ### Example
+    ```cpp
+    bool status = Database.ota(aClient, "/path/to/data");
+    ```
+    
+    ```cpp
+    bool ota(AsyncClientClass &aClient, const String &path)
+    ```
+    
+    **Params:**
+    - `aClient` - The async client.
+    - `path` - The node path to download.
+
+     **Returns:**
+    - boolean value indicates the operating status.
+
+17. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
 
     Perform OTA update using a firmware file from the database.
     
@@ -423,7 +533,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
 
 
-13. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
+18. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
 
     Perform OTA update using a firmware file from the database.
 
@@ -444,7 +554,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-14. ### 🔹 bool set(AsyncClientClass &aClient, const String &path, T value)
+19. ### 🔹 bool set(AsyncClientClass &aClient, const String &path, T value, const String &matchingEtag = "")
 
     Set value to database.
 
@@ -468,19 +578,22 @@ class RealtimeDatabase
     ```
     
     ```cpp
-    bool set(AsyncClientClass &aClient, const String &path, T value)
+    bool set(AsyncClientClass &aClient, const String &path, T value, const String &matchingEtag = "")
     ```
     
     **Params:**
     - `aClient` - The async client.
     - `path` - The node path to set the value.
     - `value` - The value to set.
+    - `matchingEtag` - Optional. The Etag value for comparison with the existing server's Ethag value.
+    
+    The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
 
     **Returns:**
     - boolean value indicates the operating status.
 
 
-15. ### 🔹 void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
+20. ### 🔹 void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult, const String &matchingEtag = "")
 
     Set value to database.
 
@@ -498,7 +611,7 @@ class RealtimeDatabase
     ```
 
     ```cpp
-    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
+    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult, const String &matchingEtag = "")
     ```
     
     **Params:**
@@ -506,9 +619,11 @@ class RealtimeDatabase
     - `path` - The node path to set the value.
     - `value` - The value to set.
     - `aResult` - The async result (AsyncResult)
-   
+    - `matchingEtag` - Optional. The Etag value for comparison with the existing server's Ethag value.
+    
+    The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
 
-16. ### 🔹 void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
+21. ### 🔹 void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "", const String &matchingEtag = "")
 
     Set value to database.
 
@@ -526,7 +641,7 @@ class RealtimeDatabase
     ```
 
     ```cpp
-    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "")
+    void set(AsyncClientClass &aClient, const String &path, T value, AsyncResultCallback cb, const String &uid = "", const String &matchingEtag = "")
     ```
     
     **Params:**
@@ -535,9 +650,13 @@ class RealtimeDatabase
     - `value` - The value to set.
     - `cb` - The async result callback (AsyncResultCallback).
     - `uid` - The user specified UID of async result (optional).
+    - `matchingEtag` - Optional. The Etag value for comparison with the existing server's Ethag value.
+    
+    The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
 
 
-17. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
+
+22. ### 🔹 bool set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult, const String &matchingEtag = "")
 
     Set content from file to database.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -584,7 +703,7 @@ class RealtimeDatabase
     ```
 
     ```cpp
-    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
+    bool set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult, const String &matchingEtag = "")
     ```
     
     **Params:**
@@ -592,9 +711,74 @@ class RealtimeDatabase
     - `path` - The node path to set value.
     - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
     - `aResult` - The async result (AsyncResult)
+    - `matchingEtag` - Optional. The Etag value for comparison with the existing server's Ethag value.
+    
+    The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
+
+    **Returns:**
+    - boolean value indicates the operating status.
 
 
-18. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
+23. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult, const String &matchingEtag = "")
+
+    Set content from file to database.
+    The FileConfig object constructor should be included filename and FileConfigCallback.
+
+    The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+
+    ### Example
+    ```cpp
+    #include <FS.h>
+    File myFile; // Define the File object globally.
+
+    #defined FILESYSTEMS SPIFFS
+
+    void fileCallback(File &file, const char *filename, file_operating_mode mode)
+    {
+      switch (mode)
+      {
+        case file_mode_open_read:
+        myFile = FILESYSTEMS.open(filename, "r");
+        break;
+
+        case file_mode_open_write:
+        myFile = FILESYSTEMS.open(filename, "w");
+        break;
+        
+        case file_mode_open_append:
+        myFile = FILESYSTEMS.open(filename, "a");
+        break;
+        
+        case file_mode_remove:
+        FILESYSTEMS.remove(filename);
+        break;
+        
+        default:
+        break;
+      }
+
+      // Set the internal FS object with global File object.
+      file = myFile;
+    }
+
+    FileConfig fileConfig("/example.txt", fileCallback);
+    Database.set(aClient, "/path/to/data", getFile(fileConfig), aResult);
+    ```
+
+    ```cpp
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult, const String &matchingEtag = "")
+    ```
+    
+    **Params:**
+    - `aClient` - The async client.
+    - `path` - The node path to set value.
+    - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
+    - `aResult` - The async result (AsyncResult)
+    - `matchingEtag` - Optional. The Etag value for comparison with the existing server's Ethag value.
+    
+    The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
+
+24. ### 🔹 void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "", const String &matchingEtag = "")
 
     Set content from file to database.
     The FileConfig object constructor should be included filename and FileConfigCallback.
@@ -641,7 +825,7 @@ class RealtimeDatabase
     ```
     
     ```cpp
-    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
+    void set(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "", const String &matchingEtag = "")
     ```
     
     **Params:**
@@ -650,9 +834,12 @@ class RealtimeDatabase
     - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
     - `cb` - The async result callback (AsyncResultCallback).
     - `uid` - The user specified UID of async result (optional).
+    - `matchingEtag` - Optional. The Etag value for comparison with the existing server's Ethag value.
+    
+    The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
 
 
-19. ### 🔹 String push(AsyncClientClass &aClient, const String &path, T value)
+25. ### 🔹 String push(AsyncClientClass &aClient, const String &path, T value)
 
     Push value to database.
     
@@ -687,7 +874,7 @@ class RealtimeDatabase
     **Returns:**
     - String random uuid string of a new node that created.
 
-20. ### 🔹 void push(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
+26. ### 🔹 void push(AsyncClientClass &aClient, const String &path, T value, AsyncResult &aResult)
 
     Push value to database.
     
@@ -720,7 +907,7 @@ class RealtimeDatabase
     - `value` - The value to push.
     - `aResult` - The async result (AsyncResult).
 
-21. ### 🔹 void push(AsyncClientClass &aClient, const String &path, T value,  AsyncResultCallback cb, const String &uid = "")
+27. ### 🔹 void push(AsyncClientClass &aClient, const String &path, T value,  AsyncResultCallback cb, const String &uid = "")
 
     Push value to database.
     
@@ -748,8 +935,67 @@ class RealtimeDatabase
     - `cb` - The async result callback (AsyncResultCallback).
     - `uid` - The user specified UID of async result (optional).
 
+28. ### 🔹 String push(AsyncClientClass &aClient, const String &path, file_config_data &file)
 
-22. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
+    Push content from file to database.
+    
+    The FileConfig object constructor should be included filename and FileConfigCallback.
+
+    The FileConfigCallback function contains the parameters i.e., File reference returned from file operation, filename for file operation and file_operating_mode.
+    
+    ### Example
+    ```cpp
+    #include <FS.h>
+    File myFile; // Define the File object globally.
+
+    #defined FILESYSTEMS SPIFFS
+
+    void fileCallback(File &file, const char *filename, file_operating_mode mode)
+    {
+      switch (mode)
+      {
+        case file_mode_open_read:
+        myFile = FILESYSTEMS.open(filename, "r");
+        break;
+
+        case file_mode_open_write:
+        myFile = FILESYSTEMS.open(filename, "w");
+        break;
+        
+        case file_mode_open_append:
+        myFile = FILESYSTEMS.open(filename, "a");
+        break;
+        
+        case file_mode_remove:
+        FILESYSTEMS.remove(filename);
+        break;
+        
+        default:
+        break;
+      }
+
+      // Set the internal FS object with global File object.
+      file = myFile;
+    }
+
+    FileConfig fileConfig("/example.txt", fileCallback);
+    bool status = Database.set(aClient, "/path/to/data", getFile(fileConfig), aResult);
+    ```
+    
+    ```cpp
+    String push(AsyncClientClass &aClient, const String &path, file_config_data &file)
+    ```
+    
+    **Params:**
+    - `aClient` - The async client.
+    - `path` - The node path to get value.
+    - `file` - The filesystem data (file_config_data) obtained from FileConfig class object.
+
+    **Returns:**
+    - String random uuid string of a new node that created.
+
+
+29. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResult &aResult)
 
     Push content from file to database.
     
@@ -807,7 +1053,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult)
 
 
-23. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
+30. ### 🔹 void push(AsyncClientClass &aClient, const String &path, file_config_data &file, AsyncResultCallback cb, const String &uid = "")
 
     Push content from file to database.
 
@@ -866,7 +1112,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-24. ### 🔹 bool update(AsyncClientClass &aClient, const String &path, const T &value)
+31. ### 🔹 bool update(AsyncClientClass &aClient, const String &path, const T &value)
 
     Update (patch) JSON object to database.
     
@@ -892,7 +1138,7 @@ class RealtimeDatabase
     **Returns:**
     - boolean value indicates the operating status.
 
-25. ### 🔹 void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult)
+32. ### 🔹 void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResult &aResult)
 
     Update (patch) JSON object to database.
     
@@ -910,7 +1156,7 @@ class RealtimeDatabase
     - `value` - The JSON object (object_t) to update.
     - `aResult` - The async result (AsyncResult).
 
-26. ### 🔹 void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "")
+33. ### 🔹 void update(AsyncClientClass &aClient, const String &path, const T &value, AsyncResultCallback cb, const String &uid = "")
 
     Update (patch) JSON object to database.
     
@@ -930,7 +1176,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-27. ### 🔹 bool remove(AsyncClientClass &aClient, const String &path)
+34. ### 🔹 bool remove(AsyncClientClass &aClient, const String &path)
 
     Remove node from database
 
@@ -956,7 +1202,7 @@ class RealtimeDatabase
     **Returns:**
     - boolean value indicates the operating status.
 
-28. ### 🔹 void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
+35. ### 🔹 void remove(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
 
     Remove node from database
 
@@ -974,7 +1220,7 @@ class RealtimeDatabase
     - `aResult` - The async result (AsyncResult).
 
 
-29. ### 🔹 void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
+36. ### 🔹 void remove(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
 
     Remove node from database
 
@@ -993,7 +1239,7 @@ class RealtimeDatabase
     - `uid` - The user specified UID of async result (optional).
 
 
-30. ### 🔹 void setSSEFilters(const String &filter = "")
+37. ### 🔹 void setSSEFilters(const String &filter = "")
 
     Filtering response payload for SSE mode (HTTP Streaming). 
     
@@ -1035,7 +1281,7 @@ class RealtimeDatabase
     **Params:**
     - `filter` - The event keywords for filtering.
 
-31. ## 🔹  void setOTAStorage(OTAStorage &storage)
+38. ## 🔹  void setOTAStorage(OTAStorage &storage)
 
     Set Arduino OTA Storage.
 
@@ -1047,10 +1293,9 @@ class RealtimeDatabase
 
     - `storage` - The Arduino `OTAStorage` class object.
 
-32. ### 🔹 void loop()
+39. ### 🔹 void loop()
 
-    Perform the async task repeatedly.
-    Should be places in main loop function.
+    Perform the async task repeatedly (DEPRECATED).
     
     ```cpp
     void loop()

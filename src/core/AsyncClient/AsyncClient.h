@@ -9,7 +9,7 @@
 
 using namespace firebase_ns;
 
-class AsyncClientClass : public ResultBase, RTDBResultBase
+class AsyncClientClass : public RTDBResultImpl
 {
     friend class AppBase;
     friend class RealtimeDatabase;
@@ -21,13 +21,14 @@ class AsyncClientClass : public ResultBase, RTDBResultBase
     friend class Storage;
     friend class CloudStorage;
     friend class FirestoreBase;
+    friend class RuleSets;
+    friend class Releases;
 
 private:
     StringUtil sut;
     URLUtil uut;
     SlotManager sman;
-
-    String header, reqEtag, resETag;
+    String header, resETag;
     uint32_t addr = 0, auth_ts = 0, cvec_addr = 0, sync_send_timeout_sec = 0, sync_read_timeout_sec = 0;
     Memory mem;
     Base64Util b64ut;
@@ -36,15 +37,14 @@ private:
 
     // Friends access
     std::vector<uint32_t> &getResultList() { return sman.rVec; }
-    app_debug_t &getAppDebug() { return sman.app_debug; }
-    app_event_t &getAppEvent() { return sman.app_event; }
+    app_log_t &getAppDebug() { return sman.debug_log; }
+    app_log_t &getAppEvent() { return sman.event_log; }
     void stop() { sman.stop(); }
     void removeSlot(uint8_t slot, bool sse = true) { sman.removeSlot(slot, sse); }
     template <typename T>
     void setClientError(T &request, int code) { sman.setClientError(request, code); }
     async_data *createSlot(slot_options_t &options) { return sman.createSlot(options); }
-    void setSSEFilter(const String &sse_events_filter) { sman.sse_events_filter = sse_events_filter; }
-    void setEvent(async_data *sData, int code, const String &msg) { setEventBase(sman.app_event, code, msg); }
+    void eventPushBack(async_data *sData, int code, const String &msg) { sman.event_log.push_back(code, msg); }
     size_t slotCount() const { return sman.sVec.size(); }
     AsyncResult *getResult() { return sman.getResult(); }
     void handleRemove()
@@ -190,12 +190,12 @@ private:
     // Handles raw data sending process.
     function_return_type sendImpl(async_data *sData, const uint8_t *data, size_t len, size_t size, async_state state = astate_send_payload)
     {
+        sys_idle();
         sData->state = state;
         if (data && len && sman.client)
         {
             uint16_t toSend = len - sData->request.dataIndex > FIREBASE_CHUNK_SIZE ? FIREBASE_CHUNK_SIZE : len - sData->request.dataIndex;
             size_t sent = sData->request.tcpWrite(data + sData->request.dataIndex, toSend);
-            sys_idle();
             if (sent == toSend)
             {
                 sData->request.dataIndex += toSend;
@@ -311,6 +311,12 @@ private:
 
             if ((sman.client_type == tcpc_sync && !sman.conn.isConnected()) || sman.client_type == tcpc_async)
             {
+                if (sData->request.getHost(true, &sData->response.val[resns::location]).length() == 0)
+                {
+                    sData->aResult.lastError.setClientError(FIREBASE_ERROR_INVALID_HOST);
+                    return sman.connErrorHandler(sData, sData->state);
+                }
+
                 // Connect to the server if not connected.
                 ret = sman.connect(sData, sData->request.getHost(true, &sData->response.val[resns::location]).c_str(), sData->request.port);
 
@@ -457,7 +463,7 @@ private:
                                 sData->aResult.setPayload(*payload);
 
                             if (sData->aResult.download_data.total > 0)
-                                clearAppData(sData->aResult.app_data);
+                                sData->aResult.data_log.reset();
 
 #if defined(ENABLE_DATABASE)
 
@@ -537,7 +543,7 @@ private:
                 }
 #endif
                 if (sData->request.method == reqns::http_delete && sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
-                    setDebugBase(sman.app_debug, FPSTR("Delete operation complete"));
+                    sman.debug_log.push_back(-1, FPSTR("Delete operation complete"));
             }
         }
     }
@@ -858,7 +864,7 @@ private:
                 // In case Stream was timed out,
                 // we have to clear app data (available), reset the last error and set the Stream time out error.
                 sData->aResult.lastError.reset();
-                clearAppData(sData->aResult.app_data);
+                sData->aResult.data_log.reset();
                 setEventResumeStatus(&sData->aResult.rtdbResult, event_resume_status_resuming);
                 // Stream timed out error.
                 sman.setAsyncError(sData, sData->state, FIREBASE_ERROR_STREAM_TIMEOUT, false, false);
@@ -903,7 +909,7 @@ private:
         {
             if (sData->async)
                 sman.returnResult(sData, false);
-            sman.reset(sData, true);
+            sman.reset(sData, sData->response.httpCode == 0 /* disconnected only when no server response */);
         }
     }
 
@@ -923,9 +929,9 @@ private:
                 if (sData && sData->async && !sData->auth_used && !sData->to_remove)
                 {
                     // Reset the app data to reset and clear the available status when the task was canceled.
-                    sData->aResult.reset(sData->aResult.app_data);
+                    sData->aResult.data_log.reset();
                     if (sman.getResult(sData))
-                        sman.getResult(sData)->reset(sman.getResult(sData)->app_data);
+                        sman.getResult(sData)->data_log.reset();
 
                     if (uid.length())
                     {
@@ -944,16 +950,15 @@ private:
         inStopAsync = false;
     }
 
-    void newRequest(async_data *sData, const String &url, const String &path, const String &extras, reqns::http_request_method method, const slot_options_t &options, const String &uid)
+    void newRequest(async_data *sData, const String &url, const String &path, const String &extras, reqns::http_request_method method, const slot_options_t &options, const String &uid, const String &etag)
     {
         sData->async = options.async;
         sData->request.val[reqns::url] = url;
         sData->request.val[reqns::path] = path;
         sData->request.method = method;
         sData->sse = options.sse;
-        sData->request.val[reqns::etag] = reqEtag;
+        sData->request.val[reqns::etag] = etag;
 
-        clear(reqEtag);
         sData->aResult.setUID(uid);
 
         clear(sData->request.val[reqns::header]);
@@ -1014,9 +1019,10 @@ private:
             if (!sData)
                 return exitProcess(false);
 
-            updateDebug(sman.app_debug);
-            updateEvent(sman.app_event);
-            sData->aResult.updateData();
+            sman.debug_log.pop_front();
+            sman.event_log.pop_front();
+            sman.getResult()->dataLog().pop_front();
+            sData->aResult.dataLog().pop_front();
 
             if (!sData->auth_used && (sData->request.ota || sData->download || sData->upload) && sData->request.ul_dl_task_running_addr > 0)
             {
@@ -1046,8 +1052,8 @@ private:
                 sData->state = astate_send_header;
             }
 
-            // Resume async task from previously stopped.
-            if (!sman.conn.async && sData->async)
+            // Resume incomplete async task from previously stopped.
+            if (!sman.conn.async && sData->async && !sData->complete)
             {
                 sData->state = astate_send_header;
                 sman.conn.async = sData->async;
@@ -1092,6 +1098,9 @@ private:
                 if (sData->return_type == ret_complete)
                     sData->return_type = ret_continue;
 
+                // We will set complete status when payload was completly uploaded.
+                sData->complete = sData->upload;
+
                 if (sData->async && !sData->response.tcpAvailable())
                 {
                     if (sData->sse)
@@ -1132,7 +1141,7 @@ private:
                         if (sData->sse)
                         {
 #if defined(ENABLE_DATABASE)
-                            clearAppData(sData->aResult.app_data);
+                            sData->aResult.data_log.reset();
                             clearSSE(&sData->aResult.rtdbResult);
 #endif
                         }
@@ -1151,7 +1160,10 @@ private:
 #endif
 
             if (!sData->sse && sData->return_type == ret_complete && sData->state != astate_send_payload)
+            {
                 sData->to_remove = true;
+                sData->complete = true;
+            }
 
             if (sData->to_remove)
                 removeSlot(slot);
@@ -1159,9 +1171,20 @@ private:
         exitProcess(false);
     }
 
+    FirebaseError *_lastError() { return &sman.lastErr; }
+
 public:
     AsyncClientClass()
     {
+        this->addr = reinterpret_cast<uint32_t>(this);
+        sman.client_type = tcpc_sync;
+    }
+
+    AsyncClientClass(Client &client, bool reconnect = true)
+    {
+        DefaultNetwork defaultNet(reconnect);
+        sman.client = &client;
+        sman.conn.setNetwork(getNetwork(defaultNet));
         this->addr = reinterpret_cast<uint32_t>(this);
         sman.client_type = tcpc_sync;
     }
@@ -1231,6 +1254,20 @@ public:
     bool networkStatus() { return sman.conn.getNetworkStatus(); }
 
     /**
+     * Get the network disconnection time.
+     *
+     * @return unsigned long The millisec of network disconnection since device boot.
+     */
+    unsigned long networkLastSeen() { return sman.conn.networkLastSeen(); }
+
+    /**
+     * Return the current network type enum.
+     *
+     * @return firebase_network_type The firebase_network_type enums are firebase_network_default, firebase_network_generic, firebase_network_ethernet and firebase_network_gsm.
+     */
+    firebase_network_type getNetworkType() { return sman.conn.getNetworkType(); }
+
+    /**
      * Stop and remove the async/sync task from the queue.
      *
      * @param all The option to stop and remove all tasks. If false, only running task will be stop and removed from queue.
@@ -1266,13 +1303,13 @@ public:
     String etag() const { return resETag; }
 
     /**
-     * Set the ETag header to the task.
+     * Set the ETag header to the task (DEPRECATED).
      *
      * @param etag The ETag to set to the task.
-     *
-     * ETag of async client which obtained from etag() function will be empty after it assign to the task.
+     * 
+     * The etag can be set via the functions that support etag.
      */
-    void setETag(const String &etag) { reqEtag = etag; }
+    void setEtag(const String &etag) { Serial.println("🔥 AsyncClientClass::setEtag is deprecated."); }
 
     /**
      * Set the sync task's send timeout in seconds.
@@ -1296,18 +1333,24 @@ public:
     void setSessionTimeout(uint32_t timeoutSec) { sman.session_timeout_sec = timeoutSec; }
 
     /**
-     * Get the network disconnection time.
+     * Filtering response payload for Relatime Database SSE streaming.
+     * @param filter The event keywords for filtering.
      *
-     * @return unsigned long The millisec of network disconnection since device boot.
-     */
-    unsigned long networkLastSeen() { return sman.conn.networkLastSeen(); }
-
-    /**
-     * Return the current network type enum.
+     * This is optional to allow specific events filtering.
      *
-     * @return firebase_network_type The firebase_network_type enums are firebase_network_default, firebase_network_generic, firebase_network_ethernet and firebase_network_gsm.
+     * The following event keywords are supported.
+     * get - To allow the http get response (first put event since stream connected).
+     * put - To allow the put event.
+     * patch - To allow the patch event.
+     * keep-alive - To allow the keep-alive event.
+     * cancel - To allow the cancel event.
+     * auth_revoked - To allow the auth_revoked event.
+     *
+     * To clear all prevousely set filter to allow all Stream events, use AsyncClientClass::setSSEFilters().
+     * 
+     * This will overwrite the value sets by RealtimeDatabase::setSSEFilters.
      */
-    firebase_network_type getNetworkType() { return sman.conn.getNetworkType(); }
+    void setSSEFilters(const String &sse_events_filter) { sman.sse_events_filter = sse_events_filter; }
 
     /**
      * Set the network interface.

@@ -60,7 +60,6 @@ public:
         error.state = astate_undefined;
         to_remove = false;
         auth_used = false;
-        complete = false;
         async = false;
         stop_current_async = false;
         sse = false;
