@@ -107,7 +107,6 @@ namespace firebase_ns
 #if defined(ENABLE_JWT)
             app.jwtProcessor()->setAppDebug(getAppDebug(app.aClient));
 #endif
-
             if (app.refResult)
             {
                 resultSetDebug(app.refResult, getAppDebug(app.aClient));

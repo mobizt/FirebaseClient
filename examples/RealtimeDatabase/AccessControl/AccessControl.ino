@@ -176,7 +176,7 @@ void loop()
         else
             Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
 
-        Serial.print("Setting the int value to outside of granted path... ");
+        Serial.print("Setting the int value to other locations... ");
         // This should be failed because we write to the path that is not allowed.
         status = Database.set<int>(aClient, "/examples/Set/Int", 12345);
         if (status)
@@ -184,7 +184,6 @@ void loop()
         else
             Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
 
-        // If you try to change the claim value e.g. from {"foo":"bar"} to {"foo":"bear"} the write and read accesses will be denied.
     }
 }
 
