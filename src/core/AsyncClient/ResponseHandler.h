@@ -16,6 +16,7 @@ namespace resns
     enum data_item_type_t
     {
         header,
+        status,
         payload,
         etag,
         location,
@@ -67,7 +68,7 @@ public:
         int resp_code = 0;
     };
 
-    int httpCode = 0;
+    int httpCode = 0, statusCode = 0;
     response_flags flags;
     size_t payloadLen = 0, payloadRead = 0;
     auth_error_t error;
@@ -278,6 +279,7 @@ public:
         if (p1 > -1)
         {
             out = val[resns::header].substring(p1 + 9, val[resns::header].indexOf(' ', p1 + 9));
+            val[resns::status] = val[resns::header].substring(p1 + 9, val[resns::header].indexOf("\r\n"));
             return atoi(out.c_str());
         }
         return 0;
@@ -388,12 +390,14 @@ public:
 
         // The first chunk (line) can be http response status or already connected stream payload
         readLine();
+        statusCode = 0;
         int status = getStatusCode();
         if (status > 0)
         {
             // http response status
             flags.header_remaining = true;
             httpCode = status;
+            statusCode = status; // keep
         }
         return true;
     }

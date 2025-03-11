@@ -1306,7 +1306,7 @@ public:
      * Set the ETag header to the task (DEPRECATED).
      *
      * @param etag The ETag to set to the task.
-     * 
+     *
      * The etag can be set via the functions that support etag.
      */
     void setEtag(const String &etag) { Serial.println("🔥 AsyncClientClass::setEtag is deprecated."); }
@@ -1347,7 +1347,7 @@ public:
      * auth_revoked - To allow the auth_revoked event.
      *
      * To clear all prevousely set filter to allow all Stream events, use AsyncClientClass::setSSEFilters().
-     * 
+     *
      * This will overwrite the value sets by RealtimeDatabase::setSSEFilters.
      */
     void setSSEFilters(const String &sse_events_filter) { sman.sse_events_filter = sse_events_filter; }

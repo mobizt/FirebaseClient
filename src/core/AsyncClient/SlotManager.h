@@ -329,26 +329,12 @@ public:
             sData->aResult.lastError.setClientError(sData->error.code);
             lastErr.setClientError(sData->error.code);
             sData->aResult.data_log.reset();
-
-            // Required for sync task.
-            if (!sData->async)
-            {
-                sData->aResult.lastError.isError();
-                lastErr.isError();
-            }
         }
         else if (sData && sData->response.httpCode > 0 && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
         {
             sData->aResult.lastError.setResponseError(sData->response.val[resns::payload], sData->response.httpCode);
             lastErr.setResponseError(sData->response.val[resns::payload], sData->response.httpCode);
             sData->aResult.data_log.reset();
-
-            // Required for sync task.
-            if (!sData->async)
-            {
-                sData->aResult.lastError.isError();
-                lastErr.isError();
-            }
         }
     }
 

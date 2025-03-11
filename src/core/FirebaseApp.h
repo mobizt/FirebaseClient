@@ -215,7 +215,8 @@ namespace firebase_ns
                 auth_timer.stop();
             }
 
-            setEventResult(sData ? &sData->aResult : getRefResult(), auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
+            String err = auth_data.user_auth.status._event == auth_event_error && sData && sData->response.val[resns::status].length() ? sData->response.val[resns::status] : auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event);
+            setEventResult(sData ? &sData->aResult : getRefResult(), err, auth_data.user_auth.status._event);
 
             if (event == auth_event_error || event == auth_event_ready)
             {
