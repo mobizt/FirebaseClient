@@ -199,7 +199,7 @@ namespace firebase_ns
             return v.existed(cVec, aclient_addr) ? aClient : nullptr;
         }
 
-        void setEvent(firebase_auth_event_type event)
+        void setEvent(firebase_auth_event_type event, const String &reason = "")
         {
             if (auth_data.user_auth.status._event == event)
                 return;
@@ -215,8 +215,7 @@ namespace firebase_ns
                 auth_timer.stop();
             }
 
-            String err = auth_data.user_auth.status._event == auth_event_error && sData && sData->response.val[resns::status].length() ? sData->response.val[resns::status] : auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event);
-            setEventResult(sData ? &sData->aResult : getRefResult(), err, auth_data.user_auth.status._event);
+            setEventResult(sData ? &sData->aResult : getRefResult(), reason.length() ? reason : auth_data.user_auth.status.authEventString(auth_data.user_auth.status._event), auth_data.user_auth.status._event);
 
             if (event == auth_event_error || event == auth_event_ready)
             {
@@ -617,7 +616,7 @@ namespace firebase_ns
                 {
                     // In case of googleapis returns http status code >= 400 or request is timed out.
                     // Note that, only status line was read in case http status code >= 400
-                    setEvent(auth_event_error);
+                    setEvent(auth_event_error, req_timer.remaining() == 0 ? "connection timed out" : sData->response.val[resns::status]);
                     return false;
                 }
 
@@ -665,7 +664,7 @@ namespace firebase_ns
                     }
                     else
                     {
-                        setEvent(auth_event_error);
+                        setEvent(auth_event_error, "unable to parse the response");
                     }
                 }
             }
