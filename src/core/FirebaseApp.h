@@ -750,12 +750,13 @@ namespace firebase_ns
         void getApp(T &app)
         {
             app.resetApp();
+
             cvec_address_info_t cvec_address_info;
             cvec_address_info.app_token = &auth_data.app_token;
             cvec_address_info.app_addr = app_addr;
             cvec_address_info.cvec_addr = cVecAddr(app);
             cvec_address_list.push_back(cvec_address_info);
-            setAppBase(app, app_addr, &auth_data.app_token, reinterpret_cast<uint32_t>(&aVec), reinterpret_cast<uint32_t>(&ul_dl_task_running), reinterpret_cast<uint32_t>(&cvec_address_list), reinterpret_cast<uint32_t>(&app_loop_count));
+            setAppBase(app, app_addr, &auth_data, reinterpret_cast<uint32_t>(&aVec), reinterpret_cast<uint32_t>(&ul_dl_task_running), reinterpret_cast<uint32_t>(&cvec_address_list), reinterpret_cast<uint32_t>(&app_loop_count));
         }
 
         /**

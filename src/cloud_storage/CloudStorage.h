@@ -1,5 +1,5 @@
 /**
- * 2025-02-26
+ * 2025-03-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -402,6 +402,7 @@ private:
             return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = atoken;
+        request.opt.user_auth = user_auth;
         String extras;
 
         sut.printTo(request.path, 200, "%s/storage/v1/b/%s/o", request.method == reqns::http_post || request.method == reqns::http_put ? "/upload" : "", request.options->parent.getBucketId().c_str());

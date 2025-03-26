@@ -970,8 +970,8 @@ private:
         if (!options.auth_used)
         {
             sData->request.app_token = options.app_token;
-            if (options.app_token && !options.auth_param && (options.app_token->auth_type > auth_unknown_token && options.app_token->auth_type < auth_refresh_token))
-                sData->request.addAuthHeader(options.app_token->auth_type);
+            if (options.app_token && !options.auth_param && (options.user_auth->getAuthTokenType() > auth_unknown_token && options.user_auth->getAuthTokenType() < auth_refresh_token))
+                sData->request.addAuthHeader(options.user_auth->getAuthTokenType());
 
             sData->request.addConnectionHeader(true);
 
@@ -1328,7 +1328,7 @@ public:
     /**
      * Set the TCP session timeout in seconds.
      *
-     * @param timeoutSec The TCP session timeout in seconds.
+     * @param timeoutSec The TCP session timeout in seconds (> 60 seconds).
      */
     void setSessionTimeout(uint32_t timeoutSec) { sman.session_timeout_sec = timeoutSec; }
 

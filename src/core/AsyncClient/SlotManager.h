@@ -362,7 +362,7 @@ public:
 
         sData->return_type = conn.connect(host, port);
 
-        if (conn.isConnected() && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC)
+        if (conn.isConnected() && !sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC)
             session_timer.feed(session_timeout_sec);
 
         return sData->return_type;

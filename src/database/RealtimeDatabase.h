@@ -1,5 +1,5 @@
 /**
- * 2025-02-26
+ * 2025-03-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -1036,7 +1036,8 @@ private:
         }
 
         request.opt.app_token = atoken;
-        request.opt.auth_param = atoken->auth_data_type != user_auth_data_no_token && atoken->auth_type != auth_access_token && atoken->auth_type != auth_sa_access_token;
+        request.opt.user_auth = user_auth;
+        request.opt.auth_param = user_auth->getAuthDataType() != user_auth_data_no_token && user_auth->getAuthTokenType() != auth_access_token && user_auth->getAuthTokenType() != auth_sa_access_token;
         String extras;
         sut.printTo(extras, 100, ".json%s%s", request.opt.auth_param ? "?auth=" : "", request.opt.auth_param ? String(FIREBASE_AUTH_PLACEHOLDER).c_str() : ""); //
         addParams(request.opt.auth_param, extras, request.method, request.options, request.file);

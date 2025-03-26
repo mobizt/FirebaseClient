@@ -44,6 +44,7 @@ namespace firebase_ns
         friend class NoAuth;
         friend class UserAccount;
         friend class FirebaseClient;
+        friend class RealtimeDatabase;
 
     public:
         user_auth_data() {}
@@ -114,6 +115,9 @@ namespace firebase_ns
             initialized = false;
             ts = 0;
         }
+
+        user_auth_data_type getAuthDataType() { return auth_data_type; }
+        auth_token_type getAuthTokenType() { return auth_type; }
 
     protected:
         user_data user;

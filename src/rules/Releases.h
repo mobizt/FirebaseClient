@@ -1,5 +1,5 @@
 /**
- * 2025-02-26
+ * 2025-03-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -116,6 +116,7 @@ private:
             return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = atoken;
+        request.opt.user_auth = user_auth;
         String extras;
         sut.printTo(request.path, request.options.projectId.length(), "/v1/projects/%s/releases", request.options.projectId.c_str());
         if (request.options.requestType == rl_get || request.options.requestType == rl_get_executable || request.options.requestType == rl_delete)
@@ -232,14 +233,14 @@ public:
     void get(AsyncClientClass &aClient, const String &projectId, const String &releaseId, AsyncResultCallback cb, const String &uid = "") { getDeleteRelease(aClient, nullptr, cb, uid, projectId, releaseId, rl_get, "", true); }
     void get(AsyncClientClass &aClient, const String &projectId, const String &releaseId, AsyncResult &aResult) { getDeleteRelease(aClient, &aResult, NULL, "", projectId, releaseId, rl_get, "", true); }
     String get(AsyncClientClass &aClient, const String &projectId, const String &releaseId) { return getDeleteRelease(aClient, getResultBase(&aClient), NULL, "", projectId, releaseId, rl_get, "", false)->c_str(); }
-   
+
     /**
      * Get the Release executable to use when enforcing rules.
      */
     void getExecutable(AsyncClientClass &aClient, const String &projectId, const String &releaseId, Rules::ReleaseExecutableVersion executableVersion, AsyncResultCallback cb, const String &uid = "") { getDeleteRelease(aClient, nullptr, cb, uid, projectId, releaseId, rl_get_executable, Rules::_ReleaseExecutableVersion[executableVersion].text, true); }
     void getExecutable(AsyncClientClass &aClient, const String &projectId, const String &releaseId, Rules::ReleaseExecutableVersion executableVersion, AsyncResult &aResult) { getDeleteRelease(aClient, &aResult, NULL, "", projectId, releaseId, rl_get_executable, Rules::_ReleaseExecutableVersion[executableVersion].text, true); }
     String getExecutable(AsyncClientClass &aClient, const String &projectId, const String &releaseId, Rules::ReleaseExecutableVersion executableVersion) { return getDeleteRelease(aClient, getResultBase(&aClient), NULL, "", projectId, releaseId, rl_get_executable, Rules::_ReleaseExecutableVersion[executableVersion].text, false)->c_str(); }
-   
+
     /**
      * List the Release values for a project.
      * This list may optionally be filtered by Release name, Ruleset name, TestSuite name, or any combination thereof.

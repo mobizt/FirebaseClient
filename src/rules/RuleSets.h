@@ -96,6 +96,7 @@ private:
             return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = atoken;
+        request.opt.user_auth = user_auth;
         String extras;
         sut.printTo(request.path, request.options.projectId.length(), "/v1/projects/%s/rulesets", request.options.projectId.c_str());
         if (request.options.requestType == rs_get || request.options.requestType == rs_delete)

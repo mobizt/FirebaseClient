@@ -1,5 +1,5 @@
 /**
- * 2025-02-26
+ * 2025-03-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -96,6 +96,7 @@ protected:
             return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = atoken;
+        request.opt.user_auth = user_auth;
         String extras;
         sut.printTo(request.path, 20, "/v1%s%s/projects/", beta == 0 ? "" : "beta", beta == 0 ? "" : String(beta).c_str());
         request.path += strlen(request.options->parent.getProjectId()) == 0 ? atoken->val[app_tk_ns::pid] : request.options->parent.getProjectId();

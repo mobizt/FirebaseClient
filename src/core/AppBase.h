@@ -58,15 +58,17 @@ private:
     uint32_t app_addr = 0, avec_addr = 0, ul_dl_task_running_addr = 0, ota_storage_addr = 0, cvec_address_list_addr = 0, app_loop_count_addr = 0;
     Timer displayInfoTimer;
     app_token_t *app_token = nullptr;
+    user_auth_data *user_auth = nullptr;
     String service_url;
     std::vector<uint32_t> cVec; // AsyncClient vector
     URLUtil uut;
     StringUtil sut;
 
-    void setApp(uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t ul_dl_task_running_addr, uint32_t cvec_address_list_addr, uint32_t app_loop_count_addr)
+    void setApp(uint32_t app_addr, auth_data_t *auth_data, uint32_t avec_addr, uint32_t ul_dl_task_running_addr, uint32_t cvec_address_list_addr, uint32_t app_loop_count_addr)
     {
         this->app_addr = app_addr;
-        this->app_token = app_token;
+        this->app_token = &auth_data->app_token;
+        this->user_auth = &auth_data->user_auth;
         this->avec_addr = avec_addr; // AsyncClient vector (list) address
         this->cvec_address_list_addr = cvec_address_list_addr;
         this->app_loop_count_addr = app_loop_count_addr;
@@ -152,7 +154,7 @@ protected:
     template <typename T>
     uint32_t cVecAddr(T &app) { return reinterpret_cast<uint32_t>(&app.cVec); }
     template <typename T>
-    void setAppBase(T &app, uint32_t app_addr, app_token_t *app_token, uint32_t avec_addr, uint32_t app_ota_status_addr, uint32_t cvec_address_list_addr, uint32_t app_loop_count_addr) { app.setApp(app_addr, app_token, avec_addr, app_ota_status_addr, cvec_address_list_addr, app_loop_count_addr); }
+    void setAppBase(T &app, uint32_t app_addr, auth_data_t *auth_data, uint32_t avec_addr, uint32_t app_ota_status_addr, uint32_t cvec_address_list_addr, uint32_t app_loop_count_addr) { app.setApp(app_addr, auth_data, avec_addr, app_ota_status_addr, cvec_address_list_addr, app_loop_count_addr); }
 };
 
 #endif

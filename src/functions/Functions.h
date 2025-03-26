@@ -1,5 +1,5 @@
 /**
- * 2025-02-26
+ * 2025-03-26
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -715,6 +715,7 @@ private:
             return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
 
         request.opt.app_token = atoken;
+        request.opt.user_auth = user_auth;
         String extras;
 
         sut.printTo(request.path, request.options->parent.getProjectId().length() + request.options->parent.getLocationId().length(), "/v%d/projects/%s/locations/%s/functions", requestType == fn_call ? 1 : 2, request.options->parent.getProjectId().c_str(), request.options->parent.getLocationId().c_str());
