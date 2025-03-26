@@ -1328,7 +1328,7 @@ public:
     /**
      * Set the TCP session timeout in seconds.
      *
-     * @param timeoutSec The TCP session timeout in seconds (> 60 seconds).
+     * @param timeoutSec The TCP session timeout in seconds (> 150 seconds).
      */
     void setSessionTimeout(uint32_t timeoutSec) { sman.session_timeout_sec = timeoutSec; }
 
