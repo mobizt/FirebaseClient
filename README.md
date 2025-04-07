@@ -2,9 +2,9 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v2.0.1-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v2.0.2-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
-Revision `2025-03-26`
+Revision `2025-04-07`
 
 ## Introduction
 
@@ -737,8 +737,8 @@ FIREBASE_DISABLE_ONBOARD_WIFI // For disabling on-board WiFI functionality in ca
 FIREBASE_DISABLE_NATIVE_ETHERNET // For disabling native (sdk) Ethernet functionality in case external Client usage.
 FIREBASE_DISABLE_NATIVE_PPP // For disabling native ESP32 (sdk) PPP functionality.
 ENABLE_ASYNC_TCP_CLIENT // For Async TCP Client usage.
-FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit setting for an async client.
-FIREBASE_PRINTF_PORT // For Firebase.printf debug port.
+FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit (number) setting for an async client.
+FIREBASE_PRINTF_PORT // For Firebase.printf debug port class object.
 FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size. The default printf buffer size is 1024 for ESP8266 and SAMD otherwise 4096. Some debug message may be truncated for larger text.
 ```
 
@@ -773,7 +773,7 @@ DISABLE_FIRESTORE // For disabling Firestore support
 DISABLE_FIRESTORE_QUERY // For Firestore Query feature compilation
 DISABLE_MESSAGING // For disabling Firebase Cloud Messaging support
 DISABLE_STORAGE // For disabling Firebase Storage support
-ENABLE_CLOUD_STORAGE // For disabling Google Cloud Storage support
+DISABLE_CLOUD_STORAGE // For disabling Google Cloud Storage support
 DISABLE_FUNCTIONS // For disabling Google Cloud Functions support
 DISABLE_RULESETS // For disabling RuleSets support
 DISABLE_PSRAM // For disabling PSRAM support

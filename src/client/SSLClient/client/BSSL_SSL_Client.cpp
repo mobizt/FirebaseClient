@@ -1,7 +1,7 @@
 /**
- * BSSL_SSL_Client library v1.0.19 for Arduino devices.
+ * BSSL_SSL_Client library v1.0.20 for Arduino devices.
  *
- * Created January 9, 2025
+ * Created April 7, 2025
  *
  * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
  *
@@ -403,7 +403,7 @@ size_t BSSL_SSL_Client::write(Stream &stream)
 int BSSL_SSL_Client::peek()
 {
 
-    if (!_sc || !available())
+    if ((!_sc && _secure) || !available())
     {
 #if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Not connected, none left available."), _debug_level, esp_ssl_debug_error, __func__);

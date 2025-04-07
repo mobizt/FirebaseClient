@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "./core/AsyncResult/AsyncResult.h"
+#if defined(ENABLE_DATABASE)
 
 namespace firebase_ns
 {
@@ -19,4 +20,5 @@ namespace firebase_ns
         void setRefPayload(RealtimeDatabaseResult *rtdbResult, String *payload) { rtdbResult->ref_payload = payload; }
     };
 }
+#endif
 #endif

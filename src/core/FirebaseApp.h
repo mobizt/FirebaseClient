@@ -645,7 +645,7 @@ namespace firebase_ns
 
                     if (parseToken(sData->response.val[resns::payload].c_str()))
                     {
-#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
+#if defined(ENABLE_SERVICE_AUTH) && defined(ENABLE_CUSTOM_AUTH)
                         if (auth_data.user_auth.auth_type == auth_sa_custom_token && auth_data.app_token.val[app_tk_ns::uid].length() == 0) // store the custom UID if UID was not found in the response.
                             auth_data.app_token.val[app_tk_ns::uid] = auth_data.user_auth.cust.val[cust_ns::uid];
 #endif
@@ -729,7 +729,9 @@ namespace firebase_ns
 #else
         void loop()
         {
+#if defined(ENABLE_JWT)
             jwtClass = nullptr;
+#endif
             await(await_ms);
         }
 #endif
@@ -894,7 +896,8 @@ namespace firebase_ns
             auth_data.force_refresh = true;
             auth_timer.setInterval(0);
         }
-
+        
+#if defined(ENABLE_JWT)
         /**
          * Set the JWT token processor object(DEPRECATED).
          *
@@ -905,6 +908,7 @@ namespace firebase_ns
          * @param  jwtClass The pointer to JWTClass class object to handle the JWT token generation and signing.
          */
         void setJWTProcessor(JWTClass &jwtClass) { this->jwtClass = &jwtClass; }
+#endif
     };
 };
 #endif

@@ -11,6 +11,12 @@
 #include "./core/AsyncResult/RTDBResult.h"
 #include "./core/AsyncResult/AppProgress.h"
 
+#if defined(ENABLE_DATABASE)
+#define PUBLIC_DATABASE_RESULT_BASE : public RealtimeDatabaseResult
+#else
+#define PUBLIC_DATABASE_RESULT_BASE
+#endif
+
 using namespace firebase_ns;
 
 namespace ares_ns
@@ -25,7 +31,7 @@ namespace ares_ns
     };
 }
 
-class AsyncResult : public RealtimeDatabaseResult
+class AsyncResult PUBLIC_DATABASE_RESULT_BASE
 {
     friend class AsyncClientClass;
     friend class AppBase;
@@ -280,8 +286,10 @@ public:
     {
         data_log.read();
         static T o;
+#if defined(ENABLE_RTDB)
         if (std::is_same<T, RealtimeDatabaseResult>::value)
             return rtdbResult;
+#endif
         return o;
     }
 

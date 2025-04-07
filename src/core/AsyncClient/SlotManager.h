@@ -8,7 +8,13 @@
 #include "./core/AsyncClient/AsyncData.h"
 #include "./core/Debug.h"
 
-class SlotManager : public RTDBResultImpl
+#if defined(ENABLE_DATABASE)
+#define PUBLIC_DATABASE_RESULT_IMPL_BASE : public RTDBResultImpl
+#else
+#define PUBLIC_DATABASE_RESULT_IMPL_BASE
+#endif
+
+class SlotManager PUBLIC_DATABASE_RESULT_IMPL_BASE
 {
     friend class AsyncClientClass;
 
@@ -62,9 +68,15 @@ public:
             else if (sse_index > -1)
                 slot = sse_index;
 
-            // Multiple SSE modes
-            if ((sse_index > -1 && options.sse) || sVec.size() >= FIREBASE_ASYNC_QUEUE_LIMIT)
+// Multiple SSE modes
+#if defined(FIREBASE_ASYNC_QUEUE_LIMIT)
+
+            if ((sse_index > -1 && options.sse) || sVec.size() >= (int)FIREBASE_ASYNC_QUEUE_LIMIT + 0)
                 slot = -2;
+#else
+            if (sse_index > -1 && options.sse)
+                slot = -2;
+#endif
 
             if (slot >= (int)sVec.size())
                 slot = -1;
@@ -150,6 +162,7 @@ public:
 
     bool sseFilter(async_data *sData)
     {
+#if defined(ENABLE_DATABASE)
         String event = sData->aResult.rtdbResult.event();
         return (sse_events_filter.length() == 0 ||
                 (sData->response.flags.http_response && sse_events_filter.indexOf("get") > -1 && event.indexOf("put") > -1) ||
@@ -158,6 +171,9 @@ public:
                 (sse_events_filter.indexOf("keep-alive") > -1 && event.indexOf("keep-alive") > -1) ||
                 (sse_events_filter.indexOf("cancel") > -1 && event.indexOf("cancel") > -1) ||
                 (sse_events_filter.indexOf("auth_revoked") > -1 && event.indexOf("auth_revoked") > -1));
+#else
+        return false;
+#endif
     }
 
     void reset(async_data *sData, bool disconnect)

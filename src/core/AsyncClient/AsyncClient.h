@@ -6,10 +6,15 @@
 #include "./core/Utils/OTA.h"
 #include "./core/Utils/StringUtil.h"
 #include "./core/AsyncClient/SlotManager.h"
+#if defined(ENABLE_DATABASE)
+#define PUBLIC_DATABASE_RESULT_IMPL_BASE : public RTDBResultImpl
+#else
+#define PUBLIC_DATABASE_RESULT_IMPL_BASE
+#endif
 
 using namespace firebase_ns;
 
-class AsyncClientClass : public RTDBResultImpl
+class AsyncClientClass PUBLIC_DATABASE_RESULT_IMPL_BASE
 {
     friend class AppBase;
     friend class RealtimeDatabase;
@@ -413,8 +418,8 @@ private:
             // Hadles redirection (stop and connect).
             String ext;
             String _host = sData->request.getHost(false, &sData->response.val[resns::location], &ext);
-            conn.stop();
-            if (conn.connect(_host.c_str(), sData->request.port) > ret_failure)
+            sman.stop();
+            if (sman.connect(sData, _host.c_str(), sData->request.port) > ret_failure)
             {
                 uut.relocate(sData->request.val[reqns::header], _host, ext);
                 sut.clear(sData->request.val[reqns::payload]);
