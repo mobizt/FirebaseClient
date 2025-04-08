@@ -286,7 +286,7 @@ public:
     {
         data_log.read();
         static T o;
-#if defined(ENABLE_RTDB)
+#if defined(ENABLE_DATABASE)
         if (std::is_same<T, RealtimeDatabaseResult>::value)
             return rtdbResult;
 #endif
