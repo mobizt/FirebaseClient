@@ -45,13 +45,10 @@ public:
         ESP.setExternalHeap();
 #endif
         p = reinterpret_cast<void *>(malloc(newLen));
-        bool nn = p ? true : false;
+        
 #if defined(ESP8266_USE_EXTERNAL_HEAP)
         ESP.resetHeap();
 #endif
-
-        if (!nn)
-            return NULL;
 
 #endif
         if (clear)

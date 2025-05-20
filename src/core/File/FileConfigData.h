@@ -52,7 +52,7 @@ struct file_config_data
     void initBlobWriter(size_t size)
     {
         clearInternalData();
-        data = (uint8_t *)mem.alloc(size);
+        data = reinterpret_cast<uint8_t *>(mem.alloc(size));
         if (data)
         {
             data_size = size;

@@ -210,7 +210,7 @@ public:
      * Perform the async task repeatedly.
      * Should be placed in main loop function.
      */
-    void loop() { loopImpl(__PRETTY_FUNCTION__); }
+    void loop() { loopImpl(); }
 
     /**
      * Create a Release.

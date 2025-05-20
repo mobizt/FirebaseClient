@@ -49,7 +49,7 @@ private:
     template <typename T>
     void setClientError(T &request, int code) { sman.setClientError(request, code); }
     async_data *createSlot(slot_options_t &options) { return sman.createSlot(options); }
-    void eventPushBack(async_data *sData, int code, const String &msg) { sman.event_log.push_back(code, msg); }
+    void eventPushBack(int code, const String &msg) { sman.event_log.push_back(code, msg); }
     size_t slotCount() const { return sman.sVec.size(); }
     AsyncResult *getResult() { return sman.getResult(); }
     void handleRemove()
@@ -89,6 +89,7 @@ private:
                 return ret_failure;
             }
 #endif
+            (void)state;
             if (sData->request.base64)
             {
                 ret = sendImpl(sData, reinterpret_cast<const uint8_t *>("\""), 1, totalLen, astate_send_payload);
@@ -548,7 +549,7 @@ private:
                 }
 #endif
                 if (sData->request.method == reqns::http_delete && sData->response.httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
-                    sman.debug_log.push_back(-1, FPSTR("Delete operation complete"));
+                    sman.debug_log.push_back(-1, "Delete operation complete");
             }
         }
     }
@@ -596,6 +597,7 @@ private:
                             {
                                 if (sData->request.ota)
                                 {
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
 #if defined(FIREBASE_OTA_STORAGE)
                                     otaut.setOTAStorage(sData->request.ota_storage_addr);
 #endif
@@ -607,6 +609,7 @@ private:
                                         sman.setAsyncError(sData, astate_read_response, sData->request.ota_error, !sData->sse, false);
                                         return false;
                                     }
+#endif
                                 }
 #if defined(ENABLE_FS)
                                 else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
@@ -668,7 +671,8 @@ private:
                                     otaut.getPad(buf + ofs, read, sData->request.b64Pad);
                                     if (sData->request.ota)
                                     {
-                                        otaut.decodeBase64OTA(mem, &b64ut, reinterpret_cast<const char *>(buf), read - ofs, sData->request.ota_error);
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
+                                        otaut.decodeBase64OTA(mem, &b64ut, reinterpret_cast<const char *>(buf), sData->request.ota_error);
                                         if (sData->request.ota_error != 0)
                                         {
                                             // OTA error.
@@ -686,6 +690,7 @@ private:
                                                 goto exit;
                                             }
                                         }
+#endif
                                     }
 #if defined(ENABLE_FS)
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
@@ -707,6 +712,7 @@ private:
                                     // To write flash (OTA)
                                     if (sData->request.ota)
                                     {
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
                                         b64ut.updateWrite(buf, read);
 
                                         if (sData->response.payloadRead == sData->response.payloadLen)
@@ -719,6 +725,7 @@ private:
                                                 goto exit;
                                             }
                                         }
+#endif
                                     }
 #if defined(ENABLE_FS)
                                     else if (sData->request.file_data.filename.length() && sData->request.file_data.cb)
@@ -800,8 +807,9 @@ private:
             // It should set in readPayload when decodeChunks returns -1.
             if (!sData->response.flags.chunks)
                 sData->response.flags.payload_remaining = false;
-
+#if defined(ENABLE_FS)
             sData->request.closeFile();
+#endif
 
             if (sData->auth_used)
                 sData->response.auth_data_available = true;
@@ -817,6 +825,8 @@ private:
         sData->response.val[resns::payload].remove(0, sData->response.val[resns::payload].length());
         sData->response.val[resns::payload].reserve(sData->response.payloadRead + 1);
         sData->response.val[resns::payload] = old;
+#else
+        (void)sData;
 #endif
     }
 
@@ -1185,7 +1195,7 @@ public:
         sman.client_type = tcpc_sync;
     }
 
-    AsyncClientClass(Client &client, bool reconnect = true)
+    explicit AsyncClientClass(Client &client, bool reconnect = true)
     {
         DefaultNetwork defaultNet(reconnect);
         sman.client = &client;
@@ -1194,7 +1204,7 @@ public:
         sman.client_type = tcpc_sync;
     }
 
-    AsyncClientClass(Client &client, network_config_data &net)
+    explicit AsyncClientClass(Client &client, network_config_data &net)
     {
         sman.client = &client;
         sman.conn.setNetwork(net);
@@ -1203,7 +1213,7 @@ public:
     }
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
-    AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
+    explicit AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
     {
         sman.atcp_config = &tcpClientConfig;
         conn.setNetwork(net);
@@ -1314,7 +1324,11 @@ public:
      *
      * The etag can be set via the functions that support etag.
      */
-    void setEtag(const String &etag) { Serial.println("🔥 AsyncClientClass::setEtag is deprecated."); }
+    void setEtag(const String &etag)
+    {
+        (void)etag;
+        Serial.println("🔥 AsyncClientClass::setEtag is deprecated.");
+    }
 
     /**
      * Set the sync task's send timeout in seconds.

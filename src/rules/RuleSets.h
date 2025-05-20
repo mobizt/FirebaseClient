@@ -175,7 +175,7 @@ public:
      * Perform the async task repeatedly.
      * Should be placed in main loop function.
      */
-    void loop() { loopImpl(__PRETTY_FUNCTION__); }
+    void loop() { loopImpl(); }
 
     void create(AsyncClientClass &aClient, const String &projectId, const Ruleset &ruleSet, AsyncResultCallback cb, const String &uid = "") { createRuleset(aClient, nullptr, cb, uid, projectId, ruleSet, true); }
     void create(AsyncClientClass &aClient, const String &projectId, const Ruleset &ruleSet, AsyncResult &aResult) { createRuleset(aClient, &aResult, NULL, "", projectId, ruleSet, true); }

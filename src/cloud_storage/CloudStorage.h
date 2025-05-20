@@ -64,7 +64,7 @@ public:
     /**
      * Perform the async task repeatedly (DEPRECATED).
      */
-    void loop() { loopImpl(__PRETTY_FUNCTION__); }
+    void loop() { loopImpl(); }
 
     /** Download object from the Google Cloud Storage.
      *

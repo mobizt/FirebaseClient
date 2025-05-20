@@ -31,6 +31,7 @@
 #define ENABLE_USER_CONFIG
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
+#define ENABLE_OTA
 
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.

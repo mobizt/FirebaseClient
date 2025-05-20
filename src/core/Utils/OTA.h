@@ -33,7 +33,7 @@ public:
         }
     }
 
-    bool decodeBase64OTA(Memory &mem, Base64Util *but, const char *src, size_t len, int16_t &code)
+    bool decodeBase64OTA(Memory &mem, Base64Util *but, const char *src, int16_t &code)
     {
         bool ret = true;
         firebase_base64_io_t<uint8_t> out;
@@ -55,10 +55,10 @@ public:
     void setOTAStorage(uint32_t addr) { OTAUpdater.setOTAStorage(addr); }
 #endif
 
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
     void prepareDownloadOTA(size_t payloadLen, bool base64, int16_t &code)
     {
         code = 0;
-#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
         int size = base64 ? (3 * (payloadLen - 2) / 4) : payloadLen;
         if (!FIREBASE_OTA_UPDATER.begin(size))
             code = FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE;
@@ -66,12 +66,11 @@ public:
         if (!OTAUpdater.isInit())
             code = FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE;
 #endif
-#endif
     }
-
+#endif
+#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
     bool endDownloadOTA(Base64Util &b64ut, int pad, int16_t &code)
     {
-#if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
         // write extra pad
         if (pad > 0)
         {
@@ -86,8 +85,7 @@ public:
                 code = FIREBASE_ERROR_FW_UPDATE_END_FAILED;
         }
         return code == 0;
-#endif
-        return false;
     }
+#endif
 };
 #endif

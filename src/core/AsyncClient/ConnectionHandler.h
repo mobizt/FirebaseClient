@@ -43,7 +43,7 @@ struct conn_handler : public ConnBase
 {
 private:
     network_config_data net;
-    tcp_client_type client_type;
+    tcp_client_type client_type = tcpc_sync;
     Client *client = nullptr;
     void *atcp_config = nullptr;
     app_log_t *debug_log = nullptr;
@@ -54,6 +54,8 @@ public:
     bool sse = false, async = false;
     String host;
     uint16_t port;
+    
+    conn_handler(){}
 
     void newConn(tcp_client_type client_type, Client *client, void *atcp_config, app_log_t *debug_log)
     {
@@ -62,7 +64,7 @@ public:
         this->atcp_config = atcp_config;
         this->debug_log = debug_log;
     }
-    void setNetwork(network_config_data &net)
+    void setNetwork(const network_config_data &net)
     {
         network_changed = true;
         this->net.copy(net);
@@ -268,14 +270,14 @@ public:
                 gsmModem->gprsConnect(net.gsm.apn.c_str(), net.gsm.user.c_str(), net.gsm.password.c_str());
 #endif
 
-                setDebug(FPSTR("Waiting for network..."));
+                setDebug("Waiting for network...");
                 return ret_continue;
             }
             else if (net.gsm.conn_status == network_config_data::gsm_conn_status_waits_network)
             {
                 if (!gsmModem->waitForNetwork())
                 {
-                    setDebug(FPSTR("Network connection failed"));
+                    setDebug("Network connection failed");
                     netErrState = 1;
                     net.network_status = false;
                     net.gsm.conn_status = network_config_data::gsm_conn_status_idle;
@@ -284,13 +286,13 @@ public:
 
                 net.gsm.conn_status = network_config_data::gsm_conn_status_waits_gprs;
 
-                setDebug(FPSTR("Network connected"));
+                setDebug("Network connected");
 
                 if (gsmModem->isNetworkConnected())
                 {
                     if (netErrState == 0)
                     {
-                        String debug = FPSTR("Connecting to ");
+                        String debug = "Connecting to ";
                         debug += net.gsm.apn.c_str();
                         setDebug(debug);
                     }
@@ -306,7 +308,7 @@ public:
                     net.network_status = gsmModem->gprsConnect(net.gsm.apn.c_str(), net.gsm.user.c_str(), net.gsm.password.c_str()) && gsmModem->isGprsConnected();
 
                     if (netErrState == 0)
-                        setDebug(net.network_status ? FPSTR("GPRS/EPS connected") : FPSTR("GPRS/EPS connection failed"));
+                        setDebug(net.network_status ? "GPRS/EPS connected" : "GPRS/EPS connection failed");
 
                     if (!net.network_status)
                         netErrState = 1;
@@ -355,7 +357,7 @@ public:
         {
             if (net.ethernet.conn_satatus == network_config_data::ethernet_conn_status_idle)
             {
-                setDebug(FPSTR("Resetting Ethernet Board..."));
+                setDebug("Resetting Ethernet Board...");
 
                 pinMode(net.ethernet.ethernet_reset_pin, OUTPUT);
                 digitalWrite(net.ethernet.ethernet_reset_pin, HIGH);
@@ -387,7 +389,7 @@ public:
         {
 
             net.ethernet.conn_satatus = network_config_data::ethernet_conn_status_waits;
-            setDebug(FPSTR("Starting Ethernet connection..."));
+            setDebug("Starting Ethernet connection...");
 
             if (validIP(net.ethernet.static_ip.ipAddress))
             {
@@ -415,13 +417,13 @@ public:
 
             if (ret)
             {
-                String msg = FPSTR("Connected, IP: ");
+                String msg = "Connected, IP: ";
                 msg += FIREBASE_ETHERNET_MODULE_CLASS_IMPL.localIP().toString();
                 setDebug(msg);
             }
             else
             {
-                setDebug(FPSTR("Can't connect to network"));
+                setDebug("Can't connect to network");
             }
 
             return ret ? ret_complete : ret_failure;
@@ -470,7 +472,7 @@ public:
                     if (generic_network_owner_addr == 0)
                         generic_network_owner_addr = reinterpret_cast<uint32_t>(this);
 
-                    setDebug(FPSTR("Reconnecting to network..."));
+                    setDebug("Reconnecting to network...");
 
                     if (net.generic.net_con_cb)
                         net.generic.net_con_cb();
@@ -506,11 +508,11 @@ public:
                 else if (net.network_type == firebase_network_default)
                 {
 
-                    if (wifi_reconnection_ms == 0 || (wifi_reconnection_ms > 0 && millis() - wifi_reconnection_ms > FIREBASE_NET_RECONNECT_TIMEOUT_SEC * 1000))
+                    if (wifi_reconnection_ms == 0 || millis() - wifi_reconnection_ms > FIREBASE_NET_RECONNECT_TIMEOUT_SEC * 1000)
                     {
                         wifi_reconnection_ms = millis();
 
-                        setDebug(FPSTR("Reconnecting to WiFi network..."));
+                        setDebug("Reconnecting to WiFi network...");
 
 #if defined(FIREBASE_WIFI_IS_AVAILABLE)
 #if defined(ESP32) || defined(ESP8266)

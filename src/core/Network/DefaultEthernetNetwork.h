@@ -14,8 +14,8 @@ public:
      *
      * This eth should be defined at the same usage scope of AsyncClientCalss.
      *
-     * To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` 
-     * and `ENABLE_ESP8266_W5100_ETH` should be defined in the sketch before including the library header file `FirebaseClient.h` 
+     * To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH`
+     * and `ENABLE_ESP8266_W5100_ETH` should be defined in the sketch before including the library header file `FirebaseClient.h`
      * or adding `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in the compiler build flags.
      *
      * Use Firebase_SPI_ETH_Module::enc28j60, Firebase_SPI_ETH_Module::w5100 and Firebase_SPI_ETH_Module::w5500 to assign the pointer to
@@ -30,6 +30,8 @@ public:
         init();
 #if defined(FIREBASE_LWIP_ETH_IS_AVAILABLE) && defined(ENABLE_ETHERNET_NETWORK)
         network_data.eth = &eth;
+#else
+        (void)eth;
 #endif
         network_data.network_type = firebase_network_default;
     }

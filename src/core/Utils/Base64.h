@@ -82,6 +82,9 @@ public:
     {
 #if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER) && (defined(ENABLE_DATABASE) || defined(ENABLE_STORAGE) || defined(ENABLE_CLOUD_STORAGE))
         return FIREBASE_OTA_UPDATER.write(data, len) == len;
+#else
+        (void)data;
+        (void)len;
 #endif
         return false;
     }
@@ -227,7 +230,7 @@ public:
     }
 
     template <typename T>
-    bool encodeLast(unsigned char *base64EncBuf, const unsigned char *in, size_t len, firebase_base64_io_t<T> &out, T **pos)
+    bool encodeLast(const unsigned char *base64EncBuf, const unsigned char *in, size_t len, firebase_base64_io_t<T> &out, T **pos)
     {
         if (len > 2)
             return false;
@@ -257,7 +260,7 @@ public:
     }
 
     template <typename T>
-    bool encode(unsigned char *base64EncBuf, uint8_t *src, size_t len, firebase_base64_io_t<T> &out, bool writeAllRemaining = true)
+    bool encode(const unsigned char *base64EncBuf, uint8_t *src, size_t len, firebase_base64_io_t<T> &out, bool writeAllRemaining = true)
     {
         const unsigned char *end, *in;
 

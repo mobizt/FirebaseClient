@@ -79,7 +79,7 @@ public:
     Timer read_timer;
     bool auth_data_available = false;
 
-    tcp_client_type client_type;
+    tcp_client_type client_type = tcpc_sync;
     Client *client = nullptr;
     void *atcp_config = nullptr;
 
@@ -304,7 +304,7 @@ public:
     {
         if (!client || !out)
             return 0;
-        int res = 0, read = 0;
+        int res = 0;
         String line;
 
         // because chunks might span multiple reads, we need to keep track of where we are in the chunk
@@ -330,7 +330,7 @@ public:
             // if chunk-size is 0, it's the last chunk, and can be skipped
             if (chunkInfo.chunkSize > 0)
             {
-                read = readLine(&line);
+              int  read = readLine(&line);
 
                 // if we read till a CRLF, we have a chunk (or the rest of it)
                 // if the last two bytes are NOT CRLF, we have a partial chunk
@@ -359,17 +359,12 @@ public:
                     if (chunkInfo.dataLen == chunkInfo.chunkSize)
                         chunkInfo.phase = READ_CHUNK_SIZE;
                 }
-                // if we read 0 bytes, read next chunk size
-                else
-                {
+                else // if we read 0 bytes, read next chunk size
                     chunkInfo.phase = READ_CHUNK_SIZE;
-                }
             }
             else
             {
-
-                read = readLine(&line);
-
+                int read = readLine(&line);
                 // CRLF (end of chunked body)
                 if (read == 2 && line[0] == '\r' && line[1] == '\n')
                     res = -1;
@@ -404,7 +399,7 @@ public:
 
     uint32_t hex2int(const char *hex)
     {
-        uint32_t val = 0;
+        uint32_t num = 0;
         while (*hex)
         {
             // get current character then increment
@@ -417,9 +412,9 @@ public:
             else if (byte >= 'A' && byte <= 'F')
                 byte = byte - 'A' + 10;
             // shift 4 to make space for new digit, and add the 4 bits of the new digit
-            val = (val << 4) | (byte & 0xF);
+            num = (num << 4) | (byte & 0xF);
         }
-        return val;
+        return num;
     }
 
     int readLine(String *buf = nullptr)

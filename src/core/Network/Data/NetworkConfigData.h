@@ -44,6 +44,7 @@ private:
         NetworkStatusCallback net_status_cb = NULL;
 
     public:
+        generic_data() {}
         void copy(const generic_data &rhs)
         {
             this->net_con_cb = rhs.net_con_cb;
@@ -74,6 +75,7 @@ private:
         gsm_conn_status conn_status;
 
     public:
+        gsm_data() {}
         void copy(const gsm_data &rhs)
         {
             this->modem = rhs.modem;
@@ -194,8 +196,9 @@ private:
     unsigned long disconnected_ms = 0;
 
 public:
+    network_config_data() {}
     ~network_config_data() { clear(); }
-    
+
     network_config_data &operator=(const network_config_data &rhs)
     {
         copy(rhs);

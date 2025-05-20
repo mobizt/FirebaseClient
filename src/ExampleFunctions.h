@@ -39,6 +39,8 @@ void set_ssl_client_insecure_and_buffer(SSL_CLIENT &client)
 #if defined(ESP8266)
     client.setBufferSizes(4096, 1024);
 #endif
+#else
+    (void)client;
 #endif
 }
 
@@ -81,7 +83,6 @@ void file_operation_callback(File &file, const char *filename, file_operating_mo
     file = myFile;
 }
 
-
 void print_file_content(const String &filename)
 {
     File file = MY_FS.open(filename, FILE_OPEN_MODE_READ);
@@ -110,7 +111,7 @@ void print_file_content(const String &filename)
 #endif
 
 // Debug information printing
-static void auth_debug_print(AsyncResult &aResult)
+void auth_debug_print(AsyncResult &aResult)
 {
     if (aResult.isEvent())
     {
@@ -129,7 +130,7 @@ static void auth_debug_print(AsyncResult &aResult)
 }
 
 // Function to get NTP server time.
-static uint32_t get_ntp_time()
+uint32_t get_ntp_time()
 {
     uint32_t ts = 0;
     Serial.print("Getting time from NTP server... ");
@@ -156,7 +157,7 @@ static uint32_t get_ntp_time()
 }
 
 // Token type information printing
-static void print_token_type(FirebaseApp &app)
+void print_token_type(FirebaseApp &app)
 {
     Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
     firebase_token_type type = app.getTokenType();

@@ -32,9 +32,17 @@
 #define ENABLE_USER_CONFIG
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_CLOUD_STORAGE
+#define ENABLE_OTA
 
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
+
+// For Arduino SAMD21 OTA supports.
+// See https://github.com/mobizt/FirebaseClient#ota-update.
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Internal_Storage_OTA.h>
+#define OTA_STORAGE InternalStorage
+#endif
 
 #define WIFI_SSID "WIFI_AP"
 #define WIFI_PASSWORD "WIFI_PASSWORD"

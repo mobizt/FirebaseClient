@@ -118,7 +118,7 @@ public:
         va_start(va, format);
         vsnprintf(s, size, format, va);
         va_end(va);
-        buff += (const char *)s;
+        buff += reinterpret_cast<const char *>(s);
     }
     void addParams(const String &src, String &dest)
     {

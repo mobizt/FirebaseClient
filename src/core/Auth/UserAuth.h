@@ -31,6 +31,8 @@ namespace firebase_ns
             data.clear();
             if (userFile.initialized)
                 data.file_data.copy(userFile);
+#else
+            (void)userFile;
 #endif
         }
 
@@ -68,6 +70,8 @@ namespace firebase_ns
                     userFile.file.close();
                 }
             }
+#else
+            (void)userFile;
 #endif
             return ret;
         }

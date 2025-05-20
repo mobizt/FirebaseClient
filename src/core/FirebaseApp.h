@@ -304,7 +304,7 @@ namespace firebase_ns
             }
         }
 
-        void process(AsyncClientClass *aClient, AsyncResult *aResult, AsyncResultCallback resultCb)
+        void process(AsyncClientClass *aClient)
         {
             if (!aClient)
                 return;
@@ -359,7 +359,7 @@ namespace firebase_ns
             getAppDebug(aClient)->pop_front();
             getAppEvent(aClient)->pop_front();
 
-            process(aClient, sData ? &sData->aResult : nullptr, resultCb);
+            process(aClient);
 
             if (!isExpired() || (isExpired() && auth_data.app_token.val[app_tk_ns::token].length() && !auth_data.auto_renew && !auth_data.force_refresh))
                 return true;
@@ -372,7 +372,7 @@ namespace firebase_ns
                     auth_data.user_auth.task_type = firebase_core_auth_task_type_refresh_token;
                     setEvent(auth_event_uninitialized);
                 }
-                else if ((auth_data.user_auth.status._event == auth_event_error || auth_data.user_auth.status._event == auth_event_ready) && (auth_data.app_token.expire == 0 || (auth_data.app_token.expire > 0 && isExpired())))
+                else if ((auth_data.user_auth.status._event == auth_event_error || auth_data.user_auth.status._event == auth_event_ready) && (auth_data.app_token.expire == 0 || isExpired()))
                 {
                     processing = true;
                     setEvent(auth_event_uninitialized);

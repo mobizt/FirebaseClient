@@ -2239,14 +2239,10 @@ void *BSSL_SSL_Client::mallocImpl(size_t len, bool clear)
 #endif
 
     p = reinterpret_cast<void *>(malloc(newLen));
-    bool nn = p ? true : false;
-
+   
 #if defined(ESP_SSLCLIENT_ESP8266_USE_EXTERNAL_HEAP)
     ESP.resetHeap();
 #endif
-
-    if (!nn)
-        return NULL;
 
 #endif
     if (clear)

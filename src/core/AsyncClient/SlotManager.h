@@ -149,7 +149,9 @@ public:
 #if defined(ENABLE_DATABASE)
         clearSSE(&sData->aResult.rtdbResult);
 #endif
+#if defined(ENABLE_FS)
         sData->request.closeFile();
+#endif
         setLastError(sData);
         // data available from sync and asyn request except for sse
         returnResult(sData, true);
@@ -281,7 +283,7 @@ public:
     void stop()
     {
         if (conn.isConnected())
-            debug_log.push_back(-1, FPSTR("Terminating the server connection..."));
+            debug_log.push_back(-1, "Terminating the server connection...");
         conn.stop();
     }
 
@@ -314,27 +316,29 @@ public:
         if (toRemove)
             sData->to_remove = toRemove;
 
+#if defined(ENABLE_FS)
         if (toCloseFile)
             sData->request.closeFile();
-
+#endif
+        (void)toCloseFile;
         setLastError(sData);
     }
 
     template <typename T>
     void setClientError(T &request, int code)
     {
-        AsyncResult *aResult = request.aResult;
+        AsyncResult *aRes = request.aResult;
 
-        if (!aResult)
-            aResult = new AsyncResult();
+        if (!aRes)
+            aRes = new AsyncResult();
 
-        aResult->lastError.setClientError(code);
-        firebase_bebug_callback(request.cb, *aResult, __func__, __LINE__, __FILE__);
+        aRes->lastError.setClientError(code);
+        firebase_bebug_callback(request.cb, *aRes, __func__, __LINE__, __FILE__);
 
         if (!request.aResult)
         {
-            delete aResult;
-            aResult = nullptr;
+            delete aRes;
+            aRes = nullptr;
         }
     }
 
@@ -374,7 +378,7 @@ public:
         debug_log.reset();
 
         if (!conn.isConnected() && !sData->auth_used) // This info is already shown in auth task
-            debug_log.push_back(-1, FPSTR("Connecting to server..."));
+            debug_log.push_back(-1, "Connecting to server...");
 
         sData->return_type = conn.connect(host, port);
 

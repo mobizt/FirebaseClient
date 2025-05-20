@@ -58,7 +58,7 @@ public:
     /**
      * Perform the async task repeatedly (DEPRECATED).
      */
-    void loop() { loopImpl(__PRETTY_FUNCTION__); }
+    void loop() { loopImpl(); }
 
     /** Creates a new function.
      * If a function with the given name already exists in the specified project,

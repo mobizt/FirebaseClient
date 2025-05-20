@@ -71,7 +71,7 @@ public:
     reqns::http_request_method method = reqns::http_undefined;
     Timer send_timer;
 
-    tcp_client_type client_type;
+    tcp_client_type client_type = tcpc_sync;
     Client *client = nullptr;
     void *atcp_config = nullptr;
 
@@ -184,7 +184,6 @@ public:
     // Note: If no custom header assigned, the new line will append to the header.
     void setFileContentLength(int headerLen = 0, const String &customHeader = "")
     {
-        StringUtil sut;
         size_t sz = 0;
 #if defined(ENABLE_FS)
         if (file_data.cb && file_data.filename.length())
@@ -203,14 +202,15 @@ public:
                 sut.printTo(val[reqns::header], customHeader.length() + 30, "%s:%d\r\n", customHeader.c_str(), file_data.file_size + headerLen);
             else
                 sut.printTo(val[reqns::header], 30, "Content-Length: %d\r\n\r\n", (int)file_data.file_size);
-
+#if defined(ENABLE_FS)
             closeFile();
+#endif
         }
     }
 
+#if defined(ENABLE_FS)
     void closeFile()
     {
-#if defined(ENABLE_FS)
         if (file_data.file && file_data.file_status == file_config_data::file_status_opened)
         {
             file_data.file_size = 0;
@@ -219,21 +219,19 @@ public:
             file_data.file_status = file_config_data::file_status_closed;
             file_data.file.close();
         }
-#endif
     }
 
     bool openFile(file_operating_mode mode)
     {
-#if defined(ENABLE_FS)
+
         file_data.cb(file_data.file, file_data.filename.c_str(), mode);
         if (!file_data.file)
             return false;
-#else
-        return false;
-#endif
+
         file_data.file_status = file_config_data::file_status_opened;
         return true;
     }
+#endif
 };
 
 #endif

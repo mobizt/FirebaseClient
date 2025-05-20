@@ -956,7 +956,7 @@ public:
     /**
      * Perform the async task repeatedly (DEPRECATED).
      */
-    void loop() { loopImpl(__PRETTY_FUNCTION__); }
+    void loop() { loopImpl(); }
 
 private:
     String sse_events_filter;

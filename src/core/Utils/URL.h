@@ -63,17 +63,15 @@ public:
 
     /* Append the string with google storage URL */
     void addGStorageURL(String &uri, const String &bucketID, const String &storagePath) { sut.printTo(uri, 500, "gs://%s%s%s", bucketID.c_str(), storagePath[0] != '/' ? "/" : "", storagePath.c_str()); }
-
+#if defined(ENABLE_FUNCTIONS)
     /* Append the string with cloudfunctions project host */
     void addFunctionsHost(String &uri, const String &locationId, const String &projectId, const String &path, bool url)
     {
-#if defined(ENABLE_FUNCTIONS)
         if (url)
             sut.clear(uri);
         sut.printTo(uri, 500, "%s%s-%s.cloudfunctions.net%s%s", url ? "https://" : "", locationId.c_str(), projectId.c_str(), path.length() ? "/" : "", path.length() ? path.c_str() : "");
-#endif
     }
-
+#endif
     void hexchar(char c, char &hex1, char &hex2)
     {
         hex1 = c / 16;

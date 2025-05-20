@@ -24,13 +24,13 @@ private:
     String buf;
     boolean_t &copy(bool rhs)
     {
-        buf = rhs ? FPSTR("true") : FPSTR("false");
+        buf = rhs ? "true" : "false";
         return *this;
     }
 
 public:
     boolean_t() {}
-    explicit boolean_t(bool v) : buf(v ? FPSTR("true") : FPSTR("false")) {}
+    explicit boolean_t(bool v) : buf(v ? "true" : "false") {}
     const char *c_str() const { return buf.c_str(); }
     size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
 };
@@ -60,7 +60,7 @@ public:
     {
         aq(true);
         if (std::is_same<T, bool>::value)
-            buf += v ? FPSTR("true") : FPSTR("false");
+            buf += v ? "true" : "false";
         else if (v_number<T>::value)
             buf += sut.numString(v);
         else
@@ -146,7 +146,7 @@ public:
     explicit object_t(T o)
     {
         if (std::is_same<T, bool>::value)
-            buf += o ? FPSTR("true") : FPSTR("false");
+            buf += o ? "true" : "false";
         else if (v_number<T>::value)
             buf += sut.numString(o);
         else
@@ -157,8 +157,8 @@ public:
     explicit object_t(string_t o) : buf(o.c_str()) {}
     size_t printTo(Print &p) const override { return p.print(buf.c_str()); }
     void clear() { sut.clear(buf); }
-    void initObject() { buf = FPSTR("{}"); };
-    void initArray() { buf = FPSTR("[]"); };
+    void initObject() { buf = "{}"; };
+    void initArray() { buf = "[]"; };
 
 private:
     String buf;
