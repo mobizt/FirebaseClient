@@ -2,7 +2,6 @@
 #define CORE_UTILS_OBJECT_WRITER_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include "./core/Utils/JSON.h"
 
 #define RESOURCE_PATH_BASE FPSTR("<resource_path>")

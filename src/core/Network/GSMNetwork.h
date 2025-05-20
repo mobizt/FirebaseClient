@@ -13,8 +13,8 @@ public:
      *
      * @param modem The pointer to TinyGsm modem object. Modem should be initialized and/or set the mode before transfering the data.
      *
-     * This required two places of the GSM module macro definitions, one in your sketch and another in /src/FirebaseConfig.h
-     * or in your own defined config at src/UserConfig.h or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
+     * This required the GSM module macro definitions, by defining the `TINY_GSM_MODEM_XXXXXXX` in the sketch before including 
+     * the library header file `FirebaseClient.h` or adding `TINY_GSM_MODEM_XXXXXXX` in the compiler build flags.
      *
      * The TinyGsm modem should be defined at the same usage scope of GSMNetwork and AsyncClientClass.
      * See /examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/ for using TinyGSM with this library.
@@ -41,8 +41,8 @@ public:
      * @param user The GPRS user.
      * @param password The GPRS password.
      *
-     * This required two places of the GSM module macro definitions, one in your sketch and another in /src/FirebaseConfig.h
-     * or in your own defined config at src/UserConfig.h or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
+     * This required the GSM module macro definitions, by defining the `TINY_GSM_MODEM_XXXXXXX` in the sketch before including 
+     * the library header file `FirebaseClient.h` or adding `TINY_GSM_MODEM_XXXXXXX` in the compiler build flags.
      *
      * The TinyGsm modem should be defined at the same usage scope of GSMNetwork and AsyncClientClass.
      * See /examples/App/NetworkInterfaces/Async/Callback/GSMNetwork/ for using TinyGSM with this library.

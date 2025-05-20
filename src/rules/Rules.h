@@ -1,7 +1,6 @@
 #ifndef RULES_RULES_H
 #define RULES_RULES_H
 
-#include "./FirebaseConfig.h"
 #if defined(ENABLE_RULESETS)
 
 #include <Arduino.h>

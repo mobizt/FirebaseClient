@@ -128,7 +128,7 @@ class GSMNetwork
 
     The GSM network reconnection will be ignored.
 
-    This required two places of the GSM module macro definitions, one in your sketch and another in `/src/FirebaseConfig.h` or in your own defined config at `src/UserConfig.h` or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
+    This required the GSM module macro definitions, by defining the `TINY_GSM_MODEM_XXXXXXX` in the sketch before including the library header file `FirebaseClient.h` or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
     
     The TinyGsm modem should be defined at the same usage scope of `GSMNetwork` and `AsyncClientClass`.
 
@@ -146,7 +146,7 @@ class GSMNetwork
 
     This will handle the GSM network reconnection.
 
-    This required two places of the GSM module macro definitions, one in your sketch and another in `/src/FirebaseConfig.h` or in your own defined config at `src/UserConfig.h` or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
+    This required the GSM module macro definitions, by defining the `TINY_GSM_MODEM_XXXXXXX` in the sketch before including the library header file `FirebaseClient.h` or adding `TINY_GSM_MODEM_XXXXXXX` in compiler build flags.
     
     The TinyGsm modem should be defined at the same usage scope of `GSMNetwork` and `AsyncClientClass`.
 
@@ -294,7 +294,7 @@ class DefaultEthernetNetwork
 
     This eth should be defined at the same usage scope of AsyncClientCalss.
 
-    To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` should be defined in src/FirebaseConfig.h or in your own defined config at src/UserConfig.h or adding `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in the compiler build flags.
+    To use ESP8266 native lwIP Ethernet, the one of following macros, `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` should be defined in the sketch before incliding the library header file `FirebaseClient.h` or adding `ENABLE_ESP8266_ENC28J60_ETH`, `ENABLE_ESP8266_W5500_ETH` and `ENABLE_ESP8266_W5100_ETH` in the compiler build flags.
     
     Use `Firebase_SPI_ETH_Module::enc28j60`, `Firebase_SPI_ETH_Module::w5100` and `Firebase_SPI_ETH_Module::w5500` to assign the pointer to `ENC28J60lwIP`, `Wiznet5100lwIP` and `Wiznet5500lwIP` classes objects respectively.
     

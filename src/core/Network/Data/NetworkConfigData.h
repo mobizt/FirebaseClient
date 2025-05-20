@@ -2,7 +2,6 @@
 #define CORE_NETWORK_DATA_NETWORK_CONFIG_DATA_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include "./core/Utils/Memory.h"
 #include "./core/Utils/Timer.h"
 #include "./core/Network/NetworkOptions.h"
@@ -113,6 +112,7 @@ private:
     {
         friend class AsyncClientClass;
         friend class conn_handler;
+        friend class EthernetNetwork;
 
     private:
         int ethernet_reset_pin = -1, ethernet_cs_pin = -1;

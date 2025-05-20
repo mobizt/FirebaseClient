@@ -23,7 +23,12 @@
  * The object is the object in Storage bucket to delete.
  */
 
-#include <Arduino.h>
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_USER_AUTH
+#define ENABLE_STORAGE
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 

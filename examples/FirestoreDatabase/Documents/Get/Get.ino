@@ -32,7 +32,12 @@
  * GetDocumentOptions::readTime - A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
  */
 
-#include <Arduino.h>
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_USER_AUTH
+#define ENABLE_FIRESTORE
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 

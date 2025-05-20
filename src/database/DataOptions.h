@@ -1,5 +1,5 @@
 /**
- * 2025-01-30
+ * 2025-05-20
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -26,7 +26,6 @@
 #define DATABASE_DATA_OPTIONS_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include "./database/DatabaseFilter.h"
 #include "./core/Utils/StringUtil.h"
 

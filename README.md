@@ -2,9 +2,9 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v2.0.3-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v2.0.4-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
-Revision `2025-04-07`
+Revision `2025-05-20`
 
 ## Introduction
 
@@ -179,7 +179,7 @@ In version 2.x.x and later, when assign the timeout (> 0) to the `initializeApp`
 
 The callback function assigned with `initializeApp` function will provide the auth process event, debug and error information while authenticating in async and sync modes.
 
-In version 2.x.x, the `FirebaseApp` class can also maintain the async tasks that shored in other `AsyncClientClass`s.
+In version 2.x.x, the `FirebaseApp` class can also maintain the async tasks that stored in other `AsyncClientClass`s.
 
 The details for all classes used in this library are available. Click the following links for details. 
 
@@ -693,7 +693,7 @@ Some options can be disabled.
 
 - ### Predefined Options
 
-The predefined options that are already set in [**FirebaseConfig.h**](src/FirebaseConfig.h) are following.
+The predefined options are defined as the following.
 
 ```cpp
 ENABLE_DATABASE // For RTDB compilation
@@ -722,9 +722,16 @@ ENABLE_ETHERNET_NETWORK
 ENABLE_GSM_NETWORK
 ```
 
+In version 2.0.4 and newer, the config file `FirebaseCongig.h` and `UserConfig.h` are obsoleted and will not be used in this library.
+
+Then in the version 2.0.4 and newer, to save program space by compiling only the options you used, define the following macro and followed by the options that you want to use before including the library header file `FirebaseClient.h`.
+
+```cpp
+ENABLE_USER_CONFIG
+```
 - ### Optional Options
 
-The following options are not yet defined in [**FirebaseConfig.h**](src/FirebaseConfig.h) and can be defined by user.
+The following options are not yet pre-defined and can be defined by user (in your sketch with `ENABLE_USER_CONFIG`).
 
 ```cpp
 FIREBASE_ETHERNET_MODULE_LIB `"EthernetLibrary.h"` // For the Ethernet library to work with external Ethernet module.
@@ -741,61 +748,6 @@ FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit (number) setting for
 FIREBASE_PRINTF_PORT // For Firebase.printf debug port class object.
 FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size. The default printf buffer size is 1024 for ESP8266 and SAMD otherwise 4096. Some debug message may be truncated for larger text.
 ```
-
-You can assign the optional build options using one of the following methods.
-
-- By creating user config file `UserConfig.h` in library installed folder and define these optional options.
-
-- By adding compiler build flags with `-D name`.
-
-- By defined the macros before including the library main header file `FirebaseClient.h`.
-
-In PlatformIO IDE, using `build_flags` in PlatformIO IDE's platformio.ini is more convenient 
-
-```ini
-build_flags = -D DISABLE_STORAGE
-              -D FIREBASE_DISABLE_ONBOARD_WIFI
-```
-
-For external Ethernet module integation used with function `setEthernetClient`, both `FIREBASE_ETHERNET_MODULE_LIB` and `FIREBASE_ETHERNET_MODULE_CLASS` should be defined.
-
-`FIREBASE_ETHERNET_MODULE_LIB` is the Ethernet library name with extension (.h) and should be inside `""` or `<>` e.g. `"Ethernet.h"`.
-
-`FIREBASE_ETHERNET_MODULE_CLASS` is the name of static object defined from class e.g. `Ethernet`.
-
-`FIREBASE_ETHERNET_MODULE_TIMEOUT` is the timeout in milliseconds to wait for network connection.
-
-For disabling predefined options instead of editing the [**FirebaseConfig.h**](src/FirebaseConfig.h) or using `#undef` in `UserConfig.h`, you can define these build flags with these names or macros in `UserConfig.h`.
-
-```cpp
-DISABLE_DATABASE // For disabling RTDB support
-DISABLE_FIRESTORE // For disabling Firestore support
-DISABLE_FIRESTORE_QUERY // For Firestore Query feature compilation
-DISABLE_MESSAGING // For disabling Firebase Cloud Messaging support
-DISABLE_STORAGE // For disabling Firebase Storage support
-DISABLE_CLOUD_STORAGE // For disabling Google Cloud Storage support
-DISABLE_FUNCTIONS // For disabling Google Cloud Functions support
-DISABLE_RULESETS // For disabling RuleSets support
-DISABLE_PSRAM // For disabling PSRAM support
-DISABLE_OTA // For disabling OTA updates support
-DISABLE_FS // For disabling filesystem support
-
-// For disabling authentication and token
-DISABLE_SERVICE_AUTH
-DISABLE_CUSTOM_AUTH
-DISABLE_USER_AUTH
-DISABLE_ACCESS_TOKEN
-DISABLE_CUSTOM_TOKEN
-DISABLE_ID_TOKEN
-DISABLE_LEGACY_TOKEN
-
-FIREBASE_DISABLE_ALL_OPTIONS // For disabling all predefined build options above
-```
-
-> [!NOTE]  
-> `UserConfig.h` for user config should be placed in the library installed folder inside the `src` folder.
-
-This `UserConfig.h` will not change or overwrite when update the library.
 
 The library code size is varied from 80k - 110k (WiFi and WiFiClientSecure excluded) depends on the build options.
 

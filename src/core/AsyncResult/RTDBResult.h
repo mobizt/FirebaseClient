@@ -2,7 +2,6 @@
 #define CORE_ASYNC_RESULT_RTDB_RESULT_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include "./core/AsyncResult/AppLog.h"
 #include "./core/AsyncResult/Value.h"
 #include "./core/Utils/Timer.h"

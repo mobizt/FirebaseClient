@@ -2,7 +2,6 @@
 #define CORE_UPDATER_OTA_UPDATER_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 
 #if __has_include(<OTAStorage.h>)
 

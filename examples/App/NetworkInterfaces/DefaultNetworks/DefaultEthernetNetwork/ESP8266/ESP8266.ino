@@ -29,7 +29,12 @@
  * SPI Ethernet module (e.g. ENC28J60lwIP, W5100lwIP and W5500lwIP).
  */
 
-#include <Arduino.h>
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_USER_AUTH
+#define ENABLE_ESP8266_ENC28J60_ETH
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 

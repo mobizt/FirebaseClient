@@ -1,6 +1,6 @@
 
 /**
- * 2025-02-08
+ * 2025-05-20
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -27,7 +27,6 @@
 #define FIRESTORE_QUERY_CPP
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 
 #if defined(ENABLE_FIRESTORE) && defined(ENABLE_FIRESTORE_QUERY)
 

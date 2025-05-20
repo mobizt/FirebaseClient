@@ -27,7 +27,12 @@
  * The location name is the project location.
  */
 
-#include <Arduino.h>
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_SERVICE_AUTH
+#define ENABLE_FUNCTIONS
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 
@@ -128,7 +133,7 @@ void processData(AsyncResult &aResult)
     // Exits when no result available when calling from the loop.
     if (!aResult.isResult())
         return;
-        
+
     if (aResult.isEvent())
     {
         Firebase.printf("Event task: %s, msg: %s, code: %d\n", aResult.uid().c_str(), aResult.eventLog().message().c_str(), aResult.eventLog().code());

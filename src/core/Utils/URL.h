@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include <Client.h>
-#include "./FirebaseConfig.h"
 #include "./core/Utils/StringUtil.h"
 #include "./core/Utils/Memory.h"
 

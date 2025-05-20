@@ -39,7 +39,12 @@
  * BatchGetDocumentOptions::readTime - Setting the documents as they were at the given time. This may not be older than 270 seconds.
  */
 
-#include <Arduino.h>
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_SERVICE_AUTH
+#define ENABLE_FIRESTORE
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 

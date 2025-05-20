@@ -26,7 +26,13 @@
  *
  */
 
-#include <Arduino.h>
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_CUSTOM_AUTH
+#define ENABLE_LEGACY_TOKEN
+#define ENABLE_DATABASE
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 #include <FirebaseJson.h>

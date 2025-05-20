@@ -1,5 +1,5 @@
 /**
- * 2025-01-30
+ * 2025-05-20
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -26,9 +26,48 @@
 #ifndef FIREBASE_CLIENT_H
 #define FIREBASE_CLIENT_H
 
-// FIREBASE_CLIENT_VERSION macro moved to core/Core.h
-
 #include <Arduino.h>
+#if !defined(ENABLE_USER_CONFIG)
+
+#define ENABLE_DATABASE
+#define ENABLE_FIRESTORE
+#define ENABLE_FIRESTORE_QUERY
+#define ENABLE_MESSAGING
+#define ENABLE_STORAGE
+#define ENABLE_CLOUD_STORAGE
+#define ENABLE_FUNCTIONS
+#define ENABLE_RULESETS
+#define ENABLE_PSRAM
+#define ENABLE_OTA
+#define ENABLE_FS
+#define ENABLE_SERVICE_AUTH
+#define ENABLE_CUSTOM_AUTH
+#define ENABLE_USER_AUTH
+#define ENABLE_ACCESS_TOKEN
+#define ENABLE_CUSTOM_TOKEN
+#define ENABLE_ID_TOKEN
+#define ENABLE_LEGACY_TOKEN
+
+#define ENABLE_ETHERNET_NETWORK
+#define ENABLE_GSM_NETWORK
+
+#endif
+#include "./core/Options.h"
+
+#if defined(ENABLE_JWT) || defined(ENABLE_ESP_SSLCLIENT)
+
+#if __has_include(<ESP_SSLClient.h>)
+#include <ESP_SSLClient.h>
+#else
+#include "./client/SSLClient/ESP_SSLClient.h"
+#endif
+
+#endif
+
+#if defined(ENABLE_JWT)
+#include "./core/JWT/JWT.h"
+#include "./core/JWT/JWT.cpp"
+#endif
 #include "./core/FirebaseApp.h"
 #include "./core/AsyncClient/AsyncClient.h"
 

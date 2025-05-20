@@ -2,14 +2,10 @@
 #define CORE_FIREBASE_APP_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include "./core/Auth/AuthConfig.h"
 #include "./core/AsyncClient/AsyncClient.h"
 #include "./core/AsyncResult/RTDBResult.h"
 #include "./core/Utils/List.h"
-#if defined(ENABLE_JWT)
-#include "./core/JWT/JWT.h"
-#endif
 #include "./core/Utils/JSON.h"
 #include "./core/Utils/Timer.h"
 #include "./core/AppBase.h"
@@ -17,10 +13,6 @@
 
 namespace firebase_ns
 {
-#if defined(ENABLE_JWT)
-    static JWTClass JWT;
-#endif
-
     class FirebaseApp : public AppBase
     {
         friend class RealtimeDatabase;
@@ -729,9 +721,6 @@ namespace firebase_ns
 #else
         void loop()
         {
-#if defined(ENABLE_JWT)
-            jwtClass = nullptr;
-#endif
             await(await_ms);
         }
 #endif

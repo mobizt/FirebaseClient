@@ -2,7 +2,6 @@
 #define CORE_NETWORK_NETWORK_OPTIONS_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include <vector>
 
 #if __has_include(<esp_idf_version.h>)
@@ -201,7 +200,8 @@
     defined(TINY_GSM_MODEM_MC60) ||       \
     defined(TINY_GSM_MODEM_MC60E) ||      \
     defined(TINY_GSM_MODEM_XBEE) ||       \
-    defined(TINY_GSM_MODEM_SEQUANS_MONARCH)
+    defined(TINY_GSM_MODEM_SEQUANS_MONARCH) ||       \
+    defined(TINY_GSM_FORK_LIBRARY)
 #define FIREBASE_TINYGSM_IS_AVAILABLE
 #endif // TINY_GSM_MODEM_SIM800 ...
 

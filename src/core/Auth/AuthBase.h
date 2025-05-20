@@ -2,7 +2,6 @@
 #define CORE_AUTH_DATA_AUTH_BASE_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 
 #define FIREBASE_DEFAULT_TOKEN_TTL 3300
 

@@ -30,7 +30,13 @@
  * See examples/RealtimeDatabase/Async/Callback/StreamPPP/StreamPPP.ino
  */
 
-#include <Arduino.h>
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_USER_AUTH
+#define ENABLE_DATABASE
+#define ENABLE_GSM_NETWORK
+#define ENABLE_ESP_SSLCLIENT
 
 #define TINY_GSM_MODEM_SIM7600 // SIMA7670 Compatible with SIM7600 AT instructions
 

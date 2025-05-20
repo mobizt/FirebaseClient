@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include <Client.h>
-#include "./FirebaseConfig.h"
 #include "./core/Network/NetConfig.h"
 #include "./core/AsyncResult/AppLog.h"
 #if defined(ENABLE_ASYNC_TCP_CLIENT)

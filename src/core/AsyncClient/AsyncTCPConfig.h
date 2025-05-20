@@ -2,7 +2,6 @@
 #define CORE_ASYNC_CLIENT_ASYNC_TCP_CONFIG_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
 /**

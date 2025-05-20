@@ -2,7 +2,6 @@
 #define CORE_NETWORK_DATA_FIREBASE_WIFI_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 
 struct FirebaseWiFi_credential_t
 {

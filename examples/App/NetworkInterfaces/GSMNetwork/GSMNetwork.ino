@@ -14,9 +14,9 @@
  * GSMNetwork::GSMNetwork(<modem>);
  *
  * <modem> - The pointer to TinyGsm modem object. Modem should be initialized and/or set mode before transfering data.
- * 
+ *
  * The GSM network reconnection will be ignored with this constructor.
- * 
+ *
  * 2.------------------------
  *
  * GSMNetwork::GSMNetwork(<modem>, <gsm_pin>, <apn>, <user>, <password>);
@@ -26,19 +26,21 @@
  * <apn> - The GPRS APN (Access Point Name).
  * <user> - The GPRS user.
  * <password> - The GPRS password.
- * 
+ *
  * This will reconnect the GSM network when it was not connected with the provided credentials.
  *
  * In ESP32 Core v3.x.x, SIM devices are natively supported.
  * See examples/App/NetworkInterfaces/Async/Callback/DefaultNetworks/DefaultPPPNetwork/ESP32/ESP32.ino
  */
 
-#include <Arduino.h>
-
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_USER_AUTH
+#define ENABLE_GSM_NETWORK
+#define ENABLE_ESP_SSLCLIENT
 #define TINY_GSM_MODEM_SIM7600 // SIMA7670 Compatible with SIM7600 AT instructions
 
-// 📍######### IMPORTANT ! #########
-// The macro TINY_GSM_MODEM_SIM7600 should be defined in src/FirebaseConfig.h or user sefined config at src/UserConfig.h
 
 // Set serial for debug console (to the Serial Monitor, default speed 115200)
 #define SerialMon Serial
@@ -68,7 +70,7 @@ const char gprsPass[] = "";
 
 // LilyGO TTGO T-A7670 development board (ESP32 with SIMCom A7670)
 #define SIM_MODEM_RST 5
-#define SIM_MODEM_RST_LOW false // active HIGH
+#define SIM_MODEM_RST_LOW true // active LOW
 #define SIM_MODEM_RST_DELAY 200
 #define SIM_MODEM_TX 26
 #define SIM_MODEM_RX 27

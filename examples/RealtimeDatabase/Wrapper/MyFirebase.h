@@ -1,7 +1,6 @@
 #ifndef MY_FIREBASE_H
 #define MY_FIREBASE_H
 
-#include <Arduino.h>
 #include <FirebaseClient.h>
 
 /**
@@ -24,45 +23,50 @@ public:
         NoAuth no_auth;
         beginInternal(client, getNetwork(net), getAuth(no_auth), databaseUrl);
     }
-
+#if defined(ENABLE_USER_AUTH)
     void userBegin(Client &client, const String &databaseUrl, const String &apiKey, const String &email, const String &password)
     {
         UserAuth user_auth(apiKey, email, password);
         beginInternal(client, getNetwork(net), getAuth(user_auth), databaseUrl);
     }
-
+#endif
+#if defined(ENABLE_SERVICE_AUTH)
     void serviceBegin(Client &client, const String &databaseUrl, uint32_t timestamp, const String &clientEmail, const String &projectId, const String &privateKey)
     {
         ServiceAuth service_auth(clientEmail, projectId, privateKey, 3000);
         service_auth.setTime(timestamp);
         beginInternal(client, getNetwork(net), getAuth(service_auth), databaseUrl);
     }
-
+#endif
+#if defined(ENABLE_CUSTOM_AUTH)
     void customBegin(Client &client, const String &databaseUrl, uint32_t timestamp, const String &apiKey, const String &clientEmail, const String &projectId, const String &privateKey, const String &uid, const String &claims = "", size_t expire = FIREBASE_DEFAULT_TOKEN_TTL)
     {
         CustomAuth custom_auth(apiKey, clientEmail, projectId, privateKey, uid, claims, 3000);
         custom_auth.setTime(timestamp);
         beginInternal(client, getNetwork(net), getAuth(custom_auth), databaseUrl);
     }
-
+#endif
+#if defined(ENABLE_ACCESS_TOKEN)
     void accessBegin(Client &client, const String &databaseUrl, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
     {
         AccessToken access_token(token, expire, refresh, client_id, client_secret);
         beginInternal(client, getNetwork(net), getAuth(access_token), databaseUrl);
     }
-
+#endif
+#if defined(ENABLE_ID_TOKEN)
     void idBegin(Client &client, const String &databaseUrl, const String &api_key, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "")
     {
         IDToken id_token(api_key, token, expire, refresh);
         beginInternal(client, getNetwork(net), getAuth(id_token), databaseUrl);
     }
-
+#endif
+#if defined(ENABLE_LEGACY_TOKEN)
     void legacyBegin(Client &client, const String &databaseUrl, const String &databaseSecret)
     {
         LegacyToken legacy_token(databaseSecret);
         beginInternal(client, getNetwork(net), getAuth(legacy_token), databaseUrl);
     }
-
+#endif
     bool ready()
     {
         if (app.isInitialized())

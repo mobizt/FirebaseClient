@@ -1,5 +1,5 @@
 /**
- * 2025-02-08
+ * 2025-05-20
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -26,7 +26,6 @@
 #define FUNCTIONS_POLICY_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include "./core/Utils/JSON.h"
 #include "./core/Utils/ObjectWriter.h"
 #include "./core/AsyncClient/AsyncClient.h"

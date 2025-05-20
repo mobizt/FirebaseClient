@@ -69,7 +69,10 @@
  * function immediately.
  */
 
-#include <Arduino.h>
+// To define build options in your sketch
+#define ENABLE_USER_CONFIG
+#define ENABLE_SERVICE_AUTH
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 

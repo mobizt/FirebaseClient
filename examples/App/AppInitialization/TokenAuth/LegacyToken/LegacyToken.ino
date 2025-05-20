@@ -17,7 +17,10 @@
  * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the LegacyToken credentials will be saved to or read from.
  */
 
-#include <Arduino.h>
+// To define build options in your sketch
+#define ENABLE_USER_CONFIG
+#define ENABLE_LEGACY_TOKEN
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 

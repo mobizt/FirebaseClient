@@ -57,7 +57,12 @@
  * By providing AsyncResultCallback in the initializeApp function, the debug information will be collected and send to AsyncResultCallback
  * function immediately.
  */
-#include <Arduino.h>
+
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_ACCESS_TOKEN
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 

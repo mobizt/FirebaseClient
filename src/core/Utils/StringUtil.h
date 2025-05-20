@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include <Client.h>
-#include "./FirebaseConfig.h"
 #include <type_traits>
 #include <stdarg.h>
 

@@ -6,7 +6,6 @@
 #if __has_include(<vector>)
 #include <vector>
 #endif
-#include "./FirebaseConfig.h"
 #include "./core/Updater/OTAUpdater.h"
 #include "./core/File/BlobWriter.h"
 #include "./core/Utils/Memory.h"

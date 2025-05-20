@@ -37,7 +37,11 @@
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
-#include <Arduino.h>
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_USER_AUTH
+
 #include <PPP.h>
 #include <NetworkClientSecure.h>
 #include <FirebaseClient.h>
@@ -64,7 +68,7 @@ AsyncClient aClient(ssl_client, getNetwork(default_network));
 
 // WaveShare SIM7600 HW Flow Control
 #define PPP_MODEM_RST 25
-#define PPP_MODEM_RST_LOW false // active HIGH
+#define PPP_MODEM_RST_LOW true // active LOW
 #define PPP_MODEM_RST_DELAY 200
 #define PPP_MODEM_TX 21
 #define PPP_MODEM_RX 22
@@ -225,7 +229,7 @@ void setConfig()
     Serial.println("Initializing app...");
     initializeApp(aClient, app, getAuth(user_auth), auth_debug_print, "🔐 authTask");
 
-     // Or intialize the app and wait.
+    // Or intialize the app and wait.
     // initializeApp(aClient, app, getAuth(user_auth), 120 * 1000, auth_debug_print);
 }
 

@@ -2,7 +2,6 @@
 #define CORE_AUTH_USER_AUTH_DATA_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include "./core/File/FileConfig.h"
 #include "./core/Auth/Data/ServiceData.h"
 #include "./core/Auth/Data/CustomData.h"

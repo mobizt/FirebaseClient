@@ -1,5 +1,5 @@
 /**
- * 2025-03-26
+ * 2025-05-20
  *
  * The MIT License (MIT)
  * Copyright (c) 2025 K. Suwatchai (Mobizt)
@@ -26,7 +26,6 @@
 #ifndef RULES_RELEASES_H
 #define RULES_RELEASES_H
 
-#include "./FirebaseConfig.h"
 #if defined(ENABLE_RULESETS)
 
 #include <Arduino.h>

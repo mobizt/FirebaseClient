@@ -2,7 +2,6 @@
 #define CORE_FILE_RESUMABLE_UPLOAD_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include "./core/Utils/StringUtil.h"
 
 #if defined(ENABLE_CLOUD_STORAGE)

@@ -2,7 +2,6 @@
 #define CORE_FILE_FILE_CONFIG_DATA_H
 
 #include <Arduino.h>
-#include "./FirebaseConfig.h"
 #include "./core/Utils/Memory.h"
 #include "./core/File/BlobWriter.h"
 #include "./core/File/ResumableUpload.h"

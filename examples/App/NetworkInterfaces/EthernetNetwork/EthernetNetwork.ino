@@ -29,7 +29,13 @@
  * If no parameters assigned to the constructor, the Ethernet client initialization will be ignored.
  */
 
-#include <Arduino.h>
+// To define build options in your sketch,
+// adding the following macros before FirebaseClient.h
+#define ENABLE_USER_CONFIG
+#define ENABLE_USER_AUTH
+#define ENABLE_ETHERNET_NETWORK
+#define ENABLE_ESP_SSLCLIENT
+
 #include <Ethernet.h>
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.

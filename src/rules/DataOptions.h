@@ -1,7 +1,6 @@
 #ifndef RULES_DATA_OPTIONS_H
 #define RULES_DATA_OPTIONS_H
 
-#include "./FirebaseConfig.h"
 #if defined(ENABLE_RULESETS)
 
 #include <Arduino.h>
