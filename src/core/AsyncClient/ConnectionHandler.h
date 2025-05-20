@@ -53,8 +53,8 @@ private:
 public:
     bool sse = false, async = false;
     String host;
-    uint16_t port;
-    
+    uint16_t port = 443;
+
     conn_handler(){}
 
     void newConn(tcp_client_type client_type, Client *client, void *atcp_config, app_log_t *debug_log)
