@@ -1,10 +1,6 @@
 /**
- * BSSL_TCP_Client v2.0.15 for Arduino devices.
- *
- * Created December 5, 2024
- *
  * The MIT License (MIT)
- * Copyright (c) 2023 K. Suwatchai (Mobizt)
+ * Copyright (c) 2025 K. Suwatchai (Mobizt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -46,15 +42,11 @@
 #ifndef BSSL_TCP_CLIENT_CPP
 #define BSSL_TCP_CLIENT_CPP
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic ignored "-Wvla"
-
 #include <Arduino.h>
-#include "../ESP_SSLClient_FS.h"
-#include "../ESP_SSLClient_Const.h"
+#include "BSSL_TCP_Client.h"
+
 #if defined(USE_LIB_SSL_ENGINE) || defined(USE_EMBED_SSL_ENGINE)
 
-#include "BSSL_TCP_Client.h"
 // #include <lwip/sockets.h>
 // #include <lwip/netdb.h>
 // #include <errno.h>
@@ -257,7 +249,12 @@ bool BSSL_TCP_Client::connectSSL()
     return 1;
 }
 
-bool BSSL_TCP_Client::connectSSL(const String host, uint16_t port) { return connectSSL(); }
+bool BSSL_TCP_Client::connectSSL(const String host, uint16_t port)
+{
+    (void)host;
+    (void)port;
+    return connectSSL();
+}
 
 void BSSL_TCP_Client::stop()
 {
@@ -352,7 +349,7 @@ int BSSL_TCP_Client::getLastSSLError(char *dest, size_t len)
     return _ssl_client.getLastSSLError(dest, len);
 }
 
-#if defined(ESP_SSL_FS_SUPPORTED)
+#if defined(ENABLE_FS)
 void BSSL_TCP_Client::setCertStore(CertStoreBase *certStore)
 {
     _ssl_client.setCertStore(certStore);

@@ -38,6 +38,9 @@
 #define ENABLE_FIRESTORE
 #define ENABLE_FIRESTORE_QUERY
 
+// For network independent usage (disable all network features).
+// #define DISABLE_NERWORKS
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 

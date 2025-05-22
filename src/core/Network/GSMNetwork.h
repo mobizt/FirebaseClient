@@ -1,6 +1,8 @@
 #ifndef CORE_NETWORK_GSM_NETWORK_H
 #define CORE_NETWORK_GSM_NETWORK_H
 
+#if !defined(DISABLE_NERWORKS)
+
 #include <Arduino.h>
 #include "./core/Network/DefaultNetwork.h"
 
@@ -62,4 +64,6 @@ public:
     ~GSMNetwork() { clear(); }
 };
 #endif
+#endif
+
 #endif

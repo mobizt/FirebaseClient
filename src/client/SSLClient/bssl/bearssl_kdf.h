@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../ESP_SSLClient_FS.h"
+#include "bssl_config.h"
 #if defined(USE_LIB_SSL_ENGINE)
 
 #ifndef BR_BEARSSL_KDF_H__

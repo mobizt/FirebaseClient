@@ -1,7 +1,7 @@
 
 /*
   Updated June 12, 2004.
-  
+
   WiFiClientBearSSL- SSL client/server for esp8266 using BearSSL libraries
   - Mostly compatible with Arduino WiFi shield library and standard
     WiFiClient/ServerSecure (except for certificate handling).
@@ -24,13 +24,6 @@
 */
 #ifndef BSSL_HELPER_H
 #define BSSL_HELPER_H
-
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic ignored "-Wvla"
-
-#include <Arduino.h>
-#include "../ESP_SSLClient_FS.h"
-#include "../ESP_SSLClient_Const.h"
 
 #if defined(USE_EMBED_SSL_ENGINE)
 
@@ -71,7 +64,6 @@
 
 #elif defined(USE_LIB_SSL_ENGINE)
 
-#include "../bssl/bearssl.h"
 
 #endif
 
@@ -178,7 +170,7 @@ namespace bssl
         explicit PublicKey(const char *pemKey);
         explicit PublicKey(const uint8_t *derKey, size_t derLen);
         explicit PublicKey(Stream &stream, size_t size);
-        explicit PublicKey(Stream &stream) : PublicKey(stream, stream.available()){};
+        explicit PublicKey(Stream &stream) : PublicKey(stream, stream.available()) {};
         ~PublicKey();
 
         bool parse(const char *pemKey);
@@ -208,7 +200,7 @@ namespace bssl
         explicit PrivateKey(const char *pemKey);
         explicit PrivateKey(const uint8_t *derKey, size_t derLen);
         explicit PrivateKey(Stream &stream, size_t size);
-        explicit PrivateKey(Stream &stream) : PrivateKey(stream, stream.available()){};
+        explicit PrivateKey(Stream &stream) : PrivateKey(stream, stream.available()) {};
         ~PrivateKey();
 
         bool parse(const char *pemKey);
@@ -241,7 +233,7 @@ namespace bssl
         explicit X509List(const char *pemCert);
         explicit X509List(const uint8_t *derCert, size_t derLen);
         explicit X509List(Stream &stream, size_t size);
-        explicit X509List(Stream &stream) : X509List(stream, stream.available()){};
+        explicit X509List(Stream &stream) : X509List(stream, stream.available()) {};
         ~X509List();
 
         bool append(const char *pemCert);

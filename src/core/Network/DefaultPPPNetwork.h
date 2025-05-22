@@ -1,6 +1,8 @@
 #ifndef CORE_NETWORK_DEFAULT_PPP_NETWORK_H
 #define CORE_NETWORK_DEFAULT_PPP_NETWORK_H
 
+#if !defined(DISABLE_NERWORKS)
+
 #include <Arduino.h>
 #include "./core/Network/DefaultNetwork.h"
 
@@ -18,4 +20,5 @@ public:
     }
     ~DefaultPPPNetwork() { clear(); }
 };
+#endif
 #endif

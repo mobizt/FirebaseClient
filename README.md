@@ -2,9 +2,9 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/mobizt/FirebaseClient/.github%2Fworkflows%2Fcompile_library.yml?logo=github&label=compile) [![Github Stars](https://img.shields.io/github/stars/mobizt/FirebaseClient?logo=github)](https://github.com/mobizt/FirebaseClient/stargazers) ![Github Issues](https://img.shields.io/github/issues/mobizt/FirebaseClient?logo=github)
 
-![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v2.0.4-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
+![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v2.0.5-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
-Revision `2025-05-20`
+Revision `2025-05-22`
 
 ## Introduction
 
@@ -150,6 +150,8 @@ In addition, some additional network tasks will be performed internally in this 
 If the network config/identifier was not assigned, library will assumed that you are using the native networks that support by the device and core libraries e.g. WiFi, Ethernet and PPP devices e.g. WiFi library in ESP8266, ESP32, Raspberry Pi Pico and Arduino MKR, Ethernet (ETH) library in ESP32 and PPP library in ESP32 device.
 
 The status of WiFi, Ethernet and PPP network connection will be checked by default in this case.
+
+You can disable all network features of library by assigning the macro `DISABLE_NERWORK` e.g. `#define DISABLE_NERWORK` before including the library header file `FirebaseClient.h`.
 
 The result of a async task can be obtained from the `AsyncResult` class object. This object provides the debug, authentication process event, error information and the response payload of the request.
 
@@ -747,6 +749,8 @@ ENABLE_ASYNC_TCP_CLIENT // For Async TCP Client usage.
 FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit (number) setting for an async client.
 FIREBASE_PRINTF_PORT // For Firebase.printf debug port class object.
 FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size. The default printf buffer size is 1024 for ESP8266 and SAMD otherwise 4096. Some debug message may be truncated for larger text.
+
+DISABLE_NERWORK // For network features disabling.
 ```
 
 The library code size is varied from 80k - 110k (WiFi and WiFiClientSecure excluded) depends on the build options.

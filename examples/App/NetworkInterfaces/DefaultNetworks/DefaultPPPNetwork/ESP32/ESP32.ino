@@ -42,6 +42,9 @@
 #define ENABLE_USER_CONFIG
 #define ENABLE_USER_AUTH
 
+// For network independent usage (disable all network features).
+// #define DISABLE_NERWORKS
+
 #include <PPP.h>
 #include <NetworkClientSecure.h>
 #include <FirebaseClient.h>

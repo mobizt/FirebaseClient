@@ -1,16 +1,6 @@
 /**
- * BSSL_SSL_Client library v1.0.20 for Arduino devices.
- *
- * Created April 7, 2025
- *
- * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
- *
- * Copyright (c) 2018 Earle F. Philhower, III
- *
- * Copyright 2019 OSU OPEnS Lab
- *
  * The MIT License (MIT)
- * Copyright (c) 2023 K. Suwatchai (Mobizt)
+ * Copyright (c) 2025 K. Suwatchai (Mobizt)
  *
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -33,47 +23,14 @@
 #ifndef BSSL_SSL_CLIENT_H
 #define BSSL_SSL_CLIENT_H
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic ignored "-Wvla"
-
 #include <Arduino.h>
-#include "../ESP_SSLClient_FS.h"
-#include "../ESP_SSLClient_Const.h"
-
-#if defined(USE_EMBED_SSL_ENGINE) && !defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_NANO_RP2040_CONNECT)
-#define EMBED_SSL_ENGINE_BASE_OVERRIDE override
-#else
-#define EMBED_SSL_ENGINE_BASE_OVERRIDE
-#endif
-
-#if defined(ESP_ARDUINO_VERSION) /* ESP32 core >= v2.0.x */
-// ESP32 Client.h Arduino API breaking fix only for ESP32 Arduino Core v3.1.0
-#if ESP_ARDUINO_VERSION == ESP_ARDUINO_VERSION_VAL(3, 1, 0) 
-#define ESP32_ARDUINO_CORE_CLIENT_CONNECT_OVERRIDE override;
-#define ESP32_ARDUINO_CORE_CLIENT_CONNECT_HAS_TMO
-#else
-#define ESP32_ARDUINO_CORE_CLIENT_CONNECT_OVERRIDE
-#endif
-#else
-#define ESP32_ARDUINO_CORE_CLIENT_CONNECT_OVERRIDE
-#endif
-
-#define BSSL_SSL_CLIENT_MIN_SESSION_TIMEOUT_SEC 60
+#include "BSSL_CertStore.h"
+#include "BSSL_CertStore.cpp"
 
 #if defined(USE_LIB_SSL_ENGINE) || defined(USE_EMBED_SSL_ENGINE)
 
-#include <vector>
-#include <memory>
-#if defined __has_include
-#if __has_include(<pgmspace.h>)
-#include <pgmspace.h>
-#endif
-#endif
 
 #if defined(USE_LIB_SSL_ENGINE)
-
-#include "BSSL_Helper.h"
-#include "BSSL_CertStore.h"
 
 using namespace bssl;
 
@@ -84,8 +41,6 @@ using namespace bssl;
 #include "CertStoreBearSSL.h"
 
 using namespace BearSSL;
-
-#include <memory>
 
 #if defined(ESP8266)
 
@@ -116,11 +71,6 @@ public:
     int connect(IPAddress ip, uint16_t port) override;
 
     int connect(const char *host, uint16_t port) override;
-
-#if defined(ESP32_ARDUINO_CORE_CLIENT_CONNECT_HAS_TMO)
-    int connect(IPAddress ip, uint16_t port, int32_t timeout) override;
-    int connect(const char *host, uint16_t port, int32_t timeout) override;
-#endif
 
     uint8_t connected() override;
 
@@ -191,7 +141,7 @@ public:
     int getMFLNStatus();
 
     int getLastSSLError(char *dest, size_t len);
-#if defined(ESP_SSL_FS_SUPPORTED)
+#if defined(ENABLE_FS)
     void setCertStore(CertStoreBase *certStore);
 #endif
     bool setCiphers(const uint16_t *cipherAry, int cipherCount);
@@ -330,7 +280,7 @@ private:
 
     time_t _now = 0;
     const X509List *_ta = nullptr;
-#if defined(ESP_SSL_FS_SUPPORTED)
+#if defined(ENABLE_FS)
     CertStoreBase *_certStore = 0;
 #endif
     // Optional client certificate

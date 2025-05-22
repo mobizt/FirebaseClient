@@ -1,16 +1,6 @@
 /**
- * BSSL_SSL_Client library v1.0.20 for Arduino devices.
- *
- * Created April 7, 2025
- *
- * This work contains codes based on WiFiClientSecure from Earle F. Philhower and SSLClient from OSU OPEnS Lab.
- *
- * Copyright (c) 2018 Earle F. Philhower, III
- *
- * Copyright 2019 OSU OPEnS Lab
- *
  * The MIT License (MIT)
- * Copyright (c) 2023 K. Suwatchai (Mobizt)
+ * Copyright (c) 2025 K. Suwatchai (Mobizt)
  *
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -33,19 +23,11 @@
 #ifndef BSSL_SSL_CLIENT_CPP
 #define BSSL_SSL_CLIENT_CPP
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#pragma GCC diagnostic ignored "-Wvla"
-
-#include <Arduino.h>
-#include "../ESP_SSLClient_FS.h"
-#include "../ESP_SSLClient_Const.h"
-#if defined(USE_LIB_SSL_ENGINE) || defined(USE_EMBED_SSL_ENGINE)
-
-#include "BSSL_Helper.h"
 #include "BSSL_SSL_Client.h"
 
-#if defined(ESP8266) && defined(MMU_EXTERNAL_HEAP) && defined(ESP_SSLCLIENT_USE_PSRAM)
+#if defined(USE_LIB_SSL_ENGINE) || defined(USE_EMBED_SSL_ENGINE)
+
+#if defined(ESP8266) && defined(MMU_EXTERNAL_HEAP) && defined(ENABLE_PSRAM)
 #include <umm_malloc/umm_malloc.h>
 #include <umm_malloc/umm_heap_select.h>
 #define ESP_SSLCLIENT_ESP8266_USE_EXTERNAL_HEAP
@@ -85,7 +67,7 @@ BSSL_SSL_Client::BSSL_SSL_Client(Client *client)
     setClient(client);
     mClear();
     mClearAuthenticationSettings();
-#if defined(ESP_SSL_FS_SUPPORTED)
+#if defined(ENABLE_FS)
     _certStore = nullptr; // Don't want to remove cert store on a clear, should be long lived
 #endif
     _sk = nullptr;
@@ -151,22 +133,6 @@ int BSSL_SSL_Client::connect(const char *host, uint16_t port)
     return 1;
 }
 
-#if defined(ESP32_ARDUINO_CORE_CLIENT_CONNECT_HAS_TMO)
-int BSSL_SSL_Client::connect(IPAddress ip, uint16_t port, int32_t timeout)
-{
-    if (timeout > 0)
-        setTimeout(timeout);
-    return connect(ip, port);
-}
-
-int BSSL_SSL_Client::connect(const char *host, uint16_t port, int32_t timeout)
-{
-    if (timeout > 0)
-        setTimeout(timeout);
-    return connect(host, port);
-}
-#endif
-
 uint8_t BSSL_SSL_Client::connected()
 {
     if (!mIsClientInitialized(false))
@@ -185,7 +151,7 @@ uint8_t BSSL_SSL_Client::connected()
         // If we've got a write error, the client probably failed for some reason
         if (_basic_client->getWriteError())
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             String s = PSTR("Socket was unexpectedly interrupted. m_client error: ");
             s += _basic_client->getWriteError();
             esp_ssl_debug_print(s.c_str(), _debug_level, esp_ssl_debug_info, __func__);
@@ -195,7 +161,7 @@ uint8_t BSSL_SSL_Client::connected()
         // Else tell the user the endpoint closed the socket on us (ouch)
         else
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             // esp_ssl_debug_print(PSTR("Socket was dropped unexpectedly (this can be an alternative to closing the connection)."), _debug_level, esp_ssl_debug_warn, func_name);
 #endif
         }
@@ -206,7 +172,7 @@ uint8_t BSSL_SSL_Client::connected()
     }
     else if (!wr_ok)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Not connected because write error is set."), _debug_level, esp_ssl_debug_error, __func__);
         mPrintClientError(getWriteError(), esp_ssl_debug_error, __func__);
 #endif
@@ -241,7 +207,7 @@ int BSSL_SSL_Client::available()
     unsigned state = mUpdateEngine();
     if (state == 0)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("SSL engine failed to update."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
     }
@@ -253,7 +219,7 @@ int BSSL_SSL_Client::available()
     }
     else if (state == BR_SSL_CLOSED)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("SSL Engine closed after update."), _debug_level, esp_ssl_debug_info, __func__);
 #endif
     }
@@ -305,10 +271,10 @@ size_t BSSL_SSL_Client::write(const uint8_t *buf, size_t size)
     if (!_secure)
         return _basic_client->write(buf, size);
 
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
     // super debug
     if (_debug_level >= esp_ssl_debug_dump)
-        ESP_SSLCLIENT_DEBUG_PORT.write(buf, size);
+        DEBUG_PORT.write(buf, size);
 #endif
 
     const char *func_name = __func__;
@@ -318,7 +284,7 @@ size_t BSSL_SSL_Client::write(const uint8_t *buf, size_t size)
     // wait until bearssl is ready to send
     if (mRunUntil(BR_SSL_SENDAPP) < 0)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Failed while waiting for the engine to enter BR_SSL_SENDAPP."), _debug_level, esp_ssl_debug_error, func_name);
 #endif
         return 0;
@@ -329,7 +295,7 @@ size_t BSSL_SSL_Client::write(const uint8_t *buf, size_t size)
     size_t cur_idx = 0;
     if (alen == 0)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("BearSSL returned zero length buffer for sending, did an internal error occur?"), _debug_level, esp_ssl_debug_error, func_name);
 #endif
         return 0;
@@ -356,7 +322,7 @@ size_t BSSL_SSL_Client::write(const uint8_t *buf, size_t size)
             // write to the socket immediatly
             if (mRunUntil(BR_SSL_SENDAPP) < 0)
             {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
                 esp_ssl_debug_print(PSTR("Failed while waiting for the engine to enter BR_SSL_SENDAPP."), _debug_level, esp_ssl_debug_error, func_name);
 #endif
                 return 0;
@@ -388,7 +354,7 @@ size_t BSSL_SSL_Client::write(Stream &stream)
 
     if (!connected())
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Connect not completed yet."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return 0;
@@ -405,7 +371,7 @@ int BSSL_SSL_Client::peek()
 
     if ((!_sc && _secure) || !available())
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Not connected, none left available."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return -1;
@@ -418,7 +384,7 @@ int BSSL_SSL_Client::peek()
     if (_recvapp_buf && _recvapp_len)
         return _recvapp_buf[0];
 
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
     esp_ssl_debug_print(PSTR("No data left."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
     return -1;
@@ -540,7 +506,7 @@ void BSSL_SSL_Client::flush()
     {
         if (mRunUntil(BR_SSL_RECVAPP) < 0)
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             esp_ssl_debug_print(PSTR("Could not flush write buffer!"), _debug_level, esp_ssl_debug_error, __func__);
             int error = br_ssl_engine_last_error(_eng);
             if (error != BR_ERR_OK)
@@ -633,7 +599,7 @@ bool BSSL_SSL_Client::setFingerprint(const char *fpStr)
         d = pgm_read_byte(fpStr++);
         if (!d)
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             esp_ssl_debug_print(PSTR("FP too short"), _debug_level, esp_ssl_debug_error, __func__);
 #endif
             return false; // Only half of the last hex digit, error
@@ -642,7 +608,7 @@ bool BSSL_SSL_Client::setFingerprint(const char *fpStr)
         d = htoi(d);
         if ((c > 15) || (d > 15))
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             esp_ssl_debug_print(PSTR("Invalid char"), _debug_level, esp_ssl_debug_error, __func__);
 #endif
             return false; // Error in one of the hex characters
@@ -657,7 +623,7 @@ bool BSSL_SSL_Client::setFingerprint(const char *fpStr)
     }
     if ((idx != 20) || pgm_read_byte(fpStr))
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Garbage at end of fp"), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return false; // Garbage at EOL or we didn't have enough hex digits
@@ -730,9 +696,10 @@ int BSSL_SSL_Client::getMFLNStatus()
 int BSSL_SSL_Client::getLastSSLError(char *dest, size_t len)
 {
     int err = 0;
-    const char *t = "";
+#if defined(ENABLE_ERROR_STRING)
     const char *recv_fatal = "";
     const char *send_fatal = "";
+#endif
     if (_sc)
         err = br_ssl_engine_last_error(_eng);
 
@@ -742,20 +709,21 @@ int BSSL_SSL_Client::getLastSSLError(char *dest, size_t len)
     {
         if (err & BR_ERR_RECV_FATAL_ALERT)
         {
-#if defined(ESP_SSLCLIENT_ENABLE_SSL_ERROR_STRING)
+#if defined(ENABLE_ERROR_STRING)
             recv_fatal = PSTR("SSL received fatal alert - ");
 #endif
             err &= ~BR_ERR_RECV_FATAL_ALERT;
         }
         if (err & BR_ERR_SEND_FATAL_ALERT)
         {
-#if defined(ESP_SSLCLIENT_ENABLE_SSL_ERROR_STRING)
+#if defined(ENABLE_ERROR_STRING)
             send_fatal = PSTR("SSL sent fatal alert - ");
 #endif
             err &= ~BR_ERR_SEND_FATAL_ALERT;
         }
     }
-#if defined(ESP_SSLCLIENT_ENABLE_SSL_ERROR_STRING)
+#if defined(ENABLE_ERROR_STRING)
+    const char *t = "";
     switch (err)
     {
     case -1000:
@@ -945,6 +913,10 @@ int BSSL_SSL_Client::getLastSSLError(char *dest, size_t len)
         // snprintf is PSTR safe and guaranteed to 0-terminate
         snprintf(dest, len, "%s%s%s", recv_fatal, send_fatal, t);
     }
+#else
+
+    (void)dest;
+    (void)len;
 
 #endif
 
@@ -952,7 +924,7 @@ int BSSL_SSL_Client::getLastSSLError(char *dest, size_t len)
 }
 
 // Attach a preconfigured certificate store
-#if defined(ESP_SSL_FS_SUPPORTED)
+#if defined(ENABLE_FS)
 void BSSL_SSL_Client::setCertStore(CertStoreBase *certStore)
 {
     _certStore = certStore;
@@ -965,7 +937,7 @@ bool BSSL_SSL_Client::setCiphers(const uint16_t *cipherAry, int cipherCount)
     _cipher_list = reinterpret_cast<uint16_t *>(mallocImpl(cipherCount));
     if (!_cipher_list)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("list empty"), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return false;
@@ -1219,7 +1191,7 @@ bool BSSL_SSL_Client::mProbeMaxFragmentLength(Client *probe, uint16_t len)
     uint8_t *clientHello = reinterpret_cast<uint8_t *>(mallocImpl(ttlLen));
     if (!clientHello)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("OOM error."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return false;
@@ -1248,7 +1220,7 @@ bool BSSL_SSL_Client::mProbeMaxFragmentLength(Client *probe, uint16_t len)
     freeImpl(&clientHello); // We're done w/the hello message
     if (!probe->connected() || (ret != ttlLen))
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Protocol error."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return false;
@@ -1396,7 +1368,7 @@ bool BSSL_SSL_Client::mProbeMaxFragmentLength(const char *name, IPAddress ip, ui
 
     if (!(name ? _basic_client->connect(name, port) : _basic_client->connect(ip, port)))
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Can't connect."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return false;
@@ -1411,9 +1383,11 @@ int BSSL_SSL_Client::mIsClientInitialized(bool notify)
 {
     if (!_basic_client)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         if (notify)
             esp_ssl_debug_print(PSTR("Basic client is not yet initialized."), _debug_level, esp_ssl_debug_error, __func__);
+#else
+        (void)notify;
 #endif
         return 0;
     }
@@ -1428,7 +1402,7 @@ int BSSL_SSL_Client::mConnectBasicClient(const char *host, IPAddress ip, uint16_
 
     if (!(host ? _basic_client->connect(host, port) : _basic_client->connect(ip, port)))
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Failed to connect to server using basic client."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         setWriteError(esp_ssl_connection_fail);
@@ -1438,7 +1412,7 @@ int BSSL_SSL_Client::mConnectBasicClient(const char *host, IPAddress ip, uint16_
 
     _secure = false;
     _write_idx = 0;
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
     esp_ssl_debug_print(PSTR("Basic client connected!"), _debug_level, esp_ssl_debug_info, __func__);
 #endif
     return 1;
@@ -1449,16 +1423,18 @@ bool BSSL_SSL_Client::mSoftConnected(const char *func_name)
     // check if the socket is still open and such
     if (getWriteError())
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Cannot operate if the write error is not reset."), _debug_level, esp_ssl_debug_error, func_name);
         mPrintClientError(getWriteError(), esp_ssl_debug_error, func_name);
+#else
+        (void)func_name;
 #endif
         return false;
     }
     // check if the ssl engine is still open
     if (!_is_connected || br_ssl_engine_current_state(_eng) == BR_SSL_CLOSED)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Cannot operate on a closed SSL connection."), _debug_level, esp_ssl_debug_error, func_name);
         int error = br_ssl_engine_last_error(_eng);
         if (error != BR_ERR_OK)
@@ -1472,15 +1448,15 @@ bool BSSL_SSL_Client::mSoftConnected(const char *func_name)
 int BSSL_SSL_Client::mConnectSSL(const char *host)
 {
 
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
     esp_ssl_debug_print(PSTR("Start connection."), _debug_level, esp_ssl_debug_info, __func__);
 #endif
     mFreeSSL();
     _oom_err = false;
 
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
     // BearSSL will reject all connections unless an authentication option is set, warn in DEBUG builds
-#if defined(ESP_SSL_FS_SUPPORTED)
+#if defined(ENABLE_FS)
 #define CRTSTORECOND &&!_certStore
 #else
 #define CRTSTORECOND
@@ -1501,7 +1477,7 @@ int BSSL_SSL_Client::mConnectSSL(const char *host)
     {
         mFreeSSL(); // Frees _sc, _iobuf*
         _oom_err = true;
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("OOM error."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return 0;
@@ -1518,7 +1494,7 @@ int BSSL_SSL_Client::mConnectSSL(const char *host)
     {
         mFreeSSL();
         _oom_err = true;
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Can't install x509 validator."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return 0;
@@ -1541,7 +1517,7 @@ int BSSL_SSL_Client::mConnectSSL(const char *host)
                                     _cert_issuer_key_type, br_ec_get_default(), br_ecdsa_sign_asn1_get_default());
 #else
         mFreeSSL();
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Attempting to use EC cert in minimal cipher mode (no EC)."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
         return 0;
@@ -1568,7 +1544,7 @@ int BSSL_SSL_Client::mConnectSSL(const char *host)
     // Restore session from the storage spot, if present
     if (_session)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Set SSL session!"), _debug_level, esp_ssl_debug_info, __func__);
 #endif
         br_ssl_engine_set_session_parameters(_eng, _session->getSession());
@@ -1576,7 +1552,7 @@ int BSSL_SSL_Client::mConnectSSL(const char *host)
 
     if (!br_ssl_client_reset(_sc.get(), host, _session ? 1 : 0))
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Can't reset client."), _debug_level, esp_ssl_debug_error, __func__);
         mPrintSSLError(br_ssl_engine_last_error(_eng), esp_ssl_debug_error, __func__);
 #endif
@@ -1586,13 +1562,13 @@ int BSSL_SSL_Client::mConnectSSL(const char *host)
     }
 
 // SSL/TLS handshake
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
     esp_ssl_debug_print(PSTR("Wait for SSL handshake."), _debug_level, esp_ssl_debug_info, __func__);
 #endif
 
     if (mRunUntil(BR_SSL_SENDAPP, _handshake_timeout) < 0)
     {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
         esp_ssl_debug_print(PSTR("Failed to initlalize the SSL layer."), _debug_level, esp_ssl_debug_error, __func__);
         mPrintSSLError(br_ssl_engine_last_error(_eng), esp_ssl_debug_error, __func__);
 #endif
@@ -1600,7 +1576,7 @@ int BSSL_SSL_Client::mConnectSSL(const char *host)
         return 0;
     }
 
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
     esp_ssl_debug_print(PSTR("Connection successful!"), _debug_level, esp_ssl_debug_info, __func__);
 #endif
     _handshake_done = true;
@@ -1640,13 +1616,16 @@ bool BSSL_SSL_Client::mConnectionValidate(const char *host, IPAddress ip, uint16
 
 bool BSSL_SSL_Client::mCheckSessionTimeout()
 {
+    
+#if defined(ENABLE_DEBUG)
     const char *func_name = __func__;
+#endif
 
     if (_tcp_session_timeout >= BSSL_SSL_CLIENT_MIN_SESSION_TIMEOUT_SEC && _session_ts > 0 && millis() - _session_ts > _tcp_session_timeout * 1000)
     {
         if (_basic_client && _basic_client->connected())
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             esp_ssl_debug_print(PSTR("The session was timed out. Starting new server connection."), _debug_level, esp_ssl_debug_info, func_name);
 #endif
             int ret = 0;
@@ -1671,7 +1650,7 @@ bool BSSL_SSL_Client::mCheckSessionTimeout()
 
             if (!ret)
             {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
                 esp_ssl_debug_print(PSTR("Failed while starting new server connection."), _debug_level, esp_ssl_debug_error, func_name);
 #endif
                 return false;
@@ -1693,7 +1672,7 @@ int BSSL_SSL_Client::mRunUntil(const unsigned target, unsigned long timeout)
         // error check
         if (state == BR_SSL_CLOSED || getWriteError() != esp_ssl_ok)
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             if (state == BR_SSL_CLOSED)
                 esp_ssl_debug_print(PSTR("Terminating because the ssl engine closed."), _debug_level, esp_ssl_debug_warn, __func__);
             else
@@ -1704,7 +1683,7 @@ int BSSL_SSL_Client::mRunUntil(const unsigned target, unsigned long timeout)
         // timeout check
         if (millis() - start > ((timeout > 0) ? timeout : getTimeout()))
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             esp_ssl_debug_print(PSTR("SSL internals timed out!"), _debug_level, esp_ssl_debug_error, __func__);
 #endif
             setWriteError(esp_ssl_write_error);
@@ -1715,7 +1694,7 @@ int BSSL_SSL_Client::mRunUntil(const unsigned target, unsigned long timeout)
         if (state != lastState || lastState == 0)
         {
             lastState = state;
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             esp_ssl_debug_print(PSTR("SSL state changed."), _debug_level, esp_ssl_debug_info, __func__);
             mPrintSSLState(state, esp_ssl_debug_info, __func__);
 #endif
@@ -1727,7 +1706,7 @@ int BSSL_SSL_Client::mRunUntil(const unsigned target, unsigned long timeout)
             if (lastLen != len)
             {
                 lastLen = len;
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
                 String s = PSTR("Expected bytes count: ");
                 s += len;
                 esp_ssl_debug_print(s.c_str(), _debug_level, esp_ssl_debug_info, __func__);
@@ -1765,7 +1744,7 @@ int BSSL_SSL_Client::mRunUntil(const unsigned target, unsigned long timeout)
             }
             else
             {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
                 esp_ssl_debug_print(PSTR("SSL engine state is RECVAPP, however the buffer was null! (This is a problem with BearSSL internals)."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
                 setWriteError(esp_ssl_write_error);
@@ -1803,7 +1782,7 @@ unsigned BSSL_SSL_Client::mUpdateEngine()
         if (_bssl_last_state == 0 || state != _bssl_last_state)
         {
             _bssl_last_state = state;
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             mPrintSSLState(state, esp_ssl_debug_info, __func__);
 #endif
         }
@@ -1827,7 +1806,7 @@ unsigned BSSL_SSL_Client::mUpdateEngine()
                 // if the arduino client encountered an error
                 if (_basic_client->getWriteError() || !_basic_client->connected())
                 {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
                     esp_ssl_debug_print(PSTR("Error writing to basic client."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
                     setWriteError(esp_ssl_write_error);
@@ -1853,7 +1832,7 @@ unsigned BSSL_SSL_Client::mUpdateEngine()
             // data has been written to the io buffer, something is wrong
             if (!(state & BR_SSL_SENDAPP))
             {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
                 esp_ssl_debug_print(PSTR("Error _write_idx > 0 but the ssl engine is not ready for data."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
                 setWriteError(esp_ssl_write_error);
@@ -1868,7 +1847,7 @@ unsigned BSSL_SSL_Client::mUpdateEngine()
                 // engine check
                 if (alen == 0 || buf == nullptr)
                 {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
                     esp_ssl_debug_print(PSTR("Engine set write flag but returned null buffer."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
                     setWriteError(esp_ssl_write_error);
@@ -1878,7 +1857,7 @@ unsigned BSSL_SSL_Client::mUpdateEngine()
                 // sanity check
                 if (alen < _write_idx)
                 {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
                     esp_ssl_debug_print(PSTR("Alen is less than _write_idx."), _debug_level, esp_ssl_debug_error, __func__);
 #endif
                     setWriteError(esp_ssl_internal_error);
@@ -1916,7 +1895,7 @@ unsigned BSSL_SSL_Client::mUpdateEngine()
                 int rlen = _basic_client->read(buf, avail < (int)len ? avail : (int)len);
                 if (rlen <= 0)
                 {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
                     String s = PSTR("Error reading bytes from basic client. Write Error: ");
                     s += _basic_client->getWriteError();
                     esp_ssl_debug_print(s.c_str(), _debug_level, esp_ssl_debug_error, __func__);
@@ -1950,9 +1929,9 @@ unsigned BSSL_SSL_Client::mUpdateEngine()
     }
 }
 
+#if defined(ENABLE_DEBUG)
 void BSSL_SSL_Client::mPrintClientError(const int ssl_error, int level, const char *func_name)
 {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
     const char *msg = nullptr;
 
     switch (ssl_error)
@@ -1978,21 +1957,18 @@ void BSSL_SSL_Client::mPrintClientError(const int ssl_error, int level, const ch
     }
 
     esp_ssl_debug_print(msg, _debug_level, level, func_name);
-#endif
 }
 
 void BSSL_SSL_Client::mPrintSSLError(const unsigned br_error_code, int level, const char *func_name)
 {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+    (void)br_error_code;
     char dest[300];
     getLastSSLError(dest, 300);
     esp_ssl_debug_print(dest, _debug_level, level, func_name);
-#endif
 }
 
 void BSSL_SSL_Client::mPrintSSLState(const unsigned state, int level, const char *func_name)
 {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
     const char *msg = nullptr;
 
     if (state == 0)
@@ -2012,8 +1988,8 @@ void BSSL_SSL_Client::mPrintSSLState(const unsigned state, int level, const char
     }
 
     esp_ssl_debug_print(msg, _debug_level, level, func_name);
-#endif
 }
+#endif
 
 bool BSSL_SSL_Client::mIsSecurePort(uint16_t port)
 {
@@ -2100,7 +2076,7 @@ bool BSSL_SSL_Client::mInstallClientX509Validator()
         _x509_insecure = std::make_shared<struct bssl::br_x509_insecure_context>();
         if (!_x509_insecure)
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             esp_ssl_debug_print(PSTR("OOM for _x509_insecure"), _debug_level, esp_ssl_debug_error, __func__);
 #endif
             return false;
@@ -2114,7 +2090,7 @@ bool BSSL_SSL_Client::mInstallClientX509Validator()
         _x509_knownkey = std::make_shared<br_x509_knownkey_context>();
         if (!_x509_knownkey)
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             esp_ssl_debug_print(PSTR("OOM for _x509_knownkey"), _debug_level, esp_ssl_debug_error, __func__);
 #endif
             return false;
@@ -2142,7 +2118,7 @@ bool BSSL_SSL_Client::mInstallClientX509Validator()
         _x509_minimal = std::make_shared<br_x509_minimal_context>();
         if (!_x509_minimal)
         {
-#if defined(ESP_SSLCLIENT_ENABLE_DEBUG)
+#if defined(ENABLE_DEBUG)
             esp_ssl_debug_print(PSTR("OOM for _x509_minimal"), _debug_level, esp_ssl_debug_error, __func__);
 #endif
             return false;
@@ -2170,7 +2146,7 @@ bool BSSL_SSL_Client::mInstallClientX509Validator()
             // Magic constants convert to x509 times
             br_x509_minimal_set_time(_x509_minimal.get(), ((uint32_t)_now) / 86400 + 719528, ((uint32_t)_now) % 86400);
         }
-#if defined(ESP_SSL_FS_SUPPORTED)
+#if defined(ENABLE_FS)
         if (_certStore)
         {
             _certStore->installCertStore(_x509_minimal.get());
@@ -2220,17 +2196,14 @@ uint8_t *BSSL_SSL_Client::mStreamLoad(Stream &stream, size_t size)
 // Allocate memory
 void *BSSL_SSL_Client::mallocImpl(size_t len, bool clear)
 {
-    void *p;
+    void *p = nullptr;
     size_t newLen = getReservedLen(len);
-#if defined(BOARD_HAS_PSRAM) && defined(ESP_SSLCLIENT_USE_PSRAM)
+#if defined(BOARD_HAS_PSRAM) && defined(ENABLE_PSRAM)
 
     if (ESP.getPsramSize() > 0)
-        p = (void *)ps_malloc(newLen);
+        p = reinterpret_cast<void *>(ps_malloc(newLen));
     else
-        p = (void *)malloc(newLen);
-
-    if (!p)
-        return NULL;
+        p = reinterpret_cast<void *>(malloc(newLen));
 
 #else
 
@@ -2239,13 +2212,13 @@ void *BSSL_SSL_Client::mallocImpl(size_t len, bool clear)
 #endif
 
     p = reinterpret_cast<void *>(malloc(newLen));
-   
+
 #if defined(ESP_SSLCLIENT_ESP8266_USE_EXTERNAL_HEAP)
     ESP.resetHeap();
 #endif
 
 #endif
-    if (clear)
+    if (clear && p)
         memset(p, 0, newLen);
     return p;
 }

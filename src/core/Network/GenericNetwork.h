@@ -1,6 +1,9 @@
 #ifndef CORE_NETWORK_GENERIC_NETWORK_H
 #define CORE_NETWORK_GENERIC_NETWORK_H
 
+
+#if !defined(DISABLE_NERWORKS)
+
 #include <Arduino.h>
 #include "./core/Network/DefaultNetwork.h"
 
@@ -28,4 +31,7 @@ public:
     }
     ~GenericNetwork() { clear(); }
 };
+
+#endif
+
 #endif

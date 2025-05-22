@@ -293,10 +293,15 @@ private:
     // Handles TCP data sending process.
     function_return_type send(async_data *sData)
     {
+
+#if defined(DISABLE_NERWORKS)
+        function_return_type ret = ret_continue;
+#else
         function_return_type ret = sman.networkConnect(sData); // Check the network status and re-connect
 
         if (ret != ret_complete)
             return ret;
+#endif
 
         ret = ret_continue;
 
@@ -378,10 +383,12 @@ private:
 
     function_return_type receive(async_data *sData)
     {
+#if !defined(DISABLE_NERWORKS)
         function_return_type ret = sman.networkConnect(sData); // Check the network status and re-connect
 
         if (ret != ret_complete)
             return ret;
+#endif
 
         // HTTP error is allowed in case non-auth task to get its response.
         if (!readResponse(sData))
@@ -1045,6 +1052,7 @@ private:
                 *ul_dl_task_running = true;
             }
 
+#if !defined(DISABLE_NERWORKS)
             if (sman.networkConnect(sData) == ret_failure)
             {
                 // TCP (network) disconnected error.
@@ -1056,6 +1064,7 @@ private:
                 }
                 return exitProcess(false);
             }
+#endif
 
             if (sData->async && !async)
                 return exitProcess(false);
@@ -1130,12 +1139,21 @@ private:
                 }
                 else if (!sData->async) // wait for non async
                 {
+#if defined(DISABLE_NERWORKS)
+                    while (!sData->response.tcpAvailable())
+                    {
+                        sys_idle();
+                        if (handleReadTimeout(sData))
+                            break;
+                    }
+#else
                     while (!sData->response.tcpAvailable() && sman.networkConnect(sData) == ret_complete)
                     {
                         sys_idle();
                         if (handleReadTimeout(sData))
                             break;
                     }
+#endif
                 }
             }
 
@@ -1195,6 +1213,14 @@ public:
         sman.client_type = tcpc_sync;
     }
 
+#if defined(DISABLE_NERWORKS)
+    explicit AsyncClientClass(Client &client)
+    {
+        sman.client = &client;
+        this->addr = reinterpret_cast<uint32_t>(this);
+        sman.client_type = tcpc_sync;
+    }
+#else
     explicit AsyncClientClass(Client &client, bool reconnect = true)
     {
         DefaultNetwork defaultNet(reconnect);
@@ -1211,6 +1237,7 @@ public:
         this->addr = reinterpret_cast<uint32_t>(this);
         sman.client_type = tcpc_sync;
     }
+#endif
 
 #if defined(ENABLE_ASYNC_TCP_CLIENT)
     explicit AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
@@ -1261,6 +1288,7 @@ public:
         sman.result_addr = 0;
     }
 
+#if !defined(DISABLE_NERWORKS)
     /**
      * Get the network connection status.
      *
@@ -1281,6 +1309,7 @@ public:
      * @return firebase_network_type The firebase_network_type enums are firebase_network_default, firebase_network_generic, firebase_network_ethernet and firebase_network_gsm.
      */
     firebase_network_type getNetworkType() { return sman.conn.getNetworkType(); }
+#endif
 
     /**
      * Stop and remove the async/sync task from the queue.
@@ -1371,6 +1400,7 @@ public:
      */
     void setSSEFilters(const String &sse_events_filter) { sman.sse_events_filter = sse_events_filter; }
 
+#if !defined(DISABLE_NERWORKS)
     /**
      * Set the network interface.
      *
@@ -1399,5 +1429,6 @@ public:
             sman.conn.setClientChange();
         }
     }
+#endif
 };
 #endif

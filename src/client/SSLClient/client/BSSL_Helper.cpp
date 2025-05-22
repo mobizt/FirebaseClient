@@ -24,25 +24,9 @@
 #ifndef BSSL_HELPER_CPP
 #define BSSL_HELPER_CPP
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic ignored "-Wvla"
-
-#include <Arduino.h>
-#include "../ESP_SSLClient_FS.h"
-#include "../ESP_SSLClient_Const.h"
-#if defined(USE_LIB_SSL_ENGINE)
-
 #include "BSSL_Helper.h"
-#include <memory>
-#include <vector>
-#include "../bssl/bearssl.h"
-#include <stdlib.h>
-#include <string.h>
-#if defined __has_include
-#if __has_include(<pgmspace.h>)
-#include <pgmspace.h>
-#endif
-#endif
+
+#if defined(USE_LIB_SSL_ENGINE)
 
 namespace key_bssl
 {

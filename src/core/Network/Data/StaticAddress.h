@@ -1,6 +1,8 @@
 #ifndef CORE_NETWORK_DATA_STATIC_ADDRESS_H
 #define CORE_NETWORK_DATA_STATIC_ADDRESS_H
 
+#if !defined(DISABLE_NERWORKS)
+
 #include <Arduino.h>
 
 typedef struct firebase_client_static_address
@@ -34,4 +36,7 @@ private:
     IPAddress ipAddress, netMask, defaultGateway, dnsServer;
     bool optional = false;
 } Firebase_StaticIP;
+
+#endif
+
 #endif

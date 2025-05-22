@@ -1,6 +1,9 @@
 #ifndef CORE_NETWORK_DATA_SPI_ETHERNET_H
 #define CORE_NETWORK_DATA_SPI_ETHERNET_H
 
+
+#if !defined(DISABLE_NERWORKS)
+
 #include <Arduino.h>
 #include "./core/Network/NetworkOptions.h"
 
@@ -20,4 +23,7 @@ typedef struct firebase_spi_ethernet_module_t
 #endif
 
 } Firebase_SPI_ETH_Module;
+
+#endif
+
 #endif

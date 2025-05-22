@@ -1,6 +1,9 @@
 #ifndef CORE_NETWORK_DEFAULT_NETWORK_H
 #define CORE_NETWORK_DEFAULT_NETWORK_H
 
+
+#if !defined(DISABLE_NERWORKS)
+
 #include <Arduino.h>
 #include "./core/Network/Data/NetworkConfigData.h"
 
@@ -41,4 +44,7 @@ protected:
         network_data.initialized = true;
     }
 };
+
+#endif
+
 #endif

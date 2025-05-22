@@ -2,6 +2,9 @@
 #define CORE_NETWORK_NETWORK_OPTIONS_H
 
 #include <Arduino.h>
+
+#if !defined(DISABLE_NERWORKS)
+
 #include <vector>
 
 #if __has_include(<esp_idf_version.h>)
@@ -231,6 +234,8 @@
 #define PPP_CONNECTED PPP.connected()
 #else
 #define PPP_CONNECTED false
+#endif
+
 #endif
 
 #endif // CORE_NETWORK_NETWORK_OPTIONS_H

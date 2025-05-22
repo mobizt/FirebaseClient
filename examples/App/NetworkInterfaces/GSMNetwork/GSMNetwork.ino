@@ -41,6 +41,8 @@
 #define ENABLE_ESP_SSLCLIENT
 #define TINY_GSM_MODEM_SIM7600 // SIMA7670 Compatible with SIM7600 AT instructions
 
+// For network independent usage (disable all network features).
+// #define DISABLE_NERWORKS
 
 // Set serial for debug console (to the Serial Monitor, default speed 115200)
 #define SerialMon Serial

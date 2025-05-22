@@ -35,6 +35,9 @@
 #define ENABLE_USER_AUTH
 #define ENABLE_ESP8266_ENC28J60_ETH
 
+// For network independent usage (disable all network features).
+// #define DISABLE_NERWORKS
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 

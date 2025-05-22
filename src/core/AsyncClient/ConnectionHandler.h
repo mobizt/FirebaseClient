@@ -42,7 +42,9 @@ using namespace firebase_ns;
 struct conn_handler : public ConnBase
 {
 private:
+#if !defined(DISABLE_NERWORKS)
     network_config_data net;
+#endif
     tcp_client_type client_type = tcpc_sync;
     Client *client = nullptr;
     void *atcp_config = nullptr;
@@ -55,7 +57,7 @@ public:
     String host;
     uint16_t port = 443;
 
-    conn_handler(){}
+    conn_handler() {}
 
     void newConn(tcp_client_type client_type, Client *client, void *atcp_config, app_log_t *debug_log)
     {
@@ -64,14 +66,19 @@ public:
         this->atcp_config = atcp_config;
         this->debug_log = debug_log;
     }
+
+#if !defined(DISABLE_NERWORKS)
     void setNetwork(const network_config_data &net)
     {
         network_changed = true;
         this->net.copy(net);
     }
-    void setClientChange() { client_changed = true; }
     unsigned long networkLastSeen() { return this->net.disconnected_ms; }
     firebase_network_type getNetworkType() { return this->net.network_type; }
+#endif
+
+    void setClientChange() { client_changed = true; }
+
     bool isConnected()
     {
         // Re-check the client status only when the connected flag was set.
@@ -177,6 +184,7 @@ public:
         return strcmp(buf, "0.0.0.0") != 0;
     }
 
+#if !defined(DISABLE_NERWORKS)
     /**
      * Get the ethernet link status.
      * @return true for link up or false for link down.
@@ -565,6 +573,7 @@ public:
 
         return net.network_status;
     }
+#endif
 };
 
 #endif

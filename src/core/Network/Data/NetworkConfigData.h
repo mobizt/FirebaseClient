@@ -1,6 +1,8 @@
 #ifndef CORE_NETWORK_DATA_NETWORK_CONFIG_DATA_H
 #define CORE_NETWORK_DATA_NETWORK_CONFIG_DATA_H
 
+#if !defined(DISABLE_NERWORKS)
+
 #include <Arduino.h>
 #include "./core/Utils/Memory.h"
 #include "./core/Utils/Timer.h"
@@ -8,6 +10,7 @@
 #include "./core/Network/Data/SPIEthernet.h"
 #include "./core/Network/Data/FirebaseWiFi.h"
 #include "./core/Network/Data/StaticAddress.h"
+
 typedef enum
 {
     firebase_network_undefined,
@@ -249,4 +252,7 @@ public:
         net_timer.setInterval(0);
     }
 };
+
+#endif
+
 #endif

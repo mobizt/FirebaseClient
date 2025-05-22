@@ -24,6 +24,9 @@
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_DATABASE
 
+// For network independent usage (disable all network features).
+// #define DISABLE_NERWORKS
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 #include <FirebaseJson.h>

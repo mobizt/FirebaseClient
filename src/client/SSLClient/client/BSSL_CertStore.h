@@ -19,27 +19,12 @@
 #ifndef BSSL_CERTSTORE_H
 #define BSSL_CERTSTORE_H
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic ignored "-Wvla"
+#include "BSSL_Helper.h"
+#include "BSSL_Helper.cpp"
 
-#include <Arduino.h>
-#include "../ESP_SSLClient_FS.h"
-#include "../ESP_SSLClient_Const.h"
 #if defined(USE_LIB_SSL_ENGINE)
 
-
-#if defined __has_include
-#if __has_include(<FS.h>) && defined(ESP_SSLCLIENT_USE_FILESYSTEM)
-#include <FS.h>
-#define ESP_SSL_FS_SUPPORTED
-#endif
-#endif
-
-#if defined(ESP_SSL_FS_SUPPORTED)
-
-
-#include "../bssl/bearssl.h"
-#include "BSSL_Helper.h"
+#if defined(ENABLE_FS)
 
 using namespace bssl;
 

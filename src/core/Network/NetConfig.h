@@ -2,6 +2,7 @@
 #define CORE_NETWORK_NET_CONFIG_H
 
 #include <Arduino.h>
+#if !defined(DISABLE_NERWORKS)
 #include "./core/Network/Data/NetworkConfigData.h"
 #include "./core/Network/GenericNetwork.h"
 #include "./core/Network/GSMNetwork.h"
@@ -14,5 +15,5 @@
 
 template <typename T>
 static network_config_data &getNetwork(T &net) { return net.get(); }
-
+#endif
 #endif

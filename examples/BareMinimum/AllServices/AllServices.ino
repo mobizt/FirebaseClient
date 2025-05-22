@@ -115,6 +115,9 @@
 #define ENABLE_CLOUD_STORAGE
 #define ENABLE_FUNCTIONS
 
+// For network independent usage (disable all network features).
+// #define DISABLE_NERWORKS
+
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <FirebaseClient.h>

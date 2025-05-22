@@ -1,6 +1,8 @@
 #ifndef CORE_NETWORK_DATA_FIREBASE_WIFI_H
 #define CORE_NETWORK_DATA_FIREBASE_WIFI_H
 
+#if !defined(DISABLE_NERWORKS)
+
 #include <Arduino.h>
 
 struct FirebaseWiFi_credential_t
@@ -84,4 +86,7 @@ private:
 #endif
     }
 };
+
+#endif
+
 #endif

@@ -2,6 +2,8 @@
 #ifndef CORE_NETWORK_ETHERNET_NETWORK_H
 #define CORE_NETWORK_ETHERNET_NETWORK_H
 
+#if !defined(DISABLE_NERWORKS)
+
 #include <Arduino.h>
 #include "./core/Network/DefaultNetwork.h"
 
@@ -67,5 +69,6 @@ public:
     }
     ~EthernetNetwork() { clear(); }
 };
+#endif
 #endif
 #endif

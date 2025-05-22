@@ -1,6 +1,6 @@
 /* Automatically generated code; do not modify directly. */
 
-#include "../ESP_SSLClient_FS.h"
+#include "bssl_config.h"
 #if defined(USE_LIB_SSL_ENGINE)
 
 #include <stddef.h>

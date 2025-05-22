@@ -1,10 +1,6 @@
 /**
- * BSSL_TCP_Client v2.0.15 for Arduino devices.
- *
- * Created December 5, 2024
- *
  * The MIT License (MIT)
- * Copyright (c) 2023 K. Suwatchai (Mobizt)
+ * Copyright (c) 2025 K. Suwatchai (Mobizt)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -47,15 +43,10 @@
 #ifndef BSSL_TCP_CLIENT_H
 #define BSSL_TCP_CLIENT_H
 
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic ignored "-Wvla"
-
-#include <Arduino.h>
-#include "../ESP_SSLClient_FS.h"
-#include "../ESP_SSLClient_Const.h"
-#if defined(USE_LIB_SSL_ENGINE) || defined(USE_EMBED_SSL_ENGINE)
-
 #include "BSSL_SSL_Client.h"
+#include "BSSL_SSL_Client.cpp"
+
+#if defined(USE_LIB_SSL_ENGINE) || defined(USE_EMBED_SSL_ENGINE)
 
 #include <string>
 
@@ -108,7 +99,7 @@ public:
      * @param timeout The connection time out in miiliseconds.
      * @return 1 for success or 0 for error.
      */
-    int connect(IPAddress ip, uint16_t port, int32_t timeout) ESP32_ARDUINO_CORE_CLIENT_CONNECT_OVERRIDE;
+    int connect(IPAddress ip, uint16_t port, int32_t timeout);
 
     /**
      * Connect to server.
@@ -125,7 +116,7 @@ public:
      * @param timeout The connection time out in miiliseconds.
      * @return 1 for success or 0 for error.
      */
-    int connect(const char *host, uint16_t port, int32_t timeout) ESP32_ARDUINO_CORE_CLIENT_CONNECT_OVERRIDE;
+    int connect(const char *host, uint16_t port, int32_t timeout);
 
     /**
      * Get TCP connection status.
@@ -373,7 +364,7 @@ public:
     int getMFLNStatus();
 
     int getLastSSLError(char *dest = NULL, size_t len = 0);
-#if defined(ESP_SSL_FS_SUPPORTED)
+#if defined(ENABLE_FS)
     void setCertStore(CertStoreBase *certStore);
 #endif
     bool setCiphers(const uint16_t *cipherAry, int cipherCount);

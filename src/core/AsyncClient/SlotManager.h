@@ -292,7 +292,7 @@ public:
         List vec;
         return vec.existed(rVec, result_addr) ? refResult : &aResult;
     }
-
+#if !defined(DISABLE_NERWORKS)
     function_return_type networkConnect(async_data *sData)
     {
         function_return_type ret = conn.netConnect();
@@ -304,6 +304,7 @@ public:
         }
         return ret;
     }
+#endif
 
     void setAsyncError(async_data *sData, async_state state, int code, bool toRemove, bool toCloseFile)
     {

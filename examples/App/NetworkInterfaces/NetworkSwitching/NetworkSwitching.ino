@@ -15,6 +15,9 @@
 #define ENABLE_ETHERNET_NETWORK
 #define ENABLE_ESP_SSLCLIENT
 
+// For network independent usage (disable all network features).
+// #define DISABLE_NERWORKS
+
 #include <Ethernet.h>
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.

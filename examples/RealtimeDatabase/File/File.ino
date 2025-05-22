@@ -51,6 +51,9 @@
 #define ENABLE_DATABASE
 #define ENABLE_FS
 
+// For network independent usage (disable all network features).
+// #define DISABLE_NERWORKS
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 
