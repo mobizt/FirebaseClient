@@ -649,7 +649,7 @@ Vcc (Pin 8)                         3V3
 Vcc (Pin 4)                         GND
 ```
 
-Once the external Heap memory was selected in IDE, to allow the library to use the external memory, you can set it in [**FirebaseConfig.h**](src/FirebaseConfig.h) by define this macro.
+Once the external Heap memory was selected in IDE, to allow the library to use the external memory, you can define this macro in your sketch before including the library header file `FirebaseClient.h`.
 
 
 ```cpp
