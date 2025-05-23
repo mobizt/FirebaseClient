@@ -680,7 +680,7 @@ In PlatformIO on VSCode or Atom IDE, add the following build_flags in your proje
 build_flags = -DBOARD_HAS_PSRAM -mfix-esp32-psram-cache-issue
 ```
 
-As in ESP8266, once the external Heap memory was enabled in IDE, to allow the library to use the external memory, you can set it in [**FirebaseConfig.h**](src/FirebaseConfig.h) by define this macro.
+As in ESP8266, once the external Heap memory was selected in IDE, to allow the library to use the external memory, you can define this macro in your sketch before including the library header file `FirebaseClient.h`.
 
 ```cpp
 #define ENABLE_PSRAM
