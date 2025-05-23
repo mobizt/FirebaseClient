@@ -26,13 +26,9 @@
 
 // To define build options in your sketch,
 // adding the following macros before FirebaseClient.h
-#define ENABLE_USER_CONFIG
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 #define ENABLE_ESP_SSLCLIENT
-
-// For network independent usage (disable all network features).
-// #define DISABLE_NERWORKS
 
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
@@ -53,8 +49,6 @@ WiFiClient basic_client1, basic_client2, basic_client3;
 // For ESP_SSLClient documentation, see https://github.com/mobizt/ESP_SSLClient
 ESP_SSLClient ssl_client, stream_ssl_client1, stream_ssl_client2;
 
-// This uses built-in core WiFi/Ethernet for network connection.
-// See examples/App/NetworkInterfaces for more network examples.
 using AsyncClient = AsyncClientClass;
 AsyncClient aClient(ssl_client), streamClient1(stream_ssl_client1), streamClient2(stream_ssl_client2);
 

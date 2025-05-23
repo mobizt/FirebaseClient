@@ -293,17 +293,7 @@ private:
     // Handles TCP data sending process.
     function_return_type send(async_data *sData)
     {
-
-#if defined(DISABLE_NERWORKS)
         function_return_type ret = ret_continue;
-#else
-        function_return_type ret = sman.networkConnect(sData); // Check the network status and re-connect
-
-        if (ret != ret_complete)
-            return ret;
-#endif
-
-        ret = ret_continue;
 
         if (sData->state == astate_undefined || sData->state == astate_send_header) // Initial connection or payload sending state.
         {
@@ -320,7 +310,7 @@ private:
             // Stop the server connection when entering the initial/auth token request states or host, port, and SSE mode changes or session timed out.
             sman.newCon(sData, sData->request.getHost(true, &sData->response.val[resns::location]).c_str(), sData->request.port);
 
-            if ((sman.client_type == tcpc_sync && !sman.conn.isConnected()) || sman.client_type == tcpc_async)
+            if ((sman.client_type == tcpc_sync && !sman.conn.isConnected()))
             {
                 if (sData->request.getHost(true, &sData->response.val[resns::location]).length() == 0)
                 {
@@ -383,13 +373,6 @@ private:
 
     function_return_type receive(async_data *sData)
     {
-#if !defined(DISABLE_NERWORKS)
-        function_return_type ret = sman.networkConnect(sData); // Check the network status and re-connect
-
-        if (ret != ret_complete)
-            return ret;
-#endif
-
         // HTTP error is allowed in case non-auth task to get its response.
         if (!readResponse(sData))
         {
@@ -1052,20 +1035,6 @@ private:
                 *ul_dl_task_running = true;
             }
 
-#if !defined(DISABLE_NERWORKS)
-            if (sman.networkConnect(sData) == ret_failure)
-            {
-                // TCP (network) disconnected error.
-                sman.setAsyncError(sData, sData->state, FIREBASE_ERROR_TCP_DISCONNECTED, !sData->sse, false);
-                if (sData->async)
-                {
-                    sman.returnResult(sData, false);
-                    sman.reset(sData, true);
-                }
-                return exitProcess(false);
-            }
-#endif
-
             if (sData->async && !async)
                 return exitProcess(false);
 
@@ -1139,21 +1108,12 @@ private:
                 }
                 else if (!sData->async) // wait for non async
                 {
-#if defined(DISABLE_NERWORKS)
                     while (!sData->response.tcpAvailable())
                     {
                         sys_idle();
                         if (handleReadTimeout(sData))
                             break;
                     }
-#else
-                    while (!sData->response.tcpAvailable() && sman.networkConnect(sData) == ret_complete)
-                    {
-                        sys_idle();
-                        if (handleReadTimeout(sData))
-                            break;
-                    }
-#endif
                 }
             }
 
@@ -1213,41 +1173,7 @@ public:
         sman.client_type = tcpc_sync;
     }
 
-#if defined(DISABLE_NERWORKS)
-    explicit AsyncClientClass(Client &client)
-    {
-        sman.client = &client;
-        this->addr = reinterpret_cast<uint32_t>(this);
-        sman.client_type = tcpc_sync;
-    }
-#else
-    explicit AsyncClientClass(Client &client, bool reconnect = true)
-    {
-        DefaultNetwork defaultNet(reconnect);
-        sman.client = &client;
-        sman.conn.setNetwork(getNetwork(defaultNet));
-        this->addr = reinterpret_cast<uint32_t>(this);
-        sman.client_type = tcpc_sync;
-    }
-
-    explicit AsyncClientClass(Client &client, network_config_data &net)
-    {
-        sman.client = &client;
-        sman.conn.setNetwork(net);
-        this->addr = reinterpret_cast<uint32_t>(this);
-        sman.client_type = tcpc_sync;
-    }
-#endif
-
-#if defined(ENABLE_ASYNC_TCP_CLIENT)
-    explicit AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
-    {
-        sman.atcp_config = &tcpClientConfig;
-        conn.setNetwork(net);
-        this->addr = reinterpret_cast<uint32_t>(this);
-        sman.client_type = tcpc_async;
-    }
-#endif
+    explicit AsyncClientClass(Client &client) { setClient(client); }
 
     ~AsyncClientClass()
     {
@@ -1287,29 +1213,6 @@ public:
         sman.refResult = nullptr;
         sman.result_addr = 0;
     }
-
-#if !defined(DISABLE_NERWORKS)
-    /**
-     * Get the network connection status.
-     *
-     * @return bool Returns true if network is connected.
-     */
-    bool networkStatus() { return sman.conn.getNetworkStatus(); }
-
-    /**
-     * Get the network disconnection time.
-     *
-     * @return unsigned long The millisec of network disconnection since device boot.
-     */
-    unsigned long networkLastSeen() { return sman.conn.networkLastSeen(); }
-
-    /**
-     * Return the current network type enum.
-     *
-     * @return firebase_network_type The firebase_network_type enums are firebase_network_default, firebase_network_generic, firebase_network_ethernet and firebase_network_gsm.
-     */
-    firebase_network_type getNetworkType() { return sman.conn.getNetworkType(); }
-#endif
 
     /**
      * Stop and remove the async/sync task from the queue.
@@ -1400,35 +1303,17 @@ public:
      */
     void setSSEFilters(const String &sse_events_filter) { sman.sse_events_filter = sse_events_filter; }
 
-#if !defined(DISABLE_NERWORKS)
     /**
-     * Set the network interface.
+     * Set the SSL client.
      *
-     * The SSL client set here should work for the type of network set.
-     *
-     * @param client The SSL client that working with this type of network interface.
-     * @param net The network config data can be obtained from the networking classes via the static function called `getNetwork`.
+     * @param client The SSL client.
      */
-    void setNetwork(Client &client, network_config_data &net)
+    void setClient(Client &client)
     {
-        // Check client changes.
-        bool client_changed = reinterpret_cast<uint32_t>(&client) != reinterpret_cast<uint32_t>(sman.client);
-
-        // Some changes, stop the current network client.
-        if (client_changed && sman.client)
-            sman.conn.stop();
-
-        // Change the network interface.
-        // Should not check the type changes, just overwrite
-        sman.conn.setNetwork(net);
-
-        // Change the client.
-        if (client_changed)
-        {
-            sman.client = &client;
-            sman.conn.setClientChange();
-        }
+        sman.client = &client;
+        sman.conn.setClientChange();
+        this->addr = reinterpret_cast<uint32_t>(this);
+        sman.client_type = tcpc_sync;
     }
-#endif
 };
 #endif

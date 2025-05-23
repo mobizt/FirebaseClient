@@ -60,11 +60,7 @@
 
 // To define build options in your sketch,
 // adding the following macros before FirebaseClient.h
-#define ENABLE_USER_CONFIG
 #define ENABLE_ACCESS_TOKEN
-
-// For network independent usage (disable all network features).
-// #define DISABLE_NERWORKS
 
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
@@ -81,8 +77,6 @@ FirebaseApp app;
 
 SSL_CLIENT ssl_client;
 
-// This uses built-in core WiFi/Ethernet for network connection.
-// See examples/App/NetworkInterfaces for more network examples.
 using AsyncClient = AsyncClientClass;
 AsyncClient aClient(ssl_client);
 

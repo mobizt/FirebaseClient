@@ -1,115 +1,6 @@
 #ifndef CORE_OPTIONS_H
 #define CORE_OPTIONS_H
 
-// -------------------------------
-// Features options
-// -------------------------------
-
-#if defined(DISABLE_ALL_OPTIONS)
-
-#undef ENABLE_DATABASE
-#undef ENABLE_FIRESTORE
-#undef ENABLE_FIRESTORE_QUERY
-#undef ENABLE_MESSAGING
-#undef ENABLE_STORAGE
-#undef ENABLE_CLOUD_STORAGE
-#undef ENABLE_FUNCTIONS
-#undef ENABLE_RULESETS
-#undef ENABLE_PSRAM
-#undef ENABLE_OTA
-#undef ENABLE_FS
-#undef ENABLE_SERVICE_AUTH
-#undef ENABLE_CUSTOM_AUTH
-#undef ENABLE_USER_AUTH
-#undef ENABLE_ACCESS_TOKEN
-#undef ENABLE_CUSTOM_TOKEN
-#undef ENABLE_ID_TOKEN
-#undef ENABLE_LEGACY_TOKEN
-#undef ENABLE_JWT
-
-#endif // DISABLE_ALL_OPTIONS
-
-#if defined(DISABLE_DATABASE)
-#undef ENABLE_DATABASE
-#endif
-
-#if defined(DISABLE_FIRESTORE)
-#undef ENABLE_FIRESTORE
-#undef ENABLE_FIRESTORE_QUERY
-#endif
-
-#if defined(DISABLE_FIRESTORE_QUERY)
-#undef ENABLE_FIRESTORE_QUERY
-#endif
-
-#if defined(DISABLE_MESSAGING)
-#undef ENABLE_MESSAGING
-#endif
-
-#if defined(DISABLE_STORAGE)
-#undef ENABLE_STORAGE
-#endif
-
-#if defined(DISABLE_CLOUD_STORAGE)
-#undef ENABLE_CLOUD_STORAGE
-#endif
-
-#if defined(DISABLE_FUNCTIONS)
-#undef ENABLE_FUNCTIONS
-#endif
-
-#if defined(DISABLE_RULESETS)
-#undef ENABLE_RULESETS
-#endif
-
-#if defined(DISABLE_PSRAM)
-#undef ENABLE_PSRAM
-#endif
-
-#if defined(DISABLE_OTA)
-#undef ENABLE_OTA
-#endif
-
-#if defined(DISABLE_FS)
-#undef ENABLE_FS
-#endif
-
-#if defined(DISABLE_SERVICE_AUTH)
-#undef ENABLE_SERVICE_AUTH
-#endif
-
-#if defined(DISABLE_CUSTOM_AUTH)
-#undef ENABLE_CUSTOM_AUTH
-#endif
-
-#if defined(DISABLE_USER_AUTH)
-#undef ENABLE_USER_AUTH
-#endif
-
-#if defined(DISABLE_ACCESS_TOKEN)
-#undef ENABLE_ACCESS_TOKEN
-#endif
-
-#if defined(DISABLE_CUSTOM_TOKEN)
-#undef ENABLE_CUSTOM_TOKEN
-#endif
-
-#if defined(DISABLE_ID_TOKEN)
-#undef ENABLE_ID_TOKEN
-#endif
-
-#if defined(DISABLE_LEGACY_TOKEN)
-#undef ENABLE_LEGACY_TOKEN
-#endif
-
-#if defined(ENABLE_PSRAM)
-#define FIREBASE_USE_PSRAM
-#endif
-
-#if !defined(FPSTR)
-#define FPSTR
-#endif
-
 #if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
 
 #define ENABLE_JWT
@@ -209,9 +100,6 @@
 #if defined(ENABLE_FS)
 
 #if (defined(ESP8266) || defined(CORE_ARDUINO_PICO)) || (defined(ESP32) && __has_include(<SPIFFS.h>))
-#ifndef FLASH_SUPPORTS
-#define FLASH_SUPPORTS
-#endif
 
 #if !defined(FILE_OPEN_MODE_READ)
 #define FILE_OPEN_MODE_READ "r"

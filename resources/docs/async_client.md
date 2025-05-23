@@ -85,44 +85,7 @@ The internal async result will be used for sync task.
 void unsetAsyncResult()
 ```
 
-3. ## 🔹   bool networkStatus()
-
-Get the network connection status.
-
-```cpp
-bool networkStatus()
-```
-
-**Returns:**
-
-- `bool` - Returns true if network is connected.
-
-4. ## 🔹   unsigned long networkLastSeen()
-
-Get the network disconnection time.
-
-```cpp
-unsigned long networkLastSeen()
-```
-
-**Returns:**
-
-- `unsigned long` - The millisec of network successfully connection since device boot.
-
-5. ## 🔹   firebase_network_data_type getNetworkType()
-
-Return the current network type.
-
-```cpp
-firebase_network_data_type getNetworkType()
-```
-
-**Returns:**
-
-- `firebase_network_data_type` - The `firebase_network_data_type` enums are `firebase_network_data_default_network`, `firebase_network_data_generic_network`, `firebase_network_data_ethernet_network` and `firebase_network_data_gsm_network`.
-
-
-6. ## 🔹 void stopAsync(bool all = false)
+3. ## 🔹 void stopAsync(bool all = false)
 
 Stop and remove the async/sync task from the queue.
 
@@ -134,7 +97,7 @@ void stopAsync(bool all = false)
 
 - `all` - The option to stop and remove all tasks. If false, only running task will be stop and removed from queue.
 
-7. ## 🔹  void stopAsync(const String &uid)
+4. ## 🔹  void stopAsync(const String &uid)
 
 Stop and remove the specific async/sync task from the queue.
 
@@ -147,7 +110,7 @@ void stopAsync(const String &uid)
 - `uid` - The task identifier of the task to stop and remove from the queue.
 
 
-8. ## 🔹  size_t taskCount() const
+5. ## 🔹  size_t taskCount() const
 
 Get the number of async/sync tasks that stored in the queue.
 
@@ -160,7 +123,7 @@ size_t taskCount() const
 - `size_t` - The total tasks in the queue.
 
 
-9. ## 🔹   FirebaseError lastError() const
+6. ## 🔹   FirebaseError lastError() const
 
 Get the last error information from async client.
 
@@ -173,7 +136,7 @@ FirebaseError lastError() const
 - `FirebaseError` - The `FirebaseError` object that contains the last error information.
 
 
-10. ## 🔹  String etag() const
+7. ## 🔹  String etag() const
 
 Get the response etag.
 
@@ -185,7 +148,7 @@ String etag() const
 
 - `String` - The response etag header.
 
-11. ## 🔹  void setETag(const String &etag) 
+8. ## 🔹  void setETag(const String &etag) 
 
 Set the etag header to the task (DEPRECATED).
 
@@ -199,7 +162,7 @@ void setEtag(const String &etag)
 
 - `etag` - The ETag to set to the task.
 
-12. ## 🔹  void setSyncSendTimeout(uint32_t timeoutSec)
+9. ## 🔹  void setSyncSendTimeout(uint32_t timeoutSec)
 
 Set the sync task's send timeout in seconds.
 
@@ -212,7 +175,7 @@ void setSyncSendTimeout(uint32_t timeoutSec)
 - `timeoutSec` - The TCP write timeout in seconds.
 
 
-13. ## 🔹  void setSyncReadTimeout(uint32_t timeoutSec) 
+10. ## 🔹  void setSyncReadTimeout(uint32_t timeoutSec) 
 
 Set the sync task's read timeout in seconds.
 
@@ -225,7 +188,7 @@ void setSyncReadTimeout(uint32_t timeoutSec)
 - `timeoutSec` - The TCP read timeout in seconds.
 
 
-14. ## 🔹  void setSessionTimeout(uint32_t timeoutSec)
+11. ## 🔹  void setSessionTimeout(uint32_t timeoutSec)
 
 Set the TCP session timeout in seconds.
 
@@ -238,7 +201,7 @@ void setSessionTimeout(uint32_t timeoutSec)
 - `timeoutSec` - The TCP session timeout in seconds.
    
 
-15. ### 🔹 void setSSEFilters(const String &filter = "")
+12. ### 🔹 void setSSEFilters(const String &filter = "")
 
 Filtering response payload for for Relatime Database SSE streaming. 
     
@@ -284,20 +247,14 @@ void setSSEFilters(const String &filter = "")
    
 
 
-16. ## 🔹  void setNetwork(Client &client, network_config_data &net)
+13. ## 🔹  void setClient(Client &client)
 
-Set the network interface.
-
-The SSL client set here should work for the type of network set.
+Set the SSL client.
 
 ```cpp
-void setNetwork(Client &client, network_config_data &net)
+void setClient(Client &client)
 ```
 
 **Params:**
 
-- `client` - The SSL client that working with this type of network interface.
-
-- `net` - The network config data can be obtained from the networking classes via the static function called `getNetwork`.
-
-
+- `client` - The SSL client.

@@ -105,12 +105,8 @@
 
 // To define build options in your sketch,
 // adding the following macros before FirebaseClient.h
-#define ENABLE_USER_CONFIG
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
-
-// For network independent usage (disable all network features).
-// #define DISABLE_NERWORKS
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -132,8 +128,6 @@ WiFiClientSecure ssl_client1, ssl_client2;
 
 // Step 6
 // Use two AsyncClients for sync and async tasks for demonstation only.
-// This uses built-in core WiFi/Ethernet for network connection.
-// See examples/App/NetworkInterfaces for more network examples.
 using AsyncClient = AsyncClientClass;
 AsyncClient async_client1(ssl_client1), async_client2(ssl_client2);
 

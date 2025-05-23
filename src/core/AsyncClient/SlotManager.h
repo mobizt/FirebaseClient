@@ -30,11 +30,6 @@ private:
     AsyncResult *refResult = nullptr;
     AsyncResult aResult;
     FirebaseError lastErr;
-#if defined(ENABLE_ASYNC_TCP_CLIENT)
-    AsyncTCPConfig *atcp_config = nullptr;
-#else
-    void *atcp_config = nullptr;
-#endif
     tcp_client_type client_type = tcpc_sync;
     std::vector<uint32_t> rVec; // AsyncResult vector
     String sse_events_filter;
@@ -259,9 +254,9 @@ public:
 
     void newCon(async_data *sData, const char *host, uint16_t port)
     {
-        conn.newConn(client_type, client, atcp_config, &debug_log);
-        sData->request.setClient(client_type, client, atcp_config);
-        sData->response.setClient(client_type, client, atcp_config);
+        conn.newConn(client_type, client, &debug_log);
+        sData->request.setClient(client_type, client);
+        sData->response.setClient(client_type, client);
 
         if ((!sData->sse && session_timeout_sec >= FIREBASE_SESSION_TIMEOUT_SEC && session_timer.remaining() == 0) || sData->stop_current_async ||
             (conn.sse && !sData->sse) || (!conn.sse && sData->sse) || (sData->auth_used && sData->state == astate_undefined) ||
@@ -292,19 +287,6 @@ public:
         List vec;
         return vec.existed(rVec, result_addr) ? refResult : &aResult;
     }
-#if !defined(DISABLE_NERWORKS)
-    function_return_type networkConnect(async_data *sData)
-    {
-        function_return_type ret = conn.netConnect();
-        if (ret == ret_failure)
-        {
-            // TCP (network) disconnected error.
-            setAsyncError(sData ? sData : nullptr, sData ? sData->state : astate_undefined, FIREBASE_ERROR_TCP_DISCONNECTED, sData ? !sData->sse : true, false);
-            return ret_failure;
-        }
-        return ret;
-    }
-#endif
 
     void setAsyncError(async_data *sData, async_state state, int code, bool toRemove, bool toCloseFile)
     {

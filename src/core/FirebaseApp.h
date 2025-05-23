@@ -84,8 +84,8 @@ namespace firebase_ns
             appLoop();
             if (await_ms > 0)
             {
-                unsigned long ms = millis();
-                while (isInitialized() && !ready() && millis() - ms < await_ms)
+                unsigned long m = millis();
+                while (isInitialized() && !ready() && millis() - m < await_ms)
                 {
                     appLoop();
                 }

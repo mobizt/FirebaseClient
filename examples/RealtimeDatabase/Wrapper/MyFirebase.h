@@ -21,13 +21,13 @@ public:
     void begin(Client &client, const String &databaseUrl)
     {
         NoAuth no_auth;
-        beginInternal(client, getNetwork(net), getAuth(no_auth), databaseUrl);
+        beginInternal(client, getAuth(no_auth), databaseUrl);
     }
 #if defined(ENABLE_USER_AUTH)
     void userBegin(Client &client, const String &databaseUrl, const String &apiKey, const String &email, const String &password)
     {
         UserAuth user_auth(apiKey, email, password);
-        beginInternal(client, getNetwork(net), getAuth(user_auth), databaseUrl);
+        beginInternal(client, getAuth(user_auth), databaseUrl);
     }
 #endif
 #if defined(ENABLE_SERVICE_AUTH)
@@ -35,7 +35,7 @@ public:
     {
         ServiceAuth service_auth(clientEmail, projectId, privateKey, 3000);
         service_auth.setTime(timestamp);
-        beginInternal(client, getNetwork(net), getAuth(service_auth), databaseUrl);
+        beginInternal(client, getAuth(service_auth), databaseUrl);
     }
 #endif
 #if defined(ENABLE_CUSTOM_AUTH)
@@ -43,36 +43,34 @@ public:
     {
         CustomAuth custom_auth(apiKey, clientEmail, projectId, privateKey, uid, claims, 3000);
         custom_auth.setTime(timestamp);
-        beginInternal(client, getNetwork(net), getAuth(custom_auth), databaseUrl);
+        beginInternal(client, getAuth(custom_auth), databaseUrl);
     }
 #endif
 #if defined(ENABLE_ACCESS_TOKEN)
     void accessBegin(Client &client, const String &databaseUrl, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "", const String &client_id = "", const String &client_secret = "")
     {
         AccessToken access_token(token, expire, refresh, client_id, client_secret);
-        beginInternal(client, getNetwork(net), getAuth(access_token), databaseUrl);
+        beginInternal(client, getAuth(access_token), databaseUrl);
     }
 #endif
 #if defined(ENABLE_ID_TOKEN)
     void idBegin(Client &client, const String &databaseUrl, const String &api_key, const String &token, size_t expire = FIREBASE_DEFAULT_TOKEN_TTL, const String &refresh = "")
     {
         IDToken id_token(api_key, token, expire, refresh);
-        beginInternal(client, getNetwork(net), getAuth(id_token), databaseUrl);
+        beginInternal(client, getAuth(id_token), databaseUrl);
     }
 #endif
 #if defined(ENABLE_LEGACY_TOKEN)
     void legacyBegin(Client &client, const String &databaseUrl, const String &databaseSecret)
     {
         LegacyToken legacy_token(databaseSecret);
-        beginInternal(client, getNetwork(net), getAuth(legacy_token), databaseUrl);
+        beginInternal(client, getAuth(legacy_token), databaseUrl);
     }
 #endif
     bool ready()
     {
         if (app.isInitialized())
-        {
             app.loop();
-        }
 
         return app.isInitialized() && app.ready();
     }
@@ -134,8 +132,6 @@ public:
     {
         this->stream_client[current_stream_index] = &stream_client;
 
-        streamClient[current_stream_index].setNetwork(stream_client, getNetwork(net));
-
         Database.setSSEFilters(filter);
 
         // All results will store in one streamResult, the data of one Stream can be replaced by another Stream.
@@ -175,7 +171,6 @@ private:
     Client *client = nullptr, *stream_client[max_stream_client_num];
     AsyncClientClass aClient, streamClient[max_stream_client_num];
 
-    DefaultNetwork net;
     FirebaseApp app;
     RealtimeDatabase Database;
     AsyncResult authResult, streamResult;
@@ -184,10 +179,10 @@ private:
     String task_id, payload_str, stream_payload, stream_event, stream_data_path, debug_str, event_str, err_str;
     int event_code = 0, err_code = 0, stream_data_type = 0, current_stream_index = 0;
 
-    void beginInternal(Client &client, network_config_data &net, user_auth_data &auth, const String &databaseUrl)
+    void beginInternal(Client &client, user_auth_data &auth, const String &databaseUrl)
     {
+        aClient.setClient(client);
         this->client = &client;
-        aClient.setNetwork(client, net);
         Database.url(databaseUrl);
         initializeApp(aClient, app, auth, authResult);
         app.getApp<RealtimeDatabase>(Database);

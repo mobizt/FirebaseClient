@@ -973,7 +973,7 @@ private:
         AsyncResultCallback cb = NULL;
         bool isSSEFilter = false;
         req_data() {}
-        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const String &etag = "")
+        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, const slot_options_t &opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const String &etag = "")
         {
             this->aClient = aClient;
             this->path = path;

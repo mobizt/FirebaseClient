@@ -32,7 +32,6 @@
 
 // To define build options in your sketch,
 // adding the following macros before FirebaseClient.h
-#define ENABLE_USER_CONFIG
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 #define ENABLE_GSM_NETWORK
@@ -71,7 +70,7 @@ const char gprsPass[] = "";
 
 // LilyGO TTGO T-A7670 development board (ESP32 with SIMCom A7670)
 #define SIM_MODEM_RST 5
-#define SIM_MODEM_RST_LOW false // active HIGH
+#define SIM_MODEM_RST_LOW true // active LOW
 #define SIM_MODEM_RST_DELAY 200
 #define SIM_MODEM_TX 26
 #define SIM_MODEM_RX 27
@@ -100,10 +99,8 @@ TinyGsmClient gsm_client(modem, 0), stream_gsm_client(modem, 1);
 // For ESP_SSLClient documentation, see https://github.com/mobizt/ESP_SSLClient
 ESP_SSLClient ssl_client, stream_ssl_client;
 
-GSMNetwork gsm_network(&modem, GSM_PIN, apn, gprsUser, gprsPass);
-
 using AsyncClient = AsyncClientClass;
-AsyncClient aClient(ssl_client, getNetwork(gsm_network)), streamClient(stream_ssl_client, getNetwork(gsm_network));
+AsyncClient aClient(ssl_client), streamClient(stream_ssl_client);
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<3600) */);
 FirebaseApp app;
@@ -112,9 +109,10 @@ AsyncResult streamResult;
 
 unsigned long ms = 0;
 
-void setup()
+bool initModem()
 {
-    Serial.begin(115200);
+    SerialMon.begin(115200);
+    delay(10);
 
     // Resetting the modem
 #if defined(SIM_MODEM_RST)
@@ -127,30 +125,28 @@ void setup()
 #endif
 
     DBG("Wait...");
-
     delay(3000);
 
     SerialAT.begin(UART_BAUD, SERIAL_8N1, SIM_MODEM_RX, SIM_MODEM_TX);
 
-    // Restart takes quite some time
-    // To skip it, call init() instead of restart()
     DBG("Initializing modem...");
     if (!modem.init())
     {
         DBG("Failed to restart modem, delaying 10s and retrying");
-        return;
+        return false;
     }
 
-    /*
-    2 Automatic
-    13 GSM Only
-    14 WCDMA Only
-    38 LTE Only
-    */
+    /**
+     * 2 Automatic
+     * 13 GSM Only
+     * 14 WCDMA Only
+     * 38 LTE Only
+     */
     modem.setNetworkMode(38);
     if (modem.waitResponse(10000L) != 1)
     {
         DBG(" setNetworkMode faill");
+        return false;
     }
 
     String name = modem.getModemName();
@@ -158,6 +154,28 @@ void setup()
 
     String modemInfo = modem.getModemInfo();
     DBG("Modem Info:", modemInfo);
+
+    SerialMon.print("Waiting for network...");
+    if (!modem.waitForNetwork())
+    {
+        SerialMon.println(" fail");
+        delay(10000);
+        return false;
+    }
+    SerialMon.println(" success");
+
+    if (modem.isNetworkConnected())
+        SerialMon.println("Network connected");
+
+    return true;
+}
+
+void setup()
+{
+    Serial.begin(115200);
+
+    if (!initModem())
+        return;
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 

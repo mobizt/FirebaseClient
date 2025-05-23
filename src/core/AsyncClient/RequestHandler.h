@@ -10,9 +10,6 @@
 #include "./core/Utils/Base64.h"
 #include "./core/AsyncClient/ConnectionHandler.h"
 #include "./core/Auth/Token/AppToken.h"
-#if defined(ENABLE_ASYNC_TCP_CLIENT)
-#include "./core/AsyncClient/AsyncTCPConfig.h"
-#endif
 
 #if defined(ENABLE_FS)
 #if __has_include(<SPIFFS.h>)
@@ -73,15 +70,13 @@ public:
 
     tcp_client_type client_type = tcpc_sync;
     Client *client = nullptr;
-    void *atcp_config = nullptr;
 
     req_handler() {}
 
-    void setClient(tcp_client_type client_type, Client *client, void *atcp_config)
+    void setClient(tcp_client_type client_type, Client *client)
     {
         this->client_type = client_type;
         this->client = client;
-        this->atcp_config = atcp_config;
     }
 
     void clear()
@@ -164,19 +159,6 @@ public:
     {
         if (client_type == tcpc_sync)
             return client ? client->write(data, size) : 0;
-        else
-        {
-#if defined(ENABLE_ASYNC_TCP_CLIENT)
-
-            AsyncTCPConfig *async_tcp_config = reinterpret_cast<AsyncTCPConfig *>(atcp_config);
-            if (!async_tcp_config && !async_tcp_config->tcpSend)
-                return 0;
-
-            uint32_t sent = 0;
-            async_tcp_config->tcpSend(data, size, sent);
-            return sent;
-#endif
-        }
         return 0;
     }
 

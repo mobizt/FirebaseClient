@@ -6,12 +6,8 @@
 
 // To define build options in your sketch,
 // adding the following macros before FirebaseClient.h
-#define ENABLE_USER_CONFIG
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
-
-// For network independent usage (disable all network features).
-// #define DISABLE_NERWORKS
 
 #include "MyFirebase.h"
 #include <WiFi.h>

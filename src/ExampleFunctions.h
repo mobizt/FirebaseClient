@@ -139,10 +139,11 @@ uint32_t get_ntp_time()
     while (time(nullptr) < FIREBASE_DEFAULT_TS && retry < max_try)
     {
         configTime(3 * 3600, 0, "pool.ntp.org");
-        unsigned long ms = millis();
-        while (time(nullptr) < FIREBASE_DEFAULT_TS && millis() - ms < 10 * 1000)
+        unsigned long m = millis();
+        while (time(nullptr) < FIREBASE_DEFAULT_TS && millis() - m < 10 * 1000)
         {
             delay(100);
+            ts = time(nullptr);
         }
         Serial.print(ts == 0 ? " failed, retry... " : "");
         retry++;

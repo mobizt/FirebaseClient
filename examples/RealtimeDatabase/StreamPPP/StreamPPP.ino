@@ -29,12 +29,8 @@
 
 // To define build options in your sketch,
 // adding the following macros before FirebaseClient.h
-#define ENABLE_USER_CONFIG
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
-
-// For network independent usage (disable all network features).
-// #define DISABLE_NERWORKS
 
 #include <PPP.h>
 
@@ -58,7 +54,7 @@
 
 // LilyGO TTGO T-A7670 development board (ESP32 with SIMCom A7670)
 // #define PPP_MODEM_RST 5
-// #define PPP_MODEM_RST_LOW false // active HIGH
+// #define PPP_MODEM_RST_LOW true // active LOW
 // #define PPP_MODEM_RST_DELAY 200
 // #define PPP_MODEM_TX 26
 // #define PPP_MODEM_RX 27
@@ -89,8 +85,6 @@ NetworkClientSecure ssl_client, stream_ssl_client;
 // NetworkClient net_client, stream_net_client;
 // ESP_SSLClient ssl_client, stream_ssl_client;
 
-// This uses built-in core WiFi/Ethernet for network connection.
-// See examples/App/NetworkInterfaces for more network examples.
 using AsyncClient = AsyncClientClass;
 AsyncClient aClient(ssl_client), streamClient(stream_ssl_client);
 
