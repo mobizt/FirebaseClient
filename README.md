@@ -685,12 +685,12 @@ ENABLE_CLOUD_STORAGE // For Google Cloud Storage compilation
 ENABLE_FUNCTIONS // For Google Cloud Functions compilation
 ENABLE_RULESETS // For RuleSets compilation
 ENABLE_PSRAM // For enabling PSRAM support
-ENABLE_OTA // For enabling OTA updates support via RTDB, Firebase Storage and Google Cloud Storage buckets
+ENABLE_OTA // For enabling OTA updates support
 ENABLE_FS // For enabling Flash filesystem support
 
-FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit (number) setting for an async client.
+FIREBASE_ASYNC_QUEUE_LIMIT // For maximum async queue limit (number).
 FIREBASE_PRINTF_PORT // For Firebase.printf debug port class object.
-FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size. The default printf buffer size is 1024 for ESP8266 and SAMD otherwise 4096. Some debug message may be truncated for larger text.
+FIREBASE_PRINTF_BUFFER // Firebase.printf buffer size.
 
 // For enabling authentication and token
 ENABLE_SERVICE_AUTH
