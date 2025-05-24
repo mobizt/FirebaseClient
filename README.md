@@ -119,7 +119,7 @@ For new `Firebase` users, please read the [Project Preparation and Setup](#proje
 
 For new library user that the project was setup and prepared, see the [bare minimun examples](/examples/BareMinimum/) to start using this library with minimum code that requires by this library.
 
-For more examples please click [here](/examples/).
+For more examples, please click [here](/examples/).
 
 ### Working Principle 
 
