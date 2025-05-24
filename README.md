@@ -4,7 +4,7 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/mobizt/FirebaseClient) ![Arduino](https://img.shields.io/badge/Arduino-v2.1.0-57C207?logo=arduino) ![PlatformIO](https://badges.registry.platformio.org/packages/mobizt/library/FirebaseClient.svg) ![GitHub Release Date](https://img.shields.io/github/release-date/mobizt/FirebaseClient)
 
-Revision `2025-05-23`
+Revision `2025-05-24`
 
 ## Introduction
 
@@ -58,29 +58,7 @@ The `AsyncClientClass` methods that are related to the networks are removed.
 
 ## Supported Devices
 
- * ESP8266 MCUs based boards
- * ESP32 MCUs based boards
- * Arduino® MKR WiFi 1010
- * Arduino® MKR 1000 WIFI
- * Arduino® Nano 33 IoT
- * Arduino® MKR Vidor 4000
- * Arduino® UNO R4 WiFi (Renesas)
- * Arduino® Portenta C33
- * Arduino® Nano RP2040
- * Arduino® GIGA R1 WiFi
- * Arduino® OPTA
- * Raspberry Pi Pico (RP2040)
- * Raspberry Pi Pico 2 (RP2350)
- * STM32 MCU based boards (minimum 256k Flash memory)
- * Teensy 3.1, 3.2, 3.5, 3.6, 4.0 and 4.1
- * LAN8720 Ethernet PHY
- * TLK110 Ethernet PHY
- * IP101 Ethernet PHY
- * ENC28J60 SPI Ethernet module
- * W5100 SPI Ethernet module
- * W5500 SPI Ethernet module
- * SIMCom Modules with [TinyGSM](https://github.com/vshymanskyy/TinyGSM)
- * PPP Modules with ESP32 Core v3.x.x 
+ESP8266, ESP32 and all 32-bit MCU except for Atmel AVR.
 
 ## Installation
 
@@ -151,7 +129,7 @@ With async mode, the task will store in the FIFO queue. The result of the runnin
 
 The `AsyncClientClass` is the proxy class that provides the queue for async tasks and also the information of task process when working in await or sync mode.
 
-The async task that stored in the queue contains the preprocess HTTP request data (headers without auth tokens and payload). 
+The async task that is stored in the queue contains the preprocess HTTP request data (headers without auth tokens and payload). 
 
 The SSL Client that assign with the `AsyncClientClass` constructor will be the network client used for all async tasks in its queue.
 
