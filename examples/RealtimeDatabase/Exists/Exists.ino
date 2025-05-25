@@ -1,31 +1,12 @@
-
 /**
- * ABOUT:
- *
  * The example to check wether data existes in your database or not.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * bool RealtimeDatabase::exists(<AsyncClient>, <path>);
- *
- * <AsyncClient> - The async client.
- * <path> - The node path to check the value existent.
- *
- * The sync Existed function returns the operating status (true if existed).
- *
- * In case of error, the operation error information can be obtain from AsyncClient via aClient.lastError().message() and
- * aClient.lastError().code().
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 

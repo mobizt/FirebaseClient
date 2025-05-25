@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to export the Firestore documents.
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,30 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for Firestore database operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Firestore::Databases::exportDocuments(<AsyncClient>, <Firestore::Parent>, <collectionIds>, <bucketID>, <storagePath>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
- * <collectionIds> - The collection ids to export.
- * <bucketID> - The Firebase storage bucket ID in the project.
- * <storagePath> - The path in the Firebase Storage data bucket to store the exported database.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
- *
- * Unspecified the collection ids means all collections will be exported.
- * Use comma (,) to separate between the collection ids.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_FIRESTORE
 

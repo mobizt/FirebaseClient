@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The Realtime Database Stream performance test example.
  *
  * This example will show how fast your device gets the Stream event.
@@ -13,8 +11,6 @@
  *
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 

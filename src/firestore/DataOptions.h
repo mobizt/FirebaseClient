@@ -37,7 +37,7 @@
 using namespace FirestoreQuery;
 #endif
 
-#define RESOURCE_PATH_BASE FPSTR("<resource_path>")
+#define RESOURCE_PATH_BASE "<resource_path>"
 
 enum firebase_firestore_request_type
 {
@@ -153,7 +153,7 @@ namespace FieldTransform
          * @param value Adds the given value to the field's current value.
          */
         template <typename T>
-        explicit Increment(T value) { owriter.setPair(buf, FPSTR("increment"), value.val()); }
+        explicit Increment(T value) { owriter.setPair(buf, "increment", value.val()); }
         const char *c_str() const { return buf.c_str(); }
         void clear() { sut.clear(buf); }
     };
@@ -176,7 +176,7 @@ namespace FieldTransform
          * @param value Sets the field to the maximum of its current value and the given value.
          */
         template <typename T>
-        explicit Maximum(T value) { owriter.setPair(buf, FPSTR("maximum"), value.c_str()); }
+        explicit Maximum(T value) { owriter.setPair(buf, "maximum", value.c_str()); }
         const char *c_str() const { return buf.c_str(); }
         void clear() { sut.clear(buf); }
     };
@@ -198,7 +198,7 @@ namespace FieldTransform
          * @param value Sets the field to the minimum of its current value and the given value.
          */
         template <typename T>
-        explicit Minimum(T value) { owriter.setPair(buf, FPSTR("minimum"), value.c_str()); }
+        explicit Minimum(T value) { owriter.setPair(buf, "minimum", value.c_str()); }
         const char *c_str() const { return buf.c_str(); }
     };
 
@@ -221,7 +221,7 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is first set to the empty array.
          * @param arrayValue The array value object to append.
          */
-        explicit AppendMissingElements(const T &arrayValue) { owriter.setPair(buf, FPSTR("appendMissingElements"), arrayValue.c_str()); }
+        explicit AppendMissingElements(const T &arrayValue) { owriter.setPair(buf, "appendMissingElements", arrayValue.c_str()); }
         const char *c_str() const { return buf.c_str(); }
         void clear() { sut.clear(buf); }
     };
@@ -244,7 +244,7 @@ namespace FieldTransform
          * If the field is not an array, or if the field does not yet exist, it is set to the empty array.
          * @param arrayValue The array value object to remove.
          */
-        explicit RemoveAllFromArray(const T &arrayValue) { owriter.setPair(buf, FPSTR("removeAllFromArray"), arrayValue.c_str()); }
+        explicit RemoveAllFromArray(const T &arrayValue) { owriter.setPair(buf, "removeAllFromArray", arrayValue.c_str()); }
         const char *c_str() const { return buf.c_str(); }
     };
 
@@ -264,7 +264,7 @@ namespace FieldTransform
          * @param enumValue The ServerValue enum
          *
          */
-        explicit SetToServerValue(ServerValue enumValue) { owriter.setPair(buf, FPSTR("setToServerValue"), jut.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? FPSTR("SERVER_VALUE_UNSPECIFIED") : FPSTR("REQUEST_TIME"))); }
+        explicit SetToServerValue(ServerValue enumValue) { owriter.setPair(buf, "setToServerValue", jut.toString(enumValue == SERVER_VALUE_UNSPECIFIED ? "SERVER_VALUE_UNSPECIFIED" : "REQUEST_TIME")); }
         const char *c_str() const { return buf.c_str(); }
     };
 
@@ -282,7 +282,7 @@ namespace FieldTransform
         template <typename T>
         void set(const String &fieldPath, T v)
         {
-            jut.addObject(buf, FPSTR("fieldPath"), fieldPath, true);
+            jut.addObject(buf, "fieldPath", fieldPath, true);
             buf += ',';
             String str = v.c_str();
             buf += str.substring(1, str.length() - 1);
@@ -346,22 +346,22 @@ private:
         if (buf[2].length())
         {
             if (buf[0].length() == 0)
-                owriter.setPair(buf[0], FPSTR("exists"), buf[2]);
+                owriter.setPair(buf[0], "exists", buf[2]);
             else
             {
                 buf[0][buf[0].length() - 1] = '\0';
-                jut.addObject(buf[0], FPSTR("exists"), buf[2], true);
+                jut.addObject(buf[0], "exists", buf[2], true);
             }
         }
 
         if (buf[3].length())
         {
             if (buf[0].length() == 0)
-                owriter.setPair(buf[0], FPSTR("updateTime"), buf[3]);
+                owriter.setPair(buf[0], "updateTime", buf[3]);
             else
             {
                 buf[0][buf[0].length() - 1] = '\0';
-                jut.addObject(buf[0], FPSTR("updateTime"), buf[3], true);
+                jut.addObject(buf[0], "updateTime", buf[3], true);
             }
         }
 
@@ -414,7 +414,7 @@ private:
         buf[2] = mv.c_str();
         sut.clear(buf[3]);
         if (buf[1].length())
-            jut.addObject(buf[3], FPSTR("name"), owriter.makeResourcePath(buf[1]), true, true);
+            jut.addObject(buf[3], "name", owriter.makeResourcePath(buf[1]), true, true);
         else
         {
             buf[0] = buf[2];
@@ -557,38 +557,38 @@ namespace Firestore
     public:
         // This value represents the item to add to an array.
         // Set the concurrency control mode to use for this database (used in database creation).
-        Database &concurrencyMode(ConcurrencyMode value) { return wr.append<Database &, const char *>(*this, _ConcurrencyMode[value].text, buf, bufSize, 1, FPSTR(__func__)); }
+        Database &concurrencyMode(ConcurrencyMode value) { return wr.append<Database &, const char *>(*this, _ConcurrencyMode[value].text, buf, bufSize, 1, __func__); }
 
         // This value represents the item to add to an array.
         // Set the App Engine integration mode to use for this database (used in database creation).
-        Database &appEngineIntegrationMode(AppEngineIntegrationMode value) { return wr.append<Database &, const char *>(*this, _AppEngineIntegrationMode[value].text, buf, bufSize, 2, FPSTR(__func__)); }
+        Database &appEngineIntegrationMode(AppEngineIntegrationMode value) { return wr.append<Database &, const char *>(*this, _AppEngineIntegrationMode[value].text, buf, bufSize, 2, __func__); }
 
         // This value represents the item to add to an array.
         // Set the state of delete protection for the database (used in database creation).
-        Database &deleteProtectionState(DeleteProtectionState value) { return wr.append<Database &, const char *>(*this, _DeleteProtectionState[value].text, buf, bufSize, 3, FPSTR(__func__)); }
+        Database &deleteProtectionState(DeleteProtectionState value) { return wr.append<Database &, const char *>(*this, _DeleteProtectionState[value].text, buf, bufSize, 3, __func__); }
 
         // This value represents the item to add to an array.
         // Set to enable the PITR feature on this database (used in database creation).
-        Database &pointInTimeRecoveryEnablement(PointInTimeRecoveryEnablement value) { return wr.append<Database &, const char *>(*this, _PointInTimeRecoveryEnablement[value].text, buf, bufSize, 4, FPSTR(__func__)); }
+        Database &pointInTimeRecoveryEnablement(PointInTimeRecoveryEnablement value) { return wr.append<Database &, const char *>(*this, _PointInTimeRecoveryEnablement[value].text, buf, bufSize, 4, __func__); }
 
         // This value represents the item to add to an array.
         // Set the type of the database (used in database creation). See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.
-        Database &databaseType(DatabaseType value) { return wr.append<Database &, const char *>(*this, _DatabaseType[value].text, buf, bufSize, 5, FPSTR(__func__)); }
+        Database &databaseType(DatabaseType value) { return wr.append<Database &, const char *>(*this, _DatabaseType[value].text, buf, bufSize, 5, __func__); }
 
         // This value represents the item to add to an array.
         // Set the location of the database (used in database creation).
         // Available locations are listed at https://cloud.google.com/firestore/docs/locations.
-        Database &locationId(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, 6, FPSTR(__func__)); }
+        Database &locationId(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, 6, __func__); }
 
         // This value represents the item to add to an array.
         // Set the resource name of the Database (used in database creation).
         // Format: projects/{project}/databases/{database}
-        Database &name(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, 7, FPSTR(__func__)); }
+        Database &name(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, 7, __func__); }
 
         // This value represents the item to add to an array.
         // Set the ETag (used in database update and deletion)
         // This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.
-        Database &etag(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, 8, FPSTR(__func__)); }
+        Database &etag(const String &value) { return wr.append<Database &, String>(*this, value, buf, bufSize, 8, __func__); }
     };
 
 }
@@ -613,8 +613,8 @@ public:
      */
     explicit DocumentTransform(const String &document, FieldTransform::FieldTransform fieldTransforms)
     {
-        jut.addObject(buf, FPSTR("document"), owriter.makeResourcePath(document), true);
-        jut.addObject(buf, FPSTR("fieldTransforms"), fieldTransforms.c_str(), false, true);
+        jut.addObject(buf, "document", owriter.makeResourcePath(document), true);
+        jut.addObject(buf, "fieldTransforms", fieldTransforms.c_str(), false, true);
     }
 };
 
@@ -654,11 +654,11 @@ public:
         bool curdoc = strlen(currentDocument.c_str());
         bool updatemask = strlen(updateMask.c_str());
         write_type = firestore_write_type_update;
-        jut.addObject(buf, FPSTR("update"), update.c_str(), false, !updatemask && !curdoc);
+        jut.addObject(buf, "update", update.c_str(), false, !updatemask && !curdoc);
         if (updatemask)
-            jut.addObject(buf, FPSTR("updateMask"), updateMask.c_str(), false, !curdoc);
+            jut.addObject(buf, "updateMask", updateMask.c_str(), false, !curdoc);
         if (curdoc)
-            jut.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false, true);
+            jut.addObject(buf, "currentDocument", currentDocument.c_str(), false, true);
     }
 
     /**
@@ -669,8 +669,8 @@ public:
     {
         write_type = firestore_write_type_delete;
         if (strlen(currentDocument.c_str()))
-            jut.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
-        jut.addObject(buf, FPSTR("delete"), owriter.makeResourcePath(deletePath), true, true);
+            jut.addObject(buf, "currentDocument", currentDocument.c_str(), false);
+        jut.addObject(buf, "delete", owriter.makeResourcePath(deletePath), true, true);
     }
 
     /**
@@ -682,8 +682,8 @@ public:
     {
         write_type = firestore_write_type_transform;
         if (strlen(currentDocument.c_str()))
-            jut.addObject(buf, FPSTR("currentDocument"), currentDocument.c_str(), false);
-        jut.addObject(buf, FPSTR("transform"), transform.c_str(), false, true);
+            jut.addObject(buf, "currentDocument", currentDocument.c_str(), false);
+        jut.addObject(buf, "transform", transform.c_str(), false, true);
     }
 
     /**
@@ -700,7 +700,7 @@ public:
             if (!updateTrans)
             {
                 buf[buf.length() - 1] = '\0';
-                jut.addObject(buf, FPSTR("updateTransforms"), owriter.getArrayStr(updateTransforms.c_str()), false, true);
+                jut.addObject(buf, "updateTransforms", owriter.getArrayStr(updateTransforms.c_str()), false, true);
             }
             else
                 owriter.addMember(buf, updateTransforms.c_str(), false, "]}");
@@ -730,8 +730,8 @@ public:
     explicit Writes(Write write, const String &transaction = "")
     {
         if (transaction.length())
-            jut.addObject(buf, FPSTR("transaction"), transaction, true);
-        jut.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), false, true);
+            jut.addObject(buf, "transaction", transaction, true);
+        jut.addObject(buf, "writes", owriter.getArrayStr(write.c_str()), false, true);
     }
 
     /**
@@ -743,8 +743,8 @@ public:
     explicit Writes(const Write &write, const Values::MapValue &labels)
     {
         if (strlen(labels.c_str()))
-            jut.addObject(buf, FPSTR("labels"), labels.c_str(), false);
-        jut.addObject(buf, FPSTR("writes"), owriter.getArrayStr(write.c_str()), false, true);
+            jut.addObject(buf, "labels", labels.c_str(), false);
+        jut.addObject(buf, "writes", owriter.getArrayStr(write.c_str()), false, true);
     }
 
     /**
@@ -775,7 +775,7 @@ public:
     explicit ReadWrite(const String &retryTransaction)
     {
         if (retryTransaction.length())
-            jut.addObject(buf, FPSTR("retryTransaction"), retryTransaction, true, true);
+            jut.addObject(buf, "retryTransaction", retryTransaction, true, true);
     }
 };
 
@@ -862,9 +862,9 @@ public:
         if (strlen(mask.c_str()))
             buf = mask.getQuery("mask", hasParam);
         if (transaction.length())
-            uut.addParam(buf, FPSTR("transaction"), transaction, hasParam);
+            uut.addParam(buf, "transaction", transaction, hasParam);
         if (readTime.length())
-            uut.addParam(buf, FPSTR("readTime"), readTime, hasParam);
+            uut.addParam(buf, "readTime", readTime, hasParam);
     }
 };
 
@@ -882,23 +882,23 @@ public:
     // This value represents the item to add to an array.
     // The names of the documents to retrieve.
     // The item or value will be added to the array or list.
-    BatchGetDocumentOptions &documents(const String &value) { return wr.append<BatchGetDocumentOptions &, String>(*this, owriter.makeResourcePath(value), buf, bufSize, 1, FPSTR(__func__)); }
+    BatchGetDocumentOptions &documents(const String &value) { return wr.append<BatchGetDocumentOptions &, String>(*this, owriter.makeResourcePath(value), buf, bufSize, 1, __func__); }
 
     // The fields to return. If not set, returns all fields.
-    BatchGetDocumentOptions &mask(const DocumentMask &value) { return wr.set<BatchGetDocumentOptions &, DocumentMask>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
+    BatchGetDocumentOptions &mask(const DocumentMask &value) { return wr.set<BatchGetDocumentOptions &, DocumentMask>(*this, value, buf, bufSize, 2, __func__); }
 
     // Union field consistency_selector
     // Timestamp Reads documents in a transaction.
-    BatchGetDocumentOptions &transaction(const String &value) { return wr.set<BatchGetDocumentOptions &, String>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+    BatchGetDocumentOptions &transaction(const String &value) { return wr.set<BatchGetDocumentOptions &, String>(*this, value, buf, bufSize, 3, __func__); }
 
     // Union field consistency_selector
     // Starts a new transaction and reads the documents. Defaults to a read-only transaction.
     // The new transaction ID will be returned as the first response in the stream.
-    BatchGetDocumentOptions &newTransaction(const TransactionOptions &value) { return wr.set<BatchGetDocumentOptions &, TransactionOptions>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+    BatchGetDocumentOptions &newTransaction(const TransactionOptions &value) { return wr.set<BatchGetDocumentOptions &, TransactionOptions>(*this, value, buf, bufSize, 3, __func__); }
 
     // Union field consistency_selector
     // Timestamp. Reads documents as they were at the given time.
-    BatchGetDocumentOptions &readTime(const String &value) { return wr.set<BatchGetDocumentOptions &, String>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+    BatchGetDocumentOptions &readTime(const String &value) { return wr.set<BatchGetDocumentOptions &, String>(*this, value, buf, bufSize, 3, __func__); }
 };
 
 class PatchDocumentOptions : public BaseO1
@@ -915,7 +915,7 @@ public:
         if (strlen(mask.c_str()))
             buf += mask.getQuery("mask", hasParam);
         if (strlen(currentDocument.c_str()))
-            uut.addParam(buf, FPSTR("currentDocument"), currentDocument.c_str(), hasParam);
+            uut.addParam(buf, "currentDocument", currentDocument.c_str(), hasParam);
     }
 };
 
@@ -932,7 +932,7 @@ public:
     // Optional. Whether to execute this query.
     // When false (the default), the query will be planned, returning only metrics from the planning stages.
     // When true, the query will be planned and executed, returning the full query results along with both planning and execution stage metrics.
-    ExplainOptions &analyze(bool value) { return wr.add<ExplainOptions &, bool>(*this, value, buf, FPSTR(__func__)); }
+    ExplainOptions &analyze(bool value) { return wr.add<ExplainOptions &, bool>(*this, value, buf, __func__); }
 };
 
 /**
@@ -944,24 +944,24 @@ public:
     QueryOptions() {}
 
     // Optional. Explain options for the query. If set, additional query statistics will be returned. If not, only query results will be returned.
-    QueryOptions &explainOptions(const ExplainOptions &value) { return wr.set<QueryOptions &, ExplainOptions>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+    QueryOptions &explainOptions(const ExplainOptions &value) { return wr.set<QueryOptions &, ExplainOptions>(*this, value, buf, bufSize, 1, __func__); }
 
     // A structured query.
-    QueryOptions &structuredQuery(const StructuredQuery &value) { return wr.set<QueryOptions &, StructuredQuery>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
+    QueryOptions &structuredQuery(const StructuredQuery &value) { return wr.set<QueryOptions &, StructuredQuery>(*this, value, buf, bufSize, 2, __func__); }
 
     // Union field consistency_selector
     // Run the query within an already active transaction.
-    QueryOptions &transaction(const String &value) { return wr.set<QueryOptions &, String>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+    QueryOptions &transaction(const String &value) { return wr.set<QueryOptions &, String>(*this, value, buf, bufSize, 3, __func__); }
 
     // Union field consistency_selector
     // Starts a new transaction and reads the documents. Defaults to a read-only transaction.
     // The new transaction ID will be returned as the first response in the stream.
-    QueryOptions &newTransaction(const TransactionOptions &value) { return wr.set<QueryOptions &, TransactionOptions>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+    QueryOptions &newTransaction(const TransactionOptions &value) { return wr.set<QueryOptions &, TransactionOptions>(*this, value, buf, bufSize, 3, __func__); }
 
     // Union field consistency_selector
     // Timestamp. Reads documents as they were at the given time.
     // This must be a microsecond precision timestamp within the past one hour,or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
-    QueryOptions &readTime(const String &value) { return wr.set<QueryOptions &, String>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+    QueryOptions &readTime(const String &value) { return wr.set<QueryOptions &, String>(*this, value, buf, bufSize, 3, __func__); }
 };
 
 #endif
@@ -985,19 +985,19 @@ private:
         owriter.clear(buf[0]);
 
         if (pagesize > 0)
-            uut.addParam(buf[0], FPSTR("pageSize"), String(pagesize), hasParam);
+            uut.addParam(buf[0], "pageSize", String(pagesize), hasParam);
         if (buf[1].length() > 0)
-            uut.addParam(buf[0], FPSTR("pageToken"), buf[1], hasParam);
+            uut.addParam(buf[0], "pageToken", buf[1], hasParam);
         if (buf[2].length() > 0)
-            uut.addParam(buf[0], FPSTR("orderBy"), buf[2], hasParam);
+            uut.addParam(buf[0], "orderBy", buf[2], hasParam);
         if (strlen(msk.c_str()) > 0)
             buf[0] += msk.getQuery("mask", hasParam);
         if (buf[3].length() > 0)
-            uut.addParam(buf[0], FPSTR("showMissing"), buf[3], hasParam);
+            uut.addParam(buf[0], "showMissing", buf[3], hasParam);
         if (buf[4].length() > 0)
-            uut.addParam(buf[0], FPSTR("transaction"), buf[4], hasParam);
+            uut.addParam(buf[0], "transaction", buf[4], hasParam);
         if (buf[5].length() > 0)
-            uut.addParam(buf[0], FPSTR("readTime"), buf[5], hasParam);
+            uut.addParam(buf[0], "readTime", buf[5], hasParam);
 
         return *this;
     }
@@ -1077,13 +1077,13 @@ public:
      * The maximum number of results to return.
      * @param value The maximum number of results to return.
      */
-    ListCollectionIdsOptions &pageSize(int value) { return wr.set<ListCollectionIdsOptions &, int>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+    ListCollectionIdsOptions &pageSize(int value) { return wr.set<ListCollectionIdsOptions &, int>(*this, value, buf, bufSize, 1, __func__); }
 
     /**
      * A page token. Must be a value from ListCollectionIdsResponse.
      * @param value A page token. Must be a value from ListCollectionIdsResponse.
      */
-    ListCollectionIdsOptions &pageToken(const String &value) { return wr.set<ListCollectionIdsOptions &, String>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
+    ListCollectionIdsOptions &pageToken(const String &value) { return wr.set<ListCollectionIdsOptions &, String>(*this, value, buf, bufSize, 2, __func__); }
 
     /**
      * Reads documents as they were at the given time.
@@ -1091,7 +1091,7 @@ public:
      * or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.
      * @param value Timestamp
      */
-    ListCollectionIdsOptions &readTime(const String value) { return wr.set<ListCollectionIdsOptions &, String>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+    ListCollectionIdsOptions &readTime(const String value) { return wr.set<ListCollectionIdsOptions &, String>(*this, value, buf, bufSize, 3, __func__); }
 };
 
 // Ref https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes
@@ -1125,10 +1125,10 @@ namespace DatabaseIndex
         IndexField() {}
 
         // The path of the field. Must match the field path specification described by [google.firestore.v1beta1.Document.fields][fields]. Special field path __name__ may be used by itself or at the end of a path. __type__ may be used only at the end of path.
-        IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+        IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, 1, __func__); }
 
         // The field's mode.
-        IndexField &mode(IndexMode::Mode value) { return wr.set<IndexField &, const char *>(*this, IndexMode::_Mode[value].text, buf, bufSize, 2, FPSTR(__func__)); }
+        IndexField &mode(IndexMode::Mode value) { return wr.set<IndexField &, const char *>(*this, IndexMode::_Mode[value].text, buf, bufSize, 2, __func__); }
     };
 
     /**
@@ -1144,11 +1144,11 @@ namespace DatabaseIndex
         }
 
         // The collection ID to which this index applies. Required.
-        Index &collectionId(const String &value) { return wr.set<Index &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+        Index &collectionId(const String &value) { return wr.set<Index &, String>(*this, value, buf, bufSize, 1, __func__); }
 
         // This value represents the item to add to an array.
         //  The field to index.
-        Index &fields(const IndexField &value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
+        Index &fields(const IndexField &value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, 2, __func__); }
     };
 
 }
@@ -1203,10 +1203,10 @@ namespace CollectionGroupsIndex
     public:
         // Required. The vector dimension this configuration applies to.
         // The resulting index will only include vectors of this dimension, and can be used for vector search with the same dimension.
-        VectorConfig &dimension(int value) { return wr.set<VectorConfig &, int>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+        VectorConfig &dimension(int value) { return wr.set<VectorConfig &, int>(*this, value, buf, bufSize, 1, __func__); }
 
         // Indicates the vector index is a flat index.
-        VectorConfig &flat() { return wr.set<VectorConfig &, const char *>(*this, "{}", buf, bufSize, 2, FPSTR(__func__)); }
+        VectorConfig &flat() { return wr.set<VectorConfig &, const char *>(*this, "{}", buf, bufSize, 2, __func__); }
     };
 
     // Ref https://firebase.google.com/docs/firestore/reference/rest/Shared.Types/FieldOperationMetadata#IndexField
@@ -1220,19 +1220,19 @@ namespace CollectionGroupsIndex
         IndexField() {}
 
         // Can be name. For single field indexes, this must match the name of the field or may be omitted.
-        IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+        IndexField &fieldPath(const String &value) { return wr.set<IndexField &, String>(*this, value, buf, bufSize, 1, __func__); }
 
         // Union field value_mode
         // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
-        IndexField &order(Order value) { return wr.set<IndexField &, const char *>(*this, _Order[value].text, buf, bufSize, 2, FPSTR(__func__)); }
+        IndexField &order(Order value) { return wr.set<IndexField &, const char *>(*this, _Order[value].text, buf, bufSize, 2, __func__); }
 
         // Union field value_mode
         // Indicates that this field supports ordering by the specified order or comparing using =, !=, <, <=, >, >=.
-        IndexField &arrayConfig(ArrayConfig value) { return wr.set<IndexField &, const char *>(*this, _ArrayConfig[value].text, buf, bufSize, 2, FPSTR(__func__)); }
+        IndexField &arrayConfig(ArrayConfig value) { return wr.set<IndexField &, const char *>(*this, _ArrayConfig[value].text, buf, bufSize, 2, __func__); }
 
         // Union field value_mode
         // Indicates that this field supports nearest neighbors and distance operations on vector.
-        IndexField &vectorConfig(const VectorConfig &value) { return wr.set<IndexField &, VectorConfig>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
+        IndexField &vectorConfig(const VectorConfig &value) { return wr.set<IndexField &, VectorConfig>(*this, value, buf, bufSize, 2, __func__); }
     };
 
     /**
@@ -1244,14 +1244,14 @@ namespace CollectionGroupsIndex
         Index() {}
 
         // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
-        Index &queryScope(QueryScope value) { return wr.set<Index &, const char *>(*this, _QueryScope[value].text, buf, bufSize, 1, FPSTR(__func__)); }
+        Index &queryScope(QueryScope value) { return wr.set<Index &, const char *>(*this, _QueryScope[value].text, buf, bufSize, 1, __func__); }
 
         // Indexes with a collection query scope specified allow queries against a collection that is the child of a specific document, specified at query time, and that has the same collection id.
-        Index &apiScope(ApiScope value) { return wr.set<Index &, const char *>(*this, _ApiScope[value].text, buf, bufSize, 2, FPSTR(__func__)); }
+        Index &apiScope(ApiScope value) { return wr.set<Index &, const char *>(*this, _ApiScope[value].text, buf, bufSize, 2, __func__); }
 
         // This value represents the item to add to an array.
         // Add the field that supported by this index.
-        Index &fields(const IndexField &value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, 3, FPSTR(__func__)); }
+        Index &fields(const IndexField &value) { return wr.append<Index &, IndexField>(*this, value, buf, bufSize, 3, __func__); }
 
         // Obsoleted, use fields instead.
         Index &addField(const IndexField &value) { return fields(value); }

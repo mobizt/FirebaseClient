@@ -1,7 +1,4 @@
-
 /**
- * ABOUT:
- *
  * The example to read (get) and write (set) the security rules.
  *
  * This example uses the LegacyToken (or ServiceAuth) class for authentication/authorization which
@@ -18,8 +15,6 @@
  *
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_DATABASE
 

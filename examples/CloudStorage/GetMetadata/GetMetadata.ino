@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to get the object metadata.
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,26 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for Cloud Storage operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * CloudStorage::getMetadata(<AsyncClient>, <GoogleCloudStorage::Parent>, <GoogleCloudStorage::GetOptions>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
- * <GoogleCloudStorage::GetOptions> - The GoogleCloudStorage::GetOptions that holds the get options.
- * For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objects/get#optional-parameters
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The bucketid is the Storage bucket Id of object to get metadata.
- * The object is the object in Cloud Storage bucket to get metadata.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_CLOUD_STORAGE
 

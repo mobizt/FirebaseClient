@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to list the Firestore collections.
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,33 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for listing the Firestore collections.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Firestore::Documents::listCollectionIds(<AsyncClient>, <Firestore::Parent>, <ListCollectionIdsOptions>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
- * <ListCollectionIdsOptions> - The  ListCollectionIdsOptions object that provides the functions to set the pageSize, pageToken and readTime options.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
- *
- * The following are the ListCollectionIdsOptions member functions.
- *
- * ListCollectionIdsOptions::pageSize - Setting the  maximum number of results to return.
- * ListCollectionIdsOptions::pageToken - The page token. Must be a value from ListCollectionIdsResponse.
- * ListCollectionIdsOptions::readTime - The timestamp for reading the documents as they were at the given time.
- * This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled,
- * can additionally be a whole minute timestamp within the past 7 days.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_FIRESTORE
 

@@ -1,38 +1,13 @@
 
 /**
- * ABOUT:
- *
  * The example to create the Firestore document.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Firestore::Documents::createDocument(<AsyncClient>, <Firestore::Parent>, <documentPath>, <DocumentMask>, <Document>, <AsyncResultCallback>, <uid>);
- *
- * Firestore::Documents::createDocument(<AsyncClient>, <Firestore::Parent>, <collectionId>, <documentId>, <DocumentMask>, <Document>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
- * <documentPath> - The relative path of document to create in the collection.
- * <DocumentMask> - The fields to return. If not set, returns all fields. Use comma (,) to separate between the field names.
- * <collectionId> - The relative path of document collection id to create the document.
- * <documentId> - The document id of document to be created.
- * <Document> - The Firestore document.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_FIRESTORE
 

@@ -1,7 +1,5 @@
 
 /**
- * ABOUT:
- *
  * The example to create a function (Cloud Functions).
  *
  * This example uses the ServiceAuth class for authentication.
@@ -10,26 +8,8 @@
  * The OAuth2.0 authentication or access token authorization is required for Cloud Functions operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * CloudFunctions::create(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <GoogleCloudFunctions::Parent> - The GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
- * <functionId> - The name of function to create.
- * <GoogleCloudFunctions::Function> - The GoogleCloudFunctions::Function object that holds the information of function to create.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The <functionId> is the name of function to create.
- *
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_FUNCTIONS
 

@@ -1,16 +1,11 @@
 /**
- * ABOUT:
- *
  * The example for creating a ruleset for Firestore, creating a release (deploying a ruleset) and updating a release.
  *
  * The Firestore database access will be tested before and after updating release.
  * 
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_RULESETS
 

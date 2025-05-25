@@ -20,28 +20,29 @@ typedef void (*FileConfigCallback)(File &file, const char *filename, file_operat
 
 struct file_config_data
 {
+
+#if defined(ENABLE_FS)
     enum file_operating_status
     {
         file_status_closed,
         file_status_opened
     };
-
-#if defined(ENABLE_FS)
     File file;
     FileConfigCallback cb = NULL;
+    String filename;
+    file_operating_status file_status = file_status_closed;
 #endif
 #if defined(ENABLE_CLOUD_STORAGE)
     file_upload_resumable_data resumable;
 #endif
-    String filename;
-    file_operating_status file_status = file_status_closed;
+
     uint8_t *data = nullptr;
     size_t data_pos = 0, data_size = 0, file_size = 0;
     bool internal_data = false, initialized = false;
     firebase_blob_writer outB;
     StringUtil sut;
     Memory mem;
-    
+
     void clearInternalData()
     {
         if (internal_data && data && data_size > 0)
@@ -72,10 +73,11 @@ public:
 #if defined(ENABLE_FS)
         this->file = rhs.file;
         this->cb = rhs.cb;
-#endif
         this->filename = rhs.filename;
-        this->file_size = rhs.file_size;
         this->file_status = rhs.file_status;
+#endif
+
+        this->file_size = rhs.file_size;
         this->data_pos = rhs.data_pos;
         this->data_size = rhs.data_size;
         this->data = rhs.data;
@@ -92,9 +94,9 @@ public:
     {
 #if defined(ENABLE_FS)
         cb = NULL;
+        sut.clear(filename);
 #endif
         clearInternalData();
-        sut.clear(filename);
         data = nullptr;
         data_size = 0;
         internal_data = false;

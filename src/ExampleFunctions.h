@@ -97,10 +97,10 @@ void print_file_content(const String &filename)
             int v = file.read();
 
             if (v < 16)
-                Serial.print((const char *)FPSTR("0"));
+                Serial.print("0");
 
             Serial.print(v, HEX);
-            Serial.print((const char *)FPSTR(" "));
+            Serial.print(" ");
             i++;
         }
         Serial.println();

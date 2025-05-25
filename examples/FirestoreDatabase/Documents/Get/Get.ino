@@ -1,39 +1,12 @@
 /**
- * ABOUT:
- *
  * The example to get the Firestore document.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Firestore::Documents::get(<AsyncClient>, <Firestore::Parent>, <documentPath>, <GetDocumentOptions>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
- * <documentPath> - The relative path of document to get in the collection.
- * <GetDocumentOptions> - The GetDocumentOptions object that provide the functions to set the mask, transaction and readTime options.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
- *
- * The following are the GetDocumentOptions member functions.
- *
- * The GetDocumentOptions::mask - The fields to return. If not set, returns all fields.
- * If the document has a field that is not present in this mask, that field will not be returned in the response. Use comma (,) to separate between the field names.
- * GetDocumentOptions::transaction - A base64-encoded string. If set, reads the document in a transaction.
- * GetDocumentOptions::readTime - A timestamp in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_FIRESTORE
 

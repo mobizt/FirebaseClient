@@ -1,30 +1,12 @@
 /**
- * ABOUT:
- *
  * The example to update the data to the database.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * RealtimeDatabase::update(<AsyncClient>, <path>, <object_t>, <AsyncResult>);
- * RealtimeDatabase::update(<AsyncClient>, <path>, <object_t>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <path> - The node path to update (patch) the value.
- * <object_t> - The JSON representation data (object_t) to update.
- * <AsyncResult> - The async result (AsyncResult).
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 

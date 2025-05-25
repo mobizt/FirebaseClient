@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example for listing the release values.
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,32 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for security rules operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Releases::list(<AsyncClient>, <projectId>, <ListOptions>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <projectId> - The project Id.
- * <ListOptions> - The ListOptions which included ::filter, ::pageSize and ::pageToken.
- * - filter is the Ruleset filter. The list method supports filters with restrictions on Ruleset.name.
- * Filters on Ruleset.create_time should use the date function which parses strings that conform to the RFC 3339 date/time specifications.
- * Example: createTime > date("2017-01-01T00:00:00Z") AND name=UUID-*
- * - pageSize is the page size to load. Maximum of 100. Defaults to 10.
- * Note: pageSize is just a hint and the service may choose to load less than pageSize due to the size of the output.
- * To traverse all of the releases, caller should iterate until the pageToken is empty.
- * - pageToken is the next page token for loading the next batch of Ruleset instances.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- *
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_RULESETS
 

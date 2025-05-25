@@ -80,7 +80,7 @@ namespace Values
         /**
          * A null value.
          */
-        NullValue() : buf(FPSTR("null")) { getVal(); }
+        NullValue() : buf("null") { getVal(); }
         const char *c_str() const { return buf.c_str(); }
         const char *val() { return getVal(); }
         size_t printTo(Print &p) const override { return p.print(str.c_str()); }
@@ -293,8 +293,8 @@ namespace Values
          */
         explicit GeoPointValue(double lat, double lng)
         {
-            jut.addObject(buf, FPSTR("latitude"), String(lat), false);
-            jut.addObject(buf, FPSTR("longitude"), String(lng), false, true);
+            jut.addObject(buf, "latitude", String(lat), false);
+            jut.addObject(buf, "longitude", String(lng), false, true);
             getVal();
         }
 
@@ -305,8 +305,8 @@ namespace Values
          */
         explicit GeoPointValue(const number_t &lat, const number_t &lng)
         {
-            jut.addObject(buf, FPSTR("latitude"), lat.c_str(), false);
-            jut.addObject(buf, FPSTR("longitude"), lng.c_str(), false, true);
+            jut.addObject(buf, "latitude", lat.c_str(), false);
+            jut.addObject(buf, "longitude", lng.c_str(), false, true);
             getVal();
         }
 
@@ -331,7 +331,7 @@ namespace Values
         template <typename T>
         void set(T value)
         {
-            owriter.setPair(buf, FPSTR("values"), value.val(), true);
+            owriter.setPair(buf, "values", value.val(), true);
         }
 
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_arrayValue].text, buf); }
@@ -398,7 +398,7 @@ namespace Values
         ObjectWriter owriter;
         StringUtil sut;
         template <typename T>
-        void set(const String &key, T value) { owriter.setPair(buf, FPSTR("fields"), MAP(key, value, true).c_str()); }
+        void set(const String &key, T value) { owriter.setPair(buf, "fields", MAP(key, value, true).c_str()); }
         const char *getVal() { return owriter.setPair(str, firestore_const_key[firestore_const_key_mapValue].text, buf); }
 
     public:

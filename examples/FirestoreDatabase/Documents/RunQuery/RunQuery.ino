@@ -1,38 +1,13 @@
 
 /**
- * ABOUT:
- *
  * The example to query a Firestore database using run query.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Firestore::Documents::runQuery(<AsyncClient>, <Firestore::Parent>, <documentPath>, <QueryOptions>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
- * <documentPath> - The relative path of document to patch with the input document.
- * <QueryOptions> - The QueryOptions object that provides the function to create the query (StructuredQuery) and consistency mode which included
- * structuredQuery, transaction, newTransaction and readTime functions.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The following are the QueryOptions member functions applied for uinion field consistency_selector.
- *
- * QueryOptions::transaction used for running the query within an already active transaction. A base64-encoded string.
- * QueryOptions::newTransaction used for starting a new transaction and reads the documents. Defaults to a read-only transaction.
- * The new transaction ID will be returned as the first response in the stream.
- * QueryOptions::readTime used for reading the documents as they were at the given time.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_FIRESTORE
 #define ENABLE_FIRESTORE_QUERY

@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to show how to use custom claims and UID with security rules to control Firebase Realtime database access.
  *
  * We use the sync functions in this example because it is easy to describe the processes stype by step.
@@ -26,8 +24,6 @@
  *
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_CUSTOM_AUTH
 #define ENABLE_LEGACY_TOKEN
 #define ENABLE_DATABASE

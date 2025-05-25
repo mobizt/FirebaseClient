@@ -182,7 +182,7 @@
 
 #define FIREBASE_TCP_READ_TIMEOUT_SEC 30 // Do not change
 
-#define FIREBASE_AUTH_PLACEHOLDER FPSTR("<auth_token>")
+#define FIREBASE_AUTH_PLACEHOLDER "<auth_token>"
 
 // Raw chunk size for TCP's read and write operations.
 #define FIREBASE_CHUNK_SIZE 2048

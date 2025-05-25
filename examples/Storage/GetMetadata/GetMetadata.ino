@@ -1,30 +1,12 @@
 /**
- * ABOUT:
- *
  * The example to get the object metadata.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Storage::getMetadata(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id and object in its constructor.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The bucketid is the Storage bucket Id of object to get metadata.
- * The object is the object in Storage bucket to get metadata.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_STORAGE
 

@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to upload object (file) to Cloud Storage bucket.
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,40 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for Cloud Storage operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * FileConfig::FileConfig(<file_name>, <file_callback>);
- *
- * <file_name> - The filename included path of file that will be used.
- * <file_callback> - The callback function that provides file operation.
- *
- * The file_callback function parameters included the File reference returned from file operation, filename for file operation and file_operating_mode.
- * The file_operating_mode included file_mode_open_read, file_mode_open_write, file_mode_open_append and file_mode_open_remove.
- *
- * The file name can be a name of source (input) and target (output) file that used in upload and download.
- *
- * 2.------------------------
- *
- * CloudStorage::upload(<AsyncClient>, <GoogleCloudStorage::Parent>, <file_config_data>, <GoogleCloudStorage::UploadOptions>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
- * <file_config_data> - The filesystem data (file_config_data) obtained from FileConfig class object.
- * <GoogleCloudStorage::UploadOptions> - The GoogleCloudStorage::UploadOptions that holds the information for insert options, properties and types of upload.
- * For the insert options (options.insertOptions), see https://cloud.google.com/storage/docs/json_api/v1/objects/insert#optional-parameters
- * For insert properties (options.insertProps), see https://cloud.google.com/storage/docs/json_api/v1/objects/insert#optional-properties
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The bucketid is the Storage bucket Id of object to upload.
- * The object is the object to be stored in the Cloud Storage bucket.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_CLOUD_STORAGE
 #define ENABLE_FS

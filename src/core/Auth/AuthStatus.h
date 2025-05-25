@@ -20,40 +20,40 @@ namespace firebase_ns
             switch (ev)
             {
             case auth_event_initializing:
-                evstr = FPSTR("initializing");
+                evstr = "initializing";
                 break;
             case auth_event_signup:
-                evstr = FPSTR("sign up");
+                evstr = "sign up";
                 break;
             case auth_event_send_verify_email:
-                evstr = FPSTR("send verification email");
+                evstr = "send verification email";
                 break;
             case auth_event_delete_user:
-                evstr = FPSTR("delete user");
+                evstr = "delete user";
                 break;
             case auth_event_reset_password:
-                evstr = FPSTR("reset password");
+                evstr = "reset password";
                 break;
             case auth_event_token_signing:
-                evstr = FPSTR("token signing");
+                evstr = "token signing";
                 break;
             case auth_event_authenticating:
-                evstr = FPSTR("authenticating");
+                evstr = "authenticating";
                 break;
             case auth_event_auth_request_sent:
-                evstr = FPSTR("auth request sent");
+                evstr = "auth request sent";
                 break;
             case auth_event_auth_response_received:
-                evstr = FPSTR("auth response received");
+                evstr = "auth response received";
                 break;
             case auth_event_ready:
-                evstr = FPSTR("ready");
+                evstr = "ready";
                 break;
             case auth_event_error:
-                evstr = FPSTR("error");
+                evstr = "error";
                 break;
             default:
-                evstr = FPSTR("undefined");
+                evstr = "undefined";
                 break;
             }
             return evstr;

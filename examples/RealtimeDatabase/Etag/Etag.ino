@@ -1,31 +1,12 @@
-
 /**
- * ABOUT:
- *
  * The example to work with Etag to prevent writing to the out dated data.
  *
  * This example uses the UserAuth class for authentication, and the DefaultNetwork class for network interface configuration.
  * See examples/App/AppInitialization and examples/App/NetworkInterfaces for more authentication and network examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * To set the Etag to the request
- *
- * AsyncClientClass::setETag(<etag>)
- *
- * <etag> - The Etag to set.
- *
- * To get the Etag from server response
- *
- * String etag = AsyncClientClass::etag()
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 

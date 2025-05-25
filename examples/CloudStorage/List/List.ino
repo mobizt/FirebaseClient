@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to list all objects in Cloud Storage bucket.
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,25 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for Cloud Storage operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * CloudStorage::list(<AsyncClient>, <GoogleCloudStorage::Parent>, <GoogleCloudStorage::ListOptions>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <GoogleCloudStorage::Parent> - The GoogleCloudStorage::Parent object included Storage bucket Id in its constructor.
- * <GoogleCloudStorage::ListOptions> - The GoogleCloudStorage::ListOptions that holds the list options.
- * For the list options, see https://cloud.google.com/storage/docs/json_api/v1/objects/list#optional-parameters
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The bucketid is the Cloud Storage bucket Id to list all objects.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_CLOUD_STORAGE
 

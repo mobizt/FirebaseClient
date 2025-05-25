@@ -33,7 +33,7 @@
 
 #if __has_include(<ESP_SSLClient.h>)
 #include <ESP_SSLClient.h>
-#else
+#elif !defined(ESP32) || defined(ENABLE_ESP_SSLCLIENT)
 #include "./client/SSLClient/ESP_SSLClient.h"
 #endif
 
@@ -243,7 +243,7 @@ namespace firebase_ns
             }
             else
             {
-                app.setEventResult(nullptr, FPSTR("initialization failed"), auth_event_error);
+                app.setEventResult(nullptr, "initialization failed", auth_event_error);
             }
 
             app.await(awaitMs);

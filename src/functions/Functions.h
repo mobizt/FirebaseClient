@@ -745,7 +745,7 @@ private:
 
         sut.addParams(request.options->extras, extras);
 
-        url(FPSTR("cloudfunctions.googleapis.com"));
+        url("cloudfunctions.googleapis.com");
 
         async_data *sData = request.aClient->createSlot(request.opt);
 

@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to create a Firestore database.
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,25 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for Firestore database operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Firestore::Databases::create(<AsyncClient>, <Firestore::Parent>, <Database>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
- * <Database> - The Firestore::Database object that hold the database information to create.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id is the id of database to create.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_FIRESTORE
 

@@ -67,10 +67,6 @@
 #define FIREBASE_ERROR_INVALID_DATABASE_URL -124
 #define FIREBASE_ERROR_INVALID_HOST -125
 
-#if !defined(FPSTR)
-#define FPSTR
-#endif
-
 #include "./core/AsyncResult/AppLog.h"
 
 class FirebaseError
@@ -95,14 +91,14 @@ private:
     void setResponseError(const String &message, int code)
     {
         if (code == FIREBASE_ERROR_HTTP_CODE_PRECONDITION_FAILED)
-            err.push_back(code, FPSTR("precondition failed (ETag does not match)"));
+            err.push_back(code, "precondition failed (ETag does not match)");
         else if (code == FIREBASE_ERROR_HTTP_CODE_UNAUTHORIZED)
-            err.push_back(code, FPSTR("unauthorized"));
+            err.push_back(code, "unauthorized");
         else if (message.length())
             err.push_back(code, message);
         else
         {
-            String buf = FPSTR("HTTP Status ");
+            String buf = "HTTP Status ";
             buf += code;
             err.push_back(code, buf);
         }
@@ -114,73 +110,73 @@ private:
             switch (code)
             {
             case FIREBASE_ERROR_TCP_CONNECTION:
-                err.push_back(code, FPSTR("TCP connection failed"));
+                err.push_back(code, "TCP connection failed");
                 break;
             case FIREBASE_ERROR_TCP_SEND:
-                err.push_back(code, FPSTR("TCP send failed"));
+                err.push_back(code, "TCP send failed");
                 break;
             case FIREBASE_ERROR_TCP_RECEIVE_TIMEOUT:
-                err.push_back(code, FPSTR("TCP receive timed out"));
+                err.push_back(code, "TCP receive timed out");
                 break;
             case FIREBASE_ERROR_TCP_DISCONNECTED:
-                err.push_back(code, FPSTR("TCP disconnected"));
+                err.push_back(code, "TCP disconnected");
                 break;
             case FIREBASE_ERROR_OPEN_FILE:
-                err.push_back(code, FPSTR("error opening file"));
+                err.push_back(code, "error opening file");
                 break;
             case FIREBASE_ERROR_FILE_READ:
-                err.push_back(code, FPSTR("error reading file"));
+                err.push_back(code, "error reading file");
                 break;
             case FIREBASE_ERROR_FILE_WRITE:
-                err.push_back(code, FPSTR("error writing file"));
+                err.push_back(code, "error writing file");
                 break;
             case FIREBASE_ERROR_UNAUTHENTICATE:
-                err.push_back(code, FPSTR("unauthenticate"));
+                err.push_back(code, "unauthenticate");
                 break;
             case FIREBASE_ERROR_TOKEN_PARSE_PK:
-                err.push_back(code, FPSTR("parse private key"));
+                err.push_back(code, "parse private key");
                 break;
             case FIREBASE_ERROR_TOKEN_SIGN:
-                err.push_back(code, FPSTR("sign JWT token"));
+                err.push_back(code, "sign JWT token");
                 break;
             case FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE:
-                err.push_back(code, FPSTR("too low sketch space"));
+                err.push_back(code, "too low sketch space");
                 break;
             case FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE:
-                err.push_back(code, FPSTR("OTA Storage was not set"));
+                err.push_back(code, "OTA Storage was not set");
                 break;
             case FIREBASE_ERROR_FW_UPDATE_WRITE_FAILED:
-                err.push_back(code, FPSTR("firmware write failed"));
+                err.push_back(code, "firmware write failed");
                 break;
             case FIREBASE_ERROR_FW_UPDATE_END_FAILED:
-                err.push_back(code, FPSTR("firmware end failed"));
+                err.push_back(code, "firmware end failed");
                 break;
             case FIREBASE_ERROR_STREAM_TIMEOUT:
-                err.push_back(code, FPSTR("stream connection timed out"));
+                err.push_back(code, "stream connection timed out");
                 break;
             case FIREBASE_ERROR_STREAM_AUTH_REVOKED:
-                err.push_back(code, FPSTR("auth revoked"));
+                err.push_back(code, "auth revoked");
                 break;
             case FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED:
-                err.push_back(code, FPSTR("app was not assigned"));
+                err.push_back(code, "app was not assigned");
                 break;
             case FIREBASE_ERROR_OPERATION_CANCELLED:
-                err.push_back(code, FPSTR("operation was cancelled"));
+                err.push_back(code, "operation was cancelled");
                 break;
             case FIREBASE_ERROR_TIME_IS_NOT_SET_OR_INVALID:
-                err.push_back(code, FPSTR("time was not set or not valid"));
+                err.push_back(code, "time was not set or not valid");
                 break;
             case FIREBASE_ERROR_INVALID_DATABASE_SECRET:
-                err.push_back(code, FPSTR("invalid database secret"));
+                err.push_back(code, "invalid database secret");
                 break;
             case FIREBASE_ERROR_INVALID_DATABASE_URL:
-                err.push_back(code, FPSTR("invalid database URL, please use RealtimeDatabase::url to set"));
+                err.push_back(code, "invalid database URL, please use RealtimeDatabase::url to set");
                 break;
             case FIREBASE_ERROR_INVALID_HOST:
-                err.push_back(code, FPSTR("invalid host"));
+                err.push_back(code, "invalid host");
                 break;
             default:
-                err.push_back(code, FPSTR("undefined"));
+                err.push_back(code, "undefined");
                 break;
             }
         }

@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example for creating a release (deploying).
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,26 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for security rules operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Releases::create(<AsyncClient>, <projectId>, <Release>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <projectId> - The project Id.
- * <Release> - The named reference to a Ruleset.
- * Once a Release refers to a Ruleset, rules-enabled services will be able to enforce the Ruleset.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- *
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_RULESETS
 

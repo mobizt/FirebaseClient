@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The beare minimum code example for using all Firebase services.
  *
  * The steps which are generally required are explained below.
@@ -103,8 +101,6 @@
 
 // Step 1
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_DATABASE
 #define ENABLE_FIRESTORE

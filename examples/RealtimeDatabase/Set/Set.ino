@@ -1,31 +1,12 @@
 /**
- * ABOUT:
- *
  * The example to set/store value to the database.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * RealtimeDatabase::set<T>(<AsyncClient>, <path>, <value>, <AsyncResultCallback>, <uid>, <matchingEtag>);
- *
- * T - The type of value to set.
- * <AsyncClient> - The async client.
- * <path> - The node path to set the value.
- * <value> - The value to set.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - Optional. The user specified UID of async result (optional).
- * <matchingEtag> - Optional. The Etag value for comparison with the existing server's Ethag value.
- * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 

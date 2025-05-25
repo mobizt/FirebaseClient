@@ -1,31 +1,12 @@
 /**
- * ABOUT:
- *
  * The example to perform OTA firmware update using object (bin file) stores in Storage bucket.
  *
  * This example uses the ServiceAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Storage::ota(<AsyncClient>, <FirebaseStorage::Parent>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <FirebaseStorage::Parent> - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The bucketid is the Storage bucket Id of object to download.
- * The object is the object in Storage bucket to download.
- * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
- */
+*/
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_STORAGE
 #define ENABLE_OTA

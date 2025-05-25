@@ -143,13 +143,13 @@ public:
 
     void updateDownloadURL(String &url, const String &payload)
     {
-        int p1 = payload.indexOf(FPSTR("\"downloadTokens\": \""));
+        int p1 = payload.indexOf("\"downloadTokens\": \"");
         if (p1 > -1)
         {
             p1 += 19;
             int p2 = payload.indexOf("\"", p1);
             if (p2 > -1)
-                url.replace(FPSTR("a82781ce-a115-442f-bac6-a52f7f63b3e8"), payload.substring(p1, p2));
+                url.replace("a82781ce-a115-442f-bac6-a52f7f63b3e8", payload.substring(p1, p2));
         }
     }
 

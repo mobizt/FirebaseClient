@@ -1,27 +1,9 @@
 /**
- * ABOUT:
- *
  * This is example for how to disable the re-authentication and force the authentication processes.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * FirebaseApp::autoRefresh(<enable>);
- *
- * <enable> - Set to true to enable auto-refresh and false for disable auto-refresh.
- *
- * 2.------------------------
- *
- * FirebaseApp::refreshToken();
- *
- * The complete usage guidelines, please visit https://github.com/mobizt/FirebaseClient
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 
 #include <FirebaseClient.h>

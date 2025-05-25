@@ -299,7 +299,7 @@ namespace firebase_ns
                 req_timer.feed(FIREBASE_TCP_READ_TIMEOUT_SEC);
                 slot = slotCountBase(aClient) - 1;
 
-                getAppDebug(aClient)->push_back(-1, FPSTR("Connecting to server..."));
+                getAppDebug(aClient)->push_back(-1, "Connecting to server...");
                 firebase_bebug_callback(resultCb, sData->aResult, __func__, __LINE__, __FILE__);
             }
         }
@@ -453,7 +453,7 @@ namespace firebase_ns
                 else if (auth_data.user_auth.status._event == auth_event_authenticating)
                 {
 
-                    subdomain = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? FPSTR("oauth2") : FPSTR("identitytoolkit");
+                    subdomain = auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token ? "oauth2" : "identitytoolkit";
                     sop.async = true;
                     sop.auth_used = true;
 
@@ -503,10 +503,10 @@ namespace firebase_ns
                     }
 
                     if (auth_data.user_auth.auth_type == auth_sa_access_token || auth_data.user_auth.auth_type == auth_access_token)
-                        extras = FPSTR("/token");
+                        extras = "/token";
                     else
                     {
-                        extras = FPSTR("/v1/accounts:signInWithCustomToken?key=");
+                        extras = "/v1/accounts:signInWithCustomToken?key=";
                         if (auth_data.user_auth.auth_type == auth_sa_custom_token)
                         {
 #if defined(ENABLE_CUSTOM_AUTH)
@@ -533,7 +533,7 @@ namespace firebase_ns
                 if ((auth_data.user_auth.task_type == firebase_core_auth_task_type_undefined || auth_data.user_auth.auth_type == auth_sa_custom_token) && auth_data.app_token.val[app_tk_ns::refresh].length())
                     auth_data.user_auth.task_type = firebase_core_auth_task_type_refresh_token;
 
-                subdomain = auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? FPSTR("securetoken") : FPSTR("identitytoolkit");
+                subdomain = auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token ? "securetoken" : "identitytoolkit";
 
                 if (auth_data.user_auth.status._event == auth_event_authenticating)
                 {
@@ -556,18 +556,18 @@ namespace firebase_ns
                             json.addObject(sData->request.val[reqns::payload], "email", auth_data.user_auth.user.val[user_ns::em], true, true);
                         }
 
-                        extras = FPSTR("/v1/accounts:sendOobCode?key=");
+                        extras = "/v1/accounts:sendOobCode?key=";
                     }
                     else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_delete_user)
                     {
                         json.addObject(sData->request.val[reqns::payload], "idToken", auth_data.user_auth.user.val[user_ns::id_token].length() ? auth_data.user_auth.user.val[user_ns::id_token] : auth_data.app_token.val[app_tk_ns::token], true, true);
-                        extras = FPSTR("/v1/accounts:delete?key=");
+                        extras = "/v1/accounts:delete?key=";
                     }
                     else if (auth_data.user_auth.task_type == firebase_core_auth_task_type_refresh_token)
                     {
                         json.addObject(sData->request.val[reqns::payload], "grantType", "refresh_token", true);
                         json.addObject(sData->request.val[reqns::payload], "refreshToken", auth_data.app_token.val[app_tk_ns::refresh], true, true);
-                        extras = FPSTR("/v1/token?key=");
+                        extras = "/v1/token?key=";
                     }
                     else
                     {
@@ -577,7 +577,7 @@ namespace firebase_ns
                             json.addObject(sData->request.val[reqns::payload], "password", auth_data.user_auth.user.val[user_ns::psw], true);
                         }
                         json.addObject(sData->request.val[reqns::payload], "returnSecureToken", "true", false, true);
-                        extras = auth_data.user_auth.task_type == firebase_core_auth_task_type_signup ? FPSTR("/v1/accounts:signUp?key=") : FPSTR("/v1/accounts:signInWithPassword?key=");
+                        extras = auth_data.user_auth.task_type == firebase_core_auth_task_type_signup ? "/v1/accounts:signUp?key=" : "/v1/accounts:signInWithPassword?key=";
                     }
 
                     if (auth_data.user_auth.auth_type == auth_sa_custom_token)

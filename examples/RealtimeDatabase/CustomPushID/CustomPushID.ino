@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to simulate push operation with set and UUID.
  *
  * This example uses the UserAuth class for authentication.
@@ -9,8 +7,6 @@
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 

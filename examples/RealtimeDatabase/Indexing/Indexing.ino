@@ -1,18 +1,12 @@
-
 /**
- * ABOUT:
- *
  * The example to read (get) the security rules and write (set) the indexing rule for data filtering.
  *
  * This example uses the LegacyToken (or ServiceAuth) class for authentication/authorization which
  * has the highest privilledge which needs to access the security rules.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_DATABASE
 

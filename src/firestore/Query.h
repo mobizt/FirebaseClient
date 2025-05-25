@@ -115,7 +115,7 @@ namespace FirestoreQuery
         explicit FieldReference(const String &value) { fieldPath(value); }
 
         // A reference to a field in a document.
-        FieldReference &fieldPath(const String &value) { return wr.add<FieldReference &, String>(*this, value, buf, FPSTR(__func__)); }
+        FieldReference &fieldPath(const String &value) { return wr.add<FieldReference &, String>(*this, value, buf, __func__); }
     };
 
     /**
@@ -129,7 +129,7 @@ namespace FirestoreQuery
 
         // This value represents the item to add to an array.
         // A reference to a field in a document.
-        Projection &fields(const FieldReference &value) { return wr.append<Projection &, FieldReference>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+        Projection &fields(const FieldReference &value) { return wr.append<Projection &, FieldReference>(*this, value, buf, bufSize, 1, __func__); }
 
         // Obsoleted, use fields instead.
         Projection &add(const FieldReference &value) { return fields(value); }
@@ -164,10 +164,10 @@ namespace FirestoreQuery
         explicit CollectionSelector(const String &collectionId, bool allDescendants) { CollectionSelector::collectionId(collectionId).allDescendants(allDescendants); }
 
         // The collection ID. When set, selects only collections with this ID.
-        CollectionSelector &collectionId(const String &value) { return wr.set<CollectionSelector &, String>(*this, value, buf, bufSize, 1, FPSTR(__func__)); }
+        CollectionSelector &collectionId(const String &value) { return wr.set<CollectionSelector &, String>(*this, value, buf, bufSize, 1, __func__); }
 
         // When false, selects only collections that are immediate children of the parent specified in the containing RunQueryRequest. When true, selects all descendant collections.
-        CollectionSelector &allDescendants(bool value) { return wr.set<CollectionSelector &, bool>(*this, value, buf, bufSize, 2, FPSTR(__func__)); }
+        CollectionSelector &allDescendants(bool value) { return wr.set<CollectionSelector &, bool>(*this, value, buf, bufSize, 2, __func__); }
     };
 
     /**

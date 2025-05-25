@@ -1,85 +1,11 @@
 /**
- * ABOUT:
- *
  * The bare minimum example for using user authentication with custom UID and claims.
  *
  * This example requires the service account credentials that obtains from the JSON key file.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * CustomAuth::CustomAuth(<api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>);
- *
- * <api_key> - The web API key of project.
- * <client_email> - The service account client Email.
- * <project_id> - The service account project ID.
- * <private_key> - The service account private key.
- * <user_id> - The unique identifier of the signed-in user must be a string, between 1-128 characters long, inclusive. Shorter uids offer better performance.
- * <claims> - Optional custom claims to include in the Security Rules auth / request.auth variables.
- * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
- *
- * 2.------------------------
- *
- * CustomAuth::CustomAuth(<TimeStatusCallback>, <api_key>, <client_email>, <project_id>, <private_key>, <user_id>, <scope>, <claims>, <expire>);
- *
- * <TimeStatusCallback> - The time status callback that provide the UNIX timestamp value used for JWT token signing.
- * <api_key> - The web API key of project.
- * <client_email> - The service account client Email.
- * <project_id> - The service account project ID.
- * <private_key> - The service account private key.
- * <user_id> - The user ID.
- * <scope> - The OAuth scopes.
- * <claims> - The OAuth claims. For more details about claims, please visit https://firebase.google.com/docs/auth/admin/custom-claims.
- * <expire> - The expiry period in seconds (less than 3600), 3300 is the default value.
- *
- * See examples/RealtimeDatabase/AccessControl/AccessControl.ino for how it can work with security rules for database access control.
- *
- * 3.------------------------
- *
- * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <FirebaseApp> - The authentication and access token handler.
- * <user_auth_data> - The user auth data (user_auth_data struct) that holds the user input sign-in credentials and token.
- *
- * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
- * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
- *
- * <AsyncResultCallback> - The AsyncResultCallback function for debugging.
- * <uid> - Optional The user defined task UID for debugging.
- *
- * 4.------------------------
- *
- * initializeApp(<AsyncClient>, <FirebaseApp>, <user_auth_data>, <timeoutMs>, <AsyncResultCallback>);
- *
- * <AsyncClient> - The async client.
- * <FirebaseApp> - The authentication and access token handler.
- * <user_auth_data> - The user auth data (user_auth_data struct) that holds the user input sign-in credentials and token.
- *
- * The <user_auth_data> can be obtained from the following sign-in credentials, access key, auth token providers classs via getAuth function i.e.
- * CustomAuth, ServiceAuth, UserAuth, NoAuth, CustomToken, AccessToken, IDToken, LegacyToken.
- *
- * <timeoutMs> - Optional. The await timeout in milliseconds.
- * <AsyncResultCallback> - Optional. The async result callback (AsyncResultCallback) for debugging.
- *
- * NOTE:
- *
- * The valid time is required for private key signing process in JWT token generation.
- * In case TimeStatusCallback was not assigned in the CustomAuth class constructor,
- * use FirebaseApp::setTime before calling initializeApp.
- *
- * The timeoutMs is the timeout for waiting the authentication process to be done.
- *
- * By providing AsyncResultCallback in the initializeApp function, the debug information will be collected and send to AsyncResultCallback
- * function immediately.
  */
 
-
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_CUSTOM_AUTH
 
 #include <FirebaseClient.h>

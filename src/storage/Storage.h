@@ -340,7 +340,7 @@ private:
             uut.addEncUrl(request.path, "/", request.options->parent.getObject());
 
         sut.addParams(request.options->extras, extras);
-        url(FPSTR("firebasestorage.googleapis.com"));
+        url("firebasestorage.googleapis.com");
 
         async_data *sData = request.aClient->createSlot(request.opt);
 

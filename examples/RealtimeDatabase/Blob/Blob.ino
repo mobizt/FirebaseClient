@@ -1,40 +1,12 @@
-
 /**
- * ABOUT:
- *
  * The example to get/set blob data from/to database.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * BlobConfig::BlobConfig(<data>, <size>);
- *
- * <data> - The BLOB data (byte array).
- * <size> - The size of data.
- *
- * The data can be a source (input) and target (output) data that used in upload and download.
- *
- * 2.------------------------
- *
- * RealtimeDatabase::set(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
- *
- * RealtimeDatabase::get(<AsyncClient>, <path>, <file_config_data>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <path> - The node path to set/get the BLOB data.
- * <file_config_data> - The file config data which in case of BLOB, it will be obtained from BlobConfig via getBlob.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 

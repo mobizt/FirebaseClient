@@ -1,7 +1,4 @@
-
 /**
- * ABOUT:
- *
  * The example to stream changes to a single location in Realtime Database.
  *
  * This example requires PPP.h from ESP32 Core v3.x.x.
@@ -10,25 +7,8 @@
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * RealtimeDatabase::get(<AsyncClient>, <path>, <AsyncResultCallback>, <SSE>, <uid>);
- *
- * RealtimeDatabase::get(<AsyncClient>, <path>, <DatabaseOption>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <path> - The node path to get/watch the value.
- * <DatabaseOption> - The database options (DatabaseOptions).
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- * <SSE> - The Server-sent events (HTTP Streaming) mode.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 

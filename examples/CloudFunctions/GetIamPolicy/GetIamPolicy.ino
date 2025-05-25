@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to get the access control policy for a resource (Cloud Functions).
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,26 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for Cloud Functions operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * CloudFunctions::getIamPolicy(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::GetPolicyOptions>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <GoogleCloudFunctions::Parent> - The GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
- * <functionId> - The function name or Id to get.
- * <GoogleCloudFunctions::GetPolicyOptions> - The GoogleCloudFunctions::GetPolicyOptions object that provides requestedPolicyVersion option.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The location name is the project location.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_FUNCTIONS
 

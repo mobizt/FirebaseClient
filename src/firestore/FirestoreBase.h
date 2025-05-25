@@ -100,13 +100,13 @@ protected:
         String extras;
         sut.printTo(request.path, 20, "/v1%s%s/projects/", beta == 0 ? "" : "beta", beta == 0 ? "" : String(beta).c_str());
         request.path += strlen(request.options->parent.getProjectId()) == 0 ? atoken->val[app_tk_ns::pid] : request.options->parent.getProjectId();
-        request.path += FPSTR("/databases");
+        request.path += "/databases";
         if (!request.options->parent.isDatabaseIdParam())
             sut.printTo(request.path, strlen(request.options->parent.getDatabaseId()) + 20, "/%s", strlen(request.options->parent.getDatabaseId()) > 0 ? request.options->parent.getDatabaseId() : "(default)");
 
         sut.addParams(request.options->extras, extras);
 
-        url(FPSTR("firestore.googleapis.com"));
+        url("firestore.googleapis.com");
 
         async_data *sData = createSlotBase(request.aClient, request.opt);
 
@@ -143,7 +143,7 @@ protected:
         options.payload = eximOptions.c_str();
         if (!isImport)
             options.payload.replace("inputUriPrefix", "outputUriPrefix");
-        options.extras += isImport ? FPSTR(":importDocuments") : FPSTR(":exportDocuments");
+        options.extras += isImport ? ":importDocuments" : ":exportDocuments";
         req_data aReq(&aClient, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);
         return aClient.getResult();
@@ -168,9 +168,9 @@ protected:
         if (key.length())
         {
             if (mode == Firestore::cf_mode_delete)
-                options.extras += FPSTR("?etag=");
+                options.extras += "?etag=";
             else if (mode == Firestore::cf_mode_patch)
-                options.extras += FPSTR("?updateMask=");
+                options.extras += "?updateMask=";
             options.extras += key;
         }
 

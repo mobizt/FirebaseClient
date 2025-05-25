@@ -1,44 +1,12 @@
-
-
 /**
- * ABOUT:
- *
  * The example to list the Firestore document.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Firestore::Documents::list(<AsyncClient>, <Firestore::Parent>, <collectionId>, <ListDocumentsOptions>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
- * <collectionId> - The relative path of document collection.
- * <ListDocumentsOptions> - The ListDocumentsOptions object that provides the functions to set the pageSize, pageToken, orderBy, mask and showMissing options.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
- *
- * The following are the ListDocumentsOptions member functions.
- *
- * ListDocumentsOptions::pageSize - Setting the maximum number of documents to return.
- * ListDocumentsOptions::pageToken - The nextPageToken value returned from a previous List request, if any.
- * ListDocumentsOptions::orderBy - The order to sort results by. For example: priority desc, name.
- * ListDocumentsOptions::mask - Setting the fields to return. If not set, returns all fields.
- * If a document has a field that is not present in this mask, that field will not be returned in the response.
- * ListDocumentsOptions::showMissing - Setting if the list should show missing documents.
- * A missing document is a document that does not exist but has sub-documents.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_FIRESTORE
 

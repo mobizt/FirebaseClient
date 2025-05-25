@@ -1,29 +1,12 @@
 /**
- * ABOUT:
- *
  * The example to remove the data from the database.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * RealtimeDatabase::remove(<AsyncClient>, <path>, <AsyncResultCallback>, <uid>, <matchingEtag>);
- *
- * <AsyncClient> - The async client.
- * <path> - The node path to remove the value.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- * <matchingEtag> - Optional. The Etag value for comparison with the existing server's Ethag value.
- * The operation will fail with HTTP code 412 Precondition Failed if the Etag does not match.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 

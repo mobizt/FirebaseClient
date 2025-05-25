@@ -1,42 +1,12 @@
 /**
- * ABOUT:
- *
  * The example to delete the Firestore document.
  *
  * This example uses the UserAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Firestore::Documents::deleteDoc(<AsyncClient>, <Firestore::Parent>, <documentPath>, <Precondition>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <Firestore::Parent> - The Firestore::Parent object included project Id and database Id in its constructor.
- * <documentPath> - The relative path of document to delete in the collection.
- * <Precondition> - The Precondition object for an optional precondition on the document and provides the functions to set the exists and updateTime.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The Firestore database id should be (default) or empty "".
- *
- * The following are the Precondition member functions.
- *
- * Precondition::exists - When set to true, the target document must exist. When set to false, the target document must not exist.
- * Precondition::updateTime - When set, the target document must exist and have been last updated at that time.
- *
- * A timestamp is in RFC3339 UTC "Zulu" format, with nanosecond resolution and up to nine fractional digits.
- * Examples: "2014-10-02T15:01:23Z" and "2014-10-02T15:01:23.045123456Z".
- *
- * The request will fail if Precondition is set and not met by the target document.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_USER_AUTH
 #define ENABLE_FIRESTORE
 

@@ -50,7 +50,7 @@ public:
         this->source(source);
         attachmentPoint(attachment_point);
     }
-    void source(const Rules::Source &source) { wr.set<Ruleset &, Rules::Source>(*this, source, buf, bufSize, 1, FPSTR(__func__)); }
+    void source(const Rules::Source &source) { wr.set<Ruleset &, Rules::Source>(*this, source, buf, bufSize, 1, __func__); }
     void attachmentPoint(const String &attachment_point) { wr.set<Ruleset &, String>(*this, attachment_point, buf, bufSize, 2, "attachment_point"); }
     const char *c_str() const { return buf[0].c_str(); }
     void clear() { owriter.clearBuf(buf, bufSize); }
@@ -103,7 +103,7 @@ private:
 
         sut.addParams(request.options.extras, extras);
 
-        url(FPSTR("firebaserules.googleapis.com"));
+        url("firebaserules.googleapis.com");
 
         async_data *sData = createSlotBase(request.aClient, request.opt);
 

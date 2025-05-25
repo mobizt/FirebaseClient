@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example for getting the ruleset.
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,25 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for security rules operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * RuleSets::get(<AsyncClient>, <projectId>, <rulesetId>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <projectId> - The project Id.
- * <rulesetId> - The ruleset Id.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- *
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_RULESETS
 

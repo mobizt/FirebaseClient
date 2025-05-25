@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to send the Cloud Messaging message.
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,24 +7,8 @@
  * You can test this example with Firebase Cloud Messaging Web Client App in /examples/Messaging/WebClient.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * Messaging::send(<AsyncClient>, <Messages::Parent>, <Messages::Message>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * The <Messages::Parent> - The Messages::Parent object included project Id in its constructor.
- * The <Messages::Message> - The Messages::Message object that holds the information of message to send.
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_MESSAGING
 

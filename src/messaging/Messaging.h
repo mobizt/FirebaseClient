@@ -115,7 +115,7 @@ private:
         {
             JSONUtil jut;
             jut.addObject(options.payload, "message", payload, false, true);
-            options.extras += FPSTR("/messages:send");
+            options.extras += "/messages:send";
         }
 
         req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
@@ -140,7 +140,7 @@ private:
 
         sut.addParams(request.options->extras, extras);
 
-        url(FPSTR("fcm.googleapis.com"));
+        url("fcm.googleapis.com");
 
         async_data *sData = request.aClient->createSlot(request.opt);
 

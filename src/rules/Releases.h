@@ -123,7 +123,7 @@ private:
 
         sut.addParams(request.options.extras, extras);
 
-        url(FPSTR("firebaserules.googleapis.com"));
+        url("firebaserules.googleapis.com");
 
         async_data *sData = createSlotBase(request.aClient, request.opt);
 

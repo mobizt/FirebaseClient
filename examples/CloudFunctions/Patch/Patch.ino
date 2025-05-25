@@ -1,6 +1,4 @@
 /**
- * ABOUT:
- *
  * The example to update the existing function (Cloud Functions).
  *
  * This example uses the ServiceAuth class for authentication.
@@ -9,28 +7,8 @@
  * The OAuth2.0 authentication or access token authorization is required for Cloud Functions operations.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * CloudFunctions::patch(<AsyncClient>, <GoogleCloudFunctions::Parent>, <functionId>, <GoogleCloudFunctions::Function>, <updateMask>, <AsyncResultCallback>, <uid>);
- *
- * <AsyncClient> - The async client.
- * <GoogleCloudFunctions::Parent> - The GoogleCloudFunctions::Parent object included project Id and location name in its constructor.
- * <functionId> - The name of function to update.
- * <GoogleCloudFunctions::Function> - The GoogleCloudFunctions::Function object that holds the information of function to update.
- * <updateMask> - The list of fields to be updated. If no field mask is provided, all provided fields in the request will be updated.
- * This is a comma-separated list of fully qualified names of fields. Example: "user.displayName,photo".
- * <AsyncResultCallback> - The async result callback (AsyncResultCallback).
- * <uid> - The user specified UID of async result (optional).
- *
- * The Firebase project Id should be only the name without the firebaseio.com.
- * The location name is the project location.
  */
 
-// To define build options in your sketch,
-// adding the following macros before FirebaseClient.h
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_FUNCTIONS
 

@@ -109,7 +109,7 @@ namespace firebase_ns
                     {
                         userfile.print(auth_data.user.val[i].c_str());
                         if (i < 2)
-                            userfile.print(FPSTR(","));
+                            userfile.print(",");
                     }
                     return true;
                 }
@@ -119,7 +119,7 @@ namespace firebase_ns
                     for (size_t i = 0; i < access_tk_ns::max_type; i++)
                     {
                         userfile.print(auth_data.access_token.val[i].c_str());
-                        userfile.print(FPSTR(","));
+                        userfile.print(",");
                     }
                     userfile.print(String(auth_data.access_token.expire).c_str());
 #endif
@@ -129,11 +129,11 @@ namespace firebase_ns
                 {
 #if defined(ENABLE_ID_TOKEN)
                     userfile.print(auth_data.id_token.val[id_tk_ns::token].c_str());
-                    userfile.print(FPSTR(","));
+                    userfile.print(",");
                     userfile.print(auth_data.id_token.val[id_tk_ns::refresh].c_str());
-                    userfile.print(FPSTR(","));
+                    userfile.print(",");
                     userfile.print(auth_data.user.val[user_ns::api_key].c_str());
-                    userfile.print(FPSTR(","));
+                    userfile.print(",");
                     userfile.print(String(auth_data.id_token.expire).c_str());
 #endif
                     return true;
@@ -142,9 +142,9 @@ namespace firebase_ns
                 {
 #if defined(ENABLE_CUSTOM_TOKEN)
                     userfile.print(auth_data.custom_token.val[cust_tk_ns::token].c_str());
-                    userfile.print(FPSTR(","));
+                    userfile.print(",");
                     userfile.print(auth_data.user.val[user_ns::api_key].c_str());
-                    userfile.print(FPSTR(","));
+                    userfile.print(",");
                     userfile.print(auth_data.custom_token.expire);
 #endif
                     return true;

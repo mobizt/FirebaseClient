@@ -14,6 +14,12 @@
 
 #if defined(ENABLE_JWT)
 
+#if defined(ESP32)
+#include <mbedtls/entropy.h>
+#include <mbedtls/pk.h>
+#include <mbedtls/ctr_drbg.h>
+#endif
+
 using namespace firebase_ns;
 
 namespace firebase_ns

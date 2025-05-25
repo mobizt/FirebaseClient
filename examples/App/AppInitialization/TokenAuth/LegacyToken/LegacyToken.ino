@@ -1,23 +1,9 @@
 /**
- * ABOUT:
- *
  * The bare minimum example for using legacy token authentication (only for Realtime Database service).
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
- *
- * SYNTAX:
- *
- * 1.------------------------
- *
- * LegacyToken::LegacyToken(<database_secret>);
- * LegacyToken::LegacyToken(<file_config_data>);
- * LegacyToken::save(<file_config_data>);
- *
- * <database_secret> - The Realtime Database secret.
- * <file_config_data> -  The filesystem data (file_config_data) obtained from FileConfig class object of file that the LegacyToken credentials will be saved to or read from.
- */
+*/
 
-// To define build options in your sketch
 #define ENABLE_LEGACY_TOKEN
 
 #include <FirebaseClient.h>
