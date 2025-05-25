@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Suwatchai K. <suwatchai@outlook.com>
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef CORE_AUTH_DATA_LEGACY_TOKEN_DATA_H
 #define CORE_AUTH_DATA_LEGACY_TOKEN_DATA_H
 

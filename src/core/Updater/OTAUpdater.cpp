@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Suwatchai K. <suwatchai@outlook.com>
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef CORE_UPDATER_OTA_UPDATER_CPP
 #define CORE_UPDATER_OTA_UPDATER_CPP
 

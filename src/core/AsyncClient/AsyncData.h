@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Suwatchai K. <suwatchai@outlook.com>
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef CORE_ASYNC_CLIENT_ASYNC_DATA_H
 #define CORE_ASYNC_CLIENT_ASYNC_DATA_H
 
