@@ -701,9 +701,3 @@ ENABLE_CUSTOM_TOKEN
 ENABLE_ID_TOKEN
 ENABLE_LEGACY_TOKEN
 ```
-
-## License
-
-SPDX-FileCopyrightText: 2025 Suwatchai K. \<suwatchai@outlook.com\>
- 
-SPDX-License-Identifier: MIT
