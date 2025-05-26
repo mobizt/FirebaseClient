@@ -704,7 +704,7 @@ ENABLE_LEGACY_TOKEN
 
 ## License
 
-The codes and exsamples in this repository are licensed under the MIT License. 
+The codes and examples in this repository are licensed under the MIT License. 
 
 Copyright (c) 2025, Suwatchai K. All rights reserved.
 
