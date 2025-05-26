@@ -12,6 +12,14 @@
 
 #if defined(ENABLE_JWT)
 
+#if defined(ESP32)
+#if defined(ESP_ARDUINO_VERSION)
+#if ESP_ARDUINO_VERSION > ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+#define ESP32_CORE_V3_UP
+#endif
+#endif
+#endif
+
 #if defined(USE_EMBED_SSL_ENGINE) && !defined(CORE_MOCK)
 extern "C"
 {
@@ -238,12 +246,19 @@ namespace firebase_ns
             mbedtls_pk_context *pk_ctx = new mbedtls_pk_context();
             mbedtls_pk_init(pk_ctx);
 
-            // parse priv key
+// parse priv key
+#if defined(ESP32_CORE_V3_UP)
             if (jwt_data.pk.length() > 0)
                 ret = mbedtls_pk_parse_key(pk_ctx, (const unsigned char *)jwt_data.pk.c_str(), jwt_data.pk.length() + 1, 0, 0, 0, 0);
             else if (auth_data->user_auth.sa.val[sa_ns::pk].length() > 0)
                 ret = mbedtls_pk_parse_key(pk_ctx, (const unsigned char *)auth_data->user_auth.sa.val[sa_ns::pk].c_str(), auth_data->user_auth.sa.val[sa_ns::pk].length() + 1, 0, 0, 0, 0);
+#else
+            if (jwt_data.pk.length() > 0)
+                ret = mbedtls_pk_parse_key(pk_ctx, (const unsigned char *)jwt_data.pk.c_str(), jwt_data.pk.length() + 1, NULL, 0);
+            else if (auth_data->user_auth.sa.val[sa_ns::pk].length() > 0)
+                ret = mbedtls_pk_parse_key(pk_ctx, (const unsigned char *)auth_data->user_auth.sa.val[sa_ns::pk].c_str(), auth_data->user_auth.sa.val[sa_ns::pk].length() + 1, NULL, 0);
 
+#endif
             if (ret != 0)
             {
                 jwt_data.err_code = FIREBASE_ERROR_TOKEN_PARSE_PK;
@@ -261,8 +276,11 @@ namespace firebase_ns
             mbedtls_entropy_init(entropy_ctx);
             mbedtls_ctr_drbg_init(ctr_drbg_ctx);
             mbedtls_ctr_drbg_seed(ctr_drbg_ctx, mbedtls_entropy_func, entropy_ctx, NULL, 0);
-
+#if defined(ESP32_CORE_V3_UP)
             ret = mbedtls_pk_sign(pk_ctx, MBEDTLS_MD_SHA256, (const unsigned char *)jwt_data.hash, 32, jwt_data.signature, 256, &sigLen, mbedtls_ctr_drbg_random, ctr_drbg_ctx);
+#else
+            ret = mbedtls_pk_sign(pk_ctx, MBEDTLS_MD_SHA256, (const unsigned char *)jwt_data.hash, 32, jwt_data.signature, &sigLen, mbedtls_ctr_drbg_random, ctr_drbg_ctx);
+#endif
             if (ret != 0)
             {
                 jwt_data.err_code = FIREBASE_ERROR_TOKEN_SIGN;
