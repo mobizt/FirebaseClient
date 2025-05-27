@@ -1,6 +1,4 @@
 /*
-  Updated June 12, 2004.
-  
   WiFiClientBearSSL- SSL client/server for esp8266 using BearSSL libraries
   - Mostly compatible with Arduino WiFi shield library and standard
     WiFiClient/ServerSecure (except for certificate handling).
