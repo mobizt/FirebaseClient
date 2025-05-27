@@ -9,4 +9,15 @@
 #define USE_LIB_SSL_ENGINE
 #endif
 
+// workaround when these macros 
+// are previousely defined.
+#if defined(MAX)
+#undef MAX
+#endif
+
+#if defined(MIN)
+#undef MIN
+#endif
+
+
 #endif
