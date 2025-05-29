@@ -129,11 +129,11 @@ The `AsyncClientClass` is the proxy class that provides the queue for async task
 
 The async task that is stored in the queue contains the preprocess HTTP request data (headers without auth tokens and payload). 
 
-The SSL Client that assign with the `AsyncClientClass` constructor will be the network client used for all async tasks in its queue.
+The SSL Client that is assigned with the `AsyncClientClass` constructor will be the network client used for all async tasks in its queue.
 
 The result of a async task can be obtained from the `AsyncResult` class object. This object provides the debug, authentication process event, error information and the response payload of the request.
 
-If no async callback function assigned with the function, the `AsyncResult` class object should be assigned otherwise it will work in sync mode.
+If no async callback function is assigned with the function, the `AsyncResult` class object should be assigned otherwise it will work in sync mode.
 
 In this case, it should be polling read for new available information from the `AsyncResult` at the end of the loop function.
 
@@ -712,4 +712,4 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 `THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`
 
-*Last updated 2025-05-26 UTC.*
+*Last updated 2025-05-29 UTC.*
