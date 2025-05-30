@@ -213,7 +213,7 @@ The [Internal_Storage_OTA](https://github.com/mobizt/Internal_Storage_OTA) is th
 
 To allow OTA update in SAMD21 Arduino boards, you have to include `Internal_Storage_OTA.h` in your sketch.
 
-Then assign the `InternalStorage` class object to be used for `Realtume Database` via `RealtumeDatabase::setOTAStorage`,  for `Google Cloud Storage` via `CloudStorage::setOTAStorage` and for `Firebase Storage` via `Storage::setOTAStorage`
+Then assign the `InternalStorage` class object to be used for `Realtime Database` via `RealtumeDatabase::setOTAStorage`,  for `Google Cloud Storage` via `CloudStorage::setOTAStorage` and for `Firebase Storage` via `Storage::setOTAStorage`
 
 In SAMD21 Arduino boards, if `OTA Storage` was not set before calling OTA function, the error `OTA Storage was not set` will be occurred.
 
