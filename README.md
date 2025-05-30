@@ -667,7 +667,7 @@ As in ESP8266, once the external Heap memory was selected in IDE, to allow the l
 
 The library build options are defined as preprocessor macros (`#define name`).
 
-Since version 2.1.0, there are no predefined build options, user needs to define what he want to use before compiling. 
+Since version 2.1.0, there are no predefined build options, user needs to define what he wants to use before compiling. 
 
 The build options can be defined before including the library header file `FirebaseClient.h` or as the compiler build flags.
 
