@@ -1,77 +1,36 @@
 /**
  * The example to stream changes to a single location in Realtime Database.
  *
- * This example uses TinyGsmClient as the network client.
- *
- * This example uses the UserAuth class for authentication.
- * See examples/App/AppInitialization for more authentication examples.
+ * The divices used in this example are WIZnet W5500 SPI Ethernet module and ESP32.
  *
  * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
-#define ENABLE_GSM_NETWORK
 #define ENABLE_ESP_SSLCLIENT
 
-#define TINY_GSM_MODEM_SIM7600 // SIMA7670 Compatible with SIM7600 AT instructions
-
-// For network independent usage (disable all network features).
-// #define DISABLE_NERWORKS
-
-// Set serial for debug console (to the Serial Monitor, default speed 115200)
-#define SerialMon Serial
-
-// Set serial for AT commands (to the module)
-// Use Hardware Serial on Mega, Leonardo, Micro
-#define SerialAT Serial1
-
-// See all AT commands, if wanted
-// #define DUMP_AT_COMMANDS
-
-// Define the serial console for debug prints, if needed
-#define TINY_GSM_DEBUG SerialMon
-
-#define TINY_GSM_USE_GPRS true
-#define TINY_GSM_USE_WIFI false
-
-// set GSM PIN, if any
-#define GSM_PIN ""
-
-// Your GPRS credentials, if any
-const char apn[] = "YourAPN";
-const char gprsUser[] = "";
-const char gprsPass[] = "";
-
-#define UART_BAUD 115200
-
-// LilyGO TTGO T-A7670 development board (ESP32 with SIMCom A7670)
-#define SIM_MODEM_RST 5
-#define SIM_MODEM_RST_LOW true // active LOW
-#define SIM_MODEM_RST_DELAY 200
-#define SIM_MODEM_TX 26
-#define SIM_MODEM_RX 27
-
-#include <Arduino.h>
-// Include TinyGsmClient.h first and followed by FirebaseClient.h
-#include <TinyGsmClient.h>
+#include <Ethernet.h>
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
-
-#define WIFI_SSID "WIFI_AP"
-#define WIFI_PASSWORD "WIFI_PASSWORD"
 
 #define API_KEY "Web_API_KEY"
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
 
-TinyGsm modem(SerialAT);
+#define WIZNET_RESET_PIN 26 // Connect W5500 Reset pin to GPIO 26 of ESP32 (-1 for no reset pin assigned)
+#define WIZNET_CS_PIN 5     // Connect W5500 CS pin to GPIO 5 of ESP32
+#define WIZNET_MISO_PIN 19  // Connect W5500 MISO pin to GPIO 19 of ESP32
+#define WIZNET_MOSI_PIN 23  // Connect W5500 MOSI pin to GPIO 23 of ESP32
+#define WIZNET_SCLK_PIN 18  // Connect W5500 SCLK pin to GPIO 18 of ESP32
 
-TinyGsmClient gsm_client(modem, 0), stream_gsm_client(modem, 1);
+uint8_t Eth_MAC[] = {0x02, 0xF0, 0x0D, 0xBE, 0xEF, 0x01};
 
-// This is the library's internal SSL clients.
-// You can use any SSL Client that works with GSM library.
+EthernetClient eth_client, stream_eth_client;
+
+// This is a library internal SSL client.
+// You can use any SSL Client that works with Ethernet library.
 // The ESP_SSLClient uses PSRAM by default (if it is available), for PSRAM usage, see https://github.com/mobizt/FirebaseClient#memory-options
 // For ESP_SSLClient documentation, see https://github.com/mobizt/ESP_SSLClient
 ESP_SSLClient ssl_client, stream_ssl_client;
@@ -86,85 +45,55 @@ AsyncResult streamResult;
 
 unsigned long ms = 0;
 
-bool initModem()
+bool connectEthernet()
 {
-    SerialMon.begin(115200);
-    delay(10);
+    Serial.println("Resetting Ethernet Board...");
 
-    // Resetting the modem
-#if defined(SIM_MODEM_RST)
-    pinMode(SIM_MODEM_RST, SIM_MODEM_RST_LOW ? OUTPUT_OPEN_DRAIN : OUTPUT);
-    digitalWrite(SIM_MODEM_RST, SIM_MODEM_RST_LOW);
-    delay(100);
-    digitalWrite(SIM_MODEM_RST, !SIM_MODEM_RST_LOW);
-    delay(3000);
-    digitalWrite(SIM_MODEM_RST, SIM_MODEM_RST_LOW);
-#endif
+    pinMode(WIZNET_RESET_PIN, OUTPUT);
+    digitalWrite(WIZNET_RESET_PIN, HIGH);
+    delay(200);
+    digitalWrite(WIZNET_RESET_PIN, LOW);
+    delay(50);
+    digitalWrite(WIZNET_RESET_PIN, HIGH);
+    delay(200);
+    Serial.println("Starting Ethernet connection...");
+    Ethernet.begin(Eth_MAC);
 
-    DBG("Wait...");
-    delay(3000);
+    unsigned long to = millis();
 
-    SerialAT.begin(UART_BAUD, SERIAL_8N1, SIM_MODEM_RX, SIM_MODEM_TX);
-
-    DBG("Initializing modem...");
-    if (!modem.init())
+    while (Ethernet.linkStatus() != LinkON && millis() - to < 2000)
     {
-        DBG("Failed to restart modem, delaying 10s and retrying");
-        return false;
+        delay(100);
     }
 
-    /**
-     * 2 Automatic
-     * 13 GSM Only
-     * 14 WCDMA Only
-     * 38 LTE Only
-     */
-    modem.setNetworkMode(38);
-    if (modem.waitResponse(10000L) != 1)
+    if (Ethernet.linkStatus() == LinkON)
     {
-        DBG(" setNetworkMode faill");
-        return false;
+        Serial.print("Connected with IP ");
+        Serial.println(Ethernet.localIP());
+        return true;
     }
+    else
+        Serial.println("Can't connected");
 
-    String name = modem.getModemName();
-    DBG("Modem Name:", name);
-
-    String modemInfo = modem.getModemInfo();
-    DBG("Modem Info:", modemInfo);
-
-    SerialMon.print("Waiting for network...");
-    if (!modem.waitForNetwork())
-    {
-        SerialMon.println(" fail");
-        delay(10000);
-        return false;
-    }
-    SerialMon.println(" success");
-
-    if (modem.isNetworkConnected())
-        SerialMon.println("Network connected");
-
-    return true;
+    return false;
 }
 
 void setup()
 {
     Serial.begin(115200);
 
-    if (!initModem())
+    if (!connectEthernet())
         return;
 
     Firebase.printf("Firebase Client v%s\n", FIREBASE_CLIENT_VERSION);
 
+    ssl_client.setClient(&eth_client);
     ssl_client.setInsecure();
-    ssl_client.setDebugLevel(1);
-    ssl_client.setBufferSizes(2048 /* rx */, 1024 /* tx */);
-    ssl_client.setClient(&gsm_client);
+    ssl_client.setBufferSizes(4096, 1024);
 
+    stream_ssl_client.setClient(&stream_eth_client);
     stream_ssl_client.setInsecure();
-    stream_ssl_client.setDebugLevel(1);
-    stream_ssl_client.setBufferSizes(2048 /* rx */, 1024 /* tx */);
-    stream_ssl_client.setClient(&stream_gsm_client);
+    stream_ssl_client.setBufferSizes(4096, 1024);
 
     Serial.println("Initializing app...");
     initializeApp(aClient, app, getAuth(user_auth), auth_debug_print, "🔐 authTask");
