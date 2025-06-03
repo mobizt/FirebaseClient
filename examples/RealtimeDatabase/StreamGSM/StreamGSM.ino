@@ -53,8 +53,12 @@ const char gprsPass[] = "";
 #define SIM_MODEM_RX 27
 
 #include <Arduino.h>
-// Include TinyGsmClient.h first and followed by FirebaseClient.h
+// https://github.com/vshymanskyy/TinyGSM
 #include <TinyGsmClient.h>
+
+// Note that the library https://github.com/lewisxhe/TinyGSM-fork, may not incompatible with 
+// vshymanskyy's TinyGSM code using in this example.
+
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 
