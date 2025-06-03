@@ -54,6 +54,8 @@
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
 
+void processData(AsyncResult &aResult);
+
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
 
 WiFiClientSecure ssl_client, stream_ssl_client;

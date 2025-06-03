@@ -20,26 +20,18 @@
 #define ENABLE_USER_AUTH
 #define ENABLE_DATABASE
 
+#include <LwipEthernet.h>
+#include <WiFiClientSecure.h>
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
 
-#include <WiFiClientSecure.h>
-
-#include <ENC28J60lwIP.h>
-// #include <W5100lwIP.h>
-// #include <W5500lwIP.h>
-
-#include <LwipEthernet.h>
-
-/** For PlatformIO IDE, please set the lib_ldf_mode or lib_deps in platformio.ini as the following.
-  lib_ldf_mode = chain+
-  lib_deps = arduino-libraries/Ethernet @ 2.0.2
-*/
 
 #define API_KEY "Web_API_KEY"
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
+
+void processData(AsyncResult &aResult);
 
 UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD, 3000 /* expire period in seconds (<= 3600) */);
 

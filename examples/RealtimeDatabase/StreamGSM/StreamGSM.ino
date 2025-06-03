@@ -66,6 +66,8 @@ const char gprsPass[] = "";
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
 
+void processData(AsyncResult &aResult);
+
 TinyGsm modem(SerialAT);
 
 TinyGsmClient gsm_client(modem, 0), stream_gsm_client(modem, 1);
