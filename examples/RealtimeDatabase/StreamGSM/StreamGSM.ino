@@ -114,12 +114,12 @@ bool initModem()
     }
 
     /**
-     * 2 Automatic
-     * 13 GSM Only
-     * 14 WCDMA Only
-     * 38 LTE Only
+       MODEM_NETWORK_AUTO = 2, //Auto
+        MODEM_NETWORK_GSM = 13, //GSM ONLY
+        MODEM_NETWORK_WCDMA = 14, // WCDMA
+        MODEM_NETWORK_LTE = 38, //LTE
      */
-    modem.setNetworkMode(38);
+    modem.setNetworkMode(MODEM_NETWORK_LTE);
     if (modem.waitResponse(10000L) != 1)
     {
         DBG(" setNetworkMode faill");
