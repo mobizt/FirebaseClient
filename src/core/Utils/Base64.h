@@ -13,6 +13,7 @@
 #include <vector>
 #endif
 #include "./core/Updater/OTAUpdater.h"
+#include "./core/Updater/OTAUpdater.cpp"
 #include "./core/File/BlobWriter.h"
 #include "./core/Utils/Memory.h"
 

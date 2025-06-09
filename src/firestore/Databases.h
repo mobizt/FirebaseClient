@@ -16,7 +16,11 @@
 
 using namespace firebase_ns;
 
+#if defined(ENABLE_FIRESTORE_QUERY)
 #include "./firestore/Query.h"
+#include "./firestore/Query.cpp"
+#endif
+
 namespace Firestore
 {
     class Databases : public FirestoreBase
