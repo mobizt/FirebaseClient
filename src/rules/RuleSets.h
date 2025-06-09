@@ -107,8 +107,6 @@ private:
         if (request.aResult)
             sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(getRVec(request.aClient))));
 
-        sData->download = request.method == reqns::http_get && sData->request.file_data.filename.length();
-
         processBase(request.aClient, sData->async);
         handleRemoveBase(request.aClient);
     }

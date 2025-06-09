@@ -378,7 +378,11 @@ private:
 
     void setFileStatus(async_data *sData, const FirebaseStorage::req_data &request)
     {
-        if ((request.file && (request.file->filename.length() || request.file->data_size)) || request.opt.ota)
+        bool isFile = request.file && request.file->data && request.file->data_size > 0;
+#if defined(ENABLE_FS)
+        isFile |= request.file && request.file->filename.length() > 0;
+#endif
+        if (isFile || request.opt.ota)
         {
             sData->download = request.method == reqns::http_get;
             sData->upload = request.method == reqns::http_post || request.method == reqns::http_put || request.method == reqns::http_patch;

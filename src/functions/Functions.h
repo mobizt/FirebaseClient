@@ -735,25 +735,8 @@ private:
             return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
         request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid, "");
-
-        if (request.file)
-            sData->request.file_data.copy(*request.file);
-
-        setFileStatus(sData, request);
-
-        if (request.file && sData->upload)
-        {
-            sData->request.base64 = false;
-
-            if (request.mime.length())
-                sData->request.addContentType(request.mime);
-
-            sData->request.setFileContentLength(0);
-
-            if (sData->request.file_data.file_size == 0)
-                return request.aClient->setClientError(request, FIREBASE_ERROR_FILE_READ);
-        }
-        else if (request.options->payload.length())
+        
+        if (request.options->payload.length())
         {
             sData->request.val[reqns::payload] = request.options->payload;
             sData->request.setContentLengthFinal(request.options->payload.length());
@@ -772,16 +755,6 @@ private:
 
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
-    }
-
-    void setFileStatus(async_data *sData, const GoogleCloudFunctions::req_data &request)
-    {
-        using namespace reqns;
-        if ((request.file && request.file->filename.length()) || request.opt.ota)
-        {
-            sData->download = request.method == http_get;
-            sData->upload = request.method == http_post || request.method == http_put || request.method == http_patch;
-        }
     }
 };
 #endif

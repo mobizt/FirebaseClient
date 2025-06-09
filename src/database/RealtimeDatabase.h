@@ -1108,11 +1108,11 @@ private:
     void setFileStatus(async_data *sData, const req_data &request)
     {
         using namespace reqns;
-        bool isFile = false;
+        bool isFile = request.file && request.file->data && request.file->data_size > 0;
 #if defined(ENABLE_FS)
-        isFile = request.file->filename.length() > 0;
+        isFile |= request.file && request.file->filename.length() > 0;
 #endif
-        if ((request.file && (isFile || (request.file->data && request.file->data_size))) || request.opt.ota)
+        if (isFile || request.opt.ota)
         {
             sData->download = request.method == http_get;
             sData->upload = request.method == http_post || request.method == http_put || request.method == http_patch;

@@ -145,7 +145,6 @@ private:
         if (request.aResult)
             sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->getResultList())));
 
-        sData->download = request.method == reqns::http_get && sData->request.file_data.filename.length();
         request.aClient->process(sData->async);
         request.aClient->handleRemove();
     }
