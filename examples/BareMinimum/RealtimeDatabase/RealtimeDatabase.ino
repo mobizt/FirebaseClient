@@ -1,12 +1,12 @@
 /**
- * The beare minimum code example for using Realtime Database service.
+ * The bare minimum code example for using Realtime Database service.
  *
  * The steps which are generally required are explained below.
  *
  * Step 1. Include the network, SSL client and Firebase libraries.
  * ===============================================================
  *
- * Step 2. Define the user functions that requred for the library usage.
+ * Step 2. Define the user functions that are required for library usage.
  * =====================================================================
  *
  * Step 3. Define the authentication config (identifier) class.
