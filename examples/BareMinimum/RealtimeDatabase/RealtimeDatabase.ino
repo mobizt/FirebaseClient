@@ -1,5 +1,5 @@
 /**
- * The beare minimum code example for using Realtime Database service.
+ * The bare minimum code example for using Realtime Database service.
  *
  * The steps which are generally required are explained below.
  *
