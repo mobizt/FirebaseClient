@@ -119,11 +119,11 @@ UserAuth user_auth("Web_API_KEY", "USER_EMAIL", "USER_PASSWORD");
 FirebaseApp app;
 
 // Step 5
-// Use two SSL clients for sync and async tasks for demonstation only.
+// Use two SSL clients for sync and async tasks for demonstration only.
 WiFiClientSecure ssl_client1, ssl_client2;
 
 // Step 6
-// Use two AsyncClients for sync and async tasks for demonstation only.
+// Use two AsyncClients for sync and async tasks for demonstration only.
 using AsyncClient = AsyncClientClass;
 AsyncClient async_client1(ssl_client1), async_client2(ssl_client2);
 
