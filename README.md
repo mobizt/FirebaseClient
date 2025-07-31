@@ -115,15 +115,15 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 
 For new `Firebase` users, please read the [Project Preparation and Setup](#project-preparation-and-setup) section for preparing the Firebase project.
 
-For new library user that the project was setup and prepared, see the [bare minimun examples](/examples/BareMinimum/) to start using this library with minimum code that requires by this library.
+For new library user that the project was setup and prepared, see the [bare minimun examples](/examples/BareMinimum/) to start using this library with minimum code that is required by this library.
 
 For more examples, please click [here](/examples/).
 
 ### Working Principle 
 
-This library can be used in two modes i.e. async mode and await or sinc mode.
+This library can be used in two modes i.e. async mode and await or sync mode.
 
-With async mode, the task will store in the FIFO queue. The result of the running task can be obtained via the callback function or the proxy object that assign when calling the functions.
+With async mode, the task will be stored in the FIFO queue. The result of the running task can be obtained via the callback function or the proxy object that is assigned when calling the functions.
 
 The `AsyncClientClass` is the proxy class that provides the queue for async tasks and also the information of task process when working in await or sync mode.
 
