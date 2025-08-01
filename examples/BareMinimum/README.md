@@ -2,6 +2,6 @@
 
 The minimum code examples when using this library.
 
-* [BeareMinimum](/examples/BareMinimum/)
+* [BareMinimum](/examples/BareMinimum/)
     * [RealtimeDatabase](/examples/BareMinimum/RealtimeDatabase/)
     * [AllServices](/examples/BareMinimum/AllServices/)
