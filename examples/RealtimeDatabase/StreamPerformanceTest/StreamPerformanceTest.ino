@@ -103,16 +103,16 @@ void processData(AsyncResult &aResult)
 
     if (aResult.available())
     {
-        RealtimeDatabaseResult &RTDB = aResult.to<RealtimeDatabaseResult>();
+        RealtimeDatabaseResult &stream = aResult.to<RealtimeDatabaseResult>();
 
-        if (RTDB.isStream())
+        if (stream.isStream())
         {
-            if (RTDB.type() == 0 /* null */)
+            if (stream.type() == 0 /* null */)
                 return;
 
-            if (RTDB.type() == 5 /* string */ && RTDB.dataPath() == "/chat")
+            if (stream.type() == 5 /* string */ && stream.dataPath() == "/chat")
             {
-                String op = RTDB.to<String>();
+                String op = stream.to<String>();
 
                 if (op.indexOf("hello-") > -1)
                 {
@@ -170,11 +170,11 @@ void processData(AsyncResult &aResult)
             {
                 counter++;
 
-                if (RTDB.type() == 1 /* int */ && RTDB.dataPath().length())
+                if (stream.type() == 1 /* int */ && stream.dataPath().length())
                 {
-                    sum += RTDB.to<int>();
+                    sum += stream.to<int>();
                     if (option == 1)
-                        Firebase.printf("counter: %d\ndata: %d\nsum: %d\n", counter, RTDB.to<int>(), sum);
+                        Firebase.printf("counter: %d\ndata: %d\nsum: %d\n", counter, stream.to<int>(), sum);
                     else if (option == 3)
                     {
                         // Blink

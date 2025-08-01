@@ -94,7 +94,7 @@
  * Before calling the Firebase/Google Cloud services functions, the FirebaseApp::ready() of authentication handler that bined to it
  * should return true.
  *
- * Step 13. Process the results of async tasks the end of the loop.
+ * Step 13. Process the results of async tasks at the end of the loop.
  * ============================================================================
  * This requires only when async result was assigned to the Firebase/Google Cloud services functions.
  */
@@ -110,6 +110,7 @@
 #define ENABLE_CLOUD_STORAGE
 #define ENABLE_FUNCTIONS
 
+// For ESP32
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <FirebaseClient.h>
@@ -191,17 +192,18 @@ void setup()
 
     // The SSL client options depend on the SSL client used.
 
-    // Skip certificate verification
+    // Skip certificate verification (Optional)
     ssl_client1.setInsecure();
     ssl_client2.setInsecure();
 
     // Set timeout
+     // Set timeout for ESP32 core sdk v3.x (Optional)
     ssl_client1.setConnectionTimeout(1000);
     ssl_client1.setHandshakeTimeout(5);
     ssl_client2.setConnectionTimeout(1000);
     ssl_client2.setHandshakeTimeout(5);
 
-    // ESP8266 Set buffer size
+    // ESP8266 Set buffer size (Optional)
     // ssl_client1.setBufferSizes(4096, 1024);
     // ssl_client2.setBufferSizes(4096, 1024);
 
@@ -232,6 +234,19 @@ void loop()
     if (app.ready() && !onetimeTest)
     {
         onetimeTest = true;
+
+        // The following codes showed how to call the Firebase functions in both async and await modes
+        
+        // for demonstation only. You can choose async or await mode or use both modes in the same application. 
+        // For await mode, no callback and AsyncResult object are assigned to the function, the function will
+        // return the value or payload immediately.
+
+        // For async mode, the value or payload will be returned later to the AsyncResult object 
+        // or when the callback was called.
+        // If AsyncResult was assigned to the function, please don't forget to check it before 
+        // exiting the loop as in step 13.
+
+        // For elaborate usage, plese see other examples.
 
         // Realtime Database set value.
         // ============================

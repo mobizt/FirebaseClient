@@ -284,22 +284,22 @@ void processData(AsyncResult &aResult)
 
     if (aResult.available())
     {
-        RealtimeDatabaseResult &RTDB = aResult.to<RealtimeDatabaseResult>();
-        if (RTDB.isStream())
+        RealtimeDatabaseResult &stream = aResult.to<RealtimeDatabaseResult>();
+        if (stream.isStream())
         {
             Serial.println("----------------------------");
             Firebase.printf("task: %s\n", aResult.uid().c_str());
-            Firebase.printf("event: %s\n", RTDB.event().c_str());
-            Firebase.printf("path: %s\n", RTDB.dataPath().c_str());
-            Firebase.printf("data: %s\n", RTDB.to<const char *>());
-            Firebase.printf("type: %d\n", RTDB.type());
+            Firebase.printf("event: %s\n", stream.event().c_str());
+            Firebase.printf("path: %s\n", stream.dataPath().c_str());
+            Firebase.printf("data: %s\n", stream.to<const char *>());
+            Firebase.printf("type: %d\n", stream.type());
 
             // The stream event from RealtimeDatabaseResult can be converted to the values as following.
-            bool v1 = RTDB.to<bool>();
-            int v2 = RTDB.to<int>();
-            float v3 = RTDB.to<float>();
-            double v4 = RTDB.to<double>();
-            String v5 = RTDB.to<String>();
+            bool v1 = stream.to<bool>();
+            int v2 = stream.to<int>();
+            float v3 = stream.to<float>();
+            double v4 = stream.to<double>();
+            String v5 = stream.to<String>();
         }
         else
         {
