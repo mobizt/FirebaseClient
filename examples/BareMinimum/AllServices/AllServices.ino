@@ -1,5 +1,5 @@
 /**
- * The beare minimum code example for using all Firebase services.
+ * The bare minimum code example for using all Firebase services.
  *
  * The steps which are generally required are explained below.
  *
@@ -37,7 +37,7 @@
  * ==============================
  * It handles server connection and data transfer works.
  *
- * In this beare minimum example we use only one SSL client for all processes.
+ * In this bare minimum example we use only one SSL client for all processes.
  * In some use cases e.g. Realtime Database Stream connection, you may have to define the SSL client for it separately.
  *
  * Step 6. Define the Async Client.
@@ -56,14 +56,14 @@
  *
  * Step 8. Start the authenticate process.
  * ========================================
- * At this step, the authentication credential will be used to generate the auth tokens for authentication by
+ * At this step, the authentication credentials will be used to generate the auth tokens for authentication by
  * calling initializeApp.
  *
  * This allows us to use different authentications for each Firebase/Google Cloud services with different
  * FirebaseApps (authentication handler)s.
  *
  * When calling initializeApp with timeout, the authenication process will begin immediately and wait at this process
- * until it finished or timed out. It works in sync mode.
+ * until it is finished or timed out. It works in sync mode.
  *
  * If no timeout was assigned, it will work in async mode. The authentication task will be added to async client queue
  * to process later e.g. in the loop by calling FirebaseApp::loop.
@@ -80,7 +80,7 @@
  * ========================================================================================================
  * This allows us to use different authentications for each Firebase/Google Cloud services.
  *
- * It is easy to bind/unbind/change the authentication method for different Firebase/Google Cloud services APIs.
+ * It is easy to bind, unbind or change the authentication method for different Firebase/Google Cloud services APIs.
  *
  * Step 10. Set the Realtime Database URL (for Realtime Database only)
  * ===================================================================
@@ -235,10 +235,10 @@ void loop()
     {
         onetimeTest = true;
 
-        // The following codes showed how to call the Firebase functions in both async and await modes
+        // The following code shows how to call the Firebase functions in both async and await or sync mode
         
-        // for demonstation only. You can choose async or await mode or use both modes in the same application. 
-        // For await mode, no callback and AsyncResult object are assigned to the function, the function will
+        // for demonstation only. You can choose async or await/sync mode or use both modes in the same application. 
+        // For await/sync mode, no callback and AsyncResult object are assigned to the function, the function will
         // return the value or payload immediately.
 
         // For async mode, the value or payload will be returned later to the AsyncResult object 
