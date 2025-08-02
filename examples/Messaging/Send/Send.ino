@@ -6,7 +6,7 @@
  *
  * You can test this example with Firebase Cloud Messaging Web Client App in /examples/Messaging/WebClient.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_SERVICE_AUTH
@@ -101,7 +101,7 @@ void loop()
 
 void processData(AsyncResult &aResult)
 {
-    // Exits when no result available when calling from the loop.
+    // Exits when no result is available when calling from the loop.
     if (!aResult.isResult())
         return;
 
@@ -155,7 +155,7 @@ void getMsg(Messages::Message &msg)
 
     Messages::AndroidConfig androidConfig;
 
-    // Priority of a message to send to Android devices.
+    // Set the priority of a message to send to Android devices.
     // https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#androidmessagepriority
     androidConfig.priority(Messages::AndroidMessagePriority::_HIGH);
 
