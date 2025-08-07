@@ -574,6 +574,11 @@ private:
                     {
                         reserveString(sData); // Work around for large string concatenation issue.
                         sData->response.val[resns::payload] += temp;
+
+                        if (sData->response.flags.gzip)
+                        {
+                           // TODO:manage gzip decompression
+                        }
                     }
 
                     if (res == -1)

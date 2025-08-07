@@ -6,7 +6,7 @@
  * This example uses the DefaultNetwork class for network interface configuration.
  * See examples/App/NetworkInterfaces for more network examples.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_SERVICE_AUTH

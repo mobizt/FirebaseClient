@@ -1,7 +1,7 @@
 /**
  * This is example for how to disable the re-authentication and force the authentication processes.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_USER_AUTH

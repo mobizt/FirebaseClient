@@ -1,7 +1,7 @@
 /**
  * The bare minimum example for using user authentication with email and password.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_USER_AUTH

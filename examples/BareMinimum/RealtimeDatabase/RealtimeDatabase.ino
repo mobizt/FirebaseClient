@@ -190,7 +190,7 @@ void loop()
     {
         onetimeTest = true;
 
-        // The following codes showed how to call the Firebase functions in both async and await modes
+        // The following code shows how to call the Firebase functions in both async and await modes
         
         // for demonstation only. You can choose async or await mode or use both modes in the same application. 
         // For await mode, no callback and AsyncResult object are assigned to the function, the function will
@@ -238,7 +238,7 @@ void loop()
 
 void processData(AsyncResult &aResult)
 {
-    // Exits when no result available when calling from the loop.
+    // Exits when no result is available when calling from the loop.
     if (!aResult.isResult())
         return;
 

@@ -367,7 +367,7 @@ void loop()
 
 void processData(AsyncResult &aResult)
 {
-    // Exits when no result available when calling from the loop.
+    // Exits when no result is available when calling from the loop.
     if (!aResult.isResult())
         return;
 

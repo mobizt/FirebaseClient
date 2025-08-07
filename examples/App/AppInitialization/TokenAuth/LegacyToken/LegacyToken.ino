@@ -1,7 +1,7 @@
 /**
  * The bare minimum example for using legacy token authentication (only for Realtime Database service).
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
 */
 
 #define ENABLE_LEGACY_TOKEN

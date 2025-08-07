@@ -3,7 +3,7 @@
  *
  * The read and write conditions in the security rules should be true for all conditions.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  *
  */
 

@@ -9,6 +9,7 @@
 
 #include <Arduino.h>
 #include "./core/Options.h"
+#include "./core/File/FileConfig.h"
 
 #if defined(ENABLE_JWT) || defined(ENABLE_ESP_SSLCLIENT)
 

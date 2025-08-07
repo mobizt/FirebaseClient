@@ -44,7 +44,7 @@ public:
 
     public:
         bool header_remaining = false, payload_remaining = false, keep_alive = false, uploadRange = false;
-        bool sse = false, http_response = false, chunks = false, payload_available = false;
+        bool sse = false, http_response = false, chunks = false, payload_available = false, gzip = false;
 
         void reset()
         {
@@ -381,6 +381,9 @@ public:
 
             parseHeaders(v, "Content-Type", true);
             flags.sse = v.length() && v.indexOf("text/event-stream") > -1;
+
+            parseHeaders(v, "Content-Encoding", true);
+            flags.gzip = v.length() && v.indexOf("gzip") > -1;
 
             if (upload)
             {

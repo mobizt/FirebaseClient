@@ -1,7 +1,7 @@
 /**
  * The bare minimum example for Firebase user authentication using custom claims signed JWT token.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_CUSTOM_TOKEN

@@ -21,6 +21,7 @@ enum file_operating_mode
 };
 
 #if defined(ENABLE_FS)
+#include <FS.h>
 typedef void (*FileConfigCallback)(File &file, const char *filename, file_operating_mode mode);
 #endif
 

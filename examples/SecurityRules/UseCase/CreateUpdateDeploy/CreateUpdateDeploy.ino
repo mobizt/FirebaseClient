@@ -3,7 +3,7 @@
  *
  * The Firestore database access will be tested before and after updating release.
  * 
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_SERVICE_AUTH

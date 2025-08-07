@@ -3,7 +3,7 @@
  *
  * This example requires the service account credentials that obtains from the JSON key file.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_SERVICE_AUTH

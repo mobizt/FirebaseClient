@@ -3,7 +3,7 @@
  *
  * The service account JSON key file will be used in this example.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_CUSTOM_AUTH

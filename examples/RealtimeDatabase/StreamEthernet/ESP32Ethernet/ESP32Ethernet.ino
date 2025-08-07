@@ -3,7 +3,7 @@
  *
  * The divices used in this example are WIZnet W5500 SPI Ethernet module and ESP32.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_USER_AUTH
@@ -155,7 +155,7 @@ void loop()
 
 void processData(AsyncResult &aResult)
 {
-    // Exits when no result available when calling from the loop.
+    // Exits when no result is available when calling from the loop.
     if (!aResult.isResult())
         return;
 

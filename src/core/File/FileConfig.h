@@ -14,7 +14,6 @@
 #include "./core/File/BlobConfig.h"
 
 #if defined(ENABLE_FS)
-#include <FS.h>
 class FileConfig
 {
 public:

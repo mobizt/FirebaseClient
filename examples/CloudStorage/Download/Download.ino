@@ -6,12 +6,17 @@
  *
  * The OAuth2.0 authentication or access token authorization is required for Cloud Storage operations.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_SERVICE_AUTH
 #define ENABLE_CLOUD_STORAGE
 #define ENABLE_FS
+
+// You may have to include the storage library you used e.g. SPIFFS.h or SD.h here.
+#include <FS.h>
+// #include <SPIFFS.h>
+// #include <SD.h>
 
 #include <FirebaseClient.h>
 #include "ExampleFunctions.h" // Provides the functions used in the examples.
@@ -118,7 +123,7 @@ void loop()
 
 void processData(AsyncResult &aResult)
 {
-    // Exits when no result available when calling from the loop.
+    // Exits when no result is available when calling from the loop.
     if (!aResult.isResult())
         return;
 

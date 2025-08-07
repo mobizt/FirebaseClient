@@ -164,18 +164,20 @@ extern "C"
 {
 #include "bssl/bearssl.h"
 }
+#include "client/Memory.h"
+#include "client/Helper.h"
+#include "client/CertStore.h"
+#include "client/SSLClient.h"
+#include "client/TCPClient.h"
 
-#include "client/BSSL_TCP_Client.h"
-#include "client/BSSL_TCP_Client.cpp"
-
-class ESP_SSLClient : public BSSL_TCP_Client
+class ESP_SSLClient : public BSSL_TCPClient
 {
 public:
     ESP_SSLClient() {};
     ~ESP_SSLClient() {};
 };
 
-class ESP_SSLClient2 : public BSSL_TCP_Client
+class ESP_SSLClient2 : public BSSL_TCPClient
 {
 public:
     explicit ESP_SSLClient2(Client &client, bool enableSSL = true) : _base_client(client)

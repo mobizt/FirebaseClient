@@ -1,7 +1,7 @@
 /**
  * The bare minimum example for using Firebase OAuth2.0 authentication with access token.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_ACCESS_TOKEN

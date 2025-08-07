@@ -7,7 +7,7 @@
  *
  * Open the index.html file with web browser and follow the instructions on that page to test.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  *
  */
 

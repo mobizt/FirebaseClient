@@ -353,9 +353,10 @@ private:
                 sData->request.addContentType(request.mime);
 
             sData->request.setFileContentLength();
-
+#if defined(ENABLE_FS)
             if (sData->request.file_data.filename.length() > 0 && sData->request.file_data.file_size == 0)
                 return request.aClient->setClientError(request, FIREBASE_ERROR_FILE_READ);
+#endif
             sData->aResult.upload_data.downloadUrl = uut.downloadURL(request.options->parent.getBucketId(), request.options->parent.getObject());
         }
         else if (request.options->payload.length())

@@ -93,7 +93,7 @@
 #include <SPI.h>
 #include <SD.h>
 #else
-#undef ENABLE_FS
+// #undef ENABLE_FS
 #endif
 #endif // ENABLE_FS
 

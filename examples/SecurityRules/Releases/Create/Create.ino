@@ -6,7 +6,7 @@
  *
  * The OAuth2.0 authentication or access token authorization is required for security rules operations.
  *
- * The complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
+ * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
 
 #define ENABLE_SERVICE_AUTH
@@ -108,7 +108,7 @@ void loop()
 
 void processData(AsyncResult &aResult)
 {
-    // Exits when no result available when calling from the loop.
+    // Exits when no result is available when calling from the loop.
     if (!aResult.isResult())
         return;
 
