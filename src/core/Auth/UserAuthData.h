@@ -65,7 +65,7 @@ namespace firebase_ns
         void copy(const user_auth_data &rhs)
         {
             this->user.copy(rhs.user);
-#if defined(ENABLE_SERVICE_AUTH)
+#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
             this->sa.copy(rhs.sa);
 #endif
 #if defined(ENABLE_CUSTOM_AUTH)
@@ -97,7 +97,7 @@ namespace firebase_ns
         void clear()
         {
             user.clear();
-#if defined(ENABLE_SERVICE_AUTH)
+#if defined(ENABLE_SERVICE_AUTH) || defined(ENABLE_CUSTOM_AUTH)
             sa.clear();
 #endif
 #if defined(ENABLE_CUSTOM_AUTH)

@@ -568,21 +568,41 @@ private:
                 if (sData->response.flags.chunks)
                 {
                     // Use temporary String buffer for decodeChunks
-                    String temp;
-                    int res = sData->response.decodeChunks(&temp);
-                    if (temp.length())
+                    if (!sData->response.chunkInfo.buf)
+                    {
+                        sData->response.chunkInfo.bufLen = 1024;
+                        sData->response.chunkInfo.dataPos = 0;
+                        sData->response.chunkInfo.buf = (uint8_t *)mem.alloc(sData->response.chunkInfo.bufLen);
+                    }
+
+                    int pos = sData->response.chunkInfo.dataPos;
+                    int res = sData->response.decodeChunks(&sData->response.chunkInfo.buf, &sData->response.chunkInfo.dataPos, &sData->response.chunkInfo.bufLen);
+
+                    if (!sData->response.flags.gzip && pos < sData->response.chunkInfo.dataPos)
                     {
                         reserveString(sData); // Work around for large string concatenation issue.
-                        sData->response.val[resns::payload] += temp;
 
-                        if (sData->response.flags.gzip)
-                        {
-                           // TODO:manage gzip decompression
-                        }
+                        int len = sData->response.chunkInfo.dataPos - pos + 1;
+                        unsigned char *buf = (unsigned char *)mem.alloc(mem.getReservedLen(len), false);
+                        memcpy(buf, sData->response.chunkInfo.buf + pos, len);
+                        buf[len - 1] = 0;
+                        sData->response.val[resns::payload] += (char *)buf;
+                        mem.release(&buf);
                     }
 
                     if (res == -1)
+                    {
                         sData->response.flags.payload_remaining = false;
+#if defined(ENABLE_GZIP)
+                        if (sData->response.flags.gzip && sData->response.chunkInfo.dataPos)
+                        {
+                        }
+#endif
+                        sData->response.chunkInfo.dataPos = 0;
+                        mem.release(&sData->response.chunkInfo.buf);
+                        sData->response.chunkInfo.bufLen = 0;
+                        sData->response.chunkInfo.dataPos = 0;
+                    }
                 }
                 else
                 {

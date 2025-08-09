@@ -26,7 +26,10 @@
 #if defined(ENABLE_GZIP)
 #include <stdlib.h>
 #include <stdio.h>
-#include "./core/uzlib/uzlib.h"
+extern "C"
+{
+    
+}
 #define EXTRAS_HEADERS "Accept-Encoding: gzip\r\n"
 #else
 #define EXTRAS_HEADERS ""
@@ -115,7 +118,7 @@ public:
     }
 
     void addNewLine() { val[reqns::header] += "\r\n"; }
-    void addHostHeader(const String &host) { sut.printTo(val[reqns::header], host.length(), "Host: %s\r\n%s", host.c_str(), EXTRAS_HEADERS); }
+    void addHostHeader(const String &host) { sut.printTo(val[reqns::header], host.length() + String(EXTRAS_HEADERS).length(), "Host: %s\r\n%s", host.c_str(), EXTRAS_HEADERS); }
     void addConnectionHeader(bool keepAlive) { sut.printTo(val[reqns::header], 50, "Connection: %s\r\n", keepAlive ? "keep-alive" : "close"); }
     void addContentType(const String &type) { sut.printTo(val[reqns::header], type.length(), "Content-Type: %s\r\n", type.c_str()); }
     void setContentLengthFinal(size_t len) { sut.printTo(val[reqns::header], 30, "Content-Length: %d\r\n\r\n", (int)len); }

@@ -51,7 +51,7 @@ public:
         ESP.setExternalHeap();
 #endif
         p = reinterpret_cast<void *>(malloc(newLen));
-        
+
 #if defined(ESP8266_USE_EXTERNAL_HEAP)
         ESP.resetHeap();
 #endif
@@ -60,6 +60,30 @@ public:
         if (clear)
             memset(p, 0, newLen);
         return p;
+    }
+
+     void *realloc(void *ptr, size_t len)
+    {
+        size_t newLen = getReservedLen(len);
+#if defined(BOARD_HAS_PSRAM)
+        if (ESP.getPsramSize() > 0)
+            ptr = reinterpret_cast<void *>(ps_realloc(ptr, newLen));
+        else
+            ptr = reinterpret_cast<void *>(realloc(ptr, newLen));
+#else
+
+#if defined(ESP8266_USE_EXTERNAL_HEAP)
+        ESP.setExternalHeap();
+#endif
+
+        ptr = reinterpret_cast<void *>(realloc(ptr, newLen));
+
+#if defined(ESP8266_USE_EXTERNAL_HEAP)
+        ESP.resetHeap();
+#endif
+
+#endif
+        return ptr;
     }
 
     size_t getReservedLen(size_t len)

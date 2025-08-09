@@ -63,6 +63,10 @@ public:
         chunk_phase phase = READ_CHUNK_SIZE;
         int chunkSize = 0;
         int dataLen = 0;
+
+        int dataPos = 0;
+        uint8_t *buf = nullptr;
+        size_t bufLen = 0;
     };
 
     struct auth_error_t
@@ -84,14 +88,13 @@ public:
 
     tcp_client_type client_type = tcpc_sync;
     Client *client = nullptr;
+    Memory mem;
 
     res_handler() {}
 
     ~res_handler()
     {
-        if (toFill)
-            free(toFill);
-        toFill = nullptr;
+        mem.release(&toFill);
         toFillLen = 0;
         toFillIndex = 0;
     }
@@ -202,27 +205,60 @@ public:
         return 0;
     }
 
-    int getChunkSize(String &line)
+    int getChunkSize(uint8_t **ptr, bool newbuf, int *bufSize)
     {
-        if (line.length() == 0)
-            readLine(&line);
+        if (newbuf)
+            readLineBuf(ptr, bufSize);
 
-        int p = line.indexOf(";");
-        if (p == -1)
-            p = line.indexOf("\r\n");
-        if (p != -1)
-            chunkInfo.chunkSize = hex2int(line.substring(0, p).c_str());
+        int p = -1, i = 0;
+        uint8_t *buf = *ptr;
+        if (buf)
+        {
+            while (i < *bufSize)
+            {
+                if (buf[i] == ';')
+                {
+                    p = i;
+                    break;
+                }
+                i++;
+            }
+
+            if (p == -1)
+            {
+                i = 0;
+                while (i < *bufSize - 1)
+                {
+                    if (buf[i] == '\r' && buf[i + 1] == '\n')
+                    {
+                        p = i;
+                        break;
+                    }
+                    i++;
+                }
+            }
+
+            if (p != -1)
+            {
+                char str[20];
+                memset(str, 0, 20);
+                memcpy(str, buf, p);
+                chunkInfo.chunkSize = hex2int(str);
+            }
+        }
 
         return chunkInfo.chunkSize;
     }
 
     // Returns -1 when complete
-    int decodeChunks(String *out)
+    int decodeChunks(uint8_t **ptr, int *index, size_t *outSize)
     {
+        uint8_t *out = *ptr;
         if (!client || !out)
             return 0;
         int res = 0;
-        String line;
+        int bufSize = 512;
+        uint8_t *buf = reinterpret_cast<uint8_t *>(mem.alloc(bufSize, true));
 
         // because chunks might span multiple reads, we need to keep track of where we are in the chunk
         // chunkInfo.dataLen is our current position in the chunk
@@ -237,7 +273,7 @@ public:
             chunkInfo.phase = READ_CHUNK_DATA;
             chunkInfo.chunkSize = -1;
             chunkInfo.dataLen = 0;
-            res = getChunkSize(line);
+            res = getChunkSize(&buf, true, &bufSize);
             payloadLen += res > -1 ? res : 0;
         }
         // read chunk-data and CRLF
@@ -247,28 +283,39 @@ public:
             // if chunk-size is 0, it's the last chunk, and can be skipped
             if (chunkInfo.chunkSize > 0)
             {
-                int read = readLine(&line);
+                int read = readLineBuf(&buf, &bufSize);
 
                 // if we read till a CRLF, we have a chunk (or the rest of it)
                 // if the last two bytes are NOT CRLF, we have a partial chunk
                 // if we read 0 bytes, read next chunk size
 
                 // check for \n and \r, remove them if present (they're part of the protocol, not the data)
-                if (read >= 2 && line[read - 2] == '\r' && line[read - 1] == '\n')
+                if (read >= 2 && buf[read - 2] == '\r' && buf[read - 1] == '\n')
                 {
                     // last chunk?
-                    if (line[0] == '0')
-                        return -1;
+                    if (buf[0] == '0')
+                    {
+                        res = -1;
+                        goto exit;
+                    }
 
                     // remove the \r\n
-                    line.remove(line.length() - 2);
                     read -= 2;
                 }
 
                 // if we still have data, append it and update the chunkInfo
                 if (read)
                 {
-                    *out += line;
+                    if (*index + read >= *outSize)
+                    {
+                        size_t newOutSize = mem.getReservedLen(*index + read + 512);
+                        out = (uint8_t *)mem.realloc(out, newOutSize);
+                        *outSize = newOutSize;
+                        *ptr = out;
+                    }
+
+                    memcpy(out + *index, buf, read);
+                    *index += read;
                     chunkInfo.dataLen += read;
                     payloadRead += read;
 
@@ -281,15 +328,20 @@ public:
             }
             else
             {
-                int read = readLine(&line);
+                int read = readLineBuf(&buf, &bufSize);
                 // CRLF (end of chunked body)
-                if (read == 2 && line[0] == '\r' && line[1] == '\n')
+                if (read == 2 && buf[0] == '\r' && buf[1] == '\n')
+                {
                     res = -1;
+                    goto exit;
+                }
                 else // another chunk?
-                    getChunkSize(line);
+                    getChunkSize(&buf, read == 0, &bufSize);
             }
         }
 
+    exit:
+        mem.release(&buf);
         return res;
     }
 
@@ -349,6 +401,34 @@ public:
                 p++;
                 if (res == '\n')
                     return p;
+            }
+        }
+        return p;
+    }
+
+    int readLineBuf(uint8_t **ptr, int *bufSize)
+    {
+        int p = 0;
+        while (tcpAvailable())
+        {
+            int res = tcpRead();
+            if (res > -1)
+            {
+                uint8_t *buf = *ptr;
+                if (buf)
+                {
+                    buf[p] = res;
+                    p++;
+                    if (res == '\n')
+                        return p;
+
+                    if (p == *bufSize)
+                    {
+                        *bufSize = mem.getReservedLen(p + 512);
+                        uint8_t *tmp = (uint8_t *)mem.realloc(buf, *bufSize);
+                        *ptr = tmp;
+                    }
+                }
             }
         }
         return p;
