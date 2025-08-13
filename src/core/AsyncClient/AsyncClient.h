@@ -583,11 +583,11 @@ private:
                         reserveString(sData); // Work around for large string concatenation issue.
 
                         int len = sData->response.chunkInfo.dataPos - pos + 1;
-                        unsigned char *buf = (unsigned char *)mem.alloc(mem.getReservedLen(len), false);
-                        memcpy(buf, sData->response.chunkInfo.buf + pos, len);
-                        buf[len - 1] = 0;
-                        sData->response.val[resns::payload] += (char *)buf;
-                        mem.release(&buf);
+                        unsigned char *temp = (unsigned char *)mem.alloc(mem.getReservedLen(len), false);
+                        memcpy(temp, sData->response.chunkInfo.buf + pos, len);
+                        temp[len - 1] = 0;
+                        sData->response.val[resns::payload] += (char *)temp;
+                        mem.release(&temp);
                     }
 
                     if (res == -1)

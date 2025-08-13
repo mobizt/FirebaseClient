@@ -54,6 +54,7 @@ public:
             sse = false;
             chunks = false;
             payload_available = false;
+            gzip = false;
             uploadRange = false;
         }
     };
@@ -66,7 +67,7 @@ public:
 
         int dataPos = 0;
         uint8_t *buf = nullptr;
-        size_t bufLen = 0;
+        int bufLen = 0;
     };
 
     struct auth_error_t
@@ -251,7 +252,7 @@ public:
     }
 
     // Returns -1 when complete
-    int decodeChunks(uint8_t **ptr, int *index, size_t *outSize)
+    int decodeChunks(uint8_t **ptr, int *index, int *outSize)
     {
         uint8_t *out = *ptr;
         if (!client || !out)
@@ -308,8 +309,8 @@ public:
                 {
                     if (*index + read >= *outSize)
                     {
-                        size_t newOutSize = mem.getReservedLen(*index + read + 512);
-                        out = (uint8_t *)mem.realloc(out, newOutSize);
+                        int newOutSize = mem.getReservedLen(*index + read + 512);
+                        out = (uint8_t *)mem.reallocate(out, newOutSize);
                         *outSize = newOutSize;
                         *ptr = out;
                     }
@@ -425,7 +426,7 @@ public:
                     if (p == *bufSize)
                     {
                         *bufSize = mem.getReservedLen(p + 512);
-                        uint8_t *tmp = (uint8_t *)mem.realloc(buf, *bufSize);
+                        uint8_t *tmp = (uint8_t *)mem.reallocate(buf, *bufSize);
                         *ptr = tmp;
                     }
                 }

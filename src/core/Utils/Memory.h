@@ -62,7 +62,7 @@ public:
         return p;
     }
 
-     void *realloc(void *ptr, size_t len)
+     void *reallocate(void *ptr, size_t len)
     {
         size_t newLen = getReservedLen(len);
 #if defined(BOARD_HAS_PSRAM)

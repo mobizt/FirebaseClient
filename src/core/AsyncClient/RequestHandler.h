@@ -28,7 +28,7 @@
 #include <stdio.h>
 extern "C"
 {
-    
+    // TO DO: include gzip library
 }
 #define EXTRAS_HEADERS "Accept-Encoding: gzip\r\n"
 #else

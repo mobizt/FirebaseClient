@@ -65,7 +65,7 @@ void setup()
     Serial.println("Initializing app...");
     initializeApp(aClient, app, getAuth(sa_auth), auth_debug_print, "🔐 authTask");
 
-    // Or intialize the app and wait.
+    // Or intialize the app and wait (recommend for ESP8266).
     // initializeApp(aClient, app, getAuth(sa_auth), 120 * 1000, auth_debug_print);
 }
 
