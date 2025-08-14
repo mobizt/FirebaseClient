@@ -580,15 +580,20 @@ private:
 
                     if (!sData->response.flags.gzip && pos < sData->response.chunkInfo.dataPos)
                     {
-                        reserveString(sData); // Work around for large string concatenation issue.
 
                         int len = sData->response.chunkInfo.dataPos - pos + 1;
+                        sData->response.payloadRead += len;
+                        reserveString(sData); // Work around for large string concatenation issue.
                         unsigned char *temp = (unsigned char *)mem.alloc(mem.getReservedLen(len), false);
                         memcpy(temp, sData->response.chunkInfo.buf + pos, len);
                         temp[len - 1] = 0;
                         sData->response.val[resns::payload] += (char *)temp;
                         mem.release(&temp);
                     }
+                     
+                     // gzip header + trailer length
+                    if (res == -1 && sData->response.flags.gzip && sData->response.chunkInfo.dataPos <= 15)
+                        res = 0;
 
                     if (res == -1)
                     {

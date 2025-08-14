@@ -23,12 +23,12 @@
 #endif
 #endif
 
-#if defined(ENABLE_GZIP)
+#if defined(ENABLE_GZIP) && defined(FIREBASE_GZIP_LIB)
 #include <stdlib.h>
 #include <stdio.h>
 extern "C"
 {
-    // TO DO: include gzip library
+    #include FIREBASE_GZIP_LIB
 }
 #define EXTRAS_HEADERS "Accept-Encoding: gzip\r\n"
 #else
