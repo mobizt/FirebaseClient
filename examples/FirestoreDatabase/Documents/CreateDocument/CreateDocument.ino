@@ -82,8 +82,17 @@ void loop()
     {
         dataMillis = millis();
 
-        // We will create the documents in this parent path "test_doc_creation/doc_1/col_1/data_?"
-        // (collection > document > collection > documents that contains fields).
+        // We will create the documents in this path "test_doc_creation/doc_1/col_1/data_?"
+        // i.e. data_? is the document with ID data_?, will be created in the subcollection.
+
+        // The document ID must consist of valid UTF-8 characters with 1,500 bytes maximum.
+        // Document IDs cannot contain forward slashes (/), as these are used to denote paths 
+        // within the Firestore hierarchy (e.g., collection/document/subcollection/subdocument).
+        // They cannot consist solely of a single period (.) or double periods (..), as 
+        // these are reserved for special directory navigation in some file systems.
+
+        // For the Firestore data model, plesae see
+        // https://firebase.google.com/docs/firestore/data-model
 
         // Note: If new document created under non-existent ancestor documents as in this example
         // which the document "test_doc_creation/doc_1" does not exist, that document (doc_1) will not appear in queries and snapshot
