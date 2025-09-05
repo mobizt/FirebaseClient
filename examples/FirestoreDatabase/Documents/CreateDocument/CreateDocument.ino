@@ -117,7 +117,7 @@ void loop()
         // As mentioned above, the document path will be used as the path parameter and
         // query parameter of the REST API endpoint (URL).
         // To ensures that the information is transmitted accurately and without corruption, the
-        // document path that contain some special characters should be URL-encoded.
+        // document path that contains some special characters should be URL-encoded.
 
         // For the Firestore data model, plesae see https://firebase.google.com/docs/firestore/data-model
 
