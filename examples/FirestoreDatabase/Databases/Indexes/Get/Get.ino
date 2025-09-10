@@ -5,6 +5,10 @@
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The OAuth2.0 authentication or access token authorization is required for indexes operations.
+ * 
+ * For Google REST API reference documentation, please visit
+ * https://firebase.google.com/docs/firestore/reference/rest#rest-resource:-v1beta1.projects.databases.indexes
+ * https://firebase.google.com/docs/firestore/reference/rest/v1beta1/projects.databases.indexes/get
  *
  * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */

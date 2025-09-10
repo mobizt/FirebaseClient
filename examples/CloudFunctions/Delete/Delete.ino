@@ -5,6 +5,9 @@
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The OAuth2.0 authentication or access token authorization is required for Cloud Functions operations.
+ * 
+ * For Google REST API reference documentation, please visit
+ * https://cloud.google.com/functions/docs/reference/rest/v2/projects.locations.functions/delete
  *
  * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */

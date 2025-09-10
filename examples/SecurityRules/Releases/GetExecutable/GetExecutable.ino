@@ -5,6 +5,9 @@
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The OAuth2.0 authentication or access token authorization is required for security rules operations.
+ * 
+ * For Google REST API reference documentation, please visit
+ * https://firebase.google.com/docs/reference/rules/rest/v1/projects.releases/getExecutable
  *
  * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
  */
