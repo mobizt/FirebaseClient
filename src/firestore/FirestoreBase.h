@@ -183,7 +183,7 @@ protected:
         options.payload = document.c_str();
         sut.printTo(options.extras, options.collectionId.length(), "/documents/%s", options.collectionId.c_str());
         bool hasQueryParams = false;
-        uut.addParam(options.extras, "documentId", options.documentId, hasQueryParams);
+        uut.addParam(options.extras, "documentId", options.documentId, hasQueryParams, true);
         options.extras += mask.getQuery("mask", hasQueryParams);
         req_data aReq(&aClient, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
         asyncRequest(aReq);

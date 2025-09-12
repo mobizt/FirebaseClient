@@ -16,7 +16,7 @@ class URLUtil
 {
 public:
     /* Append a parameter to URL */
-    bool addParam(String &url, const String &key, const String &val, bool &hasParam, bool allowEmptyValue = false)
+    bool addParam(String &url, const String &key, const String &val, bool &hasParam, bool allowEmptyValue = false, bool isEncode = false)
     {
         if (!allowEmptyValue && val.length() == 0)
             return false;
@@ -34,7 +34,7 @@ public:
             _key += "=";
 
         url += _key;
-        url += val;
+        url += isEncode ? encode(val) : val;
         hasParam = true;
         return true;
     }
@@ -143,7 +143,7 @@ public:
     String downloadURL(const String &bucketId, const String &object)
     {
         String url;
-        sut.printTo(url, 500, "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media&token=a82781ce-a115-442f-bac6-a52f7f63b3e8", bucketId.c_str(), object.c_str());
+        sut.printTo(url, 500, "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media&token=a82781ce-a115-442f-bac6-a52f7f63b3e8", encode(bucketId).c_str(), encode(object).c_str());
         return url.c_str();
     }
 

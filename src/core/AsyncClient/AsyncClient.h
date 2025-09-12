@@ -590,8 +590,8 @@ private:
                         sData->response.val[resns::payload] += (char *)temp;
                         mem.release(&temp);
                     }
-                     
-                     // gzip header + trailer length
+
+                    // gzip header + trailer length
                     if (res == -1 && sData->response.flags.gzip && sData->response.chunkInfo.dataPos <= 15)
                         res = 0;
 
@@ -833,7 +833,9 @@ private:
             // It should set in readPayload when decodeChunks returns -1.
             if (!sData->response.flags.chunks)
                 sData->response.flags.payload_remaining = false;
+
 #if defined(ENABLE_FS)
+            // Close file when uploading response complete.
             sData->request.closeFile();
 #endif
 
@@ -1005,7 +1007,6 @@ private:
         clear(sData->request.val[reqns::header]);
         sData->request.addRequestHeader(method, path, extras);
         sData->request.addHostHeader(sData->request.getHost(true, &sData->response.val[resns::location]).c_str());
-
         sData->auth_used = options.auth_used;
 
         if (!options.auth_used)

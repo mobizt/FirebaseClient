@@ -45,15 +45,15 @@ namespace firebase_ns
     enum auth_token_type
     {
         auth_unknown_token,
-        auth_user_id_token,
-        auth_sa_access_token,
-        auth_sa_custom_token,
-        auth_id_token,
-        auth_access_token,
-        auth_custom_token,
-        auth_refresh_token,
-        auth_user_signup,
-        auth_user_reset_password,
+        auth_user_id_token, // Id token using email/password credentials
+        auth_sa_access_token, // access token using service account credentials
+        auth_sa_custom_token, // Id token with custom UID and claims using service account credentials
+        auth_id_token, // Id token
+        auth_access_token, // access token
+        auth_custom_token, // Id token with custom UID and claims
+        auth_refresh_token, // refresh token
+        auth_user_signup2, // signup
+        auth_user_reset_password2, // reset password
     };
 
     enum user_auth_data_type

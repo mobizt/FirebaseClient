@@ -97,14 +97,14 @@ void loop()
         storage.upload(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), "video/mp4", processData, "⬆️  uploadTask");
 
         // Async call with AsyncResult for returning result.
-        storage.upload(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), "video/mp4", storageResult);
+        // storage.upload(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), "video/mp4", storageResult);
 
         // Sync call which waits until the operation complete.
-        bool status = storage.upload(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), "video/mp4");
-         if (status)
-            Serial.println("🔼 Upload task(await), complete!✅️");
-        else
-            Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
+        // bool status = storage.upload(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), "video/mp4");
+        // if (status)
+        //     Serial.println("🔼 Upload task(await), complete!✅️");
+        // else
+        //     Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
 #endif
     }
 

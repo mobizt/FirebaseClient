@@ -5,7 +5,7 @@
  * See examples/App/AppInitialization for more authentication examples.
  *
  * The OAuth2.0 authentication or access token authorization is required for Cloud Storage operations.
- * 
+ *
  * For Google JSON API reference documentation, please visit
  * https://cloud.google.com/storage/docs/json_api/v1/objects/insert
  * https://cloud.google.com/storage/docs/resumable-uploads
@@ -113,14 +113,14 @@ void loop()
         cstorage.upload(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options, processData, "⬆️  uploadTask");
 
         // Async call with AsyncResult for returning result.
-        cstorage.upload(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options, cloudStorageResult);
+        // cstorage.upload(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options, cloudStorageResult);
 
         // Sync call which waits until the operation complete.
-        bool status = cstorage.upload(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options);
-        if (status)
-            Serial.println("🔼 Upload task(await), complete!✅️");
-        else
-            Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
+        // bool status = cstorage.upload(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "media.mp4"), getFile(media_file), options);
+        // if (status)
+        //     Serial.println("🔼 Upload task(await), complete!✅️");
+        // else
+        //     Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
 #endif
     }
 

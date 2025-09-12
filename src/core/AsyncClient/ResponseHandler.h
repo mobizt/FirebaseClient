@@ -78,7 +78,7 @@ public:
 
     int httpCode = 0, statusCode = 0;
     response_flags flags;
-    size_t payloadLen = 0, payloadRead = 0;
+    size_t payloadLen = 0, payloadRead = 0, xx=0;
     auth_error_t error;
     uint8_t *toFill = nullptr;
     uint16_t toFillLen = 0, toFillIndex = 0;
