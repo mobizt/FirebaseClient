@@ -174,6 +174,8 @@ The details for all classes used in this library are available. Click the follow
 
 - [Messaging Class](resources/docs/messaging.md)
 
+- [MessagingInstance Class](resources/docs/messaging_instance.md)
+
 - [Storage Class](resources/docs/storage.md)
 
 - [CloudStorage Class](resources/docs/cloud_storage.md)
@@ -722,4 +724,4 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 
 `THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`
 
-*Last updated 2025-08-09 UTC.*
+*Last updated 2025-09-16 UTC.*

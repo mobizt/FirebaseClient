@@ -49,6 +49,7 @@
 #if defined(ENABLE_MESSAGING)
 #if __has_include("messaging/Messaging.h")
 #include "messaging/Messaging.h"
+#include "messaging/MessagingInstance.h"
 #endif
 #endif
 

@@ -29,6 +29,8 @@ class AsyncClientClass PUBLIC_DATABASE_RESULT_IMPL_BASE
     friend class CollectionGroups;
     friend class CloudFunctions;
     friend class Messaging;
+    friend class MessagingBase;
+    friend class MessagingInstance;
     friend class Storage;
     friend class CloudStorage;
     friend class FirestoreBase;
@@ -1025,6 +1027,9 @@ private:
 
             if (options.sse)
                 sData->request.val[reqns::header] += "Accept: text/event-stream\r\n";
+
+            if (url.indexOf("iid.googleapis.com") > -1)
+                sData->request.val[reqns::header] += "access_token_auth: true\r\n";
         }
 
         if (method == reqns::http_get || method == reqns::http_delete)

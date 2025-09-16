@@ -18,7 +18,12 @@ namespace Messages
     enum firebase_cloud_messaging_request_type
     {
         fcm_undefined,
-        fcm_send
+        fcm_send,
+        fcm_instance_batch_add,
+        fcm_instance_batch_remove,
+        fcm_instance_batch_import,
+        fcm_instance_get_info
+
     };
 
     // Priority of a message to send to Android devices. Note this priority is an FCM concept that controls when the message is delivered. See FCM guides. Additionally, you can determine notification display priority on targeted Android devices using AndroidNotification.NotificationPriority.

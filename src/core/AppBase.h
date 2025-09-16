@@ -23,6 +23,8 @@ class AppBase
     friend class FirestoreBase;
     friend class CloudFunctions;
     friend class Messaging;
+    friend class MessagingBase;
+    friend class MessagingInstance;
     friend class Storage;
     friend class CloudStorage;
     friend class RuleSets;

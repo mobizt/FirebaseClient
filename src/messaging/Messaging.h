@@ -6,15 +6,13 @@
 
 #ifndef MESSAGING_MESSAGING_H
 #define MESSAGING_MESSAGING_H
-#include <Arduino.h>
-#include "./core/FirebaseApp.h"
 
 using namespace firebase_ns;
 
 #if defined(ENABLE_MESSAGING)
-#include "./messaging/DataOptions.h"
+#include "MessagingBase.h"
 
-class Messaging : public AppBase
+class Messaging : public MessagingBase
 {
     friend class AppBase;
 
@@ -83,71 +81,7 @@ public:
      * Read more details about HTTP v1 API here https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
      */
     void send(AsyncClientClass &aClient, const Messages::Parent &parent, const Messages::Message &message, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, message.c_str(), Messages::fcm_send, true); }
-
-private:
-    String path, uid;
-
-    AsyncResult *sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Messages::Parent &parent, const String &payload, Messages::firebase_cloud_messaging_request_type requestType, bool async)
-    {
-        using namespace Messages;
-        DataOptions options;
-        options.requestType = requestType;
-        options.parent = parent;
-        if (requestType == fcm_send)
-        {
-            JSONUtil jut;
-            jut.addObject(options.payload, "message", payload, false, true);
-            options.extras += "/messages:send";
-        }
-
-        req_data aReq(&aClient, path, reqns::http_post, slot_options_t(false, false, async, false, false, false), &options, result, cb, uid);
-        asyncRequest(aReq);
-        return aClient.getResult();
-    }
-
-    void asyncRequest(Messages::req_data &request, int beta = 0)
-    {
-        app_token_t *atoken = appToken();
-
-        if (!atoken)
-            return request.aClient->setClientError(request, FIREBASE_ERROR_APP_WAS_NOT_ASSIGNED);
-
-        request.opt.app_token = atoken;
-        request.opt.user_auth = user_auth;
-        String extras;
-
-        sut.printTo(request.path, 20, "/v1%s%s/projects/", beta == 0 ? "" : "beta", beta == 0 ? "" : String(beta).c_str());
-
-        request.path += request.options->parent.getProjectId().length() == 0 ? atoken->val[app_tk_ns::pid] : request.options->parent.getProjectId();
-
-        sut.addParams(request.options->extras, extras);
-
-        url("fcm.googleapis.com");
-
-        async_data *sData = request.aClient->createSlot(request.opt);
-
-        if (!sData)
-            return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
-
-        request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid, "");
-
-        if (request.options->payload.length())
-        {
-            sData->request.val[reqns::payload] = request.options->payload;
-            sData->request.setContentLengthFinal(request.options->payload.length());
-        }
-
-        if (request.cb)
-            sData->cb = request.cb;
-
-        request.aClient->addRemoveClientVec(reinterpret_cast<uint32_t>(&(cVec)), true);
-
-        if (request.aResult)
-            sData->setRefResult(request.aResult, reinterpret_cast<uint32_t>(&(request.aClient->getResultList())));
-
-        request.aClient->process(sData->async);
-        request.aClient->handleRemove();
-    }
 };
+
 #endif
 #endif
