@@ -28,7 +28,7 @@
 #include <stdio.h>
 extern "C"
 {
-#include FIREBASE_GZIP_LIB
+    #include FIREBASE_GZIP_LIB
 }
 #define EXTRAS_HEADERS "Accept-Encoding: gzip\r\n"
 #else
@@ -175,7 +175,6 @@ public:
 
     size_t tcpWrite(const uint8_t *data, size_t size)
     {
-        Serial.print((char *)data);
         if (client_type == tcpc_sync)
             return client ? client->write(data, size) : 0;
         return 0;
