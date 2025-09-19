@@ -50,66 +50,64 @@
 
     <div class="container-sm py-5">
         <div id="instructionTab" class="tabcontent py-3 active">
-            <div id="longDiv">
-                1. Place the <span id="url1"></span> files in the root directory of the web server.<br /><br />
+            To use the FCM web app, it requires the PHP and web server to host the html and PHP script
+            files.<br /><br />
 
-                The web server can be local host e.g. <a href="https://www.apachefriends.org/download.html"
-                    target="_blank">XAMMP</a>, <a href="https://www.uniformserver.com/" target="_blank">UiformServer</a>
-                or nginx with PHP installed.<br /><br />
+            1. Place the <span id="url1"></span> files in the root directory of your web server.<br /><br />
 
-                When you host the web app on a remote server, browser should navigate through the HTTPS protocol
-                (https://) because FCM SDK is supported only in pages served over HTTPS.<br /><br />
+            When you host the FCM web app on a remote server, the app should be access through the HTTPS protocol
+            (https://) because FCM SDK is only support it.<br /><br />
 
-                When you host the web app on local host, browser can navigate through http://localhost.<br /><br />
+            When you host the FCM web app on your local host, the app should be access through
+            http://localhost.<br /><br />
 
-                2. Under the <b>Initialization</b> tab, specify the information from <a
-                    href="https://console.firebase.google.com/project/_/settings/general/" target="_blank">Project
-                    settings > General > Your apps</a><br /><br />
-
-
-                The <b>VAPID</b> key can be taken from the <b>Web Push certificates</b> section under <a
-                    href="https://console.firebase.google.com/project/_/settings/cloudmessaging/web"
-                    target="_blank">Project settings > Cloud Messaging</a><br /><br />
+            2. Under the <b>Initialization</b> page, specify the information from <a
+                href="https://console.firebase.google.com/project/_/settings/general/" target="_blank">Project
+                settings > General > Your apps</a><br /><br />
 
 
-                3. Click the <b>Initialize & Get Token</b> button to initialize your Firebase Cloud Messaging Web Client
-                and get the registration token to test with your Arduino device.<br /><br />
+            The <b>VAPID</b> key can be taken from the <b>Web Push certificates</b> section under <a
+                href="https://console.firebase.google.com/project/_/settings/cloudmessaging/web" target="_blank">Project
+                settings > Cloud Messaging</a><br /><br />
 
-                You also have to allow or enable notification for your web server site URL in your web browser
-                settings or
-                pop-up.<br /><br />
 
-                After the registration token was generated, you can now use for the registeration token in your
-                Arduino code.<br /><br />
+            3. Click the <b>Initialize</b> button to initialize your Firebase Cloud Messaging Web Client. The app
+            instance token will be generated and can be used for sending and receiving the messages.<br /><br />
 
-                4. Click the <b>Download SW File</b> button to download the service worker javascript file that is
-                required for allowing background message notification.<br /><br />
-                Save the <b>firebase-messaging-sw.js</b> that downloaded to the same directory (root) of this
-                <b><span id="url2"></span></b> file.<br /><br />
+            You also have to allow or enable notification for your web server site URL in your web browser settings or
+            pop-up.<br /><br />
 
-                In case you can't download file, you can also create a new <b>firebase-messaging-sw.js</b> by
-                clicking the <b>Copy SW Content</b> button and paste it to your <b>firebase-messaging-sw.js</b>
-                file and save to the root directory.<br /><br />
+            After the registration token was generated, you can now use for the registeration token in your
+            Arduino code.<br /><br />
 
-                5. Reload this page and click the <b>Initialize & Get Token</b> button again. Now your web client
-                is ready to receive the messages.<br /><br />
+            4. Click the <b>Download</b> button to download the service worker javascript file that is
+            required for allowing background message notification.<br /><br />
 
-                In Windows 11 PC, even notification is granted for your site in the brower notification settings, the
-                notification may go directly to the notification center instead of displaying pop-up, if <b>Do not
-                    disturb</b> is <b>On</b> in the <a href="ms-settings:notifications"><b>System >
-                        Notifications</b></a> and you have to turn it <b>Off</b> to allow the notification pop-up to
-                show.<br /><br />
+            Save the <b>firebase-messaging-sw.js</b> that downloaded to the same directory (root) of this
+            <b><span id="url2"></span></b> file.<br /><br />
 
-                6. To compose and send the message, under the <b>Compose Message</b> tab, the <b>Client Email</b> and
-                <b>Private Key</b> are taken from the <b>Service Account</b> key file which required for the FCM HTTPv1
-                API authorization.<br /><br />
+            In case you can't download file, you can also create a new <b>firebase-messaging-sw.js</b> by
+            clicking the <b>Copy</b> button and paste it to your <b>firebase-messaging-sw.js</b>
+            file and save to the root directory of your web server.<br /><br />
 
-                If you don't want to send the message using this app, you can ignore it.<br /><br />
+            5. Reload this page and click the <b>Initialize</b> button again. Now your web client
+            is ready to receive the messages.<br /><br />
 
-                The message to be sent should be valid <a
-                    href="https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages" target="_blank">HTTP
-                    v1 FCM messages</a> format.
-            </div>
+            In Windows 11 PC, even notification is granted for your site in the brower notification settings, the
+            notification may go directly to the notification center instead of displaying pop-up, if <b>Do not
+                disturb</b> is <b>On</b> in the <a href="ms-settings:notifications"><b>System >Notifications</b></a> and
+            you have to turn it <b>Off</b> to allow the notification pop-up to
+            show.<br /><br />
+
+            6. To compose and send the messages, under the <b>Compose Message</b> page, the <b>Client Email</b> and
+            <b>Private Key</b> are taken from the <b>Service Account</b> key file which required for the FCM HTTPv1
+            API authorization.<br /><br />
+
+            If you don't want to send the message using this app, you can ignore it.<br /><br />
+
+            The message to be sent should be valid <a
+                href="https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages" target="_blank">HTTP
+                v1 FCM messages</a> format.
         </div>
         <div id="setupTab" class="tabcontent py-3">
             <div class="input-group mb-3">
