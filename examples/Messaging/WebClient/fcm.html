@@ -1,126 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Firebase Cloud Messaging Web Client App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #e0c3fc, #8ec5fc);
-        }
-
-        .tab {
-            display: flex;
-            justify-content: space-around;
-            background: linear-gradient(to right, #e0c3fc, #8ec5fc);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            overflow-x: auto;
-        }
-
-        .tablinks {
-            flex: 1;
-            padding: 6px;
-            text-align: center;
-            color: white;
-            cursor: pointer;
-            margin: 5px;
-            border-radius: 8px;
-        }
-
-        .tablinks.active {
-            background-color: #6a11cb;
-        }
-
-        .content {
-            padding: 40px 20px 20px;
-            /* top padding to avoid overlap with tabs */
-        }
-
-        .tabcontent {
-            display: none;
-        }
-
-        .tabcontent.active {
-            display: block;
-        }
-
-        .form-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            width: 100%;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #5a5a5a;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        input,
-        textarea,
-        select {
-            width: 92%;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        button {
-            padding: 0.75rem;
-            background-color: #6a11cb;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #2575fc;
-        }
-
-        .mg-top {
-            margin-bottom: 4px;
-            min-width: 80%;
+        .lbl {
+            min-width: 140px;
         }
 
         .info {
-            text-align: center;
+            width: 100%;
+            max-height: 8rem;
+            min-height: 3rem;
+            overflow-y: scroll;
+            padding: 10px;
+            background-color: #0000001a;
+            border: solid rgba(0, 0, 0, 0.15);
+            border-width: 1px 0;
+            box-shadow:
+                inset 0 0.5em 1.5em #0000001a,
+                inset 0 0.125em 0.5em #00000026;
         }
     </style>
 </head>
 
-<body id="body">
+<body>
 
-    <div class="tab">
-        <div class="tablinks" id="instructionTabBtn">Instructions</div>
-        <div class="tablinks" id="setupTabBtn">Initialization</div>
-        <div class="tablinks" id="receiveTabBtn">Receive</div>
-        <div class="tablinks" id="composeTabBtn">Compose</div>
-    </div>
+    <nav class="navbar navbar-dark bg-dark fixed-top" aria-label="First navbar example">
+        <div class="container-fluid">
+            <a class="navbar-brand" id="page" href="#">Fixed navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample01"
+                aria-controls="navbarsExample01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarsExample01">
+                <ul class="tab navbar-nav me-auto mb-2">
+                    <li class="tablinks nav-item"> <a class="nav-link active" id="instructionTabBtn" aria-current="page"
+                            href="#">Home</a></li>
+                    <li class="tablinks nav-item"><a class="nav-link" id="setupTabBtn" href="#">Initialization</a></li>
+                    <li class="tablinks nav-item"><a class="nav-link" id="receiveTabBtn">Received Message</a></li>
+                    <li class="tablinks nav-item"> <a class="nav-link" id="composeTabBtn">Compose Message</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <div class="content">
-        <div id="instructionTab" class="tabcontent active">
-
-            <h3>Instructions</h3>
+    <div class="container-sm py-5">
+        <div id="instructionTab" class="tabcontent py-3 active">
             <div id="longDiv">
                 1. Place the <span id="url1"></span> files in the root directory of the web server.<br /><br />
 
@@ -182,77 +111,110 @@
                     v1 FCM messages</a> format.
             </div>
         </div>
-        <div id="setupTab" class="tabcontent">
-            <h3>Initialization</h3>
-            <div>
-                <form>
-                    <label for="projectId">Project ID:</label>
-                    <input type="text" id="projectId" name="projectId"><br />
-                    <label for="apiKey">API Key:</label>
-                    <input type="text" id="apiKey" name="apiKey"><br />
-                    <label for="appId">App ID:</label>
-                    <input type="text" id="appId" name="appId">
-                    <label for="senderId">Sender ID/Project number:</label>
-                    <input type="text" id="senderId" name="senderId"><br />
-                    <label for="vapidKey">VAPID Key:</label>
-                    <input type="text" id="vapidKey" name="vapidKey">
-                </form>
-                <div class="input-container">
-                    <label for="iidToken">Regis. Token:</label>
-                    <input type="text" id="iidToken" name="iidToken" readonly>
-                    <button class="input-button" style="min-width:50px;" id="tokenCopyBtn">Copy</button>
-                </div>
-                <hr class="rounded">
-                <p class="info" id="appStatus" style="height: 190px;"></p>
-                <hr class="rounded">
-                <div style="text-align: center;">
-                    <button type="button" class="mg-top" id="initializeBtn" title="Initialize">Initialize & Get
-                        Token</button>
-                    <br />
-                    <button type="button" class="mg-top" id="deleteTokenBtn" title="Delete Token">Delete Token</button>
-                    <br />
-                    <button type="button" class="mg-top" id="getSwBtn" title="Download Service Worker file">Download SW
-                        File</button>
-                    <br />
-                    <button type="button" class="mg-top" id="copySwBtn" title="Copy Service Worker file">Copy SW
-                        Content</button>
-                </div>
+        <div id="setupTab" class="tabcontent py-3">
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Project ID</span>
+                <input type="text" class="form-control" id="projectId" name="projectId">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">API Key</span>
+                <input type="text" class="form-control" id="apiKey" name="apiKey">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">App ID</span>
+                <input type="text" class="form-control" id="appId" name="appId">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Project Number</span>
+                <input type="text" class="form-control" id="senderId" name="senderId">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">VAPID Key</span>
+                <input type="text" class="form-control" id="vapidKey" name="vapidKey">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Instance Token</span>
+                <input type="text" class="form-control" id="iidToken" name="iidToken" readonly>
+                <button class="btn btn-secondary" style="min-width:50px;" id="tokenCopyBtn">Copy</button>
+            </div>
+            <div class="d-flex gap-2 justify-content-center py-2">
+                <button class="btn btn-primary d-inline-flex align-items-center" id="initializeBtn" title="Initialize"
+                    type="button">Initialize</button>
+                <button class="btn btn-primary d-inline-flex align-items-center" id="deleteTokenBtn"
+                    title="Delete Token" type="button">Delete</button>
+                <button class="btn btn-primary d-inline-flex align-items-center" id="getSwBtn"
+                    title="Download Service Worker file" type="button">Download</button>
+                <button class="btn btn-primary d-inline-flex align-items-center" id="copySwBtn"
+                    title="Copy Service Worker file" type="button">Copy</button>
+            </div>
+            <div class="py-2"></div>
+            <div id="appStatus" class="info"></div>
+
+        </div>
+
+        <div id="receiveTab" class="tabcontent py-3">
+            <button class="btn btn-primary d-inline-flex align-items-center" id="clearMsgBtn" title="Clear"
+                type="button">Clear</button>
+            <div class="d-flex gap-2 justify-content-center py-3">
+                <div id="messages" class="info" rows="10" cols="50"></div>
+            </div>
+            <div class="d-flex gap-2 justify-content-center">
+                <p class="info" id="receiveStatus"></p>
             </div>
         </div>
-        <div id="receiveTab" class="tabcontent">
-            <button id="clearMsgBtn" style="margin-top:15px;">Clear</button>
-            <h3 id="receiveHeader">Uninitialized</h3>
-            <div style="overflow-y: auto;height: 558px;">
-                <div id='messages'
-                    style="text-wrap: wrap;border:none;width:96%;display:block;background: transparent;"
-                    class="textarea" id="listener" name="listener" rows="10" cols="50"></div>
-                <hr class="rounded">
-                <p class="info" id="receiveStatus" style="min-height: 30px;"></p>
-            </div>
-        </div>
-        <div id="composeTab" class="tabcontent">
+
+        <div id="composeTab" class="tabcontent py-3">
             <div style="overflow-y: auto;">
-                <h3>Authorization Credentials</h3>
-                <label for="clientEmail" style="min-width:115px;">Client Email:</label>
-                <input type="text" style="margin-bottom:10px;" id="clientEmail" name="clientEmail"><br />
-                <label for="privateKey" style="min-width:115px;">Private Key:</label>
-                <input type="text" style="margin-bottom:10px;" id="privateKey" name="privateKey"><br />
-                <hr class="rounded">
-                <h3>Compose Message</h3>
-                <button id="loadMsgBtn">Sample</button><br />
-                <textarea class="textarea" style="overflow-y: auto;margin-top: 10px;" id="msgPayload" name="msgPayload" rows="10"
-                    cols="50"></textarea>
-                <hr class="rounded">
-                <p class="info" id="sendStatus" style="min-height: 30px;"></p>
-                <hr class="rounded">
-                <div style="margin-top:10px;margin-bottom:10px;">
-                    <button type="button" id="msgSendBtn" title="send">Send</button>
+                <div class="input-group mb-3">
+                    <span class="input-group-text lbl">Client Email</span>
+                    <input type="text" class="form-control" id="clientEmail" name="clientEmail">
+                </div>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text lbl">Private Key</span>
+                    <input type="text" class="form-control" id="privateKey" name="privateKey">
+                </div>
+                <button class="btn btn-primary d-inline-flex align-items-center" id="loadMsgBtn">Load
+                    Sample</button><br />
+                <div class="d-flex gap-2 justify-content-center py-3">
+                    <textarea class="form-control" id="msgPayload" name="msgPayload" rows="10" cols="50"></textarea>
+                </div>
+                <button class="btn btn-primary d-inline-flex align-items-center" type="button" id="msgSendBtn"
+                    title="send">Send</button>
+                <div class="d-flex gap-2 justify-content-center py-3">
+                    <p class="info" id="sendStatus" style="min-height: 30px;"></p>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal fade" id="msgModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel">Received Message</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modalMessage" style="overflow-wrap: break-word;">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <script type="module">import{initializeApp as e,deleteApp as t}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";import{getAuth as a}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";import{deleteToken as s,getMessaging as n,getToken as o,onMessage as i}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-messaging.js";let firebaseConfig={apiKey:"",projectId:"",messagingSenderId:"",appId:""};var appStatusTmo,receiveStatusTmo,sendStatusTmo,permissionTmo,receiveMsgTmo,app,messaging,vapidKey=void 0,onMsgCallback=!1,accessToken="",tokenTime=0,path=window.location.pathname,curPage=decodeURI(path.split("/").pop());function getEl(e){return document.getElementById(e)}function initializeFCM(){firebaseConfig.apiKey=getEl("apiKey").value.trim(),firebaseConfig.projectId=getEl("projectId").value.trim(),firebaseConfig.messagingSenderId=getEl("senderId").value.trim(),firebaseConfig.appId=getEl("appId").value.trim(),vapidKey=getEl("vapidKey").value.trim(),app&&t(app).then(function(){}).catch(function(e){showError(e,"appStatus",appStatusTmo)});try{app=e(firebaseConfig),messaging=n(app),""!=vapidKey?getRegistrationToken():showError("Please specify the public VAPID key.","appStatus",appStatusTmo),onMsgCallback||(onMsgCallback=!0,i(messaging,e=>{showMessage("New foreground message received!.","#008c00","receiveStatus",receiveStatusTmo),appendMessage(e,"foreground","#27960e")}),navigator.serviceWorker.addEventListener("message",e=>{e.data.type&&(showMessage("New background message received!.","#008c00","receiveStatus",receiveStatusTmo),appendMessage(e.data.payload,e.data.type,"#9c19eb"))}))}catch(a){showError(a,"appStatus",appStatusTmo)}}function getRegistrationToken(){o(messaging,{vapidKey}).then(e=>{e?(getEl("iidToken").value=e,getEl("iidToken").style.backgroundColor="#139a3b",getEl("receiveHeader").innerText="Received Message",showMessage("The app was successfully initialized and the registration token is applied.","#008c00","appStatus",appStatusTmo)):showError("No registration token available. Request permission to generate one.","appStatus",appStatusTmo)}).catch(e=>{showError(e,"appStatus",appStatusTmo)})}function deleteRegistrationTokenFromFirebase(){o(messaging).then(e=>{s(messaging).then(()=>{getEl("receiveHeader").innerHTML="Uninitialized",showMessage("Successfully deleted token.","#008c00","appStatus",appStatusTmo),getEl("iidToken").value="",getEl("iidToken").style.backgroundColor="#c2cad1"}).catch(e=>{showError("Unable to delete token.","appStatus",appStatusTmo)})}).catch(e=>{showError(e,"appStatus",appStatusTmo)})}function requestNotificationPermission(){showMessage("Requesting permission...","#a10fae","appStatus",appStatusTmo);var e="<span style='color:red;'>Notification Permission Blocked</span>";permissionTmo&&clearTimeout(permissionTmo),permissionTmo=setTimeout(function(){var t="<div style='color:red;'>Unable to get the browser notification permission for this site";"file:"==window.location.protocol&&(t+=" via file protocol. ",t+="Nevigate this page via http protocol, and change the browser settings to allow notification"),t+=".</div>",getEl("appStatus").innerHTML=t,getEl("receiveHeader").innerHTML=e},5e3),Notification.requestPermission().then(t=>{"granted"===t?(clearTimeout(permissionTmo),showMessage("Notification permission granted.","#008c00","appStatus",appStatusTmo),initializeFCM()):(getEl("receiveHeader").innerHTML=e,showError("Unable to get the browser notification permission for this site.<br/>Please change the browser settings to allow notification.","appStatus",appStatusTmo))}).catch(t=>{getEl("receiveHeader").innerHTML=e,showError(t,"appStatus",appStatusTmo)})}function getSWFileContent(){var e="importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');\n";return e+="importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');\n\n",e+="firebase.initializeApp({apiKey: '",e+=getEl("apiKey").value,e+="',projectId:'",e+=getEl("projectId").value,e+="',messagingSenderId:'",e+=getEl("senderId").value,e+="',appId:'",e+=getEl("appId").value,e+="'});\n\nconst messaging = firebase.messaging();\n\n",e+="function postMessage(payload) {\n",e+="self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(all => all.forEach(client => {\n",e+="var data = { payload: payload, type: 'background' };\n",e+="client.postMessage(data);\n",e+=" }));\n}\n\n",e+="messaging.onBackgroundMessage(function (payload) {\n\n",e+="postMessage(payload);\n\n});"}function getSwFile(){download("firebase-messaging-sw.js",getSWFileContent()),showMessage("Successfully downloaded the service worker javascript file.","#008c00","appStatus",appStatusTmo)}function copySwFile(){navigator.clipboard.writeText(getSWFileContent()),showMessage("Successfully copied the service worker javascript content to clipboard.","#008c00","appStatus",appStatusTmo)}function download(e,t){var a=document.createElement("a");a.setAttribute("href","data:text/plain;charset=utf-8,"+encodeURIComponent(t)),a.setAttribute("download",e),a.style.display="none",document.body.appendChild(a),a.click(),document.body.removeChild(a)}function addEvent(e,t,a,s){var n=getEl(e);n.addEventListener(t,a,!1),s&&(n.param=s)}function saveConfig(e){localStorage[e.currentTarget.param]=e.currentTarget.value.trim()}function loadConfig(e){void 0!=localStorage[e]&&(getEl(e).value=localStorage[e].trim())}function setForm(e){loadConfig("apiKey"),loadConfig("clientEmail"),loadConfig("privateKey"),loadConfig("projectId"),loadConfig("senderId"),loadConfig("appId"),loadConfig("vapidKey"),loadConfig("msgPayload")}function showError(e,t,a){try{var s=JSON.parse(e);showMessage(s.error.message,"red",t,a)}catch(n){showMessage(e,"red",t,a)}}function showMessage(e,t,a,s){s&&clearTimeout(s),addChild(a,e="<span style='color:"+t+";'>"+e+"</span>"),s=setTimeout(hideMessage,5e3,a,s,5e3)}function hideMessage(e,t,a){removeChild(e),t&&clearTimeout(t),t=setTimeout(hideMessage,e,t,a)}function addChild(e,t){var a=document.createElement("div");a.innerHTML=t,getEl(e).appendChild(a)}function removeChild(e){let t=getEl(e);t&&t.childElementCount>0&&t.removeChild(t.firstElementChild),"messages"==e&&t&&0==t.childElementCount&&(getEl("clearMsgBtn").style.display="none")}function copyToken(){navigator.clipboard.writeText(getEl("iidToken").value)}function appendMessage(e,t,a){let s=document.querySelector("#messages"),n=document.createElement("div"),o=document.createElement("span"),i=document.createElement("pre");i.style.overflowX="hidden;";var r=new Date;o.textContent="Received "+t+" message ("+r.toLocaleString()+"):",o.style.color=a,i.textContent=JSON.stringify(e,null,2),i.style.color=a,n.appendChild(o),n.appendChild(i),s.appendChild(n),getEl("clearMsgBtn").style.display="inline-block",clearTimeout(receiveMsgTmo),receiveMsgTmo=setTimeout(hideMessage,12e4,"messages",receiveMsgTmo,12e4)}function clearMessages(e){e.currentTarget.style.display="none";let t=document.querySelector("#messages");for(;t.hasChildNodes();)t.removeChild(t.lastChild)}function asyncHttpRequest(e,t,a,s,n){var o=new XMLHttpRequest;if(o.addEventListener("error",function(e){a("An error occurred while sending the request.",o.status)}),o.onreadystatechange=function(){4===o.readyState&&a(o.responseText,o.status)},o.open(e,t,!0),s)for(let i in s)o.setRequestHeader(i,s[i]);o.send(n)}function msgSend(e){if(""==accessToken||tokenTime+348e4<Date.now()){tokenTime=Date.now();var t=getEl("clientEmail").value,a=getEl("privateKey").value,s="https://oauth2.googleapis.com/token",s="https://oauth2.googleapis.com/token",n=JSON.stringify({email:t,privateKey:a,aud:s,scope:"https://www.googleapis.com/auth/devstorage.full_control https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/iam",uid:"",claims:""}),o=-1==curPage.indexOf(".php")?curPage.replace(".html",".php"):curPage;asyncHttpRequest("POST",o,function(e,t){if(e){if(200!=t)showError(404!=t?e:"Unable to locate "+o+". Plese put "+o+" in the same directory with this "+curPage+".","sendStatus",sendStatusTmo);else{var a=JSON.parse(e);"failure"==a.status?showError(a.msg,"sendStatus",sendStatusTmo):sendFCMMessage(accessToken=a.token)}}else 0!=t&&showError("The "+o+" was unable to process the HTTP request or not responding.","sendStatus",sendStatusTmo)},{"Content-Type":"application/json"},n)}else sendFCMMessage(accessToken)}function sendFCMMessage(e){var t=getEl("projectId").value,a=getEl("msgPayload").value;asyncHttpRequest("POST","https://fcm.googleapis.com/v1/projects/"+t+"/messages:send",function(e,t){200!=t?showError(e,"sendStatus",sendStatusTmo):showMessage("Successfully sent message.<br/>"+e,"#008c00","sendStatus",sendStatusTmo)},{Authorization:"Bearer "+e},a)}function loadSampleMsg(e){var t=getEl("iidToken").value;""==t&&(t="APP_REGISTRATION_TOKEN");var a='{\n    "message": {\n        "notification": {\n';a+='            "title": "Hello from FCM web app",\n            "body": "FCM notification works",\n',a+='            "image": "https://www.gstatic.com/mobilesdk/240501_mobilesdk/firebase_28dp.png"\n',a+='        },\n        "android": {\n            "priority": "HIGH",\n            "notification": {\n',a+='                "notification_priority": "PRIORITY_HIGH"\n            }\n        },\n        "webpush": {\n',a+='            "fcm_options": {\n                "link": "https://google.com"\n            }\n        },\n',a+='        "token": "'+t+'"\n',a+="    }\n}",getEl("msgPayload").value=a}function openTab(e){var t,a,s;for(t=0,a=document.getElementsByClassName("tabcontent");t<a.length;t++)a[t].style.display="none";for(t=0,s=document.getElementsByClassName("tablinks");t<s.length;t++)s[t].className=s[t].className.replace(" active","");getEl(e.currentTarget.param).style.display="block",e.currentTarget.className+=" active"}function docReady(e){"complete"===document.readyState||"interactive"===document.readyState?setTimeout(e,1):document.addEventListener("DOMContentLoaded",e)}docReady(function(){addEvent("initializeBtn","click",requestNotificationPermission),addEvent("deleteTokenBtn","click",deleteRegistrationTokenFromFirebase),addEvent("apiKey","change",saveConfig,"apiKey"),addEvent("clientEmail","change",saveConfig,"clientEmail"),addEvent("privateKey","change",saveConfig,"privateKey"),addEvent("projectId","change",saveConfig,"projectId"),addEvent("senderId","change",saveConfig,"senderId"),addEvent("appId","change",saveConfig,"appId"),addEvent("vapidKey","change",saveConfig,"vapidKey"),addEvent("msgPayload","change",saveConfig,"msgPayload"),addEvent("tokenCopyBtn","click",copyToken),addEvent("getSwBtn","click",getSwFile),addEvent("copySwBtn","click",copySwFile),addEvent("clearMsgBtn","click",clearMessages),addEvent("msgSendBtn","click",msgSend),addEvent("loadMsgBtn","click",loadSampleMsg),addEvent("instructionTabBtn","click",openTab,"instructionTab"),addEvent("setupTabBtn","click",openTab,"setupTab"),addEvent("receiveTabBtn","click",openTab,"receiveTab"),addEvent("composeTabBtn","click",openTab,"composeTab"),setForm(),getEl("url1").innerHTML=curPage.indexOf(".php")>-1?"<b>"+curPage+"</b> and <b>"+curPage.replace(".php",".html")+"</b>":"<b>"+curPage+"</b> and <b>"+curPage.replace(".html",".php")+"</b>",getEl("url2").innerHTML=curPage,getEl("instructionTabBtn").click()});</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <script type="module">import{initializeApp as e,deleteApp as t}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";import{getAuth as a}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";import{deleteToken as s,getMessaging as n,getToken as o,onMessage as i}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-messaging.js";let firebaseConfig={apiKey:"",projectId:"",messagingSenderId:"",appId:""};var appStatusTmo,receiveStatusTmo,sendStatusTmo,permissionTmo,receiveMsgTmo,app,messaging,msgModal,vapidKey=void 0,onMsgCallback=!1,accessToken="",tokenTime=0,path=window.location.pathname,curPage=decodeURI(path.split("/").pop());function getEl(e){return document.getElementById(e)}function initializeFCM(){firebaseConfig.apiKey=getEl("apiKey").value.trim(),firebaseConfig.projectId=getEl("projectId").value.trim(),firebaseConfig.messagingSenderId=getEl("senderId").value.trim(),firebaseConfig.appId=getEl("appId").value.trim(),vapidKey=getEl("vapidKey").value.trim(),app&&t(app).then((function(){})).catch((function(e){showError(e,"appStatus",appStatusTmo)}));try{app=e(firebaseConfig),messaging=n(app),""!=vapidKey?getRegistrationToken():showError("Please specify the public VAPID key.","appStatus",appStatusTmo),onMsgCallback||(onMsgCallback=!0,i(messaging,(e=>{showMessage("New foreground message received!.","#008c00","receiveStatus",receiveStatusTmo),appendMessage(e,"foreground","#27960e")})),navigator.serviceWorker.addEventListener("message",(e=>{e.data.type&&(showMessage("New background message received!.","#008c00","receiveStatus",receiveStatusTmo),appendMessage(e.data.payload,e.data.type,"#9c19eb"))})))}catch(e){showError(e,"appStatus",appStatusTmo)}}function getRegistrationToken(){o(messaging,{vapidKey:vapidKey}).then((e=>{e?(getEl("iidToken").value=e,getEl("iidToken").style.backgroundColor="#139a3b",showMessage("The app was successfully initialized and the registration token is applied.","#008c00","appStatus",appStatusTmo)):showError("No registration token available. Request permission to generate one.","appStatus",appStatusTmo)})).catch((e=>{showError(e,"appStatus",appStatusTmo)}))}function deleteRegistrationTokenFromFirebase(){o(messaging).then((e=>{s(messaging).then((()=>{showMessage("Successfully deleted token.","#008c00","appStatus",appStatusTmo),getEl("iidToken").value="",getEl("iidToken").style.backgroundColor="#c2cad1"})).catch((e=>{showError("Unable to delete token.","appStatus",appStatusTmo)}))})).catch((e=>{showError(e,"appStatus",appStatusTmo)}))}function requestNotificationPermission(){showMessage("Requesting permission...","#a10fae","appStatus",appStatusTmo);permissionTmo&&clearTimeout(permissionTmo),permissionTmo=setTimeout((function(){var e="<div style='color:red;'>Unable to get the browser notification permission for this site";"file:"==window.location.protocol&&(e+=" via file protocol. ",e+="Nevigate this page via http protocol, and change the browser settings to allow notification"),e+=".</div>",getEl("appStatus").innerHTML=e}),5e3),Notification.requestPermission().then((e=>{"granted"===e?(clearTimeout(permissionTmo),showMessage("Notification permission granted.","#008c00","appStatus",appStatusTmo),initializeFCM()):showError("Unable to get the browser notification permission for this site.<br/>Please change the browser settings to allow notification.","appStatus",appStatusTmo)})).catch((e=>{showError(e,"appStatus",appStatusTmo)}))}function getSWFileContent(){var e="importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');\n";return e+="importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');\n\n",e+="firebase.initializeApp({apiKey: '",e+=getEl("apiKey").value,e+="',projectId:'",e+=getEl("projectId").value,e+="',messagingSenderId:'",e+=getEl("senderId").value,e+="',appId:'",e+=getEl("appId").value,e+="'});\n\nconst messaging = firebase.messaging();\n\n",e+="function postMessage(payload) {\n",e+="self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(all => all.forEach(client => {\n",e+="var data = { payload: payload, type: 'background' };\n",e+="client.postMessage(data);\n",e+=" }));\n}\n\n",(e+="messaging.onBackgroundMessage(function (payload) {\n\n")+"postMessage(payload);\n\n});"}function getSwFile(){download("firebase-messaging-sw.js",getSWFileContent()),showMessage("Successfully downloaded the service worker javascript file.","#008c00","appStatus",appStatusTmo)}function copySwFile(){navigator.clipboard.writeText(getSWFileContent()),showMessage("Successfully copied the service worker javascript content to clipboard.","#008c00","appStatus",appStatusTmo)}function download(e,t){var a=document.createElement("a");a.setAttribute("href","data:text/plain;charset=utf-8,"+encodeURIComponent(t)),a.setAttribute("download",e),a.style.display="none",document.body.appendChild(a),a.click(),document.body.removeChild(a)}function addEvent(e,t,a,n){var o=getEl(e);o.addEventListener(t,a,!1),n&&(o.param=n)}function saveConfig(e){localStorage[e.currentTarget.param]=e.currentTarget.value.trim()}function loadConfig(e){null!=localStorage[e]&&(getEl(e).value=localStorage[e].trim())}function setForm(e){loadConfig("apiKey"),loadConfig("clientEmail"),loadConfig("privateKey"),loadConfig("projectId"),loadConfig("senderId"),loadConfig("appId"),loadConfig("vapidKey"),loadConfig("msgPayload")}function showError(e,t,a){try{showMessage(JSON.parse(e).error.message,"red",t,a)}catch(n){showMessage(e,"red",t,a)}}function showMessage(e,t,a,n){n&&clearTimeout(n),addChild(a,e="<span style='color:"+t+";'>"+e+"</span>"),n=setTimeout(hideMessage,5e3,a,n,5e3)}function hideMessage(e,t,a){removeChild(e),t&&clearTimeout(t),t=setTimeout(hideMessage,e,t,a)}function addChild(e,t){var a=document.createElement("div");a.innerHTML=t,getEl(e).appendChild(a)}function removeChild(e){let t=getEl(e);t&&t.childElementCount>0&&t.removeChild(t.firstElementChild),"messages"==e&&t&&0==t.childElementCount&&(getEl("clearMsgBtn").style.display="none")}function copyToken(){navigator.clipboard.writeText(getEl("iidToken").value)}function appendMessage(e,t,a){getEl("modalMessage").innerHTML=JSON.stringify(e,null,2),msgModal.show();let n=document.querySelector("#messages"),o=document.createElement("div"),s=document.createElement("span"),i=document.createElement("pre");i.style.overflowX="hidden;";var r=new Date;s.textContent="Received "+t+" message ("+r.toLocaleString()+"):",s.style.color=a,i.textContent=JSON.stringify(e,null,2),i.style.color=a,o.appendChild(s),o.appendChild(i),n.appendChild(o),getEl("clearMsgBtn").style.display="inline-block",clearTimeout(receiveMsgTmo),receiveMsgTmo=setTimeout(hideMessage,12e4,"messages",receiveMsgTmo,12e4)}function clearMessages(e){e.currentTarget.style.display="none";let t=document.querySelector("#messages");for(;t.hasChildNodes();)t.removeChild(t.lastChild)}function asyncHttpRequest(e,t,a,n,o){var s=new XMLHttpRequest;if(s.addEventListener("error",(function(e){a("An error occurred while sending the request.",s.status)})),s.onreadystatechange=function(){4===s.readyState&&a(s.responseText,s.status)},s.open(e,t,!0),n)for(let e in n)s.setRequestHeader(e,n[e]);s.send(o)}function msgSend(e){if(""==accessToken||tokenTime+348e4<Date.now()){tokenTime=Date.now();var t=getEl("clientEmail").value,a=getEl("privateKey").value,n=JSON.stringify({email:t,privateKey:a,aud:"https://oauth2.googleapis.com/token",scope:"https://www.googleapis.com/auth/devstorage.full_control https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/iam",uid:"",claims:""}),o=-1==curPage.indexOf(".php")?curPage.replace(".html",".php"):curPage;asyncHttpRequest("POST",o,(function(e,t){if(e)if(200!=t)showError(404!=t?e:"Unable to locate "+o+". Plese put "+o+" in the same directory with this "+curPage+".","sendStatus",sendStatusTmo);else{var a=JSON.parse(e);"failure"==a.status?showError(a.msg,"sendStatus",sendStatusTmo):sendFCMMessage(accessToken=a.token)}else 0!=t&&showError("The "+o+" was unable to process the HTTP request or not responding.","sendStatus",sendStatusTmo)}),{"Content-Type":"application/json"},n)}else sendFCMMessage(accessToken)}function sendFCMMessage(e){asyncHttpRequest("POST","https://fcm.googleapis.com/v1/projects/"+getEl("projectId").value+"/messages:send",(function(e,t){200!=t?showError(e,"sendStatus",sendStatusTmo):showMessage("Successfully sent message.<br/>"+e,"#008c00","sendStatus",sendStatusTmo)}),{Authorization:"Bearer "+e},getEl("msgPayload").value)}function loadSampleMsg(e){var t=getEl("iidToken").value;""==t&&(t="APP_REGISTRATION_TOKEN");var a='{\n    "message": {\n        "notification": {\n';a+='            "title": "Hello from FCM web app",\n            "body": "FCM notification works",\n',a+='            "image": "https://www.gstatic.com/mobilesdk/240501_mobilesdk/firebase_28dp.png"\n',a+='        },\n        "android": {\n            "priority": "HIGH",\n            "notification": {\n',a+='                "notification_priority": "PRIORITY_HIGH"\n            }\n        },\n        "webpush": {\n',a+='            "fcm_options": {\n                "link": "https://google.com"\n            }\n        },\n',a+='        "token": "'+t+'"\n',a+="    }\n}",getEl("msgPayload").value=a}function openTab(e){var t,a,n;for(t=0,a=document.getElementsByClassName("tabcontent");t<a.length;t++)a[t].style.display="none";for(t=0,n=document.getElementsByClassName("tablinks");t<n.length;t++)n[t].className=n[t].className.replace(" active","");getEl(e.currentTarget.param).style.display="block",e.currentTarget.className+=" active"}function docReady(e){msgModal=new bootstrap.Modal(document.getElementById("msgModal")),"complete"===document.readyState||"interactive"===document.readyState?setTimeout(e,1):document.addEventListener("DOMContentLoaded",e)}docReady((function(){addEvent("initializeBtn","click",requestNotificationPermission),addEvent("deleteTokenBtn","click",deleteRegistrationTokenFromFirebase),addEvent("apiKey","change",saveConfig,"apiKey"),addEvent("clientEmail","change",saveConfig,"clientEmail"),addEvent("privateKey","change",saveConfig,"privateKey"),addEvent("projectId","change",saveConfig,"projectId"),addEvent("senderId","change",saveConfig,"senderId"),addEvent("appId","change",saveConfig,"appId"),addEvent("vapidKey","change",saveConfig,"vapidKey"),addEvent("msgPayload","change",saveConfig,"msgPayload"),addEvent("tokenCopyBtn","click",copyToken),addEvent("getSwBtn","click",getSwFile),addEvent("copySwBtn","click",copySwFile),addEvent("clearMsgBtn","click",clearMessages),addEvent("msgSendBtn","click",msgSend),addEvent("loadMsgBtn","click",loadSampleMsg),addEvent("instructionTabBtn","click",openTab,"instructionTab"),addEvent("setupTabBtn","click",openTab,"setupTab"),addEvent("receiveTabBtn","click",openTab,"receiveTab"),addEvent("composeTabBtn","click",openTab,"composeTab"),setForm(),getEl("url1").innerHTML=curPage.indexOf(".php")>-1?"<b>"+curPage+"</b> and <b>"+curPage.replace(".php",".html")+"</b>":"<b>"+curPage+"</b> and <b>"+curPage.replace(".html",".php")+"</b>",getEl("url2").innerHTML=curPage,getEl("instructionTabBtn").click()})),document.addEventListener("DOMContentLoaded",(function(){const e=document.querySelectorAll(".navbar-nav .nav-link"),t=document.querySelector(".navbar-collapse");e.forEach((e=>{e.addEventListener("click",(function(){if(getEl("page").innerHTML=e.innerHTML,t.classList.contains("show")){new bootstrap.Collapse(t,{toggle:!1}).hide()}}))}))}));</script>
 </body>
 
 </html>
