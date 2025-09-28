@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Firebase Cloud Messaging Web Client App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .lbl {
+            min-width: 140px;
+        }
+
+        .baseline {
+            align-items: baseline;
+            display: block;
+        }
+
+        .info {
+            width: 100%;
+            max-height: 30rem;
+            min-height: 15rem;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #0000001a;
+            border: solid rgba(0, 0, 0, 0.15);
+            border-width: 1px 0;
+            box-shadow:
+                inset 0 0.5em 1.5em #0000001a,
+                inset 0 0.125em 0.5em #00000026;
+        }
+
+        .info2 {
+            max-height: 8rem;
+            min-height: 8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top" aria-label="First navbar example">
+        <div class="container-fluid">
+            <a class="navbar-brand mb-0 h1 d-lg-none page text-success-emphasis" id="page"
+                href="javascript:void(0);">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav_bar"
+                aria-controls="nav_bar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nav_bar">
+                <ul class="tab navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="tablinks nav-item"> <a class="nav-link active" id="homeTabBtn" aria-current="page"
+                            href="javascript:void(0);">Home</a></li>
+                    <li class="tablinks nav-item"><a class="nav-link" id="setupTabBtn"
+                            href="javascript:void(0);">Setup</a></li>
+                    <li class="tablinks nav-item"> <a class="nav-link" id="sendTabBtn"
+                            href="javascript:void(0);">Send</a></li>
+                    <li class="tablinks nav-item"> <a class="nav-link" id="subscribeTabBtn"
+                            href="javascript:void(0);">Subscribe</a></li>
+                    <li class="tablinks nav-item"><a class="nav-link" id="receiveTabBtn"
+                            href="javascript:void(0);">Log</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-sm" style="padding-top: 65px;">
+        <div id="homeTab" class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary tabcontent py-3 active">
+            <h1 class="display-2 text-success-emphasis">FCM Web App</h1>
+
+            <p>This FCM web app should be run on a remote PHP web server or a local PHP web server by placing the
+                <strong class="d-inline-block mb-2 text-success-emphasis" id="url1"></strong> files in
+                your web root directory.
+            </p>
+
+            <p>If this runs on a remote PHP web server, the FCM web app should be accessed trough the https protocol
+                (https://).</p>
+
+            <p>To initialize the FCM web app, go to <strong
+                    class="d-inline-block mb-2 text-success-emphasis">Setup</strong> page, and specify the required
+                credentials which can be
+                taken from the <a href="https://console.firebase.google.com/project/_/settings/general/"
+                    target="_blank">Firebase console</a>.</p>
+
+            <p>The <strong class="d-inline-block mb-2 text-success-emphasis">VAPID</strong> key can be taken from the
+                <strong class="d-inline-block mb-2 text-success-emphasis">Web Push certificates</strong> from the <a
+                    href="https://console.firebase.google.com/project/_/settings/cloudmessaging/web"
+                    target="_blank">Firebase console</a>.
+            </p>
+
+            <p>The <strong class="d-inline-block mb-2 text-success-emphasis">Client Email</strong> and <strong
+                    class="d-inline-block mb-2 text-success-emphasis">Private Key</strong> which can be taken from the
+                <strong class="d-inline-block mb-2 text-primary-emphasis">Service Account</strong> and are
+                required for authentication for sending the message and subscribing to the
+                topic.
+            </p>
+
+            <p>Click the <b>Initialize</b> button to initialize the FCM web app.</p>
+
+            <p>After the instance token was created, use this instance token for sending the message from the FCM
+                backend.</p>
+
+            <p>In the Windows 11 PC, the notification may go directly to the notification center instead of displaying
+                pop-up, if <b>Do not
+                    disturb</b> is <b>On</b> in the <a href="ms-settings:notifications"><b>System:Notifications</b></a>
+                and you have to turn it <b>Off</b> to allow the notification pop-up to show.</p>
+        </div>
+
+        <div id="setupTab" class="tabcontent py-3">
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Project ID</span>
+                <input type="text" class="form-control" id="projectId" name="projectId">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">API Key</span>
+                <input type="text" class="form-control" id="apiKey" name="apiKey">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">App ID</span>
+                <input type="text" class="form-control" id="appId" name="appId">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Project Number</span>
+                <input type="text" class="form-control" id="senderId" name="senderId">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">VAPID Key</span>
+                <input type="text" class="form-control" id="vapidKey" name="vapidKey">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Client Email</span>
+                <input type="text" class="form-control" id="clientEmail" name="clientEmail">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Private Key</span>
+                <input type="text" class="form-control" id="privateKey" name="privateKey">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Instance Token</span>
+                <input type="text" class="form-control" id="iidToken" name="iidToken" readonly>
+                <button class="btn btn-success" style="min-width:50px;" id="tokenCopyBtn">Copy</button>
+                <button class="btn btn-success" style="min-width:50px;" id="tokenInfoBtn">Info</button>
+            </div>
+            <div class="d-flex gap-2 justify-content-center py-2">
+                <button class="btn btn-primary d-inline-flex align-items-center" id="initializeBtn" title="Initialize"
+                    type="button">Initialize</button>
+                <button class="btn btn-primary d-inline-flex align-items-center" id="deleteTokenBtn"
+                    title="Delete Token" type="button">Deinitialize</button>
+            </div>
+            <div class="py-2"></div>
+            <div id="appStatus" class="info info2"></div>
+
+        </div>
+
+        <div id="sendTab" class="tabcontent py-3">
+            <div style="overflow-y: auto;">
+                <div class="input-group mb-3">
+                    <div class="input-group-text lbl baseline">Message<div class="py-1"></div><button
+                            class="btn btn-success d-inline-flex align-items-center" id="loadMsgBtn">Sample</button>
+                    </div>
+                    <textarea class="form-control" id="msgPayload" name="msgPayload" rows="10" cols="50"></textarea>
+                </div>
+
+                <button class="btn btn-primary d-inline-flex align-items-center" type="button" id="msgSendBtn"
+                    title="send">Send</button>
+                <div class="d-flex gap-2 justify-content-center py-3">
+                    <p class="info" id="sendStatus"></p>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="subscribeTab" class="tabcontent py-3">
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Topic</span>
+                <input type="text" class="form-control" id="subTopic" name="subTopic">
+            </div>
+
+            <div class="input-group mb-3 app-token-div">
+                <span class="input-group-text lbl">Instance Token</span>
+                <input type="text" class="form-control app-token-input" id="appToken1">
+                <button class="btn btn-success" style="min-width:90px;" id="moreTokenBtn">More...</button>
+            </div>
+
+            <button class="btn btn-primary d-inline-flex align-items-center" type="button" id="subscribeBtn"
+                title="subscribe">Subscribe</button>
+
+            <button class="btn btn-primary d-inline-flex align-items-center" type="button" id="unsubscribeBtn"
+                title="unsubscribe">Unsubscribe</button>
+            <div class="d-flex gap-2 justify-content-center py-3">
+                <p class="info" id="subStatus"></p>
+            </div>
+
+        </div>
+
+        <div id="receiveTab" class="tabcontent py-3">
+            <div class="input-group mb-3">
+                <div class="input-group-text lbl baseline">Message Log<div class="py-1"></div>
+                    <button class="btn btn-success d-inline-flex align-items-center" id="clearMsgBtn" title="Clear"
+                        type="button">Clear</button>
+                </div>
+                <div id="messages" class="form-control info" rows="10" cols="50"></div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="msgModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-info-emphasis" id="modalLabel">Received Message</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-success-emphasis" id="modalMessage" style="overflow-wrap: break-word;">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="homeTabLink" class="nav-link px-2 text-body-secondary">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="setupTabLink" class="nav-link px-2 text-body-secondary">Setup</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="sendTabLink" class="nav-link px-2 text-body-secondary">Send</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="subscribeTabLink"
+                        class="nav-link px-2 text-body-secondary">Subscribe</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="receiveTabLink" class="nav-link px-2 text-body-secondary">Log</a>
+                </li>
+            </ul>
+            <p class="text-center text-body-secondary">&copy; 2025 Mobizt</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <script type="module">
+        import{initializeApp as e,deleteApp as t}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";import{getAuth as a}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";import{deleteToken as s,getMessaging as n,getToken as o,onMessage as i}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-messaging.js";let firebaseConfig={apiKey:"",projectId:"",messagingSenderId:"",appId:""};var appStatusTmo,receiveStatusTmo,sendStatusTmo,subStatusTmo,permissionTmo,receiveMsgTmo,app,messaging,msgModal,vapidKey=void 0,onMsgCallback=!1,accessToken="",tokenTime=0,path=window.location.pathname,curPage=decodeURI(path.split("/").pop());""==curPage&&(curPage="index.html");var successColor="#75b798",infoColor="#6edff6",dangerColor="#ea868f";function getEl(e){return document.getElementById(e)}function disableNotification(){"serviceWorker"in navigator&&navigator.serviceWorker.getRegistrations().then((function(e){for(const t of e)t.scope.indexOf("firebase-cloud-messaging-push-scope")>-1&&t.unregister().then((function(e){e?showMessage("Service worker unregistered successfully: "+t.scope,successColor,"appStatus",appStatusTmo):showError("Failed to unregister service worker: "+t.scope,"appStatus",appStatusTmo)}))})).catch((function(e){showError("Error getting service worker registrations: "+e,"appStatus",appStatusTmo)}))}function initializeFCM(){if(""!==getEl("projectId").value.trim())if(""!==getEl("apiKey").value.trim())if(""!==getEl("appId").value.trim())if(""!==getEl("senderId").value.trim())if(""!==getEl("vapidKey").value.trim()){firebaseConfig.apiKey=getEl("apiKey").value.trim(),firebaseConfig.projectId=getEl("projectId").value.trim(),firebaseConfig.messagingSenderId=getEl("senderId").value.trim(),firebaseConfig.appId=getEl("appId").value.trim(),vapidKey=getEl("vapidKey").value.trim(),app&&t(app).then((function(){})).catch((function(e){showError(e,"appStatus",appStatusTmo)}));try{navigator.serviceWorker.register("/firebase-messaging-sw.js",{scope:"/"}).then((t=>{app=e(firebaseConfig),messaging=n(app),""!=vapidKey?getRegistrationToken():showError("Please specify the public VAPID key.","appStatus",appStatusTmo),onMsgCallback||(onMsgCallback=!0,i(messaging,(e=>{appendMessage(e,"foreground",successColor)})),navigator.serviceWorker.addEventListener("message",(e=>{e.data.type&&appendMessage(e.data.payload,e.data.type,infoColor)})))})).catch((e=>{console.error("Service Worker registration failed:",e)}))}catch(e){showError(e,"appStatus",appStatusTmo)}}else showError("Missing VAPID Key","appStatus",appStatusTmo);else showError("Missing Project ID","appStatus",appStatusTmo);else showError("Missing App ID","appStatus",appStatusTmo);else showError("Missing API Key","appStatus",appStatusTmo);else showError("Missing Project ID","appStatus",appStatusTmo)}function getRegistrationToken(){o(messaging,{vapidKey:vapidKey}).then((e=>{e?(getEl("iidToken").value=e,getEl("iidToken").classList.add("text-success-emphasis"),showMessage("The app was successfully initialized.",successColor,"appStatus",appStatusTmo)):showError("No registration token available. Request permission to generate one.","appStatus",appStatusTmo)})).catch((e=>{showError(e,"appStatus",appStatusTmo)}))}function deleteRegistrationTokenFromFirebase(){showMessage("Deinitializing...",infoColor,"appStatus",appStatusTmo),o(messaging).then((e=>{s(messaging).then((()=>{showMessage("Successfully deleted token.",successColor,"appStatus",appStatusTmo),disableNotification(),getEl("iidToken").value="",getEl("iidToken").classList.remove("text-success-emphasis")})).catch((e=>{showError("Unable to delete token.","appStatus",appStatusTmo)}))})).catch((e=>{showError(e,"appStatus",appStatusTmo)}))}function requestNotificationPermission(){showMessage("Initializing...",infoColor,"appStatus",appStatusTmo),showMessage("Requesting permission...",infoColor,"appStatus",appStatusTmo);permissionTmo&&clearTimeout(permissionTmo),permissionTmo=setTimeout((function(){var e="<div style='color:red;'>Unable to get the browser notification permission for this site";"file:"==window.location.protocol&&(e+=" via file protocol. ",e+="Nevigate this page via http protocol, and change the browser settings to allow notification"),e+=".</div>",getEl("appStatus").innerHTML=e}),5e3),Notification.requestPermission().then((e=>{"granted"===e?(clearTimeout(permissionTmo),showMessage("Notification permission granted.",successColor,"appStatus",appStatusTmo),saveSWFile(initializeFCM)):showError("Unable to get the browser notification permission for this site.<br/>Please change the browser settings to allow notification.","appStatus",appStatusTmo)})).catch((e=>{showError(e,"appStatus",appStatusTmo)}))}function getSWFileContent(){var e="importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');\n";return e+="importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');\n\n",e+="firebase.initializeApp({apiKey: '",e+=getEl("apiKey").value,e+="',projectId:'",e+=getEl("projectId").value,e+="',messagingSenderId:'",e+=getEl("senderId").value,e+="',appId:'",e+=getEl("appId").value,e+="'});\n\nconst messaging = firebase.messaging();\n\n",e+="function postMessage(payload) {\n",e+="self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(all => all.forEach(client => {\n",e+="var data = { payload: payload, type: 'background' };\n",e+="client.postMessage(data);\n",e+=" }));\n}\n\n",(e+="messaging.onBackgroundMessage(function (payload) {\n\n")+"postMessage(payload);\n\n});"}function download(e,t){var a=document.createElement("a");a.setAttribute("href","data:text/plain;charset=utf-8,"+encodeURIComponent(t)),a.setAttribute("download",e),a.style.display="none",document.body.appendChild(a),a.click(),document.body.removeChild(a)}function addEvent(e,t,a,s){var o=getEl(e);o.addEventListener(t,a,!1),s&&(o.param=s)}function saveConfig(e){localStorage[e.currentTarget.param]=e.currentTarget.value.trim()}function loadConfig(e){null!=localStorage[e]&&(getEl(e).value=localStorage[e].trim())}function setForm(e){loadConfig("subTopic"),loadConfig("apiKey"),loadConfig("clientEmail"),loadConfig("privateKey"),loadConfig("projectId"),loadConfig("senderId"),loadConfig("appId"),loadConfig("vapidKey"),loadConfig("msgPayload")}function showError(e,t,a){try{showMessage(JSON.parse(e).error.message,dangerColor,t,a)}catch(s){showMessage(e,dangerColor,t,a)}}function showMessage(e,t,a,s){s&&clearTimeout(s),addChild(a,e="<span style='color:"+t+";'>"+e+"</span>"),s=setTimeout(hideMessage,5e3,a,s,5e3)}function hideMessage(e,t,a){removeChild(e),t&&clearTimeout(t),t=setTimeout(hideMessage,e,t,a)}function addChild(e,t){var a=document.createElement("div");a.innerHTML=t,getEl(e).appendChild(a)}function removeChild(e){let t=getEl(e);t&&t.childElementCount>0&&t.removeChild(t.firstElementChild),"messages"==e&&t&&0==t.childElementCount&&(getEl("clearMsgBtn").style.display="none")}function copyToken(){navigator.clipboard.writeText(getEl("iidToken").value)}function getTokenInfo(){showMessage("Get app instance info...",infoColor,"appStatus",appStatusTmo),""!==getEl("iidToken").value.trim()?""==accessToken||tokenTime+348e4<Date.now()?getAccessToken("clientEmail","privateKey",getToken,"appStatus",appStatusTmo):getToken(accessToken):showError("The App Instance Token was not yet created.","appStatus",appStatusTmo)}function getToken(e){var t=JSON.stringify({mode:"getTokenInfo",accessToken:e,token:getEl("iidToken").value}),a=-1==curPage.indexOf(".php")?curPage.replace(".html",".php"):curPage;asyncHttpRequest("POST",a,(function(e,t){if(e)if(200!=t)showError(404!=t?e:"Unable to locate "+a+". Plese put "+a+" in the same directory with this "+curPage+".","sendStatus",sendStatusTmo);else{var s=JSON.parse(e);"failure"==s.status?showError(s.msg,"appStatus",appStatusTmo):showMessage(JSON.stringify(s.msg),successColor,"appStatus",appStatusTmo)}else 0!=t&&showError("The "+a+" was unable to process the HTTP request or not responding.","appStatus",appStatusTmo)}),{"Content-Type":"application/json"},t)}function appendMessage(e,t,a){getEl("modalMessage").innerHTML=JSON.stringify(e,null,2),msgModal.show();let s=document.querySelector("#messages"),o=document.createElement("div"),n=document.createElement("span"),i=document.createElement("pre");i.style.overflowX="hidden;";var r=new Date;n.textContent="Received "+t+" message ("+r.toLocaleString()+"):",n.style.color=a,i.textContent=JSON.stringify(e,null,2),i.style.color=a,o.appendChild(n),o.appendChild(i),s.appendChild(o),getEl("clearMsgBtn").style.display="inline-block",clearTimeout(receiveMsgTmo),receiveMsgTmo=setTimeout(hideMessage,12e4,"messages",receiveMsgTmo,12e4),getEl("messages").innerHTML.length<8192&&(localStorage.messages=getEl("messages").innerHTML),getEl("messages").scrollTo({top:getEl("messages").scrollHeight,behavior:"smooth"})}function clearMessages(e){e.currentTarget.style.display="none";let t=document.querySelector("#messages");for(;t.hasChildNodes();)t.removeChild(t.lastChild);localStorage.messages=""}function asyncHttpRequest(e,t,a,s,o){var n=new XMLHttpRequest;if(n.addEventListener("error",(function(e){a("An error occurred while sending the request.",n.status)})),n.onreadystatechange=function(){4===n.readyState&&a(n.responseText,n.status)},n.open(e,t,!0),s)for(let e in s)n.setRequestHeader(e,s[e]);n.send(o)}function getAccessToken(e,t,a,s,o,n){tokenTime=Date.now();var i=getEl(e).value,r=getEl(t).value,c=JSON.stringify({mode:"getAccessToken",email:i,privateKey:r,aud:"https://oauth2.googleapis.com/token",scope:"https://www.googleapis.com/auth/devstorage.full_control https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/iam",uid:"",claims:""}),l=-1==curPage.indexOf(".php")?curPage.replace(".html",".php"):curPage;asyncHttpRequest("POST",l,(function(e,t){if(e)if(200!=t)showError(404!=t?e:"Unable to locate "+l+". Plese put "+l+" in the same directory with this "+curPage+".","sendStatus",sendStatusTmo);else{var i=JSON.parse(e);"failure"==i.status?showError(i.msg,s,o):a(accessToken=i.token,n)}else 0!=t&&showError("The "+l+" was unable to process the HTTP request or not responding.",s,para2)}),{"Content-Type":"application/json"},c)}function msgSend(e){showMessage("Sending message...",infoColor,"sendStatus",sendStatusTmo),""==accessToken||tokenTime+348e4<Date.now()?getAccessToken("clientEmail","privateKey",sendFCMMessage,"sendStatus",sendStatusTmo):sendFCMMessage(accessToken)}function sendFCMMessage(e){asyncHttpRequest("POST","https://fcm.googleapis.com/v1/projects/"+getEl("projectId").value+"/messages:send",(function(e,t){200!=t?showError(e,"sendStatus",sendStatusTmo):showMessage("Successfully sent message.<br/>"+e,successColor,"sendStatus",sendStatusTmo)}),{Authorization:"Bearer "+e,"Content-Type":"application/json"},getEl("msgPayload").value)}function loadSampleMsg(e){var t=getEl("iidToken").value;""==t&&(t="APP_REGISTRATION_TOKEN");var a='{\n    "message": {\n        "notification": {\n';a+='            "title": "Hello from FCM web app",\n            "body": "FCM notification works",\n',a+='            "image": "https://www.gstatic.com/mobilesdk/240501_mobilesdk/firebase_28dp.png"\n',a+='        },\n        "android": {\n            "priority": "HIGH",\n            "notification": {\n',a+='                "notification_priority": "PRIORITY_HIGH"\n            }\n        },\n        "webpush": {\n',a+='            "fcm_options": {\n                "link": "https://google.com"\n            }\n        },\n',a+='        "token": "'+t+'"\n',a+="    }\n}",getEl("msgPayload").value=a}function loadTab(){localStorage.openTab?getEl(localStorage.openTab).click():getEl("homeTabBtn").click()}function openTab(e){var t,a,s;for(t=0,a=document.getElementsByClassName("tabcontent");t<a.length;t++)a[t].style.display="none";for(t=0,s=document.getElementsByClassName("tablinks");t<s.length;t++)s[t].className=s[t].className.replace(" active","");getEl(e.currentTarget.param).style.display="block",e.currentTarget.className+=" active",getEl("page").innerHTML=e.currentTarget.innerHTML,localStorage.openTab=e.currentTarget.param+"Btn"}function docReady(e){msgModal=new bootstrap.Modal(getEl("msgModal")),"complete"===document.readyState||"interactive"===document.readyState?setTimeout(e,1):document.addEventListener("DOMContentLoaded",e)}function appendTokenDiv(){addTokenInput("")}function addTokenInput(e){var t=document.getElementsByClassName("app-token-div"),a=t[t.length-1];const s=document.createElement("div");s.classList.add("input-group"),s.classList.add("mb-3"),s.classList.add("app-token-div"),s.innerHTML="<span class='input-group-text lbl'>Instance Token</span><input type='text' value='"+e+"' class='form-control app-token-input'>";const o=document.createElement("button");o.innerText="Remove",o.classList.add("btn"),o.classList.add("btn-success"),o.style.minWidth="90px",s.appendChild(o),o.onclick=function(){o.parentNode.remove(),saveAppTokens()};s.querySelectorAll("input")[0].onchange=function(){saveAppTokens()},a.insertAdjacentElement("afterend",s)}function subscribe(){showMessage("Subscribing the topic...",infoColor,"subStatus",subStatusTmo),""==accessToken||tokenTime+348e4<Date.now()?getAccessToken("clientEmail","privateKey",sendSub,"subStatus",subStatusTmo,"batchAdd"):sendSub(accessToken,"batchAdd")}function unsubscribe(){showMessage("Unsubscribing the topic...",infoColor,"subStatus",subStatusTmo),""==accessToken||tokenTime+348e4<Date.now()?getAccessToken("clientEmail","privateKey",sendSub,"subStatus",subStatusTmo,"batchRemove"):sendSub(accessToken,"batchRemove")}function loadAppTokens(){var e=localStorage.subAppToken?JSON.parse(localStorage.subAppToken):void 0;if("object"==typeof e){var t=0,a=document.getElementsByClassName("app-token-div");if(Array.prototype.forEach.call(a,(function(a){a.querySelectorAll("input")[0].value=e[t],t++})),t<e.length)for(var s=t;s<e.length;s++)addTokenInput(e[s])}}function saveAppTokens(){var e=[],t=document.getElementsByClassName("app-token-div");Array.prototype.forEach.call(t,(function(t){const a=t.querySelectorAll("input");e.push(a[0].value)})),localStorage.subAppToken=JSON.stringify(e),loadAppTokens()}function saveSWFile(e){var t=JSON.stringify({mode:"saveSWFile",payload:getSWFileContent()}),a=-1==curPage.indexOf(".php")?curPage.replace(".html",".php"):curPage;asyncHttpRequest("POST",a,(function(t,s){if(t)if(200!=s)showError(404!=s?t:"Unable to locate "+a+". Plese put "+a+" in the same directory with this "+curPage+".","sendStatus",sendStatusTmo);else{var o=JSON.parse(t);"failure"==o.status?showError(o.msg,"appStatus",appStatusTmo):e()}else 0!=s&&showError("The "+a+" was unable to process the HTTP request or not responding.","appStatus",appStatusTmo)}),{"Content-Type":"application/json"},t)}function sendSub(e,t){if(""!==getEl("clientEmail").value.trim())if(""!==getEl("privateKey").value.trim())if(""!==getEl("subTopic").value.trim()){var a={to:"/topics/"+getEl("subTopic").value,registration_tokens:[]},s=document.getElementsByClassName("app-token-div"),o=!0;if(Array.prototype.forEach.call(s,(function(e){const t=e.querySelectorAll("input");""!==t[0].value.trim()?a.registration_tokens.push(t[0].value):o=!1})),o){var n=JSON.stringify(a),i=JSON.stringify({mode:t,accessToken:e,payload:n}),r=-1==curPage.indexOf(".php")?curPage.replace(".html",".php"):curPage;asyncHttpRequest("POST",r,(function(e,t){if(e)if(200!=t)showError(404!=t?e:"Unable to locate "+r+". Plese put "+r+" in the same directory with this "+curPage+".","sendStatus",sendStatusTmo);else{var a=JSON.parse(e);"failure"==a.status?showError(a.msg,"subStatus",subStatusTmo):showMessage(a.msg,successColor,"subStatus",subStatusTmo)}else 0!=t&&showError("The "+r+" was unable to process the HTTP request or not responding.","sendStatus",sendStatusTmo)}),{"Content-Type":"application/json"},i)}else showError("Missing App Instance Topen","subStatus",subStatusTmo)}else showError("Missing Topic","subStatus",subStatusTmo);else showError("Missing Private Key","subStatus",subStatusTmo);else showError("Missing Client Email","subStatus",subStatusTmo)}docReady((function(){addEvent("moreTokenBtn","click",appendTokenDiv),addEvent("subscribeBtn","click",subscribe),addEvent("unsubscribeBtn","click",unsubscribe),addEvent("subTopic","change",saveConfig,"subTopic"),addEvent("appToken1","change",saveAppTokens,"subAppToken"),loadAppTokens(),requestNotificationPermission(),loadTab(),addEvent("initializeBtn","click",requestNotificationPermission),addEvent("deleteTokenBtn","click",deleteRegistrationTokenFromFirebase),addEvent("apiKey","change",saveConfig,"apiKey"),addEvent("clientEmail","change",saveConfig,"clientEmail"),addEvent("privateKey","change",saveConfig,"privateKey"),addEvent("projectId","change",saveConfig,"projectId"),addEvent("senderId","change",saveConfig,"senderId"),addEvent("appId","change",saveConfig,"appId"),addEvent("vapidKey","change",saveConfig,"vapidKey"),addEvent("msgPayload","change",saveConfig,"msgPayload"),addEvent("tokenCopyBtn","click",copyToken),addEvent("tokenInfoBtn","click",getTokenInfo),addEvent("clearMsgBtn","click",clearMessages),addEvent("msgSendBtn","click",msgSend),addEvent("loadMsgBtn","click",loadSampleMsg),addEvent("homeTabBtn","click",openTab,"homeTab"),addEvent("setupTabBtn","click",openTab,"setupTab"),addEvent("receiveTabBtn","click",openTab,"receiveTab"),addEvent("sendTabBtn","click",openTab,"sendTab"),addEvent("subscribeTabBtn","click",openTab,"subscribeTab"),setForm(),getEl("url1").innerHTML=curPage.indexOf(".php")>-1?"<b>"+curPage+"</b> and <b>"+curPage.replace(".php",".html")+"</b>":"<b>"+curPage+"</b> and <b>"+curPage.replace(".html",".php")+"</b>",loadTab(),addEvent("homeTabLink","click",openTab,"homeTab"),addEvent("setupTabLink","click",openTab,"setupTab"),addEvent("sendTabLink","click",openTab,"sendTab"),addEvent("receiveTabLink","click",openTab,"receiveTab"),addEvent("subscribeTabLink","click",openTab,"subscribeTab"),localStorage.messages&&(getEl("messages").innerHTML=localStorage.messages,getEl("messages").scrollTop=getEl("messages").scrollHeight)})),document.addEventListener("DOMContentLoaded",(function(){const e=document.querySelectorAll(".navbar-nav .nav-link"),t=document.querySelector(".navbar-collapse");e.forEach((e=>{e.addEventListener("click",(function(){if(document.querySelectorAll(".navbar-nav .nav-link").forEach((e=>{e.classList.remove("text-success-emphasis")})),e.classList.add("text-success-emphasis"),getEl("page").innerHTML=e.innerHTML,t.classList.contains("show")){new bootstrap.Collapse(t,{toggle:!1}).hide()}}))}))}));
+    </script>
+</body>
+
+</html>
