@@ -735,10 +735,11 @@ private:
             return request.aClient->setClientError(request, FIREBASE_ERROR_OPERATION_CANCELLED);
 
         request.aClient->newRequest(sData, service_url, request.path, extras, request.method, request.opt, request.uid, "");
-        
+
         if (request.options->payload.length())
         {
             sData->request.val[reqns::payload] = request.options->payload;
+            sData->request.addContentType("application/json");
             sData->request.setContentLengthFinal(request.options->payload.length());
         }
 
