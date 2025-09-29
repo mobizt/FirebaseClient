@@ -6,6 +6,21 @@
  *
  * The OAuth2.0 authentication or access token authorization is required for Cloud Functions operations.
  * 
+ * The functions that supports API call should be 1st gen Cloud function.
+ * 
+ * You can deploy the 1st gen Cloud function with gcloud by using the following command.
+ * 
+ * gcloud config set project YOUR_PROJECT
+ * 
+ * gcloud functions deploy helloHttp \
+ * --no-gen2 \
+ * --region YOUR_LOCATION \
+ * --runtime nodejs20 \
+ * --source gs://YOUR_FIREBASE_STORAGE_BUCKET_URL/helloWorld.zip \
+ * --entry-point helloHttp \
+ * --trigger-http
+ * 
+ *  
  * For Google REST API reference documentation, please visit
  * https://cloud.google.com/functions/docs/reference/rest/v1/projects.locations.functions/call
  *
