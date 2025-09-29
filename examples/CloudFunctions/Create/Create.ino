@@ -121,10 +121,10 @@ void loop()
         Serial.println("Createing a new function...");
 
         // Async call with callback function.
-        cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test" /* function name */, function, processData, "createTask");
+        cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloHttp" /* function name */, function, processData, "createTask");
 
         // Async call with AsyncResult for returning result.
-        cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test" /* function name */, function, cloudFunctionsResult);
+        cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloHttp" /* function name */, function, cloudFunctionsResult);
 
         // Sync call which waits until the payload was received.
         String payload = cfunctions.create(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "test" /* function name */, function);

@@ -91,13 +91,13 @@ void loop()
         Serial.println("Calling a function...");
 
         // Async call with callback function.
-        cfunctions.call(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld" /* function name */, "test" /* data to pass to function */, processData, "callTask");
+        cfunctions.call(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloHttp" /* function name */, "{\\\"name\\\":\\\"Jessie\\\"}" /* data to pass to function */, processData, "callTask");
 
         // Async call with AsyncResult for returning result.
-        cfunctions.call(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld" /* function name */, "test" /* data to pass to function */, cloudFunctionsResult);
+        cfunctions.call(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloHttp" /* function name */, "{\\\"name\\\":\\\"Jessie\\\"}" /* data to pass to function */, cloudFunctionsResult);
 
         // Sync call which waits until the payload was received.
-        String payload = cfunctions.call(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloWorld" /* function name */, "test" /* data to pass to function */);
+        String payload = cfunctions.call(aClient, GoogleCloudFunctions::Parent(FIREBASE_PROJECT_ID, PROJECT_LOCATION), "helloHttp" /* function name */, "{\\\"name\\\":\\\"Jessie\\\"}" /* data to pass to function */);
 
         if (aClient.lastError().code() == 0)
             Serial.println(payload);

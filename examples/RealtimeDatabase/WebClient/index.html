@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Firebase Realtime Database Web Client App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .lbl {
+            min-width: 140px;
+        }
+
+        .baseline {
+            align-items: baseline;
+            display: block;
+        }
+
+        .info {
+            width: 100%;
+            max-height: 30rem;
+            min-height: 15rem;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #0000001a;
+            border: solid rgba(0, 0, 0, 0.15);
+            border-width: 1px 0;
+            box-shadow:
+                inset 0 0.5em 1.5em #0000001a,
+                inset 0 0.125em 0.5em #00000026;
+        }
+
+        .info2 {
+            max-height: 8rem;
+            min-height: 8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top" aria-label="FCM Web App">
+        <div class="container-fluid">
+            <a class="navbar-brand mb-0 h1 d-lg-none page text-success-emphasis" id="page"
+                href="javascript:void(0);">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav_bar"
+                aria-controls="nav_bar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="nav_bar">
+                <ul class="tab navbar-nav justify-content-center">
+                    <li class="tablinks nav-item"> <a class="nav-link active" id="homeTabBtn" aria-current="page"
+                            href="javascript:void(0);">Home</a></li>
+                    <li class="tablinks nav-item"><a class="nav-link" id="setupTabBtn"
+                            href="javascript:void(0);">Setup</a></li>
+                    <li class="tablinks nav-item"> <a class="nav-link" id="testTabBtn"
+                            href="javascript:void(0);">Test</a></li>
+                    <li class="tablinks nav-item"><a class="nav-link" id="dashboardTabBtn"
+                            href="javascript:void(0);">Dashboard</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-sm" style="padding-top: 65px;">
+        <div id="homeTab" class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary tabcontent py-3 active">
+            <h1 class="display-2 text-success-emphasis border-bottom pb-3">Firebase Web App</h1>
+
+            <p>To initialize the Firebase Realtime Database web app, go to <strong
+                    class="d-inline-block mb-2 text-success-emphasis">Setup</strong> page, and specify the required
+                credentials which can be
+                taken from the <a href="https://console.firebase.google.com/project/_/settings/general/" target="_blank"
+                    class="link-info link-underline-opacity-0">Firebase console</a>.</p>
+
+
+            <p>Click the <b>Sign In</b> button to initialize the RTDB web app.</p>
+
+            <p>The <strong
+                class="d-inline-block mb-2 text-success-emphasis">Test</strong> page provides the test jobs that are working with your Arduino device that runs the
+                <strong class="d-inline-block mb-2 text-success-emphasis">StreamPerformanceTest.ino</strong> example.</p>
+        </div>
+
+        <div id="setupTab" class="tabcontent py-3">
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">API Key</span>
+                <input type="text" class="form-control" id="apiKey" name="apiKey">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Database URL</span>
+                <input type="text" class="form-control" id="dbUrl" name="dbUrl">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Email</span>
+                <input type="text" class="form-control" id="userEmail" name="userEmail">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Password</span>
+                <input type="text" class="form-control" id="userPsw" name="userPsw">
+            </div>
+
+
+            <div class="d-flex gap-2 justify-content-center py-2">
+                <button class="btn btn-primary d-inline-flex align-items-center" id="signInBtn" title="Sign In"
+                    type="button">Sign In</button>
+                <button class="btn btn-primary d-inline-flex align-items-center" id="signOutBtn" title="Sign Out"
+                    type="button">Sign Out</button>
+            </div>
+            <div class="py-2"></div>
+            <div id="appStatus" class="info info2"></div>
+
+        </div>
+
+        <div id="testTab" class="tabcontent py-3">
+            <div style="overflow-y: auto;">
+                <div class="input-group mb-3">
+                    <span class="input-group-text lbl">Jobs</span>
+                    <select id="deviceJob" class="form-select" style="min-width: 140px !important">
+                        <option value="1">Print all data in device</option>
+                        <option value="2">Print counter/sum in device</option>
+                        <option value="3">Blink the LED</option>
+                    </select>
+                    <span id="ledGPIOLbl" for="ledGPIO" style="display:none;" class="input-group-text lbl">GPIO</span>
+                    <input type="number" id="ledGPIO" name="ledGPIO" class="form-control" style="display:none;">
+                    <span class="input-group-text lbl" id="delayMsLbl" style="display:none;">Delay</span>
+                    <input type="number" id="delayMs" class="form-control" name="delayMs" style="display:none;" />
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Working Path</span>
+                    <input type="text" class="form-control app-token-input" id="path">
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Data Mode</span>
+                    <select id="mode" class="form-select">
+                        <option value="set">Set</option>
+                        <option value="Append">Append</option>
+                    </select>
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Value Types</span>
+                    <select id="valueType" class="form-select">
+                        <option value="1">Series</option>
+                        <option value="2">Random</option>
+                    </select>
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Value Amount</span>
+                    <select id="amount" class="form-select">
+                        <option value="1">1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="500">500</option>
+                        <option value="1000">1000</option>
+                        <option value="5000">5000</option>
+                        <option value="10000">10000</option>
+                        <option value="50000">50000</option>
+                        <option value="100000">100000</option>
+                    </select>
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Intervals</span>
+                    <select id="interval" class="form-select">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="60">60</option>
+                    </select>
+
+                    <select id="timeBase" class="form-select">
+                        <option value="Sec">Sec</option>
+                        <option value="Min">Min</option>
+                    </select>
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Iterations</span>
+                    <select id="iteration" class="form-select">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="500">500</option>
+                        <option value="700">700</option>
+                        <option value="1000">1000</option>
+                        <option value="2000">2000</option>
+                        <option value="5000">5000</option>
+                        <option value="10000">10000</option>
+                    </select>
+                    <span class="input-group-text lbl text-success-emphasis" id="iterationInfo"></span>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-center py-2">
+                    <button class="btn btn-primary d-inline-flex align-items-center" id="setBtn" title="Set data"
+                        type="button">Set</button>
+                    <button class="btn btn-primary d-inline-flex align-items-center" id="delBtn" title="Delete data"
+                        type="button">Delete</button>
+                </div>
+                <div class="py-2"></div>
+                <div id="testStatus" class="info info2"></div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="enListenerChk" />
+                    <label class="form-check-label" for="enListenerChk">Listener</label>
+                </div>
+
+                <textarea id="listener" name="listener" class="form-control info text-success-emphasis" rows="10"
+                    cols="50"></textarea>
+
+            </div>
+        </div>
+
+        <div id="dashboardTab" class="tabcontent py-3">
+
+        </div>
+
+        <footer>
+            <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="homeTabLink" class="nav-link px-2 text-body-secondary">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="setupTabLink" class="nav-link px-2 text-body-secondary">Setup</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="testTabLink" class="nav-link px-2 text-body-secondary">Test</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="dashboardTabLink"
+                        class="nav-link px-2 text-body-secondary">Dashboard</a>
+                </li>
+            </ul>
+            <p class="text-center text-body-secondary">&copy; 2025 Mobizt</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <script type="module">
+        import { initializeApp, deleteApp } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js'
+        import { getAuth, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js'
+        import { getDatabase, ref, set, onValue, off, remove } from 'https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js'
+
+        var firebaseConfig = {
+            apiKey: '',
+            databaseURL: ''
+        };
+
+        var authenticated = false;
+        var amount = 0;
+        var oldPath = '';
+        var dataListener;
+        var ackListener;
+        var helloMs = 0, ackMs = 0;
+        var appStatusTmo, testStatusTmo;
+        var app, database;
+        var intvInstant;
+        var interval = 0;
+        var iteration = 0;
+        var successColor = "#75b798";
+        var infoColor = "#6edff6";
+        var dangerColor = "#ea868f"
+
+        function initApp() {
+
+            showMessage("Initializing...", infoColor, "appStatus", appStatusTmo);
+            document.getElementById("signInBtn").disabled = true;
+
+            if (app) {
+                deleteApp(app).then(function () { }).catch(function (error) {
+                    showError(error.message, "appStatus", appStatusTmo);
+                });;
+            }
+
+            try {
+
+                firebaseConfig.apiKey = getEl("apiKey").value.trim();
+                firebaseConfig.databaseURL = getEl("dbUrl").value.trim();
+                app = initializeApp(firebaseConfig);
+                var email = getEl("userEmail").value.trim();
+                var password = getEl("userPsw").value.trim();
+                const auth = getAuth();
+                signInWithEmailAndPassword(auth, email, password)
+                    .then(function (userCredential) {
+                        setAuthState(true);
+                        const db = getDatabase();
+                        var ackRef = ref(db, "test/ack");
+
+                        ackListener = onValue(ackRef, (snapshot) => {
+                            const data = snapshot.val();
+                            if (data && data.indexOf("-") > -1) {
+                                const arr = data.split("-");
+                                if (arr[0] == "hello" && arr[1] == helloMs)
+                                    showMessage("Device [" + arr[2] + "] was connected.", successColor, "appStatus", appStatusTmo);
+                                else if (arr[0] == "accepted" && arr[1] == helloMs)
+                                    showMessage("Device [" + arr[2] + "] accepts the job.", infoColor, "appStatus", appStatusTmo);
+                                else if (arr[0] == "done" && arr[1] == helloMs)
+                                    showMessage("Device [" + arr[2] + "] has done the job.", successColor, "appStatus", appStatusTmo);
+                            }
+                        });
+
+                        showMessage("Successfully signed in.", successColor, "appStatus", appStatusTmo);
+                        checkClient();
+
+                    }).catch(function (error) {
+                        getEl("signInBtn").disabled = false;
+                        showError(error.message, "appStatus", appStatusTmo);
+                    });
+
+                showMessage("Successfully initialized.", successColor, "appStatus", appStatusTmo);
+                showMessage("Signing in...", infoColor, "appStatus", appStatusTmo);
+
+
+            } catch (error) {
+                showError(error, "appStatus", appStatusTmo);
+            }
+        }
+
+        function signOutUser() {
+            showMessage("Signing out...", infoColor, "appStatus", appStatusTmo);
+            setTimeout(function () {
+                const auth = getAuth();
+                signOut(auth).then(() => {
+                    setAuthState(false);
+                    const db = getDatabase();
+                    var ackRef = ref(db, "test/ack");
+                    ackListener = off(ackRef);
+                    showMessage("Successfully signed out.", successColor, "appStatus", appStatusTmo);
+                }).catch((error) => {
+                    showError(error.message, "appStatus", appStatusTmo);
+                });
+
+            }, 1);
+        }
+
+        function checkClient() {
+            if (authenticated && preCheck()) {
+                var path = getEl("path").value.trim();
+                helloMs = Date.now();
+                const db = getDatabase();
+                set(ref(db, path + "/chat"), "hello-" + helloMs);
+            }
+        }
+
+        function showError(msg, id, tmo) {
+            try {
+                var obj = JSON.parse(msg);
+                showMessage(obj["error"]["message"], dangerColor, id, tmo);
+            } catch (e) {
+                showMessage(msg, dangerColor, id, tmo);
+            }
+        }
+
+        function showMessage(msg, color, id, tmo) {
+            if (tmo)
+                clearTimeout(tmo);
+            msg = "<span style='color:" + color + ";'>" + msg + "</span>";
+            addChild(id, msg);
+            tmo = setTimeout(hideMessage, 5000, id, tmo, 5000);
+        }
+
+        function hideMessage(id, tmo, ms) {
+            removeChild(id);
+            if (tmo)
+                clearTimeout(tmo);
+            tmo = setTimeout(hideMessage, id, tmo, ms);
+        }
+
+        function addChild(id, val) {
+            var child = document.createElement('div');
+            child.innerHTML = val;
+            getEl(id).appendChild(child);
+        }
+
+        function removeChild(id) {
+            const parent = getEl(id);
+            if (parent && parent.childElementCount > 0)
+                parent.removeChild(parent.firstElementChild);
+        }
+
+        function getEl(id) { return document.getElementById(id); }
+
+        function loadConfig(id, val, checked) {
+
+
+            if (localStorage[id] != undefined) {
+                if (checked)
+                    getEl(id).checked = localStorage[id] == 1 ? true : false;
+                else {
+                    if (getEl(id).tagName == "SELECT" || getEl(id).tagName == "INPUT") getEl(id).value = localStorage[id].trim();
+                    else getEl(id).innerHTML = localStorage[id].trim();
+                }
+            }
+            else if (val) {
+                if (checked)
+                    getEl(id).checked = val;
+                else {
+                    if (getEl(id).tagName == "SELECT" || getEl(id).tagName == "INPUT") getEl(id).value = val;
+                    else getEl(id).innerHTML = val;
+                }
+            }
+        }
+
+        function setListener() {
+            var path = getEl("path").value.trim();
+            if (oldPath != path) {
+
+                removeListener();
+
+                const db = getDatabase();
+                var dbref = ref(db, path);
+                dataListener = onValue(dbref, (snapshot) => {
+                    const data = snapshot.val();
+                    var s = "";
+                    if (snapshot.hasChildren()) {
+                        snapshot.forEach(function (childSnapshot) {
+                            s += "Key: " + childSnapshot.key + ", Value: " + childSnapshot.val() + "\r\n";
+                        });
+                        getEl("listener").value = s;
+                    } else {
+                        getEl("listener").value += "Value: " + data + "\r\n";
+                    }
+
+                });
+                oldPath = path;
+            }
+        }
+
+        function setForm(evt) {
+            setAuthState(false);
+            loadConfig("apiKey");
+            loadConfig("dbUrl");
+            loadConfig("userEmail");
+            loadConfig("userPsw");
+            loadConfig("path", "/test/performance");
+            loadConfig("valueType", "1");
+            loadConfig("amount", 100);
+            loadConfig("mode", "set");
+            loadConfig("interval", 1);
+            loadConfig("timeBase", "Min");
+            loadConfig("iteration", 1);
+            loadConfig("deviceJob", "1");
+            loadConfig("ledGPIO", "5");
+            loadConfig("delayMs", "30");
+            loadConfig("enListenerChk", false, true);
+            saveDeviceJobs();
+            changeAppendMode();
+        }
+
+        function saveDeviceJobs() {
+            saveConfig("deviceJob");
+            var display = getEl("deviceJob").value == 3 ? "inline" : "none";
+            getEl("ledGPIO").style.display = display;
+            getEl("ledGPIOLbl").style.display = display;
+            getEl("delayMsLbl").style.display = display;
+            getEl("delayMs").style.display = display;
+        }
+
+        function changeAppendMode() {
+            getEl("setBtn").innerHTML = getEl("mode").value;
+            saveConfig("mode");
+        }
+
+        function saveConfig(id, checked) {
+            if (checked) {
+                localStorage[id] = getEl(id).checked ? 1 : 0;
+            } else {
+                localStorage[id] = (getEl(id).tagName == "SELECT" || getEl(id).tagName == "INPUT") ? getEl(id).value.trim() : getEl(id).innerHTML.trim();
+            }
+        }
+
+        function saveChange(evt) {
+            saveConfig(evt.currentTarget.param);
+        }
+
+        function setAuthState(auth) {
+
+            clearIterationLoop(true);
+
+            if (!auth)
+                removeListener();
+            else
+                addRemoveListener();
+            authenticated = auth;
+            getEl("signInBtn").disabled = auth;
+            getEl("signOutBtn").disabled = !auth;
+            getEl("delBtn").disabled = !auth;
+            getEl("setBtn").disabled = !auth;
+            getEl("enListenerChk").disabled = !auth;
+            getEl("iterationInfo").innerHTML = "";
+        }
+
+        function setBtnUi(setState, delState) {
+            getEl("setBtn").disabled = !setState;
+            getEl("delBtn").disabled = !delState;
+        }
+
+        function preCheck() {
+            var path = getEl("path").value.trim();
+            if (path == "" || path == "/") {
+                showError("Path should not be empty or at the root!", 'testStatus', testStatusTmo);
+                return false;
+            }
+            addRemoveListener();
+            return true;
+        }
+
+        function setDataEvt(evt) {
+            setData(false);
+        }
+
+        function delDataEvt(evt) {
+            delData(false);
+        }
+
+        function setData(loop) {
+            if (preCheck()) {
+                getEl("listener").value = "";
+                setBtnUi(false, false);
+                var path = getEl("path").value.trim();
+                var newAmount = getEl("amount").value.trim();
+                var append = (getEl("mode").value == "Append") ? true : false;
+
+                showMessage((append ? "Appending" : "Setting") + " the values...", infoColor, 'testStatus', testStatusTmo);
+
+                if (!loop) clearIterationLoop(true);
+
+                setTimeout(function () {
+
+                    if (loop || amount != newAmount)
+                        delData(true);
+
+                    iteration++;
+
+                    if (iteration < parseInt(getEl("iteration").value)) {
+                        getEl("iterationInfo").innerHTML = " " + iteration + "/" + getEl("iteration").value;
+                    } else {
+                        getEl("iterationInfo").innerHTML = ""
+                    }
+
+                    var option = parseInt(getEl("deviceJob").value);
+
+                    helloMs = Date.now();
+                    const db = getDatabase();
+                    if (option == 1) {
+
+                        set(ref(db, path + "/chat"), "print-all-" + getEl("amount").value + "-" + helloMs);
+                        remove(ref(db, path + "/chat"));
+                    }
+                    else if (option == 2)
+                        set(ref(db, path + "/chat"), "print-count-" + getEl("amount").value + "-" + helloMs);
+                    else if (option == 3) {
+                        set(ref(db, path + "/chat"), "blink-" + getEl("ledGPIO").value + "-" + + getEl("delayMs").value + "-" + getEl("amount").value + "-" + helloMs);
+                        remove(ref(db, path + "/chat"));
+                    }
+
+                    var sum = 0;
+                    var valType = parseInt(getEl("valueType").value);
+                    var val = 0;
+
+                    for (var i = 0; i < newAmount; i++) {
+
+                        var nval = valType == 1 ? i : Math.floor(Math.random() * 10000 + 1);
+
+                        if (nval == val)
+                            nval++;
+
+                        val = nval;
+                        sum += val;
+                        if (append)
+                            set(ref(db, path + "/" + i), val);
+                        else
+                            set(ref(db, path), val);
+                    }
+
+
+                    amount = newAmount;
+                    showMessage("Successfully " + (append ? "appended" : "set") + " values" + (option == 1 || option == 2 ? " (sum = " + sum + ")" : "") + ".", successColor, 'testStatus', testStatusTmo);
+
+                    setBtnUi(true, true);
+
+                    if (iteration >= parseInt(getEl("iteration").value)) clearIterationLoop(false);
+
+                    if (!intvInstant && parseInt(getEl("iteration").value) > 1 && iteration < parseInt(getEl("iteration").value)) {
+                        startIterationLoop();
+                    }
+
+                }, 1/* 1 ms for allowing ui to update */);
+            }
+        }
+
+        function delData(immediate) {
+            if (preCheck()) {
+                getEl("listener").value = "";
+                if (immediate) {
+                    var path = getEl("path").value.trim();
+                    const db = getDatabase();
+                    remove(ref(db, path));
+                    amount = 0;
+                } else {
+                    showMessage("Deleting the values...", infoColor, 'testStatus', testStatusTmo);
+                    setBtnUi(false, false);
+                    setTimeout(function () {
+                        var path = getEl("path").value.trim();
+                        const db = getDatabase();
+                        remove(ref(db, path));
+                        amount = 0;
+                        showMessage("Successfully deleted values.", successColor, 'testStatus', testStatusTmo);
+                        setBtnUi(true, true);
+                    }, 0);
+                }
+            }
+        }
+
+        function clearIterationLoop(reset) {
+            clearInterval(intvInstant);
+            intvInstant = undefined;
+            if (reset)
+                iteration = 0;
+        }
+
+        function addRemoveListener() {
+            var path = getEl("path").value.trim();
+            if (path == "" || path == "/")
+                return;
+
+            if (getEl("enListenerChk").checked)
+                setListener();
+            else
+                removeListener();
+
+            saveConfig("enListenerChk", true);
+        }
+
+        function removeListener() {
+            if (oldPath != "") {
+                const db = getDatabase();
+                var oldref = ref(db, oldPath);
+                dataListener = off(oldref);
+            }
+            getEl("listener").value = "";
+            oldPath = "";
+        }
+
+        function addEvent(id, event, func, param) {
+            var el = getEl(id);
+            el.addEventListener(event, func, false)
+            if (param) el.param = param;
+        }
+
+        function loadTab() {
+            if (localStorage["openTab"])
+                getEl(localStorage["openTab"]).click()
+            else
+                getEl("homeTabBtn").click()
+        }
+
+        function openTab(evt) {
+
+            var i, tabcontent, tablinks;
+
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            getEl(evt.currentTarget.param).style.display = "block";
+            evt.currentTarget.className += " active";
+
+            getEl("page").innerHTML = evt.currentTarget.innerHTML
+            localStorage["openTab"] = evt.currentTarget.param + "Btn";
+        }
+
+        function docReady(fn) {
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener("DOMContentLoaded", fn);
+            }
+
+            addEvent("homeTabLink", "click", openTab, "homeTab")
+            addEvent("setupTabLink", "click", openTab, "setupTab")
+            addEvent("testTabLink", "click", openTab, "testTab")
+            addEvent("dashboardTabLink", "click", openTab, "dashboardTab")
+        }
+
+        function saveInterval() {
+            saveConfig("interval");
+            saveConfig("timeBase");
+            if (intvInstant && authenticated) {
+                clearIterationLoop(false);
+                startIterationLoop();
+            }
+        }
+
+        function saveLedGPIO() {
+            if (parseInt(getEl("ledGPIO").value) < 0)
+                getEl("ledGPIO").value = "0";
+            saveChange("ledGPIO");
+        }
+
+        function saveDelay() {
+            if (parseInt(getEl("delayMs").value) < 0)
+                getEl("delayMs").value = "0";
+            saveChange("delayMs");
+        }
+
+        function startIterationLoop() {
+            interval = parseInt(getEl("interval").value) * 1000 * (getEl("timeBase").value == "Min" ? 60 : 1);
+            intvInstant = setInterval(function () { setData(true); }, interval);
+        }
+
+        docReady(function () {
+            addEvent('apiKey', 'change', saveChange, 'apiKey');
+            addEvent('dbUrl', 'change', saveChange, 'dbUrl');
+            addEvent('userEmail', 'change', saveChange, 'userEmail');
+            addEvent('userPsw', 'change', saveChange, 'userPsw');
+            addEvent('homeTabBtn', 'click', openTab, 'homeTab');
+            addEvent('setupTabBtn', 'click', openTab, 'setupTab');
+            addEvent('testTabBtn', 'click', openTab, 'testTab');
+            addEvent('dashboardTabBtn', 'click', openTab, 'dashboardTab');
+            addEvent('signInBtn', 'click', initApp);
+            addEvent('signOutBtn', 'click', signOutUser);
+            addEvent('mode', 'click', changeAppendMode);
+            addEvent('path', 'change', saveChange, 'path');
+            addEvent('valueType', 'change', saveChange, 'valueType');
+            addEvent('amount', 'change', saveChange, 'amount');
+            addEvent('interval', 'change', saveInterval);
+            addEvent('timeBase', 'change', saveInterval);
+            addEvent('iteration', 'change', saveChange, 'iteration');
+            addEvent('deviceJob', 'change', saveDeviceJobs);
+            addEvent('ledGPIO', 'change', saveLedGPIO);
+            addEvent('delayMs', 'change', saveDelay);
+            addEvent('enListenerChk', 'click', addRemoveListener);
+            addEvent('setBtn', 'click', setDataEvt);
+            addEvent('delBtn', 'click', delDataEvt);
+            setForm();
+            loadTab();
+            initApp();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            const navbarCollapse = document.querySelector('.navbar-collapse');
+
+            navLinks.forEach(link => {
+
+                link.addEventListener('click', function () {
+
+                    var links = document.querySelectorAll('.navbar-nav .nav-link');
+                    links.forEach(link => {
+                        link.classList.remove("text-success-emphasis");
+                    })
+
+                    link.classList.add("text-success-emphasis");
+                    getEl("page").innerHTML = link.innerHTML
+                    if (navbarCollapse.classList.contains('show')) {
+                        const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+                            toggle: false
+                        });
+                        bsCollapse.hide();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
