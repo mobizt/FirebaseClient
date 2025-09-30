@@ -10,6 +10,7 @@
         * [SaveAndLoad](/examples/App/AppInitialization/SaveAndLoad/)
         * [ServiceAuth](/examples/App/AppInitialization/ServiceAuth/)
         * [ServiceAuthFile](/examples/App/AppInitialization/ServiceAuth/)
+        * [Deinitialize](/examples/App/AppInitialization/Deinitialize/)
         * [TokenAuth](/examples/App/AppInitialization/TokenAuth/)
             * [AccessToken](/examples/App/AppInitialization/TokenAuth/AccessToken/)
             * [CustomToken](/examples/App/AppInitialization/TokenAuth/CustomToken/)
