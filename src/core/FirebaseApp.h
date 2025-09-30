@@ -351,14 +351,12 @@ namespace firebase_ns
                 return true;
 
             // Deinitialize
-            if (deinit && auth_data.user_auth.status._event == auth_event_uninitialized)
+            if (deinit && auth_data.user_auth.initialized)
             {
-                if (auth_data.user_auth.initialized)
-                {
-                    stop(aClient);
-                    deinitializeApp();
-                    auth_timer.stop();
-                }
+                setEvent(auth_event_deinitializing);
+                stop(aClient);
+                deinitializeApp();
+                auth_timer.stop();
                 return false;
             }
 
@@ -678,6 +676,8 @@ namespace firebase_ns
         {
             auth_data.app_token.clear();
             auth_data.user_auth.clear();
+            setEvent(auth_event_deinitialized);
+            setEvent(auth_event_uninitialized);
         }
 
 #if defined(ENABLE_JWT)

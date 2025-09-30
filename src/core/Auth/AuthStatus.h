@@ -58,6 +58,12 @@ namespace firebase_ns
             case auth_event_error:
                 evstr = "error";
                 break;
+            case auth_event_deinitializing:
+                evstr = "deinitializing";
+                break;
+            case auth_event_deinitialized:
+                evstr = "deinitialized";
+                break;
             default:
                 evstr = "undefined";
                 break;

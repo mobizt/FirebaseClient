@@ -1,341 +1,251 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Firebase Realtime Database Web Client</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Firebase Realtime Database Web App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+        .lbl {
+            min-width: 140px;
         }
 
-        .tab {
-            display: flex;
-            justify-content: space-around;
-            background: linear-gradient(to right, #e0c3fc, #8ec5fc);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            overflow-x: auto;
-        }
-
-        .tablinks {
-            flex: 1;
-            padding: 6px;
-            text-align: center;
-            color: white;
-            cursor: pointer;
-            margin: 5px;
-            border-radius: 8px;
-        }
-
-        .tablinks.active {
-            background-color: #6a11cb;
-        }
-
-        .content {
-            padding: 40px 20px 20px;
-            /* top padding to avoid overlap with tabs */
-        }
-
-        .tabcontent {
-            display: none;
-        }
-
-        .tabcontent.active {
+        .baseline {
+            align-items: baseline;
             display: block;
-        }
-
-        .form-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            width: 100%;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #5a5a5a;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        input,
-        textarea,
-        select {
-            width: 92%;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        button {
-            padding: 0.75rem;
-            background-color: #6a11cb;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #2575fc;
-        }
-
-        .mg-top {
-            margin-bottom: 4px;
-            min-width: 80%;
         }
 
         .info {
-            text-align: center;
+            width: 100%;
+            max-height: 30rem;
+            min-height: 15rem;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #0000001a;
+            border: solid rgba(0, 0, 0, 0.15);
+            border-width: 1px 0;
+            box-shadow:
+                inset 0 0.5em 1.5em #0000001a,
+                inset 0 0.125em 0.5em #00000026;
         }
 
-        .container {
-            position: relative;
-            padding-left: 28px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            width: 80px;
-        }
-
-        .checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 20px;
-            width: 20px;
-            background-color: #eee;
-        }
-
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-        }
-
-        .container input:checked~.checkmark {
-            background-color: #6a11cb;
-        }
-
-        .checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 20px;
-            width: 20px;
-            background-color: #eee;
-        }
-
-        .container {
-            position: relative;
-            padding-left: 28px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            width: 80px;
-        }
-
-        .container input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-        }
-
-        .container,
-        .container input:checked~.checkmark:after {
-            display: block;
-        }
-
-        .container .checkmark:after {
-            left: 6px;
-            top: 3px;
-            width: 5px;
-            height: 10px;
-            border: solid #fff;
-            border-width: 0 3px 3px 0;
-            -webkit-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-            transform: rotate(45deg);
+        .info2 {
+            max-height: 8rem;
+            min-height: 8rem;
         }
     </style>
 </head>
 
-<body id="body">
-
-
-    <div class="tab">
-        <button class="tablinks" id="instructionTabBtn">Instructions</button>
-        <button class="tablinks" id="initializeTabBtn">Initialization</button>
-        <button class="tablinks" id="testTabBtn">Test</button>
-        <button class="tablinks" id="listenerTabBtn">Listener</button>
-    </div>
-
-    <div class="content">
-        <div id="instructionTab" class="tabcontent  active">
-            <h3>Instructions</h3>
-            <div id="longDiv">
-                1. In the <b>Initialization</b> tab, specify <b>Database URL</b>, <b>API Key</b>, <b>User Email</b>, and
-                <b>User Password</b> and click <b>Sign In</b> button to initialize and sign in.<br /><br />
-                2. In the <b>Data Continuous Test</b> tab, specify the <b>Jobs</b> types, <b>Working Path</b>, <b>Data
-                    Mode</b>, <b>Value Type</b>, <b>Value Amount</b>, <b>Intervals</b> and <b>Iteration</b>.<br /><br />
-                Clike <b>Set</b> or <b>Append</b> button to test. To delete data at specified path, click <b>Delete</b>
-                button.<br /><br />
-                The Blink LED job will set the specified <b>GPIO</b> on your Arduino device that runs the
-                <b>StreamPerformanceTest.ino</b> example, On and Off by the specified <b>Delay</b> and amount of data
-                that received from the Stream events.<br /><br />
-                You can check the result on your Arduino device to see the Firebase Realtime Database Stream
-                performance.<br /><br />
-                3. In the <b>Listener</b> tab, select the <b>Enable</b> option to listen to the data changes at the
-                defined working path.
-            </div>
-
-        </div>
-        <div id="initializeTab" class="tabcontent">
-            <h3>Initialization</h3>
-            <div>
-
-                <label for="apiKey" style="min-width:115px;">API Key:</label>
-                <input type="text" style="margin-bottom:10px;width:78%;" id="apiKey" name="apiKey"><br />
-                <label for="dbUrl" style="min-width:115px;">Database URL:</label>
-                <input type="text" style="margin-bottom:10px;width:78%;" id="dbUrl" name="dbUrl">
-                <label for="userEmail" style="min-width:115px;">Email:</label>
-                <input type="text" style="margin-bottom:10px;width:78%;" id="userEmail" name="userEmail"><br />
-                <label for="userPsw" style="min-width:115px;">Password:</label>
-                <input type="text" style="margin-bottom:10px;width:78%;" id="userPsw" name="userPsw">
-
-                <hr class="rounded">
-                <p class="info" id="appStatus" style="min-height: 205px;"></p>
-                <hr class="rounded">
-                <button type="button" id="signInBtn" style="padding:5px;color:rgb(254, 254, 254);" title="Sign in">Sign
-                    In</button>
-                <button type="button" id="signOutBtn" style="padding:5px;color:rgb(254, 255, 253);"
-                    title="Sign out">Sign Out</button>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top" aria-label="FCM Web App">
+        <div class="container-fluid">
+            <a class="navbar-brand mb-0 h1 d-lg-none page text-success-emphasis" id="page"
+                href="javascript:void(0);">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav_bar"
+                aria-controls="nav_bar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="nav_bar">
+                <ul class="tab navbar-nav justify-content-center">
+                    <li class="tablinks nav-item"> <a class="nav-link active" id="homeTabBtn" aria-current="page"
+                            href="javascript:void(0);">Home</a></li>
+                    <li class="tablinks nav-item"><a class="nav-link" id="setupTabBtn"
+                            href="javascript:void(0);">Setup</a></li>
+                    <li class="tablinks nav-item"> <a class="nav-link" id="testTabBtn"
+                            href="javascript:void(0);">Test</a></li>
+                </ul>
             </div>
         </div>
+    </nav>
+    <div class="container-sm" style="padding-top: 65px;">
+        <div id="homeTab" class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary tabcontent py-3 active">
+            <h1 class="display-2 text-success-emphasis border-bottom pb-3">Firebase Web App</h1>
 
-        <div id="testTab" class="tabcontent">
-            <h3 id="testHeader">Continuous Data Test</h3>
-            <div>
-                <label for="deviceJob" style="min-width:115px;">Jobs:</label>
-                <select id="deviceJob" style="margin-bottom:10px;">
-                    <option value="1">Print all data in device</option>
-                    <option value="2">Print counter/sum in device</option>
-                    <option value="3">Blink the LED</option>
-                </select> <label id="ledGPIOLbl" for="ledGPIO" style="display:none;">GPIO </label><input type="number"
-                    id="ledGPIO" name="ledGPIO" style="width:80px;display:none;" /> <label id="delayMsLbl" for="delayMs"
-                    style="display:none;">Delay </label><input type="number" id="delayMs" name="delayMs"
-                    style="width:80px;display:none;" /><br />
+            <p>To initialize the Firebase Realtime Database web app, go to <strong
+                    class="d-inline-block mb-2 text-success-emphasis">Setup</strong> page, and specify the required
+                credentials which can be
+                taken from the <a href="https://console.firebase.google.com/project/_/settings/general/" target="_blank"
+                    class="link-info link-underline-opacity-0">Firebase console</a>.</p>
 
-                <label for="path" style="min-width:115px;">Working Path:</label>
-                <input type="text" style="margin-bottom:10px;" id="path" name="path"><br />
 
-                <label for="mode" style="min-width:115px;">Data Mode:</label>
-                <select id="mode" style="margin-bottom:10px;">
-                    <option value="set">Set</option>
-                    <option value="Append">Append</option>
-                </select><br />
+            <p>Click the <b>Sign In</b> button to initialize the RTDB web app.</p>
 
-                <label for="valueType" style="min-width:115px;">Value Types:</label>
-                <select id="valueType" style="margin-bottom:10px;">
-                    <option value="1">Series</option>
-                    <option value="2">Random</option>
-                </select><br />
-
-                <label for="amount" style="min-width:115px;">Value Amount:</label>
-                <select id="amount" style="margin-bottom:10px;">
-                    <option value="1">1</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="500">500</option>
-                    <option value="1000">1000</option>
-                    <option value="5000">5000</option>
-                    <option value="10000">10000</option>
-                    <option value="50000">50000</option>
-                    <option value="100000">100000</option>
-                </select><br />
-
-                <label for="interval" style="min-width:115px;">Intervals:</label>
-                <select id="interval" style="margin-bottom:10px;">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="60">60</option>
-                </select> <select id="timeBase" style="width:80px;margin-bottom:10px;">
-                    <option value="Sec">Sec</option>
-                    <option value="Min">Min</option>
-                </select><br />
-                <label for="iteration" style="min-width:115px;">Iterations:</label>
-                <select id="iteration" style="margin-bottom:10px;">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="200">200</option>
-                    <option value="500">500</option>
-                    <option value="700">700</option>
-                    <option value="1000">1000</option>
-                    <option value="2000">2000</option>
-                    <option value="5000">5000</option>
-                    <option value="10000">10000</option>
-                </select> <span id="iterationInfo"></span><br />
-                <hr class="rounded">
-                <p class="info" id="testStatus" style="min-height: 30px;"></p>
-                <hr class="rounded">
-                <button type="button" id="setBtn" style="padding:5px;color:rgb(255, 255, 255);"
-                    title="Set data">Set</button>
-                <button type="button" id="delBtn" style="padding:5px;color:rgb(255, 255, 255);"
-                    title="Delete data">Delete</button>
-            </div>
+            <p>The <strong class="d-inline-block mb-2 text-success-emphasis">Test</strong> page provides the test jobs
+                that are working with your Arduino device that runs the
+                <strong class="d-inline-block mb-2 text-success-emphasis">StreamPerformanceTest.ino</strong> example.
+            </p>
         </div>
 
-        <div id="listenerTab" class="tabcontent">
-            <h3>Data Changes Listener</h3>
-            <div>
-                <div>
-                    <label class="container">Enable
-                        <input type="checkbox" id="enListenerChk" name="enListenerChk" value="1">
-                        <span class="checkmark"></span>
-                    </label>
-                    <textarea class="textarea" style="width:93%;height: 422px;" id="listener" name="listener" rows="10"
-                        cols="50" readonly></textarea>
+        <div id="setupTab" class="tabcontent py-3">
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">API Key</span>
+                <input type="text" class="form-control" id="apiKey" name="apiKey">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Database URL</span>
+                <input type="text" class="form-control" id="dbUrl" name="dbUrl">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Email</span>
+                <input type="text" class="form-control" id="userEmail" name="userEmail">
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text lbl">Password</span>
+                <input type="text" class="form-control" id="userPsw" name="userPsw">
+            </div>
+
+
+            <div class="d-flex gap-2 justify-content-center py-2">
+                <button class="btn btn-primary d-inline-flex align-items-center" id="signInBtn" title="Sign In"
+                    type="button">Sign In</button>
+                <button class="btn btn-primary d-inline-flex align-items-center" id="signOutBtn" title="Sign Out"
+                    type="button">Sign Out</button>
+            </div>
+            <div class="py-2"></div>
+            <div id="appStatus" class="info info2"></div>
+
+        </div>
+
+        <div id="testTab" class="tabcontent py-3">
+            <div style="overflow-y: auto;">
+                <div class="input-group mb-3">
+                    <span class="input-group-text lbl">Jobs</span>
+                    <select id="deviceJob" class="form-select" style="min-width: 140px !important">
+                        <option value="1">Print all data in device</option>
+                        <option value="2">Print counter/sum in device</option>
+                        <option value="3">Blink the LED</option>
+                    </select>
+                    <span id="ledGPIOLbl" for="ledGPIO" style="display:none;" class="input-group-text lbl">GPIO</span>
+                    <input type="number" id="ledGPIO" name="ledGPIO" class="form-control" style="display:none;">
+                    <span class="input-group-text lbl" id="delayMsLbl" style="display:none;">Delay</span>
+                    <input type="number" id="delayMs" class="form-control" name="delayMs" style="display:none;" />
                 </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Working Path</span>
+                    <input type="text" class="form-control app-token-input" id="path">
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Data Mode</span>
+                    <select id="mode" class="form-select">
+                        <option value="set">Set</option>
+                        <option value="Append">Append</option>
+                    </select>
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Value Types</span>
+                    <select id="valueType" class="form-select">
+                        <option value="1">Series</option>
+                        <option value="2">Random</option>
+                    </select>
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Value Amount</span>
+                    <select id="amount" class="form-select">
+                        <option value="1">1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="500">500</option>
+                        <option value="1000">1000</option>
+                        <option value="5000">5000</option>
+                        <option value="10000">10000</option>
+                        <option value="50000">50000</option>
+                        <option value="100000">100000</option>
+                    </select>
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Intervals</span>
+                    <select id="interval" class="form-select">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="60">60</option>
+                    </select>
+
+                    <select id="timeBase" class="form-select">
+                        <option value="Sec">Sec</option>
+                        <option value="Min">Min</option>
+                    </select>
+                </div>
+
+                <div class="input-group mb-3 app-token-div">
+                    <span class="input-group-text lbl">Iterations</span>
+                    <select id="iteration" class="form-select">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="500">500</option>
+                        <option value="700">700</option>
+                        <option value="1000">1000</option>
+                        <option value="2000">2000</option>
+                        <option value="5000">5000</option>
+                        <option value="10000">10000</option>
+                    </select>
+                    <span class="input-group-text lbl text-success-emphasis" id="iterationInfo"></span>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-center py-2">
+                    <button class="btn btn-primary d-inline-flex align-items-center" id="setBtn" title="Set data"
+                        type="button">Set</button>
+                    <button class="btn btn-primary d-inline-flex align-items-center" id="delBtn" title="Delete data"
+                        type="button">Delete</button>
+                </div>
+                <div class="py-2"></div>
+                <div id="testStatus" class="info info2"></div>
+
+                <div class="form-check py-3">
+                    <input type="checkbox" class="form-check-input" id="enListenerChk" />
+                    <label class="form-check-label" for="enListenerChk">Listener</label>
+                </div>
+
+                <textarea id="listener" name="listener" class="form-control info text-success-emphasis" rows="10"
+                    cols="50"></textarea>
+
             </div>
         </div>
+
+        <footer>
+            <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="homeTabLink" class="nav-link px-2 text-body-secondary">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="setupTabLink" class="nav-link px-2 text-body-secondary">Setup</a>
+                </li>
+                <li class="nav-item">
+                    <a href="javascript:void(0)" id="testTabLink" class="nav-link px-2 text-body-secondary">Test</a>
+                </li>
+            </ul>
+            <p class="text-center text-body-secondary">&copy; 2025 Mobizt</p>
+        </footer>
     </div>
-    <script type="module">import { initializeApp as e, deleteApp as t } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js"; import { getAuth as a, signInWithEmailAndPassword as n, signOut as s } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js"; import { getDatabase as i, ref as l, set as o, onValue as r, off as d, remove as c } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js"; var dataListener, ackListener, appStatusTmo, testStatusTmo, app, database, intvInstant, firebaseConfig = { apiKey: "", databaseURL: "" }, authenticated = !1, amount = 0, oldPath = "", helloMs = 0, ackMs = 0, interval = 0, iteration = 0; function initApp() { showMessage("Initializing...", "#a10fae", "appStatus", appStatusTmo), document.getElementById("signInBtn").disabled = !0, app && t(app).then(function () { }).catch(function (e) { showError(e.message, "appStatus", appStatusTmo) }); try { firebaseConfig.apiKey = getEl("apiKey").value.trim(), firebaseConfig.databaseURL = getEl("dbUrl").value.trim(), app = e(firebaseConfig); var s = getEl("userEmail").value.trim(), o = getEl("userPsw").value.trim(); let d = a(); n(d, s, o).then(function (e) { setAuthState(!0); let t = i(); var a = l(t, "test/ack"); ackListener = r(a, e => { let t = e.val(); if (t.indexOf("-") > -1) { let a = t.split("-"); "hello" == a[0] && a[1] == helloMs ? (showMessage("Device [" + a[2] + "] was connected.", "#008c00", "testStatus", testStatusTmo), showMessage("Device [" + a[2] + "] was connected.", "#008c00", "appStatus", appStatusTmo)) : "accepted" == a[0] && a[1] == helloMs ? (showMessage("Device [" + a[2] + "] accepts the job.", "#a10fae", "testStatus", testStatusTmo), showMessage("Device [" + a[2] + "] accepts the job.", "#a10fae", "appStatus", appStatusTmo)) : "done" == a[0] && a[1] == helloMs && (showMessage("Device [" + a[2] + "] has done the job.", "#008c00", "testStatus", testStatusTmo), showMessage("Device [" + a[2] + "] has done the job.", "#008c00", "appStatus", appStatusTmo)) } }), showMessage("Successfully signed in.", "#008c00", "appStatus", appStatusTmo), checkClient() }).catch(function (e) { getEl("signInBtn").disabled = !1, showError(e.message, "appStatus", appStatusTmo) }), showMessage("Successfully initialized.", "#008c00", "appStatus", appStatusTmo), showMessage("Signing in...", "#a10fae", "appStatus", appStatusTmo) } catch (c) { showError(c, "appStatus", appStatusTmo) } } function signOutUser() { showMessage("Signing out...", "#a10fae", "appStatus", appStatusTmo), setTimeout(function () { let e = a(); s(e).then(() => { setAuthState(!1); let e = i(); var t = l(e, "test/ack"); ackListener = d(t), showMessage("Successfully signed out.", "#008c00", "appStatus", appStatusTmo) }).catch(e => { showError(e.message, "appStatus", appStatusTmo) }) }, 1) } function checkClient() { if (authenticated && preCheck()) { var e = getEl("path").value.trim(); helloMs = Date.now(); let t = i(); o(l(t, e + "/chat"), "hello-" + helloMs) } } function showError(e, t, a) { try { var n = JSON.parse(e); showMessage(n.error.message, "red", t, a) } catch (s) { showMessage(e, "red", t, a) } } function showMessage(e, t, a, n) { n && clearTimeout(n), addChild(a, e = "<span style='color:" + t + ";'>" + e + "</span>"), n = setTimeout(hideMessage, 5e3, a, n, 5e3) } function hideMessage(e, t, a) { removeChild(e), t && clearTimeout(t), t = setTimeout(hideMessage, e, t, a) } function addChild(e, t) { var a = document.createElement("div"); a.innerHTML = t, getEl(e).appendChild(a) } function removeChild(e) { let t = getEl(e); t && t.childElementCount > 0 && t.removeChild(t.firstElementChild) } function getEl(e) { return document.getElementById(e) } function loadConfig(e, t, a) { void 0 != localStorage[e] ? a ? getEl(e).checked = 1 == localStorage[e] : "SELECT" == getEl(e).tagName || "INPUT" == getEl(e).tagName ? getEl(e).value = localStorage[e].trim() : getEl(e).innerHTML = localStorage[e].trim() : t && (a ? getEl(e).checked = t : "SELECT" == getEl(e).tagName || "INPUT" == getEl(e).tagName ? getEl(e).value = t : getEl(e).innerHTML = t) } function setListener() { var e = getEl("path").value.trim(); if (oldPath != e) { removeListener(); let t = i(); var a = l(t, e); dataListener = r(a, e => { let t = e.val(); var a = ""; e.hasChildren() ? (e.forEach(function (e) { a += "Key: " + e.key + ", Value: " + e.val() + "\r\n" }), getEl("listener").value = a) : getEl("listener").value += "Value: " + t + "\r\n" }), oldPath = e } } function setForm(e) { setAuthState(!1), loadConfig("apiKey"), loadConfig("dbUrl"), loadConfig("userEmail"), loadConfig("userPsw"), loadConfig("path", "/test/performance"), loadConfig("valueType", "1"), loadConfig("amount", 100), loadConfig("mode", "set"), loadConfig("interval", 1), loadConfig("timeBase", "Min"), loadConfig("iteration", 1), loadConfig("deviceJob", "1"), loadConfig("ledGPIO", "5"), loadConfig("delayMs", "30"), loadConfig("enListenerChk", !1, !0), saveDeviceJobs(), changeAppendMode() } function saveDeviceJobs() { saveConfig("deviceJob"); var e = 3 == getEl("deviceJob").value ? "inline" : "none"; getEl("ledGPIO").style.display = e, getEl("ledGPIOLbl").style.display = e, getEl("delayMsLbl").style.display = e, getEl("delayMs").style.display = e } function changeAppendMode() { getEl("setBtn").innerHTML = getEl("mode").value, saveConfig("mode") } function saveConfig(e, t) { t ? localStorage[e] = getEl(e).checked ? 1 : 0 : localStorage[e] = "SELECT" == getEl(e).tagName || "INPUT" == getEl(e).tagName ? getEl(e).value.trim() : getEl(e).innerHTML.trim() } function saveChange(e) { saveConfig(e.currentTarget.param) } function setAuthState(e) { clearIterationLoop(!0), e ? addRemoveListener() : removeListener(), authenticated = e, getEl("signInBtn").disabled = e, getEl("signOutBtn").disabled = !e, getEl("delBtn").disabled = !e, getEl("setBtn").disabled = !e, getEl("enListenerChk").disabled = !e, getEl("iterationInfo").innerHTML = "" } function setBtnUi(e, t) { getEl("setBtn").disabled = !e, getEl("delBtn").disabled = !t } function preCheck() { var e = getEl("path").value.trim(); return "" == e || "/" == e ? (showError("Path should not be empty or at the root!", "testStatus", testStatusTmo), !1) : (addRemoveListener(), !0) } function setDataEvt(e) { setData(!1) } function delDataEvt(e) { delData(!1) } function setData(e) { if (preCheck()) { getEl("listener").value = "", setBtnUi(!1, !1); var t = getEl("path").value.trim(), a = getEl("amount").value.trim(), n = "Append" == getEl("mode").value; showMessage((n ? "Appending" : "Setting") + " the values...", "#a10fae", "testStatus", testStatusTmo), e || clearIterationLoop(!0), setTimeout(function () { (e || amount != a) && delData(!0), ++iteration < parseInt(getEl("iteration").value) ? getEl("iterationInfo").innerHTML = " (" + iteration + "/" + getEl("iteration").value + " completed)" : getEl("iterationInfo").innerHTML = ""; var s = parseInt(getEl("deviceJob").value); helloMs = Date.now(); let r = i(); 1 == s ? (o(l(r, t + "/chat"), "print-all-" + getEl("amount").value + "-" + helloMs), c(l(r, t + "/chat"))) : 2 == s ? o(l(r, t + "/chat"), "print-count-" + getEl("amount").value + "-" + helloMs) : 3 == s && (o(l(r, t + "/chat"), "blink-" + getEl("ledGPIO").value + "-" + +getEl("delayMs").value + "-" + getEl("amount").value + "-" + helloMs), c(l(r, t + "/chat"))); for (var d = 0, u = parseInt(getEl("valueType").value), g = 0, v = 0; v < a; v++) { var p = 1 == u ? v : Math.floor(1e4 * Math.random() + 1); p == g && p++, d += g = p, n ? o(l(r, t + "/" + v), g) : o(l(r, t), g) } amount = a, showMessage("Successfully " + (n ? "appended" : "set") + " values" + (1 == s || 2 == s ? " (sum = " + d + ")" : "") + ".", "#008c00", "testStatus", testStatusTmo), setBtnUi(!0, !0), iteration >= parseInt(getEl("iteration").value) && clearIterationLoop(!1), !intvInstant && parseInt(getEl("iteration").value) > 1 && iteration < parseInt(getEl("iteration").value) && startIterationLoop() }, 1) } } function delData(e) { if (preCheck()) { if (getEl("listener").value = "", e) { var t = getEl("path").value.trim(); let a = i(); c(l(a, t)), amount = 0 } else showMessage("Deleting the values...", "#a10fae", "testStatus", testStatusTmo), setBtnUi(!1, !1), setTimeout(function () { var e = getEl("path").value.trim(); let t = i(); c(l(t, e)), amount = 0, showMessage("Successfully deleted values.", "#008c00", "testStatus", testStatusTmo), setBtnUi(!0, !0) }, 0) } } function clearIterationLoop(e) { clearInterval(intvInstant), intvInstant = void 0, e && (iteration = 0) } function addRemoveListener() { var e = getEl("path").value.trim(); "" != e && "/" != e && (getEl("enListenerChk").checked ? setListener() : removeListener(), saveConfig("enListenerChk", !0)) } function removeListener() { if ("" != oldPath) { let e = i(); var t = l(e, oldPath); dataListener = d(t) } getEl("listener").value = "", oldPath = "" } function addEvent(e, t, a, n) { var s = getEl(e); s.addEventListener(t, a, !1), n && (s.param = n) } function openTab(e) { var t, a, n; for (t = 0, a = document.getElementsByClassName("tabcontent"); t < a.length; t++)a[t].style.display = "none"; for (t = 0, n = document.getElementsByClassName("tablinks"); t < n.length; t++)n[t].className = n[t].className.replace(" active", ""); getEl(e.currentTarget.param).style.display = "block", e.currentTarget.className += " active" } function docReady(e) { "complete" === document.readyState || "interactive" === document.readyState ? setTimeout(e, 1) : document.addEventListener("DOMContentLoaded", e) } function saveInterval() { saveConfig("interval"), saveConfig("timeBase"), intvInstant && authenticated && (clearIterationLoop(!1), startIterationLoop()) } function saveLedGPIO() { 0 > parseInt(getEl("ledGPIO").value) && (getEl("ledGPIO").value = "0"), saveChange("ledGPIO") } function saveDelay() { 0 > parseInt(getEl("delayMs").value) && (getEl("delayMs").value = "0"), saveChange("delayMs") } function startIterationLoop() { interval = 1e3 * parseInt(getEl("interval").value) * ("Min" == getEl("timeBase").value ? 60 : 1), intvInstant = setInterval(function () { setData(!0) }, interval) } docReady(function () { addEvent("apiKey", "change", saveChange, "apiKey"), addEvent("dbUrl", "change", saveChange, "dbUrl"), addEvent("userEmail", "change", saveChange, "userEmail"), addEvent("userPsw", "change", saveChange, "userPsw"), addEvent("instructionTabBtn", "click", openTab, "instructionTab"), addEvent("initializeTabBtn", "click", openTab, "initializeTab"), addEvent("testTabBtn", "click", openTab, "testTab"), addEvent("listenerTabBtn", "click", openTab, "listenerTab"), addEvent("signInBtn", "click", initApp), addEvent("signOutBtn", "click", signOutUser), addEvent("mode", "click", changeAppendMode), addEvent("path", "change", saveChange, "path"), addEvent("valueType", "change", saveChange, "valueType"), addEvent("amount", "change", saveChange, "amount"), addEvent("interval", "change", saveInterval), addEvent("timeBase", "change", saveInterval), addEvent("iteration", "change", saveChange, "iteration"), addEvent("deviceJob", "change", saveDeviceJobs), addEvent("ledGPIO", "change", saveLedGPIO), addEvent("delayMs", "change", saveDelay), addEvent("enListenerChk", "click", addRemoveListener), addEvent("setBtn", "click", setDataEvt), addEvent("delBtn", "click", delDataEvt), setForm(), getEl("instructionTabBtn").click(), initApp() });</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <script type="module">
+        import{initializeApp,deleteApp}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";import{getAuth,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";import{getDatabase,ref,set,onValue,off,remove}from"https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";var dataListener,ackListener,appStatusTmo,testStatusTmo,app,database,intvInstant,firebaseConfig={apiKey:"",databaseURL:""},authenticated=!1,amount=0,oldPath="",helloMs=0,ackMs=0,interval=0,iteration=0,successColor="#75b798",infoColor="#6edff6",dangerColor="#ea868f";function initApp(){showMessage("Initializing...",infoColor,"appStatus",appStatusTmo),document.getElementById("signInBtn").disabled=!0,app&&deleteApp(app).then((function(){})).catch((function(e){showError(e.message,"appStatus",appStatusTmo)}));try{firebaseConfig.apiKey=getEl("apiKey").value.trim(),firebaseConfig.databaseURL=getEl("dbUrl").value.trim(),app=initializeApp(firebaseConfig);var e=getEl("userEmail").value.trim(),t=getEl("userPsw").value.trim();const a=getAuth();signInWithEmailAndPassword(a,e,t).then((function(e){setAuthState(!0);const t=getDatabase();var a=ref(t,"test/ack");ackListener=onValue(a,(e=>{const t=e.val();if(t&&t.indexOf("-")>-1){const e=t.split("-");"hello"==e[0]&&e[1]==helloMs?showMessage("Device ["+e[2]+"] was connected.",successColor,"appStatus",appStatusTmo):"accepted"==e[0]&&e[1]==helloMs?showMessage("Device ["+e[2]+"] accepts the job.",infoColor,"appStatus",appStatusTmo):"done"==e[0]&&e[1]==helloMs&&showMessage("Device ["+e[2]+"] has done the job.",successColor,"appStatus",appStatusTmo)}})),showMessage("Successfully signed in.",successColor,"appStatus",appStatusTmo),checkClient()})).catch((function(e){getEl("signInBtn").disabled=!1,showError(e.message,"appStatus",appStatusTmo)})),showMessage("Successfully initialized.",successColor,"appStatus",appStatusTmo),showMessage("Signing in...",infoColor,"appStatus",appStatusTmo)}catch(e){showError(e,"appStatus",appStatusTmo)}}function signOutUser(){showMessage("Signing out...",infoColor,"appStatus",appStatusTmo),setTimeout((function(){const e=getAuth();signOut(e).then((()=>{setAuthState(!1);const e=getDatabase();var t=ref(e,"test/ack");ackListener=off(t),showMessage("Successfully signed out.",successColor,"appStatus",appStatusTmo)})).catch((e=>{showError(e.message,"appStatus",appStatusTmo)}))}),1)}function checkClient(){if(authenticated&&preCheck()){var e=getEl("path").value.trim();helloMs=Date.now();const t=getDatabase();set(ref(t,e+"/chat"),"hello-"+helloMs)}}function showError(e,t,a){try{showMessage(JSON.parse(e).error.message,dangerColor,t,a)}catch(n){showMessage(e,dangerColor,t,a)}}function showMessage(e,t,a,n){n&&clearTimeout(n),addChild(a,e="<span style='color:"+t+";'>"+e+"</span>"),n=setTimeout(hideMessage,5e3,a,n,5e3)}function hideMessage(e,t,a){removeChild(e),t&&clearTimeout(t),t=setTimeout(hideMessage,e,t,a)}function addChild(e,t){var a=document.createElement("div");a.innerHTML=t,getEl(e).appendChild(a)}function removeChild(e){const t=getEl(e);t&&t.childElementCount>0&&t.removeChild(t.firstElementChild)}function getEl(e){return document.getElementById(e)}function loadConfig(e,t,a){null!=localStorage[e]?a?getEl(e).checked=1==localStorage[e]:"SELECT"==getEl(e).tagName||"INPUT"==getEl(e).tagName?getEl(e).value=localStorage[e].trim():getEl(e).innerHTML=localStorage[e].trim():t&&(a?getEl(e).checked=t:"SELECT"==getEl(e).tagName||"INPUT"==getEl(e).tagName?getEl(e).value=t:getEl(e).innerHTML=t)}function setListener(){var e=getEl("path").value.trim();if(oldPath!=e){removeListener();const a=getDatabase();var t=ref(a,e);dataListener=onValue(t,(e=>{const t=e.val();var a="";e.hasChildren()?(e.forEach((function(e){a+="Key: "+e.key+", Value: "+e.val()+"\r\n"})),getEl("listener").value=a):getEl("listener").value+="Value: "+t+"\r\n"})),oldPath=e}}function setForm(e){setAuthState(!1),loadConfig("apiKey"),loadConfig("dbUrl"),loadConfig("userEmail"),loadConfig("userPsw"),loadConfig("path","/test/performance"),loadConfig("valueType","1"),loadConfig("amount",100),loadConfig("mode","set"),loadConfig("interval",1),loadConfig("timeBase","Min"),loadConfig("iteration",1),loadConfig("deviceJob","1"),loadConfig("ledGPIO","5"),loadConfig("delayMs","30"),loadConfig("enListenerChk",!1,!0),saveDeviceJobs(),changeAppendMode()}function saveDeviceJobs(){saveConfig("deviceJob");var e=3==getEl("deviceJob").value?"inline":"none";getEl("ledGPIO").style.display=e,getEl("ledGPIOLbl").style.display=e,getEl("delayMsLbl").style.display=e,getEl("delayMs").style.display=e}function changeAppendMode(){getEl("setBtn").innerHTML=getEl("mode").value,saveConfig("mode")}function saveConfig(e,t){localStorage[e]=t?getEl(e).checked?1:0:"SELECT"==getEl(e).tagName||"INPUT"==getEl(e).tagName?getEl(e).value.trim():getEl(e).innerHTML.trim()}function saveChange(e){saveConfig(e.currentTarget.param)}function setAuthState(e){clearIterationLoop(!0),e?addRemoveListener():removeListener(),authenticated=e,getEl("signInBtn").disabled=e,getEl("signOutBtn").disabled=!e,getEl("delBtn").disabled=!e,getEl("setBtn").disabled=!e,getEl("enListenerChk").disabled=!e,getEl("iterationInfo").innerHTML=""}function setBtnUi(e,t){getEl("setBtn").disabled=!e,getEl("delBtn").disabled=!t}function preCheck(){var e=getEl("path").value.trim();return""==e||"/"==e?(showError("Path should not be empty or at the root!","testStatus",testStatusTmo),!1):(addRemoveListener(),!0)}function setDataEvt(e){setData(!1)}function delDataEvt(e){delData(!1)}function setData(e){if(preCheck()){getEl("listener").value="",setBtnUi(!1,!1);var t=getEl("path").value.trim(),a=getEl("amount").value.trim(),n="Append"==getEl("mode").value;showMessage((n?"Appending":"Setting")+" the values...",infoColor,"testStatus",testStatusTmo),e||clearIterationLoop(!0),setTimeout((function(){(e||amount!=a)&&delData(!0),++iteration<parseInt(getEl("iteration").value)?getEl("iterationInfo").innerHTML=" "+iteration+"/"+getEl("iteration").value:getEl("iterationInfo").innerHTML="";var s=parseInt(getEl("deviceJob").value);helloMs=Date.now();const o=getDatabase();1==s?(set(ref(o,t+"/chat"),"print-all-"+getEl("amount").value+"-"+helloMs),remove(ref(o,t+"/chat"))):2==s?set(ref(o,t+"/chat"),"print-count-"+getEl("amount").value+"-"+helloMs):3==s&&(set(ref(o,t+"/chat"),"blink-"+getEl("ledGPIO").value+"-"+ +getEl("delayMs").value+"-"+getEl("amount").value+"-"+helloMs),remove(ref(o,t+"/chat")));for(var l=0,i=parseInt(getEl("valueType").value),r=0,c=0;c<a;c++){var d=1==i?c:Math.floor(1e4*Math.random()+1);d==r&&d++,l+=r=d,set(ref(o,n?t+"/"+c:t),r)}amount=a,showMessage("Successfully "+(n?"appended":"set")+" values"+(1==s||2==s?" (sum = "+l+")":"")+".",successColor,"testStatus",testStatusTmo),setBtnUi(!0,!0),iteration>=parseInt(getEl("iteration").value)&&clearIterationLoop(!1),!intvInstant&&parseInt(getEl("iteration").value)>1&&iteration<parseInt(getEl("iteration").value)&&startIterationLoop()}),1)}}function delData(e){if(preCheck())if(getEl("listener").value="",e){var t=getEl("path").value.trim();const e=getDatabase();remove(ref(e,t)),amount=0}else showMessage("Deleting the values...",infoColor,"testStatus",testStatusTmo),setBtnUi(!1,!1),setTimeout((function(){var e=getEl("path").value.trim();const t=getDatabase();remove(ref(t,e)),amount=0,showMessage("Successfully deleted values.",successColor,"testStatus",testStatusTmo),setBtnUi(!0,!0)}),0)}function clearIterationLoop(e){clearInterval(intvInstant),intvInstant=void 0,e&&(iteration=0)}function addRemoveListener(){var e=getEl("path").value.trim();""!=e&&"/"!=e&&(getEl("enListenerChk").checked?setListener():removeListener(),saveConfig("enListenerChk",!0))}function removeListener(){if(""!=oldPath){const t=getDatabase();var e=ref(t,oldPath);dataListener=off(e)}getEl("listener").value="",oldPath=""}function addEvent(e,t,a,n){var s=getEl(e);s.addEventListener(t,a,!1),n&&(s.param=n)}function loadTab(){localStorage.openTab?getEl(localStorage.openTab).click():getEl("homeTabBtn").click()}function openTab(e){var t,a,n;for(a=document.getElementsByClassName("tabcontent"),t=0;t<a.length;t++)a[t].style.display="none";for(n=document.getElementsByClassName("tablinks"),t=0;t<n.length;t++)n[t].className=n[t].className.replace(" active","");getEl(e.currentTarget.param).style.display="block",e.currentTarget.className+=" active",getEl("page").innerHTML=e.currentTarget.innerHTML,localStorage.openTab=e.currentTarget.param+"Btn"}function docReady(e){"complete"===document.readyState||"interactive"===document.readyState?setTimeout(e,1):document.addEventListener("DOMContentLoaded",e),addEvent("homeTabLink","click",openTab,"homeTab"),addEvent("setupTabLink","click",openTab,"setupTab"),addEvent("testTabLink","click",openTab,"testTab")}function saveInterval(){saveConfig("interval"),saveConfig("timeBase"),intvInstant&&authenticated&&(clearIterationLoop(!1),startIterationLoop())}function saveLedGPIO(){parseInt(getEl("ledGPIO").value)<0&&(getEl("ledGPIO").value="0"),saveChange("ledGPIO")}function saveDelay(){parseInt(getEl("delayMs").value)<0&&(getEl("delayMs").value="0"),saveChange("delayMs")}function startIterationLoop(){interval=1e3*parseInt(getEl("interval").value)*("Min"==getEl("timeBase").value?60:1),intvInstant=setInterval((function(){setData(!0)}),interval)}docReady((function(){addEvent("apiKey","change",saveChange,"apiKey"),addEvent("dbUrl","change",saveChange,"dbUrl"),addEvent("userEmail","change",saveChange,"userEmail"),addEvent("userPsw","change",saveChange,"userPsw"),addEvent("homeTabBtn","click",openTab,"homeTab"),addEvent("setupTabBtn","click",openTab,"setupTab"),addEvent("testTabBtn","click",openTab,"testTab"),addEvent("signInBtn","click",initApp),addEvent("signOutBtn","click",signOutUser),addEvent("mode","click",changeAppendMode),addEvent("path","change",saveChange,"path"),addEvent("valueType","change",saveChange,"valueType"),addEvent("amount","change",saveChange,"amount"),addEvent("interval","change",saveInterval),addEvent("timeBase","change",saveInterval),addEvent("iteration","change",saveChange,"iteration"),addEvent("deviceJob","change",saveDeviceJobs),addEvent("ledGPIO","change",saveLedGPIO),addEvent("delayMs","change",saveDelay),addEvent("enListenerChk","click",addRemoveListener),addEvent("setBtn","click",setDataEvt),addEvent("delBtn","click",delDataEvt),setForm(),loadTab(),initApp()})),document.addEventListener("DOMContentLoaded",(function(){const e=document.querySelectorAll(".navbar-nav .nav-link"),t=document.querySelector(".navbar-collapse");e.forEach((e=>{e.addEventListener("click",(function(){if(document.querySelectorAll(".navbar-nav .nav-link").forEach((e=>{e.classList.remove("text-success-emphasis")})),e.classList.add("text-success-emphasis"),getEl("page").innerHTML=e.innerHTML,t.classList.contains("show")){new bootstrap.Collapse(t,{toggle:!1}).hide()}}))}))}));
+    </script>
 </body>
 
 </html>
