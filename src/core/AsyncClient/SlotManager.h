@@ -110,9 +110,6 @@ public:
 
     async_data *createSlot(slot_options_t &options)
     {
-        if (!options.auth_used)
-            sse_events_filter.remove(0, sse_events_filter.length());
-
         int slot_index = availableSlot(options);
         // Only one SSE mode is allowed
         if (slot_index == -2)
