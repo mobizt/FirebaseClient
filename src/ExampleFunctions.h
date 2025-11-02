@@ -138,7 +138,7 @@ uint32_t get_ntp_time()
     int max_try = 10, retry = 0;
     while (time(nullptr) < FIREBASE_DEFAULT_TS && retry < max_try)
     {
-        //configTime(3 * 3600, 0, "pool.ntp.org");
+        configTime(3 * 3600, 0, "pool.ntp.org");
         unsigned long m = millis();
         while (time(nullptr) < FIREBASE_DEFAULT_TS && millis() - m < 10 * 1000)
         {

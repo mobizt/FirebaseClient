@@ -150,10 +150,6 @@
 #include <Updater.h>
 #endif
 
-#if !defined(OTA_UPDATE_PARTITION)
-#define OTA_UPDATE_PARTITION U_FLASH
-#endif
-
 #define OTA_UPDATE_ENABLED
 #endif
 
