@@ -62,11 +62,11 @@ public:
 #endif
 
 #if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
-    void prepareDownloadOTA(size_t payloadLen, bool base64, int16_t &code)
+    void prepareDownloadOTA(size_t payloadLen, bool base64, int16_t &code, int command)
     {
         code = 0;
         int size = base64 ? (3 * (payloadLen - 2) / 4) : payloadLen;
-        if (!FIREBASE_OTA_UPDATER.begin(size))
+        if (!FIREBASE_OTA_UPDATER.begin(size, command))
             code = FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE;
 #if defined(FIREBASE_OTA_STORAGE)
         if (!OTAUpdater.isInit())

@@ -1,11 +1,11 @@
 /**
- * The example to perform OTA firmware update using object (bin file) stores in Storage bucket.
+ * The example to perform OTA firmware/filesystem update using object (bin file) stores in Storage bucket.
  *
  * This example uses the ServiceAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
  *
  * For the complete usage guidelines, please read README.md or visit https://github.com/mobizt/FirebaseClient
-*/
+ */
 
 #define ENABLE_USER_AUTH
 #define ENABLE_STORAGE
@@ -30,6 +30,13 @@
 
 // Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
 #define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
+
+#define OTA_UPDATE_PARTITION U_FLASH // For the Firmware Partition
+// #define OTA_UPDATE_PARTITION U_FS // For the ESP8266 or Raspberry Pi Pico/RP2040 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_FLASHFS // For the ESP32 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_SPIFFS // For the ESP32 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_FATFS // For the ESP32 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_LITTLEFS // For the ESP32 Filesystem Partition
 
 void processData(AsyncResult &aResult);
 void restart();
@@ -93,16 +100,16 @@ void loop()
         Serial.println("Updating your firmware (OTA)... ");
 
         // Async call with callback function.
-        storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), processData, "⚡otaTask");
+        storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin" /* or "spiffs.bin" */), processData, "⚡otaTask", OTA_UPDATE_PARTITION);
         // You can provide the access token in case non-authentication mode (NoAuth) for priviledge access file download.
         // storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin", "access token"), processData, "otaTask");
 
         // Async call with AsyncResult for returning result.
-        // storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), storageResult);
+        // storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin" /* or "spiffs.bin" */), storageResult, OTA_UPDATE_PARTITION);
 
         // Sync call which waits until the operation complete.
-        // bool status = storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"));
-         // if (status)
+        // bool status = storage.ota(aClient, FirebaseStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin" /* or "spiffs.bin" */), OTA_UPDATE_PARTITION);
+        // if (status)
         //     Serial.println("⚡OTA dowload task (await), complete!✅️");
         // else
         //     Firebase.printf("Error, msg: %s, code: %d\n", aClient.lastError().message().c_str(), aClient.lastError().code());
@@ -158,7 +165,7 @@ void processData(AsyncResult &aResult)
 
 void restart()
 {
-    Serial.println("Update firmware completed.");
+    Serial.println("Update firmware/filesystem completed.");
     Serial.println();
 #if defined(OTA_STORAGE)
     Serial.println("Applying update...");

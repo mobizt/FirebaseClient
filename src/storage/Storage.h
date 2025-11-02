@@ -135,11 +135,14 @@ public:
      * The bucketid is the Storage bucket Id of object to download.
      * The object is the object in Storage bucket to download.
      * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
+     * @param command The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or 
+     * U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 
+     * 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
      *
      * @return Boolean value, indicates the success of the operation.
      *
      */
-    bool ota(AsyncClientClass &aClient, const Parent &parent) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", FirebaseStorage::fs_download_ota, false)->lastError.code() == 0; }
+    bool ota(AsyncClientClass &aClient, const Parent &parent, int command = 0) { return sendRequest(aClient, aClient.getResult(), NULL, "", parent, nullptr, "", FirebaseStorage::fs_download_ota, false, command)->lastError.code() == 0; }
 
     /** Perform OTA update using a firmware (object) from the Firebase Storage.
      *
@@ -149,9 +152,12 @@ public:
      * The object is the object in Storage bucket to download.
      * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
      * @param aResult The async result (AsyncResult).
+     * @param command The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or 
+     * U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 
+     * 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
      *
      */
-    void ota(AsyncClientClass &aClient, const Parent &parent, AsyncResult &aResult) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", FirebaseStorage::fs_download_ota, true); }
+    void ota(AsyncClientClass &aClient, const Parent &parent, AsyncResult &aResult, int command = 0) { sendRequest(aClient, &aResult, NULL, "", parent, nullptr, "", FirebaseStorage::fs_download_ota, true, command); }
 
     /** Perform OTA update using a firmware (object) from the Firebase Storage.
      *
@@ -162,9 +168,12 @@ public:
      * The access token is the Firebase Storage's file access token which used only for priviledge file download access in non-authentication mode (NoAuth).
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
+     * @param command The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or 
+     * U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 
+     * 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
      *
      */
-    void ota(AsyncClientClass &aClient, const Parent &parent, AsyncResultCallback cb, const String &uid = "") { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", FirebaseStorage::fs_download_ota, true); }
+    void ota(AsyncClientClass &aClient, const Parent &parent, AsyncResultCallback cb, const String &uid = "", int command = 0) { sendRequest(aClient, nullptr, cb, uid, parent, nullptr, "", FirebaseStorage::fs_download_ota, true, command); }
 
     /** Get the metadata of object in Firebase Storage data bucket.
      *
@@ -277,7 +286,7 @@ public:
 #endif
 
 private:
-    AsyncResult *sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, file_config_data *file, const String &mime, FirebaseStorage::firebase_storage_request_type requestType, bool async)
+    AsyncResult *sendRequest(AsyncClientClass &aClient, AsyncResult *result, AsyncResultCallback cb, const String &uid, const Parent &parent, file_config_data *file, const String &mime, FirebaseStorage::firebase_storage_request_type requestType, bool async, int command = 0)
     {
         using namespace FirebaseStorage;
         DataOptions options;
@@ -299,7 +308,7 @@ private:
                 method = reqns::http_delete;
         }
 
-        req_data aReq(&aClient, method, slot_options_t(false, false, async, false, requestType == fs_download_ota, false), &options, file, result, cb, uid);
+        req_data aReq(&aClient, method, slot_options_t(false, false, async, false, requestType == fs_download_ota, false), &options, file, result, cb, uid, command);
         if (mime.length() && requestType == fs_upload)
             aReq.mime = mime;
         asyncRequest(aReq);
@@ -343,6 +352,7 @@ private:
             sData->aResult.download_data.ota = true;
             sData->request.ul_dl_task_running_addr = ul_dl_task_running_addr;
             sData->request.ota_storage_addr = ota_storage_addr;
+            sData->request.command = request.command;
         }
 
         if (request.file && sData->upload)

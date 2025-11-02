@@ -630,7 +630,7 @@ private:
                                     otaut.setOTAStorage(sData->request.ota_storage_addr);
 #endif
 
-                                    otaut.prepareDownloadOTA(sData->response.payloadLen, sData->request.base64, sData->request.ota_error);
+                                    otaut.prepareDownloadOTA(sData->response.payloadLen, sData->request.base64, sData->request.ota_error,  sData->request.command);
                                     if (sData->request.ota_error != 0)
                                     {
                                         // OTA error.

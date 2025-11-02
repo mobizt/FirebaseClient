@@ -1,7 +1,7 @@
 /**
- * The example to perform OTA firmware update using data stores in your database.
+ * The example to perform OTA firmware/filesystem update using data stores in your database.
  *
- * Assume that your firmware bin file was converted to base64 encoded string and stores in your database before running
+ * Assume that your firmware/filesystem bin file e.g., firmware.bin or spiffs.bin was converted to base64 encoded string and stores in your database before running
  * this example.
  *
  * See examples/RealtimeDatabase/File/File.ino for how to upload your bin file.
@@ -33,6 +33,13 @@
 #define USER_EMAIL "USER_EMAIL"
 #define USER_PASSWORD "USER_PASSWORD"
 #define DATABASE_URL "URL"
+
+#define OTA_UPDATE_PARTITION U_FLASH // For the Firmware Partition
+// #define OTA_UPDATE_PARTITION U_FS // For the ESP8266 or Raspberry Pi Pico/RP2040 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_FLASHFS // For the ESP32 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_SPIFFS // For the ESP32 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_FATFS // For the ESP32 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_LITTLEFS // For the ESP32 Filesystem Partition
 
 void processData(AsyncResult &aResult);
 void ota_async();
@@ -99,7 +106,7 @@ void loop()
         // Assume that your firmware bin file was converted to base64 encoded string
         // and stores at "/examples/OTA/firmware"
 
-        Serial.println("Updating your firmware (OTA)... ");
+        Serial.println("Updating your firmware/filesystem (OTA)... ");
         ota_async();
         // ota_async2();
         // ota_await();
@@ -152,19 +159,19 @@ void processData(AsyncResult &aResult)
 void ota_async()
 {
     // Async call with callback function.
-    Database.ota(aClient, "/examples/OTA/firmware", processData, "otaTask");
+    Database.ota(aClient, "/examples/OTA/firmware", processData, "otaTask", OTA_UPDATE_PARTITION);
 }
 
 void ota_async2()
 {
     // Async call with AsyncResult for returning result.
-    Database.ota(aClient, "/examples/OTA/firmware", databaseResult);
+    Database.ota(aClient, "/examples/OTA/firmware", databaseResult, OTA_UPDATE_PARTITION);
 }
 
 void ota_await()
 {
     // Sync call which waits until the operation complete.
-    bool status = Database.ota(aClient, "/examples/OTA/firmware");
+    bool status = Database.ota(aClient, "/examples/OTA/firmware", OTA_UPDATE_PARTITION);
     if (status)
         Serial.println("⚡OTA dowload task (await), complete!✅️");
     else
@@ -173,7 +180,7 @@ void ota_await()
 
 void restart()
 {
-    Serial.println("Update firmware completed.");
+    Serial.println("Update firmware/filesystem completed.");
     Serial.println();
 #if defined(OTA_STORAGE)
     Serial.println("Applying update...");

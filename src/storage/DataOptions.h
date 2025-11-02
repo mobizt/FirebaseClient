@@ -75,8 +75,9 @@ namespace FirebaseStorage
         file_config_data *file = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
+        int command = 0;
         req_data() {}
-        explicit req_data(AsyncClientClass *aClient, reqns::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        explicit req_data(AsyncClientClass *aClient, reqns::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", int command = 0)
         {
             this->aClient = aClient;
             this->method = method;
@@ -86,6 +87,7 @@ namespace FirebaseStorage
             this->aResult = aResult;
             this->cb = cb;
             this->uid = uid;
+            this->command = command;
         }
     };
 }

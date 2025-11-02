@@ -163,7 +163,7 @@ void upload(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, fi
 - `uid` - The user specified UID of async result (optional).
 
 
-9. ## 🔹  bool ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
+9. ## 🔹  bool ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, int command = 0)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -172,19 +172,20 @@ The access token is the Firebase Storage's file access token which used only for
 
 
 ```cpp
-bool ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
+bool ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, int command = 0)
 ```
 
 **Params:**
 
 - `aClient` - The async client.
 - `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
+- `command` - The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
 
 **Returns:**
 
 - Boolean value, indicates the success of the operation.
 
-10. ## 🔹  void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult)
+10. ## 🔹  void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult, int command = 0)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -193,7 +194,7 @@ The access token is the Firebase Storage's file access token which used only for
 
 
 ```cpp
-void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult)
+void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResult &aResult, int command = 0)
 ```
 
 **Params:**
@@ -201,9 +202,9 @@ void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, Async
 - `aClient` - The async client.
 - `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
 - `aResult` - The async result (AsyncResult).
+- `command` - The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
 
-
-11. ## 🔹  void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResultCallback cb, const String &uid = "")
+11. ## 🔹  void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResultCallback cb, const String &uid = "", int command = 0)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -212,7 +213,7 @@ The access token is the Firebase Storage's file access token which used only for
 
 
 ```cpp
-void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResultCallback cb, const String &uid = "")
+void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, AsyncResultCallback cb, const String &uid = "", int command = 0)
 ```
 
 **Params:**
@@ -221,7 +222,7 @@ void ota(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent, Async
 - `parent` - The FirebaseStorage::Parent object included Storage bucket Id, object and/or access token in its constructor.
 - `cb` - The async result callback (AsyncResultCallback).
 - `uid` - The user specified UID of async result (optional).
-
+- `command` - The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
 
 12. ## 🔹  String getMetadata(AsyncClientClass &aClient, const FirebaseStorage::Parent &parent)
 

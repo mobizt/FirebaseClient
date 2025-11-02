@@ -490,7 +490,7 @@ class RealtimeDatabase
     - boolean value indicates the operating status.
 
 
-16. ### 🔹 bool ota(AsyncClientClass &aClient, const String &path)
+16. ### 🔹 bool ota(AsyncClientClass &aClient, const String &path, int command = 0)
 
     Perform OTA update using a firmware file from the database.
     
@@ -498,21 +498,22 @@ class RealtimeDatabase
 
     ### Example
     ```cpp
-    bool status = Database.ota(aClient, "/path/to/data");
+    bool status = Database.ota(aClient, "/path/to/data", U_FLASH);
     ```
     
     ```cpp
-    bool ota(AsyncClientClass &aClient, const String &path)
+    bool ota(AsyncClientClass &aClient, const String &path, int command = 0)
     ```
     
     **Params:**
     - `aClient` - The async client.
     - `path` - The node path to download.
+    - `command` - The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
 
      **Returns:**
     - boolean value indicates the operating status.
 
-17. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
+17. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, int command = 0)
 
     Perform OTA update using a firmware file from the database.
     
@@ -520,20 +521,21 @@ class RealtimeDatabase
 
     ### Example
     ```cpp
-    Database.ota(aClient, "/path/to/data", aResult);
+    Database.ota(aClient, "/path/to/data", aResult, U_FLASH);
     ```
     
     ```cpp
-    void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult)
+    void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, int command = 0)
     ```
     
     **Params:**
     - `aClient` - The async client.
     - `path` - The node path to download.
     - `aResult` - The async result (AsyncResult)
+    - `command` - The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
 
 
-18. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
+18. ### 🔹 void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "", int command = 0)
 
     Perform OTA update using a firmware file from the database.
 
@@ -541,10 +543,10 @@ class RealtimeDatabase
 
     ### Example
     ```cpp
-    Database.ota(aClient, "/path/to/data", cb);
+    Database.ota(aClient, "/path/to/data", cb, U_FLASH);
     ```
     ```cpp
-    void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "")
+    void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "", int command = 0)
     ```
     
     **Params:**
@@ -552,6 +554,7 @@ class RealtimeDatabase
     - `path` - The node path to download.
     - `cb` - The async result callback (AsyncResultCallback).
     - `uid` - The user specified UID of async result (optional).
+    - `command` - The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
 
 
 19. ### 🔹 bool set(AsyncClientClass &aClient, const String &path, T value, const String &matchingEtag = "")

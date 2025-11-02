@@ -26,7 +26,7 @@ class OTAUpdaterClass
 public:
     OTAUpdaterClass();
     ~OTAUpdaterClass();
-    bool begin(int size);
+    bool begin(int size, int command = 0);
     bool end();
     size_t write(uint8_t *data, size_t len);
     void setOTAStorage(uint32_t addr);

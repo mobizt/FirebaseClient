@@ -344,10 +344,13 @@ public:
      * ```
      * @param aClient The async client.
      * @param path The node path to download.
+     * @param command The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or 
+     * U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 
+     * 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
      * @return boolean value indicates the operating status.
      *
      */
-    bool ota(AsyncClientClass &aClient, const String &path) { return sendRequest(&aClient, path, reqns::http_get, slot_options_t(), nullptr, nullptr, nullptr, NULL)->error().code() == 0; }
+    bool ota(AsyncClientClass &aClient, const String &path, int command = 0) { return sendRequest(&aClient, path, reqns::http_get, slot_options_t(), nullptr, nullptr, nullptr, NULL, "", "", "", command)->error().code() == 0; }
 
     /**
      * Perform OTA update using a firmware file from the database.
@@ -361,9 +364,12 @@ public:
      * @param aClient The async client.
      * @param path The node path to download.
      * @param aResult The async result (AsyncResult)
+     * @param command The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or 
+     * U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 
+     * 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
      *
      */
-    void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult) { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, &aResult, NULL); }
+    void ota(AsyncClientClass &aClient, const String &path, AsyncResult &aResult, int command = 0) { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, &aResult, NULL, "", "", "", command); }
 
     /**
      * Perform OTA update using a firmware file from the database.
@@ -376,11 +382,14 @@ public:
      * @param path The node path to download.
      * @param cb The async result callback (AsyncResultCallback).
      * @param uid The user specified UID of async result (optional).
+     * @param command The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or 
+     * U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 
+     * 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
      *
      * The data of node to download should be base64 encoded string of the firmware file.
      *
      */
-    void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "") { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, nullptr, cb, uid); }
+    void ota(AsyncClientClass &aClient, const String &path, AsyncResultCallback cb, const String &uid = "", int command = 0) { sendRequest(&aClient, path, reqns::http_get, slot_options_t(false, false, true, false, true, false), nullptr, nullptr, nullptr, cb, uid, "", "", command); }
 
     /**
      * Set value to database.
@@ -954,8 +963,9 @@ private:
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
         bool isSSEFilter = false;
+        int command = 0;
         req_data() {}
-        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, const slot_options_t &opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const String &etag = "")
+        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, const slot_options_t &opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const String &etag = "", int command = 0)
         {
             this->aClient = aClient;
             this->path = path;
@@ -968,6 +978,7 @@ private:
             this->uid = uid;
             this->etag = etag;
             isSSEFilter = aClient->sman.isSSEFilter();
+            this->command = command;
         }
     };
 
@@ -991,9 +1002,9 @@ private:
         return payload.c_str();
     }
 
-    AsyncResult *sendRequest(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const char *payload = "", const String &etag = "")
+    AsyncResult *sendRequest(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DatabaseOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", const char *payload = "", const String &etag = "", int command = 0)
     {
-        req_data areq(aClient, path, method, opt, options, file, aResult, cb, uid, etag);
+        req_data areq(aClient, path, method, opt, options, file, aResult, cb, uid, etag, command);
         asyncRequest(areq, payload);
         return aClient->getResult();
     }
@@ -1043,6 +1054,7 @@ private:
             sData->aResult.download_data.ota = true;
             sData->request.ul_dl_task_running_addr = ul_dl_task_running_addr;
             sData->request.ota_storage_addr = ota_storage_addr;
+            sData->request.command = request.command;
         }
 
         if (sData->download)

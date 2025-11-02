@@ -398,8 +398,9 @@ namespace GoogleCloudStorage
         file_config_data *file = nullptr;
         AsyncResult *aResult = nullptr;
         AsyncResultCallback cb = NULL;
+        int command = 0;
         req_data() {}
-        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "")
+        req_data(AsyncClientClass *aClient, const String &path, reqns::http_request_method method, slot_options_t opt, DataOptions *options, file_config_data *file, AsyncResult *aResult, AsyncResultCallback cb, const String &uid = "", int command = 0)
         {
             this->aClient = aClient;
             this->path = path;
@@ -410,6 +411,7 @@ namespace GoogleCloudStorage
             this->aResult = aResult;
             this->cb = cb;
             this->uid = uid;
+            this->command = command;
         }
     };
 }

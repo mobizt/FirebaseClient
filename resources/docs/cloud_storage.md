@@ -169,7 +169,7 @@ void upload(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent,
 - `uid` - The user specified UID of async result (optional).
 
 
-9. ## 🔹  bool ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options)
+9. ## 🔹  bool ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, int command = 0)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -179,7 +179,7 @@ For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objec
 
 
 ```cpp
-bool ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options)
+bool ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, int command = 0)
 ```
 
 **Params:**
@@ -187,12 +187,13 @@ bool ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, Go
 - `aClient` - The async client.
 - `parent` - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
 - `options` - Optional. The GoogleCloudStorage::GetOptions that holds the get options.
+- `command` - The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
 
 **Returns:**
 
 - Boolean value, indicates the success of the operation.
 
-10. ## 🔹  void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
+10. ## 🔹  void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult, int command = 0)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -201,7 +202,7 @@ For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objec
 
 
 ```cpp
-void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult)
+void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResult &aResult, int command = 0)
 ```
 
 **Params:**
@@ -210,9 +211,9 @@ void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, Go
 - `parent` - The GoogleCloudStorage::Parent object included Storage bucket Id and object in its constructor.
 - `options` - Optional. The GoogleCloudStorage::GetOptions that holds the get options.
 - `aResult` - The async result (AsyncResult).
+- `command` - The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
 
-
-11. ## 🔹  void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
+11. ## 🔹  void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "", int command = 0)
 
 
 The bucketid is the Storage bucket Id of object to download.
@@ -221,7 +222,7 @@ For the get options, see https://cloud.google.com/storage/docs/json_api/v1/objec
 
 
 ```cpp
-void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "")
+void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options, AsyncResultCallback cb, const String &uid = "", int command = 0)
 ```
 
 **Params:**
@@ -231,7 +232,7 @@ void ota(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, Go
 - `options` - Optional. The GoogleCloudStorage::GetOptions that holds the get options.
 - `cb` - The async result callback (AsyncResultCallback).
 - `uid` - The user specified UID of async result (optional).
-
+- `command` - The OTA command (optional). 0 or U_FLASH for firmware, 100 or U_FLASHFS (ESP32) or U_FS (ESP8266 or Raspberry Pi Pico), 101 or U_SPIFFS (ESP32), 102 for U_FATFS (ESP32), 103 or U_LITTLEFS (ESP32).
 
 12. ## 🔹  String getMetadata(AsyncClientClass &aClient, const GoogleCloudStorage::Parent &parent, GoogleCloudStorage::GetOptions &options)
 

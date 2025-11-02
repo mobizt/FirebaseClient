@@ -1,5 +1,5 @@
 /**
- * The example to perform OTA firmware update using object (bin file) stores in Cloud Storage bucket.
+ * The example to perform OTA firmware/filesystem update using object (bin file) stores in Cloud Storage bucket.
  *
  * This example uses the ServiceAuth class for authentication.
  * See examples/App/AppInitialization for more authentication examples.
@@ -32,6 +32,13 @@ const char PRIVATE_KEY[] PROGMEM = "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX-----
 
 // Define the Firebase storage bucket ID e.g bucket-name.appspot.com */
 #define STORAGE_BUCKET_ID "BUCKET-NAME.appspot.com"
+
+#define OTA_UPDATE_PARTITION U_FLASH // For the Firmware Partition
+// #define OTA_UPDATE_PARTITION U_FS // For the ESP8266 or Raspberry Pi Pico/RP2040 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_FLASHFS // For the ESP32 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_SPIFFS // For the ESP32 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_FATFS // For the ESP32 Filesystem Partition
+// #define OTA_UPDATE_PARTITION U_LITTLEFS // For the ESP32 Filesystem Partition
 
 void processData(AsyncResult &aResult);
 void restart();
@@ -99,16 +106,16 @@ void loop()
 
         GoogleCloudStorage::GetOptions options;
 
-        Serial.println("Updating your firmware (OTA)... ");
+        Serial.println("Updating your firmware/fielsystem (OTA)... ");
 
         // Async call with callback function.
-        cstorage.ota(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), options, processData, "⚡otaTask");
+        cstorage.ota(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin" /* or "spiffs.bin" */), options, processData, "⚡otaTask", OTA_UPDATE_PARTITION);
 
         // Async call with AsyncResult for returning result.
-        // cstorage.ota(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), options, cloudStorageResult);
+        // cstorage.ota(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin" /* or "spiffs.bin" */), options, cloudStorageResult, OTA_UPDATE_PARTITION);
 
         // Sync call which waits until the operation complete.
-        // bool status = cstorage.ota(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin"), options);
+        // bool status = cstorage.ota(aClient, GoogleCloudStorage::Parent(STORAGE_BUCKET_ID, "firmware.bin" /* or "spiffs.bin" */), options, OTA_UPDATE_PARTITION);
         // if (status)
         //     Serial.println("⚡OTA dowload task (await), complete!✅️");
         // else
@@ -165,7 +172,7 @@ void processData(AsyncResult &aResult)
 
 void restart()
 {
-    Serial.println("Update firmware completed.");
+    Serial.println("Update firmware/filesystem completed.");
     Serial.println();
 #if defined(OTA_STORAGE)
     Serial.println("Applying update...");

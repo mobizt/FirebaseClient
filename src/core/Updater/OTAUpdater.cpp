@@ -16,8 +16,9 @@ OTAUpdaterClass::OTAUpdaterClass() {}
 
 OTAUpdaterClass::~OTAUpdaterClass() {}
 
-bool OTAUpdaterClass::begin(int size)
+bool OTAUpdaterClass::begin(int size, int command)
 {
+    void(command);
 #if defined(FIREBASE_OTA_STORAGE)
     if (storage && storage->open(size) > 0)
         return true;
