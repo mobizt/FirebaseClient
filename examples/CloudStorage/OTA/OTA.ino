@@ -180,7 +180,7 @@ void restart()
 #elif defined(ESP32) || defined(ESP8266)
     Serial.println("Restarting...\n\n");
     ESP.restart();
-#elif defined(ARDUINO_RASPBERRY_PI_PICO_W)
+#elif defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_NANO_RP2040_CONNECT)
     Serial.println("Restarting...\n\n");
     rp2040.restart();
 #endif

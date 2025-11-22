@@ -111,6 +111,7 @@ See this Arduino-Pico SDK [documentation](https://arduino-pico.readthedocs.io/en
 > You cannot install Arduino IDE and Arduino library in Microsoft's `OneDrive` folder because the `OneDrive` folder is the sandbox or virtual folder instead of real folder which causes the path error when compilation.
 
 
+
 ## Usages
 
 For new `Firebase` users, please read the [Project Preparation and Setup](#project-preparation-and-setup) section for preparing the Firebase project.
