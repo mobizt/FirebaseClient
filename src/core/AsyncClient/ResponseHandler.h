@@ -33,23 +33,15 @@ private:
     StringUtil sut;
 
 public:
-    enum chunk_phase
-    {
-        READ_CHUNK_SIZE = 0,
-        READ_CHUNK_DATA = 1
-    };
-
     struct response_flags
     {
 
     public:
-        bool header_remaining = false, payload_remaining = false, keep_alive = false, uploadRange = false;
+        bool keep_alive = false, uploadRange = false;
         bool sse = false, http_response = false, chunks = false, payload_available = false, gzip = false;
 
         void reset()
         {
-            header_remaining = false;
-            payload_remaining = false;
             keep_alive = false;
             sse = false;
             chunks = false;
@@ -59,15 +51,84 @@ public:
         }
     };
 
-    struct chunk_info_t
+    enum response_stage
     {
-        chunk_phase phase = READ_CHUNK_SIZE;
-        int chunkSize = 0;
-        int dataLen = 0;
+        response_stage_undefined,
+        response_stage_init,
+        response_stage_status_line,
+        response_stage_header,
+        response_stage_payload,
+        response_stage_finished,
+        response_stage_error
+    };
 
-        int dataPos = 0;
-        uint8_t *buf = nullptr;
-        int bufLen = 0;
+    struct ResponseContext
+    {
+    public:
+        const int bufSize = 512; // Maximum size of the buffer (including null terminator).
+        uint8_t *buf = nullptr;   //  Byte array to store the read data.
+        const int hdrSize = 512;
+        char *hdr = nullptr;
+        String *location = nullptr;
+        int totalRead = 0;       //  Reference to a counter tracking total bytes read (caller must reset).
+        char endToken = '\n';    // Character to stop reading at (e.g., '\n' for headers/SSE). Pass 0 to read until the buffer is full (binary/body mode).
+        long bytesRemState = -1; // [IN/OUT] Stateful counter. Default to -1 (Infinite/Unknown)
+        bool isChunked = false;  // Set true if "Transfer-Encoding: chunked" is detected. Enables the internal Hex parser
+        response_stage stage = response_stage_undefined;
+        bool isUpload = false;
+        bool isSSE = false;
+        bool isAuth = false;
+        long tempSize = 0;
+        bool stateChunkSizeRead = false; // Tracks if we have actually read digits for the current chunk size
+
+        void begin()
+        {
+            newBuf();
+            newHdr();
+            totalRead = 0;
+            endToken = '\n';
+            bytesRemState = -1; // Default to -1 (Infinite/Unknown)
+            isChunked = false;
+            isUpload = false;
+            location = nullptr;
+            isSSE = false;
+            isAuth = false;
+            stage = response_stage_init;
+            tempSize = 0;
+            stateChunkSizeRead = false;
+        }
+
+        void newHdr()
+        {
+            freeHdr();
+            hdr = (char *)malloc(hdrSize);
+        }
+
+        void newBuf()
+        {
+            freeBuf();
+            buf = (uint8_t *)malloc(bufSize);
+        }
+
+        void freeBuf()
+        {
+            if (buf)
+                free(buf);
+            buf = nullptr;
+        }
+
+        void freeHdr()
+        {
+            if (hdr)
+                free(hdr);
+            hdr = nullptr;
+        }
+
+        ~ResponseContext()
+        {
+            freeBuf();
+            freeHdr();
+        }
     };
 
     struct auth_error_t
@@ -78,12 +139,12 @@ public:
 
     int httpCode = 0, statusCode = 0;
     response_flags flags;
-    size_t payloadLen = 0, payloadRead = 0, xx=0;
+    size_t payloadLen = 0, payloadRead = 0, xx = 0;
     auth_error_t error;
     uint8_t *toFill = nullptr;
     uint16_t toFillLen = 0, toFillIndex = 0;
     String val[resns::max_type];
-    chunk_info_t chunkInfo;
+    ResponseContext respCtx;
     Timer read_timer;
     bool auth_data_available = false;
 
@@ -124,9 +185,6 @@ public:
         payloadRead = 0;
         error.resp_code = 0;
         sut.clear(error.string);
-        chunkInfo.chunkSize = 0;
-        chunkInfo.dataLen = 0;
-        chunkInfo.phase = READ_CHUNK_SIZE;
     }
 
     void clearHeader(bool clearPayload)
@@ -135,15 +193,9 @@ public:
         if (clearPayload)
             sut.clear(val[resns::payload]);
 
-        flags.header_remaining = false;
-        flags.payload_remaining = false;
-
         payloadRead = 0;
         error.resp_code = 0;
         sut.clear(error.string);
-        chunkInfo.chunkSize = 0;
-        chunkInfo.dataLen = 0;
-        chunkInfo.phase = READ_CHUNK_SIZE;
     }
 
     void feedTimer(int interval = -1) { read_timer.feed(interval == -1 ? FIREBASE_TCP_READ_TIMEOUT_SEC : interval); }
@@ -156,334 +208,334 @@ public:
         return 0;
     }
 
-    int tcpRead()
-    {
-        if (client_type == tcpc_sync)
-            return client ? client->read() : -1;
-
-        return 0;
-    }
-
     int tcpRead(uint8_t *buf, size_t size)
     {
         if (client_type == tcpc_sync)
             return client ? client->read(buf, size) : -1;
-
         return 0;
     }
 
-    void parseHeaders(String &out, const char *header, bool clear)
+    /**
+     * @brief Reads data from a network stream with support for HTTP Chunked Encoding,
+     * Content-Length limits, and Line-based parsing (SSE).
+     * * This function acts as a filter. If respCtx.isChunked is true, it strips HTTP hex
+     * headers and returns only the payload. It handles timeouts and connection
+     * checks automatically.
+     * @tparam TSRC Source stream type (e.g., WiFiClient, EthernetClient)
+     * @tparam TSNK Debug sink type (e.g., HardwareSerial)
+     * @param source      Pointer to the network client to read from.
+     * @param sink        Pointer to a Serial object for debug logging (can be NULL).
+     * - If respCtx.isChunked=true:  Internal state (counts bytes left in current chunk).
+     * @param respCtx    Reference to a ResponseContext struct that maintains state across calls.
+     * Must initialize to 0 before starting body.
+     * - If respCtx.isChunked=false: Acts as 'Content-Length'.
+     * Set to positive value to stop reading after N bytes.
+     * Set to -1 to read indefinitely (until close).
+     * @return int
+     * > 0 : Number of bytes written to buffer.
+     * 0 : No data currently available (keep waiting).
+     * -1 : Connection closed / Stream finished.
+     * -2 : Timeout (data transfer stalled for >5000ms).
+     */
+    template <typename TSRC, typename TSNK>
+    static int readResponse(TSRC *source, TSNK *sink, ResponseContext &respCtx)
     {
-        if (clear)
-            out.remove(0, out.length());
-        if (httpCode > 0)
+        char *buffer = (char *)respCtx.buf;
+        const char endToken = respCtx.stage == response_stage_payload ? 0 : respCtx.endToken;
+        size_t pos = 0;
+        int c;
+
+        unsigned long ms_start = millis();
+        unsigned long timeout = 5000;
+
+        // Reset state if we are switching out of chunked mode
+        if (!respCtx.isChunked)
         {
-            int p1 = -1, p2 = -1, p3 = -1;
-            p1 = val[resns::header].indexOf(header);
-            if (p1 > -1)
-                p2 = val[resns::header].indexOf(':', p1);
-
-            if (p2 > -1)
-                p3 = val[resns::header].indexOf("\r\n", p2);
-
-            if (p2 > -1 && p3 > -1)
-                out = val[resns::header].substring(p2 + 1, p3);
-
-            out.trim();
+            respCtx.stateChunkSizeRead = false;
+            respCtx.tempSize = 0;
         }
-    }
 
-    int getStatusCode()
-    {
-        String out;
-        int p1 = val[resns::header].indexOf("HTTP/1.");
-        if (p1 > -1)
+        if (!source->connected() && source->available() == 0 && respCtx.totalRead == 0)
+            return -1; // Socket closed
+
+        while ((source->connected() || source->available()) && (millis() - ms_start < timeout))
         {
-            out = val[resns::header].substring(p1 + 9, val[resns::header].indexOf(' ', p1 + 9));
-            val[resns::status] = val[resns::header].substring(p1 + 9, val[resns::header].indexOf("\r\n"));
-            return atoi(out.c_str());
-        }
-        return 0;
-    }
-
-    int getChunkSize(uint8_t **ptr, bool newbuf, int *bufSize)
-    {
-        if (newbuf)
-            readLineBuf(ptr, bufSize);
-
-        int p = -1, i = 0;
-        uint8_t *buf = *ptr;
-        if (buf)
-        {
-            while (i < *bufSize)
+            // Content-Length Limit Check (Non-Chunked)
+            if (!respCtx.isChunked && respCtx.bytesRemState == 0)
             {
-                if (buf[i] == ';')
-                {
-                    p = i;
-                    break;
-                }
-                i++;
+                buffer[pos] = '\0';
+                if (sink)
+                    sink->print(buffer);
+                return (int)pos;
             }
 
-            if (p == -1)
+            if (!source->available())
             {
-                i = 0;
-                while (i < *bufSize - 1)
-                {
-                    if (buf[i] == '\r' && buf[i + 1] == '\n')
-                    {
-                        p = i;
-                        break;
-                    }
-                    i++;
-                }
+                sys_idle();
+                continue;
             }
 
-            if (p != -1)
+            c = source->read();
+            if (c == -1)
+                continue;
+
+            if (respCtx.stage == response_stage_payload) // payload read
             {
-                char str[20];
-                memset(str, 0, 20);
-                memcpy(str, buf, p);
-                chunkInfo.chunkSize = hex2int(str);
+                if (respCtx.isChunked)
+                {
+                    if (respCtx.bytesRemState == 0)
+                    {
+                        // We are reading the Hex Size Line
+                        if (c == '\r')
+                            continue; // ignore CR
+
+                        if (c == '\n')
+                        {
+                            // If we hit a newline but haven't seen any digits yet,
+                            // it is just the trailing whitespace of the previous chunk.
+                            if (!respCtx.stateChunkSizeRead)
+                                continue;
+
+                            // If we saw digits and the value is 0, it's the actual End of Stream.
+                            if (respCtx.tempSize == 0)
+                                return (int)pos;
+
+                            // Otherwise, lock in the new chunk size
+                            respCtx.bytesRemState = respCtx.tempSize;
+                            respCtx.tempSize = 0;
+                            respCtx.stateChunkSizeRead = false; // Reset for next chunk
+                        }
+                        else
+                        {
+                            // Parse Hex
+                            int val = -1;
+                            if (c >= '0' && c <= '9')
+                                val = c - '0';
+                            else if (c >= 'a' && c <= 'f')
+                                val = c - 'a' + 10;
+                            else if (c >= 'A' && c <= 'F')
+                                val = c - 'A' + 10;
+
+                            if (val >= 0)
+                            {
+                                respCtx.tempSize = (respCtx.tempSize * 16) + val;
+                                respCtx.stateChunkSizeRead = true; // Mark that we found a valid digit
+                            }
+                        }
+                        ms_start = millis(); // Reset timeout while parsing headers
+                        continue;            // Don't write these bytes to buffer
+                    }
+                    respCtx.bytesRemState--;
+                }
+                else if (respCtx.bytesRemState > 0)
+                    respCtx.bytesRemState--;
             }
+
+            buffer[pos++] = (char)c;
+            respCtx.totalRead++;
+
+            if ((endToken != 0 && c == endToken) || pos >= respCtx.bufSize - 1 ||
+                (respCtx.stage == response_stage_payload && ((source->available() == 0) || (!respCtx.isChunked && respCtx.bytesRemState == 0))))
+            {
+                buffer[pos] = '\0';
+                if (sink)
+                    sink->print(buffer);
+
+                return (int)pos;
+            }
+
+            ms_start = millis();
         }
 
-        return chunkInfo.chunkSize;
+        return millis() - ms_start < timeout ? 0 : -2;
     }
 
-    // Returns -1 when complete
-    int decodeChunks(uint8_t **ptr, int *index, int *outSize)
+    void readMetaData()
     {
-        uint8_t *out = *ptr;
-        if (!client || !out)
-            return 0;
-        int res = 0;
-        int bufSize = 512;
-        uint8_t *buf = reinterpret_cast<uint8_t *>(mem.alloc(bufSize, true));
+        if (respCtx.stage == response_stage_finished || respCtx.stage == response_stage_payload)
+            return;
 
-        // because chunks might span multiple reads, we need to keep track of where we are in the chunk
-        // chunkInfo.dataLen is our current position in the chunk
-        // chunkInfo.chunkSize is the total size of the chunk
+        if (!respCtx.buf)
+            respCtx.newBuf();
 
-        // readline() only reads while there is data available, so it might return early
-        // when available() is less than the remaining amount of data in the chunk
+        int len = readResponse<Client, Client>(client, nullptr, respCtx);
 
-        // read chunk-size, chunk-extension (if any) and CRLF
-        if (chunkInfo.phase == READ_CHUNK_SIZE)
+        if (httpCode == 0 && len > 0)
         {
-            chunkInfo.phase = READ_CHUNK_DATA;
-            chunkInfo.chunkSize = -1;
-            chunkInfo.dataLen = 0;
-            res = getChunkSize(&buf, true, &bufSize);
-            payloadLen += res > -1 ? res : 0;
-        }
-        // read chunk-data and CRLF
-        // append chunk-data to entity-body
-        else
-        {
-            // if chunk-size is 0, it's the last chunk, and can be skipped
-            if (chunkInfo.chunkSize > 0)
+            int code = getStatusCode((const char *)respCtx.buf);
+            if (code > 0)
             {
-                int read = readLineBuf(&buf, &bufSize);
+                httpCode = code;
+                respCtx.stage = response_stage_header;
+                return;
+            }
+        }
+        readHeader(len);
+    }
 
-                // if we read till a CRLF, we have a chunk (or the rest of it)
-                // if the last two bytes are NOT CRLF, we have a partial chunk
-                // if we read 0 bytes, read next chunk size
-
-                // check for \n and \r, remove them if present (they're part of the protocol, not the data)
-                if (read >= 2 && buf[read - 2] == '\r' && buf[read - 1] == '\n')
-                {
-                    // last chunk?
-                    if (buf[0] == '0')
-                    {
-                        res = -1;
-                        goto exit;
-                    }
-
-                    // remove the \r\n
-                    read -= 2;
-                }
-
-                // if we still have data, append it and update the chunkInfo
-                if (read)
-                {
-                    if (*index + read >= *outSize)
-                    {
-                        int newOutSize = mem.getReservedLen(*index + read + 512);
-                        out = (uint8_t *)mem.reallocate(out, newOutSize);
-                        *outSize = newOutSize;
-                        *ptr = out;
-                    }
-
-                    memcpy(out + *index, buf, read);
-                    *index += read;
-                    chunkInfo.dataLen += read;
-                    payloadRead += read;
-
-                    // check if we're done reading this chunk
-                    if (chunkInfo.dataLen == chunkInfo.chunkSize)
-                        chunkInfo.phase = READ_CHUNK_SIZE;
-                }
-                else // if we read 0 bytes, read next chunk size
-                    chunkInfo.phase = READ_CHUNK_SIZE;
+    void readHeader(int len)
+    {
+        if (respCtx.stage == response_stage_header)
+        {
+            if (strcmp((const char *)respCtx.buf, "\r\n") == 0 || len <= 0)
+            {
+                respCtx.freeHdr();
+                clearHeader(!respCtx.isAuth);
+                if (httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
+                    respCtx.stage = response_stage_finished;
+                else
+                    respCtx.stage = response_stage_payload;
             }
             else
             {
-                int read = readLineBuf(&buf, &bufSize);
-                // CRLF (end of chunked body)
-                if (read == 2 && buf[0] == '\r' && buf[1] == '\n')
+                if (!respCtx.hdr)
+                    respCtx.newHdr();
+
+                flags.uploadRange = false;
+                flags.http_response = true;
+
+                if (parseHeaders((const char *)respCtx.buf, "ETag", respCtx.hdr, respCtx.hdrSize))
+                    val[resns::etag] = respCtx.hdr;
+
+                if (respCtx.location && parseHeaders((const char *)respCtx.buf, "Location", respCtx.hdr, respCtx.hdrSize))
+                    *respCtx.location = respCtx.hdr;
+
+                if (parseHeaders((const char *)respCtx.buf, "Content-Length", respCtx.hdr, respCtx.hdrSize))
                 {
-                    res = -1;
-                    goto exit;
+                    payloadLen = atoi(respCtx.hdr);
+                    respCtx.bytesRemState = payloadLen;
                 }
-                else // another chunk?
-                    getChunkSize(&buf, read == 0, &bufSize);
-            }
-        }
 
-    exit:
-        mem.release(&buf);
-        return res;
-    }
+                if (parseHeaders((const char *)respCtx.buf, "Connection", respCtx.hdr, respCtx.hdrSize) && strstr(respCtx.hdr, "keep-alive"))
+                    flags.keep_alive = true;
 
-    bool readStatusLine()
-    {
-        if (httpCode > 0)
-            return false;
-
-        val[resns::header].reserve(1024);
-
-        // The first chunk (line) can be http response status or already connected stream payload
-        readLine();
-        statusCode = 0;
-        int status = getStatusCode();
-        if (status > 0)
-        {
-            // http response status
-            flags.header_remaining = true;
-            httpCode = status;
-            statusCode = status; // keep
-        }
-        return true;
-    }
-
-    uint32_t hex2int(const char *hex)
-    {
-        uint32_t num = 0;
-        while (*hex)
-        {
-            // get current character then increment
-            uint8_t byte = *hex++;
-            // transform hex character to the 4bit equivalent number, using the ascii table indexes
-            if (byte >= '0' && byte <= '9')
-                byte = byte - '0';
-            else if (byte >= 'a' && byte <= 'f')
-                byte = byte - 'a' + 10;
-            else if (byte >= 'A' && byte <= 'F')
-                byte = byte - 'A' + 10;
-            // shift 4 to make space for new digit, and add the 4 bits of the new digit
-            num = (num << 4) | (byte & 0xF);
-        }
-        return num;
-    }
-
-    int readLine(String *buf = nullptr)
-    {
-        if (!buf)
-            buf = &val[resns::header];
-
-        int p = 0;
-        while (tcpAvailable())
-        {
-            int res = tcpRead();
-            if (res > -1)
-            {
-                *buf += (char)res;
-                p++;
-                if (res == '\n')
-                    return p;
-            }
-        }
-        return p;
-    }
-
-    int readLineBuf(uint8_t **ptr, int *bufSize)
-    {
-        int p = 0;
-        while (tcpAvailable())
-        {
-            int res = tcpRead();
-            if (res > -1)
-            {
-                uint8_t *buf = *ptr;
-                if (buf)
+                if (parseHeaders((const char *)respCtx.buf, "Transfer-Encoding", respCtx.hdr, respCtx.hdrSize) && strstr(respCtx.hdr, "chunked"))
                 {
-                    buf[p] = res;
-                    p++;
-                    if (res == '\n')
-                        return p;
+                    respCtx.isChunked = true;
+                    respCtx.bytesRemState = 0; // Initialize chunk logic to "expecting header"
+                    flags.chunks = true;
+                }
 
-                    if (p == *bufSize)
+                if (parseHeaders((const char *)respCtx.buf, "Content-Type", respCtx.hdr, respCtx.hdrSize) && strstr(respCtx.hdr, "text/event-stream"))
+                    flags.sse = true;
+
+                if (parseHeaders((const char *)respCtx.buf, "Content-Encoding", respCtx.hdr, respCtx.hdrSize) && strstr(respCtx.hdr, "gzip"))
+                    flags.gzip = true;
+
+                if (respCtx.isUpload)
+                {
+                    if (httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && parseHeaders((const char *)respCtx.buf, "Range", respCtx.hdr, respCtx.hdrSize) && strstr(respCtx.hdr, "bytes="))
+                        flags.uploadRange = true;
+                }
+            }
+        }
+    }
+
+    void readPayload()
+    {
+        if (respCtx.stage == response_stage_finished)
+            return;
+
+        if (respCtx.stage == response_stage_payload)
+        {
+            if (!respCtx.buf)
+                respCtx.newBuf();
+
+            if (client->connected() || client->available())
+            {
+                int len = readResponse<Client, Client>(client, nullptr, respCtx);
+
+                if (len < 0 || (!respCtx.isChunked && respCtx.bytesRemState == 0 && len == 0))
+                {
+                    // Timeout or Socket Closed
+                    respCtx.stage = response_stage_finished;
+                    respCtx.freeBuf();
+                }
+                else
+                {
+                    payloadRead += len;
+                    respCtx.buf[len] = '\0';
+                    reserveString();
+                    val[resns::payload] += (const char *)respCtx.buf;
+
+                    if (!respCtx.isChunked || (respCtx.isChunked && len == 0))
                     {
-                        *bufSize = mem.getReservedLen(p + 512);
-                        uint8_t *tmp = (uint8_t *)mem.reallocate(buf, *bufSize);
-                        *ptr = tmp;
+                        respCtx.stage = response_stage_finished;
+                        respCtx.freeBuf();
                     }
                 }
             }
         }
-        return p;
     }
 
-    bool endOfHeader(int read)
+    void reserveString()
     {
-        return ((read == 1 && val[resns::header][val[resns::header].length() - 1] == '\n') ||
-                (read == 2 && val[resns::header][val[resns::header].length() - 2] == '\r' && val[resns::header][val[resns::header].length() - 1] == '\n'));
+        // String memory reservation is needed to handle large data in external memory.
+#if defined(ENABLE_PSRAM) && ((defined(ESP8266) && defined(MMU_EXTERNAL_HEAP)) || (defined(ESP32) && defined(BOARD_HAS_PSRAM)))
+        String old = val[resns::payload];
+        val[resns::payload].remove(0, val[resns::payload].length());
+        val[resns::payload].reserve(payloadRead + 1);
+        val[resns::payload] = old;
+#endif
     }
 
-    bool readHeader(bool sse, bool clearPayload, bool upload, String *location)
+    int getStatusCode(const char *status_line)
     {
-        if (endOfHeader(readLine()))
+        if (status_line == NULL)
+            return -1;
+        int i = 0;
+        while (status_line[i] != '\0' && status_line[i] != ' ')
+            i++;
+
+        if (status_line[i] == '\0')
+            return -1;
+        i++;
+
+        char code_str[4] = {0};
+        int j = 0;
+        while (status_line[i] != '\0' && j < 3 && isdigit((unsigned char)status_line[i]))
+            code_str[j++] = status_line[i++];
+
+        if (j != 3)
+            return -1;
+
+        return atoi(code_str);
+    }
+
+    int parseHeaders(const char *src, const char *key, char *out_buf, size_t out_len)
+    {
+        const char *p = src;
+        size_t key_len = strlen(key);
+
+        while (*p != '\0')
         {
-            flags.uploadRange = false;
-            flags.http_response = true;
-            parseHeaders(val[resns::etag], "ETag", false);
-            parseHeaders(*location, "Location", false);
+            while (*p == '\r' || *p == '\n')
+                p++;
 
-            String v;
-            parseHeaders(v, "Content-Length", true);
-            payloadLen = atoi(v.c_str());
+            if (*p == '\0')
+                break;
 
-            parseHeaders(v, "Connection", true);
-            flags.keep_alive = v.length() && v.indexOf("keep-alive") > -1;
-
-            parseHeaders(v, "Transfer-Encoding", true);
-            flags.chunks = v.length() && v.indexOf("chunked") > -1;
-
-            parseHeaders(v, "Content-Type", true);
-            flags.sse = v.length() && v.indexOf("text/event-stream") > -1;
-
-            parseHeaders(v, "Content-Encoding", true);
-            flags.gzip = v.length() && v.indexOf("gzip") > -1;
-
-            if (upload)
+            if (strncasecmp(p, key, key_len) == 0 && p[key_len] == ':')
             {
-                parseHeaders(v, "Range", true);
-                if (httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT && v.indexOf("bytes=") > -1)
-                    flags.uploadRange = true;
+                p += key_len + 1;
+
+                while (*p == ' ' || *p == '\t')
+                    p++;
+
+                size_t i = 0;
+                while (*p != '\r' && *p != '\n' && *p != '\0')
+                {
+                    if (i < out_len - 1)
+                        out_buf[i++] = *p;
+                    p++;
+                }
+                out_buf[i] = '\0';
+                return 1;
             }
-
-            clearHeader(clearPayload);
-
-            if (httpCode > 0 && httpCode != FIREBASE_ERROR_HTTP_CODE_NO_CONTENT)
-                flags.payload_remaining = true;
-
-            if (!sse && (httpCode == FIREBASE_ERROR_HTTP_CODE_OK || httpCode == FIREBASE_ERROR_HTTP_CODE_PERMANENT_REDIRECT || httpCode == FIREBASE_ERROR_HTTP_CODE_NO_CONTENT) && !flags.chunks && payloadLen == 0)
-                flags.payload_remaining = false;
-
-            return true;
+            while (*p != '\0' && *p != '\r' && *p != '\n')
+                p++;
         }
-        return false;
+        return 0;
     }
 };
 
