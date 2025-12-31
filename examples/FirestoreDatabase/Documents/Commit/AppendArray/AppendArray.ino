@@ -25,8 +25,8 @@
 #define FIREBASE_PROJECT_ID "PROJECT_ID"
 
 void processData(AsyncResult &aResult);
-void append_array_async();
-void append_array_async2();
+void append_array_async(Writes &writes);
+void append_array_async2(Writes &writes);
 void append_array_await();
 
 SSL_CLIENT ssl_client;

@@ -66,7 +66,7 @@ public:
     {
     public:
         const int bufSize = 512; // Maximum size of the buffer (including null terminator).
-        uint8_t *buf = nullptr;   //  Byte array to store the read data.
+        uint8_t *buf = nullptr;  //  Byte array to store the read data.
         const int hdrSize = 512;
         char *hdr = nullptr;
         String *location = nullptr;
@@ -453,10 +453,13 @@ public:
                 }
                 else
                 {
-                    payloadRead += len;
-                    respCtx.buf[len] = '\0';
-                    reserveString();
-                    val[resns::payload] += (const char *)respCtx.buf;
+                    if (len > 0)
+                    {
+                        payloadRead += len;
+                        respCtx.buf[len] = '\0';
+                        reserveString();
+                        val[resns::payload] += (const char *)respCtx.buf;
+                    }
 
                     if (!respCtx.isChunked || (respCtx.isChunked && len == 0))
                     {

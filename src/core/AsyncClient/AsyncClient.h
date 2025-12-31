@@ -204,6 +204,11 @@ private:
     // Handles raw data sending process.
     function_return_type sendImpl(async_data *sData, const uint8_t *data, size_t len, size_t size, async_state state = astate_send_payload)
     {
+        if (state == astate_send_header && (sData->response.respCtx.stage == res_handler::response_stage_undefined || sData->response.respCtx.stage == res_handler::response_stage_finished))
+        {
+            initResponse(sData);
+        }
+
         sys_idle();
         sData->state = state;
         if (data && len && sman.client)
@@ -456,11 +461,18 @@ private:
 
             String *payload = &sData->response.val[resns::payload];
 
-            if (sData->auth_used)
-                sData->response.auth_data_available = true;
-
-            if (!sData->response.flags.sse)
+            if (!sData->response.flags.sse && payload->length())
+            {
                 sData->aResult.setPayload(*payload);
+                if (sData->auth_used)
+                    sData->response.auth_data_available = true;
+                else
+                {
+                    clear(*payload);
+                    sData->response.flags.payload_available = true;
+                    sman.returnResult(sData, true);
+                }
+            }
 
             if (sData->aResult.download_data.total > 0)
                 sData->aResult.data_log.reset();
@@ -487,7 +499,6 @@ private:
 
                     if (((*payload)[len - 1] == '\n' && sData->response.tcpAvailable() == 0) || partial)
                     {
-
                         setRefPayload(&sData->aResult.rtdbResult, payload);
                         parseSSE(&sData->aResult.rtdbResult);
 
@@ -946,8 +957,6 @@ private:
                 sData->request.val[reqns::header] += "access_token_auth: true\r\n";
         }
 
-        initResponse(sData);
-
         if (method == reqns::http_get || method == reqns::http_delete)
             sData->request.addNewLine();
     }
@@ -966,6 +975,14 @@ private:
         sData->response.respCtx.isSSE = sData->sse;
         sData->response.respCtx.isUpload = sData->upload;
         sData->response.respCtx.location = location;
+        sData->response.httpCode = 0;
+        sData->response.payloadLen = 0;
+        sData->response.payloadRead = 0;
+        sData->response.flags.reset();
+        sData->response.toFill = nullptr;
+        sData->response.toFillIndex = 0;
+        sData->response.toFillLen = 0;
+        sData->response.auth_data_available = false;
     }
 
     void returnResult(async_data *sData) { *sData->refResult = sData->aResult; }
@@ -1017,7 +1034,6 @@ private:
             {
                 sman.stop();
                 sData->state = astate_send_header;
-                initResponse(sData);
             }
 
             // Resume incomplete async task from previously stopped.
@@ -1025,7 +1041,6 @@ private:
             {
                 sData->state = astate_send_header;
                 sman.conn.async = sData->async;
-                initResponse(sData);
             }
 
             bool sending = false;
@@ -1104,8 +1119,7 @@ private:
 
                     handleReadTimeout(sData);
 
-                    bool allRead = sData->response.httpCode > 0 && sData->response.httpCode != FIREBASE_ERROR_HTTP_CODE_OK && sData->response.respCtx.stage == res_handler::response_stage_finished;
-                    if (allRead && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
+                    if (sData->response.respCtx.stage == res_handler::response_stage_finished && sData->response.httpCode >= FIREBASE_ERROR_HTTP_CODE_BAD_REQUEST)
                     {
                         if (sData->sse)
                         {
@@ -1115,9 +1129,10 @@ private:
 #endif
                         }
                         sData->return_type = ret_failure;
+                        sman.setAsyncError(sData, sData->state, sData->response.httpCode, !sData->sse, false);
                     }
 
-                    if (sData->async || allRead || sData->return_type == ret_failure)
+                    if (sData->async || sData->return_type == ret_failure)
                         break;
                 }
             }

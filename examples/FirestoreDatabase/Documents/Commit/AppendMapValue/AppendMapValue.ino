@@ -149,7 +149,7 @@ void append_map_value_async(Writes &writes)
     Docs.commit(aClient, Firestore::Parent(FIREBASE_PROJECT_ID), writes, processData, "commitTask");
 }
 
-void append_map_value_async(Writes &writes)
+void append_map_value_async2(Writes &writes)
 {
     Serial.println("Appending the map value in the document... ");
 
