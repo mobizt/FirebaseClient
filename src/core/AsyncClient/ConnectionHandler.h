@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2025 Suwatchai K. <suwatchai@outlook.com>
+ * SPDX-FileCopyrightText: 2026 Suwatchai K. <suwatchai@outlook.com>
  *
  * SPDX-License-Identifier: MIT
  */
@@ -10,6 +10,8 @@
 #include <Arduino.h>
 #include <Client.h>
 #include "./core/AsyncResult/AppLog.h"
+
+typedef bool (*AsyncClientNetworkStatusCallback)();
 
 namespace firebase_ns
 {
@@ -48,6 +50,7 @@ private:
     app_log_t *debug_log = nullptr;
     bool connected = false, client_changed = false;
     int netErrState = 0;
+    AsyncClientNetworkStatusCallback networkStatusCallback = nullptr;
 
 public:
     bool sse = false, async = false;
@@ -63,25 +66,30 @@ public:
         this->debug_log = debug_log;
     }
 
+    void setNetworkStatusCallback(AsyncClientNetworkStatusCallback cb)
+    {
+        this->networkStatusCallback = cb;
+    }
+
     void setClientChange() { client_changed = true; }
 
     bool isConnected()
     {
-        // Re-check the client status only when the connected flag was set.
-        // This prevents calling client's connected() if it was not yet connected.
-        // This also prevents ESP32 Arduino Core v3.x.x's WiFiClientSecure connected() method
-        // (error) warning when it was trying to read 0 byte from, and set the socket option to
-        // the unopen socket.
-        if (this->connected)
-        {
-            if (client_type == tcpc_sync)
-                this->connected = client && client->connected();
-        }
-        return this->connected;
+        return client && client->connected();
     }
 
     function_return_type connect(const char *host, uint16_t port)
     {
+        if (!isConnected())
+        {
+            if (networkStatusCallback && !networkStatusCallback())
+            {
+                setDebug("Network not connected.");
+                return ret_failure;
+            }
+        }
+
+        client->stop();
         function_return_type ret = ret_failure;
         if (!isConnected() && client_type == tcpc_sync)
             ret = client->connect(host, port) > 0 ? ret_complete : ret_failure;

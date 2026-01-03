@@ -60,6 +60,19 @@ AsyncClientClass(AsyncTCPConfig &tcpClientConfig, network_config_data &net)
 
 ## Functions
 
+1. ## 🔹 void setNetworkStatusCallback(AsyncClientNetworkStatusCallback cb)
+
+Set the network status callback function.
+
+```cpp
+void setNetworkStatusCallback(AsyncClientNetworkStatusCallback cb)
+```
+
+**Params:**
+
+- `cb` - The AsyncClientNetworkStatusCallback function pointer.
+
+
 1. ## 🔹 void setAsyncResult(AsyncResult &result)
 
 Set the external async result to use with the sync task.

@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2025 Suwatchai K. <suwatchai@outlook.com>
+ * SPDX-FileCopyrightText: 2026 Suwatchai K. <suwatchai@outlook.com>
  *
  * SPDX-License-Identifier: MIT
  */
@@ -365,6 +365,8 @@ public:
             int code = getStatusCode((const char *)respCtx.buf);
             if (code > 0)
             {
+                sut.clear(val[resns::header]);
+                sut.clear(val[resns::payload]);
                 httpCode = code;
                 respCtx.stage = response_stage_header;
                 return;

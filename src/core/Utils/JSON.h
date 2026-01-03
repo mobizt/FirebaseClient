@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2025 Suwatchai K. <suwatchai@outlook.com>
+ * SPDX-FileCopyrightText: 2026 Suwatchai K. <suwatchai@outlook.com>
  *
  * SPDX-License-Identifier: MIT
  */
@@ -84,7 +84,7 @@ public:
         }
         tmp += ']';
         addObject(buf, name, tmp, false, last);
-        delete p;
+        delete[] p;
     }
 
     String toString(const String &value)
@@ -121,7 +121,7 @@ private:
             }
             pp = end;
         }
-        delete p;
+        delete[] p;
         return i;
     }
     void ek(object_t &obj, int i)

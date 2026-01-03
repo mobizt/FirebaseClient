@@ -316,6 +316,7 @@ batchAdd    KEYWORD2
 batchRemove KEYWORD2
 batchImport KEYWORD2
 get KEYWORD2
+setNetworkStatusCallback    KEYWORD2
 
 ###################
 # Struct (KEYWORD3)

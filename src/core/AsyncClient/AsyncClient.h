@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2025 Suwatchai K. <suwatchai@outlook.com>
+ * SPDX-FileCopyrightText: 2026 Suwatchai K. <suwatchai@outlook.com>
  *
  * SPDX-License-Identifier: MIT
  */
@@ -204,7 +204,7 @@ private:
     // Handles raw data sending process.
     function_return_type sendImpl(async_data *sData, const uint8_t *data, size_t len, size_t size, async_state state = astate_send_payload)
     {
-        if (state == astate_send_header && (sData->response.respCtx.stage == res_handler::response_stage_undefined || sData->response.respCtx.stage == res_handler::response_stage_finished))
+        if (state == astate_send_header && ((sData->sse && sData->response.respCtx.stage == res_handler::response_stage_payload) || sData->response.respCtx.stage == res_handler::response_stage_undefined || sData->response.respCtx.stage == res_handler::response_stage_finished))
         {
             initResponse(sData);
         }
@@ -455,7 +455,7 @@ private:
             readPayload(sData);
         }
 
-        if (sData->response.flags.sse || sData->response.respCtx.stage == res_handler::response_stage_finished)
+        if (sData->response.respCtx.stage == res_handler::response_stage_finished)
         {
             sData->response.respCtx.stage = sData->response.flags.sse ? res_handler::response_stage_payload : res_handler::response_stage_finished;
 
@@ -1030,7 +1030,7 @@ private:
                 return exitProcess(false);
 
             // Restart connection when authenticate, client or network changed
-            if ((sData->sse && sData->auth_ts != auth_ts) || sman.conn.isChanged())
+            if ((sData->sse && (sData->auth_ts != auth_ts || !sman.conn.isConnected())) || sman.conn.isChanged())
             {
                 sman.stop();
                 sData->state = astate_send_header;
@@ -1177,6 +1177,15 @@ public:
             sData = nullptr;
         }
         addRemoveClientVec(cvec_addr, false);
+    }
+
+    /**
+     * Set the network status callback function.
+     * @param cb The AsyncClientNetworkStatusCallback function pointer.
+     */
+    void setNetworkStatusCallback(AsyncClientNetworkStatusCallback cb)
+    {
+        sman.conn.setNetworkStatusCallback(cb);
     }
 
     /**
