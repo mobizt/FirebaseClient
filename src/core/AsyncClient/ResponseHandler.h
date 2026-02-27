@@ -463,7 +463,7 @@ public:
                         val[resns::payload] += (const char *)respCtx.buf;
                     }
 
-                    if (!respCtx.isChunked || (respCtx.isChunked && len == 0))
+                    if ((!respCtx.isChunked && respCtx.bytesRemState == 0) || (respCtx.isChunked && len == 0))
                     {
                         respCtx.stage = response_stage_finished;
                         respCtx.freeBuf();
