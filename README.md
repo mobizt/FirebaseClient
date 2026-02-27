@@ -144,7 +144,7 @@ The information (debug/error) can be obtained by the `AsyncClientClass` that ass
 
 The authentications support by this library covers user, service account (admin) and no authentications.
 
-There are authentication classes that store the sign-in and authentication credentials whuch can be used temporary as it will be duplicated to use later.
+There are authentication classes that store the sign-in and authentication credentials which can be used temporary as it will be duplicated to use later.
 
 The authentication tokens are also supported e.g. custom (signed JWT token), ID and access tokens. The refresh token also supports. User can use third party app/services to create these auth token when sign-in and authentication credentials are sensitive and not allowed to store in the sketch.
 
