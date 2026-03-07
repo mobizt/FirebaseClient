@@ -707,9 +707,9 @@ ENABLE_LEGACY_TOKEN
 
 ### Slow Arduino IDE Compilation Speed
 
-Normally this issue can be existed due to large anount of files to be compiled and anti virus software interference.
+Normally this issue can be existed due to large amount of files to be compiled and anti virus software interference.
 
-This library contains the large anount of C files from `BearSSL` engine used in the internal `ESP_SSLClient` library which will be used only when the `ServiceAuth`, `CustomAuth` and `ESP_SSLClient` classes are used. This can increase the compilation time.
+This library contains the large amount of C files from `BearSSL` engine used in the internal `ESP_SSLClient` library which will be used only when the `ServiceAuth`, `CustomAuth` and `ESP_SSLClient` classes are used. This can increase the compilation time.
 
 If `ServiceAuth`, `CustomAuth` and `ESP_SSLClient` classes are not used in your code, you can remove or delete the `src/client` folder to reduce the Arduino IDE compilation time.  
 
