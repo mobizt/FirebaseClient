@@ -171,7 +171,7 @@
 #endif
 #endif
 
-#define FIREBASE_DEFAULT_TS 1759214462
+#define FIREBASE_DEFAULT_TS 1782653392
 
 #define FIREBASE_RECONNECTION_TIMEOUT_MSEC 5000
 
@@ -191,9 +191,6 @@
 // Base64 encoded string chunk size for TCP's write operation.
 // This used in Realtime database with File implementation.
 #define FIREBASE_BASE64_CHUNK_SIZE 1026
-
-// SSE mode time out in milliseconds.
-#define FIREBASE_SSE_TIMEOUT_MS 40 * 1000
 
 // The JWT process timed out due to absent of JWT.loop in loop or 
 // too long delay in time status callback.
