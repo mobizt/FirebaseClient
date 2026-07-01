@@ -375,10 +375,6 @@ namespace firebase_ns
         return exit(true);
     }
 
-#if __cplusplus >= 201703L
-    inline
-#endif
-    JWTClass JWT;
 }
 
 #endif

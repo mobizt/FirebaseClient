@@ -13,7 +13,7 @@
 
 #include <OTAStorage.h>
 #define FIREBASE_OTA_STORAGE
-#define FIREBASE_OTA_UPDATER OTAUpdater
+#define FIREBASE_OTA_UPDATER getOTAUpdater()
 
 #elif defined(ESP32) || defined(ESP8266) || defined(CORE_ARDUINO_PICO)
 #define FIREBASE_OTA_UPDATER Update
@@ -40,6 +40,13 @@ private:
     void apply();
 };
 
-extern OTAUpdaterClass OTAUpdater;
+// Meyers singleton: a single shared instance across all translation units on
+// every C++ standard (no C++17 inline-variable requirement), safe even when
+// this header/implementation is included into multiple source files.
+inline OTAUpdaterClass &getOTAUpdater()
+{
+    static OTAUpdaterClass instance;
+    return instance;
+}
 #endif
 #endif

@@ -66,9 +66,5 @@ inline void OTAUpdaterClass::apply()
         storage->apply();
 }
 
-#if __cplusplus >= 201703L
-inline
-#endif
-OTAUpdaterClass OTAUpdater;
 #endif
 #endif

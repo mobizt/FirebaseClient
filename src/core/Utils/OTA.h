@@ -58,7 +58,7 @@ public:
     }
 
 #if defined(FIREBASE_OTA_STORAGE)
-    void setOTAStorage(uint32_t addr) { OTAUpdater.setOTAStorage(addr); }
+    void setOTAStorage(uint32_t addr) { getOTAUpdater().setOTAStorage(addr); }
 #endif
 
 #if defined(OTA_UPDATE_ENABLED) && defined(FIREBASE_OTA_UPDATER)
@@ -69,7 +69,7 @@ public:
         if (!FIREBASE_OTA_UPDATER.begin(size, command))
             code = FIREBASE_ERROR_FW_UPDATE_TOO_LOW_FREE_SKETCH_SPACE;
 #if defined(FIREBASE_OTA_STORAGE)
-        if (!OTAUpdater.isInit())
+        if (!getOTAUpdater().isInit())
             code = FIREBASE_ERROR_FW_UPDATE_OTA_STORAGE_CLASS_OBJECT_UNINITIALIZE;
 #endif
     }
