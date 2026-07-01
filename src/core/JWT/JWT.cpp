@@ -32,7 +32,7 @@ extern "C"
 namespace firebase_ns
 {
 
-    JWTClass::JWTClass()
+    inline JWTClass::JWTClass()
     {
         err_timer.feed(1);
 #if defined(USE_EMBED_SSL_ENGINE)
@@ -40,16 +40,16 @@ namespace firebase_ns
 #endif
     }
 
-    JWTClass::~JWTClass()
+    inline JWTClass::~JWTClass()
     {
 #if defined(USE_EMBED_SSL_ENGINE)
         stack_thunk_del_ref();
 #endif
     }
 
-    const char *JWTClass::token() { return jwt_data.token.c_str(); }
+    inline const char *JWTClass::token() { return jwt_data.token.c_str(); }
 
-    void JWTClass::clear()
+    inline void JWTClass::clear()
     {
         sut.clear(jwt_data.token);
         sut.clear(jwt_data.pk);
@@ -63,12 +63,17 @@ namespace firebase_ns
         processing = false;
     }
 
-    bool JWTClass::ready() { return this->auth_data && this->auth_data->user_auth.sa.step == jwt_step_ready; }
+    inline bool JWTClass::ready() { return this->auth_data && this->auth_data->user_auth.sa.step == jwt_step_ready; }
 
-    bool JWTClass::loop(auth_data_t *auth_data)
+    inline bool JWTClass::loop(auth_data_t *auth_data)
     {
         if (auth_data && auth_data->user_auth.jwt_signing)
         {
+            // Bind this processor to the caller's auth data so create() (which
+            // operates on this->auth_data) always targets the correct app, even
+            // when this processor was assigned via setJWTProcessor() after the
+            // signing step had already advanced past jwt_step_begin.
+            this->auth_data = auth_data;
             bool ret = begin(auth_data);
             if (ret)
                 ret = create();
@@ -84,7 +89,7 @@ namespace firebase_ns
         return false;
     }
 
-    void JWTClass::sendErrCB(AsyncResultCallback cb, AsyncResult *aResult)
+    inline void JWTClass::sendErrCB(AsyncResultCallback cb, AsyncResult *aResult)
     {
         if (cb)
         {
@@ -106,15 +111,15 @@ namespace firebase_ns
         }
     }
 
-    void JWTClass::sendErrResult(AsyncResult *refResult)
+    inline void JWTClass::sendErrResult(AsyncResult *refResult)
     {
         if (refResult)
             refResult->error().setLastError(jwt_data.err_code, jwt_data.msg);
     }
 
-    void JWTClass::setAppDebug(app_log_t *debug_log) { this->debug_log = debug_log; }
+    inline void JWTClass::setAppDebug(app_log_t *debug_log) { this->debug_log = debug_log; }
 
-    bool JWTClass::begin(auth_data_t *auth_data)
+    inline bool JWTClass::begin(auth_data_t *auth_data)
     {
         if (processing || !auth_data)
             return false;
@@ -131,7 +136,7 @@ namespace firebase_ns
         return true;
     }
 
-    bool JWTClass::create()
+    inline bool JWTClass::create()
     {
 #if !defined(USE_LEGACY_TOKEN_ONLY) && !defined(FIREBASE_USE_LEGACY_TOKEN_ONLY)
 
@@ -370,6 +375,9 @@ namespace firebase_ns
         return exit(true);
     }
 
+#if __cplusplus >= 201703L
+    inline
+#endif
     JWTClass JWT;
 }
 

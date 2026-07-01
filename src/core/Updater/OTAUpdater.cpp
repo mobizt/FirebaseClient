@@ -12,11 +12,11 @@
 
 #if defined(FIREBASE_OTA_STORAGE)
 
-OTAUpdaterClass::OTAUpdaterClass() {}
+inline OTAUpdaterClass::OTAUpdaterClass() {}
 
-OTAUpdaterClass::~OTAUpdaterClass() {}
+inline OTAUpdaterClass::~OTAUpdaterClass() {}
 
-bool OTAUpdaterClass::begin(int size, int command)
+inline bool OTAUpdaterClass::begin(int size, int command)
 {
     void(command);
 #if defined(FIREBASE_OTA_STORAGE)
@@ -26,46 +26,49 @@ bool OTAUpdaterClass::begin(int size, int command)
     return false;
 }
 
-bool OTAUpdaterClass::end()
+inline bool OTAUpdaterClass::end()
 {
     close();
     return true;
 }
 
-void OTAUpdaterClass::setOTAStorage(uint32_t addr)
+inline void OTAUpdaterClass::setOTAStorage(uint32_t addr)
 {
     this->addr = addr;
     storage = reinterpret_cast<OTAStorage *>(addr);
 }
 
-bool OTAUpdaterClass::isInit() { return addr > 0; }
+inline bool OTAUpdaterClass::isInit() { return addr > 0; }
 
-size_t OTAUpdaterClass::write(uint8_t *data, size_t len)
+inline size_t OTAUpdaterClass::write(uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++)
         write(data[i]);
     return len;
 }
 
-size_t OTAUpdaterClass::write(uint8_t b)
+inline size_t OTAUpdaterClass::write(uint8_t b)
 {
     if (storage)
         storage->write(b);
     return 1;
 }
 
-void OTAUpdaterClass::close()
+inline void OTAUpdaterClass::close()
 {
     if (storage)
         storage->close();
 }
 
-void OTAUpdaterClass::apply()
+inline void OTAUpdaterClass::apply()
 {
     if (storage)
         storage->apply();
 }
 
+#if __cplusplus >= 201703L
+inline
+#endif
 OTAUpdaterClass OTAUpdater;
 #endif
 #endif

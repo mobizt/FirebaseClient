@@ -32,7 +32,7 @@
 #endif
 
 // Set some SSL client for skipping server certificate verification.
-void set_ssl_client_insecure_and_buffer(SSL_CLIENT &client)
+inline void set_ssl_client_insecure_and_buffer(SSL_CLIENT &client)
 {
 #if defined(ESP32) || defined(ESP8266) || defined(PICO_RP2040)
     client.setInsecure();
@@ -58,7 +58,7 @@ File myFile;
 #endif
 #define MY_FS SPIFFS
 
-void file_operation_callback(File &file, const char *filename, file_operating_mode mode)
+inline void file_operation_callback(File &file, const char *filename, file_operating_mode mode)
 {
     // FILE_OPEN_MODE_READ, FILE_OPEN_MODE_WRITE and FILE_OPEN_MODE_APPEND are defined in this library
     // MY_FS is defined in this example
@@ -83,7 +83,7 @@ void file_operation_callback(File &file, const char *filename, file_operating_mo
     file = myFile;
 }
 
-void print_file_content(const String &filename)
+inline void print_file_content(const String &filename)
 {
     File file = MY_FS.open(filename, FILE_OPEN_MODE_READ);
     int i = 0;
@@ -111,7 +111,7 @@ void print_file_content(const String &filename)
 #endif
 
 // Debug information printing
-void auth_debug_print(AsyncResult &aResult)
+inline void auth_debug_print(AsyncResult &aResult)
 {
     if (aResult.isEvent())
     {
@@ -130,7 +130,7 @@ void auth_debug_print(AsyncResult &aResult)
 }
 
 // Function to get NTP server time.
-uint32_t get_ntp_time()
+inline uint32_t get_ntp_time()
 {
     uint32_t ts = 0;
     Serial.print("Getting time from NTP server... ");
@@ -158,7 +158,7 @@ uint32_t get_ntp_time()
 }
 
 // Token type information printing
-void print_token_type(FirebaseApp &app)
+inline void print_token_type(FirebaseApp &app)
 {
     Firebase.printf("Auth Token: %s\n", app.getToken().c_str());
     firebase_token_type type = app.getTokenType();
