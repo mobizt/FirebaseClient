@@ -457,6 +457,14 @@ private:
 
         if (sData->response.respCtx.stage == res_handler::response_stage_finished)
         {
+            // The payload stage ended by read timeout instead of the protocol
+            // (Content-Length reached or chunked terminal chunk received). The
+            // socket may still hold unread bytes of this response which would
+            // desync the next keep-alive request/response, so terminate the
+            // server connection. SSE has its own timeout/resume handling.
+            if (sData->response.respCtx.abnormalEnd && !sData->sse)
+                sman.stop();
+
             sData->response.respCtx.stage = sData->response.flags.sse ? res_handler::response_stage_payload : res_handler::response_stage_finished;
 
             String *payload = &sData->response.val[resns::payload];
