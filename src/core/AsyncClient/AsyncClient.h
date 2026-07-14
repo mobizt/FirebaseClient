@@ -465,6 +465,14 @@ private:
             if (sData->response.respCtx.abnormalEnd && !sData->sse)
                 sman.stop();
 
+            // The server announced "Connection: close" in this response (e.g. the
+            // front end reached its max connection age). Terminate the connection
+            // now so the next task reconnects instead of writing a request into a
+            // connection the server is closing, which can be rejected with a bare
+            // HTTP 400 or a TCP error.
+            if (sData->response.flags.connection_close && !sData->sse)
+                sman.stop();
+
             sData->response.respCtx.stage = sData->response.flags.sse ? res_handler::response_stage_payload : res_handler::response_stage_finished;
 
             String *payload = &sData->response.val[resns::payload];

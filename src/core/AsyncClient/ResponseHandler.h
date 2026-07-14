@@ -37,12 +37,13 @@ public:
     {
 
     public:
-        bool keep_alive = false, uploadRange = false;
+        bool keep_alive = false, uploadRange = false, connection_close = false;
         bool sse = false, http_response = false, chunks = false, payload_available = false, gzip = false;
 
         void reset()
         {
             keep_alive = false;
+            connection_close = false;
             sse = false;
             chunks = false;
             payload_available = false;
@@ -420,8 +421,15 @@ public:
                     respCtx.bytesRemState = payloadLen;
                 }
 
-                if (parseHeaders((const char *)respCtx.buf, "Connection", respCtx.hdr, respCtx.hdrSize) && strstr(respCtx.hdr, "keep-alive"))
-                    flags.keep_alive = true;
+                if (parseHeaders((const char *)respCtx.buf, "Connection", respCtx.hdr, respCtx.hdrSize))
+                {
+                    if (strstr(respCtx.hdr, "keep-alive"))
+                        flags.keep_alive = true;
+                    // The server announced it will close this connection after this
+                    // response (e.g. reached its max connection age/requests limit).
+                    if (strstr(respCtx.hdr, "close"))
+                        flags.connection_close = true;
+                }
 
                 if (parseHeaders((const char *)respCtx.buf, "Transfer-Encoding", respCtx.hdr, respCtx.hdrSize) && strstr(respCtx.hdr, "chunked"))
                 {
