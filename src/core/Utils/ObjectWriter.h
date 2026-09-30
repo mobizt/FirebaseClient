@@ -278,7 +278,9 @@ protected:
 
 public:
     BaseObjects() {}
-    ~BaseObjects() { clear(); }
+    // Don't clear() here: the derived class's Strings are already destroyed
+    // at this point and remove() would write into freed memory.
+    ~BaseObjects() {}
     void init(String *buffers, size_t size)
     {
         this->buffers = buffers;
